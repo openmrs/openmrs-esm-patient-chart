@@ -26,8 +26,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import styles from './immunizations-detailed-summary.scss';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
-import { orderBy, get, first, isEmpty } from 'lodash-es';
-import { type ExistingDoses, type Sequence } from '../types';
+import { orderBy, get } from 'lodash-es';
 import SequenceTable from './components/immunizations-sequence-table.component';
 import { useImmunizations } from '../hooks/useImmunizations';
 
@@ -69,32 +68,45 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     ['desc'],
   );
 
-  const tableHeader = useMemo(
-    () => [
-      { key: 'vaccine', header: t('vaccine', 'Vaccine') },
-      { key: 'recentVaccination', header: t('recentVaccination', 'Recent vaccination') },
-      { key: 'add', header: '' },
-    ],
-    [t],
-  );
+  const sequenceLabels = useMemo(() => {
+    if (sequenceDefinitions && sequenceDefinitions.length > 0 && sequenceDefinitions[0].sequences) {
+      return sequenceDefinitions[0].sequences.map((seq) => seq.sequenceLabel);
+    }
+    return [];
+  }, [sequenceDefinitions]);
+
+  const tableHeader = useMemo(() => {
+    const headers = [{ key: 'vaccine', header: t('vaccine', 'Vaccine') }];
+
+    sequenceLabels.forEach((label) => {
+      headers.push({
+        key: label.toLowerCase().replace('-', '_'),
+        header: t(label, label),
+      });
+    });
+
+    headers.push({ key: 'add', header: '' });
+
+    return headers;
+  }, [t, sequenceLabels]);
+
+  const sequenceMapping = useMemo(() => {
+    const mapping = {};
+    if (sequenceDefinitions && sequenceDefinitions.length > 0 && sequenceDefinitions[0].sequences) {
+      sequenceDefinitions[0].sequences.forEach((seq) => {
+        mapping[seq.sequenceLabel] = seq.sequenceNumber;
+      });
+    }
+    mapping['Dose-0'] = 0;
+    return mapping;
+  }, [sequenceDefinitions]);
 
   const tableRows = useMemo(
     () =>
       sortedImmunizations?.map((immunization) => {
-        const occurrenceDate =
-          isEmpty(immunization.sequences) && !isEmpty(immunization.existingDoses)
-            ? `${t('singleDoseOn', 'Single Dose on')} ${new Date(
-                first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime,
-              ).toLocaleDateString(locale, { dateStyle: 'medium' })}`
-            : !isEmpty(immunization.existingDoses)
-            ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${new Date(
-                first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime,
-              ).toLocaleDateString(locale, { dateStyle: 'medium' })} `
-            : '';
-        return {
+        const row: any = {
           id: immunization.vaccineUuid,
           vaccine: immunization.vaccineName,
-          recentVaccination: occurrenceDate,
           add: (
             <Button
               size="sm"
@@ -117,8 +129,37 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             ></Button>
           ),
         };
+
+        sequenceLabels.forEach((label) => {
+          const key = label.toLowerCase().replace('-', '_');
+          row[key] = '-';
+        });
+
+        if (immunization.existingDoses && immunization.existingDoses.length > 0) {
+          immunization.existingDoses.forEach((dose) => {
+            let columnLabel;
+
+            if (dose.doseNumber === 0) {
+              columnLabel = 'Dose-1';
+            } else {
+              for (const [label, number] of Object.entries(sequenceMapping)) {
+                if (number === dose.doseNumber) {
+                  columnLabel = label;
+                  break;
+                }
+              }
+            }
+
+            if (columnLabel) {
+              const key = columnLabel.toLowerCase().replace('-', '_');
+              row[key] = new Date(dose.occurrenceDateTime).toLocaleDateString(locale, { dateStyle: 'medium' });
+            }
+          });
+        }
+
+        return row;
       }),
-    [sortedImmunizations, t, locale, launchImmunizationsForm],
+    [sortedImmunizations, sequenceLabels, sequenceMapping, locale, launchImmunizationsForm],
   );
 
   const { results: paginatedImmunizations, currentPage, goTo } = usePagination(tableRows, 10);
