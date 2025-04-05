@@ -1,13 +1,9 @@
-import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { capitalize, lowerCase } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
 import {
   Button,
-  DatePicker,
-  DatePickerInput,
   DataTable,
   DataTableSkeleton,
+  DatePicker,
+  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -28,21 +24,6 @@ import {
   Tile,
 } from '@carbon/react';
 import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  getDrugOrderByUuid,
-  launchPatientWorkspace,
-  PatientChartPagination,
-  type Order,
-  type OrderBasketItem,
-  type OrderType,
-  useLaunchWorkspaceRequiringVisit,
-  useOrderBasket,
-  useOrderTypes,
-  usePatientOrders,
-} from '@openmrs/esm-patient-common-lib';
-import {
   AddIcon,
   age,
   ExtensionSlot,
@@ -54,12 +35,31 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
-import MedicationRecord from './medication-record.component';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  getDrugOrderByUuid,
+  launchPatientWorkspace,
+  type Order,
+  type OrderBasketItem,
+  type OrderType,
+  PatientChartPagination,
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
+  useOrderTypes,
+  usePatientOrders,
+} from '@openmrs/esm-patient-common-lib';
+import { capitalize, lowerCase } from 'lodash-es';
+import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print/print.component';
-import TestOrder from './test-order.component';
-import styles from './order-details-table.scss';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import GeneralOrderTable from './general-order-table.component';
+import MedicationRecord from './medication-record.component';
+import styles from './order-details-table.scss';
+import TestOrder from './test-order.component';
 
 interface OrderDetailsProps {
   patientUuid: string;
