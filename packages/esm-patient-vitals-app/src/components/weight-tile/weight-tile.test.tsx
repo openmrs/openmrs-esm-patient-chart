@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema, type ConfigObject } from '../config-schema';
+import { configSchema, type ConfigObject } from '../../config-schema';
 import { getByTextWithMarkup, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockVitalsSignsConcepts } from '__mocks__';
-import { useVitalsAndBiometrics } from '../common';
+import { useVitalsAndBiometrics } from '../../common';
 import WeightTile from './weight-tile.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -13,8 +13,8 @@ const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
 
-jest.mock('../common', () => {
-  const originalModule = jest.requireActual('../common');
+jest.mock('../../common', () => {
+  const originalModule = jest.requireActual('../../common');
 
   return {
     ...originalModule,

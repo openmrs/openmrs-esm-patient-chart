@@ -1,9 +1,8 @@
+import { useMemo } from 'react';
+import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import type { OpenMRSResource } from '../../types';
-import { AllergenType } from '../../types';
-import useSWR from 'swr';
-import { useMemo } from 'react';
+import { ALLERGEN_TYPES, type OpenMRSResource, type AllergenType } from '../../types';
 
 interface ConceptFetchResponse {
   setMembers: Array<OpenMRSResource>;
@@ -95,9 +94,9 @@ export function useAllergens() {
       });
     };
 
-    extract(drugAllergenData, AllergenType.DRUG);
-    extract(environmentalAllergenData, AllergenType.ENVIRONMENT);
-    extract(foodAllergenData, AllergenType.FOOD);
+    extract(drugAllergenData, ALLERGEN_TYPES.DRUG);
+    extract(environmentalAllergenData, ALLERGEN_TYPES.ENVIRONMENT);
+    extract(foodAllergenData, ALLERGEN_TYPES.FOOD);
 
     // remove if uuid is otherConceptUuid
     allergens.forEach((allergen, index) => {

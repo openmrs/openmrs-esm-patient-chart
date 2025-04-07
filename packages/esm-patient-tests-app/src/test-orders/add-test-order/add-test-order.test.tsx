@@ -4,6 +4,7 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
 import {
+  age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
   useConfig,
@@ -218,7 +219,7 @@ describe('AddLabOrder', () => {
     renderAddLabOrderWorkspace();
     expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
     expect(screen.getByText(/male/i)).toBeInTheDocument();
-    expect(screen.getByText(/52 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(age(mockPatient.birthDate)!, 'i'))).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
   });
 

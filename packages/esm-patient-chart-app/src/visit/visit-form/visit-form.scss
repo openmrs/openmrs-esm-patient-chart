@@ -90,10 +90,6 @@
   padding: '0';
 }
 
-.queueSection {
-  margin-top: layout.$spacing-04;
-}
-
 .label {
   @include type.type-style('label-01');
   color: colors.$gray-70;

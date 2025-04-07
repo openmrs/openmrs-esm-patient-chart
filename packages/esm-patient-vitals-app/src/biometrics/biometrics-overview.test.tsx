@@ -17,22 +17,6 @@ const testProps = {
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 
-jest.mock('@carbon/charts-react', () => ({
-  LineChart: () => <div data-testid="line-chart">Line Chart</div>,
-  ScaleTypes: {
-    TIME: 'time',
-    LINEAR: 'linear',
-    LOG: 'log',
-    LABELS: 'labels',
-    LABELS_RATIO: 'labels-ratio',
-  },
-  TickRotations: {
-    ALWAYS: 'always',
-    AUTO: 'auto',
-    NEVER: 'never',
-  },
-}));
-
 jest.mock('../common', () => {
   const originalModule = jest.requireActual('../common');
 
@@ -112,8 +96,6 @@ describe('BiometricsOverview', () => {
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
 
-    const initialRowElements = screen.getAllByRole('row');
-
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
@@ -130,20 +112,43 @@ describe('BiometricsOverview', () => {
 
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
 
+    const expectedDescendingOrder = [
+      '12 — Aug — 2021, 12:00 AM',
+      '18 — Jun — 2021, 12:00 AM',
+      '10 — Jun — 2021, 12:00 AM',
+      '26 — May — 2021, 12:00 AM',
+      '10 — May — 2021, 12:00 AM',
+    ];
+    const expectedAscendingOrder = [
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '09 — Dec — 2020, 12:00 AM',
+    ];
+
+    const getRowDates = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1) // Exclude header row
+        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}, \d{1,2}:\d{2} (AM|PM)/)?.[0] || '');
+
+    // Initial state should be descending
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+
     // Sorting in descending order
     // Since the date order is already in descending order, the rows should be the same
     await user.click(sortRowsButton);
     // Sorting in ascending order
     await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
 
     // Sorting order = NONE, hence it is still in the ascending order
     await user.click(sortRowsButton);
     // Sorting in descending order
     await user.click(sortRowsButton);
 
-    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

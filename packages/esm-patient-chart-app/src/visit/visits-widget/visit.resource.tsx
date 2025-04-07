@@ -10,41 +10,19 @@ import {
   makeUrl,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { type ChartConfig } from '../../config-schema';
+
+const customRepresentation =
+  'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
 export function useInfiniteVisits(patientUuid: string) {
   const { numberOfVisitsToLoad } = useConfig<ChartConfig>();
-  const customRepresentation =
-    'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
   const url = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}&limit=${numberOfVisitsToLoad}`;
   const { data, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
 
   return { visits: data, ...rest };
-}
-
-const customRepresentation =
-  'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
-
-export function useVisits(patientUuid: string) {
-  const apiUrl = patientUuid ? `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}` : null;
-
-  const {
-    data,
-    error,
-    isLoading,
-    isValidating,
-    mutate: localMutate,
-  } = useSWR(patientUuid ? ['visits', patientUuid] : null, () => openmrsFetch(apiUrl));
-
-  return {
-    visits: data ? data?.data?.results : null,
-    error,
-    isLoading,
-    isValidating,
-    mutateVisits: localMutate,
-  };
 }
 
 export function usePaginatedVisits(patientUuid: string, pageSize: number) {
@@ -53,10 +31,6 @@ export function usePaginatedVisits(patientUuid: string, pageSize: number) {
     window.location.toString(),
   );
   return useOpenmrsPagination<Visit>(url, pageSize);
-}
-
-export function invalidateUseVisits(patientUuid: string) {
-  return mutate(['visits', patientUuid]);
 }
 
 export function useEncounters(patientUuid: string) {
