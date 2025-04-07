@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig, type OpenmrsResource } from '@openmrs/esm-framework';
 import { ALLERGEN_TYPES, type AllergenType } from '../../types';
-import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 interface ConceptFetchResponse {
   setMembers: Array<OpenmrsResource>;

@@ -1,7 +1,13 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import capitalize from 'lodash-es/capitalize';
-import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  fhirBaseUrl,
+  openmrsFetch,
+  openmrsObservableFetch,
+  restBaseUrl,
+  type OpenmrsResource,
+} from '@openmrs/esm-framework';
 import {
   type FHIRAllergy,
   type FHIRAllergyResponse,
@@ -9,7 +15,6 @@ import {
   type UseAllergies,
   type PatientAllergyPayload,
 } from '../types';
-import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export function useAllergies(patientUuid: string): UseAllergies {
   const allergiesUrl = `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`;
