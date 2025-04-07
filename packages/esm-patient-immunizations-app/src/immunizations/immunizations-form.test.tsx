@@ -252,6 +252,7 @@ describe('Immunizations Form', () => {
     });
 
     render(<ImmunizationsForm {...testProps} />);
+    
     const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
