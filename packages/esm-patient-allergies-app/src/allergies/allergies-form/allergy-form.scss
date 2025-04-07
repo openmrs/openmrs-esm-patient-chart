@@ -100,3 +100,14 @@
     height: calc(100vh - 9rem);
   }
 }
+
+.loaderContainer {
+  height: 100vh;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50%;
+}
