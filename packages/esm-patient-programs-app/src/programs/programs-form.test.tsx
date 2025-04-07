@@ -75,7 +75,7 @@ describe('ProgramsForm', () => {
     const user = userEvent.setup();
 
     const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
-    const secondLocation = {
+    const mockLocation = {
       uuid: 'uuid_2',
       name: 'location_2',
     };
@@ -84,7 +84,7 @@ describe('ProgramsForm', () => {
 
     const programNameInput = screen.getByRole('combobox', { name: /program name/i });
     const enrollmentDateInput = screen.getByRole('textbox', { name: /date enrolled/i });
-    const enrollmentLocationInput = screen.getByRole('radio', { name: secondLocation.name });
+    const enrollmentLocationInput = screen.getByRole('radio', { name: mockLocation.name });
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
 
     await user.click(enrollButton);
@@ -93,7 +93,7 @@ describe('ProgramsForm', () => {
     fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
     await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
     await user.click(enrollmentLocationInput);
-    expect(screen.getByRole('radio', { name: secondLocation.name })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: mockLocation.name })).toBeInTheDocument();
 
     await user.click(enrollButton);
 
@@ -101,7 +101,7 @@ describe('ProgramsForm', () => {
     expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
       expect.objectContaining({
         dateCompleted: null,
-        location: secondLocation.uuid,
+        location: mockLocation.uuid,
         patient: mockPatient.id,
         program: oncologyScreeningProgramUuid,
         dateEnrolled: expect.stringMatching(/^2020-05-05/),
