@@ -20,7 +20,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   // useInfiniteVisits is needed for the summary cards view and the "All encounters" table,
   // but not the visit table itself
   const { visits, error, hasMore, isLoading, isValidating, mutate, loadMore } = useInfiniteVisits(patientUuid);
-  const [visitSummaryMode, setVisitSummaryMode] = useState<'table' | 'cards'>('table');
+  const [visitSummaryMode, setVisitSummaryMode] = useState<'table' | 'cards'>('cards');
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
 
