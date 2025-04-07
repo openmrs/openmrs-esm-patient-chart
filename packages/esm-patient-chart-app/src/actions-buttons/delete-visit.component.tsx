@@ -4,30 +4,32 @@ import { OverflowMenuItem } from '@carbon/react';
 import { useVisit, showModal } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
 
-interface CancelVisitOverflowMenuItemProps {
+interface DeleteVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
-const CancelVisitOverflowMenuItem: React.FC<CancelVisitOverflowMenuItemProps> = ({ patientUuid }) => {
+const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
 
   const handleLaunchModal = useCallback(() => {
-    const dispose = showModal('cancel-visit-dialog', {
+    const dispose = showModal('delete-visit-dialog', {
       closeModal: () => dispose(),
       patientUuid,
+      visit: activeVisit,
     });
-  }, [patientUuid]);
+  }, [patientUuid, activeVisit]);
 
   return (
-    currentVisit && (
+    activeVisit && (
       <OverflowMenuItem
         className={styles.menuitem}
-        itemText={t('cancelVisit', 'Cancel visit')}
+        itemText={t('deleteActiveVisit', 'Delete active visit')}
         onClick={handleLaunchModal}
+        isDelete
       />
     )
   );
 };
 
-export default CancelVisitOverflowMenuItem;
+export default DeleteVisitOverflowMenuItem;

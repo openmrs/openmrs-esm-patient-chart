@@ -1,0 +1,11 @@
+.layer {
+  height: 100%;
+
+  :global(.cds--overflow-menu) {
+    min-height: unset;
+  }
+}
+
+.menuItem {
+  max-width: none;
+}
