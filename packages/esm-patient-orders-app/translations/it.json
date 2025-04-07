@@ -42,7 +42,7 @@
   "medicationIndefiniteDuration": "Durata indefinita",
   "medications": "Farmaci",
   "modifyOrder": "Modifica ordine",
-  "noIndicationProvided": "No indication provided",
+  "noIndicationProvided": "Nessuna indicazione fornita",
   "noMatchingOrdersToDisplay": "Nessun ordine corrispondente da visualizzare",
   "noResultsForTestTypeSearch": "Nessun risultato da visualizzare per \"{{searchTerm}}\"",
   "normalRange": "Intervallo normale",
@@ -115,5 +115,5 @@
   "tryTo": "Prova a",
   "updated": "Aggiornato",
   "usingADifferentTerm": "utilizzando un termine diverso",
-  "visitRequired": "A visit is required to make orders"
+  "visitRequired": "È richiesta una visita per poter fare ordini"
 }
