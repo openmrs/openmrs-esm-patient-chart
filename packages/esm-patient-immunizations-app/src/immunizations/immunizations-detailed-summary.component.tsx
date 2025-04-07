@@ -56,8 +56,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
   const consolidatedImmunizations = useMemo(() => {
     const immunizations = linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
-    immunizations.reverse();
-    return immunizations;
+    return immunizations.reverse();
   }, [existingImmunizations, sequenceDefinitions]);
 
   const launchImmunizationsForm = React.useCallback(() => {
