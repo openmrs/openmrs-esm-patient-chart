@@ -252,7 +252,7 @@ describe('Immunizations Form', () => {
     });
 
     render(<ImmunizationsForm {...testProps} />);
-    
+
     const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
     const vaccinationTimeField = screen.getByRole('textbox', { name: /Time/i });
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
@@ -274,7 +274,6 @@ describe('Immunizations Form', () => {
     // edit the form
     await selectOption(vaccineField, 'Hepatitis B vaccination');
     await user.clear(doseField)
-    // await user.clear(doseField)
     await user.type(doseField, '2');
     await user.click(saveButton);
 
