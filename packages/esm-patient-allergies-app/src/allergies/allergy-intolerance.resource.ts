@@ -8,8 +8,8 @@ import {
   type Allergy,
   type UseAllergies,
   type PatientAllergyPayload,
-  type OpenMRSResource,
 } from '../types';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export function useAllergies(patientUuid: string): UseAllergies {
   const allergiesUrl = `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`;
@@ -65,7 +65,7 @@ export function saveAllergy(
   patientUuid: string,
   abortController: AbortController,
 ) {
-  const reactions = patientAllergy.reactionUuids.map((reaction: OpenMRSResource) => {
+  const reactions = patientAllergy.reactionUuids.map((reaction: OpenmrsResource) => {
     return {
       reaction: {
         uuid: reaction.uuid,
@@ -89,42 +89,6 @@ export function saveAllergy(
         uuid: patientAllergy?.severityUuid,
       },
       comment: patientAllergy?.comment,
-      reactions: reactions,
-    },
-    signal: abortController.signal,
-  });
-}
-
-export function updatePatientAllergy(
-  patientAllergy: PatientAllergyPayload,
-  patientUuid: string,
-  allergyUuid: { allergyUuid: string },
-  abortController: AbortController,
-) {
-  const reactions = patientAllergy.reactionUuids.map((reaction: OpenMRSResource) => {
-    return {
-      reaction: {
-        uuid: reaction.uuid,
-      },
-    };
-  });
-
-  return openmrsFetch(`${restBaseUrl}/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: {
-      allergen: {
-        allergenType: patientAllergy.allergenType,
-        codedAllergen: {
-          uuid: patientAllergy.codedAllergenUuid,
-        },
-      },
-      severity: {
-        uuid: patientAllergy.severityUuid,
-      },
-      comment: patientAllergy.comment,
       reactions: reactions,
     },
     signal: abortController.signal,

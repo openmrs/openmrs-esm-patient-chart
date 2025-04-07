@@ -1,3 +1,5 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface FHIRAllergyResponse {
   entry: Array<{
     resource: FHIRAllergy;
@@ -89,11 +91,6 @@ export interface CodingData {
   system?: string;
 }
 
-export interface OpenMRSResource {
-  uuid: string;
-  display: string;
-}
-
 export const ALLERGEN_TYPES = {
   DRUG: 'DRUG',
   FOOD: 'FOOD',
@@ -108,7 +105,7 @@ export interface PatientAllergyPayload {
   codedAllergenUuid: string;
   severityUuid: string;
   comment?: string;
-  reactionUuids: OpenMRSResource[];
+  reactionUuids: Array<OpenmrsResource>;
 }
 
 export type Allergy = {
