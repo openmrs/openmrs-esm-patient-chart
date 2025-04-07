@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation, type TFunction } from 'react-i18next';
 import {
@@ -6,6 +6,7 @@ import {
   ButtonSet,
   Checkbox,
   CheckboxGroup,
+  CheckboxSkeleton,
   ComboBox,
   Form,
   FormGroup,
@@ -38,11 +39,11 @@ import styles from './allergy-form.scss';
 
 interface AllergyFormData {
   allergen: Allergen;
-  nonCodedAllergen: string;
   allergicReactions: string[];
+  comment: string;
+  nonCodedAllergen: string;
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string;
-  comment: string;
 }
 
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
@@ -52,12 +53,21 @@ interface AllergyFormProps extends DefaultPatientWorkspaceProps {
 
 interface DefaultAllergy {
   allergen: Allergen | null;
-  nonCodedAllergen: string;
   allergicReactions: string[];
+  comment: string;
+  nonCodedAllergen: string;
+  nonCodedAllergicReaction: string;
+  reactionManifestations?: string[];
+  severityOfWorstReaction: string | null;
+}
+
+interface FormValues {
+  allergen: Allergen | null;
+  allergicReactions: string[];
+  comment: string;
+  nonCodedAllergen: string;
   nonCodedAllergicReaction: string;
   severityOfWorstReaction: string | null;
-  comment: string;
-  reactionManifestations?: string[];
 }
 
 type Severity = 'mild' | 'moderate' | 'severe';
@@ -68,9 +78,9 @@ const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
       // Ensure an allergen is selected
       allergen: z
         .object({
-          uuid: z.string(),
           display: z.string(),
           type: z.string(),
+          uuid: z.string(),
         })
         .nullable()
         .refine((val) => val !== null, {
@@ -118,12 +128,13 @@ function AllergyForm({
   formContext,
   promptBeforeClosing,
 }: AllergyFormProps) {
-  const { t } = useTranslation();
-  const { concepts } = useConfig<AllergiesConfigObject>();
-  const isTablet = useLayoutType() === 'tablet';
-  const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { allergens } = useAllergens();
+  const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
+  const { concepts } = useConfig<AllergiesConfigObject>();
   const { mutate } = useAllergies(patientUuid);
+  const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const formValuesLoadedRef = useRef(false);
 
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
@@ -133,19 +144,19 @@ function AllergyForm({
   const severityLevels = useMemo(
     () => [
       {
-        uuid: mildReactionUuid,
-        key: 'mild',
         display: t('mild', 'Mild'),
+        key: 'mild',
+        uuid: mildReactionUuid,
       },
       {
-        uuid: moderateReactionUuid,
-        key: 'moderate',
         display: t('moderate', 'Moderate'),
+        key: 'moderate',
+        uuid: moderateReactionUuid,
       },
       {
-        uuid: severeReactionUuid,
-        key: 'severe',
         display: t('severe', 'Severe'),
+        key: 'severe',
+        uuid: severeReactionUuid,
       },
     ],
     [mildReactionUuid, moderateReactionUuid, severeReactionUuid, t],
@@ -168,40 +179,62 @@ function AllergyForm({
   );
 
   const getDefaultAllergicReactions = useCallback(() => {
+    if (!allergicReactions?.length || !allergy?.reactionManifestations?.length) {
+      return [];
+    }
+
     return allergicReactions
-      ?.map((reaction) => {
-        return allergy?.reactionManifestations?.includes(reaction.display) ? reaction.uuid : '';
-      })
-      .filter(Boolean);
-  }, [allergicReactions, allergy]);
+      .filter((reaction) => allergy.reactionManifestations.includes(reaction.display))
+      .map((reaction) => reaction.uuid);
+  }, [allergy, allergicReactions]);
 
   const setDefaultNonCodedAllergen = useCallback(
-    (defaultAllergy: DefaultAllergy) => {
+    (values: FormValues, existingAllergy: Allergy | null): FormValues => {
       const codedAllergenDisplays = allergens?.map((allergen) => allergen.display);
-      if (!codedAllergenDisplays?.includes(allergy?.display)) {
-        defaultAllergy.allergen = { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER };
-        defaultAllergy.nonCodedAllergen = allergy?.display;
+
+      if (existingAllergy && !codedAllergenDisplays?.includes(existingAllergy.display)) {
+        return {
+          ...values,
+          allergen: {
+            uuid: otherConceptUuid,
+            display: t('other', 'Other'),
+            type: ALLERGEN_TYPES.OTHER,
+          },
+          nonCodedAllergen: existingAllergy.display,
+        };
       }
+      return values;
     },
-    [allergens, allergy, otherConceptUuid, t],
+    [allergens, otherConceptUuid, t],
   );
 
-  const setDefaultNonCodedReactions = useCallback(
-    (defaultAllergy: DefaultAllergy) => {
-      const allergicReactionDisplays = allergicReactions?.map((reaction) => reaction?.display);
-      defaultAllergy?.reactionManifestations?.forEach((reaction) => {
-        if (!allergicReactionDisplays?.includes(reaction)) {
-          defaultAllergy.nonCodedAllergicReaction = reaction;
-          defaultAllergy.allergicReactions?.splice(defaultAllergy.allergicReactions?.length - 1, 1, otherConceptUuid);
-        }
-      });
+  const setDefaultNonCodedAllergicReactions = useCallback(
+    (values: FormValues, existingAllergy: Allergy | null): FormValues => {
+      if (!existingAllergy?.reactionManifestations?.length) {
+        return values;
+      }
+
+      const codedReactionDisplays = allergicReactions?.map((reaction) => reaction.display);
+      const nonCodedReaction = existingAllergy.reactionManifestations.find(
+        (reaction) => !codedReactionDisplays?.includes(reaction),
+      );
+
+      if (nonCodedReaction) {
+        return {
+          ...values,
+          allergicReactions: [...values.allergicReactions, otherConceptUuid],
+          nonCodedAllergicReaction: nonCodedReaction,
+        };
+      }
+
+      return values;
     },
     [allergicReactions, otherConceptUuid],
   );
 
-  const getDefaultAllergy = useCallback(
-    (allergy: Allergy, formContext: 'creating' | 'editing') => {
-      const defaultAllergy = {
+  const getAllergyFormDefaultValues = useCallback(
+    (allergy: Allergy | null, formContext: 'creating' | 'editing'): FormValues => {
+      const defaultValues: FormValues = {
         allergen: null,
         nonCodedAllergen: '',
         allergicReactions: [],
@@ -210,24 +243,31 @@ function AllergyForm({
         comment: '',
       };
 
-      if (formContext === 'editing' && allergy) {
-        const foundAllergen = allergens?.find((allergen) => allergy.display === allergen.display);
-        defaultAllergy.allergen = foundAllergen ?? null;
-        defaultAllergy.allergicReactions = getDefaultAllergicReactions() ?? [];
-        defaultAllergy.severityOfWorstReaction = getDefaultSeverityUuid(allergy.reactionSeverity);
-        defaultAllergy.comment = allergy.note !== '--' ? allergy.note : '';
-        setDefaultNonCodedAllergen(defaultAllergy);
-        setDefaultNonCodedReactions(defaultAllergy);
+      if (!allergy || formContext !== 'editing') {
+        return defaultValues;
       }
 
-      return defaultAllergy;
+      // Initialize with base values
+      const initialValues: FormValues = {
+        ...defaultValues,
+        allergen: allergens?.find((allergen) => allergy.display === allergen.display) ?? null,
+        allergicReactions: getDefaultAllergicReactions(),
+        severityOfWorstReaction: getDefaultSeverityUuid(allergy.reactionSeverity),
+        comment: allergy.note !== '--' ? allergy.note : '',
+      };
+
+      // Apply transformations in sequence
+      const valuesWithAllergen = setDefaultNonCodedAllergen(initialValues, allergy);
+      const finalValues = setDefaultNonCodedAllergicReactions(valuesWithAllergen, allergy);
+
+      return finalValues;
     },
     [
       allergens,
       getDefaultAllergicReactions,
       getDefaultSeverityUuid,
       setDefaultNonCodedAllergen,
-      setDefaultNonCodedReactions,
+      setDefaultNonCodedAllergicReactions,
     ],
   );
 
@@ -239,8 +279,20 @@ function AllergyForm({
   } = useForm<AllergyFormData>({
     mode: 'all',
     resolver: zodResolver(allergyFormSchema(t, otherConceptUuid)),
-    defaultValues: getDefaultAllergy(allergy, formContext),
+    defaultValues: getAllergyFormDefaultValues(allergy, formContext),
   });
+
+  useEffect(() => {
+    if (!formValuesLoadedRef.current && !isLoadingReactions && allergy && formContext === 'editing') {
+      const defaultValues = getAllergyFormDefaultValues(allergy, formContext);
+
+      Object.entries(defaultValues).forEach(([key, value]) => {
+        setValue(key as keyof AllergyFormData, value);
+      });
+
+      formValuesLoadedRef.current = true;
+    }
+  }, [allergy, formContext, getAllergyFormDefaultValues, isLoadingReactions, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -256,20 +308,20 @@ function AllergyForm({
     name: 'allergicReactions',
   });
 
-  const onSubmit = useCallback(
-    (data: AllergyFormData) => {
+  const createAllergyPayload = useCallback(
+    (data: AllergyFormData): NewAllergy => {
       const {
         allergen,
+        allergicReactions,
         comment,
         nonCodedAllergen,
         nonCodedAllergicReaction,
-        allergicReactions,
         severityOfWorstReaction,
       } = data;
 
       const selectedAllergicReactions = allergicReactions.filter(Boolean);
 
-      let patientAllergy: NewAllergy = {
+      return {
         allergen:
           allergen.uuid === otherConceptUuid
             ? {
@@ -285,56 +337,51 @@ function AllergyForm({
           uuid: severityOfWorstReaction,
         },
         comment: comment,
-        reactions: selectedAllergicReactions.map((reaction) => {
-          return reaction === otherConceptUuid
+        reactions: selectedAllergicReactions.map((reaction) =>
+          reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
-            : { reaction: { uuid: reaction } };
-        }),
+            : { reaction: { uuid: reaction } },
+        ),
       };
-      const abortController = new AbortController();
-      return formContext === 'editing'
-        ? updatePatientAllergy(patientAllergy, patientUuid, allergy?.id, abortController).then(
-            () => {
-              mutate();
-              closeWorkspace({ ignoreChanges: true });
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                title: t('allergyUpdated', 'Allergy updated'),
-                subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
-              });
-            },
-            (err) => {
-              showSnackbar({
-                title: t('allergySaveError', 'Error saving allergy'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: err?.message,
-              });
-            },
-          )
-        : saveAllergy(patientAllergy, patientUuid, abortController).then(
-            () => {
-              mutate();
-              closeWorkspace({ ignoreChanges: true });
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                title: t('allergySaved', 'Allergy saved'),
-                subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
-              });
-            },
-            (err) => {
-              showSnackbar({
-                title: t('allergySaveError', 'Error saving allergy'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: err?.message,
-              });
-            },
-          );
     },
-    [otherConceptUuid, patientUuid, t, mutate, allergy?.id, closeWorkspace, formContext],
+    [otherConceptUuid],
+  );
+
+  const onSubmit = useCallback(
+    (data: AllergyFormData) => {
+      const abortController = new AbortController();
+      const allergyPayload = createAllergyPayload(data);
+
+      const handleSuccess = () => {
+        mutate();
+        closeWorkspace({ ignoreChanges: true });
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          title:
+            formContext === 'editing' ? t('allergyUpdated', 'Allergy updated') : t('allergySaved', 'Allergy saved'),
+          subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+        });
+      };
+
+      const handleError = (err: Error) => {
+        const errorMessage = err.message;
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: t('allergySaveError', 'Error saving allergy'),
+          subtitle: errorMessage,
+        });
+      };
+
+      return formContext === 'editing'
+        ? updatePatientAllergy(allergyPayload, patientUuid, allergy?.id, abortController).then(
+            handleSuccess,
+            handleError,
+          )
+        : saveAllergy(allergyPayload, patientUuid, abortController).then(handleSuccess, handleError);
+    },
+    [allergy?.id, closeWorkspace, createAllergyPayload, formContext, mutate, patientUuid, t],
   );
 
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
@@ -342,6 +389,17 @@ function AllergyForm({
   const allergenItems = useMemo(
     () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER }],
     [allergens, otherConceptUuid, t],
+  );
+
+  const allergicReactionsItems = useMemo(
+    () =>
+      allergicReactions
+        ?.sort((a, b) => a.display.localeCompare(b.display))
+        .map((reaction) => ({
+          id: reaction.uuid,
+          labelText: reaction.display,
+        })),
+    [allergicReactions],
   );
 
   return (
@@ -352,169 +410,181 @@ function AllergyForm({
         </Row>
       ) : null}
       <div className={styles.form}>
-        <Stack gap={7} className={styles.formContent}>
-          {selectedAllergen?.uuid === otherConceptUuid && (
-            <InlineNotification
-              hideCloseButton
-              kind="warning"
-              lowContrast
-              style={{ minWidth: '100%' }}
-              subtitle={t(
-                'nonCodedAllergenWarningDescription',
-                "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
-              )}
-              title={t('nonCodedAllergenWarningTitle', 'Warning: Custom Allergen Entry')}
-            />
-          )}
-          <ResponsiveWrapper>
-            <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
-              <Controller
-                name="allergen"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <ComboBox
-                    id="allergen"
-                    invalid={!!errors.allergen}
-                    invalidText={errors.allergen?.message}
-                    itemToString={(item: Allergen) => item?.display}
-                    items={allergenItems}
-                    onChange={(props: { selectedItem?: Record<string, unknown> }) => {
-                      if (typeof props?.selectedItem !== 'undefined') {
-                        onChange(props.selectedItem);
-                      }
-                    }}
-                    placeholder={t('selectAllergen', 'Select the allergen')}
-                    selectedItem={value}
-                  />
+        {isLoadingReactions ? (
+          <div className={styles.loaderContainer}>
+            <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />
+          </div>
+        ) : (
+          <Stack gap={5} className={styles.formContent}>
+            {selectedAllergen?.uuid === otherConceptUuid && (
+              <InlineNotification
+                hideCloseButton
+                kind="warning"
+                lowContrast
+                style={{ minWidth: '100%' }}
+                subtitle={t(
+                  'nonCodedAllergenWarningDescription',
+                  "Adding a custom allergen may impact system-wide allergy notifications. It's recommended to choose from the provided list for accurate alerts. Custom entries may not trigger notifications in all relevant contexts.",
                 )}
+                title={t('nonCodedAllergenWarningTitle', 'Warning: Custom Allergen Entry')}
               />
-            </FormGroup>
-          </ResponsiveWrapper>
-          {selectedAllergen?.uuid === otherConceptUuid && (
+            )}
             <ResponsiveWrapper>
-              <Controller
-                name="nonCodedAllergen"
-                control={control}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <TextInput
-                    id="nonCodedAllergen"
-                    invalid={!!errors.nonCodedAllergen}
-                    invalidText={errors.nonCodedAllergen?.message}
-                    labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
-                    onBlur={onBlur}
-                    onChange={onChange}
-                    placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
-                    value={value}
-                  />
-                )}
-              />
+              <FormGroup legendText="">
+                <Controller
+                  name="allergen"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <ComboBox
+                      id="allergen"
+                      invalid={!!errors.allergen}
+                      invalidText={errors.allergen?.message}
+                      itemToString={(item: Allergen) => item?.display}
+                      items={allergenItems}
+                      onChange={(props: { selectedItem?: Record<string, unknown> }) => {
+                        if (typeof props?.selectedItem !== 'undefined') {
+                          onChange(props.selectedItem);
+                        }
+                      }}
+                      placeholder={t('selectAllergen', 'Select the allergen')}
+                      selectedItem={value}
+                      titleText={t('allergen', 'Allergen')}
+                    />
+                  )}
+                />
+              </FormGroup>
             </ResponsiveWrapper>
-          )}
-          <>
-            <div className={classNames({ [styles.checkboxContainer]: isTablet })}>
-              {isLoadingReactions ? (
-                <InlineLoading description={`${t('loading', 'Loading')} ...`} />
-              ) : (
-                <FormGroup legendText="" data-testid="allergic-reactions-container">
-                  <Controller
-                    name="allergicReactions"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <CheckboxGroup
-                        invalid={!!errors.allergicReactions}
-                        invalidText={errors.allergicReactions?.message}
-                        legendText={t('selectReactions', 'Select the reactions')}
-                      >
-                        {allergicReactions.map((reaction, index) => (
-                          <Checkbox
-                            checked={Boolean(value[index])}
-                            className={styles.checkbox}
-                            id={reaction.uuid}
-                            key={reaction.uuid}
-                            labelText={reaction.display}
-                            onChange={(_, { checked, id }) => {
-                              const newValue = [...value];
-                              newValue[index] = checked ? id : '';
-                              onChange(newValue);
-                              setValue(`allergicReactions.${index}`, checked ? id : '', {
-                                shouldValidate: true,
-                              });
-                            }}
-                          />
-                        ))}
-                      </CheckboxGroup>
-                    )}
-                  />
-                </FormGroup>
-              )}
-            </div>
-            {selectedAllergicReactions?.includes(otherConceptUuid) ? (
+            {selectedAllergen?.uuid === otherConceptUuid && (
               <ResponsiveWrapper>
                 <Controller
-                  name="nonCodedAllergicReaction"
+                  name="nonCodedAllergen"
                   control={control}
                   render={({ field: { onBlur, onChange, value } }) => (
                     <TextInput
-                      id="nonCodedAllergicReaction"
-                      invalid={!!errors.nonCodedAllergicReaction}
-                      invalidText={errors.nonCodedAllergicReaction?.message}
-                      labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
+                      id="nonCodedAllergen"
+                      invalid={!!errors.nonCodedAllergen}
+                      invalidText={errors.nonCodedAllergen?.message}
+                      labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
                       onBlur={onBlur}
                       onChange={onChange}
-                      placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
+                      placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
                       value={value}
                     />
                   )}
                 />
               </ResponsiveWrapper>
-            ) : null}
-          </>
-          <FormGroup legendText={t('severityOfWorstReaction', 'Severity of worst reaction')}>
-            <Controller
-              name="severityOfWorstReaction"
-              control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
-                <RadioButtonGroup
-                  name="severity-of-worst-reaction"
-                  invalid={!!errors.severityOfWorstReaction}
-                  invalidText={errors.severityOfWorstReaction?.message}
-                  onBlur={onBlur}
-                  onChange={(event) => onChange(event.toString())}
-                  valueSelected={value}
-                >
-                  {severityLevels.map(({ key, display, uuid }) => (
-                    <RadioButton id={key} key={key} labelText={display} value={uuid} />
-                  ))}
-                </RadioButtonGroup>
-              )}
-            />
-          </FormGroup>
+            )}
+            <>
+              <div className={classNames({ [styles.checkboxContainer]: isTablet })}>
+                <FormGroup legendText="" data-testid="allergic-reactions-container">
+                  {isLoadingReactions ? (
+                    <>
+                      {Array.from({ length: 10 }).map((_, index) => (
+                        <CheckboxSkeleton key={`checkbox-skeleton-${index}`} />
+                      ))}
+                    </>
+                  ) : (
+                    <Controller
+                      name="allergicReactions"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <CheckboxGroup
+                          invalid={!!errors.allergicReactions}
+                          invalidText={errors.allergicReactions?.message}
+                          legendText={t('selectReactions', 'Select the reactions')}
+                        >
+                          {allergicReactionsItems.map(({ id, labelText }) => (
+                            <Checkbox
+                              checked={Array.isArray(value) && value.includes(id)}
+                              className={styles.checkbox}
+                              id={id}
+                              key={id}
+                              labelText={labelText}
+                              onChange={(_, { checked, id }) => {
+                                const currentValue = Array.isArray(value) ? value : [];
+                                onChange(checked ? [...currentValue, id] : currentValue.filter((item) => item !== id));
+                              }}
+                            />
+                          ))}
+                        </CheckboxGroup>
+                      )}
+                    />
+                  )}
+                </FormGroup>
+              </div>
+              {selectedAllergicReactions?.includes(otherConceptUuid) ? (
+                <ResponsiveWrapper>
+                  <Controller
+                    name="nonCodedAllergicReaction"
+                    control={control}
+                    render={({ field: { onBlur, onChange, value } }) => (
+                      <TextInput
+                        id="nonCodedAllergicReaction"
+                        invalid={!!errors.nonCodedAllergicReaction}
+                        invalidText={errors.nonCodedAllergicReaction?.message}
+                        labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
+                        value={value}
+                      />
+                    )}
+                  />
+                </ResponsiveWrapper>
+              ) : null}
+            </>
+            <FormGroup legendText={t('severityOfWorstReaction', 'Severity of worst reaction')}>
+              <Controller
+                name="severityOfWorstReaction"
+                control={control}
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <RadioButtonGroup
+                    name="severity-of-worst-reaction"
+                    invalid={!!errors.severityOfWorstReaction}
+                    invalidText={errors.severityOfWorstReaction?.message}
+                    onBlur={onBlur}
+                    onChange={(event) => onChange(event.toString())}
+                    valueSelected={value}
+                  >
+                    {severityLevels.map(({ key, display, uuid }) => (
+                      <RadioButton id={key} key={key} labelText={display} value={uuid} />
+                    ))}
+                  </RadioButtonGroup>
+                )}
+              />
+            </FormGroup>
 
-          <ResponsiveWrapper>
-            <Controller
-              name="comment"
-              control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
-                <TextArea
-                  id="comments"
-                  labelText={t('comments', 'Comments')}
-                  onChange={onChange}
-                  placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
-                  onBlur={onBlur}
-                  value={value}
-                  rows={4}
-                />
-              )}
-            />
-          </ResponsiveWrapper>
-        </Stack>
+            <ResponsiveWrapper>
+              <Controller
+                name="comment"
+                control={control}
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <TextArea
+                    id="comments"
+                    labelText={t('comments', 'Comments')}
+                    onChange={onChange}
+                    placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
+                    onBlur={onBlur}
+                    value={value}
+                    rows={4}
+                  />
+                )}
+              />
+            </ResponsiveWrapper>
+          </Stack>
+        )}
         <ButtonSet
           className={classNames(styles.actionButtons, isTablet ? styles.tabletButtons : styles.desktopButtons)}
         >
           <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          <Button
+            className={styles.button}
+            disabled={isSubmitting || (formContext === 'editing' && isLoadingReactions)}
+            kind="primary"
+            type="submit"
+          >
             {isSubmitting ? (
               <InlineLoading description={t('saving', 'Saving') + '...'} />
             ) : (
