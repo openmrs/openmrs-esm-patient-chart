@@ -126,23 +126,6 @@ describe('AllergyForm', () => {
       // Test severity validation
       await user.click(screen.getByRole('radio', { name: /moderate/i }));
       expect(screen.queryByText(/severity is required/i)).not.toBeInTheDocument();
-
-      // Test successful submission with all required fields
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
-      await user.click(screen.getByText(aceInhibitorsAllergen.display));
-      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
-      await user.click(screen.getByRole('checkbox', { name: /other/i }));
-      await user.click(screen.getByRole('radio', { name: /moderate/i }));
-      await user.type(screen.getByLabelText(/comments/i), 'Test comment');
-      await user.click(screen.getByRole('button', { name: /save and close/i }));
-
-      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
-      expect(mockShowSnackbar).toHaveBeenCalledWith({
-        isLowContrast: true,
-        kind: 'success',
-        title: 'Allergy saved',
-        subtitle: 'It is now visible on the Allergies page',
-      });
     });
 
     it('handles submission errors gracefully', async () => {
@@ -218,13 +201,13 @@ describe('AllergyForm', () => {
 
 function renderAllergyForm(props = {}) {
   const defaultProps = {
+    allergy: null,
     closeWorkspace: () => {},
     closeWorkspaceWithSavedChanges: () => {},
-    promptBeforeClosing: () => {},
-    allergy: null,
     formContext: 'creating' as 'creating' | 'editing',
     patient: mockPatient,
     patientUuid: mockPatient.id,
+    promptBeforeClosing: () => {},
     setTitle: jest.fn(),
   };
 

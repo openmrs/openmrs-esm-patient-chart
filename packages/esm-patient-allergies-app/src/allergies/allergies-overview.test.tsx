@@ -55,10 +55,10 @@ describe('AllergiesOverview', () => {
     const expectedColumnHeaders = [/name/, /reactions/];
     const expectedAllergies = [
       /non-coded allergen non-coded allergic reaction \(severe\)/,
-      /ACE inhibitors Anaphylaxis \(moderate\)/,
-      /Fish Anaphylaxis, Angioedema, Fever, Hives \(mild\)/,
-      /Penicillins Mental status change, Angioedema, Cough, Diarrhea, Musculoskeletal pain \(severe\)/,
-      /Morphine Mental status change \(severe\)/,
+      /ace inhibitors anaphylaxis \(moderate\)/,
+      /fish anaphylaxis, angioedema, fever, hives \(mild\)/,
+      /penicillins angioedema, cough, diarrhea, mental status change, musculoskeletal pain \(severe\)/,
+      /morphine mental status change \(severe\)/,
     ];
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
