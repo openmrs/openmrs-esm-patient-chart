@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { type ImmunizationSequenceDefinition } from '../../types/fhir-immunization-domain';
 import { useController, type Control } from 'react-hook-form';
-import { Dropdown, Select, SelectItem } from '@carbon/react';
+import { Dropdown, NumberInput } from '@carbon/react';
 import styles from './../immunizations-form.scss';
 import { useTranslation } from 'react-i18next';
 
@@ -31,17 +31,22 @@ export const DoseInput: React.FC<{
           selectedItem={field.value}
         />
       ) : (
-        <Select
+        <NumberInput
           id="doseNumber"
-          labelText={t('doseNumberWithinSeries', 'Dose number within series')}
+          label={t('doseNumberWithinSeries', 'Dose number within series')}
+          min={1}
+          onChange={(event) => {
+            const value = event.target.value;
+            field.onChange(value === '' ? undefined : parseInt(value, 10));
+          }}
           value={field.value}
-            onChange={(event) => field.onChange(parseInt(event.target.value, 10))}
-        >
-          {[1, 2, 3, 4].map((num) => (
-            <SelectItem key={num} value={num} text={String(num)} />
-          ))}
-        </Select>
+          hideSteppers={true}
+          allowEmpty={true}
+          disableWheel={true}
+          required={true}
+        />
       )}
     </div>
   );
 };
+
