@@ -65,7 +65,7 @@ describe('AllergyForm', () => {
     it('creates a new allergy when the user selects an allergen and reaction', async () => {
       renderAllergyForm();
 
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
       await user.click(screen.getByText(aceInhibitorsAllergen.display));
       await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
       await user.click(screen.getByRole('radio', { name: /moderate/i }));
@@ -98,12 +98,12 @@ describe('AllergyForm', () => {
       expect(screen.getByText(/severity is required/i)).toBeInTheDocument();
 
       // Test allergen validation
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
       await user.click(screen.getByText(aceInhibitorsAllergen.display));
       expect(screen.queryByText(/allergen is required/i)).not.toBeInTheDocument();
 
       // Test "other" allergen validation
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
       await user.click(screen.getAllByText('Other')[0]);
 
       const warningMessage = screen.queryByText(
@@ -139,7 +139,7 @@ describe('AllergyForm', () => {
 
       renderAllergyForm();
 
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
       await user.click(screen.getByText(aceInhibitorsAllergen.display));
       await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
       await user.click(screen.getByRole('radio', { name: /moderate/i }));
@@ -173,7 +173,7 @@ describe('AllergyForm', () => {
         await user.click(reaction);
       }
 
-      await user.click(screen.getByRole('combobox', { name: /choose an item/i }));
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
       await user.click(screen.getByText(aspirinAllergen.display));
       await user.click(screen.getByRole('checkbox', { name: rashReaction.display }));
       await user.click(screen.getByRole('radio', { name: /moderate/i }));

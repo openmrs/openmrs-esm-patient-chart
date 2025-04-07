@@ -430,7 +430,7 @@ function AllergyForm({
               />
             )}
             <ResponsiveWrapper>
-              <FormGroup legendText={t('allergen', 'Allergen')} data-testid="allergens-container">
+              <FormGroup legendText="">
                 <Controller
                   name="allergen"
                   control={control}
@@ -448,6 +448,7 @@ function AllergyForm({
                       }}
                       placeholder={t('selectAllergen', 'Select the allergen')}
                       selectedItem={value}
+                      titleText={t('allergen', 'Allergen')}
                     />
                   )}
                 />
