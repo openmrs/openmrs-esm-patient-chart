@@ -74,11 +74,13 @@ export interface AllergicReaction {
   };
 }
 
-export enum ReactionSeverity {
-  MILD = 'mild',
-  MODERATE = 'moderate',
-  SEVERE = 'severe',
-}
+export const REACTION_SEVERITY = {
+  MILD: 'mild',
+  MODERATE: 'moderate',
+  SEVERE: 'severe',
+} as const;
+
+export type ReactionSeverity = (typeof REACTION_SEVERITY)[keyof typeof REACTION_SEVERITY];
 
 export interface CodingData {
   code: string;
@@ -92,9 +94,11 @@ export interface OpenMRSResource {
   display: string;
 }
 
-export enum AllergenType {
-  DRUG = 'DRUG',
-  FOOD = 'FOOD',
-  ENVIRONMENT = 'ENVIRONMENT',
-  OTHER = 'OTHER',
-}
+export const ALLERGEN_TYPES = {
+  DRUG: 'DRUG',
+  FOOD: 'FOOD',
+  ENVIRONMENT: 'ENVIRONMENT',
+  OTHER: 'OTHER',
+} as const;
+
+export type AllergenType = (typeof ALLERGEN_TYPES)[keyof typeof ALLERGEN_TYPES];

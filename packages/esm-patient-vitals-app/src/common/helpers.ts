@@ -1,4 +1,7 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from '../common';
+import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
+import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
 import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
@@ -97,4 +100,51 @@ export function getReferenceRangesForConcept(
   }
 
   return conceptMetadata?.find((metadata) => metadata.uuid === conceptUuid);
+}
+
+export function prepareObsForSubmission(
+  formData: VitalsBiometricsFormData,
+  dirtyFields: Record<string, boolean>,
+  formContext: 'creating' | 'editing',
+  initialFieldValuesMap: VitalsAndBiometricsFieldValuesMap,
+  fieldToConceptMap: Record<string, string>,
+): {
+  toBeVoided: Array<OpenmrsResource>;
+  newObs: Array<OpenmrsResource>;
+} {
+  return Object.entries(formData).reduce(
+    (obsForSubmission, [field, newValue]) => {
+      if (!fieldToConceptMap[`${field}Uuid`]) {
+        console.error(`Missing concept mapping for field: ${field}`);
+        return obsForSubmission;
+      }
+      if (formContext === 'editing' && initialFieldValuesMap.has(field) && dirtyFields[field]) {
+        // void old obs
+        const { obs } = initialFieldValuesMap.get(field);
+        obsForSubmission.toBeVoided.push({
+          uuid: obs.uuid,
+          voided: true,
+        });
+
+        if (newValue) {
+          obsForSubmission.newObs.push({
+            concept: fieldToConceptMap[`${field}Uuid`],
+            value: newValue,
+          });
+        }
+      } else if (dirtyFields[field] && newValue) {
+        // create new obs
+        obsForSubmission.newObs.push({
+          concept: fieldToConceptMap[`${field}Uuid`],
+          value: newValue,
+        });
+      }
+
+      return obsForSubmission;
+    },
+    {
+      toBeVoided: [],
+      newObs: [],
+    },
+  );
 }

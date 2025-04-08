@@ -24,7 +24,7 @@
   "endDate": "Date de fin",
   "error": "Erreur",
   "errorFetchingTestTypes": "Erreur lors de la récupération des résultats pour « {{searchTerm}} »",
-  "goToDrugOrderForm": "Préscrire",
+  "goToDrugOrderForm": "Prescrire",
   "hideResultsTable": "Masquer le tableau des résultats",
   "individualTests": "Examens individuels",
   "labOrders": "Analyses",

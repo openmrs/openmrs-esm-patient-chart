@@ -29,6 +29,7 @@
   "noConditionsToDisplay": "لا توجد حالات لعرضها",
   "noResultsFor": "لا توجد نتائج لـ",
   "onsetDate": "تاريخ البداية",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Record a Condition",
   "required": "Required",
   "saveAndClose": "حفظ وإغلاق",

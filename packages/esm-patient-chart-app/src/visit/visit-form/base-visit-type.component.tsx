@@ -67,7 +67,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
             <Controller
               name="visitType"
               control={control}
-              defaultValue={results?.length === 1 ? results[0].uuid : ''}
+              defaultValue={results?.length === 1 ? results[0].uuid : null}
               render={({ field: { onChange, value } }) => (
                 <RadioButtonGroup
                   className={styles.radioButtonGroup}

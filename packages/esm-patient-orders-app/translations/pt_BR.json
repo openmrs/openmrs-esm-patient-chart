@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Menu de ações",
-  "activeVisitRequired": "É necessário ter uma visita ativa para fazer pedidos",
   "add": "Adicionar",
   "additionalInstructions": "Instruções adicionais",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
@@ -115,5 +114,6 @@
   "trySearchingAgain": "Tente pesquisar novamente",
   "tryTo": "Tente",
   "updated": "Atualizado",
-  "usingADifferentTerm": "usando um termo diferente"
+  "usingADifferentTerm": "usando um termo diferente",
+  "visitRequired": "A visit is required to make orders"
 }
