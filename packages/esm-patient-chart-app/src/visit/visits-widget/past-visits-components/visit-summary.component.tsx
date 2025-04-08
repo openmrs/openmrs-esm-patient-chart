@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
+  type Diagnosis,
+  DiagnosisTags,
   Extension,
   ExtensionSlot,
   formatTime,
@@ -20,13 +22,6 @@ import TestsSummary from './tests-summary.component';
 import VisitsTable from './visits-table/visits-table.component';
 import styles from './visit-summary.scss';
 
-interface DiagnosisItem {
-  diagnosis: string;
-  rank: number;
-  type: string;
-  voided?: boolean;
-}
-
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
@@ -40,11 +35,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
   const layout = useLayoutType();
 
-  const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
+  const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
     const medications: Array<OrderItem> = [];
     // Diagnoses in a Visit
-    const diagnoses: Array<DiagnosisItem> = [];
+    const diagnoses: Array<Diagnosis> = [];
     // Notes Tab
     const notes: Array<Note> = [];
 
@@ -64,14 +59,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       // Check if there is a diagnosis associated with this encounter
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
-          const validDiagnoses = enc.diagnoses
-            .filter((diagnosis) => !diagnosis.voided)
-            .map((diagnosis) => ({
-              diagnosis: diagnosis.display,
-              type: diagnosis.rank === 1 ? 'red' : 'blue',
-              rank: diagnosis.rank,
-              voided: diagnosis.voided,
-            }));
+          const validDiagnoses = enc.diagnoses.filter((diagnosis) => !diagnosis.voided);
           diagnoses.push(...validDiagnoses);
         }
       }
@@ -113,11 +101,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          diagnoses.map((diagnosis, i) => (
-            <Tag key={`${diagnosis.diagnosis}-${i}`} type={diagnosis.type}>
-              {diagnosis.diagnosis}
-            </Tag>
-          ))
+          <DiagnosisTags diagnoses={diagnoses} />
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
