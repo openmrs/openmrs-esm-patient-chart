@@ -23,8 +23,9 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
-  await test.step('When I visit the Visits summary page', async () => {
+  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
     await visitsPage.goTo(patient.uuid);
+    await page.getByRole('tab', { name: /summary cards/i }).click();
     await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
   });
 
