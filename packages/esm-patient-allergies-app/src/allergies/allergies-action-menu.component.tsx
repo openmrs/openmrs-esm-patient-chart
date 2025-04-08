@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
-import { type Allergy } from './allergy-intolerance.resource';
+import { type Allergy } from '../types';
 import styles from './allergies-action-menu.scss';
 import { patientAllergiesFormWorkspace } from '../constants';
 
