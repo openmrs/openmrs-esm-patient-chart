@@ -32,9 +32,9 @@ import {
   useAllergens,
   useAllergicReactions,
 } from './allergy-form.resource';
-import { type Allergy, useAllergies } from '../allergy-intolerance.resource';
+import { useAllergies } from '../allergy-intolerance.resource';
 import { type AllergiesConfigObject } from '../../config-schema';
-import { ALLERGEN_TYPES } from '../../types';
+import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
 
 interface AllergyFormData {
