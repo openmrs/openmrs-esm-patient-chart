@@ -10,14 +10,6 @@ import { useEncounterRows, useFormsJson } from '../hooks';
 import type { TableRow, Encounter, Mode, ColumnValue, FormattedColumn } from '../types';
 import styles from './encounter-list.scss';
 
-
-export interface EncounterListColumn {
-  key: string;
-  header: string;
-  getValue: (encounter: Encounter) => ColumnValue;
-  link?: any;
-}
-
 export interface EncounterListProps {
   patientUuid: string;
   encounterType: string;

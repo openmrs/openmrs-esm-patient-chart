@@ -11,10 +11,16 @@ import {
 } from '@carbon/react';
 
 import styles from './table.scss';
+import { type TableRow as TableRowType } from '../types';
+
+type TableHeaderType = {
+  key: string;
+  header: string;
+};
 
 interface TableProps {
-  tableHeaders: any;
-  tableRows: any;
+  tableHeaders: TableHeaderType[];
+  tableRows: TableRowType[];
 }
 
 export const EncounterListDataTable: React.FC<TableProps> = ({ tableHeaders, tableRows }) => {
