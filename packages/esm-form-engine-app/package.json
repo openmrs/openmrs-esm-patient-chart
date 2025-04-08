@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@carbon/react": "^1.76.0",
-    "@openmrs/esm-form-engine-lib": "latest",
+    "@openmrs/esm-form-engine-lib": "next",
     "lodash-es": "^4.17.21",
     "react-error-boundary": "^4.0.13"
   },
