@@ -1,9 +1,9 @@
+import { useCallback } from 'react';
 import { useConfig } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 import { invalidateCachedVitalsAndBiometrics } from './common';
-import { useCallback } from 'react';
 
 /**
  * Launches the appropriate workspace based on the current visit and configuration.
