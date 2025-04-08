@@ -32,6 +32,7 @@
 .dateTimeSection {
   display: flex;
   margin: layout.$spacing-05 0;
+  align-items: center;
 }
 
 .radioButton {
@@ -129,12 +130,11 @@
 }
 
 .timePicker {
+  display: flex;
   align-items: baseline;
-  flex: none;
-  margin-left: layout.$spacing-01;
 
   :global(.cds--form-requirement) {
-    max-width: 6rem;
+    max-width: layout.$spacing-12;
     max-height: 0 !important;
   }
 }
@@ -158,4 +158,10 @@
 .timePickerContainer {
   display: flex;
   flex-direction: column;
+}
+
+.datePicker {
+  :global(.cds--date-picker-input__wrapper) {
+    inline-size: layout.$spacing-13;
+  }
 }
