@@ -1,3 +1,5 @@
+import { type Control } from 'react-hook-form';
+
 export type OpenmrsConcept = {
   uuid: string;
   display: string;
@@ -36,6 +38,7 @@ export type FHIRImmunizationResource = {
     },
   ];
 };
+
 export type FHIRImmunizationBundleEntry = {
   fullUrl: string;
   resource: FHIRImmunizationResource;
@@ -84,4 +87,10 @@ export type ImmunizationData = {
   vaccineUuid: string;
   existingDoses: Array<ImmunizationDoseData>;
   sequences?: Array<ImmunizationSequence>;
+};
+
+export type DoseInputProps = {
+  vaccine: string;
+  sequences: ImmunizationSequenceDefinition[];
+  control: Control;
 };
