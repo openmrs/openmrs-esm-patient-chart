@@ -20,7 +20,7 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useLayoutType, usePagination, type Obs } from '@openmrs/esm-framework';
 import { ErrorState, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import EncounterObservations from '../encounter-observations';
 import { useEncounters } from '../visit.resource';
@@ -28,21 +28,14 @@ import styles from './encounters-table.scss';
 
 interface Encounter {
   datetime?: string;
-  [key: string]: any;
+  obs?: Array<Obs>;
+  [key: string]: unknown | string | Array<Obs>;
 }
 
 interface EncountersTableProps {
   encounters: Array<Encounter>;
   showAllEncounters?: boolean;
 }
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<typeof DataTableHeader>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
 
 const transformEncounters = (inData) => {
   if (!inData) return [];
