@@ -82,6 +82,7 @@ export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = 
         encounters: [
           {
             uuid: 'c2f0d397-4f3e-486a-abc4-4565caa0f09c',
+            diagnoses: [],
             encounterDatetime: '2021-08-25T15:18:54.000+0000',
             orders: [],
             obs: [

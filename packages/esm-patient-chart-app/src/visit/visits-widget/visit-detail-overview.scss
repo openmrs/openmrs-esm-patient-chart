@@ -227,6 +227,15 @@
   @include type.type-style('body-01');
 }
 
+.contentSwitcherContainer {
+  margin: layout.$spacing-04 auto;
+
+  // This is bad, but I can't find another way for the
+  // content switcher to not take up the whole width
+  // while having its buttons be max-content
+  max-width: 30%;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .header {
