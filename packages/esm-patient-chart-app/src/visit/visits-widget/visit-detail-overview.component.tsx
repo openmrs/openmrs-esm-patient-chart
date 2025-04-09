@@ -48,7 +48,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         <TabPanels>
           <TabPanel>
             <div className={styles.contentSwitcherContainer}>
-              <ContentSwitcher onChange={(event) => setVisitSummaryMode(event.name)}>
+              <ContentSwitcher selectedIndex={1} onChange={(event) => setVisitSummaryMode(event.name)}>
                 <Switch name="table" text={t('table', 'Table')} />
                 <Switch name="cards" text={t('summaryCards', 'Summary cards')} />
               </ContentSwitcher>
