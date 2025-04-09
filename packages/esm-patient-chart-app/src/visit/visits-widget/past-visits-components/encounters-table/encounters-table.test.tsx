@@ -4,12 +4,12 @@ import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
 import { mockPatient, renderWithSwr } from 'tools';
 import { mockMappedEncounters } from '__mocks__';
-import VisitsTable from './visits-table.component';
+import EncountersTable from './encounters-table.component';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
   showAllEncounters: true,
-  visits: mockMappedEncounters,
+  encounters: mockMappedEncounters,
 };
 
 const mockShowModal = jest.mocked(showModal);
@@ -103,5 +103,5 @@ describe('Delete Encounter', () => {
 });
 
 function renderVisitsTable(props = {}) {
-  renderWithSwr(<VisitsTable {...defaultProps} {...props} />);
+  renderWithSwr(<EncountersTable {...defaultProps} {...props} />);
 }

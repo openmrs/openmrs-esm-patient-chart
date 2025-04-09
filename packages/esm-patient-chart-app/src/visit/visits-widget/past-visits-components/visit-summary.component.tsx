@@ -19,7 +19,7 @@ import { mapEncounters, type Encounter, type Note, type Order, type OrderItem } 
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import VisitsTable from './visits-table/visits-table.component';
+import VisitsTable from './encounters-table/encounters-table.component';
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
@@ -154,7 +154,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
+            <VisitsTable encounters={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
