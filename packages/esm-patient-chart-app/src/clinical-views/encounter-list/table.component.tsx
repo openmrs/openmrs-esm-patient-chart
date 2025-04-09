@@ -9,21 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-
+import { type TableHeaderType, type TableRow as TableRowType } from '../types';
 import styles from './table.scss';
-import { type TableRow as TableRowType } from '../types';
 
-type TableHeaderType = {
-  key: string;
-  header: string;
-};
-
-interface TableProps {
-  tableHeaders: TableHeaderType[];
-  tableRows: TableRowType[];
+interface EncounterListDataTableProps {
+  tableHeaders: Array<TableHeaderType>;
+  tableRows: Array<TableRowType>;
 }
 
-export const EncounterListDataTable: React.FC<TableProps> = ({ tableHeaders, tableRows }) => {
+export const EncounterListDataTable: React.FC<EncounterListDataTableProps> = ({ tableHeaders, tableRows }) => {
   return (
     <TableContainer>
       <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="md">
