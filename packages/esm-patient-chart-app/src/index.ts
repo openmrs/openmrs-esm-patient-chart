@@ -3,7 +3,6 @@ import {
   defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
-  registerFeatureFlag,
 } from '@openmrs/esm-framework';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -38,12 +37,6 @@ export function startupApp() {
   defineConfigSchema(moduleName, esmPatientChartSchema);
   defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
-
-  registerFeatureFlag(
-    'rde',
-    'Retrospective Data Entry',
-    "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header.",
-  );
 }
 
 export const root = getSyncLifecycle(patientChartPageComponent, { featureName: 'patient-chart', moduleName });
