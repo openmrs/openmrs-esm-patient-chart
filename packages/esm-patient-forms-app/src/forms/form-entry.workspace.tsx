@@ -11,6 +11,7 @@ interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
   mutateForm: () => void;
   formInfo: FormEntryProps;
   clinicalFormsWorkspaceName?: string;
+  onFormSave?: (data: any) => void;
 }
 
 const FormEntry: React.FC<FormEntryComponentProps> = ({
@@ -22,6 +23,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   promptBeforeClosing,
   mutateForm,
   formInfo,
+  onFormSave,
 }) => {
   const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid, additionalProps } =
     formInfo || {};
@@ -51,6 +53,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       promptBeforeClosing,
       additionalProps,
       clinicalFormsWorkspaceName,
+      onFormSave,
     }),
     [
       formUuid,
@@ -72,6 +75,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       promptBeforeClosing,
       additionalProps,
       clinicalFormsWorkspaceName,
+      onFormSave,
     ],
   );
 

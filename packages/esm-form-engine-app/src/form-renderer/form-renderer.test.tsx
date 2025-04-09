@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { mockPatient } from 'tools';
 import FormRenderer from './form-renderer.component';
 import useFormSchema from '../hooks/useFormSchema';
+import { FormEngine } from '@openmrs/esm-form-engine-lib';
 
 const mockUseFormSchema = jest.mocked(useFormSchema);
 
@@ -52,5 +53,22 @@ describe('FormRenderer', () => {
     render(<FormRenderer {...defaultProps} />);
     await expect(screen.getByText(/form engine lib/i)).toBeInTheDocument();
     expect(mockUseFormSchema).toHaveBeenCalledWith('test-form-uuid');
+  });
+
+  test('calls onFormSave when form is saved', () => {
+    const onFormSaveMock = jest.fn();
+
+    mockUseFormSchema.mockReturnValue({ schema: { uuid: 'test-schema' }, isLoading: false, error: null } as ReturnType<
+      typeof useFormSchema
+    >);
+
+    const mockedFormEngine = jest.mocked(FormEngine);
+
+    render(<FormRenderer {...defaultProps} onFormSave={onFormSaveMock} />);
+
+    mockedFormEngine.mock.calls[0][0].onSubmit('test');
+
+    expect(onFormSaveMock).toHaveBeenCalledTimes(1);
+    expect(onFormSaveMock).toHaveBeenCalledWith('test');
   });
 });

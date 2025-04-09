@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -83,6 +83,36 @@ describe('AllergyForm', () => {
         title: 'Allergy saved',
         subtitle: 'It is now visible on the Allergies page',
       });
+    });
+
+    it('calls onAllergySave after creating allergy', async () => {
+      const onAllergySave = jest.fn();
+      renderAllergyForm({ onAllergySave });
+
+      const expectedResponse: NewAllergy = buildExpectedPayload(
+        aceInhibitorsAllergen,
+        reactionToAceInhibitors,
+        mockConcepts.moderateReactionUuid,
+        'Patient experienced a persistent dry cough while taking ACE inhibitors, which resolved upon discontinuation and recurred upon rechallenge',
+      );
+
+      mockSaveAllergy.mockResolvedValue({
+        status: 201,
+        data: expectedResponse,
+      } as FetchResponse<NewAllergy>);
+
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.type(
+        screen.getByLabelText(/comments/i),
+        'Patient experienced a persistent dry cough while taking ACE inhibitors, which resolved upon discontinuation and recurred upon rechallenge',
+      );
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(onAllergySave).toHaveBeenCalledTimes(1);
+      expect(onAllergySave).toHaveBeenCalledWith(expectedResponse);
     });
 
     it('validates required fields before saving', async () => {
@@ -196,6 +226,46 @@ describe('AllergyForm', () => {
       expect(mockUpdatePatientAllergy.mock.calls[0][0]).toEqual(expectedPayload);
       expect(mockAllergy).not.toEqual(expectedPayload);
     });
+
+    it('should call the saveAllergy function with updated payload', async () => {
+      const onAllergySave = jest.fn();
+
+      renderAllergyForm({ allergy: mockAllergy, formContext: 'editing', onAllergySave });
+
+      const aspirinAllergen = mockAllergens.find((allergen) => allergen.display === 'Aspirin');
+      const rashReaction = mockAllergicReactions.find((reaction) => reaction.display === 'Rash');
+
+      const expectedResponse: NewAllergy = buildExpectedPayload(
+        aspirinAllergen,
+        rashReaction,
+        mockConcepts.moderateReactionUuid,
+        'Patient developed a rash after taking aspirin. The rash resolved after discontinuing the medication.',
+      );
+      mockUpdatePatientAllergy.mockResolvedValue({
+        status: 200,
+        data: expectedResponse,
+      } as FetchResponse<NewAllergy>);
+
+      // Clear existing reactions first
+      const existingReactions = screen.getAllByRole('checkbox', { checked: true });
+      for (const reaction of existingReactions) {
+        await user.click(reaction);
+      }
+
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
+      await user.click(screen.getByText(aspirinAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: rashReaction.display }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.clear(screen.getByLabelText(/comments/i));
+      await user.type(
+        screen.getByLabelText(/comments/i),
+        'Patient developed a rash after taking aspirin. The rash resolved after discontinuing the medication.',
+      );
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(onAllergySave).toHaveBeenCalledTimes(1);
+      expect(onAllergySave).toHaveBeenCalledWith(expectedResponse);
+    });
   });
 });
 
@@ -209,6 +279,7 @@ function renderAllergyForm(props = {}) {
     patientUuid: mockPatient.id,
     promptBeforeClosing: () => {},
     setTitle: jest.fn(),
+    onAllergySave: jest.fn(),
   };
 
   render(<AllergyForm {...defaultProps} {...props} />);

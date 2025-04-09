@@ -19,6 +19,7 @@ interface FormRendererProps extends DefaultPatientWorkspaceProps {
   patientUuid: string;
   visit?: Visit;
   clinicalFormsWorkspaceName?: string;
+  onFormSave?: (data: any) => void;
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
@@ -31,6 +32,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   promptBeforeClosing,
   visit,
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  onFormSave,
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
@@ -62,6 +64,11 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     [promptBeforeClosing],
   );
 
+  const handleSubmit = (data: any) => {
+    closeWorkspaceWithSavedChanges();
+    onFormSave?.(data);
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
@@ -89,7 +96,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
           formSessionIntent={formSessionIntent}
-          onSubmit={closeWorkspaceWithSavedChanges}
+          onSubmit={handleSubmit}
           patientUUID={patientUuid}
           visit={visit}
         />

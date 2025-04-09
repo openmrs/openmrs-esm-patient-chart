@@ -15,6 +15,7 @@ const defaultProps = {
   condition: null,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
+  onConditionSave: jest.fn(),
   patientUuid: mockPatient.id,
   patient: mockPatient,
   promptBeforeClosing: jest.fn(),
@@ -258,5 +259,30 @@ describe('Conditions form', () => {
 
     await user.click(inactiveStatusInput);
     await user.click(submitButton);
+  });
+
+  it('calls onConditionSave when the condition is saved', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+
+    mockCreateCondition.mockResolvedValue({ status: 201, data: 'Condition created' } as unknown as FetchResponse);
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Headache');
+    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+    await user.click(screen.getByLabelText(/^active/i));
+
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+    await user.click(submitButton);
+
+    expect(defaultProps.onConditionSave).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onConditionSave).toHaveBeenCalledWith('Condition created');
   });
 });
