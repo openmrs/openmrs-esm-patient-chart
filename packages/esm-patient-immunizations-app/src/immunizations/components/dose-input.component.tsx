@@ -20,8 +20,9 @@ export const DoseInput: React.FC<{
 
   const handleChange = useCallback(
     (event, { value }) => {
-      const parsedValue = value;
-      field.onChange(parsedValue === '' ? undefined : parseInt(parsedValue, 10));
+      const parsedValue =
+        value === '' || value === null || (typeof value === 'string' && !value.trim()) ? undefined : Number(value);
+      field.onChange(isNaN(parsedValue) ? undefined : parsedValue);
     },
     [field],
   );
