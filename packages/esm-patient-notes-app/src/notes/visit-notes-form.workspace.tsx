@@ -82,19 +82,7 @@ const createSchema = (t: TFunction) => {
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
-    images: z
-      .array(
-        z.object({
-          base64Content: z.string(),
-          file: z.custom<File>((value) => value instanceof File, {
-            message: 'Invalid file',
-          }),
-          fileDescription: z.string().optional(),
-          fileName: z.string(),
-          fileType: z.string(),
-        }),
-      )
-      .optional(),
+    images: z.array(z.any()).optional(),
   });
 };
 
@@ -129,7 +117,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const customResolver = useCallback(
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-
       if (selectedPrimaryDiagnoses.length === 0) {
         return {
           ...zodResult,
@@ -289,6 +276,9 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
         if (file) {
+          if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+            file.fileName = `${file.fileName}.png`;
+          }
           setValue('images', currentImages ? [...currentImages, file] : [file]);
         }
 
@@ -411,7 +401,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           createErrorHandler();
 
           showSnackbar({
-            title: t('visitNoteSaveError', 'Error saving visit note'),
+            title: err?.responseBody?.error?.message ?? err.message,
             kind: 'error',
             isLowContrast: false,
             subtitle: err?.message,

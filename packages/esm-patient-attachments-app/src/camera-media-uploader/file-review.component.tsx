@@ -115,9 +115,11 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   const fileNameWithoutExtension = uploadedFile.fileName.trim().replace(/\.[^\\/.]+$/, '');
 
   const schema = z.object({
-    fileName: z.string({
-      required_error: t('nameIsRequired', 'Name is required'),
-    }),
+    fileName: z
+      .string({
+        required_error: t('nameIsRequired', 'Name is required'),
+      })
+      .min(1),
     fileDescription: z.string().optional(),
   });
 
