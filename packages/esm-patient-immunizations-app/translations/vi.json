@@ -1,5 +1,6 @@
 {
   "add": "Thêm",
+  "AM": "AM",
   "cancel": "Hủy",
   "doseNumber": "Dose number within series",
   "doseNumberWithinSeries": "Dose number within series",
@@ -16,6 +17,7 @@
   "lotNumber": "Lot Number",
   "manufacturer": "Nhà sản xuất",
   "pleaseSelect": "Please select",
+  "PM": "PM",
   "recentVaccination": "Recent vaccination",
   "save": "Lưu",
   "seeAll": "See all",

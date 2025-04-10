@@ -45,7 +45,6 @@
   "medicationIndefiniteDuration": "Durée illimitée",
   "Medications": "Médicaments",
   "modify": "Modifier",
-  "none": "Aucun",
   "noResultsForDrugSearch": "Aucun résultat à afficher pour « {{searchTerm}} »",
   "numRefillsErrorMessage": "Le nombre de renouvellements est requis",
   "onDate": "sur",

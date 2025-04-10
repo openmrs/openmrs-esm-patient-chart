@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-entry-app",
-  "version": "9.2.0",
+  "version": "9.2.2",
   "license": "MPL-2.0",
   "description": "Angular form engine for O3",
   "browser": "dist/openmrs-esm-form-entry-app.js",
@@ -51,7 +51,7 @@
     "@ngx-translate/core": "^15.0.0",
     "@openmrs/ngx-file-uploader": "next",
     "@openmrs/ngx-formentry": "next",
-    "jspdf": "^2.5.1",
+    "jspdf": "^3.0.1",
     "moment": "^2.29.4",
     "ngx-bootstrap": "^12.0.0",
     "ngx-webcam": "^0.4.1",

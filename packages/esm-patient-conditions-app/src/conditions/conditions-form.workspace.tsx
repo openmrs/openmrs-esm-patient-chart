@@ -31,7 +31,12 @@ const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
     abatementDateTime: z.date().optional().nullable(),
     clinicalStatus: clinicalStatusValidation,
     conditionName: conditionNameValidation,
-    onsetDateTime: z.date().nullable(),
+    onsetDateTime: z
+      .date()
+      .nullable()
+      .refine((onsetDateTime) => onsetDateTime <= new Date(), {
+        message: t('onsetDateCannotBeInTheFuture', 'Onset date cannot be in the future'),
+      }),
   });
 };
 

@@ -1,5 +1,4 @@
-import React from 'react';
-import classNames from 'classnames';
+import React, { useCallback, useMemo } from 'react';
 import {
   DataTableSkeleton,
   DataTable,
@@ -55,19 +54,25 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     },
   ];
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return paginatedAllergies?.map((allergy) => ({
       ...allergy,
-      reactions: `${allergy.reactionManifestations?.join(', ') || ''} ${
+      reactions: `${allergy.reactionManifestations?.sort((a, b) => a.localeCompare(b))?.join(', ') || ''} ${
         allergy.reactionSeverity ? `(${allergy.reactionSeverity})` : ''
       }`,
     }));
   }, [paginatedAllergies]);
 
-  const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>

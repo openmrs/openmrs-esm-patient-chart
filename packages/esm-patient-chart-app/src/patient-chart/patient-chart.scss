@@ -38,10 +38,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   flex-direction: column;
 }
 
-:global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
-  margin-left: var(--omrs-sidenav-width);
-}
-
 .innerChartContainer {
   display: flex;
   width: 100%;
@@ -57,11 +53,6 @@ html[dir='rtl'] {
   .chartContainer {
     padding-right: unset;
     padding-left: layout.$spacing-01;
-  }
-
-  :global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
-    margin-right: var(--omrs-sidenav-width);
-    margin-left: unset;
   }
 
   :global(.omrs-breakpoint-lt-desktop) .innerChartContainer {

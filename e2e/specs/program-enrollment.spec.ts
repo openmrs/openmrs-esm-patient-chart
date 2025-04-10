@@ -31,16 +31,28 @@ test('Add and edit a program enrollment', async ({ page }) => {
   });
 
   await test.step('And I set `04/07/2023` as the enrollment date', async () => {
-    await page.locator('#enrollmentDateInput').fill('04/07/2023');
+    const enrollmentDateInput = page.getByTestId('enrollmentDate');
+    const enrollmentDateDayInput = enrollmentDateInput.getByRole('spinbutton', { name: /day/i });
+    const enrollmentDateMonthInput = enrollmentDateInput.getByRole('spinbutton', { name: /month/i });
+    const enrollmentDateYearInput = enrollmentDateInput.getByRole('spinbutton', { name: /year/i });
+    await enrollmentDateDayInput.fill('04');
+    await enrollmentDateMonthInput.fill('07');
+    await enrollmentDateYearInput.fill('2023');
   });
 
   await test.step('And I set `05/07/2023` as the completion date', async () => {
-    await page.locator('#completionDateInput').fill('05/07/2023');
-    await page.locator('#completionDateInput').press('Tab');
+    const completionDateInput = page.getByTestId('completionDate');
+    const completionDateDayInput = completionDateInput.getByRole('spinbutton', { name: /day/i });
+    const completionDateMonthInput = completionDateInput.getByRole('spinbutton', { name: /month/i });
+    const completionDateYearInput = completionDateInput.getByRole('spinbutton', { name: /year/i });
+    await completionDateDayInput.fill('05');
+    await completionDateMonthInput.fill('07');
+    await completionDateYearInput.fill('2023');
+    await page.locator('#search-1').focus();
   });
 
   await test.step('And I select `Outpatient Clinic` as the enrollment location', async () => {
-    await page.locator('#location').selectOption('44c3efb0-2583-4c80-a79e-1f756a03c0a1');
+    await page.getByRole('radio', { name: /Outpatient Clinic/i }).check();
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
@@ -72,18 +84,28 @@ test('Add and edit a program enrollment', async ({ page }) => {
   });
 
   await test.step('When I change the enrollment date to `03/07/2023`', async () => {
-    await page.locator('#enrollmentDateInput').clear();
-    await page.locator('#enrollmentDateInput').fill('03/07/2023');
+    const enrollmentDateInput = page.getByTestId('enrollmentDate');
+    const enrollmentDateDayInput = enrollmentDateInput.getByRole('spinbutton', { name: /day/i });
+    const enrollmentDateMonthInput = enrollmentDateInput.getByRole('spinbutton', { name: /month/i });
+    const enrollmentDateYearInput = enrollmentDateInput.getByRole('spinbutton', { name: /year/i });
+    await enrollmentDateDayInput.fill('03');
+    await enrollmentDateMonthInput.fill('07');
+    await enrollmentDateYearInput.fill('2023');
   });
 
   await test.step('And I change the completion date to `04/07/2023`', async () => {
-    await page.locator('#completionDateInput').clear();
-    await page.locator('#completionDateInput').fill('04/07/2023');
-    await page.locator('#completionDateInput').press('Tab');
+    const completionDateInput = page.getByTestId('completionDate');
+    const completionDateDayInput = completionDateInput.getByRole('spinbutton', { name: /day/i });
+    const completionDateMonthInput = completionDateInput.getByRole('spinbutton', { name: /month/i });
+    const completionDateYearInput = completionDateInput.getByRole('spinbutton', { name: /year/i });
+    await completionDateDayInput.fill('04');
+    await completionDateMonthInput.fill('07');
+    await completionDateYearInput.fill('2023');
+    await page.locator('#search-1').focus();
   });
 
   await test.step('And I change the enrollment location to `Community Outreach`', async () => {
-    await page.locator('#location').selectOption('1ce1b7d4-c865-4178-82b0-5932e51503d6');
+    await page.locator('label:has-text("Community Outreach")').click();
   });
 
   await test.step('And I click on the `Save and close` button', async () => {

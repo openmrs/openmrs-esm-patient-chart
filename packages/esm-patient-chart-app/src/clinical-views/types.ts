@@ -1,5 +1,10 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
 import { type ReactElement } from 'react';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+
+export type TableHeaderType = {
+  key: string;
+  header: string;
+};
 
 export interface Encounter extends OpenmrsResource {
   encounterDatetime: Date;

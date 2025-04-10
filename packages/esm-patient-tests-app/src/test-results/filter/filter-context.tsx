@@ -160,6 +160,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
         ...state,
         timelineData,
         tableData,
+        trendlineData: null,
         activeTests,
         someChecked,
         totalResultsCount,

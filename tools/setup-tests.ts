@@ -1,10 +1,16 @@
 import '@testing-library/jest-dom';
 
+// https://github.com/jsdom/jsdom/issues/1695
+window.HTMLElement.prototype.scrollIntoView = function () {};
+
 window.URL.createObjectURL = jest.fn();
 global.openmrsBase = '/openmrs';
 global.spaBase = '/spa';
 global.getOpenmrsSpaBase = () => '/openmrs/spa/';
 global.Response = Object as any;
+
+// https://github.com/jsdom/jsdom/issues/1695
+window.HTMLElement.prototype.scrollIntoView = function () {};
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -19,3 +25,9 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 });
+
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));

@@ -11,8 +11,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -36,8 +34,10 @@ import {
   showSnackbar,
   type UploadedFile,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -158,7 +158,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -380,8 +381,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           }
         })
         .then(() => {
+          mutateInfiniteVisits();
           mutateVisitNotes();
-          mutateVisits();
 
           if (images?.length) {
             mutateAttachments();
@@ -415,8 +416,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       encounterTypeUuid,
       formConceptUuid,
       locationUuid,
+      mutateInfiniteVisits,
       mutateVisitNotes,
-      mutateVisits,
       patientUuid,
       providerUuid,
       selectedPrimaryDiagnoses.length,
@@ -428,11 +429,14 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
         </Row>
       )}
+
       <Stack className={styles.formContainer} gap={2}>
         {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
         <Row className={styles.row}>
@@ -443,21 +447,17 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             <Controller
               name="noteDate"
               control={control}
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <ResponsiveWrapper>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    maxDate={new Date().toISOString()}
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
-                      id="visitDateTimePicker"
-                      labelText={t('visitDate', 'Visit date')}
-                      placeholder="dd/mm/yyyy"
-                    />
-                  </DatePicker>
+                  <OpenmrsDatePicker
+                    {...field}
+                    maxDate={new Date()}
+                    id="visitDateTimePicker"
+                    data-testid="visitDateTimePicker"
+                    labelText={t('visitDate', 'Visit date')}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
+                  />
                 </ResponsiveWrapper>
               )}
             />

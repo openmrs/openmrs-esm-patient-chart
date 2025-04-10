@@ -44,7 +44,7 @@ import {
   launchFormEntryOrHtmlForms,
 } from '@openmrs/esm-patient-common-lib';
 import { deleteEncounter } from './visits-table.resource';
-import { type MappedEncounter } from '../../visit.resource';
+import { type MappedEncounter, useInfiniteVisits } from '../../visit.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
 
@@ -94,6 +94,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   }, [filter, visits]);
 
   const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
+  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
 
   const tableHeaders = [
     {
@@ -144,6 +145,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
               mutateVisits?.();
+              mutateInfiniteVisits();
+
               showSnackbar({
                 isLowContrast: true,
                 title: t('encounterDeleted', 'Encounter deleted'),
@@ -166,7 +169,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         },
       });
     },
-    [t, mutateVisits],
+    [mutateVisits, mutateInfiniteVisits, t],
   );
 
   const handleFilter = useCallback(

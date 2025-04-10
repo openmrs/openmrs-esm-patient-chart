@@ -2,7 +2,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within, renderHook, waitFor } from '@testing-library/react';
-import { getByTextWithMarkup } from 'tools';
+import { getByTextWithMarkup, mockPatient } from 'tools';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
 import {
   mockDrugSearchResultApiData,
@@ -27,7 +27,7 @@ mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
+  launchPatientWorkspace: (...args: any[]) => mockLaunchPatientWorkspace(...args),
 }));
 
 /** This is needed to render the order form */
@@ -48,7 +48,7 @@ jest.mock('./drug-search/drug-search.resource', () => ({
 
 jest.mock('../api/api', () => ({
   ...jest.requireActual('../api/api'),
-  usePatientOrders: () => usePatientOrdersMock(),
+  useActivePatientOrders: () => usePatientOrdersMock(),
   useRequireOutpatientQuantity: jest
     .fn()
     .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
@@ -196,7 +196,8 @@ function renderAddDrugOrderWorkspace() {
       closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
       closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
       promptBeforeClosing={() => false}
-      patientUuid={'mock-patient-uuid'}
+      patientUuid={mockPatient.id}
+      patient={mockPatient}
       setTitle={jest.fn()}
     />,
   );

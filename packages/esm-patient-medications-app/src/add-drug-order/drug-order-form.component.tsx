@@ -7,8 +7,6 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  DatePicker,
-  DatePickerInput,
   IconButton,
   Form,
   FormGroup,
@@ -30,10 +28,10 @@ import {
   ExtensionSlot,
   formatDate,
   getPatientName,
+  OpenmrsDatePicker,
   parseDate,
   useConfig,
   useLayoutType,
-  usePatient,
 } from '@openmrs/esm-framework';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,115 +58,125 @@ export interface DrugOrderFormProps {
   promptBeforeClosing: (testFcn: () => boolean) => void;
 }
 
-const createMedicationOrderFormSchema = (requireOutpatientQuantity: boolean, t: TFunction) => {
-  const comboSchema = {
-    default: z.boolean().optional(),
-    value: z.string(),
-    valueCoded: z.string(),
-  };
+function useCreateMedicationOrderFormSchema() {
+  const { t } = useTranslation();
+  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
+  const { requireIndication } = useConfig<ConfigObject>();
 
-  const baseSchemaFields = {
-    freeTextDosage: z.string().refine((value) => !!value, {
-      message: t('freeDosageErrorMessage', 'Add free dosage note'),
-    }),
-    dosage: z.number({
-      invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
-    }),
-    unit: z.object(
-      { ...comboSchema },
-      {
-        invalid_type_error: t('selectUnitErrorMessage', 'Dose unit is required'),
-      },
-    ),
-    route: z.object(
-      { ...comboSchema },
-      {
-        invalid_type_error: t('selectRouteErrorMessage', 'Route is required'),
-      },
-    ),
-    patientInstructions: z.string().nullable(),
-    asNeeded: z.boolean(),
-    asNeededCondition: z.string().nullable(),
-    duration: z.number().nullable(),
-    durationUnit: z.object({ ...comboSchema }).nullable(),
-    indication: z.string().refine((value) => value !== '', {
-      message: t('indicationErrorMessage', 'Indication is required'),
-    }),
-    startDate: z.date(),
-    frequency: z.object(
-      { ...comboSchema },
-      {
-        invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
-      },
-    ),
-  };
+  const schema = useMemo(() => {
+    const comboSchema = {
+      default: z.boolean().optional(),
+      value: z.string(),
+      valueCoded: z.string(),
+    };
 
-  const outpatientDrugOrderFields = {
-    pillsDispensed: z
-      .number()
-      .nullable()
-      .refine(
-        (value) => {
-          if (requireOutpatientQuantity && (typeof value !== 'number' || value < 1)) {
-            return false;
-          }
-          return true;
-        },
+    const baseSchemaFields = {
+      freeTextDosage: z.string().refine((value) => !!value, {
+        message: t('freeDosageErrorMessage', 'Add free dosage note'),
+      }),
+      dosage: z.number({
+        invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
+      }),
+      unit: z.object(
+        { ...comboSchema },
         {
-          message: t('pillDispensedErrorMessage', 'Quantity to dispense is required'),
+          invalid_type_error: t('selectUnitErrorMessage', 'Dose unit is required'),
         },
       ),
-    quantityUnits: z
-      .object(comboSchema)
-      .nullable()
-      .refine(
-        (value) => {
-          if (requireOutpatientQuantity && !value) {
-            return false;
-          }
-          return true;
-        },
+      route: z.object(
+        { ...comboSchema },
         {
-          message: t('selectQuantityUnitsErrorMessage', 'Quantity unit is required'),
+          invalid_type_error: t('selectRouteErrorMessage', 'Route is required'),
         },
       ),
-    numRefills: z
-      .number()
-      .nullable()
-      .refine(
-        (value) => {
-          if (requireOutpatientQuantity && (typeof value !== 'number' || value < 0)) {
-            return false;
-          }
-          return true;
-        },
+      patientInstructions: z.string().nullable(),
+      asNeeded: z.boolean(),
+      asNeededCondition: z.string().nullable(),
+      duration: z.number().nullable(),
+      durationUnit: z.object({ ...comboSchema }).nullable(),
+      indication: requireIndication
+        ? z.string().refine((value) => value !== '', {
+            message: t('indicationErrorMessage', 'Indication is required'),
+          })
+        : z.string().nullish(),
+      startDate: z.date(),
+      frequency: z.object(
+        { ...comboSchema },
         {
-          message: t('numRefillsErrorMessage', 'Number of refills is required'),
+          invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
         },
       ),
-  };
+    };
 
-  const nonFreeTextDosageSchema = z.object({
-    ...baseSchemaFields,
-    ...outpatientDrugOrderFields,
-    isFreeTextDosage: z.literal(false),
-    freeTextDosage: z.string().optional(),
-  });
+    const outpatientDrugOrderFields = {
+      pillsDispensed: z
+        .number()
+        .nullable()
+        .refine(
+          (value) => {
+            if (requireOutpatientQuantity && (typeof value !== 'number' || value < 1)) {
+              return false;
+            }
+            return true;
+          },
+          {
+            message: t('pillDispensedErrorMessage', 'Quantity to dispense is required'),
+          },
+        ),
+      quantityUnits: z
+        .object(comboSchema)
+        .nullable()
+        .refine(
+          (value) => {
+            if (requireOutpatientQuantity && !value) {
+              return false;
+            }
+            return true;
+          },
+          {
+            message: t('selectQuantityUnitsErrorMessage', 'Quantity unit is required'),
+          },
+        ),
+      numRefills: z
+        .number()
+        .nullable()
+        .refine(
+          (value) => {
+            if (requireOutpatientQuantity && (typeof value !== 'number' || value < 0)) {
+              return false;
+            }
+            return true;
+          },
+          {
+            message: t('numRefillsErrorMessage', 'Number of refills is required'),
+          },
+        ),
+    };
 
-  const freeTextDosageSchema = z.object({
-    ...baseSchemaFields,
-    ...outpatientDrugOrderFields,
-    isFreeTextDosage: z.literal(true),
-    dosage: z.number().nullable(),
-    unit: z.object(comboSchema).nullable(),
-    route: z.object(comboSchema).nullable(),
-    frequency: z.object(comboSchema).nullable(),
-  });
+    const nonFreeTextDosageSchema = z.object({
+      ...baseSchemaFields,
+      ...outpatientDrugOrderFields,
+      isFreeTextDosage: z.literal(false),
+      freeTextDosage: z.string().optional(),
+    });
 
-  return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-};
+    const freeTextDosageSchema = z.object({
+      ...baseSchemaFields,
+      ...outpatientDrugOrderFields,
+      isFreeTextDosage: z.literal(true),
+      dosage: z.number().nullable(),
+      unit: z.object(comboSchema).nullable(),
+      route: z.object(comboSchema).nullable(),
+      frequency: z.object(comboSchema).nullable(),
+    });
 
-type MedicationOrderFormData = z.infer<ReturnType<typeof createMedicationOrderFormSchema>>;
+    return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
+  }, [requireIndication, requireOutpatientQuantity, t]);
+
+  return schema;
+}
+
+type MedicationOrderFormData = z.infer<ReturnType<typeof useCreateMedicationOrderFormSchema>>;
 
 function MedicationInfoHeader({
   orderBasketItem,
@@ -221,7 +229,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
-  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const defaultStartDate = useMemo(() => {
     if (typeof initialOrderBasketItem?.startDate === 'string') parseDate(initialOrderBasketItem?.startDate);
@@ -229,10 +236,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     return initialOrderBasketItem?.startDate as Date;
   }, [initialOrderBasketItem?.startDate]);
 
-  const medicationOrderFormSchema = useMemo(
-    () => createMedicationOrderFormSchema(requireOutpatientQuantity, t),
-    [requireOutpatientQuantity, t],
-  );
+  const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
   const {
     control,
@@ -355,15 +359,17 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patientUuid } = usePatientChartStore();
-  const { patient, isLoading: isLoadingPatientDetails } = usePatient(patientUuid);
+  const { patient } = usePatientChartStore();
   const patientName = patient ? getPatientName(patient) : '';
   const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
+    (node: HTMLElement) => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+
       observer.current = new IntersectionObserver(
         ([e]) => {
           setShowMedicationHeader(e.intersectionRatio < 1);
@@ -372,7 +378,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
           threshold: 1,
         },
       );
-      if (node) observer.current.observe(node);
+
+      if (node) {
+        observer.current.observe(node);
+      }
     },
     [setShowMedicationHeader],
   );
@@ -389,7 +398,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
           />
         </div>
       )}
-      {isTablet && !isLoadingPatientDetails && (
+      {isTablet && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
           <span className={classNames(styles.text02, styles.bodyShort01)}>
@@ -405,7 +414,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               kind="error"
               lowContrast
               className={styles.inlineNotification}
-              title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
+              title={t('errorFetchingOrderConfig', 'Error occurred when fetching Order config')}
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           )}
@@ -596,22 +605,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     <Controller
                       name="startDate"
                       control={control}
-                      render={({ field: { onBlur, value, onChange, ref } }) => (
-                        <DatePicker
-                          datePickerType="single"
-                          maxDate={new Date().toISOString()}
-                          value={value}
-                          onChange={([newStartDate]) => onChange(newStartDate)}
-                          onBlur={onBlur}
-                          ref={ref}
-                        >
-                          <DatePickerInput
-                            id="startDatePicker"
-                            placeholder="dd/mm/yyyy"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                          />
-                        </DatePicker>
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          {...field}
+                          maxDate={new Date()}
+                          id="startDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'lg' : 'sm'}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
                       )}
                     />
                   </InputWrapper>

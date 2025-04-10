@@ -6,20 +6,20 @@ import {
   restBaseUrl,
   openmrsFetch,
   useConfig,
+  type OpenmrsResource,
 } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
-import { type ObsRecord } from '@openmrs/esm-patient-common-lib';
-import { type KeyedMutator } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
 import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
-import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/vitals-biometrics-form.workspace';
 
 const pageSize = 100;
 
 /** We use this as the first value to the SWR key to be able to invalidate all relevant cached entries */
 const swrKeyNeedle = Symbol('vitalsAndBiometrics');
+const encounterRepresentation =
+  'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
 
 type VitalsAndBiometricsMode = 'vitals' | 'biometrics' | 'both';
 
@@ -48,6 +48,14 @@ export interface ConceptMetadata {
 
 interface VitalsConceptMetadataResponse {
   setMembers: Array<ConceptMetadata>;
+}
+
+export type VitalsAndBiometricsFieldValuesMap = Map<string, { value: number | string; obs: OpenmrsResource }>;
+
+interface PartialEncounter extends OpenmrsResource {
+  encounterType: OpenmrsResource;
+  encounterDatetime: string;
+  obs: Array<OpenmrsResource>;
 }
 
 function getInterpretationKey(header: string) {
@@ -105,7 +113,37 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
 // Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
 // hook is unmounted.
 let vitalsHooksCounter = 0;
-const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>();
+const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
+
+/**
+ * Hook to get concepts for vitals, biometrics or both
+ */
+export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
+  const { concepts } = useConfig<ConfigObject>();
+
+  const conceptUuids = useMemo(() => {
+    const biometricsKeys = ['heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
+
+    if (!concepts) {
+      return [];
+    }
+
+    return Object.entries(concepts)
+      .filter(([key, conceptUuid]) => {
+        if (!conceptUuid) {
+          console.warn(`Missing UUID for concept ${key}`);
+          return false;
+        }
+        if (mode === 'both') {
+          return true;
+        }
+        return mode === 'vitals' ? !biometricsKeys.includes(key) : biometricsKeys.includes(key);
+      })
+      .map(([_, conceptUuid]) => conceptUuid);
+  }, [concepts, mode]);
+
+  return conceptUuids;
+}
 
 /**
  * Hook to get the vitals and / or biometrics for a patient
@@ -117,30 +155,14 @@ const vitalsHooksMutates = new Map<number, KeyedMutator<VitalsFetchResponse[]>>(
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
   const { conceptMetadata } = useVitalsConceptMetadata();
   const { concepts } = useConfig<ConfigObject>();
-  const biometricsConcepts = useMemo(
-    () => [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
-    [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid],
-  );
-
-  const conceptUuids = useMemo(
-    () =>
-      (mode === 'both'
-        ? Object.values(concepts)
-        : Object.values(concepts).filter(
-            (uuid) =>
-              (mode === 'vitals' && !biometricsConcepts.includes(uuid)) ||
-              (mode === 'biometrics' && biometricsConcepts.includes(uuid)),
-          )
-      ).join(','),
-    [concepts, biometricsConcepts, mode],
-  );
+  const conceptUuids = useVitalsOrBiometricsConcepts(mode);
 
   const getPage = useCallback(
     (page: number, prevPageData: FHIRSearchBundleResponse): VitalsAndBiometricsSwrKey => ({
       swrKeyNeedle,
       mode,
       patientUuid,
-      conceptUuids,
+      conceptUuids: conceptUuids.join(','),
       page,
       prevPageData,
     }),
@@ -205,17 +227,20 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       .filter(Boolean)
       .map(vitalsProperties(conceptMetadata))
       ?.reduce((vitalsHashTable, vitalSign) => {
-        const recordedDate = new Date(new Date(vitalSign.recordedDate)).toISOString();
-
-        if (vitalsHashTable.has(recordedDate) && vitalsHashTable.get(recordedDate)) {
-          vitalsHashTable.set(recordedDate, {
-            ...vitalsHashTable.get(recordedDate),
+        const encounterId = vitalSign.encounterId;
+        if (vitalsHashTable.has(encounterId) && vitalsHashTable.get(encounterId)) {
+          vitalsHashTable.set(encounterId, {
+            ...vitalsHashTable.get(encounterId),
             [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
           vitalSign.value &&
-            vitalsHashTable.set(recordedDate, {
+            vitalsHashTable.set(encounterId, {
+              date:
+                typeof vitalSign.recordedDate === 'string'
+                  ? vitalSign.recordedDate
+                  : vitalSign.recordedDate.toDateString(),
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
@@ -224,10 +249,10 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         return vitalsHashTable;
       }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
 
-    return Array.from(vitalsHashTable ?? []).map(([date, vitalSigns], index) => {
+    return Array.from(vitalsHashTable ?? []).map(([encounterId, vitalSigns]) => {
       const result = {
-        id: index.toString(),
-        date: date,
+        id: encounterId,
+        date: vitalSigns.date,
         ...vitalSigns,
       };
 
@@ -261,6 +286,54 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     currentPage: size,
     totalResults: data?.[0]?.data?.total ?? undefined,
     mutate,
+  };
+}
+
+/**
+ * Hook to get the vitals and biometrics for a patient associated with a specific encounter
+ */
+export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
+  const { concepts } = useConfig<ConfigObject>();
+  const fieldNameSuffix = 'Uuid';
+  const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}?v=${encounterRepresentation}` : null;
+
+  const { data, isLoading, error, mutate } = useSWRImmutable<FetchResponse<PartialEncounter>, Error>(url, openmrsFetch);
+
+  const vitalsAndBiometrics: VitalsAndBiometricsFieldValuesMap = useMemo(() => {
+    if (!isLoading && data && concepts) {
+      return data.data.obs.reduce((vitalsAndBiometrics, obs) => {
+        let fieldName = Object.entries(concepts).find(([, value]) => value === obs.concept.uuid)?.[0];
+
+        if (fieldName) {
+          fieldName = fieldName.endsWith(fieldNameSuffix) ? fieldName.replace(fieldNameSuffix, '') : fieldName;
+          vitalsAndBiometrics.set(fieldName, {
+            value: obs.value,
+            obs,
+          });
+        }
+        return vitalsAndBiometrics;
+      }, new Map<string, { value: string; obs: OpenmrsResource }>());
+    }
+    return null;
+  }, [isLoading, data, concepts]);
+
+  const getRefinedInitialValues = useCallback(() => {
+    const initialValues: Record<string, string | number> = {};
+    if (vitalsAndBiometrics) {
+      vitalsAndBiometrics.forEach((value, key) => {
+        initialValues[key] = value.value;
+      });
+    }
+    return initialValues;
+  }, [vitalsAndBiometrics]);
+
+  return {
+    isLoading,
+    vitalsAndBiometrics,
+    encounter: data?.data,
+    error,
+    mutate,
+    getRefinedInitialValues,
   };
 }
 
@@ -301,71 +374,49 @@ function vitalsProperties(conceptMetadata: Array<ConceptMetadata> | undefined) {
     ),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
+    encounterId: extractEncounterUuid(resource.encounter),
   });
 }
 
-export function saveVitalsAndBiometrics(
+export function createOrUpdateVitalsAndBiometrics(
+  patientUuid: string,
   encounterTypeUuid: string,
-  formUuid: string,
-  concepts: ConfigObject['concepts'],
-  patientUuid: string,
-  vitals: VitalsBiometricsFormData,
-  abortController: AbortController,
+  encounterUuid: string | null,
   location: string,
+  vitalsAndBiometricsObs: Array<OpenmrsResource>,
+  abortController: AbortController,
 ) {
-  return openmrsFetch<unknown>(`${restBaseUrl}/encounter`, {
+  const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}` : `${restBaseUrl}/encounter`;
+
+  const encounter = {
+    patient: patientUuid,
+    obs: vitalsAndBiometricsObs,
+  };
+  if (!encounterUuid) {
+    encounter['location'] = location;
+    encounter['encounterType'] = encounterTypeUuid;
+  }
+  return openmrsFetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: {
-      patient: patientUuid,
-      location: location,
-      encounterType: encounterTypeUuid,
-      form: formUuid,
-      obs: createObsObject(vitals, concepts),
-    },
+    body: encounter,
   });
 }
 
-export function updateVitalsAndBiometrics(
-  concepts: ConfigObject['concepts'],
-  patientUuid: string,
-  vitals: VitalsBiometricsFormData,
-  encounterDatetime: Date,
-  abortController: AbortController,
-  encounterUuid: string,
-  location: string,
-) {
+export function deleteEncounter(encounterUuid: string) {
   return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: {
-      encounterDatetime: encounterDatetime,
-      location: location,
-      patient: patientUuid,
-      obs: createObsObject(vitals, concepts),
-      orders: [],
-    },
+    method: 'DELETE',
   });
 }
 
-function createObsObject(
-  vitals: VitalsBiometricsFormData,
-  concepts: ConfigObject['concepts'],
-): Array<Omit<ObsRecord, 'effectiveDateTime' | 'conceptClass' | 'encounter'>> {
-  return Object.entries(vitals)
-    .filter(([_, result]) => Boolean(result))
-    .map(([name, result]) => {
-      return {
-        concept: concepts[name + 'Uuid'],
-        value: result,
-      };
-    });
+function extractEncounterUuid(encounter: FHIRResource['resource']['encounter']): string {
+  if (!encounter || !encounter.reference) {
+    return '';
+  }
+  return encounter.reference.split('/')[1];
 }
 
 /**

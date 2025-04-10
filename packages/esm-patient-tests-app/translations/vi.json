@@ -24,12 +24,10 @@
   "endDate": "Ngày kết thúc",
   "error": "Lỗi",
   "errorFetchingTestTypes": "Lỗi khi tìm kiếm kết quả cho \"{{searchTerm}}\"",
-  "female": "Nữ",
   "goToDrugOrderForm": "Mẫu đơn đặt hàng",
   "hideResultsTable": "Ẩn bảng kết quả",
   "individualTests": "Kiểm tra cá nhân",
   "labOrders": "Đơn đặt hàng phòng thí nghiệm",
-  "male": "Nam",
   "moreResultsAvailable": "Có thêm kết quả",
   "noPanelsFound": "Không tìm thấy bảng điều khiển",
   "noResultsForTestTypeSearch": "Không có kết quả nào để hiển thị cho \"{{searchTerm}}\"",
@@ -46,7 +44,6 @@
   "ordered": "Đã đặt hàng",
   "orderReason": "Lý do đặt hàng",
   "orderReasonRequired": "Order reason is required",
-  "other": "Khác",
   "overTime": "Over time",
   "panel": "Bảng điều khiển",
   "panels": "bảng điều khiển",
@@ -107,9 +104,7 @@
   "trendlineRangeSelectorMonths": "6 tháng",
   "trySearchingAgain": "Vui lòng thử tìm kiếm lại",
   "tryTo": "Cố gắng để",
-  "unknown": "Unknown",
   "usingADifferentTerm": "sử dụng một thuật ngữ khác",
   "value": "Giá trị",
-  "view": "Xem",
-  "viewTimeline": "Xem timeline"
+  "view": "Xem"
 }

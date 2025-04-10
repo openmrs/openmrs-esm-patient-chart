@@ -18,6 +18,10 @@
   }
 }
 
+:global(.omrs-breakpoint-gt-tablet) .patientChartWrapper {
+  margin-left: var(--omrs-sidenav-width);
+}
+
 // Tablet side nav scrolling
 :global(.omrs-breakpoint-lt-desktop) {
   .patientChartWrapper {
@@ -41,5 +45,10 @@ html[dir='rtl'] {
       border-right: layout.$spacing-02 solid var(--brand-01);
       border-left: unset;
     }
+  }
+
+  :global(.omrs-breakpoint-gt-tablet) .patientChartWrapper {
+    margin-right: var(--omrs-sidenav-width);
+    margin-left: unset;
   }
 }

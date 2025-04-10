@@ -44,14 +44,6 @@ interface FormViewProps {
   mutateForms?: () => void;
 }
 
-interface FilterProps {
-  rowIds: Array<string>;
-  headers: Array<Record<string, string>>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-}
-
 const FormView: React.FC<FormViewProps> = ({
   category,
   forms,

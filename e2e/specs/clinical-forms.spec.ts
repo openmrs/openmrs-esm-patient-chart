@@ -98,10 +98,10 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly filled form in the encounters table', async () => {
-    await expect(page.getByRole('tab', { name: /visit summaries/i })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /visits/i })).toBeVisible();
     await expect(page.getByRole('tab', { name: /all encounters/i })).toBeVisible();
 
-    await page.getByRole('tab', { name: /^encounters$/i }).click();
+    await page.getByRole('tab', { name: /^all encounters$/i }).click();
 
     const headerRow = page.getByRole('table').locator('thead > tr');
 
@@ -109,7 +109,7 @@ test('Fill a clinical form', async ({ page }) => {
     await expect(headerRow).toContainText(/encounter type/i);
     await expect(headerRow).toContainText(/provider/i);
 
-    await page.getByRole('table').locator('th#expand').click();
+    await page.getByRole('button', { name: /expand all rows/i }).click();
 
     await expect(page.getByText(subjectiveFindings)).toBeVisible();
     await expect(page.getByText(objectiveFindings)).toBeVisible();
@@ -164,7 +164,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   });
 
   await test.step('And I should not see any error messages', async () => {
-    await expect(page.getByText('error')).not.toBeVisible();
+    await expect(page.getByText('error')).toBeHidden();
   });
 });
 

@@ -13,6 +13,8 @@ describe('GroupedTimeline', () => {
   const mockFilterContext: FilterContextProps = {
     activeTests: ['Bloodwork-Chemistry', 'Bloodwork'],
     timelineData: mockGroupedResults.timelineData,
+    tableData: null,
+    trendlineData: null,
     parents: mockGroupedResults.parents,
     checkboxes: { Bloodwork: false, Chemistry: true },
     someChecked: false,

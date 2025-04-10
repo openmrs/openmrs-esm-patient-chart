@@ -5,8 +5,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   FormLabel,
@@ -20,7 +18,16 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  OpenmrsDatePicker,
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+  LocationPicker,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -196,19 +203,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="enrollmentDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="enrollment date"
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          data-testid="enrollmentDate"
+          maxDate={new Date()}
+          labelText={t('dateEnrolled', 'Date enrolled')}
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );
@@ -217,20 +221,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     <Controller
       name="completionDate"
       control={control}
-      render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="completion date"
+      render={({ field, fieldState }) => (
+        <OpenmrsDatePicker
+          {...field}
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          data-testid="completionDate"
+          minDate={new Date(watch('enrollmentDate'))}
+          maxDate={new Date()}
+          labelText={t('dateCompleted', 'Date completed')}
+          invalid={Boolean(fieldState?.error?.message)}
+          invalidText={fieldState?.error?.message}
+        />
       )}
     />
   );
@@ -240,20 +241,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentLocation"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <Select
-          aria-label="enrollment location"
-          id="location"
-          labelText={t('enrollmentLocation', 'Enrollment location')}
-          onChange={(event) => onChange(event.target.value)}
-          value={value}
-        >
-          {availableLocations?.length > 0 &&
-            availableLocations.map((location) => (
-              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                {location.display}
-              </SelectItem>
-            ))}
-        </Select>
+        <React.Fragment>
+          <FormLabel className={`${styles.locationLabel} cds--label`}>
+            {t('enrollmentLocation', 'Enrollment location')}
+          </FormLabel>
+          <LocationPicker
+            selectedLocationUuid={value}
+            defaultLocationUuid={session?.sessionLocation?.uuid}
+            locationTag="Login Location"
+            onChange={(locationUuid) => onChange(locationUuid)}
+          />
+        </React.Fragment>
       )}
     />
   );
@@ -314,7 +312,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: completionDate,
     },
     {
-      style: { width: '50%' },
+      style: { width: '100%' },
       legendText: '',
       value: enrollmentLocation,
     },

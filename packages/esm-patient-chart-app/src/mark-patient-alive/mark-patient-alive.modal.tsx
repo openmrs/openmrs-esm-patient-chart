@@ -19,7 +19,7 @@ const MarkPatientAlive: React.FC<MarkPatientAliveProps> = ({ closeModal, patient
       .then(() => {
         closeModal();
         showSnackbar({
-          title: t('markAliveSuccessfully', 'Patient marked alive succesfully'),
+          title: t('markAliveSuccessfully', 'Patient marked alive successfully'),
         });
         window.location.reload();
       })

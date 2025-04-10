@@ -33,7 +33,9 @@ const useMock = [(key) => key, {}];
 useMock.t = (key, defaultValue, options = {}) => {
   let translatedString = defaultValue || key;
   Object.entries(options).forEach(([k, v]) => {
-    translatedString = translatedString.replace(new RegExp(`{{${k}}}`, 'g'), v);
+    if (key !== 'interpolation') {
+      translatedString = translatedString.replace(new RegExp(`{{${k}}}`, 'g'), v);
+    }
   });
 
   return translatedString;

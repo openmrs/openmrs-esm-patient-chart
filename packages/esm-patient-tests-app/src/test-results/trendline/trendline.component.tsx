@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
-import { LineChart } from '@carbon/charts-react';
+import { LineChart, ScaleTypes, TickRotations } from '@carbon/charts-react';
 import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
@@ -9,19 +9,6 @@ import { testResultsBasePath } from '../helpers';
 import CommonDataTable from '../overview/common-datatable.component';
 import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
-
-enum ScaleTypes {
-  TIME = 'time',
-  LINEAR = 'linear',
-  LOG = 'log',
-  LABELS = 'labels',
-}
-
-enum TickRotations {
-  ALWAYS = 'always',
-  AUTO = 'auto',
-  NEVER = 'never',
-}
 
 interface TrendlineProps {
   patientUuid: string;

@@ -1,5 +1,6 @@
 {
   "add": "បន្ថែម",
+  "AM": "AM",
   "cancel": "បោះបង់",
   "doseNumber": "Dose Number",
   "doseNumberWithinSeries": "Dose number within series",
@@ -16,6 +17,7 @@
   "lotNumber": "Lot Number",
   "manufacturer": "Manufacturer",
   "pleaseSelect": "Please select",
+  "PM": "PM",
   "recentVaccination": "Recent vaccination",
   "save": "Save",
   "seeAll": "ឃើញទាំងអស់",

@@ -29,6 +29,7 @@
   "noConditionsToDisplay": "Aucune pathologie à afficher",
   "noResultsFor": "Pas de résultat pour",
   "onsetDate": "Date de d'apparition",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Ajouter une pathologie",
   "required": "Requis",
   "saveAndClose": "Enregistrer et fermer",
