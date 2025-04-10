@@ -18,7 +18,7 @@ import {
   useVitalsConceptMetadata,
 } from '../common';
 import { type ConfigObject } from '../config-schema';
-import { launchVitalsAndBiometricsForm as launchForm } from '../utils';
+import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
 
@@ -43,13 +43,14 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   const { workspaces } = useWorkspaces();
 
   const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
+  const launchForm = useLaunchVitalsAndBiometricsForm();
 
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      launchForm(currentVisit, config);
+      launchForm();
     },
-    [config, currentVisit],
+    [launchForm],
   );
 
   if (isLoading) {

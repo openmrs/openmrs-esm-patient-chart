@@ -88,7 +88,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccinationDate: new Date(),
       vaccinationTime: dayjs(new Date()).format('hh:mm'),
       timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
-      doseNumber: 0,
+      doseNumber: 1,
       expirationDate: null,
       lotNumber: '',
       manufacturer: '',

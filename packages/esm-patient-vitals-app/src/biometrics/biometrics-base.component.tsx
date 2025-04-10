@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, Analytics, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { launchVitalsAndBiometricsForm } from '../utils';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../common';
 import { type ConfigObject } from '../config-schema';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
@@ -30,12 +30,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { data: conceptUnits } = useVitalsConceptMetadata();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-
-  const launchBiometricsForm = useCallback(
-    () => launchVitalsAndBiometricsForm(currentVisit, config),
-    [config, currentVisit],
-  );
+  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm();
 
   const tableHeaders: Array<BiometricsTableHeader> = [
     {

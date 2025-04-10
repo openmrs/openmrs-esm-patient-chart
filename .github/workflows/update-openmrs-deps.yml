@@ -42,14 +42,14 @@ jobs:
             Update OpenMRS dependencies
           branch: 'chore/update-openmrs-deps'
           author: 'OpenMRS Bot <infrastructure@openmrs.org>'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.OMRS_BOT_GH_TOKEN }}
       - name: ✅ Auto approve PR
-        if: steps.cpr.outputs.pull-request-operation == 'created'
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
         run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
         env:
-          GH_TOKEN: ${{ secrets.OMRS_BOT_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 🔀 Automerge PR
-        if: steps.cpr.outputs.pull-request-operation == 'created'
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
         run: gh pr merge --auto --squash "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

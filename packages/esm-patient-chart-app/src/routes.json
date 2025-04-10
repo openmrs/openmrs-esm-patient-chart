@@ -182,6 +182,13 @@
       "component": "visitContextHeader"
     }
   ],
+  "featureFlags": [
+    {
+      "description": "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header",
+      "flagName": "rde",
+      "label": "Retrospective Data Entry"
+    }
+  ],
   "modals": [
     {
       "name": "delete-encounter-modal",

@@ -274,6 +274,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   if (isLoadingConceptMetadata || isLoadingInitialValues) {
     return (
       <Form className={styles.form}>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.grid}>
           <Stack>
             <Column>
@@ -305,6 +306,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
 
   return (
     <Form className={styles.form} data-openmrs-role="Vitals and Biometrics Form">
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       <div className={styles.grid}>
         <Stack>
           <Column>
