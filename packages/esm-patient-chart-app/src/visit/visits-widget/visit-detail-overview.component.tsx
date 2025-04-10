@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
 import VisitHistoryTable from '../visit-history-table/visit-history-table.component';
 import VisitSummaries from './past-visits-components/visit-summaries.component';
-import VisitsTable from './past-visits-components/encounters-table/encounters-table.component';
+import EncountersTable from './past-visits-components/encounters-table/encounters-table.component';
 import styles from './visit-detail-overview.scss';
-import { mapEncounters, useInfiniteVisits } from './visit.resource';
+import { useInfiniteVisits } from './visit.resource';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -24,11 +24,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
 
-  const visitsWithEncounters = visits
-    ?.filter((visit) => visit?.encounters?.length)
-    ?.flatMap((visitWithEncounters) => {
-      return mapEncounters(visitWithEncounters);
-    });
   const isShowingVisitHistoryTable = tabIndex == 0 && visitSummaryMode == 'table';
   return (
     <div className={styles.tabs}>
@@ -63,12 +58,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ) : error ? (
                 <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : (
-                <VisitsTable
-                  mutateVisits={mutate}
-                  encounters={visitsWithEncounters}
-                  showAllEncounters
-                  patientUuid={patientUuid}
-                />
+                <EncountersTable mutateVisits={mutate} showAllEncounters patientUuid={patientUuid} />
               )}
             </TabPanel>
           )}

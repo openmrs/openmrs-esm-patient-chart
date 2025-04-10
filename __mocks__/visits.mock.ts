@@ -1,5 +1,5 @@
 import type { Encounter, Visit } from '@openmrs/esm-framework';
-import { type MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/visit.resource';
+import { MappedEncounter } from '../packages/esm-patient-chart-app/src/visit/visits-widget/past-visits-components/encounters-table/encounters-table.resource';
 
 export const mockVisitTypes = [
   {
@@ -311,6 +311,7 @@ export const mockMappedEncounters: Array<MappedEncounter> = [
       uuid: '17e3bc1a-d319-408f-8b57-73e367f7fa80',
       display: 'POC Consent Form',
     },
+    formName: 'POC Consent Form',
     obs: [],
     provider: '--',
     visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
@@ -322,6 +323,7 @@ export const mockMappedEncounters: Array<MappedEncounter> = [
     encounterType: 'Visit Note',
     editPrivilege: null,
     form: null,
+    formName: null,
     obs: [
       {
         uuid: 'a93ad7a9-66d8-4952-ae2e-82b59c8c5989',
@@ -366,6 +368,7 @@ export const mockMappedEncounters: Array<MappedEncounter> = [
       uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
       display: 'Covid 19',
     },
+    formName: 'Covid 19',
     obs: [],
     provider: 'Dennis The Doctor',
     visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
