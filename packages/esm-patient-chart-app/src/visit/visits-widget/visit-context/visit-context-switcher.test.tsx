@@ -1,10 +1,10 @@
 import { useVisit } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
-import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
+import { mockCurrentVisit, mockVisit2, mockVisit3, visitOverviewDetailMockData } from '__mocks__';
 import React from 'react';
 import { useVisitContextStore } from './visit-context';
-import { useInfiniteVisits } from '../visit.resource';
+import { useInfiniteVisits, usePaginatedVisits } from '../visit.resource';
 import VisitContextSwitcherModal from './visit-context-switcher.modal';
 
 const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
@@ -18,16 +18,23 @@ const mockUseVisitContextStore = jest.fn(useVisitContextStore).mockReturnValue({
   patientUuid: null,
   setVisitContext: jest.fn(),
 });
-const mockedUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
-  visits: [mockCurrentVisit, mockVisit2, mockVisit3],
+
+const mockUsePaginatedVisits = jest.fn(usePaginatedVisits).mockReturnValue({
+  data: [mockCurrentVisit, mockVisit2, mockVisit3],
   error: null,
-  hasMore: false,
-  isLoading: false,
-  isValidating: false,
-  loadMore: jest.fn(),
   mutate: jest.fn(),
-  nextUri: null,
-  totalCount: 3,
+  isValidating: false,
+  isLoading: false,
+  totalPages: 1,
+  totalCount: 1,
+  currentPage: 1,
+  currentPageSize: { current: 3 },
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: jest.fn(),
+  goToNext: jest.fn(),
+  goToPrevious: jest.fn(),
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
@@ -39,7 +46,7 @@ jest.mock('./visit-context', () => ({
 }));
 
 jest.mock('../visit.resource', () => ({
-  useInfiniteVisits: () => mockedUseInfiniteVisits('some-uuid'),
+  usePaginatedVisits: () => mockUsePaginatedVisits('some-uuid', 20),
 }));
 
 describe('VisitContextSwitcherModal', () => {

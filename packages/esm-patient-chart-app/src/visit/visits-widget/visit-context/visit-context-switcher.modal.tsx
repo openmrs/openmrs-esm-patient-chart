@@ -1,10 +1,10 @@
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, RadioButton } from '@carbon/react';
+import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, DataTableSkeleton } from '@carbon/react';
 import { ErrorState, type Visit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useInfiniteVisits } from '../visit.resource';
+import { usePaginatedVisits } from '../visit.resource';
 import { useVisitContextStore } from './visit-context';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
@@ -20,9 +20,17 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   closeModal,
   onAfterVisitSelected,
 }) => {
+  const pageSize = 5;
   const { t } = useTranslation();
-  // TODO: add pagination for the visits list.
-  const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
+  const {
+    data: visits,
+    isLoading,
+    error,
+    currentPage,
+    goTo,
+    totalCount,
+    currentPageSize,
+  } = usePaginatedVisits(patientUuid, pageSize);
   const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const [selectedVisit, setSelectedVisit] = useState<string>(
     selectedVisitPatientUuid === patientUuid ? manuallySetVisitUuid : null,
@@ -40,11 +48,11 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
       <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')} />
       <ModalBody>
         {isLoading ? (
-          <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
+          <DataTableSkeleton role="progressbar" rowCount={5} columnCount={1} showHeader={false} showToolbar={false} />
         ) : error ? (
           <ErrorState headerTitle={t('visits', 'visits')} error={error} />
         ) : (
-          <div className={styles.visitCardRowsContainer}>
+          <div>
             {visits?.map((visit) => {
               return (
                 <VisitCardRow
@@ -55,6 +63,14 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
                 />
               );
             })}
+            <PatientChartPagination
+              pageNumber={currentPage}
+              totalItems={totalCount}
+              currentItems={currentPageSize.current}
+              pageSize={pageSize}
+              onPageNumberChange={({ page }) => goTo(page)}
+              grey
+            />
           </div>
         )}
         <Button kind="ghost" size="sm" onClick={openStartVisitWorkspace}>
