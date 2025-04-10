@@ -210,6 +210,6 @@ test('renders an error snackbar if there was a problem recording a condition', a
     isLowContrast: false,
     kind: 'error',
     subtitle: 'Internal Server Error',
-    title: 'Error saving visit note',
+    title: 'Internal Server Error',
   });
 });
