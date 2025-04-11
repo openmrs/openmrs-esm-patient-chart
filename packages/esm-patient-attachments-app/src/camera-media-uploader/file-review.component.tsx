@@ -119,7 +119,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       .string({
         required_error: t('nameIsRequired', 'Name is required'),
       })
-      .min(1),
+      .trim()
+      .min(1, { message: t('nameIsRequired', 'Name is required') }),
     fileDescription: z.string().optional(),
   });
 

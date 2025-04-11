@@ -279,6 +279,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           if (file.capturedFromWebcam && !file.fileName.includes('.')) {
             file.fileName = `${file.fileName}.png`;
           }
+
           setValue('images', currentImages ? [...currentImages, file] : [file]);
         }
 
@@ -401,10 +402,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           createErrorHandler();
 
           showSnackbar({
-            title: err?.responseBody?.error?.message ?? err.message,
+            title: t('visitNoteSaveError', 'Error saving visit note'),
             kind: 'error',
             isLowContrast: false,
-            subtitle: err?.message,
+            subtitle: err?.responseBody?.error?.message ?? err.message,
           });
         });
     },
