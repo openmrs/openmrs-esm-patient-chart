@@ -282,7 +282,12 @@ describe('Conditions form', () => {
     const submitButton = screen.getByRole('button', { name: /save & close/i });
     await user.click(submitButton);
 
-    expect(defaultProps.onConditionSave).toHaveBeenCalledTimes(1);
-    expect(defaultProps.onConditionSave).toHaveBeenCalledWith('Condition created');
+    await waitFor(() => {
+      expect(defaultProps.onConditionSave).toHaveBeenCalledTimes(1);
+    });
+
+    await waitFor(() => {
+      expect(defaultProps.onConditionSave).toHaveBeenCalledWith('Condition created');
+    });
   });
 });
