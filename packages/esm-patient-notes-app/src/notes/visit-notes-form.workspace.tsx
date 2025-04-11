@@ -275,14 +275,11 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
-        if (file) {
-          if (file.capturedFromWebcam && !file.fileName.includes('.')) {
-            file.fileName = `${file.fileName}.png`;
-          }
-
-          setValue('images', currentImages ? [...currentImages, file] : [file]);
+        if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+          file.fileName = `${file.fileName}.png`;
         }
 
+        setValue('images', currentImages ? [...currentImages, file] : [file]);
         close();
         return Promise.resolve();
       },
