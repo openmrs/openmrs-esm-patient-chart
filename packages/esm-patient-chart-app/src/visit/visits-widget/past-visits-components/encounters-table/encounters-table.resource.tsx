@@ -12,6 +12,19 @@ import {
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
 
+export interface EncountersTableProps {
+  patientUuid: string;
+  totalCount: number;
+  currentPage: number;
+  goTo(page: number): void;
+  isLoading: boolean;
+  onEncountersUpdated(): void;
+  showVisitType: boolean;
+  paginatedMappedEncounters: Array<MappedEncounter>;
+  encounterTypeToFilter?: EncounterType;
+  setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
+}
+
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'DELETE',

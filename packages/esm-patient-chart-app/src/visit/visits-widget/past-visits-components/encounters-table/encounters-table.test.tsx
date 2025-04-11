@@ -1,41 +1,58 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
-import { screen, within } from '@testing-library/react';
 import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
-import { mockPatient, renderWithSwr } from 'tools';
-import { mockMappedEncounters } from '__mocks__';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { mockEncountersAlice, mockEncounterTypes, mockPatientAlice } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import EncountersTable from './encounters-table.component';
+import { type EncountersTableProps, mapEncounter, useEncounterTypes } from './encounters-table.resource';
 
-const defaultProps = {
-  patientUuid: mockPatient.id,
-  showAllEncounters: true,
-  encounters: mockMappedEncounters,
-};
+const defaultProps: () => EncountersTableProps = () => ({
+  patientUuid: mockPatientAlice.uuid,
+  paginatedMappedEncounters: mockEncountersAlice.map(mapEncounter),
+  totalCount: mockEncountersAlice.length,
+  currentPage: 1,
+  goTo: jest.fn(),
+  isLoading: false,
+  onEncountersUpdated: jest.fn(),
+  showVisitType: true,
+});
 
 const mockShowModal = jest.mocked(showModal);
-const mockGetConfig = getConfig as jest.Mock;
-const mockUserHasAccess = userHasAccess as jest.Mock;
+const mockGetConfig = jest.mocked(getConfig);
+const mockUserHasAccess = jest.mocked(userHasAccess);
 
-describe('EncounterList', () => {
+const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
+  data: mockEncounterTypes,
+  totalCount: mockEncounterTypes.length,
+  hasMore: false,
+  loadMore: jest.fn(),
+  error: undefined,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  nextUri: '',
+});
+
+jest.mock('./encounters-table.resource', () => ({
+  ...jest.requireActual('./encounters-table.resource'),
+  useEncounterTypes: () => mockUseEncounterTypes(),
+}));
+
+describe('EncountersTable', () => {
   it('renders an empty state when no encounters are available', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
+    renderEncountersTable({ totalCount: 0, paginatedMappedEncounters: [] });
 
-    renderVisitsTable({ visits: [] });
-
-    await screen.findByTitle(/empty data illustration/i);
-    expect(screen.getByText(/there are no encounters to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/No encounters to display/i)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
-    const user = userEvent.setup();
-
-    renderVisitsTable({ visits: mockMappedEncounters });
+    renderEncountersTable();
 
     await screen.findByRole('table');
 
-    const filterDropdown = screen.getByRole('combobox', { name: /filter by encounter type/i });
-    const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
-    const expectedColumnHeaders = [/date & time/, /visit type/, /Form name/, /encounter type/, /provider/];
+    const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /form name/, /provider/];
     const expectedTableRows = [
       /18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- options/,
       /03\-aug\-2021, 12:47 am facility visit visit note \-\- user one options/,
@@ -48,29 +65,6 @@ describe('EncounterList', () => {
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
-
-    // filter table to show only `Admission` encounters
-    await user.click(filterDropdown);
-    await user.click(screen.getByRole('option', { name: /Admission/i }));
-
-    expect(screen.queryByRole('cell', { name: /visit note/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: /admission/i })).toBeInTheDocument();
-
-    // show all encounter types
-    await user.click(filterDropdown);
-    await user.click(screen.getByRole('option', { name: /all/i }));
-
-    // filter table by typing in the searchbox
-    await user.type(searchbox, 'Visit Note');
-
-    expect(screen.queryByText(/consultation/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/visit note/i)).toBeInTheDocument();
-
-    await user.clear(searchbox);
-    await user.type(searchbox, 'triage');
-
-    expect(screen.getByText(/no encounters to display/i)).toBeInTheDocument();
-    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 });
 
@@ -80,7 +74,7 @@ describe('Delete Encounter', () => {
 
     mockUserHasAccess.mockReturnValue(true);
 
-    renderVisitsTable({ visits: mockMappedEncounters });
+    renderEncountersTable();
 
     await screen.findByRole('table');
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -102,6 +96,6 @@ describe('Delete Encounter', () => {
   });
 });
 
-function renderVisitsTable(props = {}) {
-  renderWithSwr(<EncountersTable {...defaultProps} {...props} />);
+function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
+  renderWithSwr(<EncountersTable {...defaultProps()} {...props} />);
 }

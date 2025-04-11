@@ -19,17 +19,18 @@ import { type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import EncountersTable from './encounters-table/encounters-table.component';
 import styles from './visit-summary.scss';
+import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
+  mutateVisit(): void;
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, mutateVisit }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -154,7 +155,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <EncountersTable visitToShowEncounters={visit} showAllEncounters={false} patientUuid={patientUuid} />
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} mutateVisits={mutateVisit} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
 import VisitHistoryTable from '../visit-history-table/visit-history-table.component';
 import VisitSummaries from './past-visits-components/visit-summaries.component';
-import EncountersTable from './past-visits-components/encounters-table/encounters-table.component';
+import AllEncountersTable from './past-visits-components/encounters-table/all-encounters-table.component';
 import styles from './visit-detail-overview.scss';
 import { useInfiniteVisits } from './visit.resource';
 
@@ -58,7 +58,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ) : error ? (
                 <ErrorState headerTitle={t('visits', 'visits')} error={error} />
               ) : (
-                <EncountersTable mutateVisits={mutate} showAllEncounters patientUuid={patientUuid} />
+                <AllEncountersTable patientUuid={patientUuid} />
               )}
             </TabPanel>
           )}

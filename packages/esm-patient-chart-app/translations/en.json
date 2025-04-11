@@ -70,7 +70,6 @@
   "filterByEncounterType": "Filter by encounter type",
   "form": "Form name",
   "fromDateToDate": "{{fromDate}} - {{toDate}}",
-  "goToThisEncounter": "Go to this encounter",
   "indication": "Indication",
   "inThePast": "In the past",
   "loading": "Loading",
