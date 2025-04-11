@@ -43,6 +43,51 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByPlaceholder('Write any notes here').fill('This is a note');
   });
 
+  await test.step('Open Add Image dialog and upload file', async () => {
+    await page.getByRole('button', { name: /add image/i }).click();
+    await expect(page.getByText(/add attachment/i)).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Upload files' }).click();
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Drag and drop files here or click to upload' }).click();
+    const fileChooser = await fileChooserPromise;
+
+    await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
+
+    await page.getByLabel(/image name/i).fill('Uploaded File Image');
+    await page.getByRole('button', { name: /add attachment/i }).click();
+
+    await expect(page.getByText(/uploaded file image/i)).toBeVisible();
+  });
+
+  await test.step('Open Add Image dialog again and take photo via webcam', async () => {
+    await page.context().grantPermissions(['camera']);
+
+    await page.getByRole('button', { name: /add image/i }).click();
+    await expect(page.getByText(/add attachment/i)).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Webcam' }).click();
+    await page.waitForFunction(() => document.querySelector('#inner-circle')?.isConnected);
+
+    const innerCircle = page.locator('#inner-circle');
+    await expect(innerCircle).toBeVisible();
+
+    await page.waitForTimeout(5000);
+    await innerCircle.click();
+
+    const imageNameField = page.getByLabel(/image name/i);
+    await imageNameField.waitFor();
+    await imageNameField.fill('Captured Webcam Image');
+
+    const submitButton = page.getByRole('button', { name: /add attachment/i });
+    await submitButton.waitFor();
+    await page.waitForTimeout(300);
+    await submitButton.click();
+
+    await expect(page.getByText(/captured webcam image/i)).toBeVisible();
+  });
+
   await test.step('And I click on the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });

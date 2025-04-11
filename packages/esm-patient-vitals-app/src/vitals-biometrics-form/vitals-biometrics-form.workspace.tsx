@@ -113,9 +113,8 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  const encounterUuid = currentVisit?.encounters?.find(
-    (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
-  )?.uuid;
+  const encounterUuid = currentVisit?.encounters?.find((encounter) => encounter?.form?.uuid === config.vitals.formUuid)
+    ?.uuid;
 
   const midUpperArmCircumference = watch('midUpperArmCircumference');
   const systolicBloodPressure = watch('systolicBloodPressure');
