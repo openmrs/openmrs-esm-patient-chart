@@ -63,14 +63,22 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
 
   if (latestVitals && Object.keys(latestVitals)?.length && conceptRanges?.length) {
     const hasActiveVisit = Boolean(currentVisit?.uuid);
-    const vitalsTakenToday = Boolean(dayjs(latestVitals?.date).isToday());
-    const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
     const now = dayjs();
-    const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
+    const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
+    const VITALS_THRESHOLD_HOURS = 12;
+    const vitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() > VITALS_THRESHOLD_HOURS;
+    const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
 
     let overdueVitalsTagContent: React.ReactNode = null;
-
-    if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
+    if (vitalsOverdueDayCount < 1) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="hoursOldVitals" count={Math.round(vitalsTakenTimeAgo.asHours())}>
+          <span>
+            These vitals are <strong>{Math.round(vitalsTakenTimeAgo.asHours())} hours old</strong>
+          </span>
+        </Trans>
+      );
+    } else if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
       overdueVitalsTagContent = (
         <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
           <span>
