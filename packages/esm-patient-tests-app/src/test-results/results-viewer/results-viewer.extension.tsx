@@ -157,12 +157,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
       <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
           <h4>{t('tests', 'Tests')}</h4>
-          <Button
-            className={styles.button}
-            kind="ghost"
-            onClick={resetTree} // TODO: Undo selections fix
-            size={isTablet ? 'md' : 'sm'}
-          >
+          <Button className={styles.button} kind="ghost" onClick={resetTree} size={isTablet ? 'md' : 'sm'}>
             <span>{t('reset', 'Reset')}</span>
           </Button>
         </div>

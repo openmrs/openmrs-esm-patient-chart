@@ -4,8 +4,8 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
-import { useGetManyObstreeData } from '../grouped-timeline';
 import { FilterProvider } from '../filter/filter-context';
+import { useGetManyObstreeData } from '../grouped-timeline';
 import TreeView from './tree-view.component';
 
 interface TreeViewWrapperProps {
@@ -26,11 +26,7 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
 
   if (roots?.length) {
-    return (
-      <FilterProvider roots={!isLoading ? roots : []}>
-        <TreeView {...props} isLoading={isLoading} />
-      </FilterProvider>
-    );
+    return <TreeView {...props} isLoading={isLoading} />;
   }
 
   return (
