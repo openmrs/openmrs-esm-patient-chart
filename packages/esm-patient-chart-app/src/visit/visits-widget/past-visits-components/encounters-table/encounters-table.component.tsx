@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -22,7 +22,7 @@ import {
   ComboBox,
   InlineLoading,
   DataTableSkeleton,
-} from '@carbon/react';
+ Pagination } from '@carbon/react';
 import {
   EditIcon,
   isDesktop,
@@ -35,12 +35,13 @@ import {
   useConfig,
   type EncounterType,
 } from '@openmrs/esm-framework';
+import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import {
-  type HtmlFormEntryForm,
-  PatientChartPagination,
-  launchFormEntryOrHtmlForms,
-} from '@openmrs/esm-patient-common-lib';
-import { deleteEncounter, type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
+  deleteEncounter,
+  type EncountersTableProps,
+  mapEncounter,
+  useEncounterTypes,
+} from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
 
@@ -57,11 +58,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   isLoading,
   onEncountersUpdated,
   showVisitType,
-  paginatedMappedEncounters,
+  paginated,
+  paginatedEncounters,
   encounterTypeToFilter,
   setEncounterTypeToFilter,
 }) => {
-  const pageSize = 20;
+  const [currentPageSize, setCurrentPageSize] = useState(20);
+  const pageSizes = [10, 20, 30, 40, 50];
+
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
@@ -72,6 +76,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     externalModuleName: '@openmrs/esm-patient-forms-app',
   });
   const { htmlFormEntryForms } = formsConfig;
+  const paginatedMappedEncounters = useMemo(() => paginatedEncounters?.map(mapEncounter), [paginatedEncounters]);
 
   const tableHeaders = [
     {
@@ -102,8 +107,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
-      const close = showModal('delete-encounter-modal', {
-        close: () => close(),
+      const dispose = showModal('delete-encounter-modal', {
+        close: () => dispose(),
         encounterTypeName: encounterTypeName || '',
         onConfirmation: () => {
           const abortController = new AbortController();
@@ -129,7 +134,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                 kind: 'error',
               });
             });
-          close();
+          dispose();
         },
       });
     },
@@ -164,15 +169,15 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         }) => (
           <>
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar {...getToolbarProps()}>
-                {encounterTypeToFilter !== undefined && (
+              {encounterTypeToFilter !== undefined && (
+                <TableToolbar {...getToolbarProps()}>
                   <TableToolbarContent>
                     <div className={styles.filterContainer}>
                       <ComboBox
                         className={styles.substitutionType}
                         id="encounterTypeFilter"
                         aria-label={t('filterByEncounterType', 'Filter by encounter type')}
-                        size={'sm'}
+                        size={desktopLayout ? 'sm' : 'lg'}
                         items={encounterTypes}
                         itemToString={(item: EncounterType) => item?.display}
                         onChange={({ selectedItem }) => {
@@ -183,8 +188,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                       />
                     </div>
                   </TableToolbarContent>
-                )}
-              </TableToolbar>
+                </TableToolbar>
+              )}
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
@@ -311,18 +316,27 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                 </div>
               )}
             </TableContainer>
-            <div className={styles.paginationContainer}>
-              <PatientChartPagination
-                currentItems={rows?.length}
-                onPageNumberChange={({ page }) => goTo(page)}
-                pageNumber={currentPage}
-                pageSize={pageSize}
-                totalItems={totalCount}
-              />
-            </div>
           </>
         )}
       </DataTable>
+      {paginated && (
+        <Pagination
+          forwardText={t('nextPage', 'Next page')}
+          backwardText={t('previousPage', 'Previous page')}
+          page={currentPage}
+          pageSize={currentPageSize}
+          pageSizes={pageSizes}
+          totalItems={totalCount}
+          onChange={({ pageSize, page }) => {
+            if (pageSize !== currentPageSize) {
+              setCurrentPageSize(pageSize);
+            }
+            if (page !== currentPage) {
+              goTo(page);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

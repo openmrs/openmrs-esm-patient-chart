@@ -4,11 +4,11 @@
 
 .container {
   margin: layout.$spacing-05 0;
+  border: 1px solid $ui-03;
 }
 
 .tableContainer {
   padding: 0;
-  border: 1px solid $ui-03;
   border-bottom: none;
 
   :global(.cds--data-table-header) {

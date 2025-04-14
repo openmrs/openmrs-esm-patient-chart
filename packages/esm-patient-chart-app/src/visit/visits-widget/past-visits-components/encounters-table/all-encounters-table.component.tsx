@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import EncountersTable from './encounters-table.component';
-import { type EncountersTableProps, mapEncounter, usePaginatedEncounters } from './encounters-table.resource';
+import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
 import { type EncounterType } from '@openmrs/esm-framework';
 
 interface AllEncountersTableProps {
@@ -21,13 +21,10 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     totalCount,
     goTo,
     mutate: mutateEncounters,
+    paginated,
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
-  const paginatedEncounterRows = useMemo(() => {
-    return paginatedEncounters?.map(mapEncounter);
-  }, [paginatedEncounters]);
-
-  const encountersTableProp: EncountersTableProps = {
+  const encountersTableProps: EncountersTableProps = {
     patientUuid,
     totalCount,
     currentPage,
@@ -35,12 +32,13 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     isLoading,
     onEncountersUpdated: mutateEncounters,
     showVisitType: true,
-    paginatedMappedEncounters: paginatedEncounterRows,
+    paginated,
+    paginatedEncounters,
     encounterTypeToFilter,
     setEncounterTypeToFilter,
   };
 
-  return <EncountersTable {...encountersTableProp} />;
+  return <EncountersTable {...encountersTableProps} />;
 };
 
 export default AllEncountersTable;

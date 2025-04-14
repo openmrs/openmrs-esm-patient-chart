@@ -14,22 +14,22 @@ interface VisitEncountersTableProps {
  */
 const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid, visit, mutateVisits }) => {
   const pageSize = 10;
-  const encounterRows = useMemo(() => visit.encounters.map(mapEncounter), [visit]);
 
-  const { results: paginatedEncounterRows, currentPage, goTo } = usePagination(encounterRows, pageSize);
+  const { results: paginatedEncounters, currentPage, goTo, paginated } = usePagination(visit.encounters, pageSize);
 
-  const encountersTableProp: EncountersTableProps = {
+  const encountersTableProps: EncountersTableProps = {
     patientUuid,
-    totalCount: encounterRows.length,
+    totalCount: visit.encounters.length,
     currentPage,
     goTo,
     isLoading: false,
     onEncountersUpdated: mutateVisits,
     showVisitType: false,
-    paginatedMappedEncounters: paginatedEncounterRows,
+    paginated,
+    paginatedEncounters: paginatedEncounters,
   };
 
-  return <EncountersTable {...encountersTableProp} />;
+  return <EncountersTable {...encountersTableProps} />;
 };
 
 export default VisitEncountersTable;

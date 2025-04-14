@@ -20,7 +20,8 @@ export interface EncountersTableProps {
   isLoading: boolean;
   onEncountersUpdated(): void;
   showVisitType: boolean;
-  paginatedMappedEncounters: Array<MappedEncounter>;
+  paginated: boolean;
+  paginatedEncounters: Array<Encounter>;
   encounterTypeToFilter?: EncounterType;
   setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
 }
@@ -33,7 +34,7 @@ export function deleteEncounter(encounterUuid: string, abortController: AbortCon
 }
 
 export function usePaginatedEncounters(patientUuid: string, encounterType: string, pageSize: number) {
-  const customRep = `custom:(uuid,display,encounterDatetime,form,encounterType,visit,patient,encounterProviders:(provider:(person)))`;
+  const customRep = `custom:(uuid,display,encounterDatetime,form,encounterType,visit,patient,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterProviders:(provider:(person)))`;
   const url = new URL(makeUrl(`${restBaseUrl}/encounter`), window.location.toString());
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);

@@ -5,18 +5,19 @@ import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import EncountersTable from './encounters-table.component';
-import { type EncountersTableProps, mapEncounter, useEncounterTypes } from './encounters-table.resource';
+import { type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
 
-const defaultProps: () => EncountersTableProps = () => ({
+const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
-  paginatedMappedEncounters: mockEncountersAlice.map(mapEncounter),
+  paginated: false,
+  paginatedEncounters: mockEncountersAlice,
   totalCount: mockEncountersAlice.length,
   currentPage: 1,
   goTo: jest.fn(),
   isLoading: false,
   onEncountersUpdated: jest.fn(),
   showVisitType: true,
-});
+};
 
 const mockShowModal = jest.mocked(showModal);
 const mockGetConfig = jest.mocked(getConfig);
@@ -42,7 +43,7 @@ jest.mock('./encounters-table.resource', () => ({
 describe('EncountersTable', () => {
   it('renders an empty state when no encounters are available', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
-    renderEncountersTable({ totalCount: 0, paginatedMappedEncounters: [] });
+    renderEncountersTable({ totalCount: 0, paginatedEncounters: [] });
 
     expect(screen.getByText(/No encounters to display/i)).toBeInTheDocument();
   });
@@ -97,5 +98,5 @@ describe('Delete Encounter', () => {
 });
 
 function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
-  renderWithSwr(<EncountersTable {...defaultProps()} {...props} />);
+  renderWithSwr(<EncountersTable {...testProps} {...props} />);
 }
