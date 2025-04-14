@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@carbon/react';
+ TableExpandHeader , TableExpandRow , TableExpandedRow } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
@@ -19,6 +19,7 @@ import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import styles from './visit-history-table.scss';
 import VisitTypeCell from './visit-type-cell.component';
+import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -32,8 +33,17 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
+  const {
+    data: visits,
+    currentPage,
+    error,
+    isLoading,
+    totalCount,
+    goTo,
+    mutate,
+  } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
+  const desktopLayout = isDesktop(useLayoutType());
 
   // TODO: make this configurable
   const columns = [
@@ -66,14 +76,15 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
     );
   }
   return (
-    <div className={''}>
-      <DataTable headers={columns} rows={rowData} useZebraStyles>
-        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+    <div className={styles.container}>
+      <DataTable headers={columns} rows={rowData} size={desktopLayout ? 'sm' : 'lg'} useZebraStyles>
+        {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
           <>
             <TableContainer>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
+                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                     {headers.map((header) => (
                       <TableHeader
                         {...getHeaderProps({
@@ -87,13 +98,21 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => {
+                  {rows.map((row, i) => {
+                    const visit = visits[i];
                     return (
-                      <TableRow key={row.id} {...getRowProps({ row })}>
-                        {row.cells.map((cell) => {
-                          return <TableCell key={cell.id}>{cell?.value}</TableCell>;
-                        })}
-                      </TableRow>
+                      <React.Fragment key={row.id}>
+                        <TableExpandRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => {
+                            return <TableCell key={cell.id}>{cell?.value}</TableCell>;
+                          })}
+                        </TableExpandRow>
+                        {row.isExpanded && (
+                          <TableExpandedRow {...getExpandedRowProps({ row })} className={styles.expandedRow} colSpan={headers.length + 2}>
+                            <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
+                          </TableExpandedRow>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </TableBody>
