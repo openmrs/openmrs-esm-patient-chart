@@ -12,8 +12,8 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
-import styles from './paginated-vitals.scss';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
+import styles from './paginated-vitals.scss';
 
 interface PaginatedVitalsProps {
   isPrinting?: boolean;
@@ -92,12 +92,13 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   return (
     <>
       <DataTable
-        rows={rows}
         headers={tableHeaders}
-        size={isTablet ? 'lg' : 'sm'}
-        useZebraStyles
-        sortRow={handleSorting}
         isSortable
+        overflowMenuOnHover={!isTablet}
+        rows={rows}
+        size={isTablet ? 'lg' : 'sm'}
+        sortRow={handleSorting}
+        useZebraStyles
       >
         {({ rows, headers, getTableProps, getHeaderProps }) => (
           <TableContainer className={styles.tableContainer}>

@@ -3,7 +3,6 @@ import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 import { type Patient, generateRandomPatient, startVisit, endVisit, deletePatient } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
-import { get } from 'lodash';
 
 let patient: Patient;
 let visit: Visit;
@@ -43,7 +42,22 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByPlaceholder('Write any notes here').fill('This is a note');
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
+  await test.step('And then I upload an image attachment', async () => {
+    await page.getByRole('button', { name: /add image/i }).click();
+    await expect(page.getByText(/add attachment/i)).toBeVisible();
+    await page.getByRole('tab', { name: /upload files/i }).click();
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
+    const fileChooser = await fileChooserPromise;
+
+    await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
+    await page.getByLabel(/image name/i).fill('Cross-sectional brain scan');
+    await page.getByRole('button', { name: /add attachment/i }).click();
+    await expect(page.getByText(/cross-sectional brain scan/i)).toBeVisible();
+  });
+
+  await test.step('And I click the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
