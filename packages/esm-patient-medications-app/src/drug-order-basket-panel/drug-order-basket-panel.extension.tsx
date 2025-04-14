@@ -10,10 +10,15 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
 import styles from './drug-order-basket-panel.scss';
 
+interface DrugOrderBasketPanelExtensionProps {
+  outsideOrderBasketWorkspace?: boolean;
+}
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
  */
-export default function DrugOrderBasketPanelExtension() {
+export default function DrugOrderBasketPanelExtension({
+  outsideOrderBasketWorkspace,
+}: DrugOrderBasketPanelExtensionProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
@@ -57,7 +62,8 @@ export default function DrugOrderBasketPanelExtension() {
   const openDrugSearch = () => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order'),
+      onWorkspaceClose: () =>
+        launchPatientWorkspace('add-drug-order', { outsideOrderBasketWorkspace: outsideOrderBasketWorkspace }),
       closeWorkspaceGroup: false,
     });
   };
@@ -65,7 +71,7 @@ export default function DrugOrderBasketPanelExtension() {
   const openDrugForm = (order: DrugOrderBasketItem) => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order }),
+      onWorkspaceClose: () => launchPatientWorkspace('add-drug-order', { order, outsideOrderBasketWorkspace }),
       closeWorkspaceGroup: false,
     });
   };

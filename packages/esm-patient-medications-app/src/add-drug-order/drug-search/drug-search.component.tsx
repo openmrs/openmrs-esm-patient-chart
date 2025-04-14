@@ -10,9 +10,10 @@ import styles from './order-basket-search.scss';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
+  outsideOrderBasketWorkspace?: boolean;
 }
 
-export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
+export default function DrugSearch({ openOrderForm, outsideOrderBasketWorkspace }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,9 +23,9 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace('add-drug-order', {
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      ...(!!outsideOrderBasketWorkspace ? {} : { onWorkspaceClose: () => launchPatientWorkspace('order-basket') }),
     });
-  }, []);
+  }, [outsideOrderBasketWorkspace]);
 
   const focusAndClearSearchInput = () => {
     setSearchTerm('');
@@ -51,6 +52,7 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
+        outsideOrderBasketWorkspace={outsideOrderBasketWorkspace}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>
