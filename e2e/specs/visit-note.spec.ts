@@ -45,19 +45,16 @@ test('Add and delete a visit note', async ({ page }) => {
   await test.step('And then I upload an image attachment', async () => {
     await page.getByRole('button', { name: /add image/i }).click();
     await expect(page.getByText(/add attachment/i)).toBeVisible();
-
-    await page.getByRole('tab', { name: 'Upload files' }).click();
+    await page.getByRole('tab', { name: /upload files/i }).click();
 
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: 'Drag and drop files here or click to upload' }).click();
+    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
     const fileChooser = await fileChooserPromise;
 
     await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
-
-    await page.getByLabel(/image name/i).fill('Uploaded File Image');
+    await page.getByLabel(/image name/i).fill('Cross-sectional brain scan');
     await page.getByRole('button', { name: /add attachment/i }).click();
-
-    await expect(page.getByText(/uploaded file image/i)).toBeVisible();
+    await expect(page.getByText(/cross-sectional brain scan/i)).toBeVisible();
   });
 
   await test.step('And I click the `Save and close` button', async () => {
