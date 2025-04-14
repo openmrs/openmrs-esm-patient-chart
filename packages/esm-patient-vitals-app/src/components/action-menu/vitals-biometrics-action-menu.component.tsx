@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
-import styles from './vitals-biometrics-action-menu.scss';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
+import styles from './vitals-biometrics-action-menu.scss';
 
 interface VitalsAndBiometricsActionMenuProps {
   encounterUuid: string;
