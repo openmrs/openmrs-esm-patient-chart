@@ -102,6 +102,7 @@ export function prepTestOrderPostData(
       orderReason: order.orderReason,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      dateActivated: order.dateActivated,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'REVISE') {
@@ -118,6 +119,7 @@ export function prepTestOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      dateActivated: order.dateActivated,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -133,6 +135,7 @@ export function prepTestOrderPostData(
       previousOrder: order.previousOrder,
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
+      dateActivated: order.dateActivated,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
     };
   } else {
