@@ -62,6 +62,7 @@ export function LabOrderForm({
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const visitStartDate = currentVisit?.startDatetime;
+  const visitEndDate = currentVisit?.stopDatetime;
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
   ).required;
@@ -138,7 +139,9 @@ export function LabOrderForm({
       };
       finalizedOrder.orderer = session.currentProvider.uuid;
       //Setting dateActivated ensures that the order date is accurately captured, which is essential for RDE
-      finalizedOrder.dateActivated = visitStartDate;
+      if (visitEndDate) {
+        finalizedOrder.dateActivated = visitStartDate;
+      }
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
 
@@ -158,7 +161,15 @@ export function LabOrderForm({
         closeWorkspaceGroup: false,
       });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder, visitStartDate],
+    [
+      orders,
+      setOrders,
+      session?.currentProvider?.uuid,
+      closeWorkspaceWithSavedChanges,
+      initialOrder,
+      visitStartDate,
+      visitEndDate,
+    ],
   );
 
   const cancelOrder = useCallback(() => {
