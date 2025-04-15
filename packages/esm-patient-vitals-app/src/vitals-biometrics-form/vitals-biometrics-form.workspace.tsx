@@ -138,8 +138,8 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
       const computedBodyMassIndex = calculateBodyMassIndex(
         weight,
         height,
-        conceptUnits.get(config.concepts.weightUuid),
-        conceptUnits.get(config.concepts.heightUuid),
+        conceptUnits.get(config.concepts.weightUuid) as 'lb' | 'lbs' | 'g',
+        conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
       );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
     }
