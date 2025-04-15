@@ -1,23 +1,28 @@
 import isNumber from 'lodash/isNumber';
 import { type ConceptMetadata } from '../common';
 
-export function calculateBodyMassIndex(weight: number, height: number, weightUnit: string, heightUnit: string): number {
-  if (weightUnit == 'lb' || weightUnit == 'lbs') {
-    weight = weight * 0.45359237;
-  }
-  if (weightUnit == 'g') {
-    weight = weight / 1000;
-  }
-  if (heightUnit == 'm') {
-    height = height * 100;
-  }
-  if (heightUnit == 'in') {
-    height = height * 0.0254;
-  }
+export function calculateBodyMassIndex(
+  weight: number,
+  height: number,
+  weightUnit: 'lb' | 'lbs' | 'g',
+  heightUnit: 'm' | 'cm' | 'in',
+): number {
   if (!weight || !height) return;
 
   if (weight > 0 && height > 0) {
-    return Number((weight / (height / 100) ** 2).toFixed(1));
+    if (weightUnit === 'lb' || weightUnit === 'lbs') {
+      weight = weight * 0.45359237;
+    }
+    if (weightUnit === 'g') {
+      weight = weight / 1000;
+    }
+    if (heightUnit === 'cm') {
+      height = height / 100;
+    }
+    if (heightUnit === 'in') {
+      height = height * 0.0254;
+    }
+    return Number((weight / height ** 2).toFixed(1));
   }
 }
 
