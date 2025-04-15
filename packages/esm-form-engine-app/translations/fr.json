@@ -25,7 +25,7 @@
   "enrollmentDiscontinuationNotAllowed": "Enrollment discontinuation not allowed",
   "enrollmentDiscontinued": "The patient's program enrollment has been successfully discontinued.",
   "enrollmentNotAllowed": "Enrollment not allowed",
-  "errorDescription": "{{errors}}",
+  "errorDescription": "{{erreurs}}",
   "errorDescriptionTitle": "errorDescriptionTitle",
   "errorLoadingFormSchema": "Error loading form schema",
   "errorLoadingInitialValues": "Error loading initial values",
