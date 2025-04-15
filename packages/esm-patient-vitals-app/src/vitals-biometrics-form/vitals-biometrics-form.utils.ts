@@ -2,7 +2,7 @@ import isNumber from 'lodash/isNumber';
 import { type ConceptMetadata } from '../common';
 
 export function calculateBodyMassIndex(weight: number, height: number, weightUnit: string, heightUnit: string): number {
-  if (weightUnit == 'lb') {
+  if (weightUnit == 'lb' || weightUnit == 'lbs') {
     weight = weight * 0.45359237;
   }
   if (weightUnit == 'g') {
