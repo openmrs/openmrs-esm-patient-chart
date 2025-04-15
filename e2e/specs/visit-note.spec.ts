@@ -97,9 +97,7 @@ test('Add and delete a visit note', async ({ page }) => {
   });
 
   await test.step('And the encounters table should be empty', async () => {
-    await expect(
-      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
-    ).toBeVisible();
+    await expect(page.getByLabel(/all encounters/i).getByText(/No encounters to display/i)).toBeVisible();
   });
 });
 

@@ -57,7 +57,7 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
 
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toHaveValue('Outpatient Clinic');
-    await expect(chartPage.page.getByText(/visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByRole('heading', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeChecked();
     await expect(chartPage.page.getByRole('search', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeVisible();
