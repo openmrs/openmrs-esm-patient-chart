@@ -5,7 +5,7 @@ export function calculateBodyMassIndex(weight: number, height: number, weightUni
   if (weightUnit == 'lb') {
     weight = weight * 0.45359237;
   }
-  if (weightUnit == 'gm') {
+  if (weightUnit == 'g') {
     weight = weight / 1000;
   }
   if (heightUnit == 'm') {
