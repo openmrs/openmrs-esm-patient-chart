@@ -9,7 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
- TableExpandHeader , TableExpandRow , TableExpandedRow } from '@carbon/react';
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
+} from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
@@ -107,11 +110,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                             return <TableCell key={cell.id}>{cell?.value}</TableCell>;
                           })}
                         </TableExpandRow>
-                        {row.isExpanded && (
-                          <TableExpandedRow {...getExpandedRowProps({ row })} className={styles.expandedRow} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
-                          </TableExpandedRow>
-                        )}
+                        <TableExpandedRow
+                          {...getExpandedRowProps({ row })}
+                          className={styles.expandedRow}
+                          colSpan={headers.length + 2}
+                        >
+                          <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
+                        </TableExpandedRow>
                       </React.Fragment>
                     );
                   })}

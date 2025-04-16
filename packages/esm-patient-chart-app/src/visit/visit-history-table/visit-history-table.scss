@@ -4,6 +4,11 @@
 .container {
   margin: layout.$spacing-05 0;
   border: 1px solid $ui-03;
+
+  // fixes padding of encounters table within the expanded visit table row
+  :global(tr.cds--parent-row.cds--expandable-row + tr[data-child-row] td) {
+    padding-inline-start: layout.$spacing-05;
+  }
 }
 
 .emptyStateContainer {
