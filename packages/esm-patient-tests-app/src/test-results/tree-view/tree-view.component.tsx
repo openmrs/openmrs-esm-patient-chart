@@ -2,16 +2,17 @@ import React, { useContext, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
-import { useLayoutType, TreeViewAltIcon } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, TreeViewAltIcon, useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation, type viewOpts } from '../../types';
 import FilterSet, { FilterContext } from '../filter';
-import GroupedTimeline from '../grouped-timeline';
+import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
+import { type ConfigObject } from '../../config-schema';
 
 interface TreeViewProps {
   patientUuid: string;
@@ -21,6 +22,7 @@ interface TreeViewProps {
   expanded: boolean;
   type: string;
   view?: viewOpts;
+  error?: string;
 }
 
 const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boolean }> = ({
@@ -76,9 +78,23 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
+  const config = useConfig<ConfigObject>();
+  const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
+  const { roots, error } = useGetManyObstreeData(conceptUuids);
 
   const { timelineData, resetTree } = useContext(FilterContext);
   const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
+
+  if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
+
+  if (roots?.length === 0) {
+    return (
+      <EmptyState
+        headerTitle={t('testResults_title', 'Test Results')}
+        displayText={t('testResultsData', 'Test results data')}
+      />
+    );
+  }
 
   if (tablet) {
     return (
