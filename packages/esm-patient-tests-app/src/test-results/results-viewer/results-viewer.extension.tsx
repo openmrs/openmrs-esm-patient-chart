@@ -12,7 +12,7 @@ import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
 import PanelView from '../panel-view/panel-view.component';
 import TabletOverlay from '../tablet-overlay';
-import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
+import TreeView from '../tree-view/tree-view.component';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.scss';
 
@@ -121,13 +121,14 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
           </div>
         </div>
         {selectedSection === 'tree' ? (
-          <TreeViewWrapper
+          <TreeView
             patientUuid={patientUuid}
             basePath={basePath}
             type={type}
             expanded={isExpanded}
             testUuid={testUuid}
             view={view}
+            isLoading={loading}
           />
         ) : selectedSection === 'panel' ? (
           <PanelView
@@ -183,13 +184,14 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
         </div>
       </div>
       <div className={styles.flex}>
-        <TreeViewWrapper
+        <TreeView
           patientUuid={patientUuid}
           basePath={basePath}
           type={type}
           expanded={false}
           testUuid={testUuid}
           view={view}
+          isLoading={loading}
         />
       </div>
     </div>
