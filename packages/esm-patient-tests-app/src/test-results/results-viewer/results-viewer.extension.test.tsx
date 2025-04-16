@@ -5,7 +5,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import FilterContext from '../filter/filter-context';
 import { type FilterContextProps } from '../filter/filter-types';
-import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
+import TreeView from '../tree-view/tree-view.component';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
 
@@ -41,6 +41,8 @@ const testProps = {
   expanded: false,
   type: 'default',
   view: 'individual-test' as const,
+  isLoading: false,
+  error: null,
 };
 
 mockUseConfig.mockReturnValue({
@@ -73,10 +75,10 @@ global.IntersectionObserver = jest.fn(function (callback, options) {
   this.options = options;
 }) as any;
 
-const renderTreeViewWrapperWithMockContext = (contextValue = mockFilterContext) => {
+const renderTreeViewWithMockContext = (contextValue = mockFilterContext) => {
   render(
     <FilterContext.Provider value={contextValue}>
-      <TreeViewWrapper {...testProps} />
+      <TreeView {...testProps} />
     </FilterContext.Provider>,
   );
 };
@@ -87,7 +89,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: null,
     });
-    render(<TreeViewWrapper {...testProps} />);
+    render(<TreeView {...testProps} />);
 
     const testResultsText = screen.getByRole('heading', { name: /test results/i });
     expect(testResultsText).toBeInTheDocument();
@@ -101,8 +103,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: new Error('An error occurred'),
     });
-    render(<TreeViewWrapper {...testProps} />);
-
+    render(<TreeView {...testProps} />);
     const testResultsText = screen.getByRole('heading', { name: /data load error/i });
     expect(testResultsText).toBeInTheDocument();
     expect(
@@ -118,7 +119,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: null,
     });
-    renderTreeViewWrapperWithMockContext();
+    renderTreeViewWithMockContext();
     expect(screen.getAllByText(/complete blood count/i)).toHaveLength(2);
     expect(screen.getAllByText(/hematocrit/i)).toHaveLength(2);
     expect(screen.getAllByText(/hemoglobin/i)).toHaveLength(4);
