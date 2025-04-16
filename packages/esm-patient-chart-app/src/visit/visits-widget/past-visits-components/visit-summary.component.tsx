@@ -15,21 +15,22 @@ import {
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import { mapEncounters, type Encounter, type Note, type Order, type OrderItem } from '../visit.resource';
+import { type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import VisitsTable from './visits-table/visits-table.component';
 import styles from './visit-summary.scss';
+import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
+  mutateVisit(): void;
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, mutateVisit }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -148,13 +149,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters as Array<Encounter>} />
+            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitsTable visits={mapEncounters(visit)} showAllEncounters={false} patientUuid={patientUuid} />
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} mutateVisits={mutateVisit} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

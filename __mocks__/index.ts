@@ -12,6 +12,7 @@ export * from './mockBasePanel.mock';
 export * from './mockDeceasedPatient';
 export * from './order-stock-data.mock';
 export * from './order-price-data.mock';
+export * from './patient.mock';
 export * from './patient-flags.mock';
 export * from './programs.mock';
 export * from './relationships.mock';

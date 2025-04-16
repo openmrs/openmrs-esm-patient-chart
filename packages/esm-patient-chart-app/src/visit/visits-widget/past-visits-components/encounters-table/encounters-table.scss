@@ -1,16 +1,15 @@
-@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.container {
+  margin: layout.$spacing-05 0;
+  border: 1px solid $ui-03;
+}
+
 .tableContainer {
   padding: 0;
-
-  :global(.cds--data-table-content) {
-    border: 1px solid $ui-03;
-    border-bottom: none;
-    overflow: visible;
-  }
+  border-bottom: none;
 
   :global(.cds--data-table-header) {
     padding: 0;
@@ -18,7 +17,6 @@
 
   :global(.cds--table-toolbar) {
     position: relative;
-    height: layout.$spacing-07;
     overflow: visible;
     top: 0;
   }
@@ -26,11 +24,12 @@
   &:global(.cds--data-table-container) {
     background: none !important;
   }
+}
 
-  :global(.cds--toolbar-content),
-  :global(.cds--toolbar-search-container-expandable) {
-    height: layout.$spacing-07;
-    margin-bottom: layout.$spacing-02;
+.paginationContainer {
+  > div {
+    border: 1px solid $ui-03 !important;
+    border-top: none !important;
   }
 }
 
@@ -42,15 +41,14 @@
   :global(.cds--list-box__menu-icon) {
     height: layout.$spacing-05;
   }
+
+  label {
+    margin-right: layout.$spacing-05 !important;
+  }
 }
 
 .search {
   max-width: 16rem;
-}
-
-.tableHeader > :global(.cds--table-header-label) {
-  @include type.type-style('productive-heading-01');
-  color: $text-02;
 }
 
 .menuItem {
@@ -58,6 +56,8 @@
 }
 
 .expandedRow {
+  padding-inline-start: 3.5rem;
+
   > td {
     padding: inherit !important;
 
@@ -103,24 +103,10 @@
   color: $text-02;
 }
 
-.text02 {
-  color: colors.$gray-70;
-}
+.layer {
+  height: 100%;
 
-.bodyLong01 {
-  @include type.type-style('body-01');
-}
-
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  :global(.cds--table-toolbar) {
-    min-height: layout.$spacing-07;
-  }
-}
-
-/* Mobile */
-:global(.omrs-breakpoint-lt-desktop) {
-  :global(.cds--table-toolbar) {
-    min-height: layout.$spacing-08;
+  :global(.cds--btn--primary) {
+    background-color: unset;
   }
 }

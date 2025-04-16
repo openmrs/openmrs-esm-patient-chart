@@ -3,14 +3,11 @@ import {
   restBaseUrl,
   useConfig,
   useOpenmrsInfinite,
-  type Obs,
   type OpenmrsResource,
-  type Privilege,
   type Visit,
   makeUrl,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 import { type ChartConfig } from '../../config-schema';
 
 const customRepresentation =
@@ -33,36 +30,6 @@ export function usePaginatedVisits(patientUuid: string, pageSize: number) {
   return useOpenmrsPagination<Visit>(url, pageSize);
 }
 
-export function useEncounters(patientUuid: string) {
-  const endpointUrl = `${restBaseUrl}/encounter`;
-  // setting this up to make it more generic and usable later
-  const params = {
-    patient: patientUuid,
-    v: 'default',
-    limit: '100',
-    order: 'desc',
-    startIndex: '0',
-  };
-  const fullRequest =
-    endpointUrl +
-    '?' +
-    Object.entries(params)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&');
-
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Record<string, unknown>> } }, Error>(
-    fullRequest,
-    openmrsFetch,
-  );
-
-  return {
-    encounters: data ? data?.data?.results : null,
-    error,
-    isLoading,
-    isValidating,
-  };
-}
-
 export function deleteVisit(visitUuid: string) {
   return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}`, {
     method: 'DELETE',
@@ -77,72 +44,6 @@ export function restoreVisit(visitUuid: string) {
     method: 'POST',
     body: { voided: false },
   });
-}
-
-export function mapEncounters(visit: Visit): MappedEncounter[] {
-  return visit?.encounters?.map((encounter) => ({
-    id: encounter?.uuid,
-    datetime: encounter?.encounterDatetime,
-    encounterType: encounter?.encounterType?.display,
-    editPrivilege: encounter?.encounterType?.editPrivilege?.display,
-    form: encounter?.form,
-    obs: encounter?.obs,
-    visitUuid: visit?.uuid,
-    visitType: visit?.visitType?.display,
-    visitTypeUuid: visit?.visitType?.uuid,
-    visitStartDatetime: visit?.startDatetime,
-    visitStopDatetime: visit?.stopDatetime,
-    provider:
-      encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
-  }));
-}
-
-export interface MappedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  editPrivilege: string;
-  form: OpenmrsResource;
-  obs: Array<Obs>;
-  provider: string;
-  visitUuid: string;
-  visitType: string;
-  visitTypeUuid?: string;
-  visitStartDatetime?: string;
-  visitStopDatetime?: string;
-}
-
-export interface Encounter {
-  uuid: string;
-  diagnoses: Array<Diagnosis>;
-  encounterDatetime: string;
-  encounterProviders: Array<EncounterProvider>;
-  encounterType: {
-    uuid: string;
-    display: string;
-    viewPrivilege?: Privilege;
-    editPrivilege?: Privilege;
-  };
-  obs: Array<Obs>;
-  orders?: Array<Order>;
-  form: OpenmrsResource;
-  patient: OpenmrsResource;
-}
-
-export interface EncounterProvider {
-  uuid: string;
-  display: string;
-  encounterRole: {
-    uuid: string;
-    display: string;
-  };
-  provider: {
-    uuid: string;
-    person?: {
-      uuid: string;
-      display: string;
-    };
-  };
 }
 
 export interface Order {
