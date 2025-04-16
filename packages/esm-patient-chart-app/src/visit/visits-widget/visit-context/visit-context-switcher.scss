@@ -2,10 +2,6 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.visitCardRowsContainer {
-  max-height: 300px;
-}
-
 .visitCardRow {
   display: flex;
   position: relative;
@@ -52,4 +48,8 @@
 .visitCardRowRadioButton {
   display: flex;
   align-items: center;
+}
+
+.pagination {
+  background-color: #f4f4f4;
 }
