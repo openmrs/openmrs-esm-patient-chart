@@ -1,7 +1,8 @@
 import { execSync } from 'node:child_process';
 
 try {
-  execSync(`yarn up --fixed '@openmrs/*@next' 'openmrs@next'`, {
+  // NB for other places use '@openmrs/*@next'; here we want to ignore patient-common-lib
+  execSync(`yarn up --fixed '@openmrs/esm-framework@next' '@openmrs/esm-form-engine-lib@next' 'openmrs@next'`, {
     stdio: ['ignore', 'inherit', 'inherit'],
     windowsHide: true,
   });

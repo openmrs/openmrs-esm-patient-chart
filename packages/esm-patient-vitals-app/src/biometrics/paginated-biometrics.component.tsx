@@ -75,6 +75,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       <DataTable
         headers={tableHeaders}
         isSortable
+        overflowMenuOnHover={!isTablet}
         rows={paginatedBiometrics}
         size={isTablet ? 'lg' : 'sm'}
         sortRow={handleSorting}

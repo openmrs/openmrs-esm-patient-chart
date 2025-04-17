@@ -22,6 +22,10 @@ const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
 
 mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
+const mockLaunchWorkspaceRequiringVisit = jest.fn();
+const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+  return () => mockLaunchWorkspaceRequiringVisit(name);
+});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -30,6 +34,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
+    useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
@@ -104,8 +109,7 @@ describe('VitalsHeader', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledTimes(1);
   });
 
   it('displays correct overdue tag for vitals 5 days old', async () => {
@@ -183,14 +187,7 @@ describe('VitalsHeader', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      formInfo: {
-        encounterUuid: '',
-        formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
-      },
-      workspaceTitle: 'Triage',
-      mutateForm: invalidateCachedVitalsAndBiometrics,
-    });
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledTimes(1);
   });
 
   it('should show links in vitals header by default', async () => {

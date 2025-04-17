@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { type ImmunizationSequenceDefinition } from '../../types/fhir-immunization-domain';
 import { useController, type Control } from 'react-hook-form';
 import { Dropdown, NumberInput } from '@carbon/react';
@@ -18,6 +18,15 @@ export const DoseInput: React.FC<{
     [sequences, vaccine],
   );
 
+  const handleChange = useCallback(
+    (event, { value }) => {
+      const parsedValue =
+        value === '' || value === null || (typeof value === 'string' && !value.trim()) ? undefined : Number(value);
+      field.onChange(isNaN(parsedValue) ? undefined : parsedValue);
+    },
+    [field],
+  );
+
   return (
     <div className={styles.row}>
       {vaccineSequences.length ? (
@@ -34,10 +43,13 @@ export const DoseInput: React.FC<{
         <NumberInput
           id="doseNumber"
           label={t('doseNumberWithinSeries', 'Dose number within series')}
-          min={0}
-          onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
+          min={1}
+          onChange={handleChange}
           value={field.value}
           hideSteppers={true}
+          allowEmpty={true}
+          disableWheel={true}
+          required={true}
         />
       )}
     </div>
