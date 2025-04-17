@@ -68,8 +68,13 @@ test('Add and edit a program enrollment', async ({ page, patient }) => {
   });
 
   await test.step('When I click on the `Edit` button of the created program', async () => {
-    await programsPage.overflowButton().click();
-    await programsPage.editProgramButton().click();
+    await expect(dataRow).toBeVisible();
+
+    await dataRow.hover();
+
+    await programsPage.overflowButton().click({ timeout: 10000 });
+
+    await page.getByRole('menuitem', { name: /edit/i }).click({ timeout: 10000 });
   });
 
   await test.step('Then I should see the program launch in the workspace in edit mode`', async () => {
