@@ -55,20 +55,18 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
 
     if (concept.setMembers?.length > 0) {
       return concept.setMembers.map((memberConcept) => {
-        const memberObs = testResultObs?.groupMembers?.find((obs) => obs?.concept?.uuid === memberConcept?.uuid);
+        const memberObs = testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid);
 
         const resultValue =
           memberObs?.value?.display ||
-          (typeof memberObs?.value === 'string' || typeof memberObs?.value === 'number'
-            ? String(memberObs.value)
-            : '--');
+          (typeof memberObs.value === 'string' || typeof memberObs.value === 'number' ? String(memberObs.value) : '--');
 
         return {
           id: memberConcept.uuid,
-          testType: <div className={styles.testType}>{memberConcept?.display || '--'}</div>,
+          testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
           result: isLoadingResult ? <SkeletonText /> : resultValue,
           normalRange:
-            memberConcept?.hiNormal && memberConcept?.lowNormal
+            memberConcept.hiNormal && memberConcept.lowNormal
               ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
               : 'N/A',
         };
