@@ -1,8 +1,8 @@
-import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
-import React from 'react';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
