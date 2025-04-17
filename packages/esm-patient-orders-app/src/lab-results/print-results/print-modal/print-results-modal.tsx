@@ -6,7 +6,7 @@ import styles from './print-results-modal.scss';
 import { useReactToPrint } from 'react-to-print';
 import PrintableReport from '../print-preview/print-preview.component';
 import classNames from 'classnames';
-import upperCase from 'lodash/upperCase';
+import Capitalize from 'lodash-es/capitalize';
 import { formatDate, useSession, formatDatetime } from '@openmrs/esm-framework';
 
 type PrintResultsModalProps = {
@@ -59,13 +59,13 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
     <>
       <ModalBody className={classNames(styles.modalBody, styles.modalContentWrapper)}>
         <div className={styles.selectionPanel}>
-          <h4 className={styles.titleHeader}>{upperCase(t('selectTestsToPrint', 'Select tests to print'))}</h4>
+          <h4 className={styles.titleHeader}>{Capitalize(t('selectTestsToPrint', 'Select tests to print'))}</h4>
           <div className={styles.checkboxList}>
             {orders.map((order) => (
               <Checkbox
                 key={order.uuid}
                 id={order.uuid}
-                labelText={<span className={styles.checkboxLabel}>{upperCase(order.concept.display)}</span>}
+                labelText={<span className={styles.checkboxLabel}>{Capitalize(order.concept.display)}</span>}
                 checked={selectedOrders.has(order.uuid)}
                 onChange={(_, { checked }) => handleOrderSelection(order.uuid, checked)}
                 className={styles.checkboxItem}
@@ -80,30 +80,30 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
               {filteredOrders.length > 0 && (
                 <>
                   <div className={styles.printableHeader}>
-                    <p className={styles.titleHeader}>{upperCase(t('laboratoryReport', 'Laboratory Report'))}</p>
+                    <p className={styles.titleHeader}>{Capitalize(t('laboratoryReport', 'Laboratory Report'))}</p>
                   </div>
 
                   <div className={styles.printableBody}>
                     <div className={styles.testResultDetails}>
-                      <p className={styles.itemHeading}>{upperCase(t('reportSummaryTo', 'Report summary to'))}</p>
+                      <p className={styles.itemHeading}>{Capitalize(t('reportSummaryTo', 'Report summary to'))}</p>
                       <p className={styles.itemLabel}>
-                        {upperCase(t('name', 'Name'))}: {upperCase(firstOrder?.patient?.person?.display)}
+                        {Capitalize(t('name', 'Name'))}: {Capitalize(firstOrder?.patient?.person?.display)}
                       </p>
                       <p className={styles.itemLabel}>
-                        {upperCase(t('age', 'Age'))}: {firstOrder?.patient?.person?.age}
+                        {Capitalize(t('age', 'Age'))}: {firstOrder?.patient?.person?.age}
                       </p>
                       <p className={styles.itemLabel}>
-                        {upperCase(t('gender', 'Gender'))}:
-                        {upperCase(firstOrder?.patient?.person?.gender === 'M' ? 'Male' : 'Female')}
+                        {Capitalize(t('gender', 'Gender'))}:
+                        {Capitalize(firstOrder?.patient?.person?.gender === 'M' ? 'Male' : 'Female')}
                       </p>
                     </div>
 
                     <div className={styles.facilityDetails}>
-                      <p className={styles.itemLabel}>{upperCase(location)}</p>
+                      <p className={styles.itemLabel}>{Capitalize(location)}</p>
                       <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
                     </div>
                   </div>
-                  <p className={styles.testDoneHeader}>{upperCase(t('testDone', 'Test done'))}</p>
+                  <p className={styles.testDoneHeader}>{Capitalize(t('testDone', 'Test done'))}</p>
                 </>
               )}
 

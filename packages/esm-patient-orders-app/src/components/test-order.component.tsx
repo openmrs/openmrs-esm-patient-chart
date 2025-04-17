@@ -1,3 +1,7 @@
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -10,10 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import styles from './test-order.scss';
 
@@ -31,7 +31,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     () => [
       {
         key: 'testType',
-        header: testOrder?.orderType?.display || t('test', 'Test'),
+        header: testOrder?.orderType?.display || '',
       },
       {
         key: 'result',
@@ -64,7 +64,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
             : '--');
 
         return {
-          id: memberConcept?.uuid,
+          id: memberConcept.uuid,
           testType: <div className={styles.testType}>{memberConcept?.display || '--'}</div>,
           result: isLoadingResult ? <SkeletonText /> : resultValue,
           normalRange:
