@@ -23,6 +23,7 @@ import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import styles from './visit-history-table.scss';
 import VisitTypeCell from './visit-type-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
+import VisitActionsCell from './visit-actions-cell.component';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -53,6 +54,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
     { key: 'visitDate', header: t('date', 'Date'), CellComponent: VisitDateCell },
     { key: 'visitType', header: t('visitType', 'Visit type'), CellComponent: VisitTypeCell },
     { key: 'diagnoses', header: t('diagnoses', 'Diagnoses'), CellComponent: VisitDiagnosisCell },
+    { key: 'actions', header: '', CellComponent: VisitActionsCell },
   ];
 
   const layout = useLayoutType();
@@ -93,6 +95,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
+                          className: header.key === 'actions' ? styles.actionsColumn : '',
                         })}
                       >
                         {header.header}

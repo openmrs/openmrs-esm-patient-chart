@@ -6,9 +6,14 @@ import { useTranslation } from 'react-i18next';
 interface DeleteVisitActionItemProps {
   patientUuid: string;
   visit: Visit;
+
+  /**
+   * If true, renders the button with fewer words
+   */
+  compact?: boolean;
 }
 
-const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUuid, visit }) => {
+const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUuid, visit, compact }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -24,10 +29,12 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
     return null;
   }
 
+  const buttonLabel = compact ? t('delete', 'Delete') : t('deleteVisit', 'Delete visit');
+
   return (
     <UserHasAccess privilege="Delete Visits">
       <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCanIcon} size={isTablet ? 'lg' : 'sm'}>
-        {t('deleteVisit', 'Delete visit')}
+        {buttonLabel}
       </Button>
     </UserHasAccess>
   );
