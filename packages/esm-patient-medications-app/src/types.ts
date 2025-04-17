@@ -48,48 +48,6 @@ export interface DosingInstructions {
   asNeededCondition?: string;
 }
 
-export interface Order {
-  uuid: string;
-  dateActivated: string;
-  dose: number;
-  doseUnits: {
-    uuid: string;
-    display?: string;
-  };
-  orderNumber: string;
-  display: string;
-  drug: {
-    uuid: string;
-    name?: string;
-    strength: string;
-  };
-  duration: number;
-  durationUnits: {
-    uuid: string;
-    display?: string;
-  };
-  frequency: {
-    uuid: string;
-    display?: string;
-  };
-  numRefills: number;
-  orderer: {
-    uuid: string;
-    person: {
-      uuid?: string;
-      display: string;
-    };
-  };
-  orderType: {
-    uuid: string;
-    display: string;
-  };
-  route: {
-    uuid: string;
-    display?: string;
-  };
-}
-
 export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
   value: number;
 }
