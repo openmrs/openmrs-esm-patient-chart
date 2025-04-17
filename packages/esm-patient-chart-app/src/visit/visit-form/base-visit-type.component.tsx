@@ -75,6 +75,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
                   onChange={onChange}
                   orientation="vertical"
                   valueSelected={value}
+                  legendText={t('selectVisitType', 'Please select a visit type')}
                 >
                   {results.map(({ uuid, display, name }) => (
                     <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
