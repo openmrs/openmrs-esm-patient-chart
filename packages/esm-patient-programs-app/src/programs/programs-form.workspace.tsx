@@ -26,6 +26,7 @@ import {
   useLayoutType,
   useLocations,
   useSession,
+  LocationPicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -240,20 +241,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentLocation"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <Select
-          aria-label="enrollment location"
-          id="location"
-          labelText={t('enrollmentLocation', 'Enrollment location')}
-          onChange={(event) => onChange(event.target.value)}
-          value={value}
-        >
-          {availableLocations?.length > 0 &&
-            availableLocations.map((location) => (
-              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                {location.display}
-              </SelectItem>
-            ))}
-        </Select>
+        <React.Fragment>
+          <FormLabel className={`${styles.locationLabel} cds--label`}>
+            {t('enrollmentLocation', 'Enrollment location')}
+          </FormLabel>
+          <LocationPicker
+            selectedLocationUuid={value}
+            defaultLocationUuid={session?.sessionLocation?.uuid}
+            locationTag="Login Location"
+            onChange={(locationUuid) => onChange(locationUuid)}
+          />
+        </React.Fragment>
       )}
     />
   );
@@ -314,7 +312,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       value: completionDate,
     },
     {
-      style: { width: '50%' },
+      style: { width: '100%' },
       legendText: '',
       value: enrollmentLocation,
     },

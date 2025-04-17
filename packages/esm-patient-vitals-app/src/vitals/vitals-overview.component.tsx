@@ -1,9 +1,9 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { CardHeader, EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   PrinterIcon,
@@ -15,13 +15,14 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
-import { launchVitalsAndBiometricsForm } from '../utils';
+import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
+import { useEncounterVitalsAndBiometrics } from '../common/data.resource';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -36,20 +37,17 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const config = useConfig<ConfigObject>();
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = useState(false);
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const [isPrinting, setIsPrinting] = useState(false);
   const contentToPrintRef = useRef(null);
+  const launchVitalsBiometricsForm = useLaunchVitalsAndBiometricsForm();
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
-  const launchVitalsBiometricsForm = useCallback(() => {
-    launchVitalsAndBiometricsForm(currentVisit, config);
-  }, [config, currentVisit]);
-
+  useEncounterVitalsAndBiometrics('771bbc44-8d45-4ac3-af6e-059814dd7cde');
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
@@ -139,10 +137,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
 
   const tableRows: Array<VitalsTableRow> = useMemo(
     () =>
-      vitals?.map((vitalSigns, index) => {
+      vitals?.map((vitalSigns) => {
         return {
           ...vitalSigns,
-          id: `${index}`,
           dateRender: formatDate(parseDate(vitalSigns.date.toString()), { mode: 'wide', time: true }),
           bloodPressureRender: `${vitalSigns.systolic ?? '--'} / ${vitalSigns.diastolic ?? '--'}`,
           pulseRender: vitalSigns.pulse ?? '--',

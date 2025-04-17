@@ -16,9 +16,9 @@ test('Start and end a new visit', async ({ page }) => {
     await chartPage.goTo(patient.uuid);
   });
 
-  await test.step('And I click on the `Start visit` button in the Actions overflow menu', async () => {
+  await test.step('And I click on the `Add visit` button in the actions overflow menu', async () => {
     await chartPage.page.getByRole('button', { name: /actions/i }).click();
-    await chartPage.page.getByRole('menuitem', { name: /start visit/i }).click();
+    await chartPage.page.getByRole('menuitem', { name: /add visit/i }).click();
   });
 
   await test.step('Then I should see the `Start Visit` form launch in the workspace', async () => {
@@ -84,9 +84,9 @@ test('Start and end a new visit', async ({ page }) => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
   });
 
-  await test.step('When I click on the `End Visit` button in the Actions overflow menu', async () => {
+  await test.step('When I click on the `End visit` button in the actions overflow menu', async () => {
     await chartPage.page.getByRole('button', { name: /actions/i }).click();
-    await chartPage.page.getByRole('menuitem', { name: /end visit/i }).click();
+    await chartPage.page.getByRole('menuitem', { name: /end active visit/i }).click();
   });
 
   await test.step('Then I should see a confirmation modal', async () => {

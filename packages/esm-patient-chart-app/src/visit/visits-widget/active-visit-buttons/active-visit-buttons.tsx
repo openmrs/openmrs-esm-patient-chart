@@ -10,6 +10,10 @@ export interface ActiveVisitActionsInterface {
   visit: Visit;
   patientUuid: string;
 }
+
+/**
+ * This is an extension that is used not in the refapp, but in other distributions.
+ */
 const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -160,12 +164,6 @@ const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid }) => 
         kind="ghost"
         label={t('endVisit', 'End visit')}
         onClick={() => openModal('end-visit-dialog')}
-        renderIcon={AddIcon}
-      />
-      <MenuItem
-        kind="ghost"
-        label={t('cancelVisit', 'Cancel visit')}
-        onClick={() => openModal('cancel-visit-dialog')}
         renderIcon={AddIcon}
       />
       <MenuItem

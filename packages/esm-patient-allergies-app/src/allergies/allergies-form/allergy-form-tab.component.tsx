@@ -1,10 +1,10 @@
 import React from 'react';
 import { RadioButtonGroup, RadioButton } from '@carbon/react';
-import { type OpenMRSResource } from '../../types';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 import styles from './allergy-form-tab.scss';
 
 interface AllergyFormTabProps {
-  allergens: Array<OpenMRSResource>;
+  allergens: Array<OpenmrsResource>;
   selectedAllergen: string;
   handleChange: Function;
   name: string;

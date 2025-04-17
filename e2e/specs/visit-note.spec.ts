@@ -42,7 +42,22 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByPlaceholder('Write any notes here').fill('This is a note');
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
+  await test.step('And then I upload an image attachment', async () => {
+    await page.getByRole('button', { name: /add image/i }).click();
+    await expect(page.getByText(/add attachment/i)).toBeVisible();
+    await page.getByRole('tab', { name: /upload files/i }).click();
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
+    const fileChooser = await fileChooserPromise;
+
+    await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
+    await page.getByLabel(/image name/i).fill('Cross-sectional brain scan');
+    await page.getByRole('button', { name: /add attachment/i }).click();
+    await expect(page.getByText(/cross-sectional brain scan/i)).toBeVisible();
+  });
+
+  await test.step('And I click the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -50,8 +65,9 @@ test('Add and delete a visit note', async ({ page }) => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
-  await test.step('When I navigate to the visits dashboard', async () => {
+  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
     await visitsPage.goTo(patient.uuid);
+    await page.getByRole('tab', { name: /summary cards/i }).click();
   });
 
   await test.step('Then I should see the newly added visit note added to the list', async () => {
@@ -81,9 +97,7 @@ test('Add and delete a visit note', async ({ page }) => {
   });
 
   await test.step('And the encounters table should be empty', async () => {
-    await expect(
-      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
-    ).toBeVisible();
+    await expect(page.getByLabel(/all encounters/i).getByText(/No encounters to display/i)).toBeVisible();
   });
 });
 

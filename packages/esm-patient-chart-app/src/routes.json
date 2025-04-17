@@ -64,16 +64,16 @@
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-actions-slot",
-      "component": "cancelVisitActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-search-actions-slot",
-      "component": "cancelVisitPatientSearchActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
@@ -81,22 +81,6 @@
       "name": "mark-patient-deceased-button",
       "slot": "patient-actions-slot",
       "component": "markPatientDeceasedActionButton",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "add-past-visit-button",
-      "slot": "patient-actions-slot",
-      "component": "addPastVisitActionButton",
-      "featureFlag": "rde",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "add-past-visit-button",
-      "slot": "patient-search-actions-slot",
-      "component": "addPastVisitPatientSearchActionButton",
-      "featureFlag": "rde",
       "online": true,
       "offline": true
     },
@@ -198,11 +182,14 @@
       "component": "visitContextHeader"
     }
   ],
-  "modals": [
+  "featureFlags": [
     {
-      "name": "cancel-visit-dialog",
-      "component": "cancelVisitModal"
-    },
+      "description": "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header",
+      "flagName": "rde",
+      "label": "Retrospective Data Entry"
+    }
+  ],
+  "modals": [
     {
       "name": "delete-encounter-modal",
       "component": "deleteEncounterModal"

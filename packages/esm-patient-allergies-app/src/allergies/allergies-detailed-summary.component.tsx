@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -49,18 +48,26 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
   ];
 
-  const tableRows = useMemo(() => {
-    return allergies?.map((allergy) => ({
-      ...allergy,
-      reactionSeverity: allergy.reactionSeverity?.toUpperCase() ?? '--',
-      lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
-      reaction: allergy.reactionManifestations?.join(', '),
-      note: allergy?.note ?? '--',
-    }));
-  }, [allergies]);
+  const tableRows = useMemo(
+    () =>
+      allergies?.map((allergy) => ({
+        ...allergy,
+        lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
+        note: allergy?.note ?? '--',
+        reaction: allergy.reactionManifestations?.sort((a, b) => a.localeCompare(b))?.join(', ') ?? '--',
+        reactionSeverity: allergy.reactionSeverity?.toUpperCase() ?? '--',
+      })),
+    [allergies],
+  );
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -117,6 +124,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAllergiesForm} />;
 };
 

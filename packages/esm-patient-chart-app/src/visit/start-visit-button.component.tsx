@@ -10,6 +10,9 @@ interface StartVisitButtonProps {
   hidePatientSearch?: () => void;
 }
 
+/**
+ * This button shows up in search results patient cards for patients with no active visit
+ */
 const StartVisitButton = ({ patientUuid, handleReturnToSearchList, hidePatientSearch }: StartVisitButtonProps) => {
   const { t } = useTranslation();
   const startVisitWorkspaceForm = 'start-visit-workspace-form';

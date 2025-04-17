@@ -20,28 +20,14 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
     });
   };
 
-  const cancelVisit = () => {
-    const dispose = showModal('cancel-visit-dialog', {
-      patientUuid,
-      closeModal: () => dispose(),
-    });
-  };
-
-  const isActiveVisit = !visit?.stopDatetime;
-
   if (visit?.encounters?.length) {
     return null;
   }
 
   return (
     <UserHasAccess privilege="Delete Visits">
-      <Button
-        onClick={isActiveVisit ? cancelVisit : deleteVisit}
-        kind="danger--ghost"
-        renderIcon={TrashCanIcon}
-        size={isTablet ? 'lg' : 'sm'}
-      >
-        {isActiveVisit ? t('cancelVisit', 'Cancel visit') : t('deleteVisit', 'Delete visit')}
+      <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCanIcon} size={isTablet ? 'lg' : 'sm'}>
+        {t('deleteVisit', 'Delete visit')}
       </Button>
     </UserHasAccess>
   );

@@ -1,9 +1,9 @@
-enum AllergenType {
-  DRUG = 'DRUG',
-  FOOD = 'FOOD',
-  ENVIRONMENT = 'ENVIRONMENT',
-  OTHER = 'OTHER',
-}
+const ALLERGEN_TYPES = {
+  DRUG: 'DRUG',
+  FOOD: 'FOOD',
+  ENVIRONMENT: 'ENVIRONMENT',
+  OTHER: 'OTHER',
+} as const;
 
 export const mockAllergyResult = {
   display: 'ACE inhibitors',
@@ -724,21 +724,21 @@ export const mockFhirAllergyIntoleranceResponse = {
 };
 
 export const mockAllergens = [
-  { uuid: '162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'ACE inhibitors', type: AllergenType.DRUG },
+  { uuid: '162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'ACE inhibitors', type: ALLERGEN_TYPES.DRUG },
   {
     uuid: '162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     display: 'ARBs (angiotensin II receptor blockers)',
-    type: AllergenType.DRUG,
+    type: ALLERGEN_TYPES.DRUG,
   },
-  { uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Aspirin', type: AllergenType.DRUG },
-  { uuid: '162543AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Beef', type: AllergenType.FOOD },
-  { uuid: '72609AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Caffeine', type: AllergenType.FOOD },
-  { uuid: '162544AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chocolate', type: AllergenType.FOOD },
-  { uuid: '162545AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Dairy food', type: AllergenType.FOOD },
-  { uuid: '162171AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Eggs', type: AllergenType.FOOD },
-  { uuid: '162536AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Bee stings', type: AllergenType.ENVIRONMENT },
-  { uuid: '162537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Dust', type: AllergenType.ENVIRONMENT },
-  { uuid: '162538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Latex', type: AllergenType.ENVIRONMENT },
+  { uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Aspirin', type: ALLERGEN_TYPES.DRUG },
+  { uuid: '162543AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Beef', type: ALLERGEN_TYPES.FOOD },
+  { uuid: '72609AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Caffeine', type: ALLERGEN_TYPES.FOOD },
+  { uuid: '162544AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chocolate', type: ALLERGEN_TYPES.FOOD },
+  { uuid: '162545AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Dairy food', type: ALLERGEN_TYPES.FOOD },
+  { uuid: '162171AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Eggs', type: ALLERGEN_TYPES.FOOD },
+  { uuid: '162536AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Bee stings', type: ALLERGEN_TYPES.ENVIRONMENT },
+  { uuid: '162537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Dust', type: ALLERGEN_TYPES.ENVIRONMENT },
+  { uuid: '162538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Latex', type: ALLERGEN_TYPES.ENVIRONMENT },
 ];
 
 export const mockAllergicReactions = [

@@ -12,7 +12,7 @@ interface CurrentVisitSummaryProps {
 
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { isLoading, currentVisit, error, isValidating } = useVisit(patientUuid);
+  const { isLoading, currentVisit, error, isValidating, mutate } = useVisit(patientUuid);
 
   if (isLoading) {
     return (
@@ -46,7 +46,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
         <span>{isValidating ? <InlineLoading /> : null}</span>
       </CardHeader>
       <div className={styles.visitSummaryCard}>
-        <VisitSummary visit={currentVisit} patientUuid={patientUuid} />
+        <VisitSummary visit={currentVisit} patientUuid={patientUuid} mutateVisit={mutate} />
       </div>
     </div>
   );

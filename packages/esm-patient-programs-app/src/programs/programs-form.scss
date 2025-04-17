@@ -53,3 +53,7 @@
 .programName {
   @include type.type-style('body-compact-02');
 }
+
+.locationLabel {
+  margin-bottom: layout.$spacing-05;
+}

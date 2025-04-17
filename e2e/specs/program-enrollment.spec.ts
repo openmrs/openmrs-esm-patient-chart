@@ -48,11 +48,11 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await completionDateDayInput.fill('05');
     await completionDateMonthInput.fill('07');
     await completionDateYearInput.fill('2023');
-    await page.locator('#location').focus();
+    await page.locator('#search-1').focus();
   });
 
   await test.step('And I select `Outpatient Clinic` as the enrollment location', async () => {
-    await page.locator('#location').selectOption('44c3efb0-2583-4c80-a79e-1f756a03c0a1');
+    await page.getByRole('radio', { name: /Outpatient Clinic/i }).check();
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
@@ -101,11 +101,11 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await completionDateDayInput.fill('04');
     await completionDateMonthInput.fill('07');
     await completionDateYearInput.fill('2023');
-    await page.locator('#location').focus();
+    await page.locator('#search-1').focus();
   });
 
   await test.step('And I change the enrollment location to `Community Outreach`', async () => {
-    await page.locator('#location').selectOption('1ce1b7d4-c865-4178-82b0-5932e51503d6');
+    await page.locator('label:has-text("Community Outreach")').click();
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
