@@ -4,7 +4,7 @@ import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import type { DrugOrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { type DrugOrderBasketItem } from '../types';
+import type { DrugOrderBasketItem, Order } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -22,7 +22,7 @@ const customRepresentation =
  * @param orders The orders to sort.
  * @returns The sorted orders.
  */
-function sortOrdersByDateActivated(orders: any[]) {
+function sortOrdersByDateActivated(orders: Order[]) {
   return orders?.sort(
     (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
   );
