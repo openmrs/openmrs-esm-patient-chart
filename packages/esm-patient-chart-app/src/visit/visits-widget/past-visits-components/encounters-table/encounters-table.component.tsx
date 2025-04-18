@@ -22,7 +22,8 @@ import {
   ComboBox,
   InlineLoading,
   DataTableSkeleton,
- Pagination } from '@carbon/react';
+  Pagination,
+} from '@carbon/react';
 import {
   EditIcon,
   isDesktop,
@@ -199,7 +200,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {header.header}
                       </TableHeader>
                     ))}
-                    <TableExpandHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
