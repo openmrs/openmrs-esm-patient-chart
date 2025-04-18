@@ -27,6 +27,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
     showVisitType: false,
     paginated,
     paginatedEncounters: paginatedEncounters,
+    showEncounterTypeFilter: false,
   };
 
   return <EncountersTable {...encountersTableProps} />;

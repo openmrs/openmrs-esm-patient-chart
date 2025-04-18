@@ -22,6 +22,7 @@ export interface EncountersTableProps {
   showVisitType: boolean;
   paginated: boolean;
   paginatedEncounters: Array<Encounter>;
+  showEncounterTypeFilter: boolean;
   encounterTypeToFilter?: EncounterType;
   setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
 }

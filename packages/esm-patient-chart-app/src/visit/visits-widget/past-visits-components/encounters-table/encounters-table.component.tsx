@@ -62,6 +62,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   paginatedEncounters,
   encounterTypeToFilter,
   setEncounterTypeToFilter,
+  showEncounterTypeFilter,
 }) => {
   const [currentPageSize, setCurrentPageSize] = useState(20);
   const pageSizes = [10, 20, 30, 40, 50];
@@ -169,7 +170,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         }) => (
           <>
             <TableContainer className={styles.tableContainer}>
-              {encounterTypeToFilter !== undefined && (
+              {showEncounterTypeFilter && (
                 <TableToolbar {...getToolbarProps()}>
                   <TableToolbarContent>
                     <div className={styles.filterContainer}>

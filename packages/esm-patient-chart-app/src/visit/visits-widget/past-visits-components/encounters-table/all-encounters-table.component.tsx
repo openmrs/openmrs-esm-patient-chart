@@ -36,6 +36,7 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     paginatedEncounters,
     encounterTypeToFilter,
     setEncounterTypeToFilter,
+    showEncounterTypeFilter: true,
   };
 
   return <EncountersTable {...encountersTableProps} />;
