@@ -1,6 +1,13 @@
 import React from 'react';
 import { Button } from '@carbon/react';
-import { TrashCanIcon, UserHasAccess, type Visit, showModal, useLayoutType } from '@openmrs/esm-framework';
+import {
+  TrashCanIcon,
+  UserHasAccess,
+  type Visit,
+  getCoreTranslation,
+  showModal,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 interface DeleteVisitActionItemProps {
@@ -29,7 +36,7 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
     return null;
   }
 
-  const buttonLabel = compact ? t('delete', 'Delete') : t('deleteVisit', 'Delete visit');
+  const buttonLabel = compact ? getCoreTranslation('delete') : t('deleteVisit', 'Delete visit');
 
   return (
     <UserHasAccess privilege="Delete Visits">

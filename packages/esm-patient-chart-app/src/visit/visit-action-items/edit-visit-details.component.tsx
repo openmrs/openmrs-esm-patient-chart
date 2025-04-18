@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { EditIcon, UserHasAccess, type Visit, useLayoutType } from '@openmrs/esm-framework';
+import { EditIcon, UserHasAccess, type Visit, getCoreTranslation, useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface EditVisitDetailsActionItemProps {
@@ -27,7 +27,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
     });
   };
 
-  const buttonLabel = compact ? t('edit', 'Edit') : t('editVisitDetails', 'Edit visit details');
+  const buttonLabel = compact ? getCoreTranslation('edit') : t('editVisitDetails', 'Edit visit details');
 
   return (
     <UserHasAccess privilege="Edit Visits">
