@@ -79,6 +79,9 @@ export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = 
     results: [
       {
         uuid: '8e2f177c-8999-4fde-ba92-1e62b33179ac',
+        patient: {
+          uuid: 'some-uuid',
+        },
         encounters: [
           {
             uuid: 'c2f0d397-4f3e-486a-abc4-4565caa0f09c',

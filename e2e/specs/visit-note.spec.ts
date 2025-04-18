@@ -65,14 +65,21 @@ test('Add and delete a visit note', async ({ page }) => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
-  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
+  await test.step('When I navigate to the visits dashboard', async () => {
     await visitsPage.goTo(patient.uuid);
-    await page.getByRole('tab', { name: /summary cards/i }).click();
   });
 
-  await test.step('Then I should see the newly added visit note added to the list', async () => {
-    await expect(page.getByText(/asthma/i)).toBeVisible();
-    await expect(page.getByText(/gi upset/i)).toBeVisible();
+  await test.step('Then I should see the newly added diagnoses', async () => {
+    // elements appear twice: once in the table row and once in the expanded visit summary card
+    await expect(page.getByText(/asthma/i)).toHaveCount(2);
+    await expect(page.getByText(/gi upset/i)).toHaveCount(2);
+  });
+
+  await test.step('When I expand the visit row', async () => {
+    await page.getByRole('button', { name: /expand current row/i }).click();
+  });
+
+  await test.step('Then I should see the newly added visit note', async () => {
     await expect(page.getByText(/this is a note/i)).toBeVisible();
   });
 
