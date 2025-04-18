@@ -135,10 +135,15 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
 
   useEffect(() => {
     if (height && weight) {
-      const computedBodyMassIndex = calculateBodyMassIndex(weight, height);
+      const computedBodyMassIndex = calculateBodyMassIndex(
+        weight,
+        height,
+        conceptUnits.get(config.concepts.weightUuid) as 'lb' | 'lbs' | 'g',
+        conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
+      );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
     }
-  }, [weight, height, setValue]);
+  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid]);
 
   function onError(err) {
     if (err?.oneFieldRequired) {
