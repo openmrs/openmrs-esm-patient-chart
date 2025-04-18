@@ -85,9 +85,11 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const { timelineData, resetTree } = useContext(FilterContext);
   const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
 
-  if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
+  }
 
-  if (roots?.length === 0) {
+  if (!roots || roots.length === 0) {
     return (
       <EmptyState
         headerTitle={t('testResults_title', 'Test Results')}
