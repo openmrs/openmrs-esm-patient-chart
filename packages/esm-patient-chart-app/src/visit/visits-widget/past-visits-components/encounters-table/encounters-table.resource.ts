@@ -25,6 +25,8 @@ export interface EncountersTableProps {
   showEncounterTypeFilter: boolean;
   encounterTypeToFilter?: EncounterType;
   setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {

@@ -11,8 +11,8 @@ interface AllEncountersTableProps {
  * This component shows a table of all encounters (across all visits) of a patient
  */
 const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) => {
-  const pageSize = 20;
   const [encounterTypeToFilter, setEncounterTypeToFilter] = useState<EncounterType>(null);
+  const [pageSize, setPageSize] = useState(20);
 
   const {
     data: paginatedEncounters,
@@ -37,6 +37,8 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     encounterTypeToFilter,
     setEncounterTypeToFilter,
     showEncounterTypeFilter: true,
+    pageSize,
+    setPageSize,
   };
 
   return <EncountersTable {...encountersTableProps} />;
