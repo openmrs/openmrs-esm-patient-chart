@@ -5076,7 +5076,7 @@ export const mockVitalsConfig = {
   vitals: {
     encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
     formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
-    thresholdHours: 12,
+    vitalsOverdueThresholdHours: 12,
     useFormEngine: false,
     logo: null,
     showPrintButton: false,
