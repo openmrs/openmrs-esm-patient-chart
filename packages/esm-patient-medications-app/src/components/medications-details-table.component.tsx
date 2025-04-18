@@ -285,7 +285,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                         {header.header}
                       </TableHeader>
                     ))}
-                    <TableHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
