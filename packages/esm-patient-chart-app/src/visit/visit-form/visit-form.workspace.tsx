@@ -451,7 +451,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
             {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
             {config.showUpcomingAppointments && (
               <section>
-                <h1 className={styles.sectionTitle}></h1>
                 <div className={styles.sectionField}>
                   <VisitFormExtensionSlot
                     name="visit-form-top-slot"
@@ -534,7 +533,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
                 {errors?.visitType && (
                   <section>
-                    <h1 className={styles.sectionTitle}></h1>
                     <div className={styles.sectionField}>
                       <InlineNotification
                         role="alert"
@@ -563,7 +561,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
             {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
                 or when the form is opened from the queues app */}
             <section>
-              <h1 className={styles.sectionTitle}></h1>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
                   name="visit-form-bottom-slot"
