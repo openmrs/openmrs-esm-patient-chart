@@ -45,6 +45,10 @@ test('Add an immunization', async ({ page }) => {
     await page.getByText(/hepatitis b vaccination/i).click();
   });
 
+  await test.step('And I set `1 dose` as the immunization dose', async () => {
+    await page.getByLabel(/Dose number within series/i).fill('1');
+  });
+
   await test.step('And I click on the `Save` button', async () => {
     await page.getByRole('button', { name: /save/i }).click();
   });
@@ -54,8 +58,9 @@ test('Add an immunization', async ({ page }) => {
   });
 
   await test.step('And I should see the newly recorded immunization in the list', async () => {
+    const doseCount = immunizationType.locator('text=1 dose');
     await expect(headerRow).toContainText(/vaccine/i);
-    await expect(headerRow).toContainText(/recent vaccination/i);
+    await expect(headerRow).toContainText(/VaccineDose-1Dose-2Dose-3Dose-4Booster-1Booster-2/i);
     await expect(immunizationType).toContainText(/hepatitis b vaccination/i);
     await expect(vaccinationDate).toContainText(/mar 8, 2024/i);
   });
