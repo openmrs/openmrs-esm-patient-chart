@@ -202,7 +202,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {header.header}
                       </TableHeader>
                     ))}
-                    <TableExpandHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
