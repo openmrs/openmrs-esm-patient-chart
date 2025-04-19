@@ -7,13 +7,14 @@ import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { type ConditionDataTableRow, useConditions } from './conditions.resource';
+import { type ConditionDataTableRow, useConditions, type Condition } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
 
-interface ConditionFormProps extends DefaultPatientWorkspaceProps {
+export interface ConditionFormProps extends DefaultPatientWorkspaceProps {
   condition?: ConditionDataTableRow;
   formContext: 'creating' | 'editing';
+  onConditionSave?: (data: Condition) => void;
 }
 
 const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
@@ -45,6 +46,7 @@ export type ConditionsFormSchema = z.infer<ReturnType<typeof createSchema>>;
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  onConditionSave,
   condition,
   formContext,
   patientUuid,
@@ -95,6 +97,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+          onConditionSave={onConditionSave}
           conditionToEdit={condition}
           isEditing={isEditing}
           isSubmittingForm={isSubmittingForm}
