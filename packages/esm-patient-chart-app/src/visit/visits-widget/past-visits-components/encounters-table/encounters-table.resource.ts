@@ -22,8 +22,11 @@ export interface EncountersTableProps {
   showVisitType: boolean;
   paginated: boolean;
   paginatedEncounters: Array<Encounter>;
+  showEncounterTypeFilter: boolean;
   encounterTypeToFilter?: EncounterType;
   setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
