@@ -1,4 +1,3 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
 import type { Drug, OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
