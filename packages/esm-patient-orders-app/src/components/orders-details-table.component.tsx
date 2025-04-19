@@ -60,6 +60,9 @@ import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
 import GeneralOrderTable from './general-order-table.component';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -320,17 +323,17 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
   const handleDateFilterChange = ([startDate, endDate]) => {
     if (startDate) {
-      const isoStartDate = startDate.toISOString();
-      setSelectedFromDate(isoStartDate);
-      if (selectedToDate && selectedToDate < startDate) {
-        setSelectedToDate(isoStartDate);
+      const utcStartDate = dayjs(startDate).utcOffset(dayjs().utcOffset()).format('YYYY-MM-DD HH:mm:ss');
+      setSelectedFromDate(utcStartDate);
+      if (selectedToDate && selectedToDate < utcStartDate) {
+        setSelectedToDate(utcStartDate);
       }
     }
     if (endDate) {
-      const isoEndDate = endDate.toISOString();
-      setSelectedToDate(isoEndDate);
-      if (selectedFromDate && selectedFromDate > endDate) {
-        setSelectedFromDate(isoEndDate);
+      const utcEndDate = dayjs(endDate).utcOffset(dayjs().utcOffset()).format('YYYY-MM-DD HH:mm:ss');
+      setSelectedToDate(utcEndDate);
+      if (selectedFromDate && selectedFromDate > utcEndDate) {
+        setSelectedFromDate(utcEndDate);
       }
     }
   };
