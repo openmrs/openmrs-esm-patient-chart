@@ -157,12 +157,12 @@ const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
         <div className={styles.tooltip}>
           <p>{t('dateCollected', 'Displaying date collected')}</p>
           <p>
-            <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
-            {formatDatetime(issuedDateTime, { mode: 'wide' })}
-          </p>
-          <p>
             <span className={styles.label}>{t('ordered', 'Ordered')}: </span>{' '}
             {formatDatetime(effectiveDateTime, { mode: 'wide' })}
+          </p>
+          <p>
+            <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
+            {formatDatetime(issuedDateTime, { mode: 'wide' })}
           </p>
         </div>
       </ToggletipContent>
