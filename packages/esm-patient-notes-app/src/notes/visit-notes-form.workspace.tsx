@@ -11,8 +11,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -36,8 +34,10 @@ import {
   showSnackbar,
   type UploadedFile,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -82,19 +82,7 @@ const createSchema = (t: TFunction) => {
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
-    images: z
-      .array(
-        z.object({
-          base64Content: z.string(),
-          file: z.custom<File>((value) => value instanceof File, {
-            message: 'Invalid file',
-          }),
-          fileDescription: z.string().optional(),
-          fileName: z.string(),
-          fileType: z.string(),
-        }),
-      )
-      .optional(),
+    images: z.array(z.any()).optional(),
   });
 };
 
@@ -129,7 +117,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const customResolver = useCallback(
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-
       if (selectedPrimaryDiagnoses.length === 0) {
         return {
           ...zodResult,
@@ -171,7 +158,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -287,10 +275,11 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
-        if (file) {
-          setValue('images', currentImages ? [...currentImages, file] : [file]);
+        if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+          file.fileName = `${file.fileName}.png`;
         }
 
+        setValue('images', currentImages ? [...currentImages, file] : [file]);
         close();
         return Promise.resolve();
       },
@@ -390,8 +379,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           }
         })
         .then(() => {
+          mutateInfiniteVisits();
           mutateVisitNotes();
-          mutateVisits();
 
           if (images?.length) {
             mutateAttachments();
@@ -413,7 +402,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             title: t('visitNoteSaveError', 'Error saving visit note'),
             kind: 'error',
             isLowContrast: false,
-            subtitle: err?.message,
+            subtitle: err?.responseBody?.error?.message ?? err.message,
           });
         });
     },
@@ -425,8 +414,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       encounterTypeUuid,
       formConceptUuid,
       locationUuid,
+      mutateInfiniteVisits,
       mutateVisitNotes,
-      mutateVisits,
       patientUuid,
       providerUuid,
       selectedPrimaryDiagnoses.length,
@@ -438,218 +427,219 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
         </Row>
       )}
-      <Stack className={styles.formContainer} gap={2}>
-        {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-          </Column>
-          <Column sm={3}>
-            <Controller
-              name="noteDate"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <ResponsiveWrapper>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    maxDate={new Date().toISOString()}
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
+
+      <div className={styles.formContainer}>
+        <Stack gap={2}>
+          {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('date', 'Date')}</span>
+            </Column>
+            <Column sm={3}>
+              <Controller
+                name="noteDate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <ResponsiveWrapper>
+                    <OpenmrsDatePicker
+                      {...field}
+                      maxDate={new Date()}
                       id="visitDateTimePicker"
+                      data-testid="visitDateTimePicker"
                       labelText={t('visitDate', 'Visit date')}
-                      placeholder="dd/mm/yyyy"
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
                     />
-                  </DatePicker>
-                </ResponsiveWrapper>
-              )}
-            />
-          </Column>
-        </Row>
-        <div className={styles.diagnosesText}>
-          {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-            <>
-              {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                <Tag
-                  className={styles.tag}
-                  filter
-                  key={index}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                  type="red"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-            </>
-          ) : null}
-          {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-            <>
-              {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                <Tag
-                  classname={styles.tag}
-                  filter
-                  key={index}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                  type="blue"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-            </>
-          ) : null}
-          {selectedPrimaryDiagnoses &&
-            !selectedPrimaryDiagnoses.length &&
-            selectedSecondaryDiagnoses &&
-            !selectedSecondaryDiagnoses.length && (
-              <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-            )}
-        </div>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
-              <DiagnosisSearch
-                name="primaryDiagnosisSearch"
-                control={control}
-                labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
-                placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
-                handleSearch={handleSearch}
-                error={errors?.primaryDiagnosisSearch}
-                setIsSearching={setIsSearching}
+                  </ResponsiveWrapper>
+                )}
               />
-              {error ? (
-                <InlineNotification
-                  className={styles.errorNotification}
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                  onClose={() => setError(null)}
-                />
-              ) : null}
-              <DiagnosesDisplay
-                fieldName={'primaryDiagnosisSearch'}
-                isDiagnosisNotSelected={isDiagnosisNotSelected}
-                isLoading={isLoadingPrimaryDiagnoses}
-                isSearching={isSearching}
-                onAddDiagnosis={handleAddDiagnosis}
-                searchResults={searchPrimaryResults}
-                t={t}
-                value={watch('primaryDiagnosisSearch')}
-              />
-            </FormGroup>
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
-              <DiagnosisSearch
-                name="secondaryDiagnosisSearch"
-                control={control}
-                labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
-                placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
-                handleSearch={handleSearch}
-                setIsSearching={setIsSearching}
-              />
-              {error ? (
-                <InlineNotification
-                  className={styles.errorNotification}
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                  onClose={() => setError(null)}
-                />
-              ) : null}
-              <DiagnosesDisplay
-                fieldName={'secondaryDiagnosisSearch'}
-                isDiagnosisNotSelected={isDiagnosisNotSelected}
-                isLoading={isLoadingSecondaryDiagnoses}
-                isSearching={isSearching}
-                onAddDiagnosis={handleAddDiagnosis}
-                searchResults={searchSecondaryResults}
-                t={t}
-                value={watch('secondaryDiagnosisSearch')}
-              />
-            </FormGroup>
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('note', 'Note')}</span>
-          </Column>
-          <Column sm={3}>
-            <Controller
-              name="clinicalNote"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <ResponsiveWrapper>
-                  <TextArea
-                    id="additionalNote"
-                    rows={rows}
-                    labelText={t('clinicalNoteLabel', 'Write your notes')}
-                    placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
-                    value={value}
-                    onBlur={onBlur}
-                    onChange={(event) => {
-                      onChange(event);
-                      const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                      const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
-                      setRows(newRows);
-                    }}
-                  />
-                </ResponsiveWrapper>
-              )}
-            />
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('image', 'Image')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText="">
-              <p className={styles.imgUploadHelperText}>
-                {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
-              </p>
-              <Button
-                className={styles.uploadButton}
-                kind={isTablet ? 'ghost' : 'tertiary'}
-                onClick={showImageCaptureModal}
-                renderIcon={(props) => <Add size={16} {...props} />}
-              >
-                {t('addImage', 'Add image')}
-              </Button>
-              <div className={styles.imgThumbnailGrid}>
-                {currentImages?.map((image, index) => (
-                  <div key={index} className={styles.imgThumbnailItem}>
-                    <div className={styles.imgThumbnailContainer}>
-                      <img
-                        className={styles.imgThumbnail}
-                        src={image.base64Content}
-                        alt={image.fileDescription ?? image.fileName}
-                      />
-                    </div>
-                    <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                      <CloseFilled size={16} className={styles.closeIcon} />
-                    </Button>
-                  </div>
+            </Column>
+          </Row>
+          <div className={styles.diagnosesText}>
+            {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
+              <>
+                {selectedPrimaryDiagnoses.map((diagnosis, index) => (
+                  <Tag
+                    className={styles.tag}
+                    filter
+                    key={index}
+                    onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                    type="red"
+                  >
+                    {diagnosis.display}
+                  </Tag>
                 ))}
-              </div>
-            </FormGroup>
-          </Column>
-        </Row>
-      </Stack>
+              </>
+            ) : null}
+            {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
+              <>
+                {selectedSecondaryDiagnoses.map((diagnosis, index) => (
+                  <Tag
+                    classname={styles.tag}
+                    filter
+                    key={index}
+                    onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                    type="blue"
+                  >
+                    {diagnosis.display}
+                  </Tag>
+                ))}
+              </>
+            ) : null}
+            {selectedPrimaryDiagnoses &&
+              !selectedPrimaryDiagnoses.length &&
+              selectedSecondaryDiagnoses &&
+              !selectedSecondaryDiagnoses.length && (
+                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              )}
+          </div>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
+                <DiagnosisSearch
+                  name="primaryDiagnosisSearch"
+                  control={control}
+                  labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
+                  placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
+                  handleSearch={handleSearch}
+                  error={errors?.primaryDiagnosisSearch}
+                  setIsSearching={setIsSearching}
+                />
+                {error ? (
+                  <InlineNotification
+                    className={styles.errorNotification}
+                    lowContrast
+                    title={t('error', 'Error')}
+                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                    onClose={() => setError(null)}
+                  />
+                ) : null}
+                <DiagnosesDisplay
+                  fieldName={'primaryDiagnosisSearch'}
+                  isDiagnosisNotSelected={isDiagnosisNotSelected}
+                  isLoading={isLoadingPrimaryDiagnoses}
+                  isSearching={isSearching}
+                  onAddDiagnosis={handleAddDiagnosis}
+                  searchResults={searchPrimaryResults}
+                  t={t}
+                  value={watch('primaryDiagnosisSearch')}
+                />
+              </FormGroup>
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
+                <DiagnosisSearch
+                  name="secondaryDiagnosisSearch"
+                  control={control}
+                  labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
+                  placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
+                  handleSearch={handleSearch}
+                  setIsSearching={setIsSearching}
+                />
+                {error ? (
+                  <InlineNotification
+                    className={styles.errorNotification}
+                    lowContrast
+                    title={t('error', 'Error')}
+                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                    onClose={() => setError(null)}
+                  />
+                ) : null}
+                <DiagnosesDisplay
+                  fieldName={'secondaryDiagnosisSearch'}
+                  isDiagnosisNotSelected={isDiagnosisNotSelected}
+                  isLoading={isLoadingSecondaryDiagnoses}
+                  isSearching={isSearching}
+                  onAddDiagnosis={handleAddDiagnosis}
+                  searchResults={searchSecondaryResults}
+                  t={t}
+                  value={watch('secondaryDiagnosisSearch')}
+                />
+              </FormGroup>
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('note', 'Note')}</span>
+            </Column>
+            <Column sm={3}>
+              <Controller
+                name="clinicalNote"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <ResponsiveWrapper>
+                    <TextArea
+                      id="additionalNote"
+                      rows={rows}
+                      labelText={t('clinicalNoteLabel', 'Write your notes')}
+                      placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={(event) => {
+                        onChange(event);
+                        const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                        const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                        setRows(newRows);
+                      }}
+                    />
+                  </ResponsiveWrapper>
+                )}
+              />
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('image', 'Image')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText="">
+                <p className={styles.imgUploadHelperText}>
+                  {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
+                </p>
+                <Button
+                  className={styles.uploadButton}
+                  kind={isTablet ? 'ghost' : 'tertiary'}
+                  onClick={showImageCaptureModal}
+                  renderIcon={(props) => <Add size={16} {...props} />}
+                >
+                  {t('addImage', 'Add image')}
+                </Button>
+                <div className={styles.imgThumbnailGrid}>
+                  {currentImages?.map((image, index) => (
+                    <div key={index} className={styles.imgThumbnailItem}>
+                      <div className={styles.imgThumbnailContainer}>
+                        <img
+                          className={styles.imgThumbnail}
+                          src={image.base64Content}
+                          alt={image.fileDescription ?? image.fileName}
+                        />
+                      </div>
+                      <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
+                        <CloseFilled size={16} className={styles.closeIcon} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </FormGroup>
+            </Column>
+          </Row>
+        </Stack>
+      </div>
       <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}

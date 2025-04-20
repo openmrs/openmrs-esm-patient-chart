@@ -1,14 +1,9 @@
-import React from 'react';
-import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig, useVisit, type VisitReturnType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig, esmPatientChartSchema } from '../config-schema';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
-
-const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
-const mockUseVisit = jest.mocked(useVisit);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -19,21 +14,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
-});
-
-mockUseVisit.mockReturnValue({
-  currentVisit: null,
-} as VisitReturnType);
-
 describe('StartVisitOverflowMenuItem', () => {
   it('should launch the start visit form', async () => {
     const user = userEvent.setup();
 
     render(<StartVisitOverflowMenuItem patient={mockPatient} />);
 
-    const startVisitButton = screen.getByRole('menuitem', { name: /start visit/i });
+    const startVisitButton = screen.getByRole('menuitem', { name: /add visit/i });
     expect(startVisitButton).toBeInTheDocument();
 
     await user.click(startVisitButton);

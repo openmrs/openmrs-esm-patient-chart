@@ -35,13 +35,6 @@ export function useCausesOfDeath() {
   };
 }
 
-export function usePatientDeceasedStatus(patient: fhir.Patient) {
-  return {
-    deathDate: patient?.deceasedDateTime,
-    isDead: patient?.deceasedBoolean ?? Boolean(patient?.deceasedDateTime),
-  };
-}
-
 const changePatientDeathStatus = (personUuid: string, payload: CauseOfDeathPayload) => {
   const abortController = new AbortController();
 

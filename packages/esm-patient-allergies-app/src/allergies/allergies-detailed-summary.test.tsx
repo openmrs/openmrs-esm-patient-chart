@@ -49,13 +49,13 @@ describe('AllergiesDetailedSummary', () => {
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /onset date and comments/i];
+    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /comments/i];
     const expectedAllergies = [
-      /ACE inhibitors moderate Anaphylaxis/i,
-      /Fish mild Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
-      /Penicillins severe Mental status change, Angioedema, Cough, Diarrhea, Musculoskeletal pain Patient allergies have been noted down/i,
-      /Morphine severe Mental status change Comments/i,
-      /Aspirin severe Mental status change Comments/i,
+      /ace inhibitors moderate anaphylaxis/i,
+      /fish mild anaphylaxis, angioedema, fever, hives some comments/i,
+      /penicillins severe angioedema, cough, diarrhea, mental status change, musculoskeletal pain patient allergies have been noted down/i,
+      /morphine severe mental status change comments/i,
+      /aspirin severe mental status change comments/i,
     ];
 
     expectedColumnHeaders.forEach((header) =>

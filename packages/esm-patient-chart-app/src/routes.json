@@ -64,16 +64,16 @@
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-actions-slot",
-      "component": "cancelVisitActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
     {
-      "name": "cancel-visit-button",
+      "name": "delete-visit-button",
       "slot": "patient-search-actions-slot",
-      "component": "cancelVisitPatientSearchActionButton",
+      "component": "deleteVisitActionMenuButton",
       "online": true,
       "offline": true
     },
@@ -85,28 +85,13 @@
       "offline": true
     },
     {
-      "name": "add-past-visit-button",
-      "slot": "patient-actions-slot",
-      "component": "addPastVisitActionButton",
-      "featureFlag": "rde",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "add-past-visit-button",
-      "slot": "patient-search-actions-slot",
-      "component": "addPastVisitPatientSearchActionButton",
-      "featureFlag": "rde",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "encounters-summary-dashboard",
       "slot": "patient-chart-dashboard-slot",
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "path": "Visits"
+        "path": "Visits",
+        "layoutMode": "anchored"
       },
       "order": 5,
       "online": true,
@@ -123,14 +108,6 @@
       },
       "online": true,
       "offline": true
-    },
-    {
-      "name": "past-visits-overview",
-      "component": "pastVisitsOverview",
-      "meta": {
-        "title": "Edit or load a past visit",
-        "view": "visits"
-      }
     },
     {
       "name": "patient-details-tile",
@@ -198,13 +175,21 @@
       "online": true,
       "offline": true,
       "order": 1
+    },
+    {
+      "name": "visit-context-header",
+      "slot": "visit-context-header-slot",
+      "component": "visitContextHeader"
+    }
+  ],
+  "featureFlags": [
+    {
+      "description": "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header",
+      "flagName": "rde",
+      "label": "Retrospective Data Entry"
     }
   ],
   "modals": [
-    {
-      "name": "cancel-visit-dialog",
-      "component": "cancelVisitModal"
-    },
     {
       "name": "delete-encounter-modal",
       "component": "deleteEncounterModal"
@@ -228,6 +213,10 @@
     {
       "name": "start-visit-dialog",
       "component": "startVisitModal"
+    },
+    {
+      "name": "visit-context-switcher",
+      "component": "visitContextSwitcherModal"
     }
   ],
   "pages": [

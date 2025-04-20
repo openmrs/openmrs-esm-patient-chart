@@ -3,7 +3,6 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
-  registerFeatureFlag,
   restBaseUrl,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
@@ -27,11 +26,6 @@ export function startupApp() {
   });
 
   defineConfigSchema(moduleName, configSchema);
-  registerFeatureFlag(
-    'print-patient-identifier-sticker',
-    'Print patient identifier sticker',
-    'Features to support printing a patient identifier sticker',
-  );
 }
 
 export const visitTag = getSyncLifecycle(visitTagComponent, options);

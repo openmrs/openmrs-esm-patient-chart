@@ -53,9 +53,7 @@ describe('End visit dialog', () => {
       screen.getByRole('heading', { name: /are you sure you want to end this active visit?/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one/i,
-      ),
+      screen.getByText(/You can add additional encounters to this visit in the visit summary/i),
     ).toBeInTheDocument();
 
     await user.click(endVisitButton);
@@ -86,9 +84,7 @@ describe('End visit dialog', () => {
     render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(
-      screen.getByText(
-        /Ending this visit means that you will no longer be able to add encounters to it. If you need to add an encounter, you can create a new visit for this patient or edit a past one/i,
-      ),
+      screen.getByText(/You can add additional encounters to this visit in the visit summary/i),
     ).toBeInTheDocument();
 
     const endVisitButton = screen.getByRole('button', { name: /End Visit/i });

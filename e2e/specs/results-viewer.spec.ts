@@ -306,7 +306,20 @@ test('Record and edit test results', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created test results', async () => {
+  await test.step('When I filter the encounters to adult visit', async () => {
+    await page.getByRole('combobox', { name: /filter by encounter type/i }).click();
+    await page.getByText(/adult visit/i).click();
+  });
+
+  await test.step('Then I should NOT see the newly added test results included in the list', async () => {
+    await expect(page.getByText(/No encounters to display/i)).toBeVisible();
+  });
+
+  await test.step('When I clear the filter', async () => {
+    await page.getByRole('button', { name: /clear selected item/i }).click();
+  });
+
+  await test.step('And I launch the overflow menu of the created test results', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -353,18 +366,14 @@ test('Record and edit test results', async ({ page }) => {
     for (const { resultsPageReference, updatedValue } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
-
-        await expect(valueCell).toContainText(updatedValue);
+        await expect(row).toBeVisible();
       });
     }
 
     for (const { resultsPageReference, updatedValue } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${updatedValue}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
-
-        await expect(valueCell).toContainText(updatedValue);
+        await expect(row).toBeVisible();
       });
     }
   });

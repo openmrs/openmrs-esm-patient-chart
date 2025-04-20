@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "9.1.0",
+  "version": "9.2.2",
   "license": "MPL-2.0",
   "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",
@@ -37,8 +37,8 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/react": ">1.47.0 <1.50.0",
-    "@openmrs/esm-form-engine-lib": "latest",
+    "@carbon/react": "^1.76.0",
+    "@openmrs/esm-form-engine-lib": "next",
     "lodash-es": "^4.17.21",
     "react-error-boundary": "^4.0.13"
   },

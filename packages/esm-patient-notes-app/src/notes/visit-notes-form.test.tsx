@@ -16,6 +16,7 @@ import VisitNotesForm from './visit-notes-form.workspace';
 
 const defaultProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
   promptBeforeClosing: jest.fn(),
@@ -62,7 +63,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   renderVisitNotesForm();
 
-  expect(screen.getByRole('textbox', { name: /visit date/i })).toBeInTheDocument();
+  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();

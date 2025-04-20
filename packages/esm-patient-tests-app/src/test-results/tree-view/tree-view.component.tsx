@@ -38,20 +38,32 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   return (
     <Layer className={className}>
       {tableData
-        ?.filter((row) => !someChecked || selectedCheckboxes.some((selectedKey) => row.flatName.includes(selectedKey)))
+        ?.filter(
+          (row) =>
+            !someChecked ||
+            row.entries?.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey)),
+        )
         .map((subRows: GroupedObservation, index) => {
-          return subRows.entries?.length > 0 ? (
+          const filteredSubRows = {
+            ...subRows,
+            entries: subRows.entries?.filter(
+              (entry) =>
+                !someChecked ||
+                selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey),
+            ),
+          };
+          return filteredSubRows.entries?.length > 0 ? (
             <div
               key={index}
               className={classNames({
-                [styles.border]: subRows?.entries.length,
+                [styles.border]: filteredSubRows?.entries.length,
               })}
             >
               <IndividualResultsTable
                 isLoading={loadingPanelData}
-                subRows={subRows}
+                subRows={filteredSubRows}
                 index={index}
-                title={subRows.key}
+                title={filteredSubRows.key}
               />
             </div>
           ) : null;
@@ -66,7 +78,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
 
   const { timelineData, resetTree } = useContext(FilterContext);
-  const { isLoading: isLoadingPanelData } = usePanelData();
+  const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
 
   if (tablet) {
     return (
