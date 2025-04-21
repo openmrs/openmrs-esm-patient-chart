@@ -26,7 +26,7 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   useEffect(() => {
     const interval = setInterval(() => {
       mutate();
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [mutate]);

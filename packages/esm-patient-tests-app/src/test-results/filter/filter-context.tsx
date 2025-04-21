@@ -47,7 +47,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const actions = useMemo(
     () => ({
       initialize: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.INITIALIZE, trees: trees }),
-      updateTests: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.UPDATE_TESTS, trees: trees }),
+      updateTree: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.UPDATE_TESTS, trees: trees }),
       toggleVal: (name: string) => {
         dispatch({ type: ReducerActionType.TOGGLEVAL, name: name });
       },
@@ -61,7 +61,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 
   useEffect(() => {
     if (roots.length > 0) {
-      actions.updateTests(roots);
+      actions.updateTree(roots);
     }
   }, [roots, actions]);
 
