@@ -117,6 +117,45 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         checkboxes: Object.fromEntries(Object.keys(state?.checkboxes)?.map((leaf) => [leaf, false])),
       };
 
+    case ReducerActionType.UPDATE_TESTS: {
+      let parents: TreeParents = {};
+      let leaves: Array<string> = [];
+      let tests: Array<[string, TreeNode]> = [];
+      let lowestParents: Array<LowestNode> = [];
+
+      action.trees?.forEach((tree) => {
+        const {
+          parents: newParents,
+          leaves: newLeaves,
+          tests: newTests,
+          lowestParents: newLP,
+        } = computeParents('', tree);
+        parents = { ...parents, ...newParents };
+        leaves = [...leaves, ...newLeaves];
+        tests = [...tests, ...newTests];
+        lowestParents = [...lowestParents, ...newLP];
+      });
+
+      const flatTests = Object.fromEntries(tests);
+
+      const preservedCheckboxes = leaves.reduce(
+        (acc, leaf) => {
+          acc[leaf] = state.checkboxes.hasOwnProperty(leaf) ? state.checkboxes[leaf] : false;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+
+      return {
+        ...state,
+        checkboxes: preservedCheckboxes,
+        parents: parents,
+        roots: action.trees,
+        tests: flatTests,
+        lowestParents: lowestParents,
+      };
+    }
+
     default:
       return state;
   }

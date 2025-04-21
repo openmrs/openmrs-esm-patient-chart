@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useConfig } from '@openmrs/esm-framework';
@@ -21,7 +21,15 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, isLoading, error, mutate } = useGetManyObstreeData(conceptUuids);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutate();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [mutate]);
 
   if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
 

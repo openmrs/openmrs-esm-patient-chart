@@ -63,6 +63,7 @@ export enum ReducerActionType {
   UDPATEPARENT = 'updateParent',
   UPDATEBASEPATH = 'updateBasePath',
   RESET_TREE = 'resetTree',
+  UPDATE_TESTS = 'updateTests',
 }
 
 export interface ReducerAction {
