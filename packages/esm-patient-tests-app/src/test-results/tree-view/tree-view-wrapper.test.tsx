@@ -93,7 +93,7 @@ describe('TreeViewWrapper', () => {
       roots: [],
       isLoading: false,
       error: null,
-      mutate: InfiniteKeyedMutator<FetchResponse<any>[]>,
+      mutate: jest.fn(),
     });
 
     render(<TreeViewWrapper {...mockProps} />);
@@ -108,7 +108,7 @@ describe('TreeViewWrapper', () => {
       roots: [],
       isLoading: false,
       error: mockError,
-      mutate: InfiniteKeyedMutator<FetchResponse<any>[]>,
+      mutate: jest.fn(),
     });
 
     render(<TreeViewWrapper {...mockProps} />);
