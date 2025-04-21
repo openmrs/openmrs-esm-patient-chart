@@ -93,7 +93,6 @@ describe('TreeViewWrapper', () => {
       roots: [],
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
     });
 
     render(<TreeViewWrapper {...mockProps} />);
@@ -108,7 +107,6 @@ describe('TreeViewWrapper', () => {
       roots: [],
       isLoading: false,
       error: mockError,
-      mutate: jest.fn(),
     });
 
     render(<TreeViewWrapper {...mockProps} />);
@@ -126,7 +124,6 @@ describe('TreeViewWrapper', () => {
       roots: mockResults,
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
     });
 
     renderTreeViewWrapperWithMockContext();

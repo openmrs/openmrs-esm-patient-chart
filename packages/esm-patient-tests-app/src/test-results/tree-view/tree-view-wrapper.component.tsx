@@ -21,15 +21,7 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, isLoading, error, mutate } = useGetManyObstreeData(conceptUuids);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      mutate();
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [mutate]);
+  const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
 
   if (error) return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data load error')} />;
 
