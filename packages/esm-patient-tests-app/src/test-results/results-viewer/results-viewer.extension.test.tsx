@@ -3,11 +3,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import FilterContext from '../filter/filter-context';
-import { type FilterContextProps } from '../filter/filter-types';
-import TreeView from '../tree-view/tree-view.component';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
+import { type FilterContextProps } from '../filter/filter-types';
+import FilterContext from '../filter/filter-context';
+import TreeView from '../tree-view/tree-view.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();

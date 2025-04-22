@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
 import { useLayoutType, TreeViewAltIcon, useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../../config-schema';
 import { type GroupedObservation, type viewOpts } from '../../types';
 import FilterSet, { FilterContext } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
@@ -12,7 +13,6 @@ import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
-import { type ConfigObject } from '../../config-schema';
 
 interface TreeViewProps {
   patientUuid: string;
