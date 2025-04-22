@@ -77,6 +77,8 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
+    refreshInterval: 60000,
+    revalidateAll: true,
   });
 
   const result = useMemo(() => {
@@ -102,6 +104,7 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
       ]
     );
   }, [data]);
+
   const roots = result.map((item) => item.data);
   const isLoading = result.some((item) => item.loading);
 
