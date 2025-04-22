@@ -3,8 +3,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import TreeViewWrapper from '../tree-view/tree-view-wrapper.component';
-import { mockResults } from '__mocks__';
+import { mockPatient } from 'tools';
+import { mockGroupedResults, mockResults } from '__mocks__';
+import { type FilterContextProps } from '../filter/filter-types';
+import FilterContext from '../filter/filter-context';
+import TreeView from '../tree-view/tree-view.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseGetManyObstreeData = jest.fn();
@@ -31,16 +34,38 @@ jest.mock('../grouped-timeline', () => ({
 }));
 
 const testProps = {
+  patientUuid: mockPatient.id,
+  patient: mockPatient,
   basePath: '/spa/patient/some-uuid/chart/Results',
-  patientUuid: 'some-uuid',
-  testUuid: 'some-uuid',
+  testUuid: 'test-uuid',
   expanded: false,
-  type: 'some-type',
+  type: 'default',
+  view: 'individual-test' as const,
+  isLoading: false,
+  error: null,
 };
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
 });
+
+const mockFilterContext: FilterContextProps = {
+  activeTests: ['Bloodwork-Chemistry', 'Bloodwork'],
+  timelineData: mockGroupedResults.timelineData,
+  tableData: null,
+  trendlineData: null,
+  parents: mockGroupedResults.parents,
+  checkboxes: { Bloodwork: false, Chemistry: true },
+  someChecked: true,
+  lowestParents: mockGroupedResults['lowestParents'],
+  totalResultsCount: 0,
+  initialize: jest.fn(),
+  toggleVal: jest.fn(),
+  updateParent: jest.fn(),
+  resetTree: jest.fn(),
+  roots: mockResults,
+  tests: {},
+};
 
 global.IntersectionObserver = jest.fn(function (callback, options) {
   this.observe = jest.fn();
@@ -50,6 +75,13 @@ global.IntersectionObserver = jest.fn(function (callback, options) {
   this.options = options;
 }) as any;
 
+const renderTreeViewWithMockContext = (contextValue = mockFilterContext) => {
+  render(
+    <FilterContext.Provider value={contextValue}>
+      <TreeView {...testProps} />
+    </FilterContext.Provider>,
+  );
+};
 describe('ResultsViewer', () => {
   it('should return an empty state when there is no data', async () => {
     mockUseGetManyObstreeData.mockReturnValue({
@@ -57,7 +89,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: null,
     });
-    render(<TreeViewWrapper {...testProps} />);
+    render(<TreeView {...testProps} />);
 
     const testResultsText = screen.getByRole('heading', { name: /test results/i });
     expect(testResultsText).toBeInTheDocument();
@@ -71,8 +103,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: new Error('An error occurred'),
     });
-    render(<TreeViewWrapper {...testProps} />);
-
+    render(<TreeView {...testProps} />);
     const testResultsText = screen.getByRole('heading', { name: /data load error/i });
     expect(testResultsText).toBeInTheDocument();
     expect(
@@ -88,8 +119,7 @@ describe('ResultsViewer', () => {
       isLoading: false,
       error: null,
     });
-    render(<TreeViewWrapper {...testProps} />);
-
+    renderTreeViewWithMockContext();
     expect(screen.getAllByText(/complete blood count/i)).toHaveLength(2);
     expect(screen.getAllByText(/hematocrit/i)).toHaveLength(2);
     expect(screen.getAllByText(/hemoglobin/i)).toHaveLength(4);

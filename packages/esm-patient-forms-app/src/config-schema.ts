@@ -38,7 +38,7 @@ export const configSchema = {
           validator(
             (v: unknown) =>
               typeof v === 'string' && (v === 'editHtmlFormWithStandardUi' || v === 'editHtmlFormWithSimpleUi'),
-            'Must be one of "enterHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
+            'Must be one of "editHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
           ),
         ],
       },
