@@ -14,10 +14,10 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
+import { orderBy } from 'lodash-es';
 import { formatDate, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { PatientNote } from '../types';
-import orderBy from 'lodash-es/orderBy';
 import styles from './notes-overview.scss';
 
 interface PaginatedNotes {
@@ -56,8 +56,8 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
     key === 'encounterDate'
       ? sortDate(notes, order)
       : order === 'DESC'
-      ? orderBy(notes, [key], ['desc'])
-      : orderBy(notes, [key], ['asc']);
+        ? orderBy(notes, [key], ['desc'])
+        : orderBy(notes, [key], ['asc']);
 
   function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
@@ -87,13 +87,14 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
         useZebraStyles
       >
         {({
-          rows,
-          headers,
+          getExpandedRowProps,
           getExpandHeaderProps,
-          getTableProps,
-          getTableContainerProps,
           getHeaderProps,
           getRowProps,
+          getTableContainerProps,
+          getTableProps,
+          headers,
+          rows,
         }) => (
           <TableContainer {...getTableContainerProps}>
             <Table {...getTableProps()}>
@@ -122,7 +123,11 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
                       ))}
                     </TableExpandRow>
                     {row.isExpanded ? (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                      <TableExpandedRow
+                        className={styles.expandedRow}
+                        colSpan={headers.length + 1}
+                        {...getExpandedRowProps({ row })}
+                      >
                         <div className={styles.container} key={i}>
                           {tableRows?.[i]?.encounterNote ? (
                             <div className={styles.copy}>
