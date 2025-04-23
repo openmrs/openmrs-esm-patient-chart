@@ -122,7 +122,10 @@ test('Add and edit an immunization', async ({ page }) => {
   });
 
   await test.step('When I click the Expand current row button', async () => {
-    await page.getByRole('button', { name: /expand current row/i }).click();
+    await immunizationsPage.immunizationsTable().waitFor({ state: 'visible' });
+    const expandButton = page.getByRole('button', { name: /expand current row/i });
+    await expandButton.waitFor({ state: 'visible' });
+    await expandButton.click();
   });
 
   await test.step('Then I should see the updated immunization details in the expanded view', async () => {
