@@ -60,8 +60,8 @@ describe('Trendline', () => {
     mockUseObstreeData.mockReturnValue({
       trendlineData: {
         obs: [
-          { obsDatetime: '2023-01-01', value: '5', interpretation: 'NORMAL' },
-          { obsDatetime: '2023-01-02', value: '6', interpretation: 'HIGH' },
+          { obsDatetime: '05-Sept-2021, 04:07 AM', value: '5', interpretation: 'NORMAL' },
+          { obsDatetime: '11-May-2023, 11:02 AM', value: '6', interpretation: 'HIGH' },
         ],
         display: 'Test Chart Title',
         hiNormal: 10,
@@ -93,9 +93,9 @@ describe('Trendline', () => {
     expect(screen.getByRole('button', { name: /hide results table/i })).toBeInTheDocument();
     expect(screen.getByText('Date and time')).toBeInTheDocument();
     expect(screen.getByText('Value (mg/dL)')).toBeInTheDocument();
-    expect(screen.getByText('2023-01-01')).toBeInTheDocument();
+    expect(screen.getByText('05-Sept-2021, 04:07 AM')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('2023-01-02')).toBeInTheDocument();
+    expect(screen.getByText('11-May-2023, 11:02 AM')).toBeInTheDocument();
     expect(screen.getByText('6')).toBeInTheDocument();
   });
 

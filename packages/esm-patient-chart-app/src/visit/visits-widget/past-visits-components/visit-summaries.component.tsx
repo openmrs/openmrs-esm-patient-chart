@@ -14,7 +14,7 @@ interface Props {
 const VisitSummaries: React.FC<Props> = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const { visits, error, isLoading } = useInfiniteVisits(patientUuid);
+  const { visits, error, isLoading, mutate: mutateVisits } = useInfiniteVisits(patientUuid);
   if (isLoading) {
     return <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />;
   }
@@ -57,7 +57,7 @@ const VisitSummaries: React.FC<Props> = ({ patientUuid }) => {
               </div>
             </div>
           </div>
-          <VisitSummary visit={visit} patientUuid={patientUuid} />
+          <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutateVisits} />
         </div>
       ))}
     </>

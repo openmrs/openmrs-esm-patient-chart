@@ -1,12 +1,18 @@
-import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { Encounter, FetchResponse, getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { visitOverviewDetailMockData } from '__mocks__';
+import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import React from 'react';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
 import { useInfiniteVisits, usePaginatedVisits } from './visit.resource';
+import {
+  useEncounterTypes,
+  usePaginatedEncounters,
+} from './past-visits-components/encounters-table/encounters-table.resource';
+import { OpenMRSPaginatedResponse } from '@openmrs/esm-react-utils/src/useOpenmrsPagination';
+import { MutatorCallback, MutatorOptions } from 'swr';
 
 const mockGetConfig = getConfig as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
@@ -52,6 +58,42 @@ jest.mock('./visit.resource', () => ({
 const mockUsePaginatedVisits = jest.mocked(usePaginatedVisits);
 const mockUseInfiniteVisits = jest.mocked(useInfiniteVisits);
 
+const mockUsePaginatedEncounters = jest.fn(usePaginatedEncounters).mockReturnValue({
+  error: null,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  data: [],
+  totalPages: 0,
+  totalCount: 0,
+  currentPage: 0,
+  currentPageSize: undefined,
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: undefined,
+  goToNext: undefined,
+  goToPrevious: undefined,
+});
+
+const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
+  data: mockEncounterTypes,
+  totalCount: mockEncounterTypes.length,
+  hasMore: false,
+  loadMore: jest.fn(),
+  error: undefined,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  nextUri: '',
+});
+
+jest.mock('./past-visits-components/encounters-table/encounters-table.resource', () => ({
+  ...jest.requireActual('./past-visits-components/encounters-table/encounters-table.resource'),
+  usePaginatedEncounters: () => mockUsePaginatedEncounters('patient-uuid', null, 10),
+  useEncounterTypes: () => mockUseEncounterTypes(),
+}));
+
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
     mockUsePaginatedVisits.mockReturnValueOnce({
@@ -80,7 +122,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
   });
 
-  it('renders an error state view if there was a problem fetching encounter data', async () => {
+  it('renders an error state view if there was a problem fetching visit data', async () => {
     const error = {
       message: 'Unauthorized',
       response: {

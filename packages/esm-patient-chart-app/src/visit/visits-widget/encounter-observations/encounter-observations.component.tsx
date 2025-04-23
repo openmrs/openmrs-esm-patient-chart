@@ -21,48 +21,45 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     }
   }
 
-  if (!observations) {
-    return <SkeletonText />;
-  }
+  const filteredObservations = !!obsConceptUuidsToHide.length
+    ? observations?.filter((obs) => {
+        return !obsConceptUuidsToHide.includes(obs?.concept?.uuid);
+      })
+    : observations;
 
-  if (observations) {
-    const filteredObservations = !!obsConceptUuidsToHide.length
-      ? observations?.filter((obs) => {
-          return !obsConceptUuidsToHide.includes(obs?.concept?.uuid);
-        })
-      : observations;
+  if (!filteredObservations || filteredObservations.length == 0) {
     return (
       <div className={styles.observation}>
-        {filteredObservations?.map((obs, index) => {
-          if (obs.groupMembers) {
-            return (
-              <React.Fragment key={index}>
-                <span className={styles.parentConcept}>{obs.concept.display}</span>
-                <span />
-                {obs.groupMembers.map((member) => (
-                  <React.Fragment key={index}>
-                    <span className={styles.childConcept}>{member.concept.display}</span>
-                    <span>{getAnswerFromDisplay(member.display)}</span>
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
-            );
-          } else {
-            return (
-              <React.Fragment key={index}>
-                <span>{obs.concept.display}</span>
-                <span>{getAnswerFromDisplay(obs.display)}</span>
-              </React.Fragment>
-            );
-          }
-        })}
+        <p>{t('noObservationsFound', 'No observations found')}</p>
       </div>
     );
   }
 
   return (
     <div className={styles.observation}>
-      <p>{t('noObservationsFound', 'No observations found')}</p>
+      {filteredObservations?.map((obs, index) => {
+        if (obs.groupMembers) {
+          return (
+            <React.Fragment key={index}>
+              <span className={styles.parentConcept}>{obs.concept.display}</span>
+              <span />
+              {obs.groupMembers.map((member) => (
+                <React.Fragment key={index}>
+                  <span className={styles.childConcept}>{member.concept.display}</span>
+                  <span>{getAnswerFromDisplay(member.display)}</span>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          );
+        } else {
+          return (
+            <React.Fragment key={index}>
+              <span>{obs.concept.display}</span>
+              <span>{getAnswerFromDisplay(obs.display)}</span>
+            </React.Fragment>
+          );
+        }
+      })}
     </div>
   );
 };
