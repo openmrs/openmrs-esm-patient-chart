@@ -230,8 +230,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       {...field}
                       id="vaccinationDate"
                       data-testid="vaccinationDate"
+                      className={styles.datePicker}
                       maxDate={new Date()}
-                      style={{ paddingBottom: '1rem', width: '100%' }}
                       labelText={t('vaccinationDate', 'Vaccination date')}
                       invalid={Boolean(fieldState?.error?.message)}
                       invalidText={fieldState?.error?.message}
@@ -244,31 +244,32 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   name="vaccinationTime"
                   control={control}
                   render={({ field: { onBlur, onChange, value } }) => (
-                    <TimePicker
-                      id="vaccinationTime"
-                      labelText={t('time', 'Time')}
-                      onChange={(event) => onChange(event.target.value as amPm)}
-                      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                      style={{ marginLeft: '0.125rem', flex: 'none' }}
-                      value={value}
-                      onBlur={onBlur}
-                    >
-                      <Controller
-                        name="timeFormat"
-                        control={control}
-                        render={({ field: { onChange, value } }) => (
-                          <TimePickerSelect
-                            id="timeFormatSelect"
-                            onChange={(event) => onChange(event.target.value as amPm)}
-                            value={value}
-                            aria-label={t('timeFormat ', 'Time Format')}
-                          >
-                            <SelectItem value="AM" text={t('AM', 'AM')} />
-                            <SelectItem value="PM" text={t('PM', 'PM')} />
-                          </TimePickerSelect>
-                        )}
-                      />
-                    </TimePicker>
+                    <div className={styles.timePickerContainer}>
+                      <TimePicker
+                        id="vaccinationTime"
+                        labelText={t('time', 'Time')}
+                        onChange={(event) => onChange(event.target.value as amPm)}
+                        pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                        value={value}
+                        onBlur={onBlur}
+                      >
+                        <Controller
+                          name="timeFormat"
+                          control={control}
+                          render={({ field: { onChange, value } }) => (
+                            <TimePickerSelect
+                              id="timeFormatSelect"
+                              onChange={(event) => onChange(event.target.value as amPm)}
+                              value={value}
+                              aria-label={t('timeFormat ', 'Time Format')}
+                            >
+                              <SelectItem value="AM" text={t('AM', 'AM')} />
+                              <SelectItem value="PM" text={t('PM', 'PM')} />
+                            </TimePickerSelect>
+                          )}
+                        />
+                      </TimePicker>
+                    </div>
                   )}
                 />
               </ResponsiveWrapper>
@@ -372,7 +373,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       {...field}
                       id="vaccinationExpiration"
                       data-testid="vaccinationExpiration"
-                      className="vaccinationExpiration"
+                      className={styles.datePicker}
                       minDate={immunizationToEditMeta ? null : new Date()}
                       labelText={t('expirationDate', 'Expiration date')}
                       invalid={Boolean(fieldState?.error?.message)}
