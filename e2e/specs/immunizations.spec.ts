@@ -58,7 +58,7 @@ test('Add and edit an immunization', async ({ page }) => {
     await expect(headerRow).toContainText(/recent vaccination/i);
   });
 
-  await test.step('And I should see the new immunization entry with the correct details', async () => {
+  await test.step('And I should see the a table row with the correct immunization details', async () => {
     await expect(immunizationType).toContainText(/hepatitis b vaccination/i);
     await expect(vaccinationDate).toContainText(/single dose on 08-Mar-2024/i);
   });
@@ -110,28 +110,16 @@ test('Add and edit an immunization', async ({ page }) => {
     await expect(page.getByText(/vaccination saved successfully/i)).toBeVisible();
   });
 
-  await test.step('When I click the Collapse current row button', async () => {
-    const collapseButton = page.getByRole('button', { name: /collapse all rows/i });
-    await collapseButton.click();
-  });
-
-  await test.step('Then I should see the updated immunization in the collapsed table view', async () => {
-    await expect(page.getByRole('columnheader', { name: /vaccine/i })).toContainText(/vaccine/i);
-    await expect(page.getByText(/recent vaccination/i)).toBeVisible();
+  await test.step('Then I should see the newly updated immunization details reflected in the table', async () => {
     await expect(page.getByRole('cell', { name: /measles vaccination/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /single dose on 02-Jan-2025/i })).toBeVisible();
   });
 
-  await test.step('When I click the Expand current row button', async () => {
-    await immunizationsPage.immunizationsTable().waitFor({ state: 'visible' });
-    const expandButton = page.getByRole('button', { name: /expand current row/i });
-    await expandButton.waitFor({ state: 'visible' });
-    await expandButton.click();
-  });
-
-  await test.step('Then I should see the updated immunization details in the expanded view', async () => {
+  await test.step('Then expanding the immunization details section should reveal the correct details', async () => {
+    await page.getByRole('button', { name: /expand current row/i }).click();
     await expect(page.getByText(/dose number within series/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
     await expect(page.getByText(/vaccination date/i)).toBeVisible();
+    await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
     await expect(page.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
   });
 });
