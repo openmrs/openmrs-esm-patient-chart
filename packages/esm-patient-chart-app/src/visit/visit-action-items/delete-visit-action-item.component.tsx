@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@carbon/react';
+import { Button , IconButton } from '@carbon/react';
 import {
   TrashCanIcon,
   UserHasAccess,
@@ -15,7 +15,7 @@ interface DeleteVisitActionItemProps {
   visit: Visit;
 
   /**
-   * If true, renders the button with fewer words
+   * If true, renders as IconButton instead
    */
   compact?: boolean;
 }
@@ -23,6 +23,7 @@ interface DeleteVisitActionItemProps {
 const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUuid, visit, compact }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const deleteVisit = () => {
     const dispose = showModal('delete-visit-dialog', {
@@ -36,13 +37,22 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
     return null;
   }
 
-  const buttonLabel = compact ? getCoreTranslation('delete') : t('deleteVisit', 'Delete visit');
-
   return (
     <UserHasAccess privilege="Delete Visits">
-      <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCanIcon} size={isTablet ? 'lg' : 'sm'}>
-        {buttonLabel}
-      </Button>
+      {compact ? (
+        <IconButton
+          onClick={deleteVisit}
+          label={getCoreTranslation('delete')}
+          kind="danger--ghost"
+          size={responsiveSize}
+        >
+          <TrashCanIcon />
+        </IconButton>
+      ) : (
+        <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCanIcon} size={responsiveSize}>
+          {t('deleteVisit', 'Delete visit')}
+        </Button>
+      )}
     </UserHasAccess>
   );
 };

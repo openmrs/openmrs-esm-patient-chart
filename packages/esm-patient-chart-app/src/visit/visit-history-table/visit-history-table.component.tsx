@@ -113,13 +113,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                             return <TableCell key={cell.id}>{cell?.value}</TableCell>;
                           })}
                         </TableExpandRow>
-                        <TableExpandedRow
-                          {...getExpandedRowProps({ row })}
-                          className={styles.expandedRow}
-                          colSpan={headers.length + 2}
-                        >
-                          <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
-                        </TableExpandedRow>
+                        {row.isExpanded ? (
+                          <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
+                            <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
+                          </TableExpandedRow>
+                        ) : (
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        )}
                       </React.Fragment>
                     );
                   })}

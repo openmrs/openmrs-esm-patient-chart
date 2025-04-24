@@ -142,7 +142,7 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
 
-    screen.getByRole('button', { name: /expand current row/i }).click();
+    await screen.getByRole('button', { name: /expand current row/i }).click();
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
@@ -175,6 +175,8 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toBeInTheDocument();
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.queryByText('/All encounters/i')).not.toBeInTheDocument();
+
+    await screen.getByRole('button', { name: /expand current row/i }).click();
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
