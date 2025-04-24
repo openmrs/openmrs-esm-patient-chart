@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button , IconButton } from '@carbon/react';
+import { Button, IconButton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { EditIcon, UserHasAccess, type Visit, getCoreTranslation, useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -32,7 +32,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
     <UserHasAccess privilege="Edit Visits">
       {compact ? (
         <IconButton onClick={editVisitDetails} label={getCoreTranslation('edit')} size={responsiveSize} kind="ghost">
-          <EditIcon />
+          <EditIcon size={16} />
         </IconButton>
       ) : (
         <Button onClick={editVisitDetails} kind="ghost" renderIcon={EditIcon} size={responsiveSize}>

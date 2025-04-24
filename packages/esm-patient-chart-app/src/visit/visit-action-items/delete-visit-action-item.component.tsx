@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button , IconButton } from '@carbon/react';
+import { Button, IconButton } from '@carbon/react';
 import {
   TrashCanIcon,
   UserHasAccess,
@@ -46,7 +46,7 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
           kind="danger--ghost"
           size={responsiveSize}
         >
-          <TrashCanIcon />
+          <TrashCanIcon size={16} />
         </IconButton>
       ) : (
         <Button onClick={deleteVisit} kind="danger--ghost" renderIcon={TrashCanIcon} size={responsiveSize}>
