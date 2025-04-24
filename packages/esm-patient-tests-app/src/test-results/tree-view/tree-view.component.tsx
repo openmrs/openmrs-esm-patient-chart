@@ -10,15 +10,12 @@ import FilterSet, { FilterContext } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 import TabletOverlay from '../tablet-overlay';
-import Trendline from '../trendline/trendline.component';
-import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
 
 interface TreeViewProps {
   patientUuid: string;
   basePath: string;
   testUuid: string;
-  isLoading: boolean;
   expanded: boolean;
   type: string;
   view?: viewOpts;
@@ -74,7 +71,7 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   );
 };
 
-const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, isLoading, expanded, type, view }) => {
+const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, expanded, type, view }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
@@ -82,8 +79,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, error } = useGetManyObstreeData(conceptUuids);
 
-  const { timelineData, resetTree } = useContext(FilterContext);
-  const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
+  const { timelineData, resetTree, isLoading } = useContext(FilterContext);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
@@ -117,7 +113,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
             headerText={t('tree', 'Tree')}
             close={() => setShowTreeOverlay(false)}
             buttonsGroup={
-              <>
+              <div className={styles.overlay}>
                 <Button kind="secondary" size="xl" onClick={resetTree} disabled={isLoading}>
                   {t('resetTreeText', 'Reset tree')}
                 </Button>
@@ -126,7 +122,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
                     !isLoading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
                   } ${t('resultsText', 'results')}`}
                 </Button>
-              </>
+              </div>
             }
           >
             {!isLoading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
@@ -144,9 +140,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
         </div>
       )}
       <div className={classNames(styles.rightSection, expanded ? styles.fullView : styles.splitView)}>
-        {testUuid && type === 'trendline' ? (
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : isLoading || isLoadingPanelData ? (
+        {isLoading ? (
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>

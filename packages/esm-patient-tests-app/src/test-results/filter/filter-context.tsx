@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import { isObject } from 'lodash-es';
-import { parseTime } from '../panel-timeline/helpers';
+import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import {
   type TreeNode,
   type FilterContextProps,
@@ -10,6 +10,31 @@ import {
 } from './filter-types';
 import reducer from './filter-reducer';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
+
+function parseTime(sortedTimes: Array<string>) {
+  const yearColumns: Array<{ year: string; size: number }> = [],
+    dayColumns: Array<{ year: string; day: string; size: number }> = [],
+    timeColumns: string[] = [];
+
+  sortedTimes.forEach((datetime) => {
+    const parsedDate = parseDate(datetime);
+    const year = parsedDate.getFullYear().toString();
+    const date = formatDate(parsedDate, { mode: 'wide', year: false, time: false });
+    const time = formatTime(parsedDate);
+
+    const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
+    if (yearColumn) yearColumn.size++;
+    else yearColumns.push({ year, size: 1 });
+
+    const dayColumn = dayColumns.find(({ year: innerYear, day: innerDay }) => date === innerDay && year === innerYear);
+    if (dayColumn) dayColumn.size++;
+    else dayColumns.push({ day: date, year, size: 1 });
+
+    timeColumns.push(time);
+  });
+
+  return { yearColumns, dayColumns, timeColumns, sortedTimes };
+}
 
 const initialState: ReducerState = {
   checkboxes: {},
@@ -28,6 +53,7 @@ const initialContext = {
   activeTests: [],
   someChecked: false,
   totalResultsCount: 0,
+  isLoading: false,
   initialize: () => {},
   toggleVal: () => {},
   updateParent: () => {},
@@ -38,10 +64,11 @@ const FilterContext = createContext<FilterContextProps>(initialContext);
 
 export interface FilterProviderProps {
   roots: any[];
+  isLoading: boolean;
   children: React.ReactNode;
 }
 
-const FilterProvider = ({ roots, children }: FilterProviderProps) => {
+const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
@@ -164,6 +191,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
         activeTests,
         someChecked,
         totalResultsCount,
+        isLoading,
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,
         updateParent: actions.updateParent,

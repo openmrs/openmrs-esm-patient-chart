@@ -11,9 +11,7 @@ import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import { testResultsBasePath } from '../helpers';
 import PanelView from '../panel-view/panel-view.component';
-import TabletOverlay from '../tablet-overlay';
 import TreeView from '../tree-view/tree-view.component';
-import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.scss';
 
 type panelOpts = 'tree' | 'panel';
@@ -26,7 +24,6 @@ interface RefreshDataButtonProps {
 interface ResultsViewerProps {
   basePath: string;
   patientUuid?: string;
-  loading?: boolean;
 }
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
@@ -41,8 +38,8 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 
   if (roots?.length) {
     return (
-      <FilterProvider roots={!isLoading ? roots : []}>
-        <ResultsViewer patientUuid={patientUuid} basePath={basePath} loading={isLoading} />
+      <FilterProvider roots={!isLoading ? roots : []} isLoading={isLoading}>
+        <ResultsViewer patientUuid={patientUuid} basePath={basePath} />
       </FilterProvider>
     );
   }
@@ -55,15 +52,14 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
   );
 };
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, loading }) => {
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount, resetTree } = useContext(FilterContext);
+  const { totalResultsCount, resetTree, isLoading } = useContext(FilterContext);
   const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
-  const trendlineView = testUuid && type === 'trendline';
   const responsiveSize = isTablet ? 'lg' : 'md';
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -128,26 +124,10 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             expanded={isExpanded}
             testUuid={testUuid}
             view={view}
-            isLoading={loading}
           />
         ) : selectedSection === 'panel' ? (
-          <PanelView
-            expanded={isExpanded}
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            testUuid={testUuid}
-          />
+          <PanelView expanded={isExpanded} patientUuid={patientUuid} />
         ) : null}
-        {trendlineView && (
-          <TabletOverlay
-            headerText={t('trendline', 'Trendline')}
-            close={navigateBackFromTrendlineView}
-            buttonsGroup={<></>}
-          >
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
-          </TabletOverlay>
-        )}
       </div>
     );
   }
@@ -176,8 +156,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
                 selectedIndex={isExpanded ? 1 : 0}
                 size={responsiveSize}
               >
-                <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={loading} />
-                <Switch name="over-time" text={t('overTime', 'Over time')} disabled={loading} />
+                <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={isLoading} />
+                <Switch name="over-time" text={t('overTime', 'Over time')} disabled={isLoading} />
               </ContentSwitcher>
             </div>
           </div>
@@ -191,7 +171,6 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
           expanded={false}
           testUuid={testUuid}
           view={view}
-          isLoading={loading}
         />
       </div>
     </div>

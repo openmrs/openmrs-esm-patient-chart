@@ -13,23 +13,22 @@ import {
   Layer,
 } from '@carbon/react';
 import { getClass } from './helper';
-import type { ObsRecord } from '../../types';
+import type { GroupedObservation, ObsRecord } from '../../types';
 import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import styles from './result-panel.scss';
 
 interface LabSetPanelProps {
-  panel: ObsRecord;
-  observations: Array<ObsRecord>;
-  activePanel: ObsRecord;
-  setActivePanel: React.Dispatch<React.SetStateAction<ObsRecord>>;
+  panel: GroupedObservation;
+  activePanel: GroupedObservation;
+  setActivePanel: React.Dispatch<React.SetStateAction<GroupedObservation>>;
 }
 
-const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePanel, setActivePanel }) => {
+const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActivePanel }) => {
   const { t } = useTranslation();
-  const date = new Date(panel.effectiveDateTime);
+  const date = new Date(panel.date);
   const layout = useLayoutType();
 
-  const hasRange = panel.meta?.range;
+  const hasRange = panel.entries.some((entry) => entry.range);
 
   const headers = useMemo(
     () =>
@@ -69,35 +68,42 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
   const rowsData = useMemo(
     () =>
       hasRange
-        ? observations.map((test) => ({
-            id: test.id,
-            testName: test.name,
-            value: {
-              content: <span>{`${test.value} ${test.meta?.units}`}</span>,
-            },
-            interpretation: test.interpretation,
-            range: test.meta.range ? `${test.meta?.range} ${test.meta?.units}` : '--',
-          }))
-        : observations.map((test) => ({
-            id: test.id,
-            testName: test.name,
-            value: {
-              content: <span>{`${test.value} ${test.meta?.units ?? ''}`}</span>,
-            },
-            interpretation: test.interpretation,
-          })),
-    [observations, hasRange],
+        ? panel.entries.map((test) => {
+            const units = test.units ?? '';
+            const range = test.range ? `${test.range} ${units}` : '--';
+            return {
+              id: test.conceptUuid,
+              testName: test.display,
+              value: {
+                content: <span>{`${test.value} ${units}`}</span>,
+              },
+              interpretation: test.interpretation,
+              range: range,
+            };
+          })
+        : panel.entries.map((test) => {
+            const units = test.units ?? '';
+            return {
+              id: test.conceptUuid,
+              testName: test.display,
+              value: {
+                content: <span>{`${test.value} ${units}`}</span>,
+              },
+              interpretation: test.interpretation,
+            };
+          }),
+    [panel, hasRange],
   );
 
   return (
     <Layer
       className={classNames(styles.labSetPanel, {
-        [styles.activePanel]: activePanel?.conceptUuid === panel.conceptUuid,
+        [styles.activePanel]: activePanel?.key === panel.key,
       })}
     >
       <div onClick={() => setActivePanel(panel)} role="button" tabIndex={0}>
         <div className={styles.panelHeader}>
-          <h2 className={styles.productiveHeading02}>{panel.name}</h2>
+          <h2 className={styles.productiveHeading02}>{panel.key}</h2>
           <p className={styles.subtitleText}>
             {formatDate(date, {
               mode: 'wide',

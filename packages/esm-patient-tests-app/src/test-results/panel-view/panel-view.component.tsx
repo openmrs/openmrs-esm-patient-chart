@@ -1,24 +1,19 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
-import { CloseIcon, navigate, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
+import { CloseIcon, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
-import type { ObsRecord } from '../../types';
-import { testResultsBasePath } from '../helpers';
+import type { GroupedObservation } from '../../types';
 import LabSetPanel from './panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';
-import PanelTimelineComponent from '../panel-timeline/panel-timeline-component';
-import Trendline from '../trendline/trendline.component';
-import usePanelData from './usePanelData';
+import FilterContext from '../filter/filter-context';
+import TimelineDataGroup from '../grouped-timeline/timeline-data-group.component';
 import styles from './panel-view.scss';
 
 interface PanelViewProps {
   expanded: boolean;
-  testUuid: string;
-  type: string;
-  basePath: string;
   patientUuid: string;
 }
 
@@ -29,32 +24,38 @@ interface PanelViewHeaderProps {
   totalSearchResults: number;
 }
 
-const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, type, patientUuid }) => {
+const PanelView: React.FC<PanelViewProps> = ({ expanded, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const trendlineView = testUuid && type === 'trendline';
-  const { panels, isLoading, groupedObservations } = usePanelData(patientUuid);
-
   const [searchTerm, setSearchTerm] = useState('');
-  const [activePanel, setActivePanel] = useState<ObsRecord>(null);
+  const [activePanel, setActivePanel] = useState<GroupedObservation>(null);
+  const { tableData, timelineData, lowestParents, isLoading } = useContext(FilterContext);
+
+  const activeTimelineData = useMemo(() => {
+    return activePanel
+      ? activePanel.entries
+          .map((panelTest) =>
+            timelineData.data.rowData.filter((timelineTest) => timelineTest.flatName == panelTest.flatName),
+          )
+          .flat()
+      : [];
+  }, [timelineData, activePanel]);
+
+  const activeTimelineParent = useMemo(() => {
+    return activePanel ? lowestParents.find((parent) => parent.display == activePanel.key) : null;
+  }, [lowestParents, activePanel]);
 
   const filteredPanels = useMemo(() => {
     if (!searchTerm) {
-      return panels;
+      return tableData;
     }
-    return panels?.filter(
+    return tableData?.filter(
       (panel) =>
-        panel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        panel.relatedObs.some((ob) => ob.name.toLowerCase().includes(searchTerm.toLowerCase())),
+        panel.flatName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        panel.entries.some((ob) => ob.display.toLowerCase().includes(searchTerm.toLowerCase())),
     );
-  }, [panels, searchTerm]);
-
-  const navigateBackFromTrendlineView = useCallback(() => {
-    navigate({
-      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
-    });
-  }, [patientUuid]);
+  }, [tableData, searchTerm]);
 
   useEffect(() => {
     // Selecting the active panel should not occur in small-desktop
@@ -74,13 +75,12 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
             totalSearchResults={filteredPanels?.length ?? 0}
           />
           {!isLoading ? (
-            panels?.length > 0 ? (
+            tableData?.length > 0 ? (
               filteredPanels?.length ? (
                 filteredPanels.map((panel) => (
                   <LabSetPanel
-                    key={panel.conceptUuid}
+                    key={panel.key}
                     panel={panel}
-                    observations={[panel, ...panel.relatedObs]}
                     setActivePanel={setActivePanel}
                     activePanel={activePanel}
                   />
@@ -96,13 +96,19 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
           )}
         </div>
         {activePanel ? (
-          <Overlay close={() => setActivePanel(null)} headerText={activePanel?.name}>
-            <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
-          </Overlay>
-        ) : null}
-        {trendlineView ? (
-          <Overlay close={navigateBackFromTrendlineView} headerText={activePanel?.name}>
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
+          <Overlay close={() => setActivePanel(null)} headerText={activePanel?.key}>
+            <div className={styles.overlay}>
+              <TimelineDataGroup
+                patientUuid={patientUuid}
+                parent={activeTimelineParent}
+                subRows={activeTimelineData}
+                panelName={activePanel.key}
+                groupNumber={1}
+                setPanelName={() => {}}
+                xScroll={0}
+                setXScroll={() => {}}
+              />
+            </div>
           </Overlay>
         ) : null}
       </>
@@ -121,14 +127,13 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
               totalSearchResults={filteredPanels?.length ?? 0}
             />
             {!isLoading ? (
-              panels?.length > 0 ? (
+              tableData?.length > 0 ? (
                 filteredPanels?.length ? (
                   filteredPanels.map((panel) => (
                     <LabSetPanel
-                      activePanel={activePanel}
-                      key={panel.conceptUuid}
-                      observations={[panel, ...panel.relatedObs]}
+                      key={panel.key}
                       panel={panel}
+                      activePanel={activePanel}
                       setActivePanel={setActivePanel}
                     />
                   ))
@@ -150,10 +155,19 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
         <div className={styles.stickySection}>
           {isLoading ? (
             <DataTableSkeleton columns={3} role="progressbar" />
-          ) : trendlineView ? (
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
           ) : activePanel ? (
-            <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
+            <div className={styles.overlay}>
+              <TimelineDataGroup
+                patientUuid={patientUuid}
+                parent={activeTimelineParent}
+                subRows={activeTimelineData}
+                panelName={activePanel.key}
+                groupNumber={1}
+                setPanelName={() => {}}
+                xScroll={0}
+                setXScroll={() => {}}
+              />
+            </div>
           ) : null}
         </div>
       </div>
@@ -193,15 +207,15 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
     <div className={styles.panelViewHeader}>
       {!showSearchFields ? (
         <>
-          <div className={styles.flex}>
-            <h4 className={styles.heading}>
-              {!searchTerm || totalSearchResults === 0
-                ? t('panel', 'Panel')
-                : t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
-                    searchTerm,
-                    count: totalSearchResults,
-                  })}
-            </h4>
+          <div className={styles.flexBaseline}>
+            {searchTerm && totalSearchResults > 0 && (
+              <h4 className={styles.heading}>
+                {t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
+                  searchTerm,
+                  count: totalSearchResults,
+                })}
+              </h4>
+            )}
             {searchTerm ? (
               <Button className={styles.clearButton} kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>
                 {t('clear', 'Clear')}
@@ -220,7 +234,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
         </>
       ) : !isTablet ? (
         <>
-          <Form onSubmit={handleSearchTerm} className={styles.flex}>
+          <Form onSubmit={handleSearchTerm} className={styles.flexBaseline}>
             <Search
               autoFocus
               labelText=""
@@ -245,7 +259,7 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
       ) : (
         <>
           <Overlay close={handleToggleSearchFields} headerText={t('search', 'Search')}>
-            <Form onSubmit={handleSearchTerm} className={classNames(styles.flex, styles.tabletSearch)}>
+            <Form onSubmit={handleSearchTerm} className={classNames(styles.flex)}>
               <Search
                 autoFocus
                 labelText=""
