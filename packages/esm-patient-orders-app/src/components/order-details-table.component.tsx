@@ -129,11 +129,17 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const [selectedToDate, setSelectedToDate] = useState(null);
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
   const {
-    data: allOrders,
+    data: fetchedOrders,
     error: error,
     isLoading,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid, selectedFromDate, selectedToDate);
+  } = usePatientOrders(patientUuid, 'ACTIVE', null, selectedFromDate, selectedToDate);
+
+  const allOrders = useMemo(() => {
+    if (!fetchedOrders) return [];
+    if (!selectedOrderTypeUuid) return fetchedOrders;
+    return fetchedOrders.filter((order) => order.orderType.uuid === selectedOrderTypeUuid);
+  }, [fetchedOrders, selectedOrderTypeUuid]);
 
   // launch respective order basket based on order type
   const openOrderForm = useCallback(
