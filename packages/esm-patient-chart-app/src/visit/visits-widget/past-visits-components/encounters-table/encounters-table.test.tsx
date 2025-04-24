@@ -17,6 +17,9 @@ const testProps: EncountersTableProps = {
   isLoading: false,
   onEncountersUpdated: jest.fn(),
   showVisitType: true,
+  showEncounterTypeFilter: false,
+  pageSize: 10,
+  setPageSize: jest.fn(),
 };
 
 const mockShowModal = jest.mocked(showModal);

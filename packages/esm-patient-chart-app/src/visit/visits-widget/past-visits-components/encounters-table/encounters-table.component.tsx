@@ -22,7 +22,8 @@ import {
   ComboBox,
   InlineLoading,
   DataTableSkeleton,
- Pagination } from '@carbon/react';
+  Pagination,
+} from '@carbon/react';
 import {
   EditIcon,
   isDesktop,
@@ -62,8 +63,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   paginatedEncounters,
   encounterTypeToFilter,
   setEncounterTypeToFilter,
+  showEncounterTypeFilter,
+  pageSize,
+  setPageSize,
 }) => {
-  const [currentPageSize, setCurrentPageSize] = useState(20);
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { t } = useTranslation();
@@ -169,7 +172,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         }) => (
           <>
             <TableContainer className={styles.tableContainer}>
-              {encounterTypeToFilter !== undefined && (
+              {showEncounterTypeFilter && (
                 <TableToolbar {...getToolbarProps()}>
                   <TableToolbarContent>
                     <div className={styles.filterContainer}>
@@ -199,7 +202,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {header.header}
                       </TableHeader>
                     ))}
-                    <TableExpandHeader />
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -324,12 +327,12 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           forwardText={t('nextPage', 'Next page')}
           backwardText={t('previousPage', 'Previous page')}
           page={currentPage}
-          pageSize={currentPageSize}
+          pageSize={pageSize}
           pageSizes={pageSizes}
           totalItems={totalCount}
-          onChange={({ pageSize, page }) => {
-            if (pageSize !== currentPageSize) {
-              setCurrentPageSize(pageSize);
+          onChange={({ pageSize: newPageSize, page }) => {
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
             }
             if (page !== currentPage) {
               goTo(page);
