@@ -6,7 +6,7 @@ import { mockGroupedResults, mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { type FilterContextProps } from '../filter/filter-types';
 import { useGetManyObstreeData } from '../grouped-timeline';
-import TreeViewWrapper from './tree-view-wrapper.component';
+import TreeView from './tree-view.component';
 import FilterContext from '../filter/filter-context';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -31,6 +31,7 @@ const mockProps = {
   expanded: false,
   type: 'default',
   view: 'individual-test' as const,
+  isLoading: false,
 };
 
 const mockFilterContext: FilterContextProps = {
@@ -51,15 +52,15 @@ const mockFilterContext: FilterContextProps = {
   tests: {},
 };
 
-const renderTreeViewWrapperWithMockContext = (contextValue = mockFilterContext) => {
+const renderTreeViewWithMockContext = (contextValue = mockFilterContext) => {
   render(
     <FilterContext.Provider value={contextValue}>
-      <TreeViewWrapper {...mockProps} />
+      <TreeView {...mockProps} />
     </FilterContext.Provider>,
   );
 };
 
-describe('TreeViewWrapper', () => {
+describe('TreeView', () => {
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('small-desktop');
 
@@ -95,7 +96,7 @@ describe('TreeViewWrapper', () => {
       error: null,
     });
 
-    render(<TreeViewWrapper {...mockProps} />);
+    render(<TreeView {...mockProps} />);
 
     expect(screen.getByRole('heading', { name: /test results/i })).toBeInTheDocument();
     expect(screen.getByText(/there are no test results data to display for this patient/i)).toBeInTheDocument();
@@ -109,7 +110,7 @@ describe('TreeViewWrapper', () => {
       error: mockError,
     });
 
-    render(<TreeViewWrapper {...mockProps} />);
+    render(<TreeView {...mockProps} />);
 
     expect(screen.getByRole('heading', { name: /data load error/i })).toBeInTheDocument();
     expect(
@@ -126,7 +127,7 @@ describe('TreeViewWrapper', () => {
       error: null,
     });
 
-    renderTreeViewWrapperWithMockContext();
+    renderTreeViewWithMockContext();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getAllByText('Complete blood count').length).toBeGreaterThan(0);

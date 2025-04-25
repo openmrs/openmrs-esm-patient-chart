@@ -22,8 +22,8 @@ import {
   ErrorState,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import styles from './immunizations-overview.scss';
 import { useImmunizations } from '../hooks/useImmunizations';
+import styles from './immunizations-overview.scss';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -67,8 +67,14 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
     }));
   }, [paginatedImmunizations]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (immunizations?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -115,15 +121,17 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
             </TableContainer>
           )}
         </DataTable>
-        <PatientChartPagination
-          currentItems={paginatedImmunizations.length}
-          onPageNumberChange={({ page }) => goTo(page)}
-          pageNumber={currentPage}
-          pageSize={immunizationsCount}
-          totalItems={immunizations.length}
-          dashboardLinkUrl={pageUrl}
-          dashboardLinkLabel={urlLabel}
-        />
+        <div className={styles.paginationContainer}>
+          <PatientChartPagination
+            currentItems={paginatedImmunizations.length}
+            onPageNumberChange={({ page }) => goTo(page)}
+            pageNumber={currentPage}
+            pageSize={immunizationsCount}
+            totalItems={immunizations.length}
+            dashboardLinkUrl={pageUrl}
+            dashboardLinkLabel={urlLabel}
+          />
+        </div>
       </div>
     );
   }
