@@ -14,10 +14,7 @@ import styles from '../results-viewer/results-viewer.scss';
 
 interface TreeViewProps {
   patientUuid: string;
-  basePath: string;
-  testUuid: string;
   expanded: boolean;
-  type: string;
   view?: viewOpts;
   error?: string;
 }
@@ -71,7 +68,7 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   );
 };
 
-const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, expanded, type, view }) => {
+const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);

@@ -1,16 +1,14 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
-import { testResultsBasePath } from '../helpers';
-import PanelView from '../panel-view/panel-view.component';
+import IndividualResultsTableTablet from '../individual-results-table-tablet/individual-results-table-tablet.component';
 import TreeView from '../tree-view/tree-view.component';
 import styles from './results-viewer.scss';
 
@@ -52,13 +50,12 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
   );
 };
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath }) => {
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
   const { totalResultsCount, resetTree, isLoading } = useContext(FilterContext);
-  const { type, testUuid } = useParams();
   const isExpanded = view === 'full';
   const responsiveSize = isTablet ? 'lg' : 'md';
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -90,12 +87,6 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath }) 
     };
   }, []);
 
-  const navigateBackFromTrendlineView = useCallback(() => {
-    navigate({
-      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
-    });
-  }, [patientUuid]);
-
   if (isTablet) {
     return (
       <div className={styles.resultsContainer}>
@@ -117,16 +108,9 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath }) 
           </div>
         </div>
         {selectedSection === 'tree' ? (
-          <TreeView
-            patientUuid={patientUuid}
-            basePath={basePath}
-            type={type}
-            expanded={isExpanded}
-            testUuid={testUuid}
-            view={view}
-          />
+          <TreeView patientUuid={patientUuid} expanded={isExpanded} view={view} />
         ) : selectedSection === 'panel' ? (
-          <PanelView expanded={isExpanded} patientUuid={patientUuid} />
+          <IndividualResultsTableTablet expanded={isExpanded} patientUuid={patientUuid} />
         ) : null}
       </div>
     );
@@ -164,14 +148,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath }) 
         </div>
       </div>
       <div className={styles.flex}>
-        <TreeView
-          patientUuid={patientUuid}
-          basePath={basePath}
-          type={type}
-          expanded={false}
-          testUuid={testUuid}
-          view={view}
-        />
+        <TreeView patientUuid={patientUuid} expanded={false} view={view} />
       </div>
     </div>
   );

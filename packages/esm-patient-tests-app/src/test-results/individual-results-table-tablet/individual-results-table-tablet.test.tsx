@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { mockPanelData } from '__mocks__';
-import PanelView from './panel-view.component';
+import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 import usePanelData from './usePanelData';
 
 const mockIsDesktop = jest.mocked(isDesktop);
@@ -22,7 +22,9 @@ describe('PanelView', () => {
   it('renders a loading state when data is loading', () => {
     mockUsePanelData.mockReturnValue({ ...mockPanelData, isLoading: true });
 
-    render(<PanelView expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />);
+    render(
+      <IndividualResultsTableTablet expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />,
+    );
 
     const progressBars = screen.getAllByRole('progressbar');
     expect(progressBars.length).toBeGreaterThan(0);
@@ -31,7 +33,9 @@ describe('PanelView', () => {
   it('renders an empty state when there are no panels to display', () => {
     mockUsePanelData.mockReturnValue({ ...mockPanelData, panels: [] });
 
-    render(<PanelView expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />);
+    render(
+      <IndividualResultsTableTablet expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />,
+    );
 
     expect(screen.getByText(/no panels found/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no panels to display for this patient/i)).toBeInTheDocument();
@@ -41,7 +45,9 @@ describe('PanelView', () => {
     mockUseLayoutType.mockReturnValue('large-desktop');
     mockIsDesktop.mockReturnValue(true);
 
-    render(<PanelView expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />);
+    render(
+      <IndividualResultsTableTablet expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />,
+    );
 
     expect(screen.getByRole('heading', { name: /panel/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /red blood cells/i })).toBeInTheDocument();
@@ -56,7 +62,9 @@ describe('PanelView', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     mockUsePanelData.mockReturnValue({ ...mockPanelData, isLoading: false });
 
-    render(<PanelView expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />);
+    render(
+      <IndividualResultsTableTablet expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />,
+    );
 
     const searchButton = screen.getByRole('button', { name: /search/i });
     expect(searchButton).toBeInTheDocument();
@@ -84,7 +92,9 @@ describe('PanelView', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     mockIsDesktop.mockReturnValue(true);
 
-    render(<PanelView expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />);
+    render(
+      <IndividualResultsTableTablet expanded={false} testUuid="" type="" basePath="" patientUuid="test-patient" />,
+    );
 
     const hematocritCell = screen.getByRole('cell', { name: /hematocrit/i });
     await user.click(hematocritCell);

@@ -5,7 +5,7 @@ import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type ObsRecord } from '../../types';
 import { mockBasePanel, mockObservations, mockConceptMeta, mockObservationsWithInterpretations } from '__mocks__';
-import LabSetPanel from './panel.component';
+import LabSetPanel from './lab-set-panel.component';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);

@@ -6,25 +6,25 @@ import { CloseIcon, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
 import type { GroupedObservation } from '../../types';
-import LabSetPanel from './panel.component';
+import LabSetPanel from './lab-set-panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';
 import FilterContext from '../filter/filter-context';
 import TimelineDataGroup from '../grouped-timeline/timeline-data-group.component';
-import styles from './panel-view.scss';
+import styles from './individual-results-table-tablet.scss';
 
-interface PanelViewProps {
+interface IndividualResultsTableTabletProps {
   expanded: boolean;
   patientUuid: string;
 }
 
-interface PanelViewHeaderProps {
+interface IndividualResultsTableTabletHeaderProps {
   isTablet: boolean;
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   totalSearchResults: number;
 }
 
-const PanelView: React.FC<PanelViewProps> = ({ expanded, patientUuid }) => {
+const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> = ({ expanded, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
@@ -68,7 +68,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, patientUuid }) => {
     return (
       <>
         <div>
-          <PanelViewHeader
+          <IndividualResultsTableTabletHeader
             isTablet={isTablet}
             setSearchTerm={setSearchTerm}
             searchTerm={searchTerm}
@@ -120,7 +120,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, patientUuid }) => {
       {!expanded ? (
         <div className={styles.leftSection}>
           <>
-            <PanelViewHeader
+            <IndividualResultsTableTabletHeader
               isTablet={isTablet}
               setSearchTerm={setSearchTerm}
               searchTerm={searchTerm}
@@ -175,7 +175,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, patientUuid }) => {
   );
 };
 
-const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
+const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletHeaderProps> = ({
   isTablet,
   searchTerm,
   setSearchTerm,
@@ -279,4 +279,4 @@ const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
   );
 };
 
-export default PanelView;
+export default IndividualResultsTableTablet;

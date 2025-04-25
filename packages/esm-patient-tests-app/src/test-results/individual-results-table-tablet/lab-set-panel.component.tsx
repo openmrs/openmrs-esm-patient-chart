@@ -13,9 +13,9 @@ import {
   Layer,
 } from '@carbon/react';
 import { getClass } from './helper';
-import type { GroupedObservation, ObsRecord } from '../../types';
+import type { GroupedObservation } from '../../types';
 import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import styles from './result-panel.scss';
+import styles from './lab-set-panel.scss';
 
 interface LabSetPanelProps {
   panel: GroupedObservation;
