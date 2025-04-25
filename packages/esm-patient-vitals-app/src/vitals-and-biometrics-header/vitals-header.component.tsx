@@ -66,7 +66,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
     const now = dayjs();
     const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
     const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;
-    const vitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() > vitalsOverdueThresholdHours;
+    const vitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
     const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
 
     let overdueVitalsTagContent: React.ReactNode = null;

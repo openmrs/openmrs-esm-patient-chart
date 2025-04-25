@@ -61,7 +61,7 @@ export const configSchema = {
     vitalsOverdueThresholdHours: {
       _type: Type.Number,
       _default: 12,
-      _description: 'Hours after which vitals are considered overdue',
+      _description: 'Hours at or above which vitals are considered overdue',
     },
     logo: {
       src: {
