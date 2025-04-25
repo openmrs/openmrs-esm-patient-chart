@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
@@ -27,20 +27,16 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
   const selectedCheckboxes = Object.keys(checkboxes).filter((key) => checkboxes[key]);
 
-  if (!tableData?.length) {
-    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
-  }
-
-  return (
-    <Layer className={className}>
-      {tableData
+  const tableFilteredSubRows = useMemo(
+    () =>
+      tableData
         ?.filter(
           (row) =>
             !someChecked ||
             row.entries?.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey)),
         )
         .map((subRows: GroupedObservation, index) => {
-          const filteredSubRows = {
+          return {
             ...subRows,
             entries: subRows.entries?.filter(
               (entry) =>
@@ -48,9 +44,20 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
                 selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey),
             ),
           };
-          return filteredSubRows.entries?.length > 0 ? (
-            <div
-              key={index}
+        }),
+    [tableData, someChecked, selectedCheckboxes],
+  );
+
+  if (!tableData?.length) {
+    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
+  }
+
+  return (
+    <Layer className={className}>
+      {tableFilteredSubRows.map((filteredSubRows, index) => {
+        return filteredSubRows.entries?.length > 0 ? (
+          <div
+            key={index}
               className={classNames({
                 [styles.border]: filteredSubRows?.entries.length,
               })}

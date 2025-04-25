@@ -268,7 +268,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
                 size="lg"
                 value={localSearchTerm}
               />
-              <Button kind="secondary" onClick={handleSearchTerm}>
+              <Button data-testid="execute-search-button" kind="secondary" onClick={handleSearchTerm}>
                 {t('search', 'Search')}
               </Button>
             </Form>
