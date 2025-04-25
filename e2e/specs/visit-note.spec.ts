@@ -70,9 +70,8 @@ test('Add and delete a visit note', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly added diagnoses', async () => {
-    // elements appear twice: once in the table row and once in the expanded visit summary card
-    await expect(page.getByText(/asthma/i)).toHaveCount(2);
-    await expect(page.getByText(/gi upset/i)).toHaveCount(2);
+    await expect(page.getByText(/asthma/i)).toBeVisible();
+    await expect(page.getByText(/gi upset/i)).toBeVisible();
   });
 
   await test.step('When I expand the visit row', async () => {
