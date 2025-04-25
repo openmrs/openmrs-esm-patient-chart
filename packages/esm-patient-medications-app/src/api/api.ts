@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
-import type { DrugOrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
+import type { DrugOrderPost, PatientOrderFetchResponse, Order } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type DrugOrderBasketItem } from '../types';
 
@@ -22,7 +22,7 @@ const customRepresentation =
  * @param orders The orders to sort.
  * @returns The sorted orders.
  */
-function sortOrdersByDateActivated(orders: any[]) {
+function sortOrdersByDateActivated(orders: Order[]) {
   return orders?.sort(
     (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
   );
