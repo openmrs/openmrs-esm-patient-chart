@@ -11,6 +11,7 @@ import { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTableTablet from '../individual-results-table-tablet/individual-results-table-tablet.component';
 import TreeView from '../tree-view/tree-view.component';
 import styles from './results-viewer.scss';
+import { type Roots } from '../filter/filter-context';
 
 type panelOpts = 'tree' | 'panel';
 
@@ -36,7 +37,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 
   if (roots?.length) {
     return (
-      <FilterProvider roots={!isLoading ? roots : []} isLoading={isLoading}>
+      <FilterProvider roots={!isLoading ? (roots as Roots) : []} isLoading={isLoading}>
         <ResultsViewer patientUuid={patientUuid} basePath={basePath} />
       </FilterProvider>
     );
