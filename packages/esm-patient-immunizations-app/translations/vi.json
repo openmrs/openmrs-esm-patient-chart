@@ -1,10 +1,10 @@
 {
   "add": "Thêm",
+  "addImmunizations": "Add immunizations",
   "AM": "AM",
   "cancel": "Hủy",
   "doseNumber": "Dose number within series",
   "doseNumberWithinSeries": "Dose number within series",
-  "edit": "Chỉnh sửa",
   "error": "Lỗi",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
