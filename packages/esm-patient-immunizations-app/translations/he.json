@@ -1,10 +1,10 @@
 {
   "add": "הוסף",
+  "addImmunizations": "Add immunizations",
   "AM": "AM",
   "cancel": "ביטול",
   "doseNumber": "Dose Number",
   "doseNumberWithinSeries": "Dose number within series",
-  "edit": "Edit",
   "error": "Error",
   "errorSaving": "שגיאה בשמירת החיסון",
   "expirationDate": "תאריך תפוגה",
