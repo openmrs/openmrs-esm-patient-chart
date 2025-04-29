@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .visitCardRow {
@@ -50,6 +51,33 @@
   align-items: center;
 }
 
-.pagination {
-  background-color: #f4f4f4;
+.createVisitButtonContainer {
+  padding: layout.$spacing-05;
+}
+
+.datepicker {
+  padding-top: layout.$spacing-05;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+}
+
+.tile {
+  margin: auto;
+  margin-top: layout.$spacing-07;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
 }

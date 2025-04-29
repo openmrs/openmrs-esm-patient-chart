@@ -1,13 +1,15 @@
-import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, DataTableSkeleton } from '@carbon/react';
-import { ErrorState, type Visit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton , InlineLoading , Tile } from '@carbon/react';
+import { ErrorState, OpenmrsDatePicker, useDebounce, type Visit } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePaginatedVisits } from '../visit.resource';
+import { useInfiniteVisits } from '../visit.resource';
 import { useVisitContextStore } from './visit-context';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
+import dayjs from 'dayjs';
+import { useOnVisible } from './visit-context-switcher.resource';
 
 interface VisitContextSwitcherProps {
   patientUuid: string;
@@ -20,21 +22,27 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   closeModal,
   onAfterVisitSelected,
 }) => {
-  const pageSize = 5;
   const { t } = useTranslation();
-  const {
-    data: visits,
-    isLoading,
-    error,
-    currentPage,
-    goTo,
-    totalCount,
-    currentPageSize,
-  } = usePaginatedVisits(patientUuid, pageSize);
+  const [maxStartDate, setMaxStartDate] = useState(new Date());
+  const maxStartDateDebounced = useDebounce(maxStartDate);
+
+  const rep = 'custom:(uuid,display,visitType,startDatetime,stopDatetime,location)';
+  const { visits, isLoading, error, hasMore, loadMore } = useInfiniteVisits(
+    patientUuid,
+    { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() },
+    rep,
+  );
   const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const [selectedVisit, setSelectedVisit] = useState<string>(
     selectedVisitPatientUuid === patientUuid ? manuallySetVisitUuid : null,
   );
+
+  const onScrollToEnd = useCallback(() => {
+    if (hasMore) {
+      loadMore();
+    }
+  }, [hasMore, loadMore]);
+  const ref = useOnVisible(onScrollToEnd);
 
   const openStartVisitWorkspace = () => {
     closeModal();
@@ -45,12 +53,26 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')} />
+      <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')}>
+        <OpenmrsDatePicker
+          id={'visit-context-swticher-date-picker'}
+          className={styles.datepicker}
+          labelText={t('showVisitOnOrPriorTo', 'Show visit on or prior to:')}
+          maxDate={Date.now()}
+          value={maxStartDate}
+          onChange={setMaxStartDate}
+        />
+      </ModalHeader>
       <ModalBody>
-        {isLoading ? (
-          <DataTableSkeleton role="progressbar" rowCount={5} columnCount={1} showHeader={false} showToolbar={false} />
-        ) : error ? (
+        {error ? (
           <ErrorState headerTitle={t('visits', 'visits')} error={error} />
+        ) : visits?.length == 0 ? (
+          <Tile className={styles.tile}>
+            <div className={styles.tileContent}>
+              <p className={styles.content}>{t('noVisitsToDisplay', 'No visits to display')}</p>
+              <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+            </div>
+          </Tile>
         ) : (
           <div>
             {visits?.map((visit) => {
@@ -63,20 +85,15 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
                 />
               );
             })}
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={totalCount}
-              currentItems={currentPageSize.current}
-              pageSize={pageSize}
-              onPageNumberChange={({ page }) => goTo(page)}
-              grey
-            />
+            {isLoading ? <InlineLoading description={t('loading', 'Loading')} /> : <span ref={ref} />}
           </div>
         )}
+      </ModalBody>
+      <div className={styles.createVisitButtonContainer}>
         <Button kind="ghost" size="sm" onClick={openStartVisitWorkspace}>
           {t('createNewVisit', 'Create new visit...')}
         </Button>
-      </ModalBody>
+      </div>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
