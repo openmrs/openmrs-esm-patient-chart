@@ -23,14 +23,12 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
-  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
+  await test.step('When I navigate to the visit history table', async () => {
     await visitsPage.goTo(patient.uuid);
-    await page.getByRole('tab', { name: /summary cards/i }).click();
-    await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
   });
 
-  await test.step('And I click on the `Edit visit details` button on an active visit', async () => {
-    await visitsPage.page.getByRole('button', { name: /edit visit details/i }).click();
+  await test.step('And I click on the `Edit` button on an active visit', async () => {
+    await visitsPage.page.getByRole('button', { name: /edit/i }).click();
   });
 
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
@@ -57,7 +55,7 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
 
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toHaveValue('Outpatient Clinic');
-    await expect(chartPage.page.getByText(/visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByRole('heading', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeChecked();
     await expect(chartPage.page.getByRole('search', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/facility visit/i)).toBeVisible();
@@ -103,11 +101,11 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api })
 
   await test.step('When I visit the Visits summary page', async () => {
     await visitsPage.goTo(patient.uuid);
-    await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
+    await expect(visitsPage.page.getByRole('button', { name: /edit/i })).toBeVisible();
   });
 
-  await test.step('And I click on the `Edit visit details` button on an active visit', async () => {
-    await visitsPage.page.getByRole('button', { name: /edit visit details/i }).click();
+  await test.step('And I click on the `Edit` button on an active visit', async () => {
+    await visitsPage.page.getByRole('button', { name: /edit/i }).click();
   });
 
   await test.step('Then I should see the visit status `Ongoing` and `Ended` tabs', async () => {

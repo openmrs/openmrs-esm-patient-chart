@@ -25,7 +25,7 @@ import {
   useAbortController,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
   extractNumbers,
@@ -41,10 +41,10 @@ import {
   createOrUpdateVitalsAndBiometrics,
   useEncounterVitalsAndBiometrics,
 } from '../common';
+import { prepareObsForSubmission } from '../common/helpers';
+import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
-import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
-import { prepareObsForSubmission } from '../common/helpers';
 
 interface VitalsAndBiometricsFormProps extends DefaultPatientWorkspaceProps {
   formContext: 'creating' | 'editing';
@@ -75,10 +75,10 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
     isLoading: isLoadingConceptMetadata,
   } = useVitalsConceptMetadata();
   const {
-    isLoading: isLoadingEncounter,
-    vitalsAndBiometrics: initialFieldValuesMap,
     getRefinedInitialValues,
+    isLoading: isLoadingEncounter,
     mutate: mutateEncounter,
+    vitalsAndBiometrics: initialFieldValuesMap,
   } = useEncounterVitalsAndBiometrics(formContext === 'editing' ? editEncounterUuid : null);
   const [hasInvalidVitals, setHasInvalidVitals] = useState(false);
   const [muacColorCode, setMuacColorCode] = useState('');
@@ -109,9 +109,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
     }
   }, [formContext, isLoadingInitialValues, initialFieldValuesMap, getRefinedInitialValues, reset]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+  useEffect(() => promptBeforeClosing(() => isDirty), [isDirty, promptBeforeClosing]);
 
   const encounterUuid = currentVisit?.encounters?.find(
     (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
@@ -137,10 +135,15 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
 
   useEffect(() => {
     if (height && weight) {
-      const computedBodyMassIndex = calculateBodyMassIndex(weight, height);
+      const computedBodyMassIndex = calculateBodyMassIndex(
+        weight,
+        height,
+        conceptUnits.get(config.concepts.weightUuid) as 'lb' | 'lbs' | 'g',
+        conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
+      );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
     }
-  }, [weight, height, setValue]);
+  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid]);
 
   function onError(err) {
     if (err?.oneFieldRequired) {

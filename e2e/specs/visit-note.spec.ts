@@ -3,7 +3,6 @@ import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
 import { type Patient, generateRandomPatient, startVisit, endVisit, deletePatient } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
-import { get } from 'lodash';
 
 let patient: Patient;
 let visit: Visit;
@@ -43,7 +42,22 @@ test('Add and delete a visit note', async ({ page }) => {
     await page.getByPlaceholder('Write any notes here').fill('This is a note');
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
+  await test.step('And then I upload an image attachment', async () => {
+    await page.getByRole('button', { name: /add image/i }).click();
+    await expect(page.getByText(/add attachment/i)).toBeVisible();
+    await page.getByRole('tab', { name: /upload files/i }).click();
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
+    const fileChooser = await fileChooserPromise;
+
+    await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
+    await page.getByLabel(/image name/i).fill('Cross-sectional brain scan');
+    await page.getByRole('button', { name: /add attachment/i }).click();
+    await expect(page.getByText(/cross-sectional brain scan/i)).toBeVisible();
+  });
+
+  await test.step('And I click the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -51,14 +65,20 @@ test('Add and delete a visit note', async ({ page }) => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
-  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
+  await test.step('When I navigate to the visits dashboard', async () => {
     await visitsPage.goTo(patient.uuid);
-    await page.getByRole('tab', { name: /summary cards/i }).click();
   });
 
-  await test.step('Then I should see the newly added visit note added to the list', async () => {
+  await test.step('Then I should see the newly added diagnoses', async () => {
     await expect(page.getByText(/asthma/i)).toBeVisible();
     await expect(page.getByText(/gi upset/i)).toBeVisible();
+  });
+
+  await test.step('When I expand the visit row', async () => {
+    await page.getByRole('button', { name: /expand current row/i }).click();
+  });
+
+  await test.step('Then I should see the newly added visit note', async () => {
     await expect(page.getByText(/this is a note/i)).toBeVisible();
   });
 
@@ -83,9 +103,7 @@ test('Add and delete a visit note', async ({ page }) => {
   });
 
   await test.step('And the encounters table should be empty', async () => {
-    await expect(
-      page.getByLabel(/all encounters/i).getByText(/there are no encounters to display for this patient/i),
-    ).toBeVisible();
+    await expect(page.getByLabel(/all encounters/i).getByText(/No encounters to display/i)).toBeVisible();
   });
 });
 

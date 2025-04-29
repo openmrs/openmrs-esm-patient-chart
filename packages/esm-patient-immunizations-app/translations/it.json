@@ -1,10 +1,10 @@
 {
   "add": "Aggiungi",
+  "addImmunizations": "Add immunizations",
   "AM": "mattinata",
   "cancel": "Annulla",
   "doseNumber": "Numero dose",
   "doseNumberWithinSeries": "Numero dose nella serie",
-  "edit": "Modifica",
   "error": "Errore",
   "errorSaving": "Errore nel salvataggio della vaccinazione",
   "expirationDate": "Data di scadenza",
