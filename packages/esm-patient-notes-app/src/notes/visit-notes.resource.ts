@@ -1,6 +1,13 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import {
+  type Diagnosis,
+  type Obs,
+  openmrsFetch,
+  type OpenmrsResource,
+  restBaseUrl,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import type {
   Concept,
@@ -10,6 +17,23 @@ import type {
   RESTPatientNote,
   VisitNotePayload,
 } from '../types';
+
+export interface MappedEncounter {
+  datetime: string;
+  diagnoses: Array<Diagnosis>;
+  editPrivilege: string;
+  encounterType: string;
+  form: OpenmrsResource;
+  formName: string;
+  id: string;
+  obs: Array<Obs>;
+  provider: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
+  visitType: string;
+  visitTypeUuid?: string;
+  visitUuid: string;
+}
 
 interface UseVisitNotes {
   visitNotes: Array<PatientNote> | null;
@@ -40,6 +64,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const mapNoteProperties = (note: RESTPatientNote, index: number): PatientNote => ({
     id: `${index}`,
     diagnoses: note.diagnoses
+      .filter((diagnosis) => !diagnosis.voided)
       .map((diagnosisData) => diagnosisData.display)
       .filter((val) => val)
       .join(', '),
@@ -130,6 +155,17 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
   });
 }
 
+export function updateVisitNote(abortController: AbortController, encounterUuid: string, payload: VisitNotePayload) {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: payload,
+    signal: abortController.signal,
+  });
+}
+
 export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
   return openmrsFetch(`${restBaseUrl}/patientdiagnoses`, {
     headers: {
@@ -137,5 +173,13 @@ export function savePatientDiagnosis(abortController: AbortController, payload: 
     },
     method: 'POST',
     body: payload,
+    signal: abortController.signal,
+  });
+}
+
+export function deletePatientDiagnosis(abortController: AbortController, diagnosisUuid: string) {
+  return openmrsFetch(`${restBaseUrl}/patientdiagnoses/${diagnosisUuid}`, {
+    method: 'DELETE',
+    signal: abortController.signal,
   });
 }

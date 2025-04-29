@@ -1,11 +1,15 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
+  ComboBox,
   DataTable,
+  DataTableSkeleton,
+  InlineLoading,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -19,10 +23,6 @@ import {
   TableToolbar,
   TableToolbarContent,
   Tile,
-  ComboBox,
-  InlineLoading,
-  DataTableSkeleton,
-  Pagination,
 } from '@carbon/react';
 import {
   EditIcon,
@@ -35,13 +35,15 @@ import {
   userHasAccess,
   useConfig,
   type EncounterType,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import {
   deleteEncounter,
-  type EncountersTableProps,
   mapEncounter,
   useEncounterTypes,
+  type EncountersTableProps,
+  type MappedEncounter,
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
@@ -52,24 +54,23 @@ import styles from './encounters-table.scss';
  * as props.
  */
 const EncountersTable: React.FC<EncountersTableProps> = ({
-  patientUuid,
-  totalCount,
   currentPage,
+  encounterTypeToFilter,
   goTo,
   isLoading,
   onEncountersUpdated,
-  showVisitType,
+  pageSize,
   paginated,
   paginatedEncounters,
-  encounterTypeToFilter,
+  patientUuid,
   setEncounterTypeToFilter,
-  showEncounterTypeFilter,
-  pageSize,
   setPageSize,
+  showEncounterTypeFilter,
+  showVisitType,
+  totalCount,
 }) => {
-  const pageSizes = [10, 20, 30, 40, 50];
-
   const { t } = useTranslation();
+  const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
 
@@ -152,8 +153,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     <div className={styles.container}>
       <DataTable
         headers={tableHeaders}
-        rows={paginatedMappedEncounters ?? []}
         overflowMenuOnHover={desktopLayout}
+        rows={paginatedMappedEncounters ?? []}
         size={desktopLayout ? 'sm' : 'lg'}
         useZebraStyles={totalCount > 1 ? true : false}
       >
@@ -166,8 +167,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getToolbarProps,
           getTableProps,
         }: {
-          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
           headers: typeof tableHeaders;
+          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
           [key: string]: any;
         }) => (
           <>
@@ -177,10 +178,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   <TableToolbarContent>
                     <div className={styles.filterContainer}>
                       <ComboBox
+                        aria-label={t('filterByEncounterType', 'Filter by encounter type')}
                         className={styles.substitutionType}
                         id="encounterTypeFilter"
-                        aria-label={t('filterByEncounterType', 'Filter by encounter type')}
-                        size={desktopLayout ? 'sm' : 'lg'}
                         items={encounterTypes}
                         itemToString={(item: EncounterType) => item?.display}
                         onChange={({ selectedItem }) => {
@@ -188,6 +188,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         }}
                         placeholder={t('filterByEncounterType', 'Filter by encounter type')}
                         selectedItem={encounterTypeToFilter}
+                        size={desktopLayout ? 'sm' : 'lg'}
                       />
                     </div>
                   </TableToolbarContent>
@@ -208,6 +209,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                 <TableBody>
                   {rows?.map((row, i) => {
                     const encounter = paginatedMappedEncounters[i];
+                    const isVisitNoteEncounter = (encounter: MappedEncounter) =>
+                      encounter.encounterType === 'Visit Note';
+
                     return (
                       <React.Fragment key={encounter.id}>
                         <TableExpandRow {...getRowProps({ row })}>
@@ -217,40 +221,49 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
                               <OverflowMenu
-                                data-floating-menu-container
-                                aria-label="Encounter table actions menu"
-                                size={desktopLayout ? 'sm' : 'lg'}
-                                flipped
                                 align="left"
+                                aria-label="Encounter table actions menu"
+                                data-floating-menu-container
+                                flipped
+                                size={desktopLayout ? 'sm' : 'lg'}
                               >
-                                {userHasAccess(encounter.editPrivilege, session?.user) && encounter.form?.uuid && (
-                                  <OverflowMenuItem
-                                    className={styles.menuItem}
-                                    itemText={t('editThisEncounter', 'Edit this encounter')}
-                                    size={desktopLayout ? 'sm' : 'lg'}
-                                    onClick={() => {
-                                      launchFormEntryOrHtmlForms(
-                                        htmlFormEntryForms,
-                                        patientUuid,
-                                        encounter.form?.uuid,
-                                        encounter.visitUuid,
-                                        encounter.id,
-                                        encounter.form?.display,
-                                        encounter.visitTypeUuid,
-                                        encounter.visitStartDatetime,
-                                        encounter.visitStopDatetime,
-                                      );
-                                    }}
-                                  />
-                                )}
+                                {userHasAccess(encounter.editPrivilege, session?.user) &&
+                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      itemText={t('editThisEncounter', 'Edit this encounter')}
+                                      size={desktopLayout ? 'sm' : 'lg'}
+                                      onClick={() => {
+                                        if (isVisitNoteEncounter(encounter)) {
+                                          launchWorkspace('visit-notes-form-workspace', {
+                                            encounter,
+                                            formContext: 'editing',
+                                            patientUuid,
+                                          });
+                                        } else {
+                                          launchFormEntryOrHtmlForms(
+                                            htmlFormEntryForms,
+                                            patientUuid,
+                                            encounter.form?.uuid,
+                                            encounter.visitUuid,
+                                            encounter.id,
+                                            encounter.form?.display,
+                                            encounter.visitTypeUuid,
+                                            encounter.visitStartDatetime,
+                                            encounter.visitStopDatetime,
+                                          );
+                                        }
+                                      }}
+                                    />
+                                  )}
                                 {userHasAccess(encounter.editPrivilege, session?.user) && (
                                   <OverflowMenuItem
-                                    size={desktopLayout ? 'sm' : 'lg'}
                                     className={styles.menuItem}
-                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                    onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
                                     hasDivider
                                     isDelete
+                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                    onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
+                                    size={desktopLayout ? 'sm' : 'lg'}
                                   />
                                 )}
                               </OverflowMenu>
@@ -263,7 +276,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                               <EncounterObservations observations={encounter.obs} />
                               {userHasAccess(encounter.editPrivilege, session?.user) && (
                                 <>
-                                  {encounter.form?.uuid && (
+                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <Button
                                       kind="ghost"
                                       onClick={() => {

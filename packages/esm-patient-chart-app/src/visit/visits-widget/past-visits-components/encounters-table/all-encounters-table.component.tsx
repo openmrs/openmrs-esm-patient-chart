@@ -25,20 +25,20 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
   const encountersTableProps: EncountersTableProps = {
-    patientUuid,
-    totalCount,
     currentPage,
+    encounterTypeToFilter,
     goTo,
     isLoading,
     onEncountersUpdated: mutateEncounters,
-    showVisitType: true,
+    pageSize,
     paginated,
     paginatedEncounters,
-    encounterTypeToFilter,
+    patientUuid,
     setEncounterTypeToFilter,
-    showEncounterTypeFilter: true,
-    pageSize,
     setPageSize,
+    showEncounterTypeFilter: true,
+    showVisitType: true,
+    totalCount,
   };
 
   return <EncountersTable {...encountersTableProps} />;
