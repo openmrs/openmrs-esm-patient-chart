@@ -5,7 +5,7 @@ import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { mockPanelData, mockResults } from '__mocks__';
 import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 import usePanelData from './usePanelData';
-import { FilterProvider, Roots } from '../filter/filter-context';
+import { FilterProvider, type Roots } from '../filter/filter-context';
 
 const mockIsDesktop = jest.mocked(isDesktop);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -19,11 +19,10 @@ describe('PanelView', () => {
   });
 
   it('renders a loading state when data is loading', () => {
-
     render(
       <FilterProvider roots={mockResults as Roots} isLoading={true}>
-      <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
-    </FilterProvider>,
+        <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
+      </FilterProvider>,
     );
 
     const progressBars = screen.getAllByRole('progressbar');
@@ -33,8 +32,8 @@ describe('PanelView', () => {
   it('renders an empty state when there are no panels to display', () => {
     render(
       <FilterProvider roots={[]} isLoading={false}>
-      <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
-    </FilterProvider>,
+        <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
+      </FilterProvider>,
     );
 
     expect(screen.getByText(/no panels found/i)).toBeInTheDocument();
@@ -47,8 +46,8 @@ describe('PanelView', () => {
 
     render(
       <FilterProvider roots={mockResults as Roots} isLoading={false}>
-      <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
-    </FilterProvider>,
+        <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
+      </FilterProvider>,
     );
 
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
@@ -76,7 +75,6 @@ describe('PanelView', () => {
     expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
     expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
 
-
     await user.click(searchButton);
 
     const searchBox = screen.getByPlaceholderText(/search by test name/i);
@@ -103,7 +101,7 @@ describe('PanelView', () => {
 
     const hivViralLoadCell = screen.getByRole('cell', { name: /hiv viral load/i });
     await user.click(hivViralLoadCell);
-    
+
     expect(screen.getByRole('banner', { name: /hiv viral load/i })).toBeInTheDocument();
 
     const backButton = screen.getByRole('button', { name: /back/i });
