@@ -59,6 +59,7 @@ const mockFilterContext: FilterContextProps = {
   someChecked: true,
   lowestParents: mockGroupedResults['lowestParents'],
   totalResultsCount: 0,
+  isLoading: false,
   initialize: jest.fn(),
   toggleVal: jest.fn(),
   updateParent: jest.fn(),

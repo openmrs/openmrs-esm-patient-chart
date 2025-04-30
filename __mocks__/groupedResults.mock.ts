@@ -244,6 +244,32 @@ export const mockGroupedResults = {
     ],
     'HIV viral load': [],
   },
+  tableData: [
+    {
+      key: 'HIV viral load',
+      date: '2024-05-31',
+      flatName: 'HIV viral load',
+      entries: [
+        {
+          obsDatetime: '2024-05-31 01:39:03.0',
+          value: '261.9',
+          interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
+        },
+      ],
+    },
+    {
+      key: 'Bloodwork-Chemistry-Serum chemistry panel',
+      date: '2024-05-31',
+      flatName: 'Bloodwork-Chemistry-Serum chemistry panel',
+      entries: [
+        {
+          obsDatetime: '2024-05-31 01:39:03.0',
+          value: '261.9',
+          interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
+        },
+      ],
+    }
+  ],
   activeTests: [],
   lowestParents: [
     {

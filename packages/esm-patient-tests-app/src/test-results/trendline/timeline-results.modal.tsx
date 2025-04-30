@@ -2,7 +2,7 @@ import React from 'react';
 import { ModalHeader, ModalBody } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { basePath } from '../../constants';
-import Trendline from '../trendline/trendline.component';
+import Trendline from './trendline.component';
 
 interface TimelineResultsModalProps {
   closeDeleteModal: () => void;
