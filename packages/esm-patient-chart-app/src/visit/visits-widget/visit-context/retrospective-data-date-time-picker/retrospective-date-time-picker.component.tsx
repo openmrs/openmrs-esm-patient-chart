@@ -65,6 +65,7 @@ const RetrospectiveDateTimePicker = ({
               invalid={Boolean(fieldState?.error?.message)}
               invalidText={fieldState?.error?.message}
               isDisabled={disableInputs}
+              maxDate={new Date()}
             />
           )}
         />
@@ -80,18 +81,20 @@ const RetrospectiveDateTimePicker = ({
                 onChange={(event) => onChange(event.target.value)}
                 pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
                 value={value}
-                isDisabled={disableInputs}
+                disabled={disableInputs}
               >
                 <Controller
                   name={'retrospective-time-format'}
-                  control={formContext.control}
+                  control={control}
                   render={({ field: { onChange, value } }) => (
                     <TimePickerSelect
                       aria-label={t('timeFormat ', 'Time Format')}
                       id={`am-pm-input`}
                       onChange={(event) => onChange(event.target.value)}
                       value={value}
+                      disabled={disableInputs}
                     >
+                      <SelectItem value="" text="" />
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />
                     </TimePickerSelect>
@@ -101,10 +104,11 @@ const RetrospectiveDateTimePicker = ({
             </div>
           )}
         />
-        {!isActiveVisit && (
+        {isActiveVisit && (
           <Checkbox
             checked={manuallyEnableDateTimePicker}
             className={styles.checkbox}
+            id={'enable-date-time-picker'}
             labelText={'Enable'}
             onChange={(_, { checked, id }) => {
               setManuallyEnableDateTimePicker(checked);
