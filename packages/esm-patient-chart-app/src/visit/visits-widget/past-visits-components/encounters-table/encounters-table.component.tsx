@@ -60,7 +60,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   isLoading,
   onEncountersUpdated,
   pageSize,
-  paginated,
   paginatedEncounters,
   patientUuid,
   setEncounterTypeToFilter,
@@ -145,7 +144,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     [onEncountersUpdated, t],
   );
 
-  if (isLoadingEncounterTypes) {
+  if (isLoadingEncounterTypes || isLoading) {
     return <DataTableSkeleton role="progressbar" zebra />;
   }
 
@@ -318,7 +317,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   })}
                 </TableBody>
               </Table>
-              {isLoading && <InlineLoading />}
               {rows?.length === 0 && (
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
@@ -333,7 +331,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           </>
         )}
       </DataTable>
-      {paginated && (
+      {
         <Pagination
           forwardText={t('nextPage', 'Next page')}
           backwardText={t('previousPage', 'Previous page')}
@@ -350,7 +348,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
             }
           }}
         />
-      )}
+      }
     </div>
   );
 };
