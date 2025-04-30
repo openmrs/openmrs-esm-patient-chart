@@ -12,7 +12,7 @@ type TFormValues = {
   'retrospective-time-format': string;
 };
 
-export const RetrospectiveDateTimePicker = ({
+const RetrospectiveDateTimePicker = ({
   patientUuid,
   onChange,
 }: {
@@ -115,3 +115,5 @@ export const RetrospectiveDateTimePicker = ({
     </section>
   );
 };
+
+export default RetrospectiveDateTimePicker;
