@@ -27,6 +27,7 @@ import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
+  type Encounter,
   ExtensionSlot,
   OpenmrsDatePicker,
   ResponsiveWrapper,
@@ -44,7 +45,6 @@ import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
-  type MappedEncounter,
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
@@ -89,7 +89,7 @@ const createSchema = (t: TFunction) => {
 };
 
 interface VisitNotesFormProps extends DefaultPatientWorkspaceProps {
-  encounter?: MappedEncounter;
+  encounter?: Encounter;
   formContext: 'creating' | 'editing';
 }
 

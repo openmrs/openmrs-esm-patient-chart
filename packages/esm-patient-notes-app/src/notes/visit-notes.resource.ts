@@ -1,13 +1,6 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import {
-  type Diagnosis,
-  type Obs,
-  openmrsFetch,
-  type OpenmrsResource,
-  restBaseUrl,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import type {
   Concept,
@@ -17,23 +10,6 @@ import type {
   RESTPatientNote,
   VisitNotePayload,
 } from '../types';
-
-export interface MappedEncounter {
-  datetime: string;
-  diagnoses: Array<Diagnosis>;
-  editPrivilege: string;
-  encounterType: string;
-  form: OpenmrsResource;
-  formName: string;
-  id: string;
-  obs: Array<Obs>;
-  provider: string;
-  visitStartDatetime?: string;
-  visitStopDatetime?: string;
-  visitType: string;
-  visitTypeUuid?: string;
-  visitUuid: string;
-}
 
 interface UseVisitNotes {
   visitNotes: Array<PatientNote> | null;
