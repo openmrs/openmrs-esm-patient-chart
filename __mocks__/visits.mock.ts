@@ -1,4 +1,7 @@
-export const mockVisitTypes = [
+import type { Encounter, Visit, VisitType } from '@openmrs/esm-framework';
+import { mockEncounter } from './encounters.mock';
+
+export const mockVisitTypes: VisitType[] = [
   {
     uuid: 'some-uuid1',
     name: 'Outpatient Visit',
@@ -17,32 +20,27 @@ export const mockVisitTypesDataResponse = {
   },
 };
 
-export const mockVisits = {
-  data: {
-    results: [
-      {
-        uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
-        patient: {
-          uuid: '5a4e7a05-e275-4c14-acab-cb86f3e16353',
-          display: '102EWH - Test Patient Registration',
-        },
-        visitType: {
-          uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-          display: 'Facility Visit',
-        },
-        location: {
-          uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453',
-          display: 'Laboratory',
-        },
-        startDatetime: '2020-07-28T10:29:00.000+0000',
-        stopDatetime: '2020-07-29T10:29:00.000+0000',
-        encounters: [],
-      },
-    ],
+export const mockVisit: Visit = {
+  uuid: '15dd49ba-4283-472f-bce3-05401f85c0d3',
+  patient: {
+    uuid: '5a4e7a05-e275-4c14-acab-cb86f3e16353',
+    display: '102EWH - Test Patient Registration',
   },
+  visitType: {
+    uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+    display: 'Facility Visit',
+  },
+  location: {
+    uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453',
+    display: 'Laboratory',
+  },
+  startDatetime: '2020-07-28T10:29:00.000+0000',
+  stopDatetime: '2020-07-29T10:29:00.000+0000',
+  encounters: [],
+  attributes: [],
 };
 
-export const mockCurrentVisit = {
+export const mockCurrentVisit: Visit = {
   uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
   encounters: [],
   patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -60,14 +58,34 @@ export const mockCurrentVisit = {
   },
 };
 
-export const visitOverviewDetailMockData = {
+// a visit that has ended
+export const mockVisit2: Visit = {
+  ...mockCurrentVisit,
+  uuid: 'a6906dfe-0bdc-11f0-9a36-00155d6fa44e',
+  startDatetime: new Date('2020-01-01T00:00:00.000+0000').toISOString(),
+  stopDatetime: new Date('2020-01-01T01:00:00.000+0000').toISOString(),
+};
+
+// a visit that has ended
+export const mockVisit3: Visit = {
+  ...mockCurrentVisit,
+  uuid: 'dd025938-0bdc-11f0-a3b8-00155d6fa44e',
+  startDatetime: new Date('2019-01-01T00:00:00.000+0000').toISOString(),
+  stopDatetime: new Date('2019-01-01T01:00:00.000+0000').toISOString(),
+};
+
+export const visitOverviewDetailMockData: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
         uuid: '8e2f177c-8999-4fde-ba92-1e62b33179ac',
+        patient: {
+          uuid: 'some-uuid',
+        },
         encounters: [
           {
             uuid: 'c2f0d397-4f3e-486a-abc4-4565caa0f09c',
+            diagnoses: [],
             encounterDatetime: '2021-08-25T15:18:54.000+0000',
             orders: [],
             obs: [
@@ -160,7 +178,7 @@ export const visitOverviewDetailMockData = {
   },
 };
 
-export const visitOverviewDetailMockDataNotEmpty = {
+export const visitOverviewDetailMockDataNotEmpty: { data: { results: Array<Visit> } } = {
   data: {
     results: [
       {
@@ -286,164 +304,35 @@ export const visitOverviewDetailMockDataNotEmpty = {
   },
 };
 
-export const mockEncounters = [
-  {
-    id: '979d38e3-fb68-47cf-843f-2b0263690f49',
-    datetime: '2022-01-18T16:25:27.000+0000',
-    encounterType: 'Admission',
-    editPrivilege: null,
-    form: {
-      uuid: '17e3bc1a-d319-408f-8b57-73e367f7fa80',
-      display: 'POC Consent Form',
+export const mockOngoingVisitWithEncounters: Visit = {
+  ...mockVisit,
+  uuid: '42e03650-0401-11f0-9a86-00155dc8b906',
+  startDatetime: '2022-01-01T10:00:00.000+0000',
+  stopDatetime: null,
+  encounters: [
+    {
+      ...mockEncounter,
+      uuid: '0e0ebbc2-0401-11f0-b5f9-00155dc8b906',
+      encounterDatetime: '2022-01-01T11:00:00.000+0000',
     },
-    obs: [],
-    provider: '--',
-    visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-    visitType: 'Facility Visit',
-  },
-  {
-    id: '09eadbdd-6924-4126-8a3b-c92aac04b8e7',
-    datetime: '2021-08-03T00:47:48.000+0000',
-    encounterType: 'Visit Note',
-    editPrivilege: null,
-    form: null,
-    obs: [
-      {
-        uuid: 'a93ad7a9-66d8-4952-ae2e-82b59c8c5989',
-        concept: {
-          uuid: '1421AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Immunization history',
-          conceptClass: {
-            uuid: '8d491a9a-c2cc-11de-8d13-0010c6dffd0f',
-            display: 'Finding',
-          },
-        },
-        display: 'Immunization history: asd, 333, 2021-08-05, 2021-08-02, 1.0, ',
-        groupMembers: null,
-        value: null,
-        obsDatetime: null,
-      },
-      {
-        uuid: '914965f1-059a-4e16-956a-b3bb9781b12a',
-        concept: {
-          uuid: '1421AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Immunization history',
-          conceptClass: {
-            uuid: '8d491a9a-c2cc-11de-8d13-0010c6dffd0f',
-            display: 'Finding',
-          },
-        },
-        display: 'Immunization history: 2021-08-02, 333, asd, , 1.0, 2021-08-05',
-        groupMembers: null,
-        value: null,
-      },
-    ],
-    provider: 'User One',
-    visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-    visitType: 'Facility Visit',
-  },
-  {
-    id: 'ff9a0035-8698-47dc-b608-bd6ec2646e5c',
-    datetime: '2021-07-05T10:07:18.000+0000',
-    encounterType: 'Consultation',
-    editPrivilege: 'edit',
-    form: {
-      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
-      display: 'Covid 19',
+    {
+      ...mockEncounter,
+      uuid: '18283232-0401-11f0-b111-00155dc8b906',
+      encounterDatetime: '2022-01-01T11:30:00.000+0000',
     },
-    obs: [],
-    provider: 'Dennis The Doctor',
-    visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-    visitType: 'Facility Visit',
-  },
-];
+  ],
+};
 
-export const mockEncounters2 = [
-  {
-    uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
-    display: 'Consultation 09/23/2022',
-    encounterDatetime: '2022-09-23T13:11:06.000+0000',
-    patient: {
-      uuid: 'b835eff8-98c9-4988-887b-d93da7fbd542',
-      display: '100019A - George Roberts',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/patient/b835eff8-98c9-4988-887b-d93da7fbd542',
-          resourceAlias: 'patient',
-        },
-      ],
-    },
-    location: null,
-    form: {
-      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
-      display: 'Covid 19',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/form/9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
-          resourceAlias: 'form',
-        },
-      ],
-    },
-    encounterType: {
-      uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
-      display: 'Consultation',
-      links: [
-        {
-          rel: 'self',
-          uri: 'http://backend:8080/openmrs/ws/rest/v1/encountertype/dd528487-82a5-4082-9c72-ed246bd49591',
-          resourceAlias: 'encountertype',
-        },
-      ],
-    },
-    obs: [
-      {
-        uuid: '04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
-        display: 'Covid 19 Signs and Symptom Set: Fever, Congestion, Loss of taste',
-        links: [
-          {
-            rel: 'self',
-            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
-            resourceAlias: 'obs',
-          },
-        ],
-      },
-      {
-        uuid: '5ca0c815-2c47-4cda-8c46-1e118b593ea8',
-        display: 'Covid 19 Test Set: Positive, No, Respiratory PCR',
-        links: [
-          {
-            rel: 'self',
-            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/5ca0c815-2c47-4cda-8c46-1e118b593ea8',
-            resourceAlias: 'obs',
-          },
-        ],
-      },
-    ],
-    orders: [],
-    voided: false,
-    visit: null,
-    encounterProviders: [],
-    diagnoses: [],
-    links: [
-      {
-        rel: 'self',
-        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
-        resourceAlias: 'encounter',
-      },
-      {
-        rel: 'full',
-        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1?v=full',
-        resourceAlias: 'encounter',
-      },
-    ],
-    resourceVersion: '2.2',
-  },
-];
+export const mockPastVisitWithEncounters: Visit = {
+  ...mockOngoingVisitWithEncounters,
+  uuid: '2993cedc-0401-11f0-9b1f-00155dc8b906',
+  startDatetime: '2022-01-01T10:00:00.000+0000',
+  stopDatetime: '2022-01-01T12:00:00.000+0000',
+};
 
 export const mockVisitWithAttributes = {
-  ...mockVisits.data.results[0],
+  ...mockVisit,
+  uuid: '380d78c8-0401-11f0-ad28-00155dc8b906',
   attributes: [
     {
       attributeType: {

@@ -79,8 +79,18 @@
 
 .background {
   width: 100%;
-  padding: 2.375rem 5.688rem 2.188rem layout.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-03;
   background: white;
+
+  :global(
+      .cds--chart-holder
+        .cds--cc--toolbar
+        .cds--overflow-menu-options
+        .cds--overflow-menu-options__option
+        .cds--overflow-menu-options__btn
+    ) {
+    max-width: none !important;
+  }
 }
 
 .range-tabs :global(.cds--tabs--scrollable__nav-link) {

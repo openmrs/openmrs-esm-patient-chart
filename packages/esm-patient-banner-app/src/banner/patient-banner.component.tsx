@@ -66,9 +66,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             {!hideActionsOverflow ? (
               <PatientBannerActionsMenu
                 actionsSlotName="patient-actions-slot"
-                isDeceased={patient.deceasedBoolean}
-                patientUuid={patientUuid}
                 patient={patient}
+                patientUuid={patientUuid}
               />
             ) : null}
           </div>

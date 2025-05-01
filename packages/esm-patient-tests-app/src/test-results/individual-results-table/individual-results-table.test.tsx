@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import IndividualResultsTable from './individual-results-table.component';
 import { type GroupedObservation } from '../../types';
+import IndividualResultsTable from './individual-results-table.component';
 
 describe('IndividualResultsTable', () => {
   const mockSubRows = {
@@ -41,10 +41,10 @@ describe('IndividualResultsTable', () => {
   it('renders a tabular overview of the available test result data', () => {
     render(<IndividualResultsTable isLoading={false} subRows={mockSubRows} index={0} title={'HIV viral load'} />);
 
+    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText(/15-Oct-2024/i)).toBeInTheDocument();
     expect(screen.getByText(/test name/i)).toBeInTheDocument();
     expect(screen.getByText(/reference range/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /view timeline/i })).toBeInTheDocument();
     expect(screen.getByRole('row', { name: /hiv viral load 45 copies\/ml -- copies\/ml/i })).toBeInTheDocument();
   });
 });

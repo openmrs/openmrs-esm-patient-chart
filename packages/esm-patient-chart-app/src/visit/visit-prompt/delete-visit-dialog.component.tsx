@@ -19,18 +19,13 @@ const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patie
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('deletePastVisit', 'Delete past visit')}
-        title={t('deletePastVisitDialogHeader', 'Are you sure you want to delete this past visit?')}
+        title={t('deleteVisitDialogHeader', 'Are you sure you want to delete this visit?')}
       />
       <ModalBody>
         <p className={styles.body}>
-          {t(
-            'confirmDeletePastVisitText',
-            'Clicking confirm will delete this {{visit}} and all of its associated encounters.',
-            {
-              visit: visit?.visitType?.display ?? t('visit', 'Visit'),
-            },
-          )}
+          {t('confirmDeleteVisitText', 'Deleting this {{visit}} will delete its associated encounters.', {
+            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+          })}
         </p>
       </ModalBody>
       <ModalFooter>

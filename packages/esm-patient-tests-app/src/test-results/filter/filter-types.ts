@@ -1,4 +1,5 @@
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type GroupedObservation } from '../../types';
 
 interface Observation {
   display: string;
@@ -101,13 +102,15 @@ export interface TimelineData {
 
 export interface FilterContextProps extends ReducerState {
   timelineData: TimelineData;
-  tableData?: any;
+  tableData: GroupedObservation[] | null;
+  trendlineData: TreeNode | null;
   activeTests: string[];
   someChecked: boolean;
   totalResultsCount: number;
-  initialize: any;
-  toggleVal: any;
-  updateParent: any;
+  isLoading: boolean;
+  initialize: (trees: Array<TreeNode>) => void;
+  toggleVal: (name: string) => void;
+  updateParent: (name: string) => void;
   resetTree: () => void;
 }
 

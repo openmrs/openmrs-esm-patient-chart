@@ -3,13 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { formattedVitals, mockConceptMetadata, mockConceptUnits, mockVitalsConfig } from '__mocks__';
+import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
+  patient: mockPatient,
   pageSize: 5,
   pageUrl: '',
   urlLabel: '',
@@ -39,9 +40,9 @@ jest.mock('../common', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
       isLoading: false,
     })),
     useVitalsAndBiometrics: jest.fn(),

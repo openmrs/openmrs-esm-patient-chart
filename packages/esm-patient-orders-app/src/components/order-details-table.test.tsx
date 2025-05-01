@@ -9,14 +9,15 @@ import {
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';
-import { useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib';
+import { type Order, useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
-import OrderDetailsTable from './orders-details-table.component';
+import { mockPatient } from 'tools';
+import OrderDetailsTable from './order-details-table.component';
 
-const mockUsePatientOrders = usePatientOrders as jest.Mock;
-const mockUseOrderTypes = useOrderTypes as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUsePatientOrders = jest.mocked(usePatientOrders);
+const mockUseOrderTypes = jest.mocked(useOrderTypes);
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseReactToPrint = jest.mocked(useReactToPrint);
@@ -57,6 +58,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: true,
       isValidating: false,
+      mutate: jest.fn(),
     });
 
     renderOrderDetailsTable();
@@ -69,6 +71,7 @@ describe('OrderDetailsTable', () => {
 
   it('renders an error state if there is a problem fetching orders', async () => {
     const error = {
+      name: 'Error',
       message: 'You are not logged in',
       response: {
         status: 401,
@@ -86,6 +89,7 @@ describe('OrderDetailsTable', () => {
       error: error,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
 
     renderOrderDetailsTable();
@@ -100,10 +104,16 @@ describe('OrderDetailsTable', () => {
         {
           uuid: 'Drug Order',
           display: 'Routine',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
         },
         {
           uuid: 'Lab Order',
           display: 'Urgent',
+          name: 'Lab Order',
+          retired: false,
+          description: 'Lab Order',
         },
       ],
       error: null,
@@ -111,10 +121,11 @@ describe('OrderDetailsTable', () => {
       isValidating: false,
     });
     mockUsePatientOrders.mockReturnValue({
-      data: mockOrders,
+      data: mockOrders as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
 
     renderOrderDetailsTable();
@@ -151,18 +162,31 @@ describe('OrderDetailsTable', () => {
   it('filters the orders list when the user types into the searchbox', async () => {
     mockUseOrderTypes.mockReturnValue({
       data: [
-        { uuid: drugOrderTypeUuid, display: 'Drug Order' },
-        { uuid: testOrderTypeUuid, display: 'Test Order' },
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
+        },
       ],
       isLoading: false,
       error: null,
       isValidating: false,
     });
     mockUsePatientOrders.mockReturnValue({
-      data: mockOrders,
+      data: mockOrders as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
 
     renderOrderDetailsTable();
@@ -195,8 +219,20 @@ describe('OrderDetailsTable', () => {
 
     mockUseOrderTypes.mockReturnValue({
       data: [
-        { uuid: drugOrderTypeUuid, display: 'Drug Order' },
-        { uuid: testOrderTypeUuid, display: 'Test Order' },
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
+        },
       ],
       isLoading: false,
       error: null,
@@ -204,10 +240,11 @@ describe('OrderDetailsTable', () => {
     });
 
     mockUsePatientOrders.mockImplementation((_patientUuid, _status, orderType) => ({
-      data: orderType ? testOrders : allOrders,
+      data: orderType ? (testOrders as unknown as Array<Order>) : (allOrders as unknown as Array<Order>),
       error: undefined,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     }));
 
     renderOrderDetailsTable();
@@ -234,18 +271,31 @@ describe('OrderDetailsTable', () => {
     mockUseReactToPrint.mockReturnValue(mockHandlePrint);
     mockUseOrderTypes.mockReturnValue({
       data: [
-        { uuid: drugOrderTypeUuid, display: 'Drug Order' },
-        { uuid: testOrderTypeUuid, display: 'Test Order' },
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
+        },
       ],
       error: null,
       isLoading: false,
       isValidating: false,
     });
     mockUsePatientOrders.mockReturnValue({
-      data: mockOrders,
+      data: mockOrders as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
@@ -264,5 +314,13 @@ describe('OrderDetailsTable', () => {
 });
 
 function renderOrderDetailsTable() {
-  render(<OrderDetailsTable patientUuid="mock-patient-uuid" showAddButton showPrintButton title="Patient Orders" />);
+  render(
+    <OrderDetailsTable
+      patientUuid={mockPatient.id}
+      patient={mockPatient}
+      showAddButton
+      showPrintButton
+      title="Patient Orders"
+    />,
+  );
 }

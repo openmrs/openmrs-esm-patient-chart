@@ -3,7 +3,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
+import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
@@ -22,9 +22,9 @@ jest.mock('../common', () => {
 
   return {
     ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
       isLoading: false,
     })),
     useVitalsAndBiometrics: jest.fn(),
@@ -36,7 +36,7 @@ mockUseConfig.mockReturnValue({
   ...mockBiometricsConfig,
 } as ConfigObject);
 
-describe('BiometricsOverview', () => {
+describe('Biometrics Overview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
@@ -96,8 +96,6 @@ describe('BiometricsOverview', () => {
     expect(screen.getByRole('tab', { name: /chart view/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see all/i })).toBeInTheDocument();
 
-    const initialRowElements = screen.getAllByRole('row');
-
     const expectedColumnHeaders = [/date/, /weight/, /height/, /bmi/, /muac/];
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
@@ -114,20 +112,43 @@ describe('BiometricsOverview', () => {
 
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
 
+    const expectedDescendingOrder = [
+      '12 — Aug — 2021, 12:00 AM',
+      '18 — Jun — 2021, 12:00 AM',
+      '10 — Jun — 2021, 12:00 AM',
+      '26 — May — 2021, 12:00 AM',
+      '10 — May — 2021, 12:00 AM',
+    ];
+    const expectedAscendingOrder = [
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020, 12:00 AM',
+      '09 — Dec — 2020, 12:00 AM',
+    ];
+
+    const getRowDates = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1) // Exclude header row
+        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}, \d{1,2}:\d{2} (AM|PM)/)?.[0] || '');
+
+    // Initial state should be descending
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+
     // Sorting in descending order
     // Since the date order is already in descending order, the rows should be the same
     await user.click(sortRowsButton);
     // Sorting in ascending order
     await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
 
     // Sorting order = NONE, hence it is still in the ascending order
     await user.click(sortRowsButton);
     // Sorting in descending order
     await user.click(sortRowsButton);
 
-    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

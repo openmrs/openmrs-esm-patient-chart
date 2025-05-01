@@ -10,10 +10,14 @@ import {
   TableCell,
   TableBody,
 } from '@carbon/react';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { type OverviewPanelData } from './useOverviewData';
+import { type OverviewPanelData as BaseOverviewPanelData } from './useOverviewData';
 import styles from './common-datatable.scss';
+
+interface OverviewPanelData extends BaseOverviewPanelData {
+  dateTime?: string;
+}
 
 interface CommonDataTableProps {
   data: Array<OverviewPanelData>;
@@ -38,6 +42,11 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
   };
 
   const isTablet = useLayoutType() === 'tablet';
+
+  data = data.map((item) => ({
+    ...item,
+    dateTime: formatDate(parseDate(item?.dateTime), { mode: 'standard', time: true }),
+  }));
 
   return (
     <DataTable rows={data} headers={tableHeaders} size="sm" useZebraStyles>

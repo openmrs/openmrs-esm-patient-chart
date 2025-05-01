@@ -73,16 +73,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
                       {t('seeAllResults', 'See all results')}
                     </Button>
                   </div>
-                  <CommonOverview
-                    {...{
-                      patientUuid,
-                      overviewData: overviewData.slice(0, resultsToShow),
-                      insertSeparator: true,
-                      deactivateToolbar: true,
-                      isPatientSummaryDashboard: false,
-                      hideToolbar: true,
-                    }}
-                  />
+                  <CommonOverview patientUuid={patientUuid} overviewData={overviewData.slice(0, resultsToShow)} />
                   {overviewData.length > resultsToShow && (
                     <Button onClick={handleSeeAll} kind="ghost">
                       {t('moreResultsAvailable', 'More results available')}

@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Menu azioni",
-  "activeVisitRequired": "È necessaria una visita attiva per effettuare ordini",
   "add": "Aggiungi",
   "additionalInstructions": "Istruzioni aggiuntive",
   "addOrderableForOrderType": "Aggiungi {{orderTypeDisplay}}",
@@ -43,6 +42,7 @@
   "medicationIndefiniteDuration": "Durata indefinita",
   "medications": "Farmaci",
   "modifyOrder": "Modifica ordine",
+  "noIndicationProvided": "Nessuna indicazione fornita",
   "noMatchingOrdersToDisplay": "Nessun ordine corrispondente da visualizzare",
   "noResultsForTestTypeSearch": "Nessun risultato da visualizzare per \"{{searchTerm}}\"",
   "normalRange": "Intervallo normale",
@@ -114,5 +114,6 @@
   "trySearchingAgain": "Prova a cercare di nuovo",
   "tryTo": "Prova a",
   "updated": "Aggiornato",
-  "usingADifferentTerm": "utilizzando un termine diverso"
+  "usingADifferentTerm": "utilizzando un termine diverso",
+  "visitRequired": "È richiesta una visita per poter fare ordini"
 }

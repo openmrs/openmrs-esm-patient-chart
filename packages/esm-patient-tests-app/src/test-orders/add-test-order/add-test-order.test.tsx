@@ -4,11 +4,11 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
 import {
+  age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
   useConfig,
   useLayoutType,
-  usePatient,
   useSession,
 } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
@@ -20,7 +20,6 @@ import AddLabOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePatient = jest.mocked(usePatient);
 const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
@@ -28,8 +27,6 @@ const mockUseOrderType = jest.mocked(useOrderType);
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
 });
-
-const ptUuid = 'test-patient-uuid';
 
 const mockTestTypes = [
   // {
@@ -67,9 +64,10 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
-  getPatientUuidFromStore: jest.fn(() => ptUuid),
+  getPatientUuidFromStore: jest.fn(() => mockPatient.id),
   usePatientChartStore: jest.fn(() => ({
-    patientUuid: ptUuid,
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
   })),
 }));
 
@@ -86,7 +84,8 @@ function renderAddLabOrderWorkspace() {
       closeWorkspace={mockCloseWorkspace}
       closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
       promptBeforeClosing={mockPromptBeforeClosing}
-      patientUuid={ptUuid}
+      patientUuid={mockPatient.id}
+      patient={mockPatient}
       setTitle={jest.fn()}
       orderTypeUuid="test-lab-order-type-uuid"
     />,
@@ -104,8 +103,6 @@ mockUseConfig.mockReturnValue({
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-
-mockUsePatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id, isLoading: false, error: null });
 
 mockUseOrderType.mockReturnValue({
   orderType: {
@@ -222,7 +219,7 @@ describe('AddLabOrder', () => {
     renderAddLabOrderWorkspace();
     expect(screen.getByText(/john wilson/i)).toBeInTheDocument();
     expect(screen.getByText(/male/i)).toBeInTheDocument();
-    expect(screen.getByText(/52 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(age(mockPatient.birthDate), 'i'))).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
   });
 

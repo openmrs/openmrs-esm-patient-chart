@@ -21,9 +21,68 @@ export type ObservationInterpretation = 'critically_low' | 'critically_high' | '
 export type MappedVitals = {
   code: string;
   interpretation: string;
-  recordedDate: Date;
+  recordedDate: string | Date;
   value: number;
+  encounterId: string;
 };
+
+export interface FHIRObservationResource {
+  resourceType: string;
+  id: string;
+  category: Array<{
+    coding: Array<{
+      system: string;
+      code: string;
+      display: string;
+    }>;
+  }>;
+  code: {
+    coding: Array<{
+      code: string;
+      display: string;
+    }>;
+    text: string;
+  };
+  encounter?: {
+    reference: string;
+    type: string;
+  };
+  effectiveDateTime: string;
+  issued: string;
+  valueString?: string;
+  valueQuantity?: {
+    value: number;
+    unit: string;
+    system: string;
+    code: string;
+  };
+  valueCodeableConcept?: {
+    coding: [
+      {
+        code: string;
+        display: string;
+      },
+    ];
+    text: string;
+  };
+  referenceRange: Array<{
+    low?: {
+      value: number;
+    };
+    high?: {
+      value: number;
+    };
+    type: {
+      coding: Array<{
+        system: string;
+        code: string;
+      }>;
+    };
+  }>;
+  hasMember?: Array<{
+    reference: string;
+  }>;
+}
 
 export interface PatientVitalsAndBiometrics {
   id: string;
@@ -32,18 +91,22 @@ export interface PatientVitalsAndBiometrics {
   diastolic?: number;
   bloodPressureRenderInterpretation?: ObservationInterpretation;
   pulse?: number;
+  pulseRenderInterpretation?: ObservationInterpretation;
   temperature?: number;
+  temperatureRenderInterpretation?: ObservationInterpretation;
   spo2?: number;
+  spo2RenderInterpretation?: ObservationInterpretation;
   height?: number;
   weight?: number;
   bmi?: number | null;
   respiratoryRate?: number;
+  respiratoryRateRenderInterpretation?: ObservationInterpretation;
   muac?: number;
 }
 
 export interface VitalsResponse {
   entry: Array<{
-    resource: FHIRResource['resource'];
+    resource: FHIRObservationResource;
   }>;
   id: string;
   meta: {
