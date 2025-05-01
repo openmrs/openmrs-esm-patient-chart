@@ -1,15 +1,14 @@
-import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton , InlineLoading , Tile } from '@carbon/react';
-import { ErrorState, OpenmrsDatePicker, useDebounce, type Visit } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
+import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading, Tile } from '@carbon/react';
+import { ErrorState, OpenmrsDatePicker, useDebounce, useOnVisible, type Visit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInfiniteVisits } from '../visit.resource';
 import { useVisitContextStore } from './visit-context';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
 import dayjs from 'dayjs';
-import { useOnVisible } from './visit-context-switcher.resource';
 
 interface VisitContextSwitcherProps {
   patientUuid: string;
@@ -26,7 +25,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   const [maxStartDate, setMaxStartDate] = useState(new Date());
   const maxStartDateDebounced = useDebounce(maxStartDate);
 
-  const rep = 'custom:(uuid,display,visitType,startDatetime,stopDatetime,location)';
+  const rep = 'custom:(uuid,display,visitType,startDatetime,stopDatetime,location,patient)';
   const { visits, isLoading, error, hasMore, loadMore } = useInfiniteVisits(
     patientUuid,
     { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() },

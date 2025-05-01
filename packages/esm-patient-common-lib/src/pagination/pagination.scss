@@ -52,14 +52,6 @@
   padding: 0 layout.$spacing-03;
 }
 
-.paginationContainer {
-  background-color: $ui-02;
-}
-
-.greyBackground {
-  background-color: #f4f4f4 !important;
-}
-
 .pagination {
   @include type.type-style('body-compact-01');
   background-color: $ui-02;

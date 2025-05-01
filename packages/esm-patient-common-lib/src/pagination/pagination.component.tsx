@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import classNames from 'classnames';
 import { Pagination } from '@carbon/react';
 import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import { usePaginationInfo } from './usePaginationInfo';
@@ -14,7 +13,6 @@ interface PatientChartPaginationProps {
   onPageNumberChange?: any;
   dashboardLinkUrl?: string;
   dashboardLinkLabel?: string;
-  grey?: boolean;
 }
 
 export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
@@ -25,7 +23,6 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
   dashboardLinkUrl,
   currentItems,
   dashboardLinkLabel: urlLabel,
-  grey,
 }) => {
   const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
@@ -34,13 +31,7 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
   return (
     <>
       {totalItems > 0 && (
-        <div
-          className={classNames(
-            isTablet ? styles.tablet : styles.desktop,
-            styles.paginationContainer,
-            grey ? styles.greyBackground : '',
-          )}
-        >
+        <div className={isTablet ? styles.tablet : styles.desktop}>
           <div>
             {itemsDisplayed}
             {dashboardLinkUrl && (
@@ -50,7 +41,7 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
             )}
           </div>
           <Pagination
-            className={classNames(styles.pagination, grey ? styles.greyBackground : '')}
+            className={styles.pagination}
             page={pageNumber}
             pageSize={pageSize}
             pageSizes={pageSizes}
