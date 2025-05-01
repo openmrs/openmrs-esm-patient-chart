@@ -14,6 +14,7 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
 
 const mockUseVisitContextStore = jest.fn(useVisitContextStore).mockReturnValue({
   manuallySetVisitUuid: null,
+  mutateVisitCallbacks: {},
   patientUuid: null,
   setVisitContext: jest.fn(),
 });
@@ -40,10 +41,6 @@ jest.mock('./visit-context', () => ({
 
 jest.mock('../visit.resource', () => ({
   useInfiniteVisits: () => mockUseInfiniteVisits('some-uuid'),
-}));
-
-jest.mock('./visit-context-switcher.resource', () => ({
-  useOnVisible: jest.fn(),
 }));
 
 describe('VisitContextSwitcherModal', () => {

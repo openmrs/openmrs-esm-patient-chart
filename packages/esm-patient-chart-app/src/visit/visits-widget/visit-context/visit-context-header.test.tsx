@@ -14,6 +14,7 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
 
 const mockUseVisitContextStore = jest.fn(useVisitContextStore).mockReturnValue({
   manuallySetVisitUuid: null,
+  mutateVisitCallbacks: {},
   patientUuid: null,
   setVisitContext: jest.fn(),
 });
