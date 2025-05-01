@@ -28,9 +28,13 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
-  const htmlFormEntryForms = config.htmlFormEntryForms;
-  const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const htmlFormEntryForms = config.htmlFormEntryForms;
+  const {
+    data: forms,
+    error,
+    mutateForms,
+  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
