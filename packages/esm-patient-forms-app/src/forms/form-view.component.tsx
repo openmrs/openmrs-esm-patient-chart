@@ -30,7 +30,7 @@ import { EditIcon, formatDatetime, useConfig, useLayoutType, usePagination } fro
 import { type ConfigObject } from '../config-schema';
 import { type CompletedFormInfo } from '../types';
 import styles from './form-view.scss';
-import { mapFormsToHtmlFormEntryForms } from '../hooks/use-forms';
+import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 

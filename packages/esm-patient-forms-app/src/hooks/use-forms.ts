@@ -12,7 +12,6 @@ import type { ConfigObject } from '../config-schema';
 import type { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
-import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
@@ -126,36 +125,4 @@ function mapToFormCompletedInfo(
       lastCompletedDate,
     };
   });
-}
-
-/**
- * Given a list of forms and a list of HtmlFormEntryForm objects from configuration, return a List of HtmlFormEntryForm
- * returned forms either
- *  a) have a form resource with a name of `formEngine` and a value of `htmlformentry, or
- *  b) have an entry in the HtmlFormEntryForm array for a given form uuid
- * The HtmlFormEntryForm configuration provides a means to override the name and rendering mode of a given form
- * @param allForms
- * @param htmlFormEntryForms
- */
-export function mapFormsToHtmlFormEntryForms(allForms: Array<Form>, htmlFormEntryForms: HtmlFormEntryForm[]) {
-  return allForms
-    ?.filter((form) => {
-      return (
-        htmlFormEntryForms?.some((hfeForm) => hfeForm.formUuid === form.uuid) ||
-        form.resources?.some((resource) => {
-          return resource.name === 'formEngine' && resource.valueReference === 'htmlformentry';
-        })
-      );
-    })
-    ?.map((form) => {
-      const hfeForm = htmlFormEntryForms?.find((f) => f.formUuid === form.uuid);
-      const simple = form.resources?.some((r) => r.name === 'uiStyle' && r.valueReference === 'simple');
-      return {
-        formUuid: form.uuid,
-        formName: hfeForm?.formName ?? form.display ?? form.name,
-        formUiResource: hfeForm?.formUiResource,
-        formUiPage: hfeForm?.formUiPage ?? simple ? 'enterHtmlFormWithSimpleUi' : 'enterHtmlFormWithStandardUi',
-        formEditUiPage: hfeForm?.formEditUiPage ?? simple ? 'editHtmlFormWithSimpleUi' : 'editHtmlFormWithStandardUi',
-      } as HtmlFormEntryForm;
-    });
 }

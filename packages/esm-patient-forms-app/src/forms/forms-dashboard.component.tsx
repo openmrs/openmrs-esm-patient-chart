@@ -9,9 +9,10 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import { mapFormsToHtmlFormEntryForms, useForms } from '../hooks/use-forms';
+import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
+import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 
 interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
   clinicalFormsWorkspaceName?: string;
