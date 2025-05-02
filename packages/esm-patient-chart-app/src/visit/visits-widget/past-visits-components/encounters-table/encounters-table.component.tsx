@@ -183,9 +183,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         id="encounterTypeFilter"
                         items={encounterTypes}
                         itemToString={(item: EncounterType) => item?.display}
-                        onChange={({ selectedItem }) => {
-                          setEncounterTypeToFilter(selectedItem);
-                        }}
+                        onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
                         placeholder={t('filterByEncounterType', 'Filter by encounter type')}
                         selectedItem={encounterTypeToFilter}
                         size={desktopLayout ? 'sm' : 'lg'}
@@ -209,8 +207,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                 <TableBody>
                   {rows?.map((row, i) => {
                     const encounter = paginatedMappedEncounters[i];
+
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                      encounter.encounterType === 'Visit Note';
+                      encounter.encounterType === 'Visit Note' && !encounter.form;
 
                     return (
                       <React.Fragment key={encounter.id}>
@@ -222,8 +221,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                             <Layer className={styles.layer}>
                               <OverflowMenu
                                 align="left"
-                                aria-label="Encounter table actions menu"
-                                data-floating-menu-container
+                                aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                 flipped
                                 size={desktopLayout ? 'sm' : 'lg'}
                               >

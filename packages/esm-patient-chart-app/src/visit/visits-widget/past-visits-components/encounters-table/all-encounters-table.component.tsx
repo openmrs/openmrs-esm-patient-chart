@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import EncountersTable from './encounters-table.component';
-import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
 import { type EncounterType } from '@openmrs/esm-framework';
+import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
+import EncountersTable from './encounters-table.component';
 
 interface AllEncountersTableProps {
   patientUuid: string;
