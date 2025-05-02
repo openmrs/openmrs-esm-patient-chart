@@ -55,7 +55,10 @@ export function launchFormEntry(
  * @param allForms
  * @param htmlFormEntryForms
  */
-export function mapFormsToHtmlFormEntryForms(allForms: Array<Form>, htmlFormEntryForms: HtmlFormEntryForm[]) {
+export function mapFormsToHtmlFormEntryForms(
+  allForms: Array<Form>,
+  htmlFormEntryForms: Array<HtmlFormEntryForm>,
+): Array<HtmlFormEntryForm> {
   return allForms
     ?.filter((form) => {
       return (
@@ -74,6 +77,6 @@ export function mapFormsToHtmlFormEntryForms(allForms: Array<Form>, htmlFormEntr
         formUiResource: hfeForm?.formUiResource,
         formUiPage: hfeForm?.formUiPage ?? simple ? 'enterHtmlFormWithSimpleUi' : 'enterHtmlFormWithStandardUi',
         formEditUiPage: hfeForm?.formEditUiPage ?? simple ? 'editHtmlFormWithSimpleUi' : 'editHtmlFormWithStandardUi',
-      } as HtmlFormEntryForm;
+      };
     });
 }
