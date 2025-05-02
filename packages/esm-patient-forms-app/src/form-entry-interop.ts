@@ -6,6 +6,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { isEmpty } from 'lodash-es';
 import type { Form } from './types';
+import { formEngineResourceName, htmlformentryFormEngine, uiStyleResourceName, uiStyleSimple } from './constants';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,
@@ -60,13 +61,13 @@ export function mapFormsToHtmlFormEntryForms(allForms: Array<Form>, htmlFormEntr
       return (
         htmlFormEntryForms?.some((hfeForm) => hfeForm.formUuid === form.uuid) ||
         form.resources?.some((resource) => {
-          return resource.name === 'formEngine' && resource.valueReference === 'htmlformentry';
+          return resource.name === formEngineResourceName && resource.valueReference === htmlformentryFormEngine;
         })
       );
     })
     ?.map((form) => {
       const hfeForm = htmlFormEntryForms?.find((f) => f.formUuid === form.uuid);
-      const simple = form.resources?.some((r) => r.name === 'uiStyle' && r.valueReference === 'simple');
+      const simple = form.resources?.some((r) => r.name === uiStyleResourceName && r.valueReference === uiStyleSimple);
       return {
         formUuid: form.uuid,
         formName: hfeForm?.formName ?? form.display ?? form.name,

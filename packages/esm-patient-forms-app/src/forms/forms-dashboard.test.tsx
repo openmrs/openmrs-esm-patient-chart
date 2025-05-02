@@ -11,7 +11,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('../hooks/use-forms', () => ({
-  useForms: jest.fn().mockReturnValue({
+  useForms: jest.fn().mockReturnValueOnce({
     data: [],
     error: null,
     isValidating: false,
