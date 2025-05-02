@@ -12,6 +12,7 @@
   "enterSecondaryDiagnoses": "הזן אבחנות משניות",
   "error": "Error",
   "errorFetchingConcepts": "There was a problem fetching concepts",
+  "errorTransformingDiagnoses": "Error transforming diagnoses",
   "image": "תמונה",
   "imageRemoved": "Image removed",
   "imageUploadHelperText": "טען תמונה או השתמש במצלמה של המכשיר כדי לצלם תמונה",

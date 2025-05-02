@@ -41,6 +41,7 @@
   "encounterDeleted": "Encounter deleted",
   "encounters_title": "Encounters",
   "encounterSuccessfullyDeleted": "The encounter has been deleted successfully",
+  "encounterTableActionsMenu": "Encounter table actions menu",
   "encounterType": "Encounter type",
   "encounterWithError": "The encounter could not be deleted successfully. If the error persists, please contact your system administrator.",
   "endActiveVisit": "End active visit",
