@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './html-form-entry-wrapper.scss';
-import { SkeletonText } from '@carbon/react';
+import { InlineLoading } from '@carbon/react';
 
 interface HtmlFormEntryWrapperProps {
   closeWorkspaceWithSavedChanges: () => void;
@@ -39,7 +39,7 @@ const HtmlFormEntryWrapper: React.FC<HtmlFormEntryWrapperProps> = ({ closeWorksp
 
   return (
     <div>
-      {isIframeLoading && <SkeletonText heading={true} />}
+      {isIframeLoading && <InlineLoading />}
       <iframe ref={iframeRef} src={src} className={styles.wrapper} onLoad={onLoad}></iframe>
     </div>
   );
