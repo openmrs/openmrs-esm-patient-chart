@@ -73,6 +73,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
+  const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
 
@@ -155,7 +156,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         headers={tableHeaders}
         overflowMenuOnHover={desktopLayout}
         rows={paginatedMappedEncounters ?? []}
-        size={desktopLayout ? 'sm' : 'lg'}
+        size={responsiveSize}
         useZebraStyles={totalCount > 1 ? true : false}
       >
         {({
@@ -186,7 +187,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
                         placeholder={t('filterByEncounterType', 'Filter by encounter type')}
                         selectedItem={encounterTypeToFilter}
-                        size={desktopLayout ? 'sm' : 'lg'}
+                        size={responsiveSize}
                       />
                     </div>
                   </TableToolbarContent>
@@ -223,14 +224,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 align="left"
                                 aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                 flipped
-                                size={desktopLayout ? 'sm' : 'lg'}
+                                size={responsiveSize}
                               >
                                 {userHasAccess(encounter.editPrivilege, session?.user) &&
                                   (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      size={desktopLayout ? 'sm' : 'lg'}
+                                      size={responsiveSize}
                                       onClick={() => {
                                         if (isVisitNoteEncounter(encounter)) {
                                           launchWorkspace('visit-notes-form-workspace', {
@@ -261,7 +262,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     isDelete
                                     itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    size={desktopLayout ? 'sm' : 'lg'}
+                                    size={responsiveSize}
                                   />
                                 )}
                               </OverflowMenu>
@@ -278,17 +279,25 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <Button
                                       kind="ghost"
                                       onClick={() => {
-                                        launchFormEntryOrHtmlForms(
-                                          htmlFormEntryForms,
-                                          patientUuid,
-                                          encounter.form?.uuid,
-                                          encounter.visitUuid,
-                                          encounter.id,
-                                          encounter.form?.display,
-                                          encounter.visitTypeUuid,
-                                          encounter.visitStartDatetime,
-                                          encounter.visitStopDatetime,
-                                        );
+                                        if (isVisitNoteEncounter(encounter)) {
+                                          launchWorkspace('visit-notes-form-workspace', {
+                                            encounter,
+                                            formContext: 'editing',
+                                            patientUuid,
+                                          });
+                                        } else {
+                                          launchFormEntryOrHtmlForms(
+                                            htmlFormEntryForms,
+                                            patientUuid,
+                                            encounter.form?.uuid,
+                                            encounter.visitUuid,
+                                            encounter.id,
+                                            encounter.form?.display,
+                                            encounter.visitTypeUuid,
+                                            encounter.visitStartDatetime,
+                                            encounter.visitStopDatetime,
+                                          );
+                                        }
                                       }}
                                       renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                         <EditIcon size={16} {...props} />
