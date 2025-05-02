@@ -28,9 +28,9 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { EditIcon, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 import { type CompletedFormInfo } from '../types';
 import styles from './form-view.scss';
-import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 

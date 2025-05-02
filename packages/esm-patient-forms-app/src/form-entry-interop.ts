@@ -5,8 +5,8 @@ import {
   launchStartVisitPrompt,
 } from '@openmrs/esm-patient-common-lib';
 import { isEmpty } from 'lodash-es';
-import type { Form } from './types';
 import { formEngineResourceName, htmlformentryFormEngine, uiStyleResourceName, uiStyleSimple } from './constants';
+import type { Form } from './types';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,
