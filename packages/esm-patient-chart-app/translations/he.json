@@ -41,6 +41,7 @@
   "encounterDeleted": "הביקור נמחק",
   "encounters_title": "ביקורים",
   "encounterSuccessfullyDeleted": "The encounter has been deleted successfully",
+  "encounterTableActionsMenu": "Encounter table actions menu",
   "encounterType": "סוג הביקור",
   "encounterWithError": "The encounter could not be deleted successfully. If the error persists, please contact your system administrator.",
   "endActiveVisit": "End active visit",

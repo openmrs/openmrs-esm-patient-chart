@@ -41,6 +41,7 @@
   "encounterDeleted": "Encuentro eliminado",
   "encounters_title": "Encuentros",
   "encounterSuccessfullyDeleted": "El encuentro ha sido eliminado con éxito",
+  "encounterTableActionsMenu": "Encounter table actions menu",
   "encounterType": "Tipo de encuentro",
   "encounterWithError": "No se pudo eliminar el encuentro. Si el error persiste, por favor contacte a su administrador de sistema",
   "endActiveVisit": "End active visit",

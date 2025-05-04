@@ -41,6 +41,7 @@
   "encounterDeleted": "Cuộc gặp gỡ đã xóa",
   "encounters_title": "Cuộc gặp",
   "encounterSuccessfullyDeleted": "The encounter has been deleted successfully",
+  "encounterTableActionsMenu": "Encounter table actions menu",
   "encounterType": "Loại gặp gỡ",
   "encounterWithError": "The encounter could not be deleted successfully. If the error persists, please contact your system administrator.",
   "endActiveVisit": "End active visit",
