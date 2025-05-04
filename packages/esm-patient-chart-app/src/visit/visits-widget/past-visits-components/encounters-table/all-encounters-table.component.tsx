@@ -21,7 +21,6 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     totalCount,
     goTo,
     mutate: mutateEncounters,
-    paginated,
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
   const encountersTableProps: EncountersTableProps = {
@@ -31,7 +30,6 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     isLoading,
     onEncountersUpdated: mutateEncounters,
     pageSize,
-    paginated,
     paginatedEncounters,
     patientUuid,
     setEncounterTypeToFilter,

@@ -22,7 +22,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
       }),
     [visit],
   );
-  const { results: paginatedEncounters, currentPage, goTo, paginated } = usePagination(mappedEncounters, pageSize);
+  const { results: paginatedEncounters, currentPage, goTo } = usePagination(mappedEncounters, pageSize);
 
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
@@ -32,7 +32,6 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
     isLoading: false,
     onEncountersUpdated: mutateVisits,
     showVisitType: false,
-    paginated,
     paginatedEncounters: paginatedEncounters,
     showEncounterTypeFilter: false,
     pageSize,

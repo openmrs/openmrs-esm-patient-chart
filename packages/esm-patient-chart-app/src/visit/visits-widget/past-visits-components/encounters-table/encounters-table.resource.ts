@@ -21,7 +21,6 @@ export interface EncountersTableProps {
   isLoading: boolean;
   onEncountersUpdated(): void;
   showVisitType: boolean;
-  paginated: boolean;
   paginatedEncounters: Array<Encounter>;
   showEncounterTypeFilter: boolean;
   encounterTypeToFilter?: EncounterType;
