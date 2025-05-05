@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import {
   getDynamicOfflineDataEntries,
+  interpolateUrl,
   openmrsFetch,
   restBaseUrl,
   useConfig,
@@ -28,10 +29,11 @@ export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: s
     : showHtmlFormEntryForms
       ? formEncounterUrl
       : formEncounterUrlPoc;
-  url = url
-    .replace('{patientUuid}', patientUuid)
-    .replace('{visitUuid}', visitUuid)
-    .replace('{representation}', customFormRepresentation);
+  url = interpolateUrl(url, {
+    patientUuid: patientUuid,
+    visitUuid: visitUuid,
+    representation: customFormRepresentation,
+  });
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
