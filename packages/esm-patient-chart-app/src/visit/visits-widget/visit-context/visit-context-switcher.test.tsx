@@ -1,4 +1,3 @@
-import { useVisit } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
@@ -15,19 +14,21 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
 
 const mockUseVisitContextStore = jest.fn(useVisitContextStore).mockReturnValue({
   manuallySetVisitUuid: null,
+  mutateVisitCallbacks: {},
   patientUuid: null,
   setVisitContext: jest.fn(),
 });
-const mockedUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
+
+const mockUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
   visits: [mockCurrentVisit, mockVisit2, mockVisit3],
   error: null,
-  hasMore: false,
-  isLoading: false,
-  isValidating: false,
-  loadMore: jest.fn(),
   mutate: jest.fn(),
-  nextUri: null,
+  isValidating: false,
+  isLoading: false,
   totalCount: 3,
+  hasMore: false,
+  loadMore: jest.fn(),
+  nextUri: '',
 });
 
 jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
@@ -39,7 +40,7 @@ jest.mock('./visit-context', () => ({
 }));
 
 jest.mock('../visit.resource', () => ({
-  useInfiniteVisits: () => mockedUseInfiniteVisits('some-uuid'),
+  useInfiniteVisits: () => mockUseInfiniteVisits('some-uuid'),
 }));
 
 describe('VisitContextSwitcherModal', () => {

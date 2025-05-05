@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
-import { fetchDiagnosisConceptsByName, saveVisitNote } from './visit-notes.resource';
+import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
   diagnosisSearchResponse,
@@ -15,10 +15,11 @@ import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm from './visit-notes-form.workspace';
 
 const defaultProps = {
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
   closeWorkspace: jest.fn(),
   closeWorkspaceWithSavedChanges: jest.fn(),
+  formContext: 'creating' as const,
+  patient: mockPatient,
+  patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
 };
@@ -30,6 +31,7 @@ function renderVisitNotesForm(props = {}) {
 const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
 const mockSaveVisitNote = jest.mocked(saveVisitNote);
 const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUpdateVisitNote = jest.mocked(updateVisitNote);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseSession = jest.mocked(useSession);
 
@@ -37,6 +39,7 @@ jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 jest.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: jest.fn(),
+  updateVisitNote: jest.fn(),
   useLocationUuid: jest.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
   })),
@@ -123,6 +126,7 @@ test('closes the form and the workspace when the cancel button is clicked', asyn
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
   const user = userEvent.setup();
+  const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
   const successPayload = {
     encounterProviders: expect.arrayContaining([
@@ -172,6 +176,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
+  mockConsoleError.mockRestore();
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {
@@ -212,4 +217,162 @@ test('renders an error snackbar if there was a problem recording a condition', a
     subtitle: 'Internal Server Error',
     title: 'Error saving visit note',
   });
+});
+
+test('initializes form with existing encounter data when in edit mode', () => {
+  const mockEncounter = {
+    id: '123',
+    uuid: '123',
+    datetime: '2024-03-20T10:00:00.000Z',
+    obs: [
+      {
+        concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        value: 'Existing clinical note',
+      },
+    ],
+    diagnoses: [
+      {
+        uuid: '456',
+        diagnosis: {
+          coded: { uuid: '789', display: 'Diabetes Mellitus' },
+        },
+        certainty: 'PROVISIONAL',
+        rank: 1,
+        display: 'Diabetes Mellitus',
+      },
+    ],
+  };
+
+  renderVisitNotesForm({
+    formContext: 'editing',
+    encounter: mockEncounter,
+  });
+
+  // Verify date is pre-filled
+  expect(screen.getByLabelText(/visit date/i)).toHaveValue('20/03/2024');
+
+  // Verify clinical note is pre-filled
+  expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
+
+  // Verify diagnosis is pre-filled
+  expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+});
+
+test('updates existing visit note when in edit mode', async () => {
+  const user = userEvent.setup();
+  const mockEncounter = {
+    id: '123',
+    uuid: '123',
+    datetime: '2024-03-20T10:00:00.000Z',
+    obs: [
+      {
+        concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        value: 'Existing clinical note',
+      },
+    ],
+    diagnoses: [
+      {
+        uuid: '456',
+        diagnosis: {
+          coded: { uuid: '789', display: 'Diabetes Mellitus' },
+        },
+        certainty: 'PROVISIONAL',
+        rank: 1,
+        display: 'Diabetes Mellitus',
+      },
+    ],
+  };
+
+  const updatePayload = {
+    encounterProviders: [
+      {
+        encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
+        provider: mockSessionDataResponse.data.currentProvider.uuid,
+      },
+    ],
+    encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
+    form: ConfigMock.visitNoteConfig.formConceptUuid,
+    location: mockSessionDataResponse.data.sessionLocation.uuid,
+    obs: [
+      {
+        concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        value: 'Updated clinical note',
+        uuid: undefined,
+      },
+    ],
+    patient: mockPatient.id,
+    encounterDatetime: undefined,
+  };
+
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200, body: 'Visit note updated' } as unknown as ReturnType<
+    typeof updateVisitNote
+  >);
+
+  renderVisitNotesForm({
+    formContext: 'editing',
+    encounter: mockEncounter,
+  });
+
+  // Update clinical note
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Updated clinical note');
+  expect(clinicalNote).toHaveValue('Updated clinical note');
+
+  // Submit form
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
+
+  expect(mockUpdateVisitNote).toHaveBeenCalledWith(
+    expect.any(AbortController),
+    mockEncounter.id,
+    expect.objectContaining(updatePayload),
+  );
+});
+
+test('handles existing diagnoses correctly when in edit mode', async () => {
+  const user = userEvent.setup();
+  const mockEncounter = {
+    id: '123',
+    uuid: '123',
+    datetime: '2024-03-20T10:00:00.000Z',
+    diagnoses: [
+      {
+        uuid: '456',
+        diagnosis: {
+          coded: { uuid: '789', display: 'Diabetes Mellitus' },
+        },
+        certainty: 'PROVISIONAL',
+        rank: 1,
+        display: 'Diabetes Mellitus',
+      },
+    ],
+  };
+
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm({
+    formContext: 'editing',
+    encounter: mockEncounter,
+  });
+
+  // Verify existing diagnosis is displayed
+  expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+
+  // Remove existing diagnosis
+  const closeTagButton = screen.getByRole('button', { name: /clear filter/i });
+  await user.click(closeTagButton);
+
+  // Verify no diagnoses are selected
+  expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
+
+  // Add new diagnosis
+  const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
+  await user.type(searchBox, 'Diabetes Mellitus');
+  const targetSearchResult = screen.getByText('Diabetes Mellitus');
+  await user.click(targetSearchResult);
+
+  // Verify new diagnosis is displayed
+  expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
 });

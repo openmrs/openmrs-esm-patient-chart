@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-tests-app",
-  "version": "9.2.2",
+  "version": "10.0.0",
   "license": "MPL-2.0",
   "description": "Patient test order and results microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-tests-app.js",
@@ -45,7 +45,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "6.x",
-    "@openmrs/esm-patient-common-lib": "9.x",
+    "@openmrs/esm-patient-common-lib": "10.x",
     "react": "18.x",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",

@@ -9,7 +9,6 @@ import { type EncountersTableProps, useEncounterTypes } from './encounters-table
 
 const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
-  paginated: false,
   paginatedEncounters: mockEncountersAlice,
   totalCount: mockEncountersAlice.length,
   currentPage: 1,
