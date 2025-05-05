@@ -7,6 +7,7 @@ import {
   useConfig,
   useEmrConfiguration,
   useLocations,
+  useVisitContextStore,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -167,16 +168,6 @@ jest.mock('./visit-form.resource', () => {
   };
 });
 
-jest.mock('../visits-widget/visit.resource', () => {
-  const requireActual = jest.requireActual('../visits-widget/visit.resource');
-  return {
-    ...requireActual,
-    useInfiniteVisits: jest.fn(() => ({
-      mutate: jest.fn(),
-    })),
-  };
-});
-
 mockSaveVisit.mockResolvedValue({
   status: 201,
   data: {
@@ -186,6 +177,14 @@ mockSaveVisit.mockResolvedValue({
     },
   },
 } as unknown as FetchResponse<Visit>);
+
+jest.mocked(useVisitContextStore).mockReturnValue({
+  manuallySetVisitUuid: null,
+  patientUuid: null,
+  setVisitContext: jest.fn(),
+  mutateVisitCallbacks: {},
+  mutateVisit: jest.fn(),
+});
 
 describe('Visit form', () => {
   beforeEach(() => {

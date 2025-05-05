@@ -41,11 +41,6 @@ export const esmPatientChartSchema = {
     _type: Type.Array,
     _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
   },
-  numberOfVisitsToLoad: {
-    _type: Type.Number,
-    _description: 'The number of visits to load initially in the Visits Summary tab. Defaults to 5',
-    _default: 5,
-  },
   obsConceptUuidsToHide: {
     _type: Type.Array,
     _elements: {
@@ -160,7 +155,6 @@ export interface ChartConfig {
     src: string;
   };
   notesConceptUuids: string[];
-  numberOfVisitsToLoad: number;
   offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
