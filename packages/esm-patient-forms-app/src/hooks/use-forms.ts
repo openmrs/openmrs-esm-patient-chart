@@ -19,8 +19,8 @@ export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: s
   const url = hasCustomFormsUrl
     ? customFormsUrl.concat(`?patientUuid=${patientUuid}`)
     : showHtmlFormEntryForms
-    ? formEncounterUrl
-    : formEncounterUrlPoc;
+      ? formEncounterUrl
+      : formEncounterUrlPoc;
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
