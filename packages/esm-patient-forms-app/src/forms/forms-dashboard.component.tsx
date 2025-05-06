@@ -29,13 +29,13 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const {
     data: forms,
     allForms,
     error,
     mutateForms,
-  } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const htmlFormEntryForms = useMemo(() => {
     return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
