@@ -11,5 +11,25 @@
 
 .pickerWrapper {
   display: flex;
-  gap: layout.$spacing-05;
+  align-items: center;
+}
+
+.datePicker {
+  :global(.cds--date-picker-input__wrapper) {
+    inline-size: layout.$spacing-13;
+  }
+}
+
+.timePicker {
+  display: flex;
+  align-items: baseline;
+
+  :global(.cds--form-requirement) {
+    max-width: layout.$spacing-12;
+    max-height: 0 !important;
+  }
+}
+
+.checkBox {
+  margin-bottom: layout.$spacing-05;
 }
