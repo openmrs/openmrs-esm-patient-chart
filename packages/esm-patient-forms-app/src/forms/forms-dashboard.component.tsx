@@ -32,14 +32,14 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const {
     data: forms,
+    allForms,
     error,
     mutateForms,
   } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const htmlFormEntryForms = useMemo(() => {
-    const allForms = forms.map((completedFormInfo) => completedFormInfo.form);
     return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
-  }, [config.htmlFormEntryForms, forms]);
+  }, [config.htmlFormEntryForms, allForms]);
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
