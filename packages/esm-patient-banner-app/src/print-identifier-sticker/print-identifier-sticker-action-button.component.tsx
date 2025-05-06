@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
+import { useFeatureFlag } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
@@ -13,10 +13,13 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
   const canPrintPatientIdentifierSticker = useFeatureFlag('print-patient-identifier-sticker');
 
   const handleLaunchModal = useCallback(() => {
-    const dispose = showModal('print-identifier-sticker-modal', {
-      closeModal: () => dispose(),
-      patient,
-    });
+    if (patient?.id) {
+      const url = `${window.openmrsBase}/ws/module/commonreports/patientIdSticker?patientUuid=${patient?.id}`;
+      const anchor = document.createElement('a');
+      anchor.setAttribute('href', url);
+      anchor.click();
+      anchor.remove();
+    }
   }, [patient]);
 
   if (!patient || !canPrintPatientIdentifierSticker) {
