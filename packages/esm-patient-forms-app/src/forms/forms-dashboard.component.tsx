@@ -10,6 +10,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
+import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
@@ -29,12 +30,16 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const htmlFormEntryForms = config.htmlFormEntryForms;
   const {
     data: forms,
     error,
     mutateForms,
   } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+
+  const htmlFormEntryForms = useMemo(() => {
+    const allForms = forms.map((completedFormInfo) => completedFormInfo.form);
+    return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
+  }, [config.htmlFormEntryForms, forms]);
 
   const handleFormOpen = useCallback(
     (formUuid: string, encounterUuid: string, formName: string) => {
