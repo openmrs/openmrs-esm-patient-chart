@@ -32,18 +32,5 @@
       "online": true,
       "offline": true
     }
-  ],
-  "modals": [
-    {
-      "name": "print-identifier-sticker-modal",
-      "component": "printIdentifierStickerModal"
-    }
-  ],
-  "featureFlags": [
-    {
-      "description": "Features to support printing a patient identifier sticker",
-      "flagName": "print-patient-identifier-sticker",
-      "label": "Print patient identifier sticker"
-    }
   ]
 }
