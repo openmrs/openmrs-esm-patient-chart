@@ -1,13 +1,13 @@
+import { useCallback } from 'react';
 import {
   openmrsFetch,
   restBaseUrl,
-  useConfig,
   useOpenmrsInfinite,
   type OpenmrsResource,
   type Visit,
   useOpenmrsPagination,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
-import { type ChartConfig } from '../../config-schema';
 
 const customRepresentation =
   'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
@@ -17,19 +17,19 @@ export function useInfiniteVisits(
   params: Record<string, number | string> = {},
   rep: string = customRepresentation,
 ) {
-  const { numberOfVisitsToLoad } = useConfig<ChartConfig>();
-
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}&limit=${numberOfVisitsToLoad}`,
+    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
     window.location.toString(),
   );
   for (const key in params) {
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const { data, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
+  const { data, mutate, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
+  const mutateVisit = useCallback(() => mutate(), [mutate]);
+  useVisitContextStore(mutateVisit);
 
-  return { visits: data, ...rest };
+  return { visits: data, mutate, ...rest };
 }
 
 export function usePaginatedVisits(
@@ -44,7 +44,13 @@ export function usePaginatedVisits(
   for (const key in params) {
     url.searchParams.set(key, '' + params[key]);
   }
-  return useOpenmrsPagination<Visit>(url, pageSize);
+
+  const ret = useOpenmrsPagination<Visit>(url, pageSize);
+  const { mutate } = ret;
+  const mutateVisit = useCallback(() => mutate(), [mutate]);
+  useVisitContextStore(mutateVisit);
+
+  return ret;
 }
 
 export function deleteVisit(visitUuid: string) {
