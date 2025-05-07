@@ -38,6 +38,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -48,7 +49,6 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
-  useInfiniteVisits,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
@@ -197,7 +197,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
 
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
@@ -442,7 +442,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then(() => {
-          mutateInfiniteVisits();
+          mutateVisit();
           mutateVisitNotes();
 
           if (images?.length) {
@@ -481,7 +481,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       formConceptUuid,
       isEditing,
       locationUuid,
-      mutateInfiniteVisits,
+      mutateVisit,
       mutateVisitNotes,
       patientUuid,
       providerUuid,

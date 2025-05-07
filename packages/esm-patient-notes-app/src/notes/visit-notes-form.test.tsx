@@ -50,9 +50,6 @@ jest.mock('./visit-notes.resource', () => ({
   useVisitNotes: jest.fn().mockImplementation(() => ({
     mutateVisitNotes: jest.fn(),
   })),
-  useInfiniteVisits: jest.fn().mockImplementation(() => ({
-    mutateVisits: jest.fn(),
-  })),
 }));
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
