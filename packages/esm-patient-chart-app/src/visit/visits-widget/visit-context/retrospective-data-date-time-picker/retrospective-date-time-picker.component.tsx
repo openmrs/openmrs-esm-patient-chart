@@ -41,19 +41,26 @@ const RetrospectiveDateTimePicker = ({
   // disable inputs if isActiveVisit and user has not manually enabled the picker.
   const disableInputs = isActiveVisit && !manuallyEnableDateTimePicker;
 
-  // this form is for when the caller does not pass a control prop
+  // the below form is for when the caller does not pass a control prop
   // when this happens we assume the caller passed an onChange function which we
   // call to supply the data
   const form = useForm<TFormValues>();
-  const unManagedFormValues = form.getValues();
+
+  const retrospectiveDate = form.watch('retrospective-date');
+  const retrospectiveTime = form.watch('retrospective-time');
+  const retrospectiveTimeFormat = form.watch('retrospective-time-format');
 
   const control = propControl || form.control;
 
   useEffect(() => {
     if (onChange) {
-      onChange(unManagedFormValues);
+      onChange({
+        'retrospective-date': retrospectiveDate,
+        'retrospective-time': retrospectiveTime,
+        'retrospective-time-format': retrospectiveTimeFormat,
+      });
     }
-  }, [onChange, unManagedFormValues]);
+  }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
 
   if (showDatePicker === false) {
     return null;
