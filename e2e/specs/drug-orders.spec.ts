@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
-import { MedicationsPage } from '../pages';
+import { MedicationsPage, OrdersPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
@@ -219,6 +219,140 @@ test('Record, edit and discontinue a drug order', async ({ page }) => {
 
   await test.step('And the medications table should be empty', async () => {
     await expect(page.getByText(/there are no active medications to display for this patient/i)).toBeVisible();
+  });
+});
+
+test('Cancelling a drug order', async ({ page }) => {
+  const medicationsPage = new MedicationsPage(page);
+  const ordersPage = new OrdersPage(page);
+  const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+
+  await test.step('When I visit the medications page', async () => {
+    await medicationsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click on the "Record active medications" link', async () => {
+    await page.getByText(/record active medications/i).click();
+  });
+
+  await test.step('And I search for "Aspirin" in the search bar', async () => {
+    await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
+  });
+
+  await test.step('And I add "Aspirin 81mg" to the basket', async () => {
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: /aspirin 81mg — 81mg — tablet/i })
+      .getByRole('button', { name: /add to basket/i })
+      .click();
+  });
+
+  await test.step('Then I should see "Aspirin 81mg" under drug order', async () => {
+    await expect(page.getByText('Aspirin 81mg')).toBeVisible();
+  });
+
+  await test.step('When I click on the newly created drug order', async () => {
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: /incomplete/i })
+      .click();
+  });
+
+  await test.step('Then I should see the drug order form launch in the workspace', async () => {
+    await expect(page.getByText(/order form/i)).toBeVisible();
+  });
+
+  await test.step('When I set the dose to "1" tablet', async () => {
+    await page.getByLabel(/^dose$/i, { exact: true }).click();
+    await page.getByLabel(/^dose$/i, { exact: true }).fill('1');
+  });
+
+  await test.step('And I set the route to "Oral"', async () => {
+    await page.getByRole('combobox', { name: /route/i }).click();
+    await page.getByRole('option', { name: /oral/i }).click();
+  });
+
+  await test.step('And I set the frequency to "Once daily"', async () => {
+    await page.getByRole('combobox', { name: /frequency/i }).click();
+    await page.getByRole('option', { name: /once daily/i }).click();
+  });
+
+  await test.step('And I set duration to "3" days', async () => {
+    await page.getByText(/^duration$/i).clear();
+    await page.getByText(/^duration$/i).fill('3');
+  });
+
+  await test.step('And I set the quantity to dispense to 3', async () => {
+    await page.getByText(/^quantity to dispense$/i).clear();
+    await page.getByText(/^quantity to dispense$/i).fill('3');
+  });
+
+  await test.step('And I set the prescription refills to 1', async () => {
+    await page.getByText(/^prescription refills$/i).clear();
+    await page.getByText(/^prescription refills$/i).fill('1');
+  });
+
+  await test.step('And I set the indication to "Headache"', async () => {
+    await page.getByText(/indication/i).fill('Headache');
+  });
+
+  await test.step('And I click on the "Save Order" button', async () => {
+    await page.getByRole('button', { name: /save order/i }).click();
+  });
+
+  await test.step('Then the order status should be changed to "New"', async () => {
+    await expect(orderBasket.getByText(/incomplete/i)).toBeHidden();
+    await expect(orderBasket.getByText(/new/i)).toBeVisible();
+  });
+
+  await test.step('When I click on the "Sign and close" button', async () => {
+    await page.getByRole('button', { name: /sign and close/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
+  });
+
+  await test.step('And I should see the newly added order in the active medications list', async () => {
+    const headerRow = medicationsPage.medicationsTable().locator('thead > tr');
+    const dataRow = medicationsPage.medicationsTable().locator('tbody > tr');
+
+    await expect(headerRow).toContainText(/start date/i);
+    await expect(headerRow).toContainText(/details/i);
+    await expect(dataRow).toContainText(/aspirin 81mg/i);
+    await expect(dataRow).toContainText(/1 tablet/i);
+    await expect(dataRow).toContainText(/oral/i);
+    await expect(dataRow).toContainText(/once daily/i);
+    await expect(dataRow).toContainText(/3 days/i);
+    await expect(dataRow).toContainText(/indication headache/i);
+  });
+
+  await test.step('When I click on the Orders section', async () => {
+    await ordersPage.page.getByRole('link', { name: 'Orders' }).click();
+  });
+
+  await test.step('Then I should see the previously added drug order in the list', async () => {
+    await expect(page.getByRole('cell', { name: 'ORD-' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Drug order' })).toBeVisible();
+    await expect(
+      page.getByRole('cell', { name: '(NEW) Aspirin 81mg: 1.0 Tablet Oral Once daily 3 Days' }),
+    ).toBeVisible();
+  });
+
+  await test.step('When I click the overflow menu in the table row with the existing drug order', async () => {
+    await page.getByRole('button', { name: 'Options' }).click();
+  });
+
+  await test.step('And I click on the `Cancel order` button', async () => {
+    await page.getByRole('menuitem', { name: 'Cancel order' }).click();
+  });
+
+  await test.step('And I click on the `Sign and close` button', async () => {
+    await page.getByRole('button', { name: 'Sign and close' }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/Discontinued Aspirin 81mg/i)).toBeVisible();
   });
 });
 
