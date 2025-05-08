@@ -6,18 +6,18 @@ import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
-type TFormValues = {
-  'retrospective-date': Date;
-  'retrospective-time': string;
-  'retrospective-time-format': string;
+type FormValues = {
+  retrospectiveDate: Date;
+  retrospectiveTime: string;
+  retrospectiveTimeFormat: string;
 };
 
-type IRetrospectiveDateTimePickerProps = {
+type RetrospectiveDateTimePickerProps = {
   patientUuid: string;
-  control: Control<TFormValues>;
+  control: Control<FormValues>;
   maxDate?: Date;
   minDate?: Date;
-  onChange?: (data: TFormValues) => void;
+  onChange?: (data: FormValues) => void;
 };
 
 const RetrospectiveDateTimePicker = ({
@@ -26,43 +26,40 @@ const RetrospectiveDateTimePicker = ({
   maxDate,
   minDate,
   onChange,
-}: IRetrospectiveDateTimePickerProps) => {
+}: RetrospectiveDateTimePickerProps) => {
   const { t } = useTranslation();
-  const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
-
-  const showDatePicker = systemVisitEnabled && isRdeEnabled;
 
   const { currentVisit } = useVisit(patientUuid);
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
 
-  const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean | false>(false);
+  const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
 
   // disable inputs if isActiveVisit and user has not manually enabled the picker.
-  const disableInputs = isActiveVisit && !manuallyEnableDateTimePicker;
+  const disableInputs = !manuallyEnableDateTimePicker;
 
   // the below form is for when the caller does not pass a control prop
   // when this happens we assume the caller passed an onChange function which we
   // call to supply the data
-  const form = useForm<TFormValues>();
+  const form = useForm<FormValues>();
 
-  const retrospectiveDate = form.watch('retrospective-date');
-  const retrospectiveTime = form.watch('retrospective-time');
-  const retrospectiveTimeFormat = form.watch('retrospective-time-format');
+  const retrospectiveDate = form.watch('retrospectiveDate');
+  const retrospectiveTime = form.watch('retrospectiveTime');
+  const retrospectiveTimeFormat = form.watch('retrospectiveTimeFormat');
 
   const control = propControl || form.control;
 
   useEffect(() => {
     if (onChange) {
       onChange({
-        'retrospective-date': retrospectiveDate,
-        'retrospective-time': retrospectiveTime,
-        'retrospective-time-format': retrospectiveTimeFormat,
+        retrospectiveDate: retrospectiveDate,
+        retrospectiveTime: retrospectiveTime,
+        retrospectiveTimeFormat: retrospectiveTimeFormat,
       });
     }
   }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
 
-  if (showDatePicker === false) {
+  if (!isRdeEnabled) {
     return null;
   }
 
@@ -82,7 +79,7 @@ const RetrospectiveDateTimePicker = ({
       )}
       <div className={styles.pickerWrapper}>
         <Controller
-          name={'retrospective-date'}
+          name={'retrospectiveDate'}
           control={control}
           render={({ field, fieldState }) => (
             <ResponsiveWrapper>
@@ -102,7 +99,7 @@ const RetrospectiveDateTimePicker = ({
         />
         <ResponsiveWrapper>
           <Controller
-            name={'retrospective-time'}
+            name={'retrospectiveTime'}
             control={control}
             render={({ field: { onBlur, onChange, value } }) => (
               <div className={styles.timePickerWrapper}>
@@ -117,7 +114,7 @@ const RetrospectiveDateTimePicker = ({
                   className={styles.timePicker}
                 >
                   <Controller
-                    name={'retrospective-time-format'}
+                    name={'retrospectiveTimeFormat'}
                     control={control}
                     render={({ field: { onChange, value } }) => (
                       <TimePickerSelect
