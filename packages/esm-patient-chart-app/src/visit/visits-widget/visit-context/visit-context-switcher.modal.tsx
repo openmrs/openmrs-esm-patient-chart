@@ -1,11 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading, Tile } from '@carbon/react';
-import { ErrorState, OpenmrsDatePicker, useDebounce, useOnVisible, type Visit } from '@openmrs/esm-framework';
+import {
+  ErrorState,
+  OpenmrsDatePicker,
+  useDebounce,
+  useOnVisible,
+  useVisitContextStore,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useInfiniteVisits } from '../visit.resource';
-import { useVisitContextStore } from './visit-context';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
 import dayjs from 'dayjs';

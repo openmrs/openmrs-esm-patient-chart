@@ -37,15 +37,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const {
-    data: visits,
-    currentPage,
-    error,
-    isLoading,
-    totalCount,
-    goTo,
-    mutate,
-  } = usePaginatedVisits(patientUuid, pageSize);
+  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -117,7 +109,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
+                            <VisitSummary visit={visit} patientUuid={patientUuid} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

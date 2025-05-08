@@ -13,7 +13,7 @@ interface DeleteVisitDialogProps {
 
 const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patientUuid, visit }) => {
   const { t } = useTranslation();
-  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(patientUuid, visit, closeModal);
+  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, closeModal);
 
   return (
     <div>

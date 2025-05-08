@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-vitals-app",
-  "version": "10.0.0",
+  "version": "10.1.0",
   "license": "MPL-2.0",
   "description": "Patient vitals microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-vitals-app.js",

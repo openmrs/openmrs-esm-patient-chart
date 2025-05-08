@@ -15,11 +15,6 @@ import {
 const mockGetConfig = getConfig as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 
-mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(esmPatientChartSchema),
-  numberOfVisitsToLoad: 5,
-});
-
 const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   data: visitOverviewDetailMockData.data.results,
   error: null,
