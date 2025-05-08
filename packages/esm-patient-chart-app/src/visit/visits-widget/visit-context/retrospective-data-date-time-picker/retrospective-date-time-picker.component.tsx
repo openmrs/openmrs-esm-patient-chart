@@ -15,16 +15,12 @@ type FormValues = {
 type RetrospectiveDateTimePickerProps = {
   patientUuid: string;
   control: Control<FormValues>;
-  maxDate?: Date;
-  minDate?: Date;
   onChange?: (data: FormValues) => void;
 };
 
 const RetrospectiveDateTimePicker = ({
   patientUuid,
   control: propControl,
-  maxDate,
-  minDate,
   onChange,
 }: RetrospectiveDateTimePickerProps) => {
   const { t } = useTranslation();
@@ -32,11 +28,13 @@ const RetrospectiveDateTimePicker = ({
 
   const { currentVisit } = useVisit(patientUuid);
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
+  const maxDate = currentVisit?.stopDatetime;
+  const minDate = currentVisit?.startDatetime;
 
   const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
 
-  // disable inputs if isActiveVisit and user has not manually enabled the picker.
-  const disableInputs = !manuallyEnableDateTimePicker;
+  // disable inputs if user has not manually enabled the picker.
+  const disableInputs = isActiveVisit && !manuallyEnableDateTimePicker;
 
   // the below form is for when the caller does not pass a control prop
   // when this happens we assume the caller passed an onChange function which we
