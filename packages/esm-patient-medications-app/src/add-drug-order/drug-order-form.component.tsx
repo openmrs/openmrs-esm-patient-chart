@@ -56,6 +56,7 @@ export interface DrugOrderFormProps {
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
   promptBeforeClosing: (testFcn: () => boolean) => void;
+  outsideOrderBasketWorkspace?: boolean;
 }
 
 function useCreateMedicationOrderFormSchema() {
@@ -224,7 +225,13 @@ function InputWrapper({ children }) {
   );
 }
 
-export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
+export function DrugOrderForm({
+  initialOrderBasketItem,
+  onSave,
+  onCancel,
+  promptBeforeClosing,
+  outsideOrderBasketWorkspace,
+}: DrugOrderFormProps) {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
@@ -427,7 +434,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                 size="sm"
                 onClick={onCancel}
               >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+                <span>
+                  {!!outsideOrderBasketWorkspace ? t('back', 'Back') : t('backToOrderBasket', 'Back to order basket')}
+                </span>
               </Button>
             </div>
           )}

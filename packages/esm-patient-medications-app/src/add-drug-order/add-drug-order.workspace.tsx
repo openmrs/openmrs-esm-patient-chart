@@ -16,6 +16,10 @@ import styles from './add-drug-order.scss';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
+  /**
+   * Whether this workspace was launched from a workspace other than order basket.
+   */
+  outsideOrderBasketWorkspace?: boolean;
 }
 
 export interface AddDrugOrderWorkspace extends DefaultPatientWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
@@ -25,6 +29,7 @@ export default function AddDrugOrderWorkspace({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  outsideOrderBasketWorkspace,
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -34,10 +39,10 @@ export default function AddDrugOrderWorkspace({
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      ...(!!outsideOrderBasketWorkspace ? {} : { onWorkspaceClose: () => launchPatientWorkspace('order-basket') }),
       closeWorkspaceGroup: false,
     });
-  }, [closeWorkspace]);
+  }, [closeWorkspace, outsideOrderBasketWorkspace]);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -68,10 +73,10 @@ export default function AddDrugOrderWorkspace({
       }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        ...(!!outsideOrderBasketWorkspace ? {} : { onWorkspaceClose: () => launchPatientWorkspace('order-basket') }),
       });
     },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid, outsideOrderBasketWorkspace],
   );
 
   if (!currentOrder) {
@@ -86,11 +91,13 @@ export default function AddDrugOrderWorkspace({
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
               size="sm"
             >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+              <span>
+                {!!outsideOrderBasketWorkspace ? t('back', 'Back') : t('backToOrderBasket', 'Back to order basket')}
+              </span>
             </Button>
           </div>
         )}
-        <DrugSearch openOrderForm={openOrderForm} />
+        <DrugSearch openOrderForm={openOrderForm} outsideOrderBasketWorkspace={outsideOrderBasketWorkspace} />
       </>
     );
   } else {
@@ -100,6 +107,7 @@ export default function AddDrugOrderWorkspace({
         onSave={saveDrugOrder}
         onCancel={cancelDrugOrder}
         promptBeforeClosing={promptBeforeClosing}
+        outsideOrderBasketWorkspace={outsideOrderBasketWorkspace}
       />
     );
   }
