@@ -6,6 +6,7 @@ import {
   type DefaultPatientWorkspaceProps,
   launchPatientWorkspace,
   useOrderBasket,
+  useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
@@ -25,12 +26,16 @@ export default function AddDrugOrderWorkspace({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  patientUuid,
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const visitStartDate = currentVisit?.startDatetime;
+  const visitEndDate = currentVisit?.stopDatetime;
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
@@ -55,6 +60,10 @@ export default function AddDrugOrderWorkspace({
     (finalizedOrder: DrugOrderBasketItem) => {
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
+      //Setting dateActivated ensures that the order date is accurately captured, which is essential for RDE
+      if (visitEndDate) {
+        finalizedOrder.dateActivated = visitStartDate;
+      }
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       if (existingOrder) {
@@ -71,7 +80,7 @@ export default function AddDrugOrderWorkspace({
         onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid, visitStartDate, visitEndDate],
   );
 
   if (!currentOrder) {
