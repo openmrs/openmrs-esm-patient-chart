@@ -39,5 +39,5 @@ export const generateRandomDrugOrder = async (
 };
 
 export const deleteDrugOrder = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`order/${uuid}`, { data: {} });
+  await api.delete(`order/${uuid}?purge=true`, { data: {} });
 };
