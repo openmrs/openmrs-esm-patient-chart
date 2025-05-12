@@ -22,6 +22,7 @@ let visit: Visit;
 let drugOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
+let url: String;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
@@ -32,12 +33,12 @@ test.beforeEach(async ({ api }) => {
 });
 
 test('Edit and discontinue a drug order', async ({ page }) => {
-  const medicationsPage = new MedicationsPage(page);
+  url = process.env.E2E_BASE_URL;
   const form = page.locator('#drugOrderForm');
   const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
   await test.step('When I visit the medications page', async () => {
-    await medicationsPage.goTo(patient.uuid);
+    await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
   });
 
   await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
@@ -99,8 +100,8 @@ test('Edit and discontinue a drug order', async ({ page }) => {
   });
 
   await test.step('And I should see the updated order in the list in Active Medications table', async () => {
-    const headerRow = medicationsPage.medicationsTable().locator('thead > tr');
-    const dataRow = medicationsPage.medicationsTable().locator('tbody > tr');
+    const headerRow = page.locator('thead > tr');
+    const dataRow = page.locator('tbody > tr');
 
     await expect(headerRow.nth(0)).toContainText(/start date/i);
     await expect(headerRow.nth(0)).toContainText(/details/i);
@@ -143,10 +144,9 @@ test('Edit and discontinue a drug order', async ({ page }) => {
 });
 
 test('Cancel a existing drug order', async ({ page, api }) => {
-  const ordersPage = new OrdersPage(page);
-
+  url = process.env.E2E_BASE_URL;
   await test.step('When I click on the Orders section', async () => {
-    await ordersPage.goTo(patient.uuid);
+    await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
   });
 
   await test.step('Then I should see an existing drug order in the list', async () => {
