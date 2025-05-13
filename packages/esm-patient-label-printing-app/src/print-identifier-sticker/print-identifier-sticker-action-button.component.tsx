@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { useFeatureFlag, showSnackbar, getCoreTranslation } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
-import { useSickerPdfPrinter } from '../hooks/useSickerPdfPrinter';
+import { useStickerPdfPrinter } from '../hooks/useStickerPdfPrinter';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
   patient: fhir.Patient;
@@ -12,7 +12,7 @@ interface PrintIdentifierStickerOverflowMenuItemProps {
 const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({ patient }) => {
   const { t } = useTranslation();
   const canPrintPatientIdentifierSticker = useFeatureFlag('print-patient-identifier-sticker');
-  const { printPdf, isPrinting } = useSickerPdfPrinter();
+  const { printPdf, isPrinting } = useStickerPdfPrinter();
 
   const getPdfUrl = useCallback(() => {
     if (!patient?.id) {

@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0",
     "commonreports": "^1.5.0"
   },
   "extensions": [
