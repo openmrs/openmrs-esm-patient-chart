@@ -271,3 +271,4 @@ export const isCoded = (concept: LabOrderConcept) => concept.datatype?.display =
 export const isNumeric = (concept: LabOrderConcept) => concept.datatype?.display === 'Numeric';
 export const isPanel = (concept: LabOrderConcept) => concept.setMembers?.length > 0;
 export const isText = (concept: LabOrderConcept) => concept.datatype?.display === 'Text';
+export const isNA = (concept: LabOrderConcept) => concept.datatype.display === 'N/A';

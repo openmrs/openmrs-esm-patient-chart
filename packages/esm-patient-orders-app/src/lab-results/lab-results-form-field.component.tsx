@@ -1,8 +1,8 @@
-import React from 'react';
-import { NumberInput, Select, SelectItem, TextInput } from '@carbon/react';
+import React, { useMemo } from 'react';
+import { NumberInput, Select, SelectItem, TextInput, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller, type FieldErrors } from 'react-hook-form';
-import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
+import { isCoded, isNA, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
 
@@ -47,6 +47,11 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
       : defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value;
   };
 
+  const labelText = useMemo(
+    () => `${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`,
+    [concept],
+  );
+
   return (
     <>
       {isText(concept) && (
@@ -59,7 +64,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               className={styles.textInput}
               id={concept.uuid}
               key={concept.uuid}
-              labelText={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
+              labelText={labelText}
               type="text"
               invalidText={errors[concept.uuid]?.message}
               invalid={!!errors[concept.uuid]}
@@ -80,7 +85,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               hideSteppers
               id={concept.uuid}
               key={concept.uuid}
-              label={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
+              label={labelText}
               onChange={(event) => field.onChange(parseFloat(event.target.value))}
               value={field.value || ''}
               invalidText={errors[concept.uuid]?.message}
@@ -101,7 +106,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               defaultValue={defaultValue?.value?.uuid}
               id={`select-${concept.uuid}`}
               key={concept.uuid}
-              labelText={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}
+              labelText={labelText}
               invalidText={errors[concept.uuid]?.message}
               invalid={!!errors[concept.uuid]}
             >
@@ -188,6 +193,17 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             )}
           </React.Fragment>
         ))}
+
+      {isNA(concept) && (
+        <>
+          <label className={styles.label}>{labelText}</label>
+          <InlineNotification
+            hideCloseButton
+            title={t('invalidConceptDatatype', 'Invalid concept datatype')}
+            subtitle={t('updateConceptDatatypeFromNa', 'Update concept datatype from N/A to appropriate datatype')}
+          />
+        </>
+      )}
     </>
   );
 };
