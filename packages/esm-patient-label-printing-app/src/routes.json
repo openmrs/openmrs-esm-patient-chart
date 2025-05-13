@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0",
+    "commonreports": "^1.5.0"
+  },
+  "extensions": [
+    {
+      "name": "print-identifier-sticker-button",
+      "slot": "patient-actions-slot",
+      "component": "printIdentifierStickerActionButton",
+      "online": true,
+      "offline": true
+    }
+  ]
+}
