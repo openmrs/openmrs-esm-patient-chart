@@ -5021,6 +5021,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-patient-label-printing-app@workspace:packages/esm-patient-label-printing-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-label-printing-app@workspace:packages/esm-patient-label-printing-app"
+  dependencies:
+    "@carbon/react": "npm:^1.76.0"
+    webpack: "npm:^5.94.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 6.x
+    "@openmrs/esm-patient-common-lib": 10.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app"
