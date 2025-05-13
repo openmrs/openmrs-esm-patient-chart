@@ -1,6 +1,3 @@
 {
-  "failedToAccessPrintWindow": "Failed to access print window",
-  "failedToLoadPDF": "Failed to load PDF",
-  "patientIdNotFound": "Patient ID not found",
-  "printingFailed": "Printing failed"
+  "patientIdNotFound": "Patient ID not found"
 }
