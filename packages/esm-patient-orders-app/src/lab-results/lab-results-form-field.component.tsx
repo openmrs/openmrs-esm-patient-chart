@@ -40,7 +40,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
     return units ? ` (${displayUnit})` : '';
   };
 
-  const getSavedMemberValue = useCallback(
+  const getSavedMemberDefaultObservation = useCallback(
     (conceptUuid: string) => defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid),
 
     [defaultValue],
@@ -78,14 +78,15 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               />
             ) : isNumericField ? (
               <NumberInput
+                {...field}
                 allowEmpty
                 className={styles.numberInput}
                 disableWheel
-                hideSteppers
                 id={concept.uuid}
                 key={concept.uuid}
                 label={labelText}
-                onChange={(event) => field.onChange(parseFloat(event.target.value))}
+                onChange={(_, { value }) => field.onChange(value !== '' ? value : undefined)}
+                step={concept.allowDecimal ? 0.01 : 1}
                 value={field.value || ''}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
@@ -118,7 +119,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 key={member.uuid}
                 concept={member}
                 control={control}
-                defaultValue={getSavedMemberValue(member.uuid)}
+                defaultValue={getSavedMemberDefaultObservation(member.uuid)}
               />
             ))
           : null}
