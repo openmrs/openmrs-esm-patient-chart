@@ -114,7 +114,7 @@
   "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
-  "updateConceptDatatypeFromNa": "Update concept datatype from N/A to appropriate datatype",
+  "updateConceptDatatypeFromNa": "Update concept datatype from {{datatype}} to appropriate datatype",
   "updated": "Updated",
   "usingADifferentTerm": "using a different term",
   "visitRequired": "A visit is required to make orders"

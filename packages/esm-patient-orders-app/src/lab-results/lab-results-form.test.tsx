@@ -627,7 +627,7 @@ describe('LabResultsForm', () => {
     );
   });
 
-  test.only('display error notification when the concept datatype is N/A', async () => {
+  test('display error notification when the concept datatype is N/A', async () => {
     mockUseOrderConceptByUuid.mockReturnValue({
       concept: {
         uuid: 'concept-uuid',
