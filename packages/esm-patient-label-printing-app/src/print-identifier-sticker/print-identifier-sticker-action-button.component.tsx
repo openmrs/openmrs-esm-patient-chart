@@ -1,23 +1,25 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { useFeatureFlag, showSnackbar, getCoreTranslation } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
+import { useSickerPdfPrinter } from '../hooks/useSickerPdfPrinter';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
   patient: fhir.Patient;
 }
 
 const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({ patient }) => {
+  const { t } = useTranslation();
   const canPrintPatientIdentifierSticker = useFeatureFlag('print-patient-identifier-sticker');
   const { printPdf, isPrinting } = useSickerPdfPrinter();
 
   const getPdfUrl = useCallback(() => {
     if (!patient?.id) {
-      throw new Error('Patient ID not found');
+      throw new Error(t('patientIdNotFound', 'Patient ID not found'));
     }
     return `${window.openmrsBase}/ws/module/commonreports/patientIdSticker?patientUuid=${patient.id}`;
-  }, [patient]);
+  }, [patient.id, t]);
 
   const handlePrint = useCallback(async () => {
     try {
@@ -51,6 +53,3 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
 };
 
 export default PrintIdentifierStickerOverflowMenuItem;
-function useSickerPdfPrinter(): { printPdf: any; isPrinting: any } {
-  throw new Error('Function not implemented.');
-}
