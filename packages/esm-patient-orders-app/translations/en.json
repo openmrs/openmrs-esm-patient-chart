@@ -32,6 +32,7 @@
   "indication": "Indication",
   "inStock": "In stock",
   "instructions": "Instructions",
+  "invalidConceptDatatype": "Invalid concept datatype",
   "labResultError": "Error loading lab results",
   "launchOrderBasket": "Launch order basket",
   "loading": "Loading",
@@ -113,6 +114,7 @@
   "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
+  "updateConceptDatatypeFromNa": "Update concept datatype from N/A to appropriate datatype",
   "updated": "Updated",
   "usingADifferentTerm": "using a different term",
   "visitRequired": "A visit is required to make orders"

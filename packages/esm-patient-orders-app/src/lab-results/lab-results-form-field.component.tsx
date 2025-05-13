@@ -47,10 +47,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
       : defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value;
   };
 
-  const labelText = useMemo(
-    () => `${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`,
-    [concept],
-  );
+  const labelText = useMemo(() => `${concept.display} ${formatLabRange(concept)}`, [concept]);
 
   return (
     <>

@@ -27,10 +27,6 @@ jest.mock('./lab-results.resource', () => ({
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
   useCompletedLabResults: jest.fn(),
-  isCoded: (concept) => concept?.datatype?.display === 'Coded',
-  isText: (concept) => concept?.datatype?.display === 'Text',
-  isNumeric: (concept) => concept?.datatype?.display === 'Numeric',
-  isPanel: (concept) => concept?.setMembers?.length > 0,
 }));
 
 const mockOrder = {
@@ -629,6 +625,28 @@ describe('LabResultsForm', () => {
       },
       expect.anything(),
     );
+  });
+
+  test.only('display error notification when the concept datatype is N/A', async () => {
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        setMembers: [],
+        datatype: { display: 'N/A' },
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    render(<LabResultsForm {...testProps} />);
+
+    const label = screen.getByText('Test Concept');
+    expect(label).toBeInTheDocument();
+
+    const errorNotification = screen.getByText('Update concept datatype from N/A to appropriate datatype');
+    expect(errorNotification).toBeInTheDocument();
   });
 
   test('should handle empty form submission', async () => {
