@@ -138,6 +138,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
           'Update concept datatype from {{datatype}} to appropriate datatype',
           {
             datatype: concept.datatype.display,
+            interpolation: { escapeValue: false },
           },
         )}
       />
