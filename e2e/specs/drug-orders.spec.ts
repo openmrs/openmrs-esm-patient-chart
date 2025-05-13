@@ -22,10 +22,9 @@ let visit: Visit;
 let drugOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
-let url: String;
+const url = process.env.E2E_BASE_URL;
 
 test.beforeEach(async ({ api }) => {
-  url = process.env.E2E_BASE_URL;
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
   orderer = await getProvider(api);
@@ -246,7 +245,6 @@ test.describe.serial('Drug Order Tests', () => {
   });
 
   test('Cancel a existing drug order', async ({ page, api }) => {
-    url = process.env.E2E_BASE_URL;
     const ordersPage = new OrdersPage(page);
 
     await test.step('When I click on the Orders section', async () => {
