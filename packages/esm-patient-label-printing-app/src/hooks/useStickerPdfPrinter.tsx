@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const useSickerPdfPrinter = () => {
+export const useStickerPdfPrinter = () => {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isPrinting, setIsPrinting] = useState(false);
