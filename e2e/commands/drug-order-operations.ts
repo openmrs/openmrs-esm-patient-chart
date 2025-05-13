@@ -1,11 +1,11 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import { type Order } from '@openmrs/esm-patient-common-lib';
-import dayjs from 'dayjs';
+import { type Encounter } from './types';
 
 export const generateRandomDrugOrder = async (
   api: APIRequestContext,
   patientId: string,
-  encounterUuid: string,
+  encounter: Encounter,
   providerUuid: string,
 ): Promise<Order> => {
   const order = await api.post('order', {
@@ -15,9 +15,9 @@ export const generateRandomDrugOrder = async (
       action: 'new',
       drug: '09e58895-e7f0-4649-b7c0-e665c5c08e93',
       urgency: 'ROUTINE',
-      dateActivated: dayjs().format(),
+      dateActivated: encounter.encounterDateTime,
       careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
-      encounter: encounterUuid,
+      encounter: encounter,
       patient: patientId,
       concept: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       orderer: providerUuid,

@@ -12,7 +12,7 @@ import {
   startVisit,
   endVisit,
 } from '../commands';
-import { type Encounter, type Provider } from '../types';
+import { type Encounter, type Provider } from '../commands/types';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { test } from '../core';
 import { OrdersPage } from '../pages';
@@ -28,11 +28,11 @@ test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
   orderer = await getProvider(api);
-  encounter = await createEncounter(api, patient.uuid, orderer.uuid);
-  drugOrder = await generateRandomDrugOrder(api, patient.uuid, encounter.uuid, orderer.uuid);
+  encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
+  drugOrder = await generateRandomDrugOrder(api, patient.uuid, encounter, orderer.uuid);
 });
 
-test.describe.serial('Drug Order Tests', () => {
+test.describe('Drug Order Tests', () => {
   test('Record a drug order', async ({ page }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
@@ -48,7 +48,7 @@ test.describe.serial('Drug Order Tests', () => {
       await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
     });
 
-    await test.step('And I add "Aspirin 81mg" to the basket', async () => {
+    await test.step('And I add "Aspirin 325mg" to the basket', async () => {
       await page
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i })
