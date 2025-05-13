@@ -1,11 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-  registerFeatureFlag,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, messageOmrsServiceWorker, restBaseUrl } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
 import patientBannerComponent from './banner/patient-banner.component';
