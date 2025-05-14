@@ -183,7 +183,7 @@ test('Add lab results via lab App', async ({ page }) => {
       .getByRole('row', { name: new RegExp(`Expand current row ${fullName}`) })
       .getByLabel('Expand current row')
       .click();
-    await expect(page.getByText(/Status:Order not picked/i)).toBeVisible();
+    await expect(page.getByText(/Status:Order not picked/i).first()).toBeVisible();
     await expect(page.getByRole('cell', { name: 'serum glucose' })).toBeVisible();
   });
 
