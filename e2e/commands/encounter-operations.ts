@@ -35,9 +35,12 @@ export const createEncounter = async (
   providerId: string,
   visit: Visit,
 ): Promise<Encounter> => {
+  const encounterAfterVisit = dayjs(visit.startDatetime).add(1, 'minute');
+  const now = dayjs().subtract(1, 'second');
+  const encounterDatetime = encounterAfterVisit.isBefore(now) ? encounterAfterVisit.format() : now.format();
   const encounterRes = await api.post('encounter', {
     data: {
-      encounterDatetime: dayjs().format(),
+      encounterDatetime,
       form: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
       patient: patientId,
       visit: visit,
