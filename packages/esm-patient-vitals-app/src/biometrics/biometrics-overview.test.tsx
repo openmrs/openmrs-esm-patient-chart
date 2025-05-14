@@ -3,7 +3,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockConceptUnits } from '__mocks__';
+import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
@@ -22,9 +22,9 @@ jest.mock('../common', () => {
 
   return {
     ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
       isLoading: false,
     })),
     useVitalsAndBiometrics: jest.fn(),
@@ -36,7 +36,7 @@ mockUseConfig.mockReturnValue({
   ...mockBiometricsConfig,
 } as ConfigObject);
 
-describe('BiometricsOverview', () => {
+describe('Biometrics Overview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],

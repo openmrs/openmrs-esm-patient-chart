@@ -28,6 +28,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { EditIcon, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 import { type CompletedFormInfo } from '../types';
 import styles from './form-view.scss';
 
@@ -57,7 +58,6 @@ const FormView: React.FC<FormViewProps> = ({
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const isTablet = useLayoutType() === 'tablet';
-  const htmlFormEntryForms = config.htmlFormEntryForms;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -70,6 +70,11 @@ const FormView: React.FC<FormViewProps> = ({
       return formName.toLowerCase().includes(searchTerm.toLowerCase());
     });
   }, [forms, searchTerm]);
+
+  const htmlFormEntryForms = useMemo(() => {
+    const allForms = forms.map((completedFormInfo) => completedFormInfo.form);
+    return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
+  }, [config.htmlFormEntryForms, forms]);
 
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 

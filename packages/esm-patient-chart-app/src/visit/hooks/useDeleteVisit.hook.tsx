@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type Visit, showSnackbar, useVisit } from '@openmrs/esm-framework';
-import { deleteVisit, restoreVisit, useInfiniteVisits } from '../visits-widget/visit.resource';
+import { type Visit, showSnackbar, useVisitContextStore } from '@openmrs/esm-framework';
+import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
-export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
+export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
 
   const restoreDeletedVisit = () => {
@@ -19,8 +18,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
           }),
           kind: 'success',
         });
-        mutateCurrentVisit();
-        mutateInfiniteVisits();
+        mutateVisit();
         onVisitRestore?.();
       })
       .catch(() => {
@@ -39,8 +37,7 @@ export function useDeleteVisit(patientUuid: string, visit: Visit, onVisitDelete 
 
     deleteVisit(visit?.uuid)
       .then(() => {
-        mutateCurrentVisit();
-        mutateInfiniteVisits();
+        mutateVisit();
 
         showSnackbar({
           title: t('visitDeleted', '{{visit}} deleted', {

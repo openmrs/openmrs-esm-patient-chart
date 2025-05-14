@@ -37,10 +37,6 @@
   margin-top: layout.$spacing-10;
 }
 
-.tabletSearch {
-  margin: -(layout.$spacing-05);
-}
-
 .clearButton {
   margin-left: layout.$spacing-03;
 }
@@ -59,8 +55,12 @@
   }
 }
 
-.flex {
+.flexBaseline {
   display: flex;
   flex: 1;
   align-items: baseline;
+}
+
+.overlay {
+  padding: layout.$spacing-05;
 }

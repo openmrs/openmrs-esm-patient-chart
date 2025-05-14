@@ -1,9 +1,8 @@
-import { useVisit } from '@openmrs/esm-framework';
+import { useVisit, useVisitContextStore } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
-import { useVisitContextStore } from './visit-context';
 import VisitContextHeader from './visit-context-header.component';
 
 const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
@@ -12,10 +11,12 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
   isLoadingSystemVisitSetting: false,
 });
 
-const mockUseVisitContextStore = jest.fn(useVisitContextStore).mockReturnValue({
+jest.mocked(useVisitContextStore).mockReturnValue({
   manuallySetVisitUuid: null,
+  mutateVisitCallbacks: {},
   patientUuid: null,
   setVisitContext: jest.fn(),
+  mutateVisit: jest.fn(),
 });
 
 jest.mocked(useVisit).mockReturnValue({
@@ -30,10 +31,6 @@ jest.mocked(useVisit).mockReturnValue({
 
 jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
   useSystemVisitSetting: () => mockUseSystemVisitSetting(),
-}));
-
-jest.mock('./visit-context', () => ({
-  useVisitContextStore: () => mockUseVisitContextStore(),
 }));
 
 describe('VisitContextHeader', () => {
