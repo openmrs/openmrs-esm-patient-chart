@@ -120,7 +120,7 @@ test.describe('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('And I click to Add a drug order ', async () => {
-      await page.getByText(/record orders/i).click();
+      await page.getByRole('button', { name: 'Add' }).click();
     });
 
     await test.step('And I click the `Add +` button on the Lab orders tile', async () => {
