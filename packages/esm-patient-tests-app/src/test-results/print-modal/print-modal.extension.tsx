@@ -30,7 +30,7 @@ import {
   getCoreTranslation,
   OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
-import usePanelData from '../panel-view/usePanelData';
+import usePanelData from '../individual-results-table-tablet/usePanelData';
 import styles from './print-modal.scss';
 
 function PrintModal({

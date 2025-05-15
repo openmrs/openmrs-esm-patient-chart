@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import OrderDetailsTable from '../components/orders-details-table.component';
 import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
+import OrderDetailsTable from '../components/order-details-table.component';
 
 export interface OrdersSummaryProps {
   patientUuid: string;
@@ -10,8 +10,8 @@ export interface OrdersSummaryProps {
 
 const OrdersSummary: React.FC<OrdersSummaryProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const ordersDisplayText = t('orders', 'Orders');
   const { showPrintButton } = useConfig<ConfigObject>();
+  const ordersDisplayText = t('orders', 'Orders');
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>

@@ -11,7 +11,6 @@ const mockExtensionSlot = ExtensionSlot as jest.Mock;
 const mockGetConfig = jest.mocked(getConfig);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
-const mockMutateVisits = jest.fn();
 
 describe('VisitSummary', () => {
   beforeEach(() => {
@@ -27,7 +26,7 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} mutateVisit={mockMutateVisits} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
@@ -60,7 +59,7 @@ describe('VisitSummary', () => {
   it('renders diagnoses tags when there are diagnoses', () => {
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} mutateVisit={mockMutateVisits} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     const malariaTag = screen.getByText(/^malaria, confirmed$/i);
     const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
@@ -75,7 +74,7 @@ describe('VisitSummary', () => {
 
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} mutateVisit={mockMutateVisits} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();

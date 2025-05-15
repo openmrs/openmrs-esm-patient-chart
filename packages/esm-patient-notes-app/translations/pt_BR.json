@@ -12,6 +12,7 @@
   "enterSecondaryDiagnoses": "Digite os diagnósticos secundários",
   "error": "Erro",
   "errorFetchingConcepts": "Houve um problema ao buscar conceitos",
+  "errorTransformingDiagnoses": "Error transforming diagnoses",
   "image": "Imagem",
   "imageRemoved": "Imagem removida",
   "imageUploadHelperText": "Faça upload de uma imagem ou use a câmera deste dispositivo para capturar uma imagem",

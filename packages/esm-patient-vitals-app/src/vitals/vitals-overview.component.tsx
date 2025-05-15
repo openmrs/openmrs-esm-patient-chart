@@ -15,14 +15,13 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
-import { useLaunchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsAndBiometrics, useVitalsConceptMetadata, withUnit } from '../common';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
+import { useLaunchVitalsAndBiometricsForm } from '../utils';
+import { useVitalsAndBiometrics, useConceptUnits, withUnit } from '../common';
 import PaginatedVitals from './paginated-vitals.component';
 import PrintComponent from './print/print.component';
 import VitalsChart from './vitals-chart.component';
 import styles from './vitals-overview.scss';
-import { useEncounterVitalsAndBiometrics } from '../common/data.resource';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -44,10 +43,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { conceptUnits } = useConceptUnits();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
-  useEncounterVitalsAndBiometrics('771bbc44-8d45-4ac3-af6e-059814dd7cde');
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
@@ -89,7 +87,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
       key: 'temperatureRender',
       header: withUnit(t('temperatureAbbreviated', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
       isSortable: true,
-
       sortFunc: (valueA, valueB) =>
         valueA.temperature && valueB.temperature ? valueA.temperature - valueB.temperature : 0,
     },
@@ -100,7 +97,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
         conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '',
       ),
       isSortable: true,
-
       sortFunc: (valueA, valueB) =>
         valueA.systolic && valueB.systolic && valueA.diastolic && valueB.diastolic
           ? valueA.systolic !== valueB.systolic
@@ -112,7 +108,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
       key: 'pulseRender',
       header: withUnit(t('pulse', 'Pulse'), conceptUnits.get(config.concepts.pulseUuid) ?? ''),
       isSortable: true,
-
       sortFunc: (valueA, valueB) => (valueA.pulse && valueB.pulse ? valueA.pulse - valueB.pulse : 0),
     },
     {
@@ -122,7 +117,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
         conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '',
       ),
       isSortable: true,
-
       sortFunc: (valueA, valueB) =>
         valueA.respiratoryRate && valueB.respiratoryRate ? valueA.respiratoryRate - valueB.respiratoryRate : 0,
     },
@@ -130,7 +124,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
       key: 'spo2Render',
       header: withUnit(t('spo2', 'SpO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
       isSortable: true,
-
       sortFunc: (valueA, valueB) => (valueA.spo2 && valueB.spo2 ? valueA.spo2 - valueB.spo2 : 0),
     },
   ];
@@ -142,10 +135,15 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
           ...vitalSigns,
           dateRender: formatDate(parseDate(vitalSigns.date.toString()), { mode: 'wide', time: true }),
           bloodPressureRender: `${vitalSigns.systolic ?? '--'} / ${vitalSigns.diastolic ?? '--'}`,
+          bloodPressureRenderInterpretation: vitalSigns.bloodPressureRenderInterpretation,
           pulseRender: vitalSigns.pulse ?? '--',
+          pulseRenderInterpretation: vitalSigns.pulseRenderInterpretation,
           spo2Render: vitalSigns.spo2 ?? '--',
+          spo2RenderInterpretation: vitalSigns.spo2RenderInterpretation,
           temperatureRender: vitalSigns.temperature ?? '--',
+          temperatureRenderInterpretation: vitalSigns.temperatureRenderInterpretation,
           respiratoryRateRender: vitalSigns.respiratoryRate ?? '--',
+          respiratoryRateRenderInterpretation: vitalSigns.respiratoryRateRenderInterpretation,
         };
       }),
     [vitals],
@@ -178,8 +176,14 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   return (
     <>
       {(() => {
-        if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+        if (isLoading) {
+          return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+        }
+
+        if (error) {
+          return <ErrorState error={error} headerTitle={headerTitle} />;
+        }
+
         if (vitals?.length) {
           return (
             <div className={styles.widgetCard}>
@@ -232,11 +236,11 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                   <PrintComponent subheader={headerTitle} patientDetails={patientDetails} />
                   <PaginatedVitals
                     isPrinting={isPrinting}
-                    tableRows={tableRows}
                     pageSize={pageSize}
-                    urlLabel={urlLabel}
                     pageUrl={pageUrl}
                     tableHeaders={tableHeaders}
+                    tableRows={tableRows}
+                    urlLabel={urlLabel}
                   />
                 </div>
               )}

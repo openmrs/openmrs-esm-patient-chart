@@ -8,3 +8,9 @@
 .hiddenRow {
   display: none;
 }
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}

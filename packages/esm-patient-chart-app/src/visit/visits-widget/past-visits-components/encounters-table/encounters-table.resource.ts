@@ -1,13 +1,14 @@
 import {
-  type Encounter,
-  type EncounterType,
   formatDatetime,
   makeUrl,
-  type Obs,
   openmrsFetch,
-  type OpenmrsResource,
   parseDate,
   restBaseUrl,
+  type Diagnosis,
+  type Encounter,
+  type EncounterType,
+  type Obs,
+  type OpenmrsResource,
   useOpenmrsFetchAll,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
@@ -20,13 +21,29 @@ export interface EncountersTableProps {
   isLoading: boolean;
   onEncountersUpdated(): void;
   showVisitType: boolean;
-  paginated: boolean;
   paginatedEncounters: Array<Encounter>;
   showEncounterTypeFilter: boolean;
   encounterTypeToFilter?: EncounterType;
   setEncounterTypeToFilter?: React.Dispatch<React.SetStateAction<EncounterType>>;
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export interface MappedEncounter {
+  datetime: string;
+  diagnoses: Array<Diagnosis>;
+  editPrivilege: string;
+  encounterType: string;
+  form: OpenmrsResource;
+  formName: string;
+  id: string;
+  obs: Array<Obs>;
+  provider: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
+  visitType: string;
+  visitTypeUuid?: string;
+  visitUuid: string;
 }
 
 export function deleteEncounter(encounterUuid: string, abortController: AbortController) {
@@ -37,7 +54,7 @@ export function deleteEncounter(encounterUuid: string, abortController: AbortCon
 }
 
 export function usePaginatedEncounters(patientUuid: string, encounterType: string, pageSize: number) {
-  const customRep = `custom:(uuid,display,encounterDatetime,form,encounterType,visit,patient,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterProviders:(provider:(person)))`;
+  const customRep = `custom:(uuid,display,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),encounterDatetime,form,encounterType,visit,patient,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterProviders:(provider:(person)))`;
   const url = new URL(makeUrl(`${restBaseUrl}/encounter`), window.location.toString());
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);
@@ -55,34 +72,27 @@ export function useEncounterTypes() {
 export function mapEncounter(encounter: Encounter): MappedEncounter {
   return {
     id: encounter.uuid,
-    datetime: formatDatetime(parseDate(encounter.encounterDatetime)),
+    datetime: formatDatetime(parseDate(encounter.encounterDatetime), {
+      noToday: true,
+    }),
+    diagnoses:
+      encounter.diagnoses
+        ?.filter((diagnosis) => !diagnosis.voided)
+        .map((diagnosis) => ({
+          ...diagnosis,
+          certainty: diagnosis.certainty || 'PROVISIONAL',
+        })) || [],
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
     form: encounter.form,
     formName: encounter.form?.display ?? '--',
     obs: encounter.obs,
-    visitUuid: encounter.visit?.uuid,
-    visitType: encounter.visit?.visitType?.display,
-    visitTypeUuid: encounter.visit?.visitType?.uuid,
-    visitStartDatetime: encounter.visit?.startDatetime,
-    visitStopDatetime: encounter.visit?.stopDatetime,
     provider:
       encounter.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
+    visitStartDatetime: encounter.visit?.startDatetime,
+    visitStopDatetime: encounter.visit?.stopDatetime,
+    visitType: encounter.visit?.visitType?.display,
+    visitTypeUuid: encounter.visit?.visitType?.uuid,
+    visitUuid: encounter.visit?.uuid,
   };
-}
-
-export interface MappedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  editPrivilege: string;
-  form: OpenmrsResource;
-  formName: string;
-  obs: Array<Obs>;
-  provider: string;
-  visitUuid: string;
-  visitType: string;
-  visitTypeUuid?: string;
-  visitStartDatetime?: string;
-  visitStopDatetime?: string;
 }

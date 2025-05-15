@@ -107,6 +107,7 @@ export interface FilterContextProps extends ReducerState {
   activeTests: string[];
   someChecked: boolean;
   totalResultsCount: number;
+  isLoading: boolean;
   initialize: (trees: Array<TreeNode>) => void;
   toggleVal: (name: string) => void;
   updateParent: (name: string) => void;

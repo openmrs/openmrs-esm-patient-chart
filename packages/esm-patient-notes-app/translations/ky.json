@@ -12,6 +12,7 @@
   "enterSecondaryDiagnoses": "Enter Secondary diagnoses",
   "error": "Error",
   "errorFetchingConcepts": "There was a problem fetching concepts",
+  "errorTransformingDiagnoses": "Error transforming diagnoses",
   "image": "Image",
   "imageRemoved": "Image removed",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",

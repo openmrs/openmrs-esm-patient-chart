@@ -22,3 +22,9 @@
 .immunizationMore p {
   margin: 0;
 }
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}

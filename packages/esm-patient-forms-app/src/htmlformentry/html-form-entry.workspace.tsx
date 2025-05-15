@@ -36,7 +36,11 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   if (encounterUuid) {
     searchParams.append('encounterId', encounterUuid);
   }
-  searchParams.append('definitionUiResource', htmlForm.formUiResource);
+  if (htmlForm.formUiResource) {
+    searchParams.append('definitionUiResource', htmlForm.formUiResource);
+  } else {
+    searchParams.append('formUuid', htmlForm.formUuid);
+  }
   searchParams.append('returnUrl', 'post-message:close-workspace');
 
   const showFormAndLoadedData = formInfo && patientUuid;

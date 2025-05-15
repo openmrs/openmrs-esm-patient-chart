@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { Button, TableToolbarContent, TableToolbar, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { ChartLine, Information, Table } from '@carbon/react/icons';
+import { Button, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { Information } from '@carbon/react/icons';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { type OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
@@ -10,54 +10,19 @@ import styles from './common-overview.scss';
 
 const DashboardResultsCount = 5;
 
-interface CommonOverviewPropsBase {
-  overviewData: Array<OverviewPanelEntry>;
-  insertSeparator?: boolean;
+interface CommonOverviewProps {
   patientUuid?: string;
+  overviewData: Array<OverviewPanelEntry>;
 }
 
-interface CommonOverviewPropsWithToolbar {
-  openTimeline: (panelUuid: string) => void;
-  openTrendline: (panelUuid: string, testUuid: string) => void;
-}
-
-interface CommonOverviewPropsWithoutToolbar {
-  hideToolbar: true;
-}
-
-type Only<T, U> = {
-  [P in keyof T]: T[P];
-} & {
-  [P in keyof Omit<U, keyof T>]?: never;
-};
-
-type Either<T, U> = Only<T, U> | Only<U, T>;
-
-type CommonOverviewProps = CommonOverviewPropsBase &
-  Either<CommonOverviewPropsWithToolbar, CommonOverviewPropsWithoutToolbar>;
-
-const CommonOverview: React.FC<CommonOverviewProps> = ({
-  overviewData = [],
-  openTimeline,
-  openTrendline,
-  insertSeparator = false,
-  hideToolbar = false,
-  patientUuid,
-}) => {
+const CommonOverview: React.FC<CommonOverviewProps> = ({ patientUuid, overviewData = [] }) => {
   const { t } = useTranslation();
-  const [activeCardUuid, setActiveCardUuid] = React.useState('');
 
   const headers = [
     { key: 'name', header: 'Test Name' },
     { key: 'value', header: 'Value' },
     { key: 'range', header: 'Reference Range' },
   ];
-
-  const isActiveCard = useCallback(
-    (uuid: string) =>
-      activeCardUuid === uuid || (!activeCardUuid && uuid === overviewData[0][overviewData[0].length - 1]),
-    [activeCardUuid, overviewData],
-  );
 
   const handleSeeAvailableResults = useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results` });
@@ -72,16 +37,13 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
     <>
       {(() => {
         const cards = overviewData.map(([title, type, data, effectiveDateTime, issuedDateTime, uuid]) => (
-          <article
-            key={uuid}
-            className={insertSeparator ? '' : `${styles.card} ${isActiveCard(uuid) ? styles.activeCard : ''}`}
-          >
+          <article key={uuid}>
             <CommonDataTable
               {...{
                 title,
                 data,
                 description: (
-                  <div className={insertSeparator ? '' : styles.cardHeader}>
+                  <div>
                     <div className={styles.meta}>
                       {formatDatetime(effectiveDateTime, { mode: 'wide' })}
                       <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />
@@ -89,37 +51,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                   </div>
                 ),
                 tableHeaders: headers,
-                toolbar: hideToolbar || (
-                  <TableToolbar>
-                    <TableToolbarContent>
-                      {type === 'Test' && (
-                        <Button
-                          kind="ghost"
-                          renderIcon={(props) => <ChartLine size={16} {...props} />}
-                          onClick={() => {
-                            setActiveCardUuid(uuid);
-                            openTrendline(uuid, uuid);
-                          }}
-                        >
-                          {t('trend', 'Trend')}
-                        </Button>
-                      )}
-                      <Button
-                        kind="ghost"
-                        renderIcon={(props) => <Table size={16} {...props} />}
-                        onClick={() => {
-                          setActiveCardUuid(uuid);
-                          openTimeline(uuid);
-                        }}
-                      >
-                        {t('timeline', 'Timeline')}
-                      </Button>
-                    </TableToolbarContent>
-                  </TableToolbar>
-                ),
               }}
             />
-            {data.length > DashboardResultsCount && insertSeparator && (
+            {data.length > DashboardResultsCount && (
               <Button onClick={handleSeeAvailableResults} kind="ghost">
                 {t('moreResultsAvailable', 'More results available')}
               </Button>
@@ -127,18 +61,15 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
           </article>
         ));
 
-        if (insertSeparator)
-          return cards.reduce((acc, val, i, { length }) => {
-            acc.push(val);
+        return cards.reduce((acc, val, i, { length }) => {
+          acc.push(val);
 
-            if (i < length - 1) {
-              acc.push(<Separator key={i} />);
-            }
+          if (i < length - 1) {
+            acc.push(<Separator key={i} />);
+          }
 
-            return acc;
-          }, []);
-
-        return cards;
+          return acc;
+        }, []);
       })()}
     </>
   );
@@ -157,12 +88,12 @@ const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
         <div className={styles.tooltip}>
           <p>{t('dateCollected', 'Displaying date collected')}</p>
           <p>
-            <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
-            {formatDatetime(issuedDateTime, { mode: 'wide' })}
-          </p>
-          <p>
             <span className={styles.label}>{t('ordered', 'Ordered')}: </span>{' '}
             {formatDatetime(effectiveDateTime, { mode: 'wide' })}
+          </p>
+          <p>
+            <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
+            {formatDatetime(issuedDateTime, { mode: 'wide' })}
           </p>
         </div>
       </ToggletipContent>

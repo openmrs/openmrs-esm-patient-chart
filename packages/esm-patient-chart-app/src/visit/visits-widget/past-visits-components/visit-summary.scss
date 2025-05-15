@@ -21,7 +21,7 @@
   background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
-  padding: layout.$spacing-05 0;
+  padding: layout.$spacing-05;
 
   :global(.cds--tabs) {
     min-height: 8rem;
@@ -74,7 +74,6 @@
   :global(.cds--tab--list) {
     flex-direction: column;
     max-height: fit-content;
-    overflow-x: visible;
   }
 
   > button :global(.cds--tabs .cds--tabs__nav-link) {

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { mockConceptMetadata, mockConceptRanges, mockConceptUnits, mockVitalsConfig } from '__mocks__';
+import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
 
@@ -40,16 +40,17 @@ jest.mock('../common', () => ({
   invalidateCachedVitalsAndBiometrics: jest.fn(),
   createOrUpdateVitalsAndBiometrics: jest.fn(),
   useVitalsAndBiometrics: jest.fn(),
-  useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-    data: mockConceptUnits,
-    conceptMetadata: mockConceptMetadata,
-    conceptRanges: mockConceptRanges,
+  useConceptUnits: jest.fn().mockImplementation(() => ({
+    conceptUnits: mockConceptUnits,
+    error: null,
+    isLoading: false,
   })),
   useEncounterVitalsAndBiometrics: jest.fn().mockImplementation(() => ({
     isLoading: false,
     vitalsAndBiometrics: null,
     mutate: jest.fn(),
   })),
+  useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
 }));
 
 mockUseConfig.mockReturnValue({
@@ -398,33 +399,5 @@ describe('VitalsBiometricsForm', () => {
       subtitle: 'Some of the values entered are invalid',
       title: 'Error saving Vitals and Biometrics',
     });
-  });
-
-  it('Display an inline error notification on submit if value of vitals entered is invalid', async () => {
-    const user = userEvent.setup();
-
-    render(<VitalsAndBiometricsForm {...testProps} />);
-
-    const systolic = screen.getByRole('spinbutton', { name: /systolic/i });
-    const pulse = screen.getByRole('spinbutton', { name: /pulse/i });
-    const oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
-    const temperature = screen.getByRole('spinbutton', { name: /temperature/i });
-
-    await user.type(systolic, '1000');
-    await user.type(pulse, pulseValue.toString());
-    await user.type(oxygenSaturation, '200');
-    await user.type(temperature, temperatureValue.toString());
-
-    const saveButton = screen.getByRole('button', { name: /save and close/i });
-    await user.click(saveButton);
-
-    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
-
-    // close the inline notification --> resubmit --> check for presence of inline notification
-    const closeInlineNotificationButton = screen.getByTitle(/close notification/i);
-    await user.click(closeInlineNotificationButton);
-    expect(screen.queryByText(/some of the values entered are invalid/i)).not.toBeInTheDocument();
-    await user.click(saveButton);
-    expect(screen.getByText(/Some of the values entered are invalid/i)).toBeInTheDocument();
   });
 });

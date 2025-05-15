@@ -1,3 +1,11 @@
+import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { capitalize, lowerCase } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import utc from 'dayjs/plugin/utc';
 import {
   Button,
   DataTable,
@@ -30,6 +38,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
+  parseDate,
   PrinterIcon,
   useConfig,
   useLayoutType,
@@ -50,16 +59,16 @@ import {
   useOrderTypes,
   usePatientOrders,
 } from '@openmrs/esm-patient-common-lib';
-import { capitalize, lowerCase } from 'lodash-es';
-import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
-import PrintComponent from '../print/print.component';
-import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import GeneralOrderTable from './general-order-table.component';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
-import styles from './order-details-table.scss';
+import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
+import styles from './order-details-table.scss';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(utc);
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -204,7 +213,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         id: order.uuid,
         dateActivated: order.dateActivated,
         orderNumber: order.orderNumber,
-        dateOfOrder: <div className={styles.singleLineText}>{formatDate(new Date(order.dateActivated))}</div>,
+        dateOfOrder: <div className={styles.singleLineText}>{formatDate(parseDate(order.dateActivated))}</div>,
         orderType: capitalize(order.orderType?.display ?? '-'),
         dosage:
           order.type === 'drugorder' ? (
@@ -320,17 +329,20 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
   const handleDateFilterChange = ([startDate, endDate]) => {
     if (startDate) {
-      const isoStartDate = startDate.toISOString();
-      setSelectedFromDate(isoStartDate);
-      if (selectedToDate && selectedToDate < startDate) {
-        setSelectedToDate(isoStartDate);
+      const start = dayjs(startDate).startOf('day').toISOString();
+      setSelectedFromDate(start);
+
+      if (selectedToDate && dayjs(selectedToDate).isBefore(startDate)) {
+        setSelectedToDate(start);
       }
     }
+
     if (endDate) {
-      const isoEndDate = endDate.toISOString();
-      setSelectedToDate(isoEndDate);
-      if (selectedFromDate && selectedFromDate > endDate) {
-        setSelectedFromDate(isoEndDate);
+      const end = dayjs(endDate).endOf('day').toISOString();
+      setSelectedToDate(end);
+
+      if (selectedFromDate && dayjs(selectedFromDate).isAfter(endDate)) {
+        setSelectedFromDate(end);
       }
     }
   };
@@ -438,6 +450,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           kind="ghost"
                           renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
+                          PrintComponent
                           onClick={launchOrderBasket}
                         >
                           {t('add', 'Add')}

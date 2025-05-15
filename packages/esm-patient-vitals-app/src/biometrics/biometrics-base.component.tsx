@@ -5,7 +5,7 @@ import { Add, Analytics, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
-import { useVitalsConceptMetadata, useVitalsAndBiometrics, withUnit } from '../common';
+import { useConceptUnits, useVitalsAndBiometrics, withUnit } from '../common';
 import { type ConfigObject } from '../config-schema';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import BiometricsChart from './biometrics-chart.component';
@@ -29,7 +29,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const config = useConfig<ConfigObject>();
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { conceptUnits } = useConceptUnits();
   const launchBiometricsForm = useLaunchVitalsAndBiometricsForm();
 
   const tableHeaders: Array<BiometricsTableHeader> = [

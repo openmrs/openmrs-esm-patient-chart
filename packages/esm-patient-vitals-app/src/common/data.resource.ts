@@ -12,7 +12,13 @@ import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
 import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
-import type { FHIRSearchBundleResponse, MappedVitals, PatientVitalsAndBiometrics, VitalsResponse } from './types';
+import type {
+  FHIRObservationResource,
+  FHIRSearchBundleResponse,
+  MappedVitals,
+  PatientVitalsAndBiometrics,
+  VitalsResponse,
+} from './types';
 
 const pageSize = 100;
 
@@ -20,6 +26,18 @@ const pageSize = 100;
 const swrKeyNeedle = Symbol('vitalsAndBiometrics');
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
+
+type ConceptRange = {
+  display: string;
+  hiAbsolute: number | null;
+  hiCritical: number | null;
+  hiNormal: number | null;
+  lowAbsolute: number | null;
+  lowCritical: number | null;
+  lowNormal: number | null;
+  units: string | null;
+  uuid: string;
+};
 
 type VitalsAndBiometricsMode = 'vitals' | 'biometrics' | 'both';
 
@@ -63,12 +81,66 @@ function getInterpretationKey(header: string) {
   return `${header}RenderInterpretation`;
 }
 
-export function useVitalsConceptMetadata() {
+export function useVitalsConceptMetadata(patientUuid: string) {
+  const {
+    concepts: {
+      diastolicBloodPressureUuid,
+      oxygenSaturationUuid,
+      pulseUuid,
+      respiratoryRateUuid,
+      systolicBloodPressureUuid,
+      temperatureUuid,
+    },
+  } = useConfig<ConfigObject>();
+
+  const apiUrl = `${restBaseUrl}/conceptreferencerange/?patient=${patientUuid}&concept=${systolicBloodPressureUuid},${diastolicBloodPressureUuid},${pulseUuid},${temperatureUuid},${oxygenSaturationUuid},${respiratoryRateUuid}&v=full`;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: any }, Error>(patientUuid ? apiUrl : null, openmrsFetch);
+
+  const conceptMetadata = data?.data?.results;
+
+  const conceptUnits = conceptMetadata?.length
+    ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
+    : new Map<string, string>([]);
+
+  const conceptRanges = useMemo(
+    () =>
+      conceptMetadata?.length
+        ? conceptMetadata.map((concept) => ({
+            uuid: concept.concept,
+            display: concept.display,
+            hiNormal: concept.hiNormal ?? null,
+            hiAbsolute: concept.hiAbsolute ?? null,
+            hiCritical: concept.hiCritical ?? null,
+            lowNormal: concept.lowNormal ?? null,
+            lowAbsolute: concept.lowAbsolute ?? null,
+            lowCritical: concept.lowCritical ?? null,
+            units: concept.units ?? null,
+          }))
+        : [],
+    [conceptMetadata],
+  );
+
+  const conceptRangeMap = useMemo(
+    () => new Map<string, ConceptRange>(conceptRanges.map((range) => [range.uuid, range])),
+    [conceptRanges],
+  );
+
+  return {
+    data: conceptUnits,
+    error,
+    isLoading,
+    conceptMetadata,
+    conceptRanges,
+    conceptRangeMap,
+  };
+}
+
+export function useConceptUnits() {
   const { concepts } = useConfig<ConfigObject>();
   const vitalSignsConceptSetUuid = concepts.vitalSignsConceptSetUuid;
 
-  const customRepresentation =
-    'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
+  const customRepresentation = 'custom:(setMembers:(uuid,display,units))';
 
   const apiUrl = `${restBaseUrl}/concept/${vitalSignsConceptSetUuid}?v=${customRepresentation}`;
 
@@ -83,24 +155,10 @@ export function useVitalsConceptMetadata() {
     ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
     : new Map<string, string>([]);
 
-  const conceptRanges = conceptMetadata?.length
-    ? new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
-        conceptMetadata.map((concept) => [
-          concept.uuid,
-          {
-            lowAbsolute: concept.lowAbsolute ?? null,
-            highAbsolute: concept.hiAbsolute ?? null,
-          },
-        ]),
-      )
-    : new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>([]);
-
   return {
-    data: conceptUnits,
+    conceptUnits,
     error,
     isLoading,
-    conceptMetadata,
-    conceptRanges,
   };
 }
 
@@ -153,9 +211,9 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
  * @returns An SWR-like structure that includes the cleaned-up vitals
  */
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
-  const { conceptMetadata } = useVitalsConceptMetadata();
-  const { concepts } = useConfig<ConfigObject>();
   const conceptUuids = useVitalsOrBiometricsConcepts(mode);
+  const { concepts } = useConfig<ConfigObject>();
+  const { conceptRanges } = useVitalsConceptMetadata(patientUuid);
 
   const getPage = useCallback(
     (page: number, prevPageData: FHIRSearchBundleResponse): VitalsAndBiometricsSwrKey => ({
@@ -225,7 +283,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     const vitalsHashTable = data?.[0]?.data?.entry
       ?.map((entry) => entry.resource)
       .filter(Boolean)
-      .map(vitalsProperties(conceptMetadata))
+      .map(mapVitalsAndBiometrics)
       ?.reduce((vitalsHashTable, vitalSign) => {
         const encounterId = vitalSign.encounterId;
         if (vitalsHashTable.has(encounterId) && vitalsHashTable.get(encounterId)) {
@@ -245,7 +303,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
         }
-
         return vitalsHashTable;
       }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
 
@@ -265,13 +322,29 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalSigns.systolic,
           vitalSigns.diastolic,
           concepts,
-          conceptMetadata,
+          conceptRanges,
+        );
+        result.pulseRenderInterpretation = assessValue(
+          vitalSigns.pulse,
+          getReferenceRangesForConcept(concepts.pulseUuid, conceptRanges),
+        );
+        result.temperatureRenderInterpretation = assessValue(
+          vitalSigns.temperature,
+          getReferenceRangesForConcept(concepts.temperatureUuid, conceptRanges),
+        );
+        result.spo2RenderInterpretation = assessValue(
+          vitalSigns.spo2,
+          getReferenceRangesForConcept(concepts.oxygenSaturationUuid, conceptRanges),
+        );
+        result.respiratoryRateRenderInterpretation = assessValue(
+          vitalSigns.respiratoryRate,
+          getReferenceRangesForConcept(concepts.respiratoryRateUuid, conceptRanges),
         );
       }
 
       return result;
     });
-  }, [data, conceptMetadata, getVitalsMapKey, concepts, mode]);
+  }, [conceptRanges, concepts, data, getVitalsMapKey, mode]);
 
   return {
     data: data ? formattedObs : undefined,
@@ -365,17 +438,44 @@ function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAn
  * Mapper that converts a FHIR Observation resource into a MappedVitals object.
  * @internal
  */
-function vitalsProperties(conceptMetadata: Array<ConceptMetadata> | undefined) {
-  return (resource: FHIRResource['resource']): MappedVitals => ({
+function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals {
+  const referenceRanges = {
+    uuid: resource?.code?.coding?.[0]?.code,
+    display: resource?.code?.text,
+    hiNormal: null,
+    hiAbsolute: null,
+    hiCritical: null,
+    lowNormal: null,
+    lowAbsolute: null,
+    lowCritical: null,
+    units: resource.valueQuantity?.unit ?? null,
+  };
+
+  resource?.referenceRange?.forEach((range) => {
+    const rangeType = range.type?.coding?.[0]?.code;
+    const rangeSystem = range.type?.coding?.[0]?.system;
+
+    if (rangeSystem === 'http://terminology.hl7.org/CodeSystem/referencerange-meaning') {
+      if (rangeType === 'normal') {
+        referenceRanges.hiNormal = range.high?.value ?? null;
+        referenceRanges.lowNormal = range.low?.value ?? null;
+      } else if (rangeType === 'treatment') {
+        referenceRanges.hiCritical = range.high?.value ?? null;
+        referenceRanges.lowCritical = range.low?.value ?? null;
+      }
+    } else if (rangeSystem === 'http://fhir.openmrs.org/ext/obs/reference-range' && rangeType === 'absolute') {
+      referenceRanges.hiAbsolute = range.high?.value ?? null;
+      referenceRanges.lowAbsolute = range.low?.value ?? null;
+    }
+  });
+
+  return {
     code: resource?.code?.coding?.[0]?.code,
-    interpretation: assessValue(
-      resource?.valueQuantity?.value,
-      getReferenceRangesForConcept(resource?.code?.coding?.[0]?.code, conceptMetadata),
-    ),
+    encounterId: extractEncounterUuid(resource.encounter),
+    interpretation: assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
-    encounterId: extractEncounterUuid(resource.encounter),
-  });
+  };
 }
 
 export function createOrUpdateVitalsAndBiometrics(

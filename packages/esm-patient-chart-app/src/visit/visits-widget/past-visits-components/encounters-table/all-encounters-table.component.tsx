@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import EncountersTable from './encounters-table.component';
-import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
 import { type EncounterType } from '@openmrs/esm-framework';
+import { type EncountersTableProps, usePaginatedEncounters } from './encounters-table.resource';
+import EncountersTable from './encounters-table.component';
 
 interface AllEncountersTableProps {
   patientUuid: string;
@@ -21,24 +21,22 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     totalCount,
     goTo,
     mutate: mutateEncounters,
-    paginated,
   } = usePaginatedEncounters(patientUuid, encounterTypeToFilter?.uuid, pageSize);
 
   const encountersTableProps: EncountersTableProps = {
-    patientUuid,
-    totalCount,
     currentPage,
+    encounterTypeToFilter,
     goTo,
     isLoading,
     onEncountersUpdated: mutateEncounters,
-    showVisitType: true,
-    paginated,
-    paginatedEncounters,
-    encounterTypeToFilter,
-    setEncounterTypeToFilter,
-    showEncounterTypeFilter: true,
     pageSize,
+    paginatedEncounters,
+    patientUuid,
+    setEncounterTypeToFilter,
     setPageSize,
+    showEncounterTypeFilter: true,
+    showVisitType: true,
+    totalCount,
   };
 
   return <EncountersTable {...encountersTableProps} />;

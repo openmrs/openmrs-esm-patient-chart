@@ -14,10 +14,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 8000;
   background-color: $ui-02;
   overflow: hidden;
-  padding-top: layout.$spacing-09;
+  padding-top: var(--omrs-navbar-height);
   display: grid;
   grid-template-rows: 1fr auto;
 }
@@ -37,7 +37,6 @@
 }
 
 .overlayContent {
-  padding: layout.$spacing-05;
   overflow-y: auto;
 }
 

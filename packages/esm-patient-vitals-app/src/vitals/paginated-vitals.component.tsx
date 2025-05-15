@@ -34,7 +34,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
-  const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
+  const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
     switch (interpretation) {
       case 'critically_high':
         return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;

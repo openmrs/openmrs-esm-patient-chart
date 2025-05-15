@@ -635,144 +635,6 @@ export const mockBiometricsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/6448739f-59dd-4af8-94d4-d524a99f1297',
-      resource: {
-        resourceType: 'Observation',
-        id: '6448739f-59dd-4af8-94d4-d524a99f1297',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>6448739f-59dd-4af8-94d4-d524a99f1297</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Weight (kg) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/db1c2b8b-de5a-44fb-987b-68e5ba9bf8dd">Encounter/db1c2b8b-de5a-44fb-987b-68e5ba9bf8dd</a></td></tr><tr><td>Effective:</td><td> 11 February 2021 07:10:15 </td></tr><tr><td>Issued:</td><td>11/02/2021 06:41:16 PM</td></tr><tr><td>Value:</td><td>75.0 kg </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>0.0 </td><td>250.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Weight (kg)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '3141-9',
-              display: 'Weight (kg)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/db1c2b8b-de5a-44fb-987b-68e5ba9bf8dd',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-02-11T07:10:15+00:00',
-        issued: '2021-02-11T18:41:16.000+00:00',
-        valueQuantity: {
-          value: 75,
-          unit: 'kg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/c71ad411-9c41-40fc-a4dc-ecbee9200a72',
-      resource: {
-        resourceType: 'Observation',
-        id: 'c71ad411-9c41-40fc-a4dc-ecbee9200a72',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>c71ad411-9c41-40fc-a4dc-ecbee9200a72</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Weight (kg) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/b4399c30-73c1-48a6-abed-520912ffbd96">Encounter/b4399c30-73c1-48a6-abed-520912ffbd96</a></td></tr><tr><td>Effective:</td><td> 17 February 2021 21:10:04 </td></tr><tr><td>Issued:</td><td>17/02/2021 09:10:04 PM</td></tr><tr><td>Value:</td><td>10.0 kg </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>0.0 </td><td>250.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Weight (kg)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '3141-9',
-              display: 'Weight (kg)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/b4399c30-73c1-48a6-abed-520912ffbd96',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-02-17T21:10:04+00:00',
-        issued: '2021-02-17T21:10:04.000+00:00',
-        valueQuantity: {
-          value: 10,
-          unit: 'kg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/6fafa681-632c-4151-8f0f-0abc59a75afa',
       resource: {
         resourceType: 'Observation',
@@ -1256,75 +1118,6 @@ export const mockBiometricsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/e55de98d-b689-4e44-86bb-6f5e1e53476e',
-      resource: {
-        resourceType: 'Observation',
-        id: 'e55de98d-b689-4e44-86bb-6f5e1e53476e',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>e55de98d-b689-4e44-86bb-6f5e1e53476e</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Weight (kg) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/838c9b30-9671-4af9-bf3e-b3a6ed6ab5ef">Encounter/838c9b30-9671-4af9-bf3e-b3a6ed6ab5ef</a></td></tr><tr><td>Effective:</td><td> 23 March 2021 06:39:19 </td></tr><tr><td>Issued:</td><td>23/03/2021 06:39:19 AM</td></tr><tr><td>Value:</td><td>99.0 kg </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>0.0 </td><td>250.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Weight (kg)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '3141-9',
-              display: 'Weight (kg)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/838c9b30-9671-4af9-bf3e-b3a6ed6ab5ef',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-03-23T06:39:19+00:00',
-        issued: '2021-03-23T06:39:19.000+00:00',
-        valueQuantity: {
-          value: 99,
-          unit: 'kg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/5a3c78a7-6e20-429c-8621-59fe20884004',
       resource: {
         resourceType: 'Observation',
@@ -1371,75 +1164,6 @@ export const mockBiometricsResponse = {
         issued: '2021-03-30T10:49:59.000+00:00',
         valueQuantity: {
           value: 87,
-          unit: 'kg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/46f73822-f7a7-4bea-9241-5354598128e2',
-      resource: {
-        resourceType: 'Observation',
-        id: '46f73822-f7a7-4bea-9241-5354598128e2',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>46f73822-f7a7-4bea-9241-5354598128e2</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Weight (kg) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20">Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20</a></td></tr><tr><td>Effective:</td><td> 08 April 2021 14:44:24 </td></tr><tr><td>Issued:</td><td>08/04/2021 02:44:24 PM</td></tr><tr><td>Value:</td><td>67.0 kg </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>0.0 </td><td>250.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Weight (kg)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '3141-9',
-              display: 'Weight (kg)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-04-08T14:44:24+00:00',
-        issued: '2021-04-08T14:44:24.000+00:00',
-        valueQuantity: {
-          value: 67,
           unit: 'kg',
         },
         referenceRange: [
@@ -2015,75 +1739,6 @@ export const mockBiometricsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/fd9448a7-9c6c-486c-80db-be2cfc9a75bc',
-      resource: {
-        resourceType: 'Observation',
-        id: 'fd9448a7-9c6c-486c-80db-be2cfc9a75bc',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>fd9448a7-9c6c-486c-80db-be2cfc9a75bc</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Height (cm) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/6f25a7db-63b0-46bc-9b97-0fd1b6204a06">Encounter/6f25a7db-63b0-46bc-9b97-0fd1b6204a06</a></td></tr><tr><td>Effective:</td><td> 09 December 2020 13:25:28 </td></tr><tr><td>Issued:</td><td>09/12/2020 01:25:29 PM</td></tr><tr><td>Value:</td><td>199.0 cm </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>10.0 </td><td>272.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/6f25a7db-63b0-46bc-9b97-0fd1b6204a06',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2020-12-09T13:25:28+00:00',
-        issued: '2020-12-09T13:25:29.000+00:00',
-        valueQuantity: {
-          value: 199,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/6480ade6-ea10-4e57-af15-113a40cf7df7',
       resource: {
         resourceType: 'Observation',
@@ -2498,75 +2153,6 @@ export const mockBiometricsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/655e71e0-f569-4157-95e8-961017eed1f6',
-      resource: {
-        resourceType: 'Observation',
-        id: '655e71e0-f569-4157-95e8-961017eed1f6',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>655e71e0-f569-4157-95e8-961017eed1f6</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Height (cm) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/000df441-1367-4e3d-ae67-b0c852cc2654">Encounter/000df441-1367-4e3d-ae67-b0c852cc2654</a></td></tr><tr><td>Effective:</td><td> 21 February 2021 11:00:44 </td></tr><tr><td>Issued:</td><td>21/02/2021 11:00:44 AM</td></tr><tr><td>Value:</td><td>185.0 cm </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>10.0 </td><td>272.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/000df441-1367-4e3d-ae67-b0c852cc2654',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-02-21T11:00:44+00:00',
-        issued: '2021-02-21T11:00:44.000+00:00',
-        valueQuantity: {
-          value: 185,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/d732275c-876a-4750-b525-b1521735971c',
       resource: {
         resourceType: 'Observation',
@@ -2682,75 +2268,6 @@ export const mockBiometricsResponse = {
         issued: '2021-03-10T13:44:04.000+00:00',
         valueQuantity: {
           value: 10,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/f8556923-f044-44a5-bb66-b20b7dff824e',
-      resource: {
-        resourceType: 'Observation',
-        id: 'f8556923-f044-44a5-bb66-b20b7dff824e',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>f8556923-f044-44a5-bb66-b20b7dff824e</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Height (cm) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/e00cbc9f-9bc8-4710-b824-b10f030bc344">Encounter/e00cbc9f-9bc8-4710-b824-b10f030bc344</a></td></tr><tr><td>Effective:</td><td> 13 March 2021 21:37:54 </td></tr><tr><td>Issued:</td><td>13/03/2021 09:37:54 PM</td></tr><tr><td>Value:</td><td>88.0 cm </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>10.0 </td><td>272.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/e00cbc9f-9bc8-4710-b824-b10f030bc344',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-03-13T21:37:54+00:00',
-        issued: '2021-03-13T21:37:54.000+00:00',
-        valueQuantity: {
-          value: 88,
           unit: 'cm',
         },
         referenceRange: [
@@ -3096,75 +2613,6 @@ export const mockBiometricsResponse = {
         issued: '2021-03-30T10:49:59.000+00:00',
         valueQuantity: {
           value: 185,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/9e396c1d-4396-47aa-85ab-fa1ea989a7fe',
-      resource: {
-        resourceType: 'Observation',
-        id: '9e396c1d-4396-47aa-85ab-fa1ea989a7fe',
-        text: {
-          status: 'generated',
-          div: '<div xmlns="http://www.w3.org/1999/xhtml"><table class="hapiPropertyTable"><tbody><tr><td>Id:</td><td>9e396c1d-4396-47aa-85ab-fa1ea989a7fe</td></tr><tr><td>Status:</td><td>FINAL</td></tr><tr><td>Category:</td><td> Exam </td></tr><tr><td>Code:</td><td> Height (cm) </td></tr><tr><td>Subject:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Patient/8673ee4f-e2ab-4077-ba55-4980f408773e">John Wilson (Old Identification Number: 100GEJ)</a></td></tr><tr><td>Encounter:</td><td><a href="http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20">Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20</a></td></tr><tr><td>Effective:</td><td> 08 April 2021 14:44:24 </td></tr><tr><td>Issued:</td><td>08/04/2021 02:44:24 PM</td></tr><tr><td>Value:</td><td>172.0 cm </td></tr><tr><td>Reference Ranges:</td><td><table class="subPropertyTable"><tbody><tr><th>-</th><th>Low</th><th>High</th><th>Type</th><th>Applies To</th><th>Age</th></tr><tr><td>1</td><td>10.0 </td><td>272.0 </td><td> absolute </td><td/><td> - </td></tr></tbody></table></td></tr></tbody></table></div>',
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-04-08T14:44:24+00:00',
-        issued: '2021-04-08T14:44:24.000+00:00',
-        valueQuantity: {
-          value: 172,
           unit: 'cm',
         },
         referenceRange: [
@@ -3599,20 +3047,6 @@ export const formattedBiometrics = [
   },
 ];
 
-export const mockConceptMetadata = [
-  {
-    uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Systolic',
-    hiNormal: 140,
-    hiAbsolute: 250,
-    hiCritical: 180,
-    lowNormal: 100,
-    lowAbsolute: 0,
-    lowCritical: 85,
-    units: 'mmHg',
-  },
-];
-
 export const mockVitalsData = [
   {
     id: 'e8a96dcc-5bb6-4975-be3b-214440e34fa4',
@@ -3904,7 +3338,7 @@ export const mockVitalsData = [
   },
 ];
 
-export const mockVitalSigns = mockVitalsData[0];
+export const mockVitalsSigns = mockVitalsData[0];
 
 export const mockVitalsSignsConcepts = {
   data: {
@@ -3913,102 +3347,102 @@ export const mockVitalsSignsConcepts = {
         setMembers: [
           {
             uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Systolic blood pressure',
-            hiNormal: 140,
-            hiAbsolute: 250.0,
-            hiCritical: 180,
-            lowNormal: 100,
+            display: 'Systolic Blood Pressure',
+            hiNormal: 120,
+            hiAbsolute: 250,
+            hiCritical: 250,
+            lowNormal: 90,
             lowAbsolute: 0,
-            lowCritical: 85,
+            lowCritical: 0,
             units: 'mmHg',
           },
           {
             uuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Diastolic blood pressure',
-            hiNormal: 90,
+            display: 'Diastolic Blood Pressure',
+            hiNormal: 80,
             hiAbsolute: 150,
-            hiCritical: 120,
-            lowNormal: 55,
+            hiCritical: 150,
+            lowNormal: 60,
             lowAbsolute: 0,
-            lowCritical: 40,
+            lowCritical: 0,
             units: 'mmHg',
-          },
-          {
-            uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Temperature (C)',
-            hiNormal: 37.5,
-            hiAbsolute: 43.0,
-            hiCritical: null,
-            lowNormal: 36.5,
-            lowAbsolute: 25.0,
-            lowCritical: null,
-            units: 'DEG C',
-          },
-          {
-            uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Height (cm)',
-            hiNormal: null,
-            hiAbsolute: 272.0,
-            hiCritical: null,
-            lowNormal: null,
-            lowAbsolute: 10.0,
-            lowCritical: null,
-            units: 'cm',
-          },
-          {
-            uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Weight (kg)',
-            hiNormal: null,
-            hiAbsolute: 250.0,
-            hiCritical: null,
-            lowNormal: null,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: 'kg',
           },
           {
             uuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
             display: 'Pulse',
             hiNormal: 100,
             hiAbsolute: 230,
-            hiCritical: 130,
-            lowNormal: 55,
+            hiCritical: 230,
+            lowNormal: 60,
             lowAbsolute: 0,
-            lowCritical: 49,
+            lowCritical: 0,
             units: 'beats/min',
           },
           {
-            uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Blood oxygen saturation',
-            hiNormal: 100,
-            hiAbsolute: 100.0,
-            hiCritical: null,
-            lowNormal: 95,
-            lowAbsolute: 0.0,
-            lowCritical: null,
-            units: '%',
+            uuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Temperature',
+            hiNormal: 37.5,
+            hiAbsolute: 43,
+            hiCritical: 43,
+            lowNormal: 35,
+            lowAbsolute: 25,
+            lowCritical: 25,
+            units: 'DEG C',
           },
           {
-            uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'MID-UPPER ARM CIRCUMFERENCE',
-            hiNormal: 25,
-            hiAbsolute: null,
-            hiCritical: null,
-            lowNormal: 23,
-            lowAbsolute: null,
-            lowCritical: null,
+            uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Weight',
+            hiNormal: 250,
+            hiAbsolute: 250,
+            hiCritical: 250,
+            lowNormal: 0,
+            lowAbsolute: 0,
+            lowCritical: 0,
+            units: 'kg',
+          },
+          {
+            uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Height',
+            hiNormal: 272,
+            hiAbsolute: 272,
+            hiCritical: 272,
+            lowNormal: 10,
+            lowAbsolute: 10,
+            lowCritical: 10,
             units: 'cm',
           },
           {
+            uuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Oxygen Saturation',
+            hiNormal: 100,
+            hiAbsolute: 100,
+            hiCritical: 100,
+            lowNormal: 95,
+            lowAbsolute: 0,
+            lowCritical: 0,
+            units: '%',
+          },
+          {
             uuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Respiratory rate',
-            hiNormal: 70.0,
-            hiAbsolute: 999.0,
-            hiCritical: 120.0,
-            lowNormal: null,
-            lowAbsolute: 0.0,
-            lowCritical: null,
+            display: 'Respiratory Rate',
+            hiNormal: 30,
+            hiAbsolute: 100,
+            hiCritical: 100,
+            lowNormal: 12,
+            lowAbsolute: 0,
+            lowCritical: 0,
             units: 'breaths/min',
+          },
+          {
+            uuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Mid-Upper Arm Circumference',
+            hiNormal: 50,
+            hiAbsolute: 50,
+            hiCritical: 50,
+            lowNormal: 0,
+            lowAbsolute: 0,
+            lowCritical: 0,
+            units: 'cm',
           },
         ],
       },
@@ -4686,186 +4120,6 @@ export const mockFhirVitalsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/0a1f6a92-30a4-47b9-8add-5237d807f8a9',
-      resource: {
-        resourceType: 'Observation',
-        id: '0a1f6a92-30a4-47b9-8add-5237d807f8a9',
-        meta: {
-          tag: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationValue',
-              code: 'SUBSETTED',
-              display: 'Resource encoded in summary mode',
-            },
-          ],
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Systolic',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8480-6',
-              display: 'Systolic',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/71a9faed-1102-4ab6-b412-06b7de69eceb',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-05-10T06:41:46+00:00',
-        issued: '2021-05-10T06:41:46.000+00:00',
-        valueQuantity: {
-          value: 120,
-          unit: 'mmHg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 100,
-            },
-            high: {
-              value: 140,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
-                  code: 'normal',
-                },
-              ],
-            },
-          },
-          {
-            low: {
-              value: 85,
-            },
-            high: {
-              value: 180,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
-                  code: 'treatment',
-                },
-              ],
-            },
-          },
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/801e6cbb-29d2-4581-9d6b-f75c1967351c',
-      resource: {
-        resourceType: 'Observation',
-        id: '801e6cbb-29d2-4581-9d6b-f75c1967351c',
-        meta: {
-          tag: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationValue',
-              code: 'SUBSETTED',
-              display: 'Resource encoded in summary mode',
-            },
-          ],
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/71a9faed-1102-4ab6-b412-06b7de69eceb',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-05-10T06:41:46+00:00',
-        issued: '2021-05-10T06:41:46.000+00:00',
-        valueQuantity: {
-          value: 198,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/5cd10d94-6322-45f1-ac2c-f595d2a81941',
       resource: {
         resourceType: 'Observation',
@@ -5331,117 +4585,6 @@ export const mockFhirVitalsResponse = {
       },
     },
     {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/9469ec9c-ade7-4424-b940-2238717c104c',
-      resource: {
-        resourceType: 'Observation',
-        id: '9469ec9c-ade7-4424-b940-2238717c104c',
-        meta: {
-          tag: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationValue',
-              code: 'SUBSETTED',
-              display: 'Resource encoded in summary mode',
-            },
-          ],
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Diastolic',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '35094-2',
-              display: 'Diastolic',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8462-4',
-              display: 'Diastolic',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/b524d4c6-2426-4af1-a8e5-e03379286968',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-05-07T09:04:51+00:00',
-        issued: '2021-05-07T09:04:51.000+00:00',
-        valueQuantity: {
-          value: 80,
-          unit: 'mmHg',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 55,
-            },
-            high: {
-              value: 90,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
-                  code: 'normal',
-                },
-              ],
-            },
-          },
-          {
-            low: {
-              value: 40,
-            },
-            high: {
-              value: 120,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://terminology.hl7.org/CodeSystem/referencerange-meaning',
-                  code: 'treatment',
-                },
-              ],
-            },
-          },
-          {
-            low: {
-              value: 0,
-            },
-            high: {
-              value: 150,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
       fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/d58614c6-a824-4a36-97ff-8e2969f1d776',
       resource: {
         resourceType: 'Observation',
@@ -5534,80 +4677,6 @@ export const mockFhirVitalsResponse = {
             },
             high: {
               value: 250,
-            },
-            type: {
-              coding: [
-                {
-                  system: 'http://fhir.openmrs.org/ext/obs/reference-range',
-                  code: 'absolute',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: 'https://openmrs-spa.org/openmrs/ws/fhir2//R4/Observation/9e396c1d-4396-47aa-85ab-fa1ea989a7fe',
-      resource: {
-        resourceType: 'Observation',
-        id: '9e396c1d-4396-47aa-85ab-fa1ea989a7fe',
-        meta: {
-          tag: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationValue',
-              code: 'SUBSETTED',
-              display: 'Resource encoded in summary mode',
-            },
-          ],
-        },
-        status: 'final',
-        category: [
-          {
-            coding: [
-              {
-                system: 'http://terminology.hl7.org/CodeSystem/observation-category',
-                code: 'exam',
-                display: 'Exam',
-              },
-            ],
-          },
-        ],
-        code: {
-          coding: [
-            {
-              code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Height (cm)',
-            },
-            {
-              system: 'http://loinc.org',
-              code: '8302-2',
-              display: 'Height (cm)',
-            },
-          ],
-        },
-        subject: {
-          reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e',
-          type: 'Patient',
-          display: 'John Wilson (Old Identification Number: 100GEJ)',
-        },
-        encounter: {
-          reference: 'Encounter/b5e913b6-a6cb-4be1-ac5c-173580558d20',
-          type: 'Encounter',
-        },
-        effectiveDateTime: '2021-04-08T14:44:24+00:00',
-        issued: '2021-04-08T14:44:24.000+00:00',
-        valueQuantity: {
-          value: 172,
-          unit: 'cm',
-        },
-        referenceRange: [
-          {
-            low: {
-              value: 10,
-            },
-            high: {
-              value: 272,
             },
             type: {
               coding: [
@@ -6063,15 +5132,49 @@ export const formattedVitals = [
   },
 ];
 
-export const mockVitalsConceptMetadata = mockVitalsSignsConcepts.data.results[0].setMembers;
-
-export const mockConceptUnits = new Map<string, string>(
-  mockVitalsConceptMetadata.map((concept) => [concept.uuid, concept.units]),
-);
+export const mockVitalsConceptMetadata = {
+  data: null,
+  error: null,
+  isLoading: false,
+  conceptMetadata: mockVitalsSignsConcepts.data.results[0].setMembers,
+  conceptRanges: mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => ({
+    uuid: concept.uuid,
+    display: concept.display,
+    hiNormal: concept.hiNormal ?? null,
+    hiAbsolute: concept.hiAbsolute ?? null,
+    hiCritical: concept.hiCritical ?? null,
+    lowNormal: concept.lowNormal ?? null,
+    lowAbsolute: concept.lowAbsolute ?? null,
+    lowCritical: concept.lowCritical ?? null,
+    units: concept.units ?? null,
+  })),
+  conceptRangeMap: new Map(
+    mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [
+      concept.uuid,
+      {
+        hiNormal: concept.hiNormal ?? null,
+        hiAbsolute: concept.hiAbsolute ?? null,
+        hiCritical: concept.hiCritical ?? null,
+        lowNormal: concept.lowNormal ?? null,
+        lowAbsolute: concept.lowAbsolute ?? null,
+        lowCritical: concept.lowCritical ?? null,
+      },
+    ]),
+  ),
+};
 
 export const mockConceptRanges = new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
-  mockVitalsConceptMetadata.map((concept) => [
+  mockVitalsConceptMetadata.conceptMetadata.map((concept) => [
     concept.uuid,
-    { lowAbsolute: concept.lowAbsolute ?? null, highAbsolute: concept.hiAbsolute ?? null },
+    {
+      lowAbsolute: concept.lowAbsolute ?? null,
+      highAbsolute: concept.hiAbsolute ?? null,
+    },
   ]),
 );
+
+export const mockConceptUnits = new Map<string, string>(
+  mockVitalsConceptMetadata.conceptMetadata.map((concept) => [concept.uuid, concept.units]),
+);
+
+mockVitalsConceptMetadata.data = mockConceptUnits;

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "9.2.2",
+  "version": "10.1.0",
   "license": "MPL-2.0",
   "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",
@@ -44,7 +44,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "6.x",
-    "@openmrs/esm-patient-common-lib": "9.x",
+    "@openmrs/esm-patient-common-lib": "10.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",

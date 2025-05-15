@@ -20,6 +20,7 @@ describe('GroupedTimeline', () => {
     someChecked: false,
     lowestParents: mockGroupedResults['lowestParents'],
     totalResultsCount: 0,
+    isLoading: false,
     initialize: jest.fn(),
     toggleVal: jest.fn(),
     updateParent: jest.fn(),

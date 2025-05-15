@@ -1,6 +1,25 @@
 @use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05 0;
+  border: 1px solid $ui-03;
+
+  // fixes padding of encounters table within the expanded visit table row
+  :global(tr.cds--parent-row.cds--expandable-row + tr[data-child-row] td) {
+    padding-inline-start: layout.$spacing-05;
+  }
+}
 
 .emptyStateContainer {
   text-align: center;
   margin: layout.$spacing-05 0;
+}
+
+.actionsColumn {
+  width: 1% !important; // fixes the width of action column to fit content
+}
+
+.hiddenRow {
+  display: none;
 }

@@ -2,15 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
-import {
-  ExtensionSlot,
-  showModal,
-  showSnackbar,
-  useConfig,
-  useFeatureFlag,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
+import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,

@@ -25,12 +25,11 @@ import VisitEncountersTable from './encounters-table/visit-encounters-table.comp
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
-  mutateVisit(): void;
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, mutateVisit }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -155,7 +154,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, mutateV
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} mutateVisits={mutateVisit} />
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

@@ -1,20 +1,20 @@
 import React, { type ComponentProps, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
+import { isEmpty } from 'lodash-es';
 import {
   Button,
   DataTable,
-  TableContainer,
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@carbon/react';
 import { EditIcon, formatDate, getCoreTranslation, parseDate } from '@openmrs/esm-framework';
-import { type ImmunizationGrouped } from '../../types';
 import { immunizationFormSub } from '../utils';
+import { type ImmunizationGrouped } from '../../types';
 import styles from './immunizations-sequence-table.scss';
 
 interface SequenceTableProps {
@@ -26,7 +26,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
   const { t } = useTranslation();
   const { existingDoses, sequences, vaccineUuid } = immunizationsByVaccine;
 
-  const tableHeader = useMemo(
+  const tableHeaders = useMemo(
     () => [
       { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
@@ -42,12 +42,12 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
       sequence: isEmpty(sequences)
         ? dose.doseNumber || 0
         : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
-      vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
-      expirationDate: dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true }),
+      vaccinationDate: dose?.occurrenceDateTime && formatDate(parseDate(dose.occurrenceDateTime), { noToday: true }),
+      expirationDate: dose?.expirationDate && formatDate(parseDate(dose.expirationDate), { noToday: true }),
       edit: (
         <Button
           kind="ghost"
-          iconDescription={t('edit', 'Edit')}
+          iconDescription={getCoreTranslation('edit', 'Edit')}
           renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
@@ -63,7 +63,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
             launchPatientImmunizationForm();
           }}
         >
-          {t('edit', 'Edit')}
+          {getCoreTranslation('edit', 'Edit')}
         </Button>
       ),
     };
@@ -71,7 +71,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
 
   return (
     tableRows.length > 0 && (
-      <DataTable rows={tableRows} headers={tableHeader} useZebraStyles>
+      <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer className={styles.sequenceTable}>
             <Table {...getTableProps()}>
