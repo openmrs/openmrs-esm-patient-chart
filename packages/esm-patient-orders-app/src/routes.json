@@ -85,11 +85,5 @@
       "component": "orderableConceptSearch",
       "type": "order"
     }
-  ],
-  "modals": [
-    {
-      "name": "edit-lab-results-modal",
-      "component": "editLabResultsModal"
-    }
   ]
 }

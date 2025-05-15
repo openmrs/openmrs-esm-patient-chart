@@ -2,8 +2,8 @@ import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGr
 import { launchWorkspace, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import lowerCase from 'lodash/lowerCase';
-import upperCase from 'lodash/upperCase';
+import lowerCase from 'lodash-es/lowerCase';
+import upperCase from 'lodash-es/upperCase';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './edit-lab-results.scss';
