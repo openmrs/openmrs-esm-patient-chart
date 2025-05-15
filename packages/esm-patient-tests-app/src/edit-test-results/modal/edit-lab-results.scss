@@ -87,7 +87,7 @@
 
 .itemHeading {
   @include type.type-style('label-02');
-  margin-bottom: 0.25rem;
+  margin-bottom: layout.$spacing-02;
   font-weight: bold;
   color: colors.$cool-gray-90;
 }
