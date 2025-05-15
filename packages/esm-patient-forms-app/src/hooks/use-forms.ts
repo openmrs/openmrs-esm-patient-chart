@@ -34,7 +34,6 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   return {
     url,
     hasCustomFormsUrl,
-    showHtmlFormEntryForms,
   };
 }
 
