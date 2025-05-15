@@ -203,7 +203,7 @@ test('Add lab results via lab App', async ({ page }) => {
       .getByRole('button', { name: 'Expand current row' })
       .click();
     await expect(page.getByText(/Status:IN_PROGRESS/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'serum glucose' })).toBeVisible();
+    await expect(page.getByText(/serum glucose/i)).toBeVisible();
   });
 
   await test.step(' Then I click Add Lab results form action and enters the result value', async () => {
