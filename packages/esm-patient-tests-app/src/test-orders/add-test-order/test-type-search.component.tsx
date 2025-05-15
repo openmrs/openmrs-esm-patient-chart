@@ -1,23 +1,24 @@
 import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import {
   ArrowRightIcon,
   closeWorkspace,
+  launchWorkspace,
   ResponsiveWrapper,
   ShoppingCartArrowDownIcon,
   useDebounce,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import type { TestOrderBasketItem } from '../../types';
 import { prepTestOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
-import styles from './test-type-search.scss';
 import { useTestTypes, type TestType } from './useTestTypes';
+import styles from './test-type-search.scss';
 
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;
@@ -51,7 +52,7 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
   const cancelOrder = useCallback(() => {
     closeWorkspace('add-lab-order', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, []);
 
@@ -205,7 +206,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     setOrders([...orders, labOrder]);
     closeWorkspace('add-lab-order', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, [orders, setOrders, createLabOrder, testType]);
 

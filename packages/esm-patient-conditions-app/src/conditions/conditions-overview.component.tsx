@@ -21,20 +21,15 @@ import {
   formatDate,
   parseDate,
   isDesktop as isDesktopLayout,
+  launchWorkspace,
   useLayoutType,
   usePagination,
   useConfig,
 } from '@openmrs/esm-framework';
-import {
-  EmptyState,
-  ErrorState,
-  PatientChartPagination,
-  launchPatientWorkspace,
-  CardHeader,
-} from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../config-schema';
+import { EmptyState, ErrorState, PatientChartPagination, CardHeader } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
+import { type ConfigObject } from '../config-schema';
 import styles from './conditions-overview.scss';
 
 interface ConditionTableRow extends Condition {
@@ -70,7 +65,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
-      launchPatientWorkspace('conditions-form-workspace', {
+      launchWorkspace('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],

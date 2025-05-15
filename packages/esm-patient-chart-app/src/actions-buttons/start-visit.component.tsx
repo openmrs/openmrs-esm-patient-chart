@@ -1,7 +1,7 @@
-import { OverflowMenuItem } from '@carbon/react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { OverflowMenuItem } from '@carbon/react';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
 
 interface StartVisitOverflowMenuItemProps {
@@ -14,7 +14,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
 
   const handleLaunchModal = useCallback(
     () =>
-      launchPatientWorkspace('start-visit-workspace-form', {
+      launchWorkspace('start-visit-workspace-form', {
         openedFrom: 'patient-chart-start-visit',
       }),
     [],
