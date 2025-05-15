@@ -23,13 +23,7 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
   const hasCustomFormsUrl = Boolean(customFormsUrl);
 
-  let baseUrl = hasCustomFormsUrl
-    ? customFormsUrl.indexOf('?') === -1
-      ? `${customFormsUrl}?patientUuid=\${patientUuid}&visitUuid=\${visitUuid}`
-      : customFormsUrl
-    : showHtmlFormEntryForms
-      ? formEncounterUrl
-      : formEncounterUrlPoc;
+  const baseUrl = hasCustomFormsUrl ? customFormsUrl : showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
 
   const url = interpolateUrl(baseUrl, {
     patientUuid: patientUuid,
