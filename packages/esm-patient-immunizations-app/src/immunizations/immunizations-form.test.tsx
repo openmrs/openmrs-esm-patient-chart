@@ -273,7 +273,7 @@ describe('Immunizations Form', () => {
 
     // edit the form
     await selectOption(vaccineField, 'Hepatitis B vaccination');
-    await user.clear(doseField)
+    await user.clear(doseField);
     await user.type(doseField, '2');
     await user.click(saveButton);
 
