@@ -19,7 +19,6 @@ export interface EncountersTableProps {
   currentPage: number;
   goTo(page: number): void;
   isLoading: boolean;
-  onEncountersUpdated(): void;
   showVisitType: boolean;
   paginatedEncounters: Array<Encounter>;
   showEncounterTypeFilter: boolean;
