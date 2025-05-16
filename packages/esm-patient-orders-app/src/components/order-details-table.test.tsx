@@ -11,7 +11,7 @@ import {
 } from '@openmrs/esm-framework';
 import { type Order, useOrderTypes, usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
-import { mockOrders, mockSessionDataResponse } from '__mocks__';
+import { mockCurrentVisit, mockOrders, mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import OrderDetailsTable from './order-details-table.component';
 
@@ -38,6 +38,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     usePatientOrders: jest.fn(),
     useOrderTypes: jest.fn(),
     usePatient: jest.fn(),
+    useLaunchWorkspaceRequiringVisit: jest.fn(),
   };
 });
 
