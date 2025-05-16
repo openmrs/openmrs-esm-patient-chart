@@ -14,7 +14,6 @@ const testProps: EncountersTableProps = {
   currentPage: 1,
   goTo: jest.fn(),
   isLoading: false,
-  onEncountersUpdated: jest.fn(),
   showVisitType: true,
   showEncounterTypeFilter: false,
   pageSize: 10,

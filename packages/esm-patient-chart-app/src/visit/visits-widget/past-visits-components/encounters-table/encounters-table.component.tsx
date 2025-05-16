@@ -5,7 +5,6 @@ import {
   ComboBox,
   DataTable,
   DataTableSkeleton,
-  InlineLoading,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -36,6 +35,7 @@ import {
   useConfig,
   type EncounterType,
   launchWorkspace,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
 import {
@@ -58,7 +58,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   encounterTypeToFilter,
   goTo,
   isLoading,
-  onEncountersUpdated,
   pageSize,
   paginatedEncounters,
   patientUuid,
@@ -72,6 +71,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
+  const { mutateVisit } = useVisitContextStore();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -118,7 +118,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              onEncountersUpdated();
+              mutateVisit();
 
               showSnackbar({
                 isLowContrast: true,
@@ -142,7 +142,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         },
       });
     },
-    [onEncountersUpdated, t],
+    [mutateVisit, t],
   );
 
   if (isLoadingEncounterTypes || isLoading) {
