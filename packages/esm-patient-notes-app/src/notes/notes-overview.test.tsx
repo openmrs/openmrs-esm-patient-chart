@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { mockVisitNotes, ConfigMock } from '__mocks__';
+import { mockVisitNotes, ConfigMock, mockCurrentVisit } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
 import NotesOverview from './notes-overview.extension';
@@ -17,6 +17,24 @@ const mockUseConfig = jest.mocked(useConfig);
 
 jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+  return {
+    ...originalModule,
+    usePatientChartStore: () => ({
+      visits: {
+        activeVisit: mockCurrentVisit,
+        currentVisit: mockCurrentVisit,
+        currentVisitIsRetrospective: false,
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: null,
+      },
+    }),
+  };
 });
 
 describe('NotesOverview', () => {

@@ -3,7 +3,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
+import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits, mockCurrentVisit } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
@@ -35,6 +35,14 @@ mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockBiometricsConfig,
 } as ConfigObject);
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+  return {
+    ...originalModule,
+    useLaunchWorkspaceRequiringVisit: jest.fn(),
+  };
+});
 
 describe('Biometrics Overview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {

@@ -5,11 +5,12 @@ import {
   queueSynchronizationItem,
   useConnectivity,
   useSession,
-  useVisit,
+  type useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { usePatientChartStore } from '../store/patient-chart-store';
 
 /**
  * The identifier of a visit in the sync queue.
@@ -31,7 +32,7 @@ export interface OfflineVisit extends NewVisitPayload {
 export function useVisitOrOfflineVisit(patientUuid: string) {
   const isOnline = useConnectivity();
 
-  const onlineVisit = useVisit(patientUuid);
+  const onlineVisit = usePatientChartStore().visits;
   const offlineVisit = useOfflineVisit(patientUuid);
 
   return isOnline ? onlineVisit : offlineVisit;

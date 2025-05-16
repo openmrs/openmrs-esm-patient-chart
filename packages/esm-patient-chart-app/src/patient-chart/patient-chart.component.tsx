@@ -3,6 +3,7 @@ import {
   WorkspaceContainer,
   setCurrentVisit,
   usePatient,
+  useVisit,
   useWorkspaces,
   useLeftNav,
 } from '@openmrs/esm-framework';
@@ -21,7 +22,8 @@ const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
-  const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
+  const visits = useVisit(patientUuid);
+  const state = useMemo(() => ({ patient, patientUuid, visits }), [patient, patientUuid, visits]);
   const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
   // Keep state updated with the current patient. Anything used outside the patient

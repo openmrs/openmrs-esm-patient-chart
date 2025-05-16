@@ -1,11 +1,11 @@
 import { Button, Loading } from '@carbon/react';
-import { showModal, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
+import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-context-header.scss';
 import VisitContextInfo from './visit-context-info.component';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 interface VisitContextHeaderProps {
   patientUuid: string;
@@ -17,7 +17,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   const isRdeEnabled = useFeatureFlag('rde');
   const showVisitContextHeader = systemVisitEnabled && isRdeEnabled;
 
-  const { currentVisit, isLoading } = useVisit(showVisitContextHeader ? patientUuid : null);
+  const { currentVisit, isLoading } = usePatientChartStore().visits;
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
 
   const openVisitSwitcherModal = () => {

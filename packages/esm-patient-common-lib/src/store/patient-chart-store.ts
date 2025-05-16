@@ -1,8 +1,9 @@
-import { createGlobalStore, useStore } from '@openmrs/esm-framework';
+import { createGlobalStore, useStore, type VisitReturnType } from '@openmrs/esm-framework';
 
 export interface PatientChartStore {
   patientUuid?: string;
   patient?: fhir.Patient;
+  visits?: VisitReturnType;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
