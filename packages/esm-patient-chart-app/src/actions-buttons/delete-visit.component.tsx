@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { useVisit, showModal } from '@openmrs/esm-framework';
+import { showModal } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface DeleteVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -10,7 +11,7 @@ interface DeleteVisitOverflowMenuItemProps {
 
 const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit } = usePatientChartStore().visits;
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('delete-visit-dialog', {

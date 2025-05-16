@@ -23,7 +23,7 @@ import {
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -67,7 +67,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   const useMuacColorStatus = config.vitals.useMuacColors;
 
   const session = useSession();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
   const { conceptUnits, isLoading: isLoadingConceptUnits } = useConceptUnits();
   const { conceptRanges, conceptRangeMap } = useVitalsConceptMetadata(patientUuid);
   const {
