@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetCard {
   background-color: colors.$white;
@@ -9,7 +10,7 @@
 .divider {
   width: 1px;
   height: layout.$spacing-05;
-  color: colors.$gray-20;
+  color: $ui-05;
   margin: 0 layout.$spacing-05;
 }
 
