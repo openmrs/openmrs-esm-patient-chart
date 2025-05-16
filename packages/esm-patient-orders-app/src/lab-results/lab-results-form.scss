@@ -6,6 +6,10 @@
   margin-bottom: layout.$spacing-05;
 }
 
+.label {
+  @include type.type-style('label-01');
+}
+
 .loaderContainer {
   display: flex;
   justify-content: center;
