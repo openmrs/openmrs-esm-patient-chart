@@ -1,4 +1,5 @@
 import { type Order, type OrderAction, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ObservationValue } from '../types/encounter';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
@@ -110,3 +111,14 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
   };
 }
+
+/**
+ * Utility function to extract display value from ObservationValue
+ */
+export const getObservationDisplayValue = (value: ObservationValue): string => {
+  if (!value) return '--';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return value.toString();
+  if (value && typeof value === 'object' && 'display' in value) return value.display;
+  return '--';
+};

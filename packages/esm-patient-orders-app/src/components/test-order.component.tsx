@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { getObservationDisplayValue } from '../utils';
 import styles from './test-order.scss';
 
 interface TestOrderProps {
@@ -51,20 +52,26 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   }, [concept, encounter]);
 
   const testRows = useMemo(() => {
-    if (!concept || !encounter) return [];
+    if (!concept) return [];
 
-    if (concept.setMembers?.length > 0) {
+    // For panel tests (with set members)
+    if (concept.setMembers && concept.setMembers.length > 0) {
       return concept.setMembers.map((memberConcept) => {
         const memberObs = testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid);
 
-        const resultValue =
-          memberObs?.value?.display ||
-          (typeof memberObs.value === 'string' || typeof memberObs.value === 'number' ? String(memberObs.value) : '--');
+        let resultValue: React.ReactNode;
+        if (isLoadingResult) {
+          resultValue = <SkeletonText />;
+        } else if (memberObs) {
+          resultValue = getObservationDisplayValue(memberObs.value ?? memberObs);
+        } else {
+          resultValue = '--';
+        }
 
         return {
           id: memberConcept.uuid,
           testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
-          result: isLoadingResult ? <SkeletonText /> : resultValue,
+          result: resultValue,
           normalRange:
             memberConcept.hiNormal && memberConcept.lowNormal
               ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
@@ -73,23 +80,25 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
       });
     }
 
-    const mainResultValue =
-      testResultObs?.value?.display ||
-      (typeof testResultObs?.value === 'string' || typeof testResultObs?.value === 'number'
-        ? String(testResultObs.value)
-        : '--') ||
-      testResultObs?.display ||
-      '--';
+    // For single tests (no set members)
+    let resultValue: React.ReactNode;
+    if (isLoadingResult) {
+      resultValue = <SkeletonText />;
+    } else if (testResultObs) {
+      resultValue = getObservationDisplayValue(testResultObs.value ?? testResultObs);
+    } else {
+      resultValue = '--';
+    }
 
     return [
       {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
-        result: isLoadingResult ? <SkeletonText /> : mainResultValue,
+        result: resultValue,
         normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
       },
     ];
-  }, [concept, encounter, isLoadingResult, testResultObs]);
+  }, [concept, isLoadingResult, testResultObs]);
 
   if (isLoadingTestConcepts || isLoadingResult) {
     return <DataTableSkeleton role="progressbar" compact={isTablet} zebra />;

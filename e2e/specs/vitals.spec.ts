@@ -310,14 +310,14 @@ test('Add high and critically high range patient vitals', async ({ page }) => {
     const criticallyHighRange = vitalsPage.page.getByRole('cell', { name: '200 ↑↑' });
 
     const backgroundColor = await highRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    expect(backgroundColor).toBe('rgb(255, 242, 232)');
+    expect(backgroundColor).toBe('rgb(255, 215, 217)');
 
     const afterContent = await highRange.evaluate((el) => {
       const after = window.getComputedStyle(el, '::after');
       return after.content;
     });
 
-    expect(afterContent).toBe('" ↑"');
+    expect(afterContent).toBe('" ↑↑"');
 
     const backgroundColorLow = await criticallyHighRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
     expect(backgroundColorLow).toBe('rgb(255, 215, 217)');

@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useSession,
+  useVisitContextStore,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -39,6 +47,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -67,6 +76,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           abortController,
         );
         mutateEncounterUuid();
+        mutateVisit();
         clearOrders();
         await mutateOrders();
         closeWorkspaceWithSavedChanges();
@@ -81,6 +91,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+      mutateVisit();
       await mutateOrders();
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();
@@ -100,6 +111,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     mutateEncounterUuid,
     mutateOrders,
+    mutateVisit,
     orders,
     patientUuid,
     session,
