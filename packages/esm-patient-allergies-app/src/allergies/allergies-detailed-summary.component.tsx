@@ -13,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { AddIcon, formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { AddIcon, formatDate, launchWorkspace, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import { AllergiesActionMenu } from './allergies-action-menu.component';
@@ -26,14 +26,14 @@ interface AllergiesDetailedSummaryProps {
 
 const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('allergyIntolerances', 'allergy intolerances');
-  const headerTitle = t('allergies', 'Allergies');
-  const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
   const layout = useLayoutType();
+  const { allergies, error, isLoading, isValidating } = useAllergies(patient.id);
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
+  const displayText = t('allergyIntolerances', 'allergy intolerances');
+  const headerTitle = t('allergies', 'Allergies');
 
-  const launchAllergiesForm = useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = useCallback(() => launchWorkspace(patientAllergiesFormWorkspace), []);
 
   const tableHeaders = [
     { key: 'display', header: t('allergen', 'Allergen') },
