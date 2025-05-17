@@ -22,6 +22,16 @@ interface PrintableReportProps {
   index: number;
 }
 
+const getObservationValueDisplay = (value: any): string => {
+  if (typeof value === 'object' && value !== null && 'display' in value) {
+    return value.display;
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    return String(value);
+  }
+  return '--';
+};
+
 const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
   const { t } = useTranslation();
 
@@ -57,12 +67,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
     if (concept.setMembers?.length > 0) {
       return concept.setMembers.map((memberConcept) => {
         const memberObs = testResultObs?.groupMembers?.find((obs) => obs?.concept?.uuid === memberConcept?.uuid);
-
-        const resultValue =
-          memberObs?.value?.display ||
-          (typeof memberObs?.value === 'string' || typeof memberObs?.value === 'number'
-            ? String(memberObs.value)
-            : '--');
+        const resultValue = getObservationValueDisplay(memberObs?.value);
 
         return {
           id: memberConcept?.uuid,
@@ -76,13 +81,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
       });
     }
 
-    const mainResultValue =
-      testResultObs?.value?.display ||
-      (typeof testResultObs?.value === 'string' || typeof testResultObs?.value === 'number'
-        ? String(testResultObs.value)
-        : '--') ||
-      testResultObs?.display ||
-      '--';
+    const mainResultValue = getObservationValueDisplay(testResultObs?.value) || testResultObs?.display || '--';
 
     return [
       {
