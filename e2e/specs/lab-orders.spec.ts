@@ -1,24 +1,151 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, type Patient, startVisit, endVisit, deletePatient } from '../commands';
+import { type Encounter, type Provider } from '../commands/types';
+import { type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  generateRandomPatient,
+  generateRandomTestOrder,
+  deleteTestOrder,
+  createEncounter,
+  deleteEncounter,
+  getProvider,
+  type Patient,
+  startVisit,
+  endVisit,
+  deletePatient,
+} from '../commands';
 import { test } from '../core';
 import { OrdersPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
+const url = process.env.E2E_BASE_URL;
+let testOrder: Order;
+let encounter: Encounter;
+let orderer: Provider;
 
 test.beforeAll(async ({ api }) => {
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
+  orderer = await getProvider(api);
+  encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
+  testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
 });
 
-test.describe.serial('Running laboratory order tests sequentially', () => {
-  test('Record a lab order', async ({ page }) => {
+test.describe('Running laboratory order tests sequentially', () => {
+  test('Modify a lab order', async ({ page }) => {
+    await test.step('When I visit the orders page', async () => {
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+    });
+
+    await test.step('Then I should see the previously added lab order in the list', async () => {
+      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
+      await page.getByRole('button', { name: /options/i }).click();
+    });
+
+    await test.step('And I click on the `Modify order` button', async () => {
+      await page.getByRole('menuitem', { name: /modify order/i }).click();
+    });
+
+    await test.step('And I change the additional instructions to `Priority test order`', async () => {
+      await page.getByLabel(/additional instructions/i).clear();
+      await page.getByLabel(/additional instructions/i).fill('Priority test order');
+    });
+
+    await test.step('And I click on the `Save Order` button', async () => {
+      await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('Then the order status should be changed to `Modify`', async () => {
+      await expect(page.getByRole('status', { name: /new/i })).toBeHidden();
+      await expect(page.getByRole('status', { name: /modify/i })).toBeVisible();
+    });
+
+    await test.step('When I click on the `Sign and close` button', async () => {
+      await page.getByRole('button', { name: /sign and close/i }).click();
+    });
+
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(/updated serum glucose/i)).toBeVisible();
+    });
+  });
+
+  test('Discontinue a lab order', async ({ page }) => {
     const ordersPage = new OrdersPage(page);
+
+    await test.step('When I visit the orders page', async () => {
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+    });
+
+    await test.step('Then I should see the previously added lab order in the list', async () => {
+      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
+      await page.getByRole('button', { name: /options/i }).click();
+    });
+
+    await test.step('And I click on the `Cancel order` button', async () => {
+      await page.getByRole('menuitem', { name: /cancel order/i }).click();
+    });
+
+    await test.step('Then the order status should be changed to `Discontinue`', async () => {
+      await expect(page.getByRole('status', { name: /discontinue/i })).toBeVisible();
+    });
+
+    await test.step('And I click on the `Sign and close` button', async () => {
+      await page.getByRole('button', { name: /sign and close/i }).click();
+    });
+
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(/discontinued serum glucose/i)).toBeVisible();
+    });
+
+    await test.step('And the order table should be empty', async () => {
+      await expect(page.getByText(/there are no orders to display for this patient/i)).toBeVisible();
+    });
+  });
+
+  test('Add laboratory results via orders app', async ({ page }) => {
+    await test.step('When i navigate to the Orders section under patient chart', async () => {
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+    });
+
+    await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
+      await expect(page.getByRole('cell', { name: 'Test order' })).toBeVisible();
+      await expect(page.getByRole('cell', { name: 'Serum glucose' })).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu in the table row', async () => {
+      await page
+        .getByRole('button', { name: /options/i })
+        .nth(0)
+        .click();
+    });
+
+    await test.step(' Then I click on Add results action', async () => {
+      await page.getByRole('menuitem', { name: 'Add results' }).click();
+      await expect(page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' })).toBeVisible();
+    });
+
+    await test.step(' Then I fill in the lab result and click save', async () => {
+      await page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' }).fill('55');
+      await page.getByRole('button', { name: 'Save and close' }).click();
+    });
+
+    await test.step('And a confirmation message should be displayed indicating that the result was saved', async () => {
+      await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
+    });
+  });
+
+  test('Record a lab order', async ({ page }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('And I click on the `Record orders` link', async () => {
@@ -64,100 +191,18 @@ test.describe.serial('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('When I navigate to the orders dashboard', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then I should see the newly added lab order in the list', async () => {
       await expect(page.getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
     });
   });
-
-  test('Modify a lab order', async ({ page }) => {
-    const ordersPage = new OrdersPage(page);
-
-    await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
-    });
-
-    await test.step('Then I should see the previously added lab order in the list', async () => {
-      await expect(page.getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
-    });
-
-    await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
-      await page
-        .getByRole('button', { name: /options/i })
-        .nth(0)
-        .click();
-    });
-
-    await test.step('And I click on the `Modify order` button', async () => {
-      await page.getByRole('menuitem', { name: /modify order/i }).click();
-    });
-
-    await test.step('And I change the additional instructions to `Priority test order`', async () => {
-      await page.getByLabel(/additional instructions/i).clear();
-      await page.getByLabel(/additional instructions/i).fill('Priority test order');
-    });
-
-    await test.step('And I click on the `Save Order` button', async () => {
-      await page.getByRole('button', { name: /save order/i }).click();
-    });
-
-    await test.step('Then the order status should be changed to `Modify`', async () => {
-      await expect(page.getByRole('status', { name: /new/i })).toBeHidden();
-      await expect(page.getByRole('status', { name: /modify/i })).toBeVisible();
-    });
-
-    await test.step('When I click on the `Sign and close` button', async () => {
-      await page.getByRole('button', { name: /sign and close/i }).click();
-    });
-
-    await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/updated blood urea nitrogen/i)).toBeVisible();
-    });
-  });
-
-  test('Discontinue a lab order', async ({ page }) => {
-    const ordersPage = new OrdersPage(page);
-
-    await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
-    });
-
-    await test.step('Then I should see the previously added lab order in the list', async () => {
-      await expect(page.getByRole('cell', { name: /blood urea nitrogen/i })).toBeVisible();
-    });
-
-    await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
-      await page
-        .getByRole('button', { name: /options/i })
-        .nth(0)
-        .click();
-    });
-
-    await test.step('And I click on the `Cancel order` button', async () => {
-      await page.getByRole('menuitem', { name: /cancel order/i }).click();
-    });
-
-    await test.step('Then the order status should be changed to `Discontinue`', async () => {
-      await expect(page.getByRole('status', { name: /discontinue/i })).toBeVisible();
-    });
-
-    await test.step('And I click on the `Sign and close` button', async () => {
-      await page.getByRole('button', { name: /sign and close/i }).click();
-    });
-
-    await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/discontinued blood urea nitrogen/i)).toBeVisible();
-    });
-
-    await test.step('And the order table should be empty', async () => {
-      await expect(page.getByText(/there are no orders to display for this patient/i)).toBeVisible();
-    });
-  });
 });
 
 test.afterAll(async ({ api }) => {
   await endVisit(api, visit);
+  await deleteEncounter(api, encounter.uuid);
+  await deleteTestOrder(api, testOrder.uuid);
   await deletePatient(api, patient.uuid);
 });
