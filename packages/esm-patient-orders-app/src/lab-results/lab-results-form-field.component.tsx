@@ -42,9 +42,8 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
   };
 
   const getSavedMemberValue = (conceptUuid: string, dataType: string) => {
-    return dataType === 'Coded'
-      ? defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value?.uuid
-      : defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value;
+    const value = defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value;
+    return dataType === 'CWE' && value && typeof value === 'object' && 'uuid' in value ? value.uuid : value;
   };
 
   return (
@@ -98,7 +97,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             <Select
               {...field}
               className={styles.textInput}
-              defaultValue={defaultValue?.value?.uuid}
+              defaultValue={getSavedMemberValue(concept.uuid, concept.datatype.hl7Abbreviation)}
               id={`select-${concept.uuid}`}
               key={concept.uuid}
               labelText={`${concept?.display ? concept.display + ' ' : ''}${formatLabRange(concept)}`}

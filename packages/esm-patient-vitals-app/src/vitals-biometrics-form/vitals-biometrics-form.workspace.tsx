@@ -22,6 +22,7 @@ import {
   useLayoutType,
   useSession,
   useVisit,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -81,6 +82,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
+  const { mutateVisit } = useVisitContextStore();
 
   const isLoadingInitialValues = useMemo(
     () => (formContext === 'creating' ? false : isLoadingEncounter),
@@ -195,6 +197,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
             if (mutateEncounter) {
               mutateEncounter();
             }
+            mutateVisit();
             invalidateCachedVitalsAndBiometrics();
             closeWorkspaceWithSavedChanges();
             showSnackbar({
@@ -233,6 +236,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
       formContext,
       initialFieldValuesMap,
       mutateEncounter,
+      mutateVisit,
       patientUuid,
       session?.sessionLocation?.uuid,
       t,
