@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar, updateVisit, useVisit, useVisitContextStore } from '@openmrs/esm-framework';
+import { showSnackbar, updateVisit, useVisitContextStore } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './end-visit-dialog.scss';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface EndVisitDialogProps {
-  patientUuid: string;
   closeModal: () => void;
 }
 
@@ -14,9 +14,9 @@ interface EndVisitDialogProps {
  * patient banner. It should only show when the patient has an active visit. See stop-visit.component.tsx
  * for the button.
  */
-const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
+const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ closeModal }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit } = usePatientChartStore().visits;
   const { mutateVisit } = useVisitContextStore();
 
   const handleEndVisit = () => {
