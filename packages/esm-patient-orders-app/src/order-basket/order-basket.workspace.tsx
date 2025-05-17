@@ -89,7 +89,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         );
       }
     } else {
-      const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
+      const erroredItems = await postOrders(orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
       mutateVisit();
       await mutateOrders();

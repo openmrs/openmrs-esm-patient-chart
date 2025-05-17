@@ -8,6 +8,7 @@ import type {
   OrderErrorObject,
   OrderPost,
 } from './types';
+import { getPatientUuidFromStore } from '../store/patient-chart-store';
 
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
@@ -60,8 +61,9 @@ export async function postOrdersOnNewEncounter(
   }).then((res) => res?.data?.uuid);
 }
 
-export async function postOrders(patientUuid: string, encounterUuid: string, abortController: AbortController) {
+export async function postOrders(encounterUuid: string, abortController: AbortController) {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
+  const patientUuid = getPatientUuidFromStore();
   const patientItems = items[patientUuid];
 
   const erroredItems: Array<OrderBasketItem> = [];
