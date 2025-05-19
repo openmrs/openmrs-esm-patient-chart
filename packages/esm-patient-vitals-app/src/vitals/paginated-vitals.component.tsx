@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Table,
@@ -32,6 +33,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   tableRows,
   urlLabel,
 }) => {
+  const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
   const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
@@ -110,7 +112,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
+                  <TableHeader aria-label={t('actions', 'Actions')} />
                 </TableRow>
               </TableHead>
               <TableBody>

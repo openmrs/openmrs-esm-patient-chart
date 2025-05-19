@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Table,
@@ -31,6 +32,8 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   tableHeaders,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
+
+  const { t } = useTranslation();
 
   const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
     key: '',
@@ -96,7 +99,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
+                  <TableHeader aria-label={t('actions', 'Actions')} />
                 </TableRow>
               </TableHead>
               <TableBody>
