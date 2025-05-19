@@ -47,7 +47,7 @@ const createProgramsFormSchema = (t: TFunction) =>
   z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
     enrollmentDate: z.date(),
-    completionDate: z.date().nullable(),
+    completionDate: z.date().optional().nullable(),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
   });
