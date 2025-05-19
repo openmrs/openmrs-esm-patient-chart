@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   type DefaultWorkspaceProps,
   launchWorkspace,
@@ -6,7 +7,6 @@ import {
   useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
-import { useCallback } from 'react';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';
