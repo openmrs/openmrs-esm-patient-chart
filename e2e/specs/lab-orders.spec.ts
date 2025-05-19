@@ -122,10 +122,9 @@ test.describe('Record lab order workflow', async () => {
       await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
-    await test.step('And I click to Add a drug order ', async () => {
-      await page.getByRole('button', { name: 'Add' }).click();
+    await test.step('And I click on the `Record orders` link', async () => {
+      await page.getByText(/record orders/i).click();
     });
-
     await test.step('And I click the `Add +` button on the Lab orders tile', async () => {
       await orderBasket.getByRole('button', { name: /add/i }).nth(1).click();
     });
