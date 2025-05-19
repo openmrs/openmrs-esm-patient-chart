@@ -30,7 +30,6 @@ export const generateRandomTestOrder = async (
       orderReasonNonCoded: 'order reason',
       instructions: null,
       commentToFulfiller: null,
-      display: 'Serum glucose',
       fulfillerStatus: null,
       fulfillerComment: null,
       specimenSource: null,

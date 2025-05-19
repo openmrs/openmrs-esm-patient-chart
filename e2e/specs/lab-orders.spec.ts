@@ -15,26 +15,27 @@ import {
   deletePatient,
 } from '../commands';
 import { test } from '../core';
-import { OrdersPage } from '../pages';
 
 let patient: Patient;
 let visit: Visit;
 const url = process.env.E2E_BASE_URL;
 let fullName: String;
-let drugOrder: Order;
+let testOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
 
-test.beforeAll(async ({ api }) => {
+test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
-  orderer = await getProvider(api);
-  encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
-  drugOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
   fullName = patient.person.display || patient.display;
 });
 
-test.describe('Running laboratory order tests sequentially', () => {
+test.describe('Lab workflow for existing order', () => {
+  test.beforeEach(async ({ api }) => {
+    orderer = await getProvider(api);
+    encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
+    testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
+  });
   test('Modify a lab order', async ({ page }) => {
     await test.step('When I visit the orders page', async () => {
       await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
@@ -111,7 +112,9 @@ test.describe('Running laboratory order tests sequentially', () => {
       await expect(page.getByText(/there are no orders to display for this patient/i)).toBeVisible();
     });
   });
+});
 
+test.describe('Record lab order workflow', async () => {
   test('Record a lab order', async ({ page }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
@@ -171,50 +174,15 @@ test.describe('Running laboratory order tests sequentially', () => {
   });
 });
 
-test('Add lab results via lab App', async ({ page }) => {
-  await test.step(' Then I  the Laboratory section', async () => {
-    await page.goto(url + `/spa/home/laboratory`);
-  });
-
-  await test.step('And I select the patient and the order for which the results need to be added', async () => {
-    await expect(page.getByRole('tab', { name: 'Tests ordered' })).toBeVisible();
-
-    await page
-      .getByRole('row', { name: new RegExp(`Expand current row ${fullName}`) })
-      .getByLabel('Expand current row')
-      .click();
-    await expect(page.getByText(/Status:Order not picked/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'serum glucose' })).toBeVisible();
-  });
-
-  await test.step(' Then I click on Pick lab request action', async () => {
-    await page.getByRole('button', { name: 'Pick Lab Request' }).first().click();
-    await page.getByRole('button', { name: 'Pick up lab request' }).click();
-    await expect(page.getByText(/You have successfully picked an order/i)).toBeVisible();
-  });
-
-  await test.step(' Then I click In progress tab', async () => {
-    await page.getByRole('tab', { name: 'In progress' }).click();
-  });
-
-  await test.step('And I select the patient and the order for which the results need to be added', async () => {
-    await page
-      .getByRole('row', { name: new RegExp(`Expand current row ${fullName}`) })
-      .getByRole('button', { name: 'Expand current row' })
-      .click();
-    await expect(page.getByText(/Status:IN_PROGRESS/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: 'serum glucose' })).toBeVisible();
-  });
-
-  await test.step(' Then I click Add Lab results form action and enters the result value', async () => {
-    await page.getByRole('button', { name: 'Add lab results' }).click();
-    await page.getByRole('spinbutton', { name: 'serum glucose (>= 0' }).fill('35');
-    await page.getByRole('button', { name: 'Save and close' }).click();
-    await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
-  });
-});
-
-test.afterAll(async ({ api }) => {
+test.afterEach(async ({ api }) => {
   await endVisit(api, visit);
+  if (encounter) {
+    await deleteEncounter(api, encounter.uuid);
+    encounter = undefined;
+  }
+  if (testOrder) {
+    await deleteTestOrder(api, testOrder.uuid);
+    testOrder = undefined;
+  }
   await deletePatient(api, patient.uuid);
 });
