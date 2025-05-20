@@ -30,7 +30,7 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And I choose the attachment file to upload', async () => {
-    await page.on('filechooser', async (fileChooser) => {
+    page.on('filechooser', async (fileChooser) => {
       await fileChooser.setFiles(filePath);
     });
     await page.click('.cds--file-browse-btn');
