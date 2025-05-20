@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisitContextStore } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import styles from './end-visit-dialog.scss';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface EndVisitDialogProps {
   closeModal: () => void;

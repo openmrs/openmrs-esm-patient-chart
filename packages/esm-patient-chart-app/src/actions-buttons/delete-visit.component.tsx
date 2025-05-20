@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import styles from './action-button.scss';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface DeleteVisitOverflowMenuItemProps {
   patientUuid: string;
