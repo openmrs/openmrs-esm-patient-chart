@@ -8,6 +8,8 @@ import { type ConfigObject } from '../config-schema';
 import { type PatientVitalsAndBiometrics } from '../common';
 import styles from './biometrics-chart.scss';
 
+type BiometricType = 'weight' | 'height' | 'bmi';
+
 interface BiometricsChartProps {
   conceptUnits: Map<string, string>;
   config: ConfigObject;
@@ -15,12 +17,10 @@ interface BiometricsChartProps {
 }
 
 interface BiometricChartData {
-  groupName: 'Weight' | 'Height' | 'Body mass index' | string;
+  groupName: BiometricType;
   title: string;
   value: number | string;
 }
-
-const chartColors = { weight: '#6929c4', height: '#6929c4', bmi: '#6929c4' };
 
 const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config }) => {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     groupName: 'weight',
   });
 
-  const biometrics = [
+  const biometrics: { id: BiometricType; title: string; value: BiometricType }[] = [
     {
       id: 'weight',
       title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
@@ -42,11 +42,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       title: `${t('height', 'Height')} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})`,
       value: 'height',
     },
-    {
-      id: 'bmi',
-      title: `${t('bmi', 'BMI')} (${bmiUnit})`,
-      value: 'bmi',
-    },
+    { id: 'bmi', title: `${t('bmi', 'BMI')} (${bmiUnit})`, value: 'bmi' },
   ];
 
   const chartData = useMemo(
@@ -59,7 +55,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           (biometrics) =>
             biometrics[selectedBiometrics.value] && {
               group: selectedBiometrics.title,
-              key: formatDate(new Date(biometrics.date), { mode: 'wide', year: false, time: false }),
+              key: biometrics.date,
               value: biometrics[selectedBiometrics.value],
               date: biometrics.date,
             },
@@ -74,7 +70,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         bottom: {
           title: t('date', 'Date'),
           mapsTo: 'key',
-          scaleType: ScaleTypes.LABELS,
+          scaleType: ScaleTypes.TIME,
         },
         left: {
           mapsTo: 'value',
