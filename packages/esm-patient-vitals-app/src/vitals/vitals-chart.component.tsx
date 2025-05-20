@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { withUnit, type PatientVitalsAndBiometrics } from '../common';
 import styles from './vitals-chart.scss';
@@ -66,13 +67,13 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           return [
             {
               group: 'Systolic blood pressure',
-              key: vitals.date,
+              key: formatDate(parseDate(vitals.date), { year: true }),
               value: vitals.systolic,
               date: vitals.date,
             },
             {
               group: 'Diastolic blood pressure',
-              key: vitals.date,
+              key: formatDate(parseDate(vitals.date), { year: true }),
               value: vitals.diastolic,
               date: vitals.date,
             },
@@ -80,7 +81,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         }
         return {
           group: selectedVitalsSign.value,
-          key: vitals.date,
+          key: formatDate(parseDate(vitals.date)),
           value: vitals[selectedVitalsSign.value],
           date: vitals.date,
         };
@@ -92,7 +93,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     axes: {
       bottom: {
         title: t('date', 'Date'),
-        mapsTo: 'key',
+        mapsTo: 'date',
         scaleType: ScaleTypes.TIME,
       },
       left: {

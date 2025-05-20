@@ -55,7 +55,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           (biometrics) =>
             biometrics[selectedBiometrics.value] && {
               group: selectedBiometrics.title,
-              key: biometrics.date,
+              key: formatDate(parseDate(biometrics.date), { year: true }),
               value: biometrics[selectedBiometrics.value],
               date: biometrics.date,
             },
@@ -69,7 +69,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       axes: {
         bottom: {
           title: t('date', 'Date'),
-          mapsTo: 'key',
+          mapsTo: 'date',
           scaleType: ScaleTypes.TIME,
         },
         left: {
