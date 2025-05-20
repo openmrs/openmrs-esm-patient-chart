@@ -1,6 +1,12 @@
 import { type OpenmrsResource, type Visit } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 
+export type ObservationValue =
+  | OpenmrsResource // coded
+  | number // numeric
+  | string // text or misc
+  | null;
+
 export interface Encounter {
   uuid: string;
   encounterDatetime: string;
@@ -41,10 +47,7 @@ export interface Observation {
   obsGroup: any;
   obsDatetime: string;
   groupMembers?: Array<Observation>;
-  value: {
-    uuid: string;
-    display: string;
-  };
+  value: ObservationValue;
   location: OpenmrsResource;
   order: Order;
   status: string;

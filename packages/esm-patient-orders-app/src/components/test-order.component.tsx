@@ -1,6 +1,4 @@
 import React, { useMemo } from 'react';
-import styles from './test-order.scss';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -14,8 +12,11 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { type Order } from '@openmrs/esm-patient-common-lib';
+import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { getObservationDisplayValue } from '../utils';
+import styles from './test-order.scss';
 
 interface TestOrderProps {
   testOrder: Order;
@@ -56,7 +57,9 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         result: isLoadingResult ? (
           <SkeletonText />
         ) : (
-          testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value ?? '--'
+          getObservationDisplayValue(
+            testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value,
+          )
         ),
         normalRange:
           memberConcept.hiNormal && memberConcept.lowNormal
@@ -68,7 +71,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         {
           id: concept.uuid,
           testType: <div className={styles.testType}>{concept.display}</div>,
-          result: isLoadingResult ? <SkeletonText /> : testResultObs?.value ?? '--',
+          result: isLoadingResult ? <SkeletonText /> : getObservationDisplayValue(testResultObs?.value),
           normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
         },
       ];

@@ -14,9 +14,11 @@ interface VitalsChartProps {
   patientVitals: Array<PatientVitalsAndBiometrics>;
 }
 
+type VitalSignKey = 'systolic' | 'spo2' | 'temperature' | 'respiratoryRate' | 'pulse';
+
 interface VitalsChartData {
   title: string;
-  value: string;
+  value: VitalSignKey;
 }
 
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
@@ -27,7 +29,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     value: 'systolic',
   });
 
-  const vitalSigns = [
+  const vitalSigns: { id: string; title: string; value: VitalSignKey }[] = [
     {
       id: 'bloodPressure',
       title: withUnit(t('bp', 'BP'), conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
@@ -61,19 +63,17 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       .slice(0, 10)
       .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
-        const formattedDate = formatDate(parseDate(vitals.date.toString()), { year: false });
-
         if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
           return [
             {
               group: 'Systolic blood pressure',
-              key: formattedDate,
+              key: formatDate(parseDate(vitals.date), { year: true }),
               value: vitals.systolic,
               date: vitals.date,
             },
             {
               group: 'Diastolic blood pressure',
-              key: formattedDate,
+              key: formatDate(parseDate(vitals.date), { year: true }),
               value: vitals.diastolic,
               date: vitals.date,
             },
@@ -81,7 +81,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         }
         return {
           group: selectedVitalsSign.value,
-          key: formattedDate,
+          key: formatDate(parseDate(vitals.date)),
           value: vitals[selectedVitalsSign.value],
           date: vitals.date,
         };
@@ -93,8 +93,8 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     axes: {
       bottom: {
         title: t('date', 'Date'),
-        mapsTo: 'key',
-        scaleType: ScaleTypes.LABELS,
+        mapsTo: 'date',
+        scaleType: ScaleTypes.TIME,
       },
       left: {
         mapsTo: 'value',
@@ -117,6 +117,11 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           group,
         ).toUpperCase()}
         <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
+    },
+    zoomBar: {
+      top: {
+        enabled: true,
+      },
     },
     height: '400px',
   };
