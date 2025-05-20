@@ -19,23 +19,23 @@ import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  getCoreTranslation,
+  LocationPicker,
   OpenmrsDatePicker,
   parseDate,
   showSnackbar,
   useConfig,
   useLayoutType,
-  useLocations,
   useSession,
-  LocationPicker,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   createProgramEnrollment,
+  findLastState,
+  updateProgramEnrollment,
   useAvailablePrograms,
   useEnrollments,
-  updateProgramEnrollment,
-  findLastState,
 } from './programs.resource';
 import styles from './programs-form.scss';
 
@@ -64,7 +64,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const availableLocations = useLocations();
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const { showProgramStatusField } = useConfig<ConfigObject>();
@@ -346,7 +345,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       </Stack>
       <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
           {isSubmitting ? (
