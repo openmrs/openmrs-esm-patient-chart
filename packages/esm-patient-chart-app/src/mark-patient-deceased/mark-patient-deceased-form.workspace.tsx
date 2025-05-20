@@ -170,7 +170,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
                   <Search
-                    labelText=""
+                    labelText={t('searchForCauseOfDeath', 'Search for a cause of death')}
                     onChange={handleSearchTermChange}
                     placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
                   />

@@ -25,7 +25,7 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
-  useVisit,
+  useVisitContextStore,
   type AssignedExtension,
   type NewVisitPayload,
   type Visit,
@@ -42,7 +42,6 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import { useInfiniteVisits } from '../visits-widget/visit.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
@@ -100,8 +99,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -327,8 +325,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // do nothing, this catches any reject promises used for short-circuiting
           })
           .finally(() => {
-            mutateCurrentVisit();
-            mutateInfiniteVisits();
+            mutateVisit();
           });
       } else {
         createOfflineVisitForPatient(
@@ -338,7 +335,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            mutateCurrentVisit();
+            mutateVisit();
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -369,8 +366,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
       extraVisitInfo,
       handleVisitAttributes,
       isOnline,
-      mutateCurrentVisit,
-      mutateInfiniteVisits,
+      mutateVisit,
       visitFormCallbacks,
       patientUuid,
       t,

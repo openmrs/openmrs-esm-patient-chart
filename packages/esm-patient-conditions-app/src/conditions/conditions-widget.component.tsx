@@ -232,11 +232,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       })}
                       disabled={isEditing}
                       id="conditionsSearch"
+                      aria-labelledby={errors?.conditionName ? 'conditionsSearchError' : undefined}
                       labelText={t('enterCondition', 'Enter condition')}
                       onChange={(event) => {
-                        const value = event.target.value;
-                        onChange(value);
-                        handleSearchTermChange(value);
+                        const val = event.target.value;
+                        onChange(val);
+                        handleSearchTermChange(val);
                       }}
                       onClear={() => {
                         setSearchTerm('');
@@ -257,7 +258,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
+              {errors?.conditionName && (
+                <p id="conditionsSearchError" className={styles.errorMessage}>
+                  {errors.conditionName.message}
+                </p>
+              )}
               <SearchResults
                 isSearching={isSearching}
                 onConditionChange={handleConditionChange}
@@ -301,13 +306,18 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 onChange={onChange}
                 orientation="vertical"
                 valueSelected={value.toLowerCase()}
+                aria-labelledby={errors?.clinicalStatus ? 'clinicalStatusError' : undefined}
               >
                 <RadioButton id="active" labelText={t('active', 'Active')} value="active" />
                 <RadioButton id="inactive" labelText={t('inactive', 'Inactive')} value="inactive" />
               </RadioButtonGroup>
             )}
           />
-          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
+          {errors?.clinicalStatus && (
+            <p id="clinicalStatusError" className={styles.errorMessage}>
+              {errors.clinicalStatus.message}
+            </p>
+          )}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">

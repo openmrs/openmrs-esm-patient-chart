@@ -18,9 +18,12 @@ const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, val
 
   const generatedId = useId();
 
-  const labelId = `omrs-patient-chart-label-${unitName}-${generatedId}`;
-  const valueId = `omrs-patient-chart-value-${unitName}-${generatedId}`;
-  const unitId = `omrs-patient-chart-unit-${unitName}-${generatedId}`;
+  const trimmedUnitName = unitName.trim().toLowerCase();
+  const unitNameWithoutSpaces = trimmedUnitName.replace(/\s+/g, '-');
+
+  const labelId = `omrs-patient-chart-label-${unitNameWithoutSpaces}-${generatedId}`;
+  const valueId = `omrs-patient-chart-value-${unitNameWithoutSpaces}-${generatedId}`;
+  const unitId = `omrs-patient-chart-unit-${unitNameWithoutSpaces}-${generatedId}`;
 
   const displayValue = Boolean(value) ? value : t('notAvailable', 'Not available');
 

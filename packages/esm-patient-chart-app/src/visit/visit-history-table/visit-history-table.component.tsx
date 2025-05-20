@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -6,24 +8,22 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
   TableHead,
   TableHeader,
   TableRow,
-  TableExpandHeader,
-  TableExpandRow,
-  TableExpandedRow,
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
-import styles from './visit-history-table.scss';
-import VisitTypeCell from './visit-type-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
+import VisitTypeCell from './visit-type-cell.component';
 import VisitActionsCell from './visit-actions-cell.component';
+import styles from './visit-history-table.scss';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -37,15 +37,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const {
-    data: visits,
-    currentPage,
-    error,
-    isLoading,
-    totalCount,
-    goTo,
-    mutate,
-  } = usePaginatedVisits(patientUuid, pageSize);
+  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -70,10 +62,12 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />;
   }
+
   if (error) {
     return <ErrorState error={error} headerTitle={t('pastVisits', 'Past visits')} />;
   }
-  if (visits.length == 0) {
+
+  if (visits.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
         <EmptyState headerTitle={t('pastVisits', 'Past visits')} displayText={t('visits', 'visits')} />
@@ -115,7 +109,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} mutateVisit={mutate} />
+                            <VisitSummary visit={visit} patientUuid={patientUuid} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

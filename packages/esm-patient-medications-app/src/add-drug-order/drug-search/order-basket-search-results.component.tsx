@@ -120,7 +120,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
     [orders, drug],
   );
   const drugAlreadyPrescribed = useMemo(
-    () => activeOrders?.some((order) => order.drug.uuid == drug.uuid),
+    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
     [activeOrders, drug],
   );
 
