@@ -118,6 +118,11 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         ).toUpperCase()}
         <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
     },
+    zoomBar: {
+      top: {
+        enabled: true,
+      },
+    },
     height: '400px',
   };
 

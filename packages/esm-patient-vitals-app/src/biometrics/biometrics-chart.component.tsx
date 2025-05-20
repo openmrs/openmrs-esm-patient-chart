@@ -95,6 +95,11 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           )} -
           <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
       },
+      zoomBar: {
+        top: {
+          enabled: true,
+        },
+      },
       height: '400px',
     };
   }, [selectedBiometrics, t]);
