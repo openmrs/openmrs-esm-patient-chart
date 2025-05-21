@@ -389,12 +389,11 @@ function AllergyForm({
     () => [
       ...allergens.map((allergen) => ({
         ...allergen,
-        disabled:
-          formContext === 'editing' ? false : allergies?.some((allergy) => allergy.display === allergen.display),
+        disabled: allergies?.some((allergy) => allergy.display === allergen.display),
       })),
       { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER, disabled: false },
     ],
-    [allergens, otherConceptUuid, t, allergies, formContext],
+    [allergens, otherConceptUuid, t, allergies],
   );
 
   const allergicReactionsItems = useMemo(
