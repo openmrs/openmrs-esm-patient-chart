@@ -5,12 +5,13 @@ import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-fram
 import {
   type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
+  type Form,
   launchFormEntryOrHtmlForms,
+  mapFormsToHtmlFormEntryForms,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
-import { mapFormsToHtmlFormEntryForms } from '../form-entry-interop';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
@@ -42,14 +43,13 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   }, [config.htmlFormEntryForms, allForms]);
 
   const handleFormOpen = useCallback(
-    (formUuid: string, encounterUuid: string, formName: string) => {
+    (form: Form, encounterUuid: string) => {
       launchFormEntryOrHtmlForms(
         htmlFormEntryForms,
         patientUuid,
-        formUuid,
+        form,
         currentVisit?.uuid,
         encounterUuid,
-        formName,
         currentVisit?.visitType.uuid,
         currentVisit?.startDatetime,
         currentVisit?.stopDatetime,
