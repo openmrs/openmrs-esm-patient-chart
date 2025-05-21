@@ -111,3 +111,8 @@
   align-items: center;
   min-height: 50%;
 }
+
+.disabledAllergen {
+  background-color: $grey-2;
+  cursor: not-allowed;
+}

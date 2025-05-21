@@ -1,7 +1,7 @@
+import { openmrsFetch, restBaseUrl, useConfig, type OpenmrsResource } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type OpenmrsResource } from '@openmrs/esm-framework';
 import { ALLERGEN_TYPES, type AllergenType } from '../../types';
 
 interface ConceptFetchResponse {
@@ -43,6 +43,7 @@ export interface Allergen {
   uuid: string;
   display: string;
   type: AllergenType;
+  disabled?: boolean;
 }
 
 export interface AllergicReaction {

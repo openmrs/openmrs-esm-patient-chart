@@ -1,6 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import classNames from 'classnames';
-import { useTranslation, type TFunction } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -19,22 +16,25 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { ExtensionSlot, ResponsiveWrapper, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useTranslation, type TFunction } from 'react-i18next';
+import { z } from 'zod';
+import { type AllergiesConfigObject } from '../../config-schema';
+import { ALLERGEN_TYPES, type Allergy } from '../../types';
+import { useAllergies } from '../allergy-intolerance.resource';
 import {
-  type Allergen,
-  type NewAllergy,
   saveAllergy,
   updatePatientAllergy,
   useAllergens,
   useAllergicReactions,
+  type Allergen,
+  type NewAllergy,
 } from './allergy-form.resource';
-import { useAllergies } from '../allergy-intolerance.resource';
-import { type AllergiesConfigObject } from '../../config-schema';
-import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
 
 interface AllergyFormData {
@@ -131,11 +131,10 @@ function AllergyForm({
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
-  const { mutate } = useAllergies(patientUuid);
+  const { allergies, mutate } = useAllergies(patient.id);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const formValuesLoadedRef = useRef(false);
-
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
     [concepts],
@@ -387,8 +386,15 @@ function AllergyForm({
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
   const allergenItems = useMemo(
-    () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER }],
-    [allergens, otherConceptUuid, t],
+    () => [
+      ...allergens.map((allergen) => ({
+        ...allergen,
+        disabled:
+          formContext === 'editing' ? false : allergies?.some((allergy) => allergy.display === allergen.display),
+      })),
+      { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER, disabled: false },
+    ],
+    [allergens, otherConceptUuid, t, allergies, formContext],
   );
 
   const allergicReactionsItems = useMemo(
