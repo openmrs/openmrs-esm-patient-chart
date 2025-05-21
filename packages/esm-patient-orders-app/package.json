@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-orders-app",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "license": "MPL-2.0",
   "description": "Microfrontend for the OpenMRS SPA providing the order basket for the patient chart",
   "browser": "dist/openmrs-esm-patient-orders-app.js",
