@@ -1,3 +1,6 @@
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import classNames from 'classnames';
+import { useTranslation, type TFunction } from 'react-i18next';
 import {
   Button,
   ButtonSet,
@@ -16,25 +19,22 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ExtensionSlot, ResponsiveWrapper, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useTranslation, type TFunction } from 'react-i18next';
 import { z } from 'zod';
-import { type AllergiesConfigObject } from '../../config-schema';
-import { ALLERGEN_TYPES, type Allergy } from '../../types';
-import { useAllergies } from '../allergy-intolerance.resource';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
+  type Allergen,
+  type NewAllergy,
   saveAllergy,
   updatePatientAllergy,
   useAllergens,
   useAllergicReactions,
-  type Allergen,
-  type NewAllergy,
 } from './allergy-form.resource';
+import { useAllergies } from '../allergy-intolerance.resource';
+import { type AllergiesConfigObject } from '../../config-schema';
+import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
 
 interface AllergyFormData {
