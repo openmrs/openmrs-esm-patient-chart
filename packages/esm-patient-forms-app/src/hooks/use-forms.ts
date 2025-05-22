@@ -19,21 +19,26 @@ import {
 } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
-export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
+function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
   const hasCustomFormsUrl = Boolean(customFormsUrl);
-  let url = hasCustomFormsUrl
-    ? customFormsUrl.indexOf('?') === -1
-      ? `${customFormsUrl}?patientUuid=${patientUuid}`
-      : customFormsUrl
-    : showHtmlFormEntryForms
-      ? formEncounterUrl
-      : formEncounterUrlPoc;
-  url = interpolateUrl(url, {
+
+  const baseUrl = hasCustomFormsUrl ? customFormsUrl : showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
+
+  const url = interpolateUrl(baseUrl, {
     patientUuid: patientUuid,
     visitUuid: visitUuid,
     representation: customFormRepresentation,
   });
+
+  return {
+    url,
+    hasCustomFormsUrl,
+  };
+}
+
+export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
+  const { url, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
