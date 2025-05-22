@@ -1,18 +1,8 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Add, edit and delete patient biometrics', async ({ page }) => {
+test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
   const biometricsPage = new BiometricsAndVitalsPage(page);
 
   await test.step('When I visit the vitals and biometrics page', async () => {
@@ -135,9 +125,4 @@ test('Add, edit and delete patient biometrics', async ({ page }) => {
   await test.step('And the Biometrics table should be empty', async () => {
     await expect(page.getByText(/There are no biometrics to display for this patient/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });

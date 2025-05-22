@@ -1,18 +1,8 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Add, edit and delete patient vitals', async ({ page }) => {
+test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
   const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
@@ -156,7 +146,7 @@ test('Add, edit and delete patient vitals', async ({ page }) => {
   });
 });
 
-test('Add low and critically low range patient vitals', async ({ page }) => {
+test('Add low and critically low range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
   const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
@@ -242,7 +232,7 @@ test('Add low and critically low range patient vitals', async ({ page }) => {
   });
 });
 
-test('Add high and critically high range patient vitals', async ({ page }) => {
+test('Add high and critically high range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
   const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
@@ -328,9 +318,4 @@ test('Add high and critically high range patient vitals', async ({ page }) => {
     });
     expect(afterContentLow).toBe('" ↑↑"');
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });
