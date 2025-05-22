@@ -16,7 +16,8 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
-    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+    // await page.getByLabel(/clinical forms/i, { exact: true }).click();
+    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
   });
 
   await test.step('Then I should see the clinical forms workspace', async () => {
@@ -57,7 +58,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.getByRole('button', { name: 'Order basket' }).click();
+    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {

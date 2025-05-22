@@ -13,7 +13,7 @@ import { type Visit } from '@openmrs/esm-framework/src';
 export interface CustomTestFixtures {
   loginAsAdmin: Page;
   patient: Patient;
-  visit: Visit;
+  visit?: Visit;
 }
 
 export interface CustomWorkerFixtures {
