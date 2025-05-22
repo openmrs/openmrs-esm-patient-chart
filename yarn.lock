@@ -4520,6 +4520,7 @@ __metadata:
     webpack: "npm:^5.94.0"
   peerDependencies:
     "@carbon/react": 1.x
+    "@openmrs/esm-form-engine-lib": 3.x
     "@openmrs/esm-framework": 6.x
     "@openmrs/esm-patient-common-lib": "*"
     dayjs: 1.x

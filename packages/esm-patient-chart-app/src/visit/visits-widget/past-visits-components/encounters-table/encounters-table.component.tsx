@@ -47,6 +47,7 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
+import { FormEngine } from '@openmrs/esm-form-engine-lib/src';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -271,6 +272,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
+                              <FormEngine
+                                patientUUID={patientUuid}
+                                formUUID={encounter?.form?.uuid}
+                                encounterUUID={encounter?.id}
+                                mode="embedded-view"
+                              />
+
                               <EncounterObservations observations={encounter.obs} />
                               {userHasAccess(encounter.editPrivilege, session?.user) && (
                                 <>
