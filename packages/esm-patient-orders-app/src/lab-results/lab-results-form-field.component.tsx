@@ -133,14 +133,10 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
       <InlineNotification
         kind="error"
         hideCloseButton
-        title={t('invalidConceptDatatype', 'Invalid concept datatype')}
+        title={t('invalidLabTestConfiguration', 'Invalid lab test configuration')}
         subtitle={t(
-          'updateConceptDatatypeFromNa',
-          'Update concept datatype from {{datatype}} to appropriate datatype',
-          {
-            datatype: concept.datatype.display,
-            interpolation: { escapeValue: false },
-          },
+          'invalidLabTestConfigurationSubtitle',
+          'This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.',
         )}
       />
     </>
