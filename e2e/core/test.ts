@@ -2,7 +2,7 @@ import { type APIRequestContext, type Page, test as base } from '@playwright/tes
 import { api } from '../fixtures';
 import { type Patient } from '../commands';
 import { generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
-import { type Visit } from '@openmrs/esm-framework/src';
+import { type Visit } from '@openmrs/esm-framework';
 
 // This file sets up our custom test harness using the custom fixtures.
 // See https://playwright.dev/docs/test-fixtures#creating-a-fixture for details.
