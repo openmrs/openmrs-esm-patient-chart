@@ -645,7 +645,9 @@ describe('LabResultsForm', () => {
     const label = screen.getByText('Test Concept');
     expect(label).toBeInTheDocument();
 
-    const errorNotification = screen.getByText('Update concept datatype from N/A to appropriate datatype');
+    const errorNotification = screen.getByText(
+      'This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.',
+    );
     expect(errorNotification).toBeInTheDocument();
   });
 
