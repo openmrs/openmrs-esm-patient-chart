@@ -40,6 +40,14 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
     return units ? ` (${displayUnit})` : '';
   };
 
+  const getSavedMemberValue = useCallback(
+    (conceptUuid: string, hl7Abbreviation: string) => {
+      const value = defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid)?.value;
+      return hl7Abbreviation === 'CWE' && value && typeof value === 'object' && 'uuid' in value ? value.uuid : value;
+    },
+    [defaultValue],
+  );
+
   const getSavedMemberDefaultObservation = useCallback(
     (conceptUuid: string) => defaultValue?.groupMembers?.find((member) => member.concept.uuid === conceptUuid),
 
@@ -95,7 +103,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               <Select
                 {...field}
                 className={styles.textInput}
-                defaultValue={defaultValue?.value?.uuid}
+                defaultValue={getSavedMemberValue(concept.uuid, concept.datatype.hl7Abbreviation)}
                 id={`select-${concept.uuid}`}
                 key={concept.uuid}
                 labelText={labelText}
