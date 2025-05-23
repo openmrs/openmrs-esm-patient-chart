@@ -3,6 +3,7 @@ import { type Order } from '@openmrs/esm-patient-common-lib';
 import useSWR from 'swr';
 import { type Encounter, type Observation } from '../types/encounter';
 import { type OrderDiscontinuationPayload } from '../types/order';
+import { useMemo } from 'react';
 
 const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
@@ -79,13 +80,19 @@ export function useOrderConceptByUuid(uuid: string) {
     apiUrl,
     openmrsFetch,
   );
-  return {
-    concept: data?.data,
-    isLoading,
-    error,
-    isValidating,
-    mutate,
-  };
+
+  const results = useMemo(
+    () => ({
+      concept: data?.data,
+      isLoading,
+      error,
+      isValidating,
+      mutate,
+    }),
+    [data, error, isLoading, isValidating, mutate],
+  );
+
+  return results;
 }
 
 export function useLabEncounter(encounterUuid: string) {
