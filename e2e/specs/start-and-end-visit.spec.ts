@@ -1,19 +1,22 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { type Patient, generateRandomPatient, deletePatient } from '../commands';
 import { ChartPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Start and end a new visit', async ({ page }) => {
+test('Start and end a new visit', async ({ page, patient, api }) => {
   const chartPage = new ChartPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
     await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('Ensure no active visits for the patient', async () => {
+    const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
+    const data = await res.json();
+    const visits = data?.results || [];
+
+    for (const visit of visits) {
+      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
+    }
   });
 
   await test.step('And I click on the `Add visit` button in the actions overflow menu', async () => {
@@ -100,8 +103,4 @@ test('Start and end a new visit', async ({ page }) => {
   await test.step('Then I should see a success notification', async () => {
     await expect(chartPage.page.getByText(/ended current visit successfully/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
