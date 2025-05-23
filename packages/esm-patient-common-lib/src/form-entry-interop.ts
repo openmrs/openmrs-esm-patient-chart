@@ -1,4 +1,5 @@
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 
 export const clinicalFormsWorkspace = 'clinical-forms-workspace';
 export const formEntryWorkspace = 'patient-form-entry-workspace';
@@ -67,7 +68,7 @@ export function launchFormEntry(
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   formEntryWorkspaceName = formEntryWorkspace,
 ) {
-  launchPatientWorkspace(formEntryWorkspaceName, {
+  launchWorkspace(formEntryWorkspaceName, {
     workspaceTitle: formName,
     clinicalFormsWorkspaceName,
     formEntryWorkspaceName,
@@ -94,7 +95,7 @@ export function launchHtmlFormEntry(
   htmlForm: HtmlFormEntryForm,
   workspaceName = htmlFormEntryWorkspace,
 ) {
-  launchPatientWorkspace(workspaceName, {
+  launchWorkspace(workspaceName, {
     workspaceTitle: formName,
     patientUuid,
     formInfo: {
