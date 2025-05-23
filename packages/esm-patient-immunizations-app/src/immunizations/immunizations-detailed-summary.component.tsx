@@ -95,11 +95,11 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                 { time: false, noToday: true },
               )}`
             : immunization.existingDoses?.length
-              ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${formatDate(
-                  parseDate(first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime),
-                  { time: false, noToday: true },
-                )} `
-              : '';
+            ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${formatDate(
+                parseDate(first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime),
+                { time: false, noToday: true },
+              )} `
+            : '';
 
         return {
           id: immunization.vaccineUuid,

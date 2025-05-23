@@ -56,8 +56,8 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
     key === 'encounterDate'
       ? sortDate(notes, order)
       : order === 'DESC'
-        ? orderBy(notes, [key], ['desc'])
-        : orderBy(notes, [key], ['asc']);
+      ? orderBy(notes, [key], ['desc'])
+      : orderBy(notes, [key], ['asc']);
 
   function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
