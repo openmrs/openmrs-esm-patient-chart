@@ -1,19 +1,9 @@
 /* eslint-disable playwright/no-nested-step */
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, type Patient, startVisit, endVisit, deletePatient } from '../commands';
 import { test } from '../core';
 import { ChartPage, ResultsViewerPage, VisitsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Record and edit test results', async ({ page }) => {
+test('Record and edit test results', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const resultsViewerPage = new ResultsViewerPage(page);
   const visitsPage = new VisitsPage(page);
@@ -377,9 +367,4 @@ test('Record and edit test results', async ({ page }) => {
       });
     }
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });

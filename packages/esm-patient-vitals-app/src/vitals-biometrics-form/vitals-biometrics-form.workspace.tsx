@@ -588,7 +588,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
             className={styles.errorNotification}
             lowContrast={false}
             onClose={() => setHasInvalidVitals(false)}
-            title={t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics')}
+            title={t('vitalsAndBiometricsSaveError', 'Error saving Vitals and Biometrics')}
             subtitle={t('checkForValidity', 'Some of the values entered are invalid')}
           />
         </Column>

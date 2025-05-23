@@ -1,15 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { PatientAllergiesPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Add, edit and delete an allergy', async ({ page }) => {
+test('Add, edit and delete an allergy', async ({ page, patient }) => {
   const allergiesPage = new PatientAllergiesPage(page);
   const headerRow = allergiesPage.allergiesTable().locator('thead > tr');
   const dataRow = allergiesPage.allergiesTable().locator('tbody > tr');
@@ -150,8 +143,4 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   await test.step('And the allergy table should be empty', async () => {
     await expect(page.getByText(/there are no allergy intolerances to display for this patient/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

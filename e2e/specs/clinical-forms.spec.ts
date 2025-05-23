@@ -1,23 +1,13 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
-import { generateRandomPatient, deletePatient, type Patient, startVisit, endVisit } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
-
-let patient: Patient;
-let visit: Visit;
 
 const subjectiveFindings = `I've had a headache for the last two days`;
 const objectiveFindings = `General appearance is healthy. No signs of distress. Head exam shows no abnormalities, no tenderness on palpation. Neurological exam is normal; cranial nerves intact, normal gait and coordination.`;
 const assessment = `Diagnosis: Tension-type headache. Differential Diagnoses: Migraine, sinusitis, refractive error.`;
 const plan = `Advise use of over-the-counter ibuprofen as needed for headache pain. Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.`;
 
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Fill a clinical form', async ({ page }) => {
+test('Fill a clinical form', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -67,7 +57,7 @@ test('Fill a clinical form', async ({ page }) => {
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
+    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
@@ -118,7 +108,7 @@ test('Fill a clinical form', async ({ page }) => {
   });
 });
 
-test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
+test('Fill a form with a browser slightly ahead of time', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
   await page.clock.fastForward('01:00'); // Advances the time by 1 minute in the testing environment.
@@ -168,7 +158,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page }) => {
   });
 });
 
-test('Form state is retained when moving between forms in the workspace', async ({ page }) => {
+test('Form state is retained when moving between forms in the workspace', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
@@ -197,7 +187,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.getByRole('button', { name: /order basket/i, exact: true }).click();
+    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
@@ -215,7 +205,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 });
 
-test('Form state is retained when minimizing a form in the workspace', async ({ page }) => {
+test('Form state is retained when minimizing a form in the workspace', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
 
   await test.step('When I visit the chart summary page', async () => {
@@ -270,9 +260,4 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });
