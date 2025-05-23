@@ -1,0 +1,11 @@
+@use '@carbon/react/scss/colors';
+
+.customModal {
+  :global(.cds--modal-close) {
+    position: fixed;
+  }
+
+  :global(.cds--btn--primary) {
+    background-color: transparent;
+  }
+}

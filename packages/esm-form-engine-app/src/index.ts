@@ -29,6 +29,8 @@ export const deleteQuestionModal = getAsyncLifecycle(
   options,
 );
 
+export const emptyFormModal = getAsyncLifecycle(() => import('./form-renderer/repeat/empty-form.modal'), options);
+
 /**
  * DO NOT REMOVE THIS COMMENT
  * THE TRANSLATION KEYS AND VALUES USED IN THE FORM ENGINE LIB ARE WRITTEN HERE
