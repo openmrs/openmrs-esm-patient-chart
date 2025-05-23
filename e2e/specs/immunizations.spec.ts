@@ -1,18 +1,8 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, type Patient, startVisit, deletePatient } from '../commands';
 import { test } from '../core';
 import { ImmunizationsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Add and edit an immunization', async ({ page }) => {
+test('Add and edit an immunization', async ({ page, patient }) => {
   const immunizationsPage = new ImmunizationsPage(page);
   const headerRow = immunizationsPage.immunizationsTable().locator('thead > tr');
   const immunizationType = immunizationsPage.immunizationsTable().locator('tbody td:nth-child(2)');
@@ -122,8 +112,4 @@ test('Add and edit an immunization', async ({ page }) => {
     await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
     await expect(page.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
