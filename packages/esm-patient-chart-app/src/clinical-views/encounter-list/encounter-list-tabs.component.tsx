@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
-import { useConfig, useVisit } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { EncounterList } from './encounter-list.component';
 import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
 import styles from './encounter-list-tabs.scss';
@@ -15,7 +16,7 @@ interface EncounterListTabsComponentProps {
 
 const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
 
   const config = useConfig();
   const { tabDefinitions = [] } = config;

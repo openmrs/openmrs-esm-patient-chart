@@ -1,8 +1,8 @@
 import React from 'react';
-import { ErrorState, useVisit } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { launchPatientWorkspace, CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
@@ -12,7 +12,7 @@ interface CurrentVisitSummaryProps {
 
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { isLoading, currentVisit, error, isValidating } = useVisit(patientUuid);
+  const { isLoading, currentVisit, error, isValidating } = usePatientChartStore().visits;
 
   if (isLoading) {
     return (
