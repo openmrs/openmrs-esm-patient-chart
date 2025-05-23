@@ -57,7 +57,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.getByRole('button', { name: /medications/i }).click();
+    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
@@ -187,7 +187,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.getByRole('button', { name: /medications/i }).click();
+    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
