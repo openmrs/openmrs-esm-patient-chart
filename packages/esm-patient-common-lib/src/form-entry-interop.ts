@@ -1,24 +1,22 @@
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { type Form, type HtmlFormEntryForm, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+
+import { launchWorkspace } from '@openmrs/esm-framework';
 
 export const clinicalFormsWorkspace = 'clinical-forms-workspace';
 export const formEntryWorkspace = 'patient-form-entry-workspace';
 export const htmlFormEntryWorkspace = 'patient-html-form-entry-workspace';
 
-interface HtmlFormEntryForm {
-  formUuid: string;
-  formName: string;
-  formUiResource: string;
-  formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
-  formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
-}
+const formEngineResourceName = 'formEngine';
+const htmlformentryFormEngine = 'htmlformentry';
+const uiStyleResourceName = 'uiStyle';
+const uiStyleSimple = 'simple';
 
 export function launchFormEntryOrHtmlForms(
   htmlFormEntryForms: Array<HtmlFormEntryForm>,
   patientUuid: string,
-  formUuid: string,
+  form: Form,
   visitUuid?: string,
   encounterUuid?: string,
-  formName?: string,
   visitTypeUuid?: string,
   visitStartDatetime?: string,
   visitStopDatetime?: string,
@@ -28,8 +26,10 @@ export function launchFormEntryOrHtmlForms(
   htmlFormEntryWorkspaceName = htmlFormEntryWorkspace,
 ) {
   if (visitUuid) {
-    const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
+    const { uuid: formUuid, display, name } = form ?? {};
+    const formName = display ?? name ?? '--';
 
+    const htmlForm = toHtmlForm(form, htmlFormEntryForms);
     if (htmlForm) {
       launchHtmlFormEntry(patientUuid, formName, encounterUuid, visitUuid, htmlForm, htmlFormEntryWorkspaceName);
     } else {
@@ -67,7 +67,7 @@ export function launchFormEntry(
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   formEntryWorkspaceName = formEntryWorkspace,
 ) {
-  launchPatientWorkspace(formEntryWorkspaceName, {
+  launchWorkspace(formEntryWorkspaceName, {
     workspaceTitle: formName,
     clinicalFormsWorkspaceName,
     formEntryWorkspaceName,
@@ -94,7 +94,7 @@ export function launchHtmlFormEntry(
   htmlForm: HtmlFormEntryForm,
   workspaceName = htmlFormEntryWorkspace,
 ) {
-  launchPatientWorkspace(workspaceName, {
+  launchWorkspace(workspaceName, {
     workspaceTitle: formName,
     patientUuid,
     formInfo: {
@@ -103,4 +103,50 @@ export function launchHtmlFormEntry(
       htmlForm,
     },
   });
+}
+
+/**
+ * For a given form , check if it is an HTML form. If it is, return the HtmlFormEntryForm object,
+ * otherwise return null
+ * @param form
+ * @param htmlFormEntryForms A list of HTML forms configured in @esm-patient-forms-app's config
+ *
+ * @returns
+ */
+function toHtmlForm(form: Form, htmlFormEntryForms: Array<HtmlFormEntryForm>): HtmlFormEntryForm {
+  const isHtmlForm =
+    htmlFormEntryForms?.some((hfeForm) => hfeForm.formUuid === form.uuid) ||
+    form.resources?.some((resource) => {
+      return resource.name === formEngineResourceName && resource.valueReference === htmlformentryFormEngine;
+    });
+  if (isHtmlForm) {
+    const hfeForm = htmlFormEntryForms?.find((f) => f.formUuid === form.uuid);
+    const simple = form.resources?.some((r) => r.name === uiStyleResourceName && r.valueReference === uiStyleSimple);
+
+    return {
+      formUuid: form.uuid,
+      formName: hfeForm?.formName ?? form.display ?? form.name,
+      formUiResource: hfeForm?.formUiResource,
+      formUiPage: hfeForm?.formUiPage ?? (simple ? 'enterHtmlFormWithSimpleUi' : 'enterHtmlFormWithStandardUi'),
+      formEditUiPage: hfeForm?.formEditUiPage ?? (simple ? 'editHtmlFormWithSimpleUi' : 'editHtmlFormWithStandardUi'),
+    };
+  } else {
+    return null;
+  }
+}
+
+/**
+ * Given a list of forms and a list of HtmlFormEntryForm objects from configuration, return a List of HtmlFormEntryForm
+ * returned forms either
+ *  a) have a form resource with a name of `formEngine` and a value of `htmlformentry, or
+ *  b) have an entry in the HtmlFormEntryForm array for a given form uuid
+ * The HtmlFormEntryForm configuration provides a means to override the name and rendering mode of a given form
+ * @param allForms
+ * @param htmlFormEntryForms
+ */
+export function mapFormsToHtmlFormEntryForms(
+  allForms: Array<Form>,
+  htmlFormEntryForms: Array<HtmlFormEntryForm>,
+): Array<HtmlFormEntryForm> {
+  return allForms?.map((form) => toHtmlForm(form, htmlFormEntryForms))?.filter((form) => form !== null);
 }
