@@ -1,0 +1,21 @@
+{
+  "backToPatientLists": "Back to patient lists",
+  "checkFilters": "Check the filters above",
+  "createdOn": "შექმნის დრო",
+  "identifier": "იდენტიფიკატორი",
+  "listName": "სიის სახელი",
+  "listType": "სიის ტიპი",
+  "name": "სახელი",
+  "noMatchingListsFound": "No matching lists to display",
+  "noMatchingPatients": "No matching patients to display",
+  "noPatientListsToDisplay": "No patient lists to display",
+  "noPatientsInList": "There are no patients in this list",
+  "numberOfPatients": "პაციენტების რაოდენობა",
+  "patientListDetailWorkspaceTitle": "პაციენტის სიის დეტალები",
+  "patientLists": "პაციენტის სიები",
+  "patientListsWorkspaceTitle": "პაციენტის სიები",
+  "patients": "პაციენტი",
+  "searchThisList": "ამ სიაში ძებნა",
+  "sex": "სქესი",
+  "startDate": "დაწყების თარიღი"
+}

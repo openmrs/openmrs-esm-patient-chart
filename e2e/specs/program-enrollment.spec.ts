@@ -1,15 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { ProgramsPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Add and edit a program enrollment', async ({ page }) => {
+test('Add and edit a program enrollment', async ({ page, patient }) => {
   const programsPage = new ProgramsPage(page);
   const headerRow = programsPage.programsTable().locator('thead > tr');
   const dataRow = programsPage.programsTable().locator('tbody > tr');
@@ -124,8 +117,4 @@ test('Add and edit a program enrollment', async ({ page }) => {
     await expect(dataRow).not.toContainText(/outpatient clinic/i);
     await expect(dataRow).toContainText(/community outreach/i);
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
