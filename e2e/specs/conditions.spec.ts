@@ -1,15 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { ConditionsPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Record, edit and delete a condition', async ({ page }) => {
+test('Record, edit and delete a condition', async ({ page, patient }) => {
   const conditionsPage = new ConditionsPage(page);
   const headerRow = conditionsPage.conditionsTable().locator('thead > tr');
   const dataRow = conditionsPage.conditionsTable().locator('tbody > tr');
@@ -130,8 +123,4 @@ test('Record, edit and delete a condition', async ({ page }) => {
     await expect(conditionsPage.page.getByText(/mental status change/i)).toBeHidden();
     await expect(conditionsPage.page.getByText(/there are no conditions to display for this patient/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

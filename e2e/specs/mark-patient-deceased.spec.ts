@@ -1,16 +1,9 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { MarkPatientDeceasedPage } from '../pages/mark-patient-deceased-page';
 import dayjs from 'dayjs';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Mark a patient as deceased', async ({ page }) => {
+test('Mark a patient as deceased', async ({ page, patient }) => {
   const markPatientDeceasedPage = new MarkPatientDeceasedPage(page);
   const causeOfDeath = 'Neoplasm';
   const actionsButton = () => page.getByRole('button', { name: /actions/i });
@@ -57,8 +50,4 @@ test('Mark a patient as deceased', async ({ page }) => {
     const deceasedTagLocator = page.locator('[data-extension-id="deceased-patient-tag"] span[title="Deceased"]');
     await expect(deceasedTagLocator).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
