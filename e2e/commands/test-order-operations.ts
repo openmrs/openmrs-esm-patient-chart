@@ -1,7 +1,6 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from './types';
-import dayjs from 'dayjs';
 
 export const generateRandomTestOrder = async (
   api: APIRequestContext,
