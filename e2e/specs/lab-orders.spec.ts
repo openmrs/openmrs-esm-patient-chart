@@ -3,19 +3,19 @@ import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncoun
 import { test } from '../core';
 import { type Encounter, type Provider } from '../commands/types';
 import { type Order } from '@openmrs/esm-patient-common-lib';
-import { OrdersPage } from '../pages';
 
 let testOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
+const url = process.env.E2E_BASE_URL;
 
 test.describe('Running laboratory order tests sequentially', () => {
   test('Record a lab order', async ({ page, patient }) => {
-    const ordersPage = new OrdersPage(page);
+    await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(patient.uuid);
     });
 
     await test.step('And I click on the `Record orders` link', async () => {
@@ -61,7 +61,7 @@ test.describe('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('When I navigate to the orders dashboard', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(patient.uuid);
     });
 
     await test.step('Then I should see the newly added lab order in the list', async () => {
@@ -77,11 +77,41 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
   });
 
-  test('Modify a lab order', async ({ page, patient }) => {
-    const ordersPage = new OrdersPage(page);
+  test('Add laboratory results via orders app', async ({ page, patient }) => {
+    await test.step('When i navigate to the Orders section under patient chart', async () => {
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+    });
 
+    await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
+      await expect(page.getByRole('cell', { name: 'Test order' })).toBeVisible();
+      await expect(page.getByRole('cell', { name: 'Serum glucose' })).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu in the table row', async () => {
+      await page
+        .getByRole('button', { name: /options/i })
+        .nth(0)
+        .click();
+    });
+
+    await test.step(' Then I click on Add results action', async () => {
+      await page.getByRole('menuitem', { name: 'Add results' }).click();
+      await expect(page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' })).toBeVisible();
+    });
+
+    await test.step(' Then I fill in the lab result and click save', async () => {
+      await page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' }).fill('55');
+      await page.getByRole('button', { name: 'Save and close' }).click();
+    });
+
+    await test.step('And a confirmation message should be displayed indicating that the result was saved', async () => {
+      await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
+    });
+  });
+
+  test('Modify a lab order', async ({ page, patient }) => {
     await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
@@ -123,10 +153,8 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
   });
 
   test('Discontinue a lab order', async ({ page, patient }) => {
-    const ordersPage = new OrdersPage(page);
-
     await test.step('When I visit the orders page', async () => {
-      await ordersPage.goTo(patient.uuid);
+      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
