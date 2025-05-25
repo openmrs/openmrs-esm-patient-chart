@@ -15,7 +15,7 @@
   "flagCount_other": "{{count}} რისკის ალამი",
   "flagDisabled": "ალამი გამორთულია",
   "flagDisabledSuccessfully": "ალამი წარმატებით გაითიშა",
-  "flagDisableError": "Error disabling the flag",
+  "flagDisableError": "ალმის გამორთვის შეცდომა",
   "flagEnabled": "ალამი ჩართულია",
   "flagEnabledSuccessfully": "ალამი წარმატებით ჩაირთო",
   "flagEnableError": "ალმის ჩართვის შეცდომა",
@@ -25,5 +25,5 @@
   "noFlagsFound": "Sorry, no flags found matching your search",
   "retiredFirst": "აღარ გამოყენებული პირველი",
   "saveAndClose": "შენახვა და დახურვა",
-  "searchForAFlag": "Search for a flag"
+  "searchForAFlag": "ალმის ძებნა"
 }
