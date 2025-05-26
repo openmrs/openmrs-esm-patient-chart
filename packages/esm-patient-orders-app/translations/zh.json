@@ -32,6 +32,8 @@
   "indication": "适应症",
   "inStock": "In stock",
   "instructions": "Instructions",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error loading lab results",
   "launchOrderBasket": "开启医嘱篮",
   "loading": "加载中",
