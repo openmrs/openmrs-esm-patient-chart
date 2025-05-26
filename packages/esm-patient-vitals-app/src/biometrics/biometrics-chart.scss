@@ -20,7 +20,6 @@
 .biometricsArea {
   flex-grow: 1;
   margin: layout.$spacing-03 0;
-  padding-right: layout.$spacing-05;
 
   // This is a hack to override the max-width of the overflow menu button
   :global(
@@ -31,6 +30,11 @@
         .cds--overflow-menu-options__btn
     ) {
     max-width: none !important;
+  }
+
+  // Ensures the chart toolbar tooltips are visible
+  :global(.cds--tabs--vertical ~ .cds--tab-content) {
+    overflow-y: visible;
   }
 }
 
