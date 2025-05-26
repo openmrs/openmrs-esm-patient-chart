@@ -1,39 +1,23 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import {
-  generateRandomPatient,
-  deletePatient,
-  generateRandomDrugOrder,
-  deleteDrugOrder,
-  createEncounter,
-  deleteEncounter,
-  getProvider,
-  type Patient,
-  startVisit,
-  endVisit,
-} from '../commands';
+import { generateRandomDrugOrder, deleteDrugOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
 import { type Encounter, type Provider } from '../commands/types';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { test } from '../core';
 import { OrdersPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
 let drugOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
 const url = process.env.E2E_BASE_URL;
 
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
+test.beforeEach(async ({ api, patient, visit }) => {
   orderer = await getProvider(api);
   encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
   drugOrder = await generateRandomDrugOrder(api, patient.uuid, encounter, orderer.uuid);
 });
 
 test.describe('Drug Order Tests', () => {
-  test('Record a drug order', async ({ page }) => {
+  test('Record a drug order', async ({ page, patient }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
@@ -132,7 +116,7 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Edit a drug order', async ({ page }) => {
+  test('Edit a drug order', async ({ page, patient }) => {
     const form = page.locator('#drugOrderForm');
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
@@ -215,7 +199,7 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Discontinue a drug order', async ({ page }) => {
+  test('Discontinue a drug order', async ({ page, patient }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
@@ -244,7 +228,7 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Cancel a existing drug order', async ({ page, api }) => {
+  test('Cancel a existing drug order', async ({ page, patient }) => {
     const ordersPage = new OrdersPage(page);
 
     await test.step('When I click on the Orders section', async () => {
@@ -276,8 +260,6 @@ test.describe('Drug Order Tests', () => {
 });
 
 test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
   await deleteEncounter(api, encounter.uuid);
   await deleteDrugOrder(api, drugOrder.uuid);
-  await deletePatient(api, patient.uuid);
 });
