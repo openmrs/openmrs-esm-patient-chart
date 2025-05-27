@@ -38,6 +38,12 @@
       }
     },
     {
+      "name": "print-lab-results-action-button",
+      "component": "printLabResultsButton",
+      "slot": "print-lab-results-action-button-slot",
+      "meta":{ "fullWidth": false }
+    },
+    {
       "name": "patient-orders-summary-dashboard",
       "component": "ordersDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -84,6 +90,12 @@
       "title": "searchOrderables",
       "component": "orderableConceptSearch",
       "type": "order"
+    }
+  ],
+  "modals": [
+    {
+      "component": "printLabResultModal",
+      "name": "print-lab-results-modal"
     }
   ]
 }

@@ -6,10 +6,7 @@ import { type OrderDiscontinuationPayload } from '../types/order';
 import { useMemo } from 'react';
 
 const labEncounterRepresentation =
-  'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
-  'patient:(uuid,display),encounterProviders:(uuid,provider:(uuid,name)),' +
-  'obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),' +
-  'value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name))))';
+  'custom:(uuid,encounterDatetime,encounterType:(uuid,display),location:(uuid,name),patient:(uuid,display,person:(uuid,display,gender,age)),encounterProviders:(uuid,provider:(uuid,name)),obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name)))';
 const labConceptRepresentation =
   'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal))';

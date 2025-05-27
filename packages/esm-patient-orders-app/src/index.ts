@@ -56,7 +56,10 @@ export const ordersDashboardLink =
 
 export const ordersDashboard = getSyncLifecycle(OrdersSummary, options);
 export const labResult = getAsyncLifecycle(() => import('./lab-results/lab-result.component'), options);
-
+export const printLabResultModal = getAsyncLifecycle(
+  () => import('./lab-results/print-results/print-modal/print-results-modal'),
+  options,
+);
 // t('searchOrderables','Search orderables')
 export const orderableConceptSearch = getAsyncLifecycle(
   () => import('./order-basket/general-order-type/orderable-concept-search/orderable-concept-search.workspace'),
