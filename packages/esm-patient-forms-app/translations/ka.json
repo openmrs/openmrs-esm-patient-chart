@@ -10,7 +10,7 @@
   "never": "არასდროს",
   "noFormsToDisplay": "There are no forms to display.",
   "noMatchingFormsAvailable": "There are no {{formCategory}} forms to display",
-  "noMatchingFormsToDisplay": "No matching forms to display",
+  "noMatchingFormsToDisplay": "საჩვენებლად შესაბამისი ფორმები აღმოჩენილი არაა",
   "offlineForms": "ინტერნეტის გარეშე ფორმები",
   "offlineForms__lower": "ინტერნეტის გარეშე ფორმა",
   "offlineFormsOverviewCardAvailableOffline": "ხელმისაწვდომია ინტერნეტის გარეშეც",

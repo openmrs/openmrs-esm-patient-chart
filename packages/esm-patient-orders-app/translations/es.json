@@ -32,6 +32,8 @@
   "indication": "Indicación",
   "inStock": "En stock",
   "instructions": "Instrucciones",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error al cargar resultados de laboratorio",
   "launchOrderBasket": "Abrir canasta de órdenes",
   "loading": "Cargando",

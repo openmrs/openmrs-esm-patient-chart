@@ -29,7 +29,7 @@
   "fileDeleted": "ფაილი წაიშალა",
   "fileName": "ფაილის სახელი",
   "fileSizeInstructions": "Drag and drop files here or click to upload",
-  "fileSizeLimitExceeded": "exceeds the size limit of",
+  "fileSizeLimitExceeded": " სცდება ზომის ლიმიტს მიმაგრებული ფაილებისთვის",
   "fileSizeLimitExceededText": "ფაილის ზომის ლიმიტი გადაცილებულია",
   "fileUploadSizeConstraints": "ფაილის ზომის ლიმიტია {{fileSize}}მბ",
   "gridView": "ბადის ხედი",
