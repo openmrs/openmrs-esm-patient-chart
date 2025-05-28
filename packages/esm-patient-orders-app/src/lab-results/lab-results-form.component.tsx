@@ -215,7 +215,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 defaultValue={completeLabResult}
                 concept={concept}
                 control={control as unknown as Control<Record<string, unknown>>}
-                errors={errors}
               />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />

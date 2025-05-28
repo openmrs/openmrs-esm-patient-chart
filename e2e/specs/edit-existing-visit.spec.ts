@@ -1,25 +1,10 @@
 import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
-import {
-  deletePatient,
-  generateRandomPatient,
-  getVisit,
-  type Patient,
-  startVisit,
-  visitStartDatetime,
-} from '../commands';
+import { getVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Edit an existing ongoing visit', async ({ page, api }) => {
+test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -95,7 +80,7 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
   });
 });
 
-test('Edit an existing ongoing visit to have an end time', async ({ page, api }) => {
+test('Edit an existing ongoing visit to have an end time', async ({ page, api, patient, visit }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -136,8 +121,4 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api })
     const updatedVisit = await getVisit(api, visit.uuid);
     expect(updatedVisit.stopDatetime).not.toBeNull();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });
