@@ -1,7 +1,7 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "chartView": "გრაფიკის ხედი",
+  "dateAndTime": "თარიღი და დრო",
+  "displaying": "ნაჩვენებია",
+  "encounterType": "კონსულტაციის ტიპი",
+  "tableView": "ცხრილის ხედი"
 }
