@@ -1,11 +1,16 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
+import { HomePage } from '../pages/home-page';
 
 const subjectiveFindings = `I've had a headache for the last two days`;
 const objectiveFindings = `General appearance is healthy. No signs of distress. Head exam shows no abnormalities, no tenderness on palpation. Neurological exam is normal; cranial nerves intact, normal gait and coordination.`;
 const assessment = `Diagnosis: Tension-type headache. Differential Diagnoses: Migraine, sinusitis, refractive error.`;
 const plan = `Advise use of over-the-counter ibuprofen as needed for headache pain. Educate about proper posture during reading and screen time; discuss healthy sleep hygiene. Schedule a follow-up appointment in 2 weeks or sooner if the headache becomes more frequent or severe.`;
+
+test.use({
+  locale: 'en',
+});
 
 test('Fill a clinical form', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
@@ -259,5 +264,88 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
 
   await test.step('Then I should see a success notification', async () => {
     await expect(page.getByText(/form submitted successfully/i)).toBeVisible();
+  });
+});
+
+test('Form labels should be translated to the system language', async ({ page, patient }) => {
+  const chartPage = new ChartPage(page);
+  const homePage = new HomePage(page);
+
+  await test.step('When I visit the home page', async () => {
+    await homePage.goTo();
+  });
+
+  await test.step('Then I change the system language to French', async () => {
+    await homePage.myAccountButton().click();
+    await homePage.changeLanguageButton().click();
+    await page.locator('label').filter({ hasText: 'Français' }).locator('span').first().click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /change/i })
+      .click();
+  });
+
+  await test.step('Then I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByRole('button', { name: /formulaires cliniques/i, exact: true }).click();
+  });
+
+  await test.step('Then I should see the `Adult HIV Return Visit` form listed in the clinical forms workspace', async () => {
+    await expect(page.getByRole('cell', { name: /adult hiv return visit/i, exact: true })).toBeVisible();
+  });
+
+  await test.step('And when I click the `Adult HIV Return Visit` link to launch the form', async () => {
+    await page.getByText(/adult hiv return visit/i).click();
+  });
+
+  await test.step('Then I should see the `Adult HIV Return Visit` form launch in the workspace', async () => {
+    await expect(page.getByText(/adult hiv return visit/i)).toBeVisible();
+  });
+
+  await test.step('And I should see all the form labels translated to French', async () => {
+    await expect(page.getByRole('paragraph').filter({ hasText: /détails de la rencontre/i })).toBeVisible();
+    await expect(page.getByRole('paragraph').filter({ hasText: /examen préclinique/i })).toBeVisible();
+    await expect(page.getByRole('paragraph').filter({ hasText: /histoire clinique/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^enregistrer$/i, exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /annuler/i, exact: true })).toBeVisible();
+    await expect(page.getByText(/réduire tout/i, { exact: true })).toBeVisible();
+  });
+
+  await test.step('And when I change the system language back to English', async () => {
+    await homePage.goTo();
+    await page.getByRole('button', { name: /mon compte/i, exact: true }).click();
+    await page
+      .getByLabel(/changer de langue/i)
+      .getByRole('button', { name: /modifier/i })
+      .click();
+    await page
+      .locator('label')
+      .filter({ hasText: /^english$/i })
+      .locator('span')
+      .first()
+      .click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /modifier/i })
+      .click();
+  });
+
+  await test.step('Then I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Clinical forms` button on the siderail', async () => {
+    await page.getByRole('button', { name: /clinical forms/i, exact: true }).click();
+  });
+
+  await test.step('Then I click the `Adult HIV Return Visit` link to launch the form', async () => {
+    await page.getByText(/adult hiv return visit/i).click();
+  });
+
+  await test.step('Then I should see the form labels updated to English', async () => {
+    await expect(page.getByRole('paragraph').filter({ hasText: /encounter details/i })).toBeVisible();
   });
 });
