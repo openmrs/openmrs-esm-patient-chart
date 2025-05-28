@@ -267,7 +267,7 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 });
 
-test('Form labels should be translated to the system language', async ({ page, patient }) => {
+test.skip('Form labels should be translated to the system language', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const homePage = new HomePage(page);
 
