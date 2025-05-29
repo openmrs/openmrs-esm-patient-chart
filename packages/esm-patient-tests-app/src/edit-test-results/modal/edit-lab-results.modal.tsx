@@ -2,8 +2,6 @@ import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGr
 import { launchWorkspace, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import lowerCase from 'lodash-es/lowerCase';
-import upperCase from 'lodash-es/upperCase';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './edit-lab-results.scss';
@@ -42,12 +40,12 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
       <ModalBody>
         <p className={styles.titleHeader}>
           {t('confirmationText', 'Do you want to edit {{test}} results for the following patient?', {
-            test: lowerCase(orders?.find((order) => order?.uuid === selectedOrder)?.concept?.display),
+            test: orders?.find((order) => order?.uuid === selectedOrder)?.concept?.display,
           })}
         </p>
         <div className={classNames(styles.modalBody, styles.modalContentWrapper)}>
           <div className={styles.selectionPanel}>
-            <h4 className={styles.titleHeader}>{upperCase(t('selectTestToEdit', 'Select test to edit'))}</h4>
+            <h4 className={styles.titleHeader}>{t('selectTestToEdit', 'Select test to edit')}</h4>
             <div className={styles.radioGroup}>
               <RadioButtonGroup
                 name="order-selection-group"
@@ -60,7 +58,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                   <RadioButton
                     key={order.uuid}
                     id={order.uuid}
-                    labelText={<span className={styles.radioLabel}>{upperCase(order.concept.display)}</span>}
+                    labelText={<span className={styles.radioLabel}>{order.concept.display}</span>}
                     value={order.uuid}
                     className={styles.radioItem}
                   />
@@ -78,21 +76,21 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
                     <div className={styles.patientDetailsBody}>
                       <div>
-                        <p className={styles.itemHeading}>{upperCase(t('patientDetails', 'Patient Details'))}</p>
+                        <p className={styles.itemHeading}>{t('patientDetails', 'Patient Details')}</p>
                         <p className={styles.itemLabel}>
-                          {upperCase(t('name', 'Name'))}: {upperCase(firstOrder?.patient?.person?.display)}
+                          {t('name', 'Name')}: {firstOrder?.patient?.person?.display}
                         </p>
                         <p className={styles.itemLabel}>
-                          {upperCase(t('age', 'Age'))}: {firstOrder?.patient?.person?.age}
+                          {t('age', 'Age')}: {firstOrder?.patient?.person?.age}
                         </p>
                         <p className={styles.itemLabel}>
-                          {upperCase(t('gender', 'Gender'))}:
-                          {upperCase(firstOrder?.patient?.person?.gender === 'M' ? 'Male' : 'Female')}
+                          {t('gender', 'Gender')}:
+                          {firstOrder?.patient?.person?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')}
                         </p>
                       </div>
 
                       <div className={styles.facilityDetails}>
-                        <p className={styles.itemLabel}>{upperCase(location)}</p>
+                        <p className={styles.itemLabel}>{location}</p>
                         <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
                       </div>
                     </div>
