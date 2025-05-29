@@ -22,7 +22,7 @@
   "loading": "მიმდინარეობს ჩატვირთვა",
   "matchesForSearchTerm_one": "{{count}} ალამი",
   "matchesForSearchTerm_other": "{{count}} ალამი",
-  "noFlagsFound": "Sorry, no flags found matching your search",
+  "noFlagsFound": "უკაცრავად, მაგრამ ძებნის პირობას ალმები არ შეესაბამება",
   "retiredFirst": "აღარ გამოყენებული პირველი",
   "saveAndClose": "შენახვა და დახურვა",
   "searchForAFlag": "ალმის ძებნა"
