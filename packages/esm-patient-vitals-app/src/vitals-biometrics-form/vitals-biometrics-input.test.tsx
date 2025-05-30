@@ -91,7 +91,7 @@ jest.mock('../common', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
+    useConceptUnits: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
       conceptMetadata: { ...overridenMetadata },
       isLoading: false,

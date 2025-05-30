@@ -7,6 +7,7 @@ import { mutate } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { type ObservationValue } from '../types/encounter';
 import {
   createObservationPayload,
   isCoded,
@@ -59,32 +60,32 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     formState: { errors, isDirty, isSubmitting },
     setValue,
     handleSubmit,
-  } = useForm<{ testResult: Record<string, unknown> }>({
-    defaultValues: {},
+  } = useForm<Record<string, ObservationValue>>({
+    defaultValues: {} as Record<string, ObservationValue>,
     resolver: zodResolver(schema),
     mode: 'all',
   });
 
   useEffect(() => {
     if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
-      if (isCoded(concept) && completeLabResult?.value?.uuid) {
-        setValue(concept.uuid as any, completeLabResult?.value?.uuid);
+      if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
+        setValue(concept.uuid, completeLabResult.value.uuid);
       } else if (isNumeric(concept) && completeLabResult?.value) {
-        setValue(concept.uuid as any, parseFloat(completeLabResult?.value as any));
+        setValue(concept.uuid, parseFloat(completeLabResult.value as string));
       } else if (isText(concept) && completeLabResult?.value) {
-        setValue(concept.uuid as any, completeLabResult?.value);
+        setValue(concept.uuid, completeLabResult?.value);
       } else if (isPanel(concept)) {
         concept.setMembers.forEach((member) => {
           const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
-          let value: any;
+          let value: ObservationValue;
           if (isCoded(member)) {
-            value = obs?.value?.uuid;
+            value = typeof obs?.value === 'object' ? obs.value.uuid : obs?.value;
           } else if (isNumeric(member)) {
-            value = obs?.value ? parseFloat(obs?.value as any) : undefined;
+            value = obs?.value ? parseFloat(obs.value as string) : undefined;
           } else if (isText(member)) {
             value = obs?.value;
           }
-          if (value) setValue(member.uuid as any, value);
+          if (value) setValue(member.uuid, value);
         });
       }
     }
@@ -214,7 +215,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 defaultValue={completeLabResult}
                 concept={concept}
                 control={control as unknown as Control<Record<string, unknown>>}
-                errors={errors}
               />
             ) : (
               <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />

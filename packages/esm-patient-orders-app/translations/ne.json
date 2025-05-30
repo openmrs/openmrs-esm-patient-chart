@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Actions menu",
-  "activeVisitRequired": "An active visit is required to make orders",
   "add": "Add",
   "additionalInstructions": "Additional instructions",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
@@ -33,6 +32,8 @@
   "indication": "Indication",
   "inStock": "In stock",
   "instructions": "Instructions",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error loading lab results",
   "launchOrderBasket": "Launch order basket",
   "loading": "Loading",
@@ -47,6 +48,7 @@
   "noMatchingOrdersToDisplay": "No matching orders to display",
   "noResultsForTestTypeSearch": "No results to display for \"{{searchTerm}}\"",
   "normalRange": "Normal range",
+  "noTestData": "No test data available",
   "onDate": "on",
   "or": "or",
   "order": "Order",
@@ -109,11 +111,13 @@
   "status": "Status",
   "successfullyCancelledOrder": "Order {{orderNumber}} has been cancelled successfully",
   "successfullySavedLabResults": "Lab results for {{orderNumber}} have been successfully updated",
+  "test": "Test",
   "Test Order_few": "Test orders",
   "testType": "Test type",
   "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
   "updated": "Updated",
-  "usingADifferentTerm": "using a different term"
+  "usingADifferentTerm": "using a different term",
+  "visitRequired": "A visit is required to make orders"
 }

@@ -1,3 +1,6 @@
+import { Patient, PersonAddress } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+
 export const mockFhirPatient: fhir.Patient = {
   resourceType: 'Patient',
   id: 'bfa09dac-ec9e-47c1-9ad3-e3ebdd5d722d',
@@ -320,4 +323,47 @@ export const mockFhirPatient: fhir.Patient = {
       country: 'Uganda',
     },
   ],
+};
+
+const birthdate = '2000-01-01T00:00:00.000+0000';
+const age = dayjs().diff(birthdate, 'years');
+
+const mockAddress: PersonAddress = {
+  postalCode: '12345',
+  address1: '123 Main St',
+  cityVillage: 'City',
+  stateProvince: 'State',
+  country: 'Country',
+  preferred: true,
+  uuid: 'add7e55',
+};
+
+export const mockPatientAlice: Patient = {
+  uuid: '00000000-0000-0001-0000-000000000000',
+  display: 'Alice Johnson',
+  identifiers: [],
+  person: {
+    uuid: '00000000-0001-0000-0000-000000000000',
+    display: 'Alice Johnson',
+    gender: 'F',
+    age: age,
+    birthdate: birthdate,
+    birthdateEstimated: false,
+    dead: false,
+    deathDate: null,
+    causeOfDeath: null,
+    preferredName: {
+      display: 'Alice Johnson',
+      givenName: 'Alice',
+      familyName: 'Johnson',
+      uuid: 'preferred-name-uuid',
+    },
+    preferredAddress: mockAddress as PersonAddress,
+    names: [null],
+    addresses: [],
+    attributes: [],
+    birthtime: null,
+    deathdateEstimated: null,
+    causeOfDeathNonCoded: null,
+  },
 };

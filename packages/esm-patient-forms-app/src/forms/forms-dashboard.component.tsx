@@ -5,7 +5,9 @@ import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-fram
 import {
   type DefaultPatientWorkspaceProps,
   EmptyDataIllustration,
+  type Form,
   launchFormEntryOrHtmlForms,
+  mapFormsToHtmlFormEntryForms,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
@@ -28,19 +30,26 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
-  const htmlFormEntryForms = config.htmlFormEntryForms;
-  const { data: forms, error, mutateForms } = useForms(patientUuid, undefined, undefined, !isOnline, config.orderBy);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const {
+    data: forms,
+    allForms,
+    error,
+    mutateForms,
+  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+
+  const htmlFormEntryForms = useMemo(() => {
+    return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
+  }, [config.htmlFormEntryForms, allForms]);
 
   const handleFormOpen = useCallback(
-    (formUuid: string, encounterUuid: string, formName: string) => {
+    (form: Form, encounterUuid: string) => {
       launchFormEntryOrHtmlForms(
         htmlFormEntryForms,
         patientUuid,
-        formUuid,
+        form,
         currentVisit?.uuid,
         encounterUuid,
-        formName,
         currentVisit?.visitType.uuid,
         currentVisit?.startDatetime,
         currentVisit?.stopDatetime,

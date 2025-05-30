@@ -1,3 +1,5 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface FHIRAllergyResponse {
   entry: Array<{
     resource: FHIRAllergy;
@@ -74,11 +76,13 @@ export interface AllergicReaction {
   };
 }
 
-export enum ReactionSeverity {
-  MILD = 'mild',
-  MODERATE = 'moderate',
-  SEVERE = 'severe',
-}
+export const REACTION_SEVERITY = {
+  MILD: 'mild',
+  MODERATE: 'moderate',
+  SEVERE: 'severe',
+} as const;
+
+export type ReactionSeverity = (typeof REACTION_SEVERITY)[keyof typeof REACTION_SEVERITY];
 
 export interface CodingData {
   code: string;
@@ -87,14 +91,42 @@ export interface CodingData {
   system?: string;
 }
 
-export interface OpenMRSResource {
-  uuid: string;
-  display: string;
+export const ALLERGEN_TYPES = {
+  DRUG: 'DRUG',
+  FOOD: 'FOOD',
+  ENVIRONMENT: 'ENVIRONMENT',
+  OTHER: 'OTHER',
+} as const;
+
+export type AllergenType = (typeof ALLERGEN_TYPES)[keyof typeof ALLERGEN_TYPES];
+
+export interface PatientAllergyPayload {
+  allergenType: AllergenType;
+  codedAllergenUuid: string;
+  severityUuid: string;
+  comment?: string;
+  reactionUuids: Array<OpenmrsResource>;
 }
 
-export enum AllergenType {
-  DRUG = 'DRUG',
-  FOOD = 'FOOD',
-  ENVIRONMENT = 'ENVIRONMENT',
-  OTHER = 'OTHER',
-}
+export type Allergy = {
+  id: string;
+  clinicalStatus: string;
+  criticality: string;
+  display: string;
+  recordedDate: string;
+  recordedBy: string;
+  recorderType: string;
+  note: string;
+  reactionToSubstance: string;
+  reactionManifestations: Array<string>;
+  reactionSeverity: ReactionSeverity;
+  lastUpdated: string;
+};
+
+export type UseAllergies = {
+  allergies: Array<Allergy>;
+  error: Error | null;
+  isLoading: boolean;
+  isValidating: boolean;
+  mutate: () => void;
+};

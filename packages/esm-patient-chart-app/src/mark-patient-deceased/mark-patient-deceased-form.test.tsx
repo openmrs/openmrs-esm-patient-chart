@@ -81,9 +81,12 @@ describe('MarkPatientDeceasedForm', () => {
     expect(
       screen.getByText(/marking the patient as deceased will end any active visits for this patient/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/cause of death/i)).toBeInTheDocument();
+    const causes = screen.getAllByText(/cause of death/i);
+    expect(causes.length).toBeGreaterThan(0);
+    expect(causes[0]).toBeInTheDocument();
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date/i }));
+    expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
+
     codedCausesOfDeath.forEach((codedCauseOfDeath) => {
       expect(screen.getByRole('radio', { name: codedCauseOfDeath.display })).toBeInTheDocument();
     });

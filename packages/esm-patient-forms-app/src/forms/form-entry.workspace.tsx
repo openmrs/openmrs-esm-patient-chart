@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useFeatureFlag, useVisitContextStore } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   type DefaultPatientWorkspaceProps,
@@ -28,6 +28,8 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
   const isOnline = useConnectivity();
+  const { mutateVisit } = useVisitContextStore();
+
   const state = useMemo(
     () => ({
       view: 'form',
@@ -46,6 +48,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       },
       closeWorkspaceWithSavedChanges: () => {
         typeof mutateForm === 'function' && mutateForm();
+        mutateVisit();
         closeWorkspaceWithSavedChanges();
       },
       promptBeforeClosing,
@@ -67,6 +70,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       patient,
       isOnline,
       mutateForm,
+      mutateVisit,
       closeWorkspace,
       closeWorkspaceWithSavedChanges,
       promptBeforeClosing,
@@ -87,6 +91,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
 
   return (
     <div>
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
       {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
     </div>
   );

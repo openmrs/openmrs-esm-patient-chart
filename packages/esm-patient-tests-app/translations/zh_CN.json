@@ -14,7 +14,6 @@
   "closeSearchBar": "关闭搜索",
   "data": "数据",
   "dataLoadError": "数据加载错误",
-  "dataTimeline": "数据时间线",
   "dataTimelineText": "数据时间线",
   "date": "日期",
   "dateCollected": "显示采集日期",
@@ -45,7 +44,6 @@
   "orderReason": "医嘱原因",
   "orderReasonRequired": "Order reason is required",
   "overTime": "超时",
-  "panel": "面板",
   "panels": "面板",
   "pleaseRequiredFields": "请填写所有必填字段",
   "print": "打印",
@@ -90,10 +88,7 @@
   "tests": "检验",
   "testType": "检验类型",
   "testTypeRequired": "Test type is required",
-  "timeline": "时间线",
-  "timelineData_lower": "时间线数据",
   "tree": "树状结构",
-  "trend": "趋势",
   "trendline": "趋势线",
   "trendlineRangeSelector1Day": "1天",
   "trendlineRangeSelector1Month": "1个月",
@@ -106,6 +101,5 @@
   "tryTo": "尝试",
   "usingADifferentTerm": "使用不同的术语",
   "value": "值",
-  "view": "查看",
-  "viewTimeline": "查看时间线"
+  "view": "查看"
 }

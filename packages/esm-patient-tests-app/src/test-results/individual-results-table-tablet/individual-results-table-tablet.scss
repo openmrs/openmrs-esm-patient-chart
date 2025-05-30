@@ -1,0 +1,66 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.panelViewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: layout.$spacing-12;
+  background-color: $ui-01;
+  z-index: 99;
+  padding: layout.$spacing-03 0;
+}
+
+.flex {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
+}
+
+.stickySection {
+  top: 9rem;
+  position: sticky;
+}
+
+.headerMargin {
+  margin-top: layout.$spacing-09;
+}
+
+.headerMarginTablet {
+  margin-top: layout.$spacing-10;
+}
+
+.clearButton {
+  margin-left: layout.$spacing-03;
+}
+
+.leftSection {
+  width: 45%;
+  margin-right: layout.$spacing-05;
+}
+
+.rightSection,
+.rightSectionHeader {
+  width: 55%;
+
+  &.fullView {
+    width: 100%;
+  }
+}
+
+.flexBaseline {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+}
+
+.overlay {
+  padding: layout.$spacing-05;
+}

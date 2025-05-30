@@ -7,8 +7,6 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  DatePicker,
-  DatePickerInput,
   IconButton,
   Form,
   FormGroup,
@@ -30,6 +28,7 @@ import {
   ExtensionSlot,
   formatDate,
   getPatientName,
+  OpenmrsDatePicker,
   parseDate,
   useConfig,
   useLayoutType,
@@ -415,7 +414,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               kind="error"
               lowContrast
               className={styles.inlineNotification}
-              title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
+              title={t('errorFetchingOrderConfig', 'Error occurred when fetching Order config')}
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           )}
@@ -511,7 +510,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                   </Column>
                 </Grid>
                 <Grid className={styles.gridRow}>
-                  <Column lg={8} md={4} sm={4}>
+                  <Column lg={16} md={4} sm={4}>
                     <InputWrapper>
                       <ControlledFieldInput
                         control={control}
@@ -526,7 +525,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       />
                     </InputWrapper>
                   </Column>
-                  <Column lg={8} md={4} sm={4}>
+                  <Column lg={16} md={4} sm={4}>
                     <InputWrapper>
                       <ControlledFieldInput
                         control={control}
@@ -606,22 +605,16 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                     <Controller
                       name="startDate"
                       control={control}
-                      render={({ field: { onBlur, value, onChange, ref } }) => (
-                        <DatePicker
-                          datePickerType="single"
-                          maxDate={new Date().toISOString()}
-                          value={value}
-                          onChange={([newStartDate]) => onChange(newStartDate)}
-                          onBlur={onBlur}
-                          ref={ref}
-                        >
-                          <DatePickerInput
-                            id="startDatePicker"
-                            placeholder="dd/mm/yyyy"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                          />
-                        </DatePicker>
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          {...field}
+                          maxDate={new Date()}
+                          id="startDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'lg' : 'sm'}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
                       )}
                     />
                   </InputWrapper>

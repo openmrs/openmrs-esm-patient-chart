@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "active": "Kích hoạt",
   "add": "Thêm",
   "cancel": "Hủy",
@@ -29,6 +30,7 @@
   "noConditionsToDisplay": "Không có điều khoản để hiển thị",
   "noResultsFor": "Không có kết quả cho",
   "onsetDate": "Ngày bắt đầu",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Ghi lại một điều khoản",
   "required": "Yêu cầu",
   "saveAndClose": "Lưu và đóng",

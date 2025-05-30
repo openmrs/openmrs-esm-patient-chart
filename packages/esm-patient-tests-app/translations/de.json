@@ -14,7 +14,6 @@
   "closeSearchBar": "Suche schließen",
   "data": "Daten",
   "dataLoadError": "Datenladefehler",
-  "dataTimeline": "Daten-Zeitleiste",
   "dataTimelineText": "Daten-Zeitleiste",
   "date": "Datum",
   "dateCollected": "Anzeige des Erfassungsdatums",
@@ -45,7 +44,6 @@
   "orderReason": "Auftragsgrund",
   "orderReasonRequired": "Order reason is required",
   "overTime": "Over time",
-  "panel": "Panel",
   "panels": "panels",
   "pleaseRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus",
   "print": "Drucken",
@@ -90,10 +88,7 @@
   "tests": "Tests",
   "testType": "Testart",
   "testTypeRequired": "Test type is required",
-  "timeline": "Zeitleiste",
-  "timelineData_lower": "Daten der Zeitleiste",
   "tree": "Baum",
-  "trend": "Trend",
   "trendline": "Trendlinie",
   "trendlineRangeSelector1Day": "1 Tag",
   "trendlineRangeSelector1Month": "1 Monat",
@@ -106,6 +101,5 @@
   "tryTo": "Versuchen Sie",
   "usingADifferentTerm": "einen anderen Begriff verwenden",
   "value": "Wert",
-  "view": "Ansicht",
-  "viewTimeline": "Zeitleiste ansehen"
+  "view": "Ansicht"
 }

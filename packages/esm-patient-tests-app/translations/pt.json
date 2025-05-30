@@ -14,7 +14,6 @@
   "closeSearchBar": "Fechar pesquisa",
   "data": "dado",
   "dataLoadError": "Erro ao carregar dados",
-  "dataTimeline": "Linha do Tempo dos Dados",
   "dataTimelineText": "Linha do tempo dos dados",
   "date": "Data",
   "dateCollected": "Visualizando data de colheita",
@@ -45,7 +44,6 @@
   "orderReason": "Motivo do pedido",
   "orderReasonRequired": "Order reason is required",
   "overTime": "Ao longo do tempo",
-  "panel": "Painel",
   "panels": "paineis",
   "pleaseRequiredFields": "Favor de preencher todos campos obrigatórios",
   "print": "Imprimir",
@@ -90,10 +88,7 @@
   "tests": "Testes",
   "testType": "Tipo de teste",
   "testTypeRequired": "Test type is required",
-  "timeline": "Linha do Tempo",
-  "timelineData_lower": "dados da linha do tempo",
   "tree": "Árvore",
-  "trend": "Tendência",
   "trendline": "Linha de tendência",
   "trendlineRangeSelector1Day": "1 dia",
   "trendlineRangeSelector1Month": "1 mês",
@@ -106,6 +101,5 @@
   "tryTo": "Tente para",
   "usingADifferentTerm": "usando um termo diferente",
   "value": "Valor",
-  "view": "Visualizar",
-  "viewTimeline": "Visualizar linha do tempo"
+  "view": "Visualizar"
 }

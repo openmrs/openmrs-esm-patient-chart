@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "active": "活跃",
   "add": "添加",
   "cancel": "取消",
@@ -29,6 +30,7 @@
   "noConditionsToDisplay": "没有可显示的病情",
   "noResultsFor": "没有原因",
   "onsetDate": "发病日期",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "记录一个病情",
   "required": "必填",
   "saveAndClose": "保存并关闭",

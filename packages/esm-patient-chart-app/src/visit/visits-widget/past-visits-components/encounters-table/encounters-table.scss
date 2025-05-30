@@ -1,0 +1,112 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05 0;
+  border: 1px solid $ui-03;
+}
+
+.tableContainer {
+  padding: 0;
+  border-bottom: none;
+
+  :global(.cds--data-table-header) {
+    padding: 0;
+  }
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    overflow: visible;
+    top: 0;
+  }
+
+  &:global(.cds--data-table-container) {
+    background: none !important;
+  }
+}
+
+.paginationContainer {
+  > div {
+    border: 1px solid $ui-03 !important;
+    border-top: none !important;
+  }
+}
+
+.filterContainer {
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: layout.$spacing-05;
+  }
+
+  label {
+    margin-right: layout.$spacing-05 !important;
+  }
+}
+
+.search {
+  max-width: 16rem;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.expandedRow {
+  padding-inline-start: 3.5rem;
+
+  > td {
+    padding: inherit !important;
+
+    > div {
+      max-height: max-content !important;
+    }
+  }
+
+  > div {
+    background-color: $ui-02;
+  }
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: layout.$spacing-11 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}

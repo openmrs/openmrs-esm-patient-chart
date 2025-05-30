@@ -35,7 +35,7 @@
       "component": "biometricsOverview",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
-        "fullWidth": false
+        "fullWidth": true
       },
       "order": 2
     },
@@ -72,6 +72,12 @@
       "name": "patient-vitals-biometrics-form-workspace",
       "title": "recordVitalsAndBiometrics",
       "component": "vitalsBiometricsFormWorkspace"
+    }
+  ],
+  "modals": [
+    {
+      "name": "vitals-biometrics-delete-confirmation-modal",
+      "component": "vitalsAndBiometricsDeleteConfirmationModal"
     }
   ]
 }

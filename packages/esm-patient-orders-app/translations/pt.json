@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Menu de acções",
-  "activeVisitRequired": "É necessária uma visita activa para efectuar pedidos",
   "add": "Adicionar",
   "additionalInstructions": "Additional instructions",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
@@ -33,6 +32,8 @@
   "indication": "Indicação",
   "inStock": "Em stock",
   "instructions": "Instructions",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error loading lab results",
   "launchOrderBasket": "Iniciar carrinho de pedido",
   "loading": "Carregando",
@@ -47,6 +48,7 @@
   "noMatchingOrdersToDisplay": "Não há pedidos correspondentes para visualizar",
   "noResultsForTestTypeSearch": "No results to display for \"{{searchTerm}}\"",
   "normalRange": "Faixa normal",
+  "noTestData": "No test data available",
   "onDate": "no",
   "or": "or",
   "order": "Pedido",
@@ -109,11 +111,13 @@
   "status": "Estado",
   "successfullyCancelledOrder": "O pedido {{orderNumber}} foi cancelado com sucesso",
   "successfullySavedLabResults": "Os resultados do laboratório para {{orderNumber}} foram actualizados com sucesso",
+  "test": "Test",
   "Test Order_few": "Pedidos de teste",
   "testType": "Tipo de teste",
   "tryReopeningTheWorkspaceAgain": "Tente iniciar o espaço de trabalho novamente",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
   "updated": "Actualizada",
-  "usingADifferentTerm": "using a different term"
+  "usingADifferentTerm": "using a different term",
+  "visitRequired": "A visit is required to make orders"
 }

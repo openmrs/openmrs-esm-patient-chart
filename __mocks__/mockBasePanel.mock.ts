@@ -1,105 +1,61 @@
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
+import { GroupedObservation } from '../packages/esm-patient-tests-app/src/types';
 
-export const mockConceptMeta = {
-  display: '',
-  hiNormal: 0,
-  hiAbsolute: 0,
-  hiCritical: 0,
-  lowNormal: 0,
-  lowAbsolute: 0,
-  lowCritical: 0,
-  units: 'g/dL',
-  range: '12-16',
-  getInterpretation: function (value: string): OBSERVATION_INTERPRETATION {
-    const numValue = Number(value);
-    if (numValue > this.hiNormal) return 'HIGH';
-    if (numValue < this.lowNormal) return 'LOW';
-    return 'NORMAL';
-  },
-};
-
-export const mockBasePanel: ObsRecord = {
-  resourceType: 'Observation',
-  id: 'test-id',
-  conceptUuid: 'test-uuid',
-  category: [
+export const mockBasePanel: GroupedObservation = {
+  key: 'Hematology',
+  date: '2024-01-01T10:00:00Z',
+  flatName: 'Hematology',
+  entries: [
     {
-      coding: [
-        {
-          system: 'test-system',
-          code: 'test-code',
-          display: 'Laboratory',
-        },
-      ],
+      conceptUuid: 'cbc-uuid',
+      datatype: 'numeric',
+      display: 'Complete Blood Count',
+      lowAbsolute: 0,
+      lowNormal: 100,
+      units: 'g/dL',
+      lowCritical: 80,
+      hiNormal: 150,
+      flatName: 'Hematology-Complete Blood Count',
+      hasData: true,
+      range: '100-150',
+      obsDatetime: '2024-01-01T10:00:00Z',
+      value: '120',
+      interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
+      key: 'test-key',
+    },
+    {
+      conceptUuid: 'hematocrit-uuid',
+      datatype: 'numeric',
+      display: 'Hematocrit',
+      lowAbsolute: 0,
+      lowNormal: 35,
+      units: '%',
+      lowCritical: 20,
+      hiNormal: 45,
+      flatName: 'Hematology-Hematocrit',
+      hasData: true,
+      range: '35-45',
+      obsDatetime: '2024-01-01T10:00:00Z',
+      value: '50',
+      interpretation: 'HIGH' as OBSERVATION_INTERPRETATION,
+      key: 'test-key',
+    },
+    {
+      conceptUuid: 'hemoglobin-uuid',
+      datatype: 'numeric',
+      display: 'Hemoglobin',
+      lowAbsolute: 0,
+      lowNormal: 12,
+      units: 'g/dL',
+      lowCritical: 10,
+      hiNormal: 16,
+      flatName: 'Hematology-Hemoglobin',
+      hasData: true,
+      range: '12-16',
+      obsDatetime: '2024-01-01T10:00:00Z',
+      value: '8',
+      interpretation: 'LOW' as OBSERVATION_INTERPRETATION,
+      key: 'test-key',
     },
   ],
-  code: {
-    coding: [
-      {
-        code: 'test-code',
-        display: 'Test Display',
-      },
-    ],
-    text: 'Test Text',
-  },
-  effectiveDateTime: '2024-01-01T10:00:00Z',
-  issued: '2024-01-01T10:00:00Z',
-  name: 'Complete Blood Count',
-  value: '120',
-  interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
-  relatedObs: [],
-  meta: mockConceptMeta,
-  referenceRange: [],
 };
-
-export const mockObservations: Array<ObsRecord> = [
-  {
-    ...mockBasePanel,
-    id: '1',
-    name: 'Hemoglobin',
-    value: '14',
-    interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
-    meta: {
-      ...mockConceptMeta,
-      units: 'g/dL',
-      range: '12-16',
-    },
-  },
-  {
-    ...mockBasePanel,
-    id: '2',
-    name: 'Hematocrit',
-    value: '42',
-    interpretation: 'HIGH' as OBSERVATION_INTERPRETATION,
-    meta: {
-      ...mockConceptMeta,
-      units: '%',
-      range: '35-45',
-    },
-  },
-];
-
-export const mockObservationsWithInterpretations: Array<ObsRecord> = [
-  {
-    ...mockBasePanel,
-    id: '1',
-    name: 'Normal Test',
-    value: '14',
-    interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
-  },
-  {
-    ...mockBasePanel,
-    id: '2',
-    name: 'High Test',
-    value: '42',
-    interpretation: 'HIGH' as OBSERVATION_INTERPRETATION,
-  },
-  {
-    ...mockBasePanel,
-    id: '3',
-    name: 'Low Test',
-    value: '2',
-    interpretation: 'LOW' as OBSERVATION_INTERPRETATION,
-  },
-];

@@ -194,7 +194,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}
-                      <TableHeader />
+                      <TableHeader aria-label={t('actions', 'Actions')} />
                     </TableRow>
                   </TableHead>
                   <TableBody>

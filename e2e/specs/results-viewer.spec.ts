@@ -1,19 +1,9 @@
 /* eslint-disable playwright/no-nested-step */
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, type Patient, startVisit, endVisit, deletePatient } from '../commands';
 import { test } from '../core';
 import { ChartPage, ResultsViewerPage, VisitsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Record and edit test results', async ({ page }) => {
+test('Record and edit test results', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const resultsViewerPage = new ResultsViewerPage(page);
   const visitsPage = new VisitsPage(page);
@@ -306,7 +296,20 @@ test('Record and edit test results', async ({ page }) => {
     ).toBeVisible();
   });
 
-  await test.step('When I launch the overflow menu of the created test results', async () => {
+  await test.step('When I filter the encounters to adult visit', async () => {
+    await page.getByRole('combobox', { name: /filter by encounter type/i }).click();
+    await page.getByText(/adult visit/i).click();
+  });
+
+  await test.step('Then I should NOT see the newly added test results included in the list', async () => {
+    await expect(page.getByText(/No encounters to display/i)).toBeVisible();
+  });
+
+  await test.step('When I clear the filter', async () => {
+    await page.getByRole('button', { name: /clear selected item/i }).click();
+  });
+
+  await test.step('And I launch the overflow menu of the created test results', async () => {
     await page
       .getByRole('button', { name: /options/i })
       .nth(0)
@@ -364,9 +367,4 @@ test('Record and edit test results', async ({ page }) => {
       });
     }
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });

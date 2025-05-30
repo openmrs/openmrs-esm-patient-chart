@@ -1,5 +1,3 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
 import {
   ExtensionSlot,
   WorkspaceContainer,
@@ -9,15 +7,16 @@ import {
   usePatient,
   useWorkspaces,
 } from '@openmrs/esm-framework';
+import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { spaBasePath } from '../constants';
-import { type LayoutMode } from './chart-review/dashboard-view.component';
-import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import Loader from '../loader/loader.component';
-import styles from './patient-chart.scss';
-import VisitHeader from '../visit-header/visit-header.component';
+import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import SideMenuPanel from '../side-nav/side-menu.component';
-import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type LayoutMode } from './chart-review/dashboard-view.component';
+import styles from './patient-chart.scss';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -51,7 +50,6 @@ const PatientChart: React.FC = () => {
 
   return (
     <>
-      <VisitHeader patient={state.patient} patientUuid={state.patientUuid} />
       <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <>

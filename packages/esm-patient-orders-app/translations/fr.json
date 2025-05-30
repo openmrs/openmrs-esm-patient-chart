@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Actions",
-  "activeVisitRequired": "Une visite ouverte est nécessaire pour prescrire",
   "add": "Ajouter",
   "additionalInstructions": "Instructions supplémentaires",
   "addOrderableForOrderType": "{{orderTypeDisplay}}",
@@ -14,7 +13,7 @@
   "checkFilters": "Vérifiez les filtres ci-dessus",
   "chooseAnOption": "Sélectionner une option",
   "clearSearchResults": "Réinitialiser",
-  "dateCannotBeBeforeToday": "La date ne peut être antérieure à aujourd'hui",
+  "dateCannotBeBeforeToday": "La date ne peut être antérieure à aujourd’hui",
   "dateOfOrder": "Date de prescription",
   "dateRange": "Période",
   "directlyAddToBasket": "Ajouter à l'ordonnance",
@@ -33,6 +32,8 @@
   "indication": "Indication",
   "inStock": "En stock",
   "instructions": "Instructions",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error de chargement des résultats d'analyses",
   "launchOrderBasket": "Accéder à l'ordonnance",
   "loading": "Chargement",
@@ -47,6 +48,7 @@
   "noMatchingOrdersToDisplay": "Aucune prescription à afficher",
   "noResultsForTestTypeSearch": "Aucun résultat pour \"{{searchTerm}}\"",
   "normalRange": "Plage normale",
+  "noTestData": "No test data available",
   "onDate": "on",
   "or": "ou",
   "order": "Examen",
@@ -109,11 +111,13 @@
   "status": "Statut",
   "successfullyCancelledOrder": "La prescription {{orderNumber}} a été annulée",
   "successfullySavedLabResults": "Les résultats d'analyses pour {{orderNumber}} ont été modifiés",
+  "test": "Test",
   "Test Order_few": "Examens",
   "testType": "Type d'examen",
   "tryReopeningTheWorkspaceAgain": "Veuillez essayer de relancer l'espace de travail",
   "trySearchingAgain": "Veuillez ré-essayer la recherche",
   "tryTo": "Essayez de",
   "updated": "Modifié",
-  "usingADifferentTerm": "en utilisant un terme différent"
+  "usingADifferentTerm": "en utilisant un terme différent",
+  "visitRequired": "A visit is required to make orders"
 }

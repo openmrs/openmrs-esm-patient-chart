@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "active": "Attivo",
   "add": "Aggiungi",
   "cancel": "Annulla",
@@ -29,6 +30,7 @@
   "noConditionsToDisplay": "Nessuna condizione da visualizzare",
   "noResultsFor": "Nessun risultato per",
   "onsetDate": "Data di insorgenza",
+  "onsetDateCannotBeInTheFuture": "La data d'insorgenza non può essere nel futuro",
   "recordCondition": "Registra una condizione",
   "required": "Obbligatorio",
   "saveAndClose": "Salva e chiudi",

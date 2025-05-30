@@ -1,6 +1,5 @@
 {
   "actionsMenu": "Menu azioni",
-  "activeVisitRequired": "È necessaria una visita attiva per effettuare ordini",
   "add": "Aggiungi",
   "additionalInstructions": "Istruzioni aggiuntive",
   "addOrderableForOrderType": "Aggiungi {{orderTypeDisplay}}",
@@ -33,6 +32,8 @@
   "indication": "Indicazione",
   "inStock": "Disponibile",
   "instructions": "Istruzioni",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Errore nel caricamento dei risultati di laboratorio",
   "launchOrderBasket": "Apri carrello ordini",
   "loading": "Caricamento in corso",
@@ -43,10 +44,11 @@
   "medicationIndefiniteDuration": "Durata indefinita",
   "medications": "Farmaci",
   "modifyOrder": "Modifica ordine",
-  "noIndicationProvided": "No indication provided",
+  "noIndicationProvided": "Nessuna indicazione fornita",
   "noMatchingOrdersToDisplay": "Nessun ordine corrispondente da visualizzare",
   "noResultsForTestTypeSearch": "Nessun risultato da visualizzare per \"{{searchTerm}}\"",
   "normalRange": "Intervallo normale",
+  "noTestData": "No test data available",
   "onDate": "il",
   "or": "o",
   "order": "Ordine",
@@ -109,11 +111,13 @@
   "status": "Stato",
   "successfullyCancelledOrder": "Ordine {{orderNumber}} annullato con successo",
   "successfullySavedLabResults": "Risultati di laboratorio per {{orderNumber}} aggiornati con successo",
+  "test": "Test",
   "Test Order_few": "Ordini di test",
   "testType": "Tipo di test",
   "tryReopeningTheWorkspaceAgain": "Prova a riaprire l'area di lavoro",
   "trySearchingAgain": "Prova a cercare di nuovo",
   "tryTo": "Prova a",
   "updated": "Aggiornato",
-  "usingADifferentTerm": "utilizzando un termine diverso"
+  "usingADifferentTerm": "utilizzando un termine diverso",
+  "visitRequired": "È richiesta una visita per poter fare ordini"
 }

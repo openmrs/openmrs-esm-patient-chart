@@ -1,0 +1,83 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.visitCardRow {
+  display: flex;
+  position: relative;
+  border: solid 1px #e0e0e0;
+  padding: layout.$spacing-03;
+
+  &.activeVisit {
+    background-color: #defbe6;
+    &:hover {
+      background-color: #b6f6c8;
+    }
+  }
+
+  &.retroactiveVisit {
+    background-color: #f4f4f4;
+    &:hover {
+      background-color: #e5e5e5;
+    }
+  }
+}
+
+.visitInfoContainer {
+  flex: 1;
+}
+
+.visitType {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.visitCardRowButton {
+  border: none;
+  padding: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: pointer;
+  }
+}
+
+.visitCardRowRadioButton {
+  display: flex;
+  align-items: center;
+}
+
+.createVisitButtonContainer {
+  padding: layout.$spacing-05;
+}
+
+.datepicker {
+  padding-top: layout.$spacing-05;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+}
+
+.tile {
+  margin: auto;
+  margin-top: layout.$spacing-07;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}

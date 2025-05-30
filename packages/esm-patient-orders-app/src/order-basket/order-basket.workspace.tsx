@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
-import { ExtensionSlot, showModal, showSnackbar, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useSession,
+  useVisitContextStore,
+} from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
@@ -26,11 +34,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
   const session = useSession();
-  const { activeVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
-    activeVisitRequired,
+    visitRequired,
     isLoading: isLoadingEncounterUuid,
     encounterUuid,
     error: errorFetchingEncounterUuid,
@@ -39,6 +47,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -62,11 +71,12 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         await postOrdersOnNewEncounter(
           patientUuid,
           config?.orderEncounterType,
-          activeVisitRequired ? activeVisit : null,
+          visitRequired ? currentVisit : null,
           session?.sessionLocation?.uuid,
           abortController,
         );
         mutateEncounterUuid();
+        mutateVisit();
         clearOrders();
         await mutateOrders();
         closeWorkspaceWithSavedChanges();
@@ -81,6 +91,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+      mutateVisit();
       await mutateOrders();
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();
@@ -92,14 +103,15 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
-    activeVisit,
-    activeVisitRequired,
+    currentVisit,
+    visitRequired,
     clearOrders,
     closeWorkspaceWithSavedChanges,
     config,
     encounterUuid,
     mutateEncounterUuid,
     mutateOrders,
+    mutateVisit,
     orders,
     patientUuid,
     session,
@@ -113,6 +125,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   return (
     <>
       <div className={styles.container}>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
@@ -165,7 +178,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 isSavingOrders ||
                 !orders?.length ||
                 isLoadingEncounterUuid ||
-                (activeVisitRequired && !activeVisit) ||
+                (visitRequired && !currentVisit) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
               }
             >
@@ -178,13 +191,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           </ButtonSet>
         </div>
       </div>
-      {activeVisitRequired && !activeVisit && (
+      {visitRequired && !currentVisit && (
         <ActionableNotification
           kind="error"
           actionButtonLabel={t('startVisit', 'Start visit')}
           onActionButtonClick={openStartVisitDialog}
           title={t('startAVisitToRecordOrders', 'Start a visit to order')}
-          subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+          subtitle={t('visitRequired', 'You must select a visit to make orders')}
           lowContrast={true}
           inline
           className={styles.actionNotification}

@@ -1,6 +1,4 @@
 import React, { useMemo } from 'react';
-import styles from './general-order-table.scss';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -14,8 +12,11 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { getObservationDisplayValue } from '../utils';
+import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import styles from './general-order-table.scss';
 
 interface GeneralOrderProps {
   order: Order;
@@ -59,7 +60,9 @@ const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
         result: isLoadingResult ? (
           <SkeletonText />
         ) : (
-          obs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value.display ?? '--'
+          getObservationDisplayValue(
+            obs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid)?.value,
+          ) ?? '--'
         ),
         normalRange:
           memberConcept.hiNormal && memberConcept.lowNormal
@@ -73,7 +76,7 @@ const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
           id: concept.uuid,
           orderName: <div className={styles.type}>{concept.display}</div>,
           instructions: order?.instructions ?? '--',
-          result: isLoadingResult ? <SkeletonText /> : obs?.value.display ?? '--',
+          result: isLoadingResult ? <SkeletonText /> : getObservationDisplayValue(obs?.value) ?? '--',
           normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
           referenceNumber: order?.accessionNumber,
         },
@@ -81,7 +84,7 @@ const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
     } else {
       return [];
     }
-  }, [concept, isLoadingResult, obs?.groupMembers, obs?.value.display, order?.accessionNumber, order?.instructions]);
+  }, [concept, isLoadingResult, obs?.groupMembers, obs?.value, order?.accessionNumber, order?.instructions]);
 
   return (
     <div className={styles.order}>

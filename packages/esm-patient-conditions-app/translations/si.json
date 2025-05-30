@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "active": "Active",
   "add": "Add",
   "cancel": "Cancel",
@@ -29,6 +30,7 @@
   "noConditionsToDisplay": "No conditions to display",
   "noResultsFor": "No results for",
   "onsetDate": "Onset date",
+  "onsetDateCannotBeInTheFuture": "Onset date cannot be in the future",
   "recordCondition": "Record a Condition",
   "required": "Required",
   "saveAndClose": "Save & close",

@@ -14,7 +14,6 @@
   "closeSearchBar": "Close search",
   "data": "data",
   "dataLoadError": "Data load error",
-  "dataTimeline": "Data Timeline",
   "dataTimelineText": "Data timeline",
   "date": "تاريخ",
   "dateCollected": "عرض تاريخ الجمع",
@@ -45,7 +44,6 @@
   "orderReason": "Order reason",
   "orderReasonRequired": "Order reason is required",
   "overTime": "Over time",
-  "panel": "Panel",
   "panels": "panels",
   "pleaseRequiredFields": "Please fill all required fields",
   "print": "Print",
@@ -90,10 +88,7 @@
   "tests": "Tests",
   "testType": "نوع الاختبار",
   "testTypeRequired": "Test type is required",
-  "timeline": "الجدول الزمني",
-  "timelineData_lower": "timeline data",
   "tree": "شجرة",
-  "trend": "اتجاه",
   "trendline": "Trendline",
   "trendlineRangeSelector1Day": "يوم واحد",
   "trendlineRangeSelector1Month": "شهر واحد",
@@ -106,6 +101,5 @@
   "tryTo": "Try to",
   "usingADifferentTerm": "using a different term",
   "value": "القيمة",
-  "view": "عرض",
-  "viewTimeline": "View timeline"
+  "view": "عرض"
 }

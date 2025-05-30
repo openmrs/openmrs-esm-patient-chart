@@ -1,15 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, type Patient, deletePatient } from '../commands';
 import { test } from '../core';
 import { AttachmentsPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Add and remove an attachment', async ({ page }) => {
+test('Add and remove an attachment', async ({ page, patient }) => {
   const attachmentsPage = new AttachmentsPage(page);
   const filePath = './e2e/support/upload/brainScan.jpeg';
 
@@ -78,14 +71,10 @@ test('Add and remove an attachment', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted attachment in the list', async () => {
-    await expect(page.getByRole('button', { name: /brainScan/i })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /brainScan/i })).toBeHidden();
   });
 
   await test.step('And the attachments table should be empty', async () => {
     await expect(page.getByText(/there are no attachments to display for this patient/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

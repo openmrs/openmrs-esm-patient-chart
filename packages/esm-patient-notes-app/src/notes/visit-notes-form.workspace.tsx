@@ -11,8 +11,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -29,7 +27,9 @@ import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
+  type Encounter,
   ExtensionSlot,
+  OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
@@ -38,15 +38,17 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
+  deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
   savePatientDiagnosis,
   saveVisitNote,
-  useInfiniteVisits,
+  updateVisitNote,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
@@ -82,28 +84,24 @@ const createSchema = (t: TFunction) => {
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
-    images: z
-      .array(
-        z.object({
-          base64Content: z.string(),
-          file: z.custom<File>((value) => value instanceof File, {
-            message: 'Invalid file',
-          }),
-          fileDescription: z.string().optional(),
-          fileName: z.string(),
-          fileType: z.string(),
-        }),
-      )
-      .optional(),
+    images: z.array(z.any()).optional(),
   });
 };
 
-const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
+interface VisitNotesFormProps extends DefaultPatientWorkspaceProps {
+  encounter?: Encounter;
+  formContext: 'creating' | 'editing';
+}
+
+const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
+  encounter,
+  formContext = 'creating',
 }) => {
+  const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -129,7 +127,6 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const customResolver = useCallback(
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-
       if (selectedPrimaryDiagnoses.length === 0) {
         return {
           ...zodResult,
@@ -160,7 +157,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
-      noteDate: new Date(),
+      noteDate: isEditing ? new Date(encounter.datetime) : new Date(),
+      clinicalNote: isEditing
+        ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
+        : '',
     },
   });
 
@@ -168,10 +168,37 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
+  useEffect(() => {
+    if (encounter?.diagnoses?.length) {
+      try {
+        const transformedDiagnoses = encounter.diagnoses.map((d) => ({
+          patient: patientUuid,
+          diagnosis: {
+            coded: d.diagnosis.coded?.uuid,
+          },
+          certainty: d.certainty,
+          rank: d.rank,
+          display: d.display,
+        }));
+
+        const primaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 1);
+        const secondaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 2);
+
+        setSelectedPrimaryDiagnoses(primaryDiagnoses);
+        setSelectedSecondaryDiagnoses(secondaryDiagnoses);
+        setCombinedDiagnoses([...primaryDiagnoses, ...secondaryDiagnoses]);
+      } catch (err) {
+        setError(new Error(t('errorTransformingDiagnoses', 'Error transforming diagnoses')));
+        createErrorHandler();
+      }
+    }
+  }, [encounter, patientUuid, t]);
+
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits } = useInfiniteVisits(patientUuid);
+  const { mutateVisit } = useVisitContextStore();
+
   const mutateAttachments = () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
 
@@ -287,10 +314,11 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const showImageCaptureModal = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
-        if (file) {
-          setValue('images', currentImages ? [...currentImages, file] : [file]);
+        if (file.capturedFromWebcam && !file.fileName.includes('.')) {
+          file.fileName = `${file.fileName}.png`;
         }
 
+        setValue('images', currentImages ? [...currentImages, file] : [file]);
         close();
         return Promise.resolve();
       },
@@ -332,6 +360,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         finalNoteDate = null;
       }
 
+      const existingClinicalNoteObs = encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid);
+
       const visitNotePayload: VisitNotePayload = {
         encounterDatetime: finalNoteDate?.format(),
         form: formConceptUuid,
@@ -345,31 +375,53 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         ],
         encounterType: encounterTypeUuid,
         obs: clinicalNote
-          ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: clinicalNote }]
+          ? [
+              {
+                concept: { uuid: encounterNoteTextConceptUuid, display: '' },
+                value: clinicalNote,
+                ...(existingClinicalNoteObs && { uuid: existingClinicalNoteObs.uuid }),
+              },
+            ]
           : [],
       };
 
       const abortController = new AbortController();
 
-      saveVisitNote(abortController, visitNotePayload)
+      const savePromise = isEditing
+        ? updateVisitNote(abortController, encounter.id, visitNotePayload)
+        : saveVisitNote(abortController, visitNotePayload);
+
+      savePromise
         .then((response) => {
-          if (response.status === 201) {
-            return Promise.all(
-              combinedDiagnoses.map((diagnosis, position: number) => {
-                const diagnosesPayload: DiagnosisPayload = {
-                  encounter: response.data.uuid,
-                  patient: patientUuid,
-                  condition: null,
-                  diagnosis: {
-                    coded: diagnosis.diagnosis.coded,
-                  },
-                  certainty: diagnosis.certainty,
-                  rank: diagnosis.rank,
-                };
-                return savePatientDiagnosis(abortController, diagnosesPayload);
-              }),
-            );
+          if (response.status === 201 || response.status === 200) {
+            const encounterUuid = encounter?.id || response.data.uuid;
+
+            // If editing, first delete existing diagnoses
+            if (isEditing && encounter?.diagnoses?.length) {
+              return Promise.all(
+                encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+              ).then(() => encounterUuid);
+            }
+
+            return encounterUuid;
           }
+        })
+        .then((encounterUuid) => {
+          return Promise.all(
+            combinedDiagnoses.map((diagnosis) => {
+              const diagnosesPayload: DiagnosisPayload = {
+                encounter: encounterUuid,
+                patient: patientUuid,
+                condition: null,
+                diagnosis: {
+                  coded: diagnosis.diagnosis.coded,
+                },
+                certainty: diagnosis.certainty,
+                rank: diagnosis.rank,
+              };
+              return savePatientDiagnosis(abortController, diagnosesPayload);
+            }),
+          );
         })
         .then(() => {
           if (images?.length) {
@@ -390,8 +442,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           }
         })
         .then(() => {
+          mutateVisit();
           mutateVisitNotes();
-          mutateVisits();
 
           if (images?.length) {
             mutateAttachments();
@@ -413,7 +465,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
             title: t('visitNoteSaveError', 'Error saving visit note'),
             kind: 'error',
             isLowContrast: false,
-            subtitle: err?.message,
+            subtitle: err?.responseBody?.error?.message ?? err.message,
           });
         });
     },
@@ -421,12 +473,16 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       clinicianEncounterRole,
       closeWorkspaceWithSavedChanges,
       combinedDiagnoses,
+      encounter?.diagnoses,
+      encounter?.id,
+      encounter?.obs,
       encounterNoteTextConceptUuid,
       encounterTypeUuid,
       formConceptUuid,
+      isEditing,
       locationUuid,
+      mutateVisit,
       mutateVisitNotes,
-      mutateVisits,
       patientUuid,
       providerUuid,
       selectedPrimaryDiagnoses.length,
@@ -438,218 +494,220 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
         </Row>
       )}
-      <Stack className={styles.formContainer} gap={2}>
-        {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-          </Column>
-          <Column sm={3}>
-            <Controller
-              name="noteDate"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <ResponsiveWrapper>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    maxDate={new Date().toISOString()}
-                    value={value}
-                    onChange={([date]) => onChange(date)}
-                  >
-                    <DatePickerInput
+
+      <div className={styles.formContainer}>
+        <Stack gap={2}>
+          {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('date', 'Date')}</span>
+            </Column>
+            <Column sm={3}>
+              <Controller
+                name="noteDate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <ResponsiveWrapper>
+                    <OpenmrsDatePicker
+                      {...field}
+                      data-testid="visitDateTimePicker"
                       id="visitDateTimePicker"
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                      isDisabled={isEditing}
                       labelText={t('visitDate', 'Visit date')}
-                      placeholder="dd/mm/yyyy"
+                      maxDate={new Date()}
                     />
-                  </DatePicker>
-                </ResponsiveWrapper>
-              )}
-            />
-          </Column>
-        </Row>
-        <div className={styles.diagnosesText}>
-          {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-            <>
-              {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                <Tag
-                  className={styles.tag}
-                  filter
-                  key={index}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                  type="red"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-            </>
-          ) : null}
-          {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-            <>
-              {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                <Tag
-                  classname={styles.tag}
-                  filter
-                  key={index}
-                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                  type="blue"
-                >
-                  {diagnosis.display}
-                </Tag>
-              ))}
-            </>
-          ) : null}
-          {selectedPrimaryDiagnoses &&
-            !selectedPrimaryDiagnoses.length &&
-            selectedSecondaryDiagnoses &&
-            !selectedSecondaryDiagnoses.length && (
-              <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-            )}
-        </div>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
-              <DiagnosisSearch
-                name="primaryDiagnosisSearch"
-                control={control}
-                labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
-                placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
-                handleSearch={handleSearch}
-                error={errors?.primaryDiagnosisSearch}
-                setIsSearching={setIsSearching}
+                  </ResponsiveWrapper>
+                )}
               />
-              {error ? (
-                <InlineNotification
-                  className={styles.errorNotification}
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                  onClose={() => setError(null)}
-                />
-              ) : null}
-              <DiagnosesDisplay
-                fieldName={'primaryDiagnosisSearch'}
-                isDiagnosisNotSelected={isDiagnosisNotSelected}
-                isLoading={isLoadingPrimaryDiagnoses}
-                isSearching={isSearching}
-                onAddDiagnosis={handleAddDiagnosis}
-                searchResults={searchPrimaryResults}
-                t={t}
-                value={watch('primaryDiagnosisSearch')}
-              />
-            </FormGroup>
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
-              <DiagnosisSearch
-                name="secondaryDiagnosisSearch"
-                control={control}
-                labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
-                placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
-                handleSearch={handleSearch}
-                setIsSearching={setIsSearching}
-              />
-              {error ? (
-                <InlineNotification
-                  className={styles.errorNotification}
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                  onClose={() => setError(null)}
-                />
-              ) : null}
-              <DiagnosesDisplay
-                fieldName={'secondaryDiagnosisSearch'}
-                isDiagnosisNotSelected={isDiagnosisNotSelected}
-                isLoading={isLoadingSecondaryDiagnoses}
-                isSearching={isSearching}
-                onAddDiagnosis={handleAddDiagnosis}
-                searchResults={searchSecondaryResults}
-                t={t}
-                value={watch('secondaryDiagnosisSearch')}
-              />
-            </FormGroup>
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('note', 'Note')}</span>
-          </Column>
-          <Column sm={3}>
-            <Controller
-              name="clinicalNote"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <ResponsiveWrapper>
-                  <TextArea
-                    id="additionalNote"
-                    rows={rows}
-                    labelText={t('clinicalNoteLabel', 'Write your notes')}
-                    placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
-                    value={value}
-                    onBlur={onBlur}
-                    onChange={(event) => {
-                      onChange(event);
-                      const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                      const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
-                      setRows(newRows);
-                    }}
-                  />
-                </ResponsiveWrapper>
-              )}
-            />
-          </Column>
-        </Row>
-        <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('image', 'Image')}</span>
-          </Column>
-          <Column sm={3}>
-            <FormGroup legendText="">
-              <p className={styles.imgUploadHelperText}>
-                {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
-              </p>
-              <Button
-                className={styles.uploadButton}
-                kind={isTablet ? 'ghost' : 'tertiary'}
-                onClick={showImageCaptureModal}
-                renderIcon={(props) => <Add size={16} {...props} />}
-              >
-                {t('addImage', 'Add image')}
-              </Button>
-              <div className={styles.imgThumbnailGrid}>
-                {currentImages?.map((image, index) => (
-                  <div key={index} className={styles.imgThumbnailItem}>
-                    <div className={styles.imgThumbnailContainer}>
-                      <img
-                        className={styles.imgThumbnail}
-                        src={image.base64Content}
-                        alt={image.fileDescription ?? image.fileName}
-                      />
-                    </div>
-                    <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                      <CloseFilled size={16} className={styles.closeIcon} />
-                    </Button>
-                  </div>
+            </Column>
+          </Row>
+          <div className={styles.diagnosesText}>
+            {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
+              <>
+                {selectedPrimaryDiagnoses.map((diagnosis, index) => (
+                  <Tag
+                    className={styles.tag}
+                    filter
+                    key={index}
+                    onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                    type="red"
+                  >
+                    {diagnosis.display}
+                  </Tag>
                 ))}
-              </div>
-            </FormGroup>
-          </Column>
-        </Row>
-      </Stack>
+              </>
+            ) : null}
+            {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
+              <>
+                {selectedSecondaryDiagnoses.map((diagnosis, index) => (
+                  <Tag
+                    classname={styles.tag}
+                    filter
+                    key={index}
+                    onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                    type="blue"
+                  >
+                    {diagnosis.display}
+                  </Tag>
+                ))}
+              </>
+            ) : null}
+            {selectedPrimaryDiagnoses &&
+              !selectedPrimaryDiagnoses.length &&
+              selectedSecondaryDiagnoses &&
+              !selectedSecondaryDiagnoses.length && (
+                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              )}
+          </div>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
+                <DiagnosisSearch
+                  name="primaryDiagnosisSearch"
+                  control={control}
+                  labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
+                  placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
+                  handleSearch={handleSearch}
+                  error={errors?.primaryDiagnosisSearch}
+                  setIsSearching={setIsSearching}
+                />
+                {error ? (
+                  <InlineNotification
+                    className={styles.errorNotification}
+                    lowContrast
+                    title={t('error', 'Error')}
+                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                    onClose={() => setError(null)}
+                  />
+                ) : null}
+                <DiagnosesDisplay
+                  fieldName={'primaryDiagnosisSearch'}
+                  isDiagnosisNotSelected={isDiagnosisNotSelected}
+                  isLoading={isLoadingPrimaryDiagnoses}
+                  isSearching={isSearching}
+                  onAddDiagnosis={handleAddDiagnosis}
+                  searchResults={searchPrimaryResults}
+                  t={t}
+                  value={watch('primaryDiagnosisSearch')}
+                />
+              </FormGroup>
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
+                <DiagnosisSearch
+                  name="secondaryDiagnosisSearch"
+                  control={control}
+                  labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
+                  placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
+                  handleSearch={handleSearch}
+                  setIsSearching={setIsSearching}
+                />
+                {error ? (
+                  <InlineNotification
+                    className={styles.errorNotification}
+                    lowContrast
+                    title={t('error', 'Error')}
+                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                    onClose={() => setError(null)}
+                  />
+                ) : null}
+                <DiagnosesDisplay
+                  fieldName={'secondaryDiagnosisSearch'}
+                  isDiagnosisNotSelected={isDiagnosisNotSelected}
+                  isLoading={isLoadingSecondaryDiagnoses}
+                  isSearching={isSearching}
+                  onAddDiagnosis={handleAddDiagnosis}
+                  searchResults={searchSecondaryResults}
+                  t={t}
+                  value={watch('secondaryDiagnosisSearch')}
+                />
+              </FormGroup>
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('note', 'Note')}</span>
+            </Column>
+            <Column sm={3}>
+              <Controller
+                name="clinicalNote"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <ResponsiveWrapper>
+                    <TextArea
+                      id="additionalNote"
+                      rows={rows}
+                      labelText={t('clinicalNoteLabel', 'Write your notes')}
+                      placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={(event) => {
+                        onChange(event);
+                        const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                        const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                        setRows(newRows);
+                      }}
+                    />
+                  </ResponsiveWrapper>
+                )}
+              />
+            </Column>
+          </Row>
+          <Row className={styles.row}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('image', 'Image')}</span>
+            </Column>
+            <Column sm={3}>
+              <FormGroup legendText="">
+                <p className={styles.imgUploadHelperText}>
+                  {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
+                </p>
+                <Button
+                  className={styles.uploadButton}
+                  kind={isTablet ? 'ghost' : 'tertiary'}
+                  onClick={showImageCaptureModal}
+                  renderIcon={(props) => <Add size={16} {...props} />}
+                >
+                  {t('addImage', 'Add image')}
+                </Button>
+                <div className={styles.imgThumbnailGrid}>
+                  {currentImages?.map((image, index) => (
+                    <div key={index} className={styles.imgThumbnailItem}>
+                      <div className={styles.imgThumbnailContainer}>
+                        <img
+                          className={styles.imgThumbnail}
+                          src={image.base64Content}
+                          alt={image.fileDescription ?? image.fileName}
+                        />
+                      </div>
+                      <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
+                        <CloseFilled size={16} className={styles.closeIcon} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </FormGroup>
+            </Column>
+          </Row>
+        </Stack>
+      </div>
       <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}

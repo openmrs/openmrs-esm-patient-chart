@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
-import { Accordion, AccordionItem } from '@carbon/react';
-import { registerNavGroup } from '..';
 import { useTranslation } from 'react-i18next';
+import { Accordion, AccordionItem } from '@carbon/react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import { registerNavGroup } from '..';
+import './dashboard-group-extension.scss';
 
 export interface DashboardGroupExtensionProps {
   title: string;
@@ -18,8 +19,8 @@ export const DashboardGroupExtension = ({ title, slotName, basePath, isExpanded 
   }, [slotName]);
 
   return (
-    <Accordion>
-      <AccordionItem open={isExpanded ?? true} title={t(title)} style={{ border: 'none' }}>
+    <Accordion className="nav-group">
+      <AccordionItem open={isExpanded ?? true} title={t(title)}>
         <ExtensionSlot name={slotName ?? title} state={{ basePath }} />
       </AccordionItem>
     </Accordion>

@@ -1,6 +1,5 @@
 {
   "actionsMenu": "动作菜单",
-  "activeVisitRequired": "需要一个活动就诊才能下达遗嘱",
   "add": "添加",
   "additionalInstructions": "附加说明",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
@@ -33,6 +32,8 @@
   "indication": "适应症",
   "inStock": "在库存中",
   "instructions": "说明",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "加载检验结果时出错",
   "launchOrderBasket": "开启医嘱篮",
   "loading": "加载中",
@@ -47,6 +48,7 @@
   "noMatchingOrdersToDisplay": "没有匹配的医嘱可显示",
   "noResultsForTestTypeSearch": "没有与“{{searchTerm}}”有关的结果可显示",
   "normalRange": "正常范围",
+  "noTestData": "No test data available",
   "onDate": "on",
   "or": "或",
   "order": "医嘱",
@@ -109,11 +111,13 @@
   "status": "状态",
   "successfullyCancelledOrder": "医嘱{{orderNumber}}已成功取消",
   "successfullySavedLabResults": "序号为{{orderNumber}}的检验结果已成功更新",
+  "test": "Test",
   "Test Order_few": "检验医嘱",
   "testType": "检验类型",
   "tryReopeningTheWorkspaceAgain": "请尝试重新启动工作区",
   "trySearchingAgain": "请尝试重新搜索",
   "tryTo": "尝试",
   "updated": "已更新",
-  "usingADifferentTerm": "使用不同的术语"
+  "usingADifferentTerm": "使用不同的术语",
+  "visitRequired": "A visit is required to make orders"
 }

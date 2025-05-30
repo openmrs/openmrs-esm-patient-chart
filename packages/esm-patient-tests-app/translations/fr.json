@@ -14,7 +14,6 @@
   "closeSearchBar": "Fermer la recherche",
   "data": "donnée",
   "dataLoadError": "Erreur lors du chargement des données",
-  "dataTimeline": "Chronologie des Données",
   "dataTimelineText": "Chronologie des données",
   "date": "Date",
   "dateCollected": "Affichage de la date collectée",
@@ -24,7 +23,7 @@
   "endDate": "Date de fin",
   "error": "Erreur",
   "errorFetchingTestTypes": "Erreur lors de la récupération des résultats pour « {{searchTerm}} »",
-  "goToDrugOrderForm": "Préscrire",
+  "goToDrugOrderForm": "Prescrire",
   "hideResultsTable": "Masquer le tableau des résultats",
   "individualTests": "Examens individuels",
   "labOrders": "Analyses",
@@ -45,7 +44,6 @@
   "orderReason": "Raison de la prescription",
   "orderReasonRequired": "Order reason is required",
   "overTime": "Au fil du temps",
-  "panel": "Panels",
   "panels": "panels",
   "pleaseRequiredFields": "Prière de remplir tous les champs obligatoires",
   "print": "Imprimer",
@@ -90,10 +88,7 @@
   "tests": "Examens",
   "testType": "Analyse",
   "testTypeRequired": "Le type d'examen est requis",
-  "timeline": "Chronologie",
-  "timelineData_lower": "données chronologiques",
   "tree": "Arborescence",
-  "trend": "Tendance",
   "trendline": "Ligne de Tendance",
   "trendlineRangeSelector1Day": "1 jour",
   "trendlineRangeSelector1Month": "1 mois",
@@ -106,6 +101,5 @@
   "tryTo": "Essayez de",
   "usingADifferentTerm": "en utilisant un terme différent",
   "value": "Valeur",
-  "view": "Vue",
-  "viewTimeline": "Voir la chronologie"
+  "view": "Vue"
 }

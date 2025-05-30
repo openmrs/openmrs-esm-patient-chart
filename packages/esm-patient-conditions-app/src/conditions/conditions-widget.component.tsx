@@ -4,8 +4,6 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import {
-  DatePicker,
-  DatePickerInput,
   FormGroup,
   FormLabel,
   InlineLoading,
@@ -18,7 +16,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
@@ -234,11 +232,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       })}
                       disabled={isEditing}
                       id="conditionsSearch"
+                      aria-labelledby={errors?.conditionName ? 'conditionsSearchError' : undefined}
                       labelText={t('enterCondition', 'Enter condition')}
                       onChange={(event) => {
-                        const value = event.target.value;
-                        onChange(value);
-                        handleSearchTermChange(value);
+                        const val = event.target.value;
+                        onChange(val);
+                        handleSearchTermChange(val);
                       }}
                       onClear={() => {
                         setSearchTerm('');
@@ -259,7 +258,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
+              {errors?.conditionName && (
+                <p id="conditionsSearchError" className={styles.errorMessage}>
+                  {errors.conditionName.message}
+                </p>
+              )}
               <SearchResults
                 isSearching={isSearching}
                 onConditionChange={handleConditionChange}
@@ -275,20 +278,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           <Controller
             name="onsetDateTime"
             control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field, fieldState }) => (
               <ResponsiveWrapper>
-                <DatePicker
+                <OpenmrsDatePicker
+                  {...field}
                   id="onsetDate"
-                  datePickerType="single"
-                  dateFormat="d/m/Y"
-                  maxDate={dayjs().utc().format()}
-                  placeholder="dd/mm/yyyy"
-                  onChange={([date]) => onChange(date)}
-                  onBlur={onBlur}
-                  value={value}
-                >
-                  <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
-                </DatePicker>
+                  data-testid="onsetDate"
+                  maxDate={new Date()}
+                  labelText={t('onsetDate', 'Onset date')}
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                />
               </ResponsiveWrapper>
             )}
           />
@@ -306,35 +306,37 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 onChange={onChange}
                 orientation="vertical"
                 valueSelected={value.toLowerCase()}
+                aria-labelledby={errors?.clinicalStatus ? 'clinicalStatusError' : undefined}
               >
                 <RadioButton id="active" labelText={t('active', 'Active')} value="active" />
                 <RadioButton id="inactive" labelText={t('inactive', 'Inactive')} value="inactive" />
               </RadioButtonGroup>
             )}
           />
-          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
+          {errors?.clinicalStatus && (
+            <p id="clinicalStatusError" className={styles.errorMessage}>
+              {errors.clinicalStatus.message}
+            </p>
+          )}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">
             <Controller
               name="abatementDateTime"
               control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <>
                   <ResponsiveWrapper>
-                    <DatePicker
+                    <OpenmrsDatePicker
+                      {...field}
                       id="endDate"
-                      datePickerType="single"
-                      dateFormat="d/m/Y"
-                      minDate={new Date(watch('onsetDateTime')).toISOString()}
-                      maxDate={dayjs().utc().format()}
-                      placeholder="dd/mm/yyyy"
-                      onChange={([date]) => onChange(date)}
-                      onBlur={onBlur}
-                      value={value}
-                    >
-                      <DatePickerInput id="abatementDateTime" labelText={t('endDate', 'End date')} />
-                    </DatePicker>
+                      data-testid="endDate"
+                      minDate={new Date(watch('onsetDateTime'))}
+                      maxDate={new Date()}
+                      labelText={t('endDate', 'End date')}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
                   </ResponsiveWrapper>
                 </>
               )}

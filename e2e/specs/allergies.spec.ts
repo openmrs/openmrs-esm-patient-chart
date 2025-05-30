@@ -1,15 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 import { test } from '../core';
 import { PatientAllergiesPage } from '../pages';
 
-let patient: Patient;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-});
-
-test('Add, edit and delete an allergy', async ({ page }) => {
+test('Add, edit and delete an allergy', async ({ page, patient }) => {
   const allergiesPage = new PatientAllergiesPage(page);
   const headerRow = allergiesPage.allergiesTable().locator('thead > tr');
   const dataRow = allergiesPage.allergiesTable().locator('tbody > tr');
@@ -27,12 +20,15 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('When I select `ACE inhibitors` as the allergy', async () => {
-    await page.getByPlaceholder(/select the allergen/i).click();
+    await page.getByRole('combobox', { name: /allergen/i }).click();
     await page.getByText(/ace inhibitors/i).click();
   });
 
   await test.step('And I select `Mental status change` as the reaction', async () => {
-    await page.getByText(/mental status change/i).click();
+    await page
+      .getByTestId('allergic-reactions-container')
+      .getByText(/mental status change/i)
+      .click();
   });
 
   await test.step('And I select `Mild` as the severity', async () => {
@@ -81,6 +77,12 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   await test.step('When I change the allergy to `Bee stings`', async () => {
     await page.getByPlaceholder(/select the allergen/i).click();
     await page.getByText(/bee stings/i).click();
+    await page
+      .getByTestId('allergic-reactions-container')
+      .getByText(/mental status change/i)
+      .click();
+    await page.getByText(/itching/i).click();
+    await page.getByText(/hives/i).click();
   });
 
   await test.step('And I change the severity to `Severe`', async () => {
@@ -89,7 +91,11 @@ test('Add, edit and delete an allergy', async ({ page }) => {
 
   await test.step('And I change the allergy comment to `Itching all over the body`', async () => {
     await page.locator('#comments').clear();
-    await page.locator('#comments').fill('Itching all over the body');
+    await page
+      .locator('#comments')
+      .fill(
+        'Pt w/ diffuse urticaria & severe pruritus 30 min post bee sting. No angioedema, resp distress or hemodynamic compromise. Known bee venom allergy. Pruritus 8/10. Tx: epi 0.3mg IM, diphenhydramine 50mg IV, methylprednisolone 125mg IV. Symptoms improving. Monitoring for biphasic reaction x 4-6h',
+      );
   });
 
   await test.step('And I click on the `Save and close` button', async () => {
@@ -107,10 +113,11 @@ test('Add, edit and delete an allergy', async ({ page }) => {
     await expect(headerRow).toContainText(/comments/i);
     await expect(dataRow).toContainText(/bee stings/i);
     await expect(dataRow).not.toContainText(/ace inhibitors/i);
-    await expect(dataRow).toContainText(/severe/i);
+    await expect(dataRow).toContainText('SEVERE');
     await expect(dataRow).not.toContainText(/mild/i);
-    await expect(dataRow).toContainText(/itching all over the body/i);
-    await expect(dataRow).not.toContainText(/feeling faint and light-headed/i);
+    await expect(dataRow).toContainText(/hives/i);
+    await expect(dataRow).toContainText(/itching/i);
+    await expect(dataRow).toContainText(/pt w\/ diffuse urticaria/i);
   });
 
   await test.step('When I click the overflow menu in the table row with the updated allergy', async () => {
@@ -130,14 +137,10 @@ test('Add, edit and delete an allergy', async ({ page }) => {
   });
 
   await test.step('And I should not see the deleted allergy in the list', async () => {
-    await expect(page.getByText(/bee stings/i)).not.toBeVisible();
+    await expect(page.getByText(/bee stings/i)).toBeHidden();
   });
 
   await test.step('And the allergy table should be empty', async () => {
     await expect(page.getByText(/there are no allergy intolerances to display for this patient/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

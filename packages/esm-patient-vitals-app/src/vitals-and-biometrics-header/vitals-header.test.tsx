@@ -5,10 +5,15 @@ import userEvent from '@testing-library/user-event';
 import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
+import {
+  formattedVitals,
+  mockConceptUnits,
+  mockCurrentVisit,
+  mockVitalsConceptMetadata,
+  mockVitalsConfig,
+} from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { invalidateCachedVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -22,6 +27,10 @@ const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
 
 mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
+const mockLaunchWorkspaceRequiringVisit = jest.fn();
+const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+  return () => mockLaunchWorkspaceRequiringVisit(name);
+});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -30,19 +39,21 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
+    useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
-jest.mock('../common', () => {
-  const originalModule = jest.requireActual('../common');
+jest.mock('../common/data.resource', () => {
+  const originalModule = jest.requireActual('../common/data.resource');
 
   return {
     ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
       isLoading: false,
     })),
+    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
     useVitalsAndBiometrics: jest.fn(),
   };
 });
@@ -69,7 +80,20 @@ describe('VitalsHeader', () => {
 
   it('renders the most recently recorded values in the vitals header', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
-      data: formattedVitals,
+      data: [
+        {
+          id: '0',
+          date: '2021-05-19T04:26:51.000Z',
+          pulse: 76,
+          temperature: 37,
+          respiratoryRate: 12,
+          diastolic: 89,
+          systolic: 121,
+          bmi: null,
+          muac: 23,
+          bloodPressureRenderInterpretation: 'normal',
+        },
+      ],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderWithSwr(<VitalsHeader {...testProps} />);
@@ -104,8 +128,7 @@ describe('VitalsHeader', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledTimes(1);
   });
 
   it('displays correct overdue tag for vitals 5 days old', async () => {
@@ -130,8 +153,23 @@ describe('VitalsHeader', () => {
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
+    const normalVitals = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 75, // Within normal range (60-80)
+        systolic: 115, // Within normal range (90-120)
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
     mockUseVitalsAndBiometrics.mockReturnValue({
-      data: formattedVitals,
+      data: normalVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderWithSwr(<VitalsHeader {...testProps} />);
@@ -183,14 +221,7 @@ describe('VitalsHeader', () => {
 
     await user.click(recordVitalsButton);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      formInfo: {
-        encounterUuid: '',
-        formUuid: '9f26aad4-244a-46ca-be49-1196df1a8c9a',
-      },
-      workspaceTitle: 'Triage',
-      mutateForm: invalidateCachedVitalsAndBiometrics,
-    });
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledTimes(1);
   });
 
   it('should show links in vitals header by default', async () => {
