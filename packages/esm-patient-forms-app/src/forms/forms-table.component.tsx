@@ -15,6 +15,7 @@ import {
   TableToolbarSearch,
 } from '@carbon/react';
 import styles from './forms-table.scss';
+import { type Form } from '../types';
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -27,10 +28,11 @@ interface FormsTableProps {
     formName: string;
     formUuid: string;
     encounterUuid: string;
+    form: Form;
   }>;
   isTablet: boolean;
   handleSearch: (search: string) => void;
-  handleFormOpen: (formUuid: string, encounterUuid: string, formName: string) => void;
+  handleFormOpen: (form: Form, encounterUuid: string) => void;
 }
 
 const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
@@ -69,7 +71,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                         <Link
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            handleFormOpen(row.id, '', tableRows[i].formName);
+                            handleFormOpen(tableRows[i].form, '');
                           }}
                           role="presentation"
                           className={styles.formName}

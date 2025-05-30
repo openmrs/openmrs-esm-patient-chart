@@ -12,6 +12,7 @@ import {
   useOpenmrsFetchAll,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 
 export interface EncountersTableProps {
   patientUuid: string;
@@ -33,7 +34,7 @@ export interface MappedEncounter {
   diagnoses: Array<Diagnosis>;
   editPrivilege: string;
   encounterType: string;
-  form: OpenmrsResource;
+  form: Form;
   formName: string;
   id: string;
   obs: Array<Obs>;
@@ -53,7 +54,7 @@ export function deleteEncounter(encounterUuid: string, abortController: AbortCon
 }
 
 export function usePaginatedEncounters(patientUuid: string, encounterType: string, pageSize: number) {
-  const customRep = `custom:(uuid,display,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),encounterDatetime,form,encounterType,visit,patient,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterProviders:(provider:(person)))`;
+  const customRep = `custom:(uuid,display,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),encounterDatetime,form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterType,visit,patient,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterProviders:(provider:(person)))`;
   const url = new URL(makeUrl(`${restBaseUrl}/encounter`), window.location.toString());
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);
@@ -83,7 +84,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
         })) || [],
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
-    form: encounter.form,
+    form: encounter.form as Form,
     formName: encounter.form?.display ?? '--',
     obs: encounter.obs,
     provider:
