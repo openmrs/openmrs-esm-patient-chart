@@ -1,16 +1,12 @@
 {
   "clinicalForm": "formulir klinis",
   "clinicalForms": "formulir klinis",
-  "editForm": "edit formulir",
   "formName": "formulir nama (A - Z)",
   "forms": "formulir",
-  "formSearchHint": "petunjuk pencarian formulir",
   "homeOverviewCardView": "tampilan kartu ringkasan beranda",
   "lastCompleted": "terakhir diselesaikan",
   "never": "tidak pernah",
   "noFormsToDisplay": "tidak ada formulir untuk ditampilkan",
-  "noMatchingFormsAvailable": "tidak ada formulir {{formCategory}} yang cocok untuk ditampilkan",
-  "noMatchingFormsToDisplay": "tidak ada formulir yang cocok untuk ditampilkan",
   "offlineForms": "formulir offline",
   "offlineForms__lower": "formulir offline",
   "offlineFormsOverviewCardAvailableOffline": "kartu ringkasan formulir offline tersedia offline",
@@ -20,6 +16,5 @@
   "offlinePatientsTableSearchLabel": "label pencarian tabel pasien offline",
   "offlinePatientsTableSearchPlaceholder": "placeholder pencarian tabel pasien offline",
   "offlineToggle": "toggle offline",
-  "searchForAForm": "cari formulir",
   "searchThisList": "cari dalam daftar ini"
 }
