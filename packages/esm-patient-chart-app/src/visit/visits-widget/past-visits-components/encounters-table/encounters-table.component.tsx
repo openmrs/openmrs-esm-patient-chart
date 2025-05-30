@@ -242,10 +242,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                           launchFormEntryOrHtmlForms(
                                             htmlFormEntryForms,
                                             patientUuid,
-                                            encounter.form?.uuid,
+                                            encounter.form,
                                             encounter.visitUuid,
                                             encounter.id,
-                                            encounter.form?.display,
                                             encounter.visitTypeUuid,
                                             encounter.visitStartDatetime,
                                             encounter.visitStopDatetime,
@@ -288,10 +287,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                           launchFormEntryOrHtmlForms(
                                             htmlFormEntryForms,
                                             patientUuid,
-                                            encounter.form?.uuid,
+                                            encounter.form,
                                             encounter.visitUuid,
                                             encounter.id,
-                                            encounter.form?.display,
                                             encounter.visitTypeUuid,
                                             encounter.visitStartDatetime,
                                             encounter.visitStopDatetime,

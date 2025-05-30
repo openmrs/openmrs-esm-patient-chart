@@ -6,8 +6,3 @@ export const customEncounterRepresentation = `custom:(uuid,encounterDatetime,enc
 
 export const formEncounterUrl = `${restBaseUrl}/form?v=custom:${customFormRepresentation}`;
 export const formEncounterUrlPoc = `${restBaseUrl}/form?v=custom:${customFormRepresentation}&q=poc`;
-
-export const formEngineResourceName = 'formEngine';
-export const htmlformentryFormEngine = 'htmlformentry';
-export const uiStyleResourceName = 'uiStyle';
-export const uiStyleSimple = 'simple';
