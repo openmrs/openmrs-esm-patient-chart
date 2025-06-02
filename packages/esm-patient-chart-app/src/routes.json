@@ -180,6 +180,11 @@
       "name": "visit-context-header",
       "slot": "visit-context-header-slot",
       "component": "visitContextHeader"
+    },
+    {
+      "name": "retrospective-date-time-picker",
+      "slot": "restrospective-date-time-picker-slot",
+      "component": "retrospectiveDateTimePicker"
     }
   ],
   "featureFlags": [
