@@ -1,22 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, openmrsFetch } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsOverview from './programs-overview.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 const testProps = {
   basePath: `/patient/${mockPatient.id}/chart`,
@@ -82,16 +73,15 @@ describe('ProgramsOverview', () => {
     const actionMenuButton = within(row).getByRole('button', { name: /options$/i });
     expect(actionMenuButton).toBeInTheDocument();
 
-    // Clicking "Add" launches the programs form in a workspace
     expect(addButton).toBeEnabled();
     await user.click(addButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
     await user.click(actionMenuButton);
     await user.click(screen.getByText('Edit'));
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
       workspaceTitle: 'Edit program enrollment',
     });

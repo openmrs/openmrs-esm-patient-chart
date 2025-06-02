@@ -9,14 +9,10 @@ import {
   type DefaultWorkspaceProps,
   MaybeIcon,
   useLayoutType,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import {
-  type OrderBasketItem,
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import { prepOrderPostData } from './resources';
 import { type OrderTypeDefinition } from '../../config-schema';
@@ -72,7 +68,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () =>
-        launchPatientWorkspace('orderable-concept-workspace', {
+        launchWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
         }),
       closeWorkspaceGroup: false,
@@ -83,7 +79,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
     closeWorkspace({
       ignoreChanges: true,
       onWorkspaceClose: () =>
-        launchPatientWorkspace('orderable-concept-workspace', {
+        launchWorkspace('orderable-concept-workspace', {
           order,
           orderTypeUuid,
         }),

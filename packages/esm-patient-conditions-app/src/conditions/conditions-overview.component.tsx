@@ -22,15 +22,13 @@ import {
   formatDate,
   isDesktop as isDesktopLayout,
   launchWorkspace,
-  parseDate,
-  useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { type ConfigObject } from '../config-schema';
 import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
+import { type ConfigObject } from '../config-schema';
 import styles from './conditions-overview.scss';
 
 interface ConditionTableRow extends Condition {
