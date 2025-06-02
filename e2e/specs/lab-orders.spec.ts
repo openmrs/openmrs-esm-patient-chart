@@ -3,6 +3,7 @@ import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncoun
 import { test } from '../core';
 import { type Encounter, type Provider } from '../commands/types';
 import { type Order } from '@openmrs/esm-patient-common-lib';
+import { OrdersPage } from '../pages';
 
 let testOrder: Order;
 let encounter: Encounter;
@@ -10,11 +11,11 @@ let orderer: Provider;
 
 test.describe('Running laboratory order tests sequentially', () => {
   test('Record a lab order', async ({ page, patient }) => {
-    await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
+    const ordersPage = new OrdersPage(page);
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
-      await page.goto(patient.uuid);
+      await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('And I click on the `Record orders` link', async () => {
@@ -60,7 +61,7 @@ test.describe('Running laboratory order tests sequentially', () => {
     });
 
     await test.step('When I navigate to the orders dashboard', async () => {
-      await page.goto(patient.uuid);
+      await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then I should see the newly added lab order in the list', async () => {
@@ -77,8 +78,9 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
   });
 
   test('Add laboratory results via orders app', async ({ page, patient }) => {
+    const ordersPage = new OrdersPage(page);
     await test.step('When i navigate to the Orders section under patient chart', async () => {
-      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
@@ -112,8 +114,9 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
   });
 
   test('Modify a lab order', async ({ page, patient }) => {
+    const ordersPage = new OrdersPage(page);
     await test.step('When I visit the orders page', async () => {
-      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
@@ -155,8 +158,9 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
   });
 
   test('Discontinue a lab order', async ({ page, patient }) => {
+    const ordersPage = new OrdersPage(page);
     await test.step('When I visit the orders page', async () => {
-      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
