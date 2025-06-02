@@ -19,7 +19,7 @@ export const configSchema = {
   interpretationSlot: {
     _type: Type.String,
     _description: 'Interpretation slot to display bellow the graph in obs graph widget.',
-    _default: '',
+    _default: null,
   },
   data: {
     _type: Type.Array,
