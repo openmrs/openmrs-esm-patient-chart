@@ -14,7 +14,7 @@ type FormValues = {
 
 type RetrospectiveDateTimePickerProps = {
   patientUuid: string;
-  control: Control<FormValues>;
+  control?: Control<FormValues>;
   onChange?: (data: FormValues) => void;
 };
 
