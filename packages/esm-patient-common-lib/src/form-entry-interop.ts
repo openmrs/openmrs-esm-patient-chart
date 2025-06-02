@@ -1,5 +1,4 @@
 import { type Form, type HtmlFormEntryForm, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-
 import { launchWorkspace } from '@openmrs/esm-framework';
 
 export const clinicalFormsWorkspace = 'clinical-forms-workspace';
