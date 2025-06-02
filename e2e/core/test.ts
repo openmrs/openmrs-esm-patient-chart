@@ -1,6 +1,14 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
 import { api } from '../fixtures';
-import { type Patient, generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
+import {
+  type Patient,
+  generateRandomPatient,
+  deletePatient,
+  startVisit,
+  endVisit,
+  generateNewbornPatient,
+  generatePatientByAge,
+} from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 
 // This file sets up our custom test harness using the custom fixtures.
@@ -12,6 +20,10 @@ import { type Visit } from '@openmrs/esm-framework';
 export interface CustomTestFixtures {
   loginAsAdmin: Page;
   patient: Patient;
+  newbornPatient: Patient;
+  infantPatient: Patient;
+  childPatient: Patient;
+  adultPatient: Patient;
   visit?: Visit;
 }
 
@@ -33,6 +45,61 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
       }
     },
     { scope: 'test', auto: true },
+  ],
+  // Newborn patient (0-1 month)
+  newbornPatient: [
+    async ({ api }, use) => {
+      const patient = await generateNewbornPatient(api, 1);
+      await use(patient);
+      try {
+        if (patient) await deletePatient(api, patient.uuid);
+      } catch (e) {
+        console.warn('Failed to delete newborn patient:', e);
+      }
+    },
+    { scope: 'test' },
+  ],
+
+  // Infant patient (6 months)
+  infantPatient: [
+    async ({ api }, use) => {
+      const patient = await generatePatientByAge(api, { months: 6 });
+      await use(patient);
+      try {
+        if (patient) await deletePatient(api, patient.uuid);
+      } catch (e) {
+        console.warn('Failed to delete infant patient:', e);
+      }
+    },
+    { scope: 'test' },
+  ],
+
+  // Child patient (8 years)
+  childPatient: [
+    async ({ api }, use) => {
+      const patient = await generatePatientByAge(api, { years: 8 });
+      await use(patient);
+      try {
+        if (patient) await deletePatient(api, patient.uuid);
+      } catch (e) {
+        console.warn('Failed to delete child patient:', e);
+      }
+    },
+    { scope: 'test' },
+  ],
+
+  // Adult patient (30 years)
+  adultPatient: [
+    async ({ api }, use) => {
+      const patient = await generatePatientByAge(api, { years: 30 });
+      await use(patient);
+      try {
+        if (patient) await deletePatient(api, patient.uuid);
+      } catch (e) {
+        console.warn('Failed to delete adult patient:', e);
+      }
+    },
+    { scope: 'test' },
   ],
 
   visit: [
