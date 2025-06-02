@@ -123,8 +123,8 @@ const RetrospectiveDateTimePicker = ({
                         disabled={disableInputs}
                       >
                         <SelectItem value="" text="" />
-                        <SelectItem value="AM" text="AM" />
-                        <SelectItem value="PM" text="PM" />
+                        <SelectItem value="AM" text={t('AM', 'AM')} />
+                        <SelectItem value="PM" text={t('PM', 'PM')} />
                       </TimePickerSelect>
                     )}
                   />
