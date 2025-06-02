@@ -142,7 +142,7 @@ test.describe('Vitals validation for different age groups', () => {
         const after = window.getComputedStyle(el, '::after');
         return after.content;
       });
-      expect(afterContentLow).toBe('" ↑"');
+      expect(afterContentLow).toBe('" ↓↓"');
     });
   });
 
