@@ -7,11 +7,10 @@ import { type Order } from '@openmrs/esm-patient-common-lib';
 let testOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
-const url = process.env.E2E_BASE_URL;
 
 test.describe('Running laboratory order tests sequentially', () => {
   test('Record a lab order', async ({ page, patient }) => {
-    await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+    await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the orders page', async () => {
@@ -79,12 +78,15 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
   test('Add laboratory results via orders app', async ({ page, patient }) => {
     await test.step('When i navigate to the Orders section under patient chart', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
-      await expect(page.getByRole('cell', { name: 'Test order' })).toBeVisible();
-      await expect(page.getByRole('cell', { name: 'Serum glucose' })).toBeVisible();
+      const row = page
+        .locator('tr')
+        .filter({ has: page.getByRole('cell', { name: 'Test order', exact: true }) })
+        .filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) });
+      await expect(row).toBeVisible();
     });
 
     await test.step('When I click the overflow menu in the table row', async () => {
@@ -94,12 +96,12 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
         .click();
     });
 
-    await test.step(' Then I click on Add results action', async () => {
+    await test.step('Then I click on Add results action', async () => {
       await page.getByRole('menuitem', { name: 'Add results' }).click();
       await expect(page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' })).toBeVisible();
     });
 
-    await test.step(' Then I fill in the lab result and click save', async () => {
+    await test.step('Then I fill in the lab result and click save', async () => {
       await page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' }).fill('55');
       await page.getByRole('button', { name: 'Save and close' }).click();
     });
@@ -111,7 +113,7 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
   test('Modify a lab order', async ({ page, patient }) => {
     await test.step('When I visit the orders page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
@@ -154,7 +156,7 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
   test('Discontinue a lab order', async ({ page, patient }) => {
     await test.step('When I visit the orders page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Orders`);
+      await page.goto(process.env.E2E_BASE_URL + `/spa/patient/${patient.uuid}/chart/Orders`);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
