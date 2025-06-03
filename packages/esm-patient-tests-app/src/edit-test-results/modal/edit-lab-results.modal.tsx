@@ -36,7 +36,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
   const firstOrder = filteredOrders[0];
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={t('editLabResults', 'Edit laboratory tests')} />
+      <ModalHeader closeModal={closeModal} title={t('editLabResults', 'Edit lab results')} />
       <ModalBody>
         <p className={styles.titleHeader}>
           {t('confirmationText', 'Do you want to edit {{test}} results for the following patient?', {
@@ -68,35 +68,31 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
           </div>
 
           <div className={styles.previewPanel}>
-            <div>
-              <div className={styles.printContent}>
-                {filteredOrders.length > 0 && (
-                  <>
-                    <div className={styles.patientHeader}></div>
-
-                    <div className={styles.patientDetailsBody}>
-                      <div>
-                        <p className={styles.itemHeading}>{t('patientDetails', 'Patient Details')}</p>
-                        <p className={styles.itemLabel}>
-                          {t('name', 'Name')}: {firstOrder?.patient?.person?.display}
-                        </p>
-                        <p className={styles.itemLabel}>
-                          {t('age', 'Age')}: {firstOrder?.patient?.person?.age}
-                        </p>
-                        <p className={styles.itemLabel}>
-                          {t('gender', 'Gender')}:
-                          {firstOrder?.patient?.person?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')}
-                        </p>
-                      </div>
-
-                      <div className={styles.facilityDetails}>
-                        <p className={styles.itemLabel}>{location}</p>
-                        <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
-                      </div>
+            <div className={styles.printContent}>
+              {filteredOrders.length > 0 && (
+                <>
+                  <div className={styles.patientDetailsBody}>
+                    <div>
+                      <p className={styles.itemHeading}>{t('patientDetails', 'Patient Details')}</p>
+                      <p className={styles.itemLabel}>
+                        {t('name', 'Name')}: {firstOrder?.patient?.person?.display}
+                      </p>
+                      <p className={styles.itemLabel}>
+                        {t('age', 'Age')}: {firstOrder?.patient?.person?.age}
+                      </p>
+                      <p className={styles.itemLabel}>
+                        {t('gender', 'Gender')}:{' '}
+                        {firstOrder?.patient?.person?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')}
+                      </p>
                     </div>
-                  </>
-                )}
-              </div>
+
+                    <div className={styles.facilityDetails}>
+                      <p className={styles.itemLabel}>{location}</p>
+                      <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

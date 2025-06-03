@@ -50,13 +50,6 @@
   @include type.type-style('label-02');
 }
 
-.noSelection {
-  @include type.type-style('label-02');
-  color: themes.$text-secondary;
-  text-align: center;
-  margin-top: layout.$spacing-05;
-}
-
 .modalFooter {
   border-top: 1px solid themes.$border-subtle-01;
   padding: layout.$spacing-05;
@@ -97,13 +90,6 @@
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-}
-
-.testDoneHeader {
-  @include type.type-style('label-02');
-  margin-top: layout.$spacing-05;
-  font-weight: bold;
-  color: colors.$cool-gray-90;
 }
 
 .itemLabel {
