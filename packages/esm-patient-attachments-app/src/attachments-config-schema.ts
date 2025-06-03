@@ -5,6 +5,6 @@ export const attachmentsConfigSchema = {
     _type: Type.Number,
     _description: 'Maximum allowed upload file size (in MB)',
     _default: 1,
-    _validators: [validator((val) => val > 0, 'Must be greater than zero')],
+    _validators: [validator((v: unknown) => typeof v === 'number' && v > 0, 'Must be greater than zero')],
   },
 };
