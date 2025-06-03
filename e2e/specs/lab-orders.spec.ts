@@ -93,8 +93,9 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
     await test.step('When I click the overflow menu in the table row', async () => {
       await page
+      	.locator('tr')
+      	.filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) })
         .getByRole('button', { name: /options/i })
-        .nth(0)
         .click();
     });
 
