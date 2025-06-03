@@ -24,15 +24,24 @@ test.describe('Drug Order Tests', () => {
       await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
     });
 
-    await test.step('And I click to Add a drug order ', async () => {
+    await test.step('And I click the Add button on the medications details table', async () => {
       await page.getByRole('button', { name: 'Add', exact: true }).click();
     });
 
-    await test.step('And I search for "Aspirin" in the search bar', async () => {
+    await test.step('Then the add drug order workspace should be visible in the order basket', async () => {
+      await expect(page.getByText(/add drug order/i)).toBeVisible();
+      await expect(page.getByRole('searchbox', { name: /search for a drug or orderset/i })).toBeVisible();
+    });
+
+    await test.step('And when I type "Aspirin" in the search box', async () => {
       await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
     });
 
-    await test.step('And I add "Aspirin 325mg" to the basket', async () => {
+    await test.step('Then I should see a matching order item for "Aspirin 325mg" in the search results', async () => {
+      await expect(page.getByRole('listitem').filter({ hasText: /aspirin 325mg — 325mg — tablet/i })).toBeVisible();
+    });
+
+    await test.step('And when I click on the "Add to basket" button for "Aspirin 325mg"', async () => {
       await page
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i })
@@ -40,18 +49,19 @@ test.describe('Drug Order Tests', () => {
         .click();
     });
 
-    await test.step('Then I should see "Aspirin 325mg" under drug order', async () => {
-      await expect(page.getByText('Aspirin 325mg')).toBeVisible();
+    await test.step('Then I should see a new incomplete drug order for "Aspirin 325mg"', async () => {
+      await expect(page.getByText(/incomplete/i)).toBeVisible();
+      await expect(page.getByRole('listitem').filter({ hasText: /aspirin 325mg — 325mg — tablet/i })).toBeVisible();
     });
 
-    await test.step('When I click on the newly created drug order', async () => {
+    await test.step('When I click on the incomplete drug order', async () => {
       await page
         .getByRole('listitem')
         .filter({ hasText: /incomplete/i })
         .click();
     });
 
-    await test.step('Then I should see the drug order form launch in the workspace', async () => {
+    await test.step('Then I should see the medication order form launch in the workspace with the medication details from the order pre-filled', async () => {
       await expect(page.getByText(/order form/i)).toBeVisible();
     });
 

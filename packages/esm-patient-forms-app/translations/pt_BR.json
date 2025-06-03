@@ -1,16 +1,12 @@
 {
   "clinicalForm": "Formulário clínico",
   "clinicalForms": "Formulários clínicos",
-  "editForm": "Editar formulário",
   "formName": "Nome do formulário (A-Z)",
   "forms": "Formulários",
-  "formSearchHint": "Tente pesquisar o formulário usando um nome alternativo ou uma palavra-chave",
   "homeOverviewCardView": "Exibir",
   "lastCompleted": "Último preenchimento",
   "never": "Nunca",
   "noFormsToDisplay": "Não há formulários para exibir.",
-  "noMatchingFormsAvailable": "Não há formulários {{formCategory}} para exibir",
-  "noMatchingFormsToDisplay": "Não há formulários correspondentes para exibir",
   "offlineForms": "Formulários off-line",
   "offlineForms__lower": "formulários off-line",
   "offlineFormsOverviewCardAvailableOffline": "Disponível off-line",
@@ -20,6 +16,5 @@
   "offlinePatientsTableSearchLabel": "Pesquisar nesta lista",
   "offlinePatientsTableSearchPlaceholder": "Pesquisar nesta lista",
   "offlineToggle": "Alternar off-line",
-  "searchForAForm": "Pesquisar um formulário",
   "searchThisList": "Pesquisar nesta lista"
 }
