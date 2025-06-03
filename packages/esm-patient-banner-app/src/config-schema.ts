@@ -38,6 +38,9 @@ export const configSchema = {
       _type: Type.Array,
       _description: 'Patient demographics to include in the patient sticker printout',
       _default: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
+      _elements: {
+        _type: Type.String,
+      },
     },
     pageSize: {
       _type: Type.String,
