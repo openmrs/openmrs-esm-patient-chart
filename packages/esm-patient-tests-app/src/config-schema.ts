@@ -68,9 +68,12 @@ export const configSchema = {
           'The custom label to be shown for the order type. The label will be translated using the label as the key itself.',
       },
       orderableConceptSets: {
-        _type: Type.UUID,
+        _type: Type.Array,
         _description:
           'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderableConceptClasses` will be considered orderable.',
+        _elements: {
+          _type: Type.UUID,
+        },
       },
       icon: {
         _type: Type.String,
