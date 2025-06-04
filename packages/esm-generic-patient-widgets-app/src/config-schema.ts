@@ -78,7 +78,7 @@ export const configSchema = {
     _type: Type.String,
     _description: 'Type of display for data',
     _default: 'dateTime',
-    validators: [
+    _validators: [
       validator(
         (v: unknown) => typeof v === 'string' && (v === 'date' || v === 'time' || v === 'dateTime'),
         'Must be one of "date", "time" or "dateTime"',
