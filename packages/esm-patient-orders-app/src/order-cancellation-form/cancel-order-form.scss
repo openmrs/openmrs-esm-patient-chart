@@ -1,87 +1,182 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/themes';
+@use '@carbon/colors';
 
-.productiveHeading03 {
-  @include type.type-style('heading-03');
-}
-
-.title {
-  @extend .productiveHeading03;
-  margin: 0 layout.$spacing-03 layout.$spacing-03 0;
-}
-
-.orderDisplay {
-  margin-bottom: layout.$spacing-05;
-}
-
-.danger {
-  color: $danger;
-}
-
-.button {
-  height: layout.$spacing-10;
-  display: flex;
-  align-content: flex-start;
-  align-items: baseline;
-  min-width: 50%;
-
-  :global(.cds--inline-loading) {
-    min-height: layout.$spacing-05 !important;
-  }
-
-  :global(.cds--inline-loading__text) {
-    font-size: unset !important;
-  }
-}
-
-.tablet {
-  padding: layout.$spacing-06 layout.$spacing-05;
-  background-color: $ui-02;
-}
-
-.desktop {
-  padding: 0;
-}
-
-.form {
+.modalContentWrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .form {
-  background-color: #ededed;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .form {
-  background-color: $ui-02;
-}
-
-.grid {
-  margin: layout.$spacing-05;
-}
-
-.row {
-  margin: layout.$spacing-03 0 0;
+.modalBody {
   display: flex;
-  flex-flow: row wrap;
+  flex-direction: row;
   gap: layout.$spacing-05;
+  flex: 1;
+  padding: layout.$spacing-05;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    flex-direction: column;
+    gap: layout.$spacing-06;
+  }
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    padding: layout.$spacing-04;
+    gap: layout.$spacing-05;
+  }
 }
 
-.spacer {
-  margin-top: layout.$spacing-05;
+.selectionPanel {
+  width: 30%;
+  padding: layout.$spacing-05;
+  border-right: layout.$spacing-01 solid themes.$border-subtle-01;
+  margin-top: 1.25rem;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 100%;
+    border-right: none;
+    border-bottom: layout.$spacing-01 solid themes.$border-subtle-01;
+    margin-top: 0;
+    padding-bottom: layout.$spacing-06;
+  }
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    padding: layout.$spacing-04;
+    padding-bottom: layout.$spacing-05;
+  }
 }
 
-.noteInput {
+.previewPanel {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 100%;
+    margin-top: layout.$spacing-05;
+  }
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    margin-top: layout.$spacing-04;
+  }
+}
+
+.printContent {
+  background: transparent;
   width: 100%;
 }
 
-.errorNotification {
-  margin: layout.$spacing-03 0;
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-10;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    gap: layout.$spacing-05;
+  }
 }
 
-.errorContainer {
-  margin: layout.$spacing-05;
+.radioItem {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  margin-top: layout.$spacing-04;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    margin-top: layout.$spacing-03;
+  }
+}
+
+.radioLabel {
+  @include type.type-style('label-02');
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    @include type.type-style('label-01');
+  }
+}
+
+.modalFooter {
+  border-top: 1px solid themes.$border-subtle-01;
+  padding: layout.$spacing-05;
+  display: flex;
+  justify-content: flex-end;
+  gap: layout.$spacing-03;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    padding: layout.$spacing-04;
+    gap: layout.$spacing-02;
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.patientHeader {
+  display: flex;
+  flex-direction: row;
+  margin: layout.$spacing-05 0;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    margin: layout.$spacing-04 0;
+  }
+}
+
+.facilityDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: layout.$spacing-05;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    align-items: flex-start;
+    margin-top: layout.$spacing-04;
+  }
+}
+
+.titleHeader {
+  @include type.type-style('label-02');
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    @include type.type-style('label-01');
+  }
+}
+
+.itemHeading {
+  @include type.type-style('label-02');
+  margin-bottom: layout.$spacing-02;
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    @include type.type-style('label-01');
+    margin-bottom: layout.$spacing-01;
+  }
+}
+
+.patientDetailsBody {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    flex-direction: column;
+    gap: layout.$spacing-04;
+  }
+}
+
+.itemLabel {
+  @include type.type-style('label-02');
+  color: colors.$cool-gray-90;
+  margin-bottom: layout.$spacing-03;
+
+  :global(.omrs-breakpoint-gt-tablet) & {
+    @include type.type-style('label-01');
+    margin-bottom: layout.$spacing-02;
+  }
 }
