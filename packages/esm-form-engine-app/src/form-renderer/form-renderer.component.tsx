@@ -3,11 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import { showModal, type Visit } from '@openmrs/esm-framework';
-import {
-  clinicalFormsWorkspace,
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-} from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
@@ -30,7 +26,6 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   patientUuid,
   promptBeforeClosing,
   visit,
-  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
@@ -39,8 +34,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace();
-    !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchPatientWorkspace(clinicalFormsWorkspaceName);
-  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose, clinicalFormsWorkspaceName]);
+    !encounterUuid && openClinicalFormsWorkspaceOnFormClose;
+  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
