@@ -22,7 +22,7 @@ export const configSchema = {
       },
       moduleName: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description:
           'The specifier for the module, e.g., "@myOrg/myGreatDataSource". This module should be defined in your import map and will be loaded for all forms.',
         _validators: [validator((val) => val !== '', 'Must have a value')],
