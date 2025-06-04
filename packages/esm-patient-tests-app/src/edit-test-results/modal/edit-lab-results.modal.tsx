@@ -1,5 +1,5 @@
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
-import { launchWorkspace, useSession } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
@@ -88,7 +88,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
                     <div className={styles.facilityDetails}>
                       <p className={styles.itemLabel}>{location}</p>
-                      <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
+                      <p className={styles.itemLabel}>{formatDate(new Date(firstOrder.dateActivated))}</p>
                     </div>
                   </div>
                 </>
