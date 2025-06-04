@@ -4,6 +4,7 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
 import {
   ExtensionSlot,
+  parseDate,
   showModal,
   showSnackbar,
   useConfig,
@@ -23,6 +24,7 @@ import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
+import { set } from 'date-fns';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -34,7 +36,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
   const session = useSession();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit, currentVisitIsRetrospective } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -46,6 +48,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   } = useOrderEncounter(patientUuid);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
+  const [rdeDate, setRdeDate] = useState<Date>();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
   const { mutateVisit } = useVisitContextStore();
 
@@ -59,6 +62,37 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       closeModal: () => dispose(),
     });
   }, [patientUuid]);
+
+  const handleRdeDateTimeChange = useCallback(
+    (dateTime: { retrospectiveDate: Date; retrospectiveTime: string; retrospectiveTimeFormat: string }) => {
+      if (!dateTime.retrospectiveDate || !dateTime.retrospectiveTime || !dateTime.retrospectiveTimeFormat) {
+        setRdeDate(undefined);
+        return;
+      }
+
+      let [rawHour, minute] = dateTime.retrospectiveTime.split(':').map(Number);
+
+      // Adjust hour for AM/PM
+      let hour = rawHour;
+      if (dateTime.retrospectiveTimeFormat === 'PM' && hour < 12) {
+        hour += 12;
+      }
+
+      if (dateTime.retrospectiveTimeFormat === 'AM' && hour === 12) {
+        hour = 0;
+      }
+
+      const completeDate = set(dateTime.retrospectiveDate, {
+        hours: hour,
+        minutes: minute,
+        seconds: 0,
+        milliseconds: 0,
+      });
+
+      setRdeDate(completeDate);
+    },
+    [],
+  );
 
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
@@ -74,6 +108,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           visitRequired ? currentVisit : null,
           session?.sessionLocation?.uuid,
           abortController,
+          rdeDate,
         );
         mutateEncounterUuid();
         mutateVisit();
@@ -103,19 +138,20 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
-    currentVisit,
-    visitRequired,
-    clearOrders,
-    closeWorkspaceWithSavedChanges,
-    config,
     encounterUuid,
-    mutateEncounterUuid,
-    mutateOrders,
-    mutateVisit,
-    orders,
     patientUuid,
-    session,
+    config?.orderEncounterType,
+    visitRequired,
+    currentVisit,
+    session?.sessionLocation?.uuid,
+    rdeDate,
+    mutateEncounterUuid,
+    mutateVisit,
+    clearOrders,
+    mutateOrders,
+    closeWorkspaceWithSavedChanges,
     t,
+    orders,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -126,6 +162,10 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     <>
       <div className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        <ExtensionSlot
+          name="restrospective-date-time-picker-slot"
+          state={{ patientUuid, onChange: handleRdeDateTimeChange }}
+        />
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
@@ -179,7 +219,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (visitRequired && !currentVisit) ||
-                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
+                (currentVisitIsRetrospective && !rdeDate)
               }
             >
               {isSavingOrders ? (

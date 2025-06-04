@@ -15,12 +15,17 @@ export async function postOrdersOnNewEncounter(
   currentVisit: Visit | null,
   sessionLocationUuid: string,
   abortController?: AbortController,
+  selectedDate?: Date,
 ) {
   const now = new Date();
   const visitStartDate = parseDate(currentVisit?.startDatetime);
   const visitEndDate = parseDate(currentVisit?.stopDatetime);
   let encounterDate: Date;
-  if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
+
+  // If a selected date is provided, prefer it over any other dates
+  if (selectedDate) {
+    encounterDate = selectedDate;
+  } else if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
     encounterDate = now;
   } else {
     console.warn(
