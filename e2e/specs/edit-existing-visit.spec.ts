@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
 import { getVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
@@ -120,5 +119,50 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   await test.step('And the visit should have ended', async () => {
     const updatedVisit = await getVisit(api, visit.uuid);
     expect(updatedVisit.stopDatetime).not.toBeNull();
+  });
+});
+
+test('Edit start date and time for a past visit', async ({ page, patient, pastVisit }) => {
+  const chartPage = new ChartPage(page);
+  const visitsPage = new VisitsPage(page);
+
+  await test.step('Navigate to visits page for patient', async () => {
+    await visitsPage.goTo(patient.uuid);
+  });
+
+  await test.step('Click edit on past visit', async () => {
+    await expect(chartPage.page.getByRole('cell', { name: '30-May-2025 - 30-May-2025' })).toBeVisible();
+    await visitsPage.page
+      .getByRole('row', { name: /30-May/i })
+      .getByLabel('Edit')
+      .click();
+  });
+  await test.step('Then i should see the eisting start date', async () => {
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
+    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
+    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
+
+    await expect(startDateInput).toBeVisible();
+    const startDateDayInputValue = await startDateDayInput.textContent();
+    expect(startDateDayInputValue).toBe('30');
+    const startDateMonthInputValue = await startDateMonthInput.textContent();
+    expect(startDateMonthInputValue).toBe('05');
+    const startDateYearInputValue = await startDateYearInput.textContent();
+    expect(startDateYearInputValue).toBe('2025');
+  });
+
+  await test.step('Edit start date', async () => {
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('30');
+    await startDateInput.getByRole('spinbutton', { name: /month/i }).fill('4');
+    await startDateInput.getByRole('spinbutton', { name: /year/i }).fill('2025');
+    await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('09:30');
+    await chartPage.page.getByRole('button', { name: /update visit/i }).click();
+  });
+
+  await test.step('Verify success message and new start date', async () => {
+    await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: '30-Apr-2025 - 30-May-2025' })).toBeVisible();
   });
 });

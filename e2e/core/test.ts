@@ -1,6 +1,13 @@
 import { type APIRequestContext, type Page, test as base } from '@playwright/test';
 import { api } from '../fixtures';
-import { type Patient, generateRandomPatient, deletePatient, startVisit, endVisit } from '../commands';
+import {
+  type Patient,
+  generateRandomPatient,
+  deletePatient,
+  startVisit,
+  endVisit,
+  createPastEndedVisit,
+} from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 
 // This file sets up our custom test harness using the custom fixtures.
@@ -13,6 +20,7 @@ export interface CustomTestFixtures {
   loginAsAdmin: Page;
   patient: Patient;
   visit?: Visit;
+  pastVisit?: Visit;
 }
 
 export interface CustomWorkerFixtures {
@@ -46,5 +54,17 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
       }
     },
     { scope: 'test', auto: true },
+  ],
+  pastVisit: [
+    async ({ api, patient }, use) => {
+      const pastVisit = await createPastEndedVisit(api, patient.uuid);
+      await use(pastVisit);
+      try {
+        if (pastVisit) await endVisit(api, pastVisit);
+      } catch (e) {
+        console.warn('Failed to end pastVisit:', e);
+      }
+    },
+    { scope: 'test' },
   ],
 });
