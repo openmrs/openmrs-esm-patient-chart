@@ -316,13 +316,45 @@ const VisitForm: React.FC<VisitFormProps> = ({
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
-            return Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
+            return Promise.allSettled([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]).then((results) => {
+              const visitAttributesResult = results[0];
+              const callbackResults = results.slice(1);
+              const callbackFailures = callbackResults.filter((result) => result.status === 'rejected');
+
+              // If visit attributes failed, don't close workspace
+              if (visitAttributesResult.status === 'rejected') {
+                return;
+              }
+
+              // Handle callback failures
+              if (callbackFailures.length > 0) {
+                const callbackFailuresMessages = callbackFailures
+                  .filter((failure): failure is PromiseRejectedResult => failure.status === 'rejected')
+                  .map((failure) => failure.reason?.message);
+                showSnackbar({
+                  title: t('postVisitActionsFailed', 'Post-visit actions failed'),
+                  kind: 'error',
+                  isLowContrast: true,
+                  subtitle: t(
+                    'postVisitActionsFailedDescription',
+                    'Visit created successfully. {{callbackFailuresMessages}}',
+                    {
+                      callbackFailuresMessages: callbackFailuresMessages.join(', '),
+                    },
+                  ),
+                  timeoutInMs: 5000,
+                  autoClose: true,
+                });
+              }
+              closeWorkspace({ ignoreChanges: true });
+            });
           })
           .then(() => {
-            closeWorkspace({ ignoreChanges: true });
+            mutateVisit();
           })
-          .catch(() => {
+          .catch((error) => {
             // do nothing, this catches any reject promises used for short-circuiting
+            console.error('error', error);
           })
           .finally(() => {
             mutateVisit();
