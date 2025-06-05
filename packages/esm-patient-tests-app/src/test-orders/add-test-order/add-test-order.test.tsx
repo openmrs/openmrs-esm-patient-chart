@@ -61,9 +61,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
   useOrderType: jest.fn(),
-}));
-
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
   getPatientUuidFromStore: jest.fn(() => mockPatient.id),
   usePatientChartStore: jest.fn(() => ({
     patientUuid: mockPatient.id,
