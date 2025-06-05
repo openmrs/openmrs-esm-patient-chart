@@ -191,4 +191,5 @@ export interface TestOrderBasketItem extends OrderBasketItem {
   };
   orderReason?: string;
   specimenSource?: string;
+  dateActivated?: string;
 }
