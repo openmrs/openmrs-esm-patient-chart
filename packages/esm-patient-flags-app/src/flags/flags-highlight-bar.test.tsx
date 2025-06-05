@@ -1,22 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsHighlightBar from './flags-highlight-bar.component';
 
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');
@@ -58,7 +50,7 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 
   await user.click(editButton);
 
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
 
   const closeButton = screen.getByRole('button', { name: /close flags bar/i });
 
