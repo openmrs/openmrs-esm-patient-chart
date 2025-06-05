@@ -77,9 +77,45 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
   });
 
+  test('Add laboratory results via orders app', async ({ page, patient }) => {
+    const ordersPage = new OrdersPage(page);
+    await test.step('When i navigate to the Orders section under patient chart', async () => {
+      await ordersPage.goTo(patient.uuid);
+    });
+
+    await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
+      const row = page
+        .locator('tr')
+        .filter({ has: page.getByRole('cell', { name: 'Test order', exact: true }) })
+        .filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) });
+      await expect(row).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu in the table row', async () => {
+      await page
+      	.locator('tr')
+      	.filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) })
+        .getByRole('button', { name: /options/i })
+        .click();
+    });
+
+    await test.step('Then I click on Add results action', async () => {
+      await page.getByRole('menuitem', { name: 'Add results' }).click();
+      await expect(page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' })).toBeVisible();
+    });
+
+    await test.step('Then I fill in the lab result and click save', async () => {
+      await page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' }).fill('55');
+      await page.getByRole('button', { name: 'Save and close' }).click();
+    });
+
+    await test.step('And a confirmation message should be displayed indicating that the result was saved', async () => {
+      await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
+    });
+  });
+
   test('Modify a lab order', async ({ page, patient }) => {
     const ordersPage = new OrdersPage(page);
-
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
     });
@@ -124,7 +160,6 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
   test('Discontinue a lab order', async ({ page, patient }) => {
     const ordersPage = new OrdersPage(page);
-
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
     });
