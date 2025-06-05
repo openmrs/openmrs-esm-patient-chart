@@ -58,19 +58,19 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
         return filteredSubRows.entries?.length > 0 ? (
           <div
             key={index}
-              className={classNames({
-                [styles.border]: filteredSubRows?.entries.length,
-              })}
-            >
-              <IndividualResultsTable
-                isLoading={loadingPanelData}
-                subRows={filteredSubRows}
-                index={index}
-                title={filteredSubRows.key}
-              />
-            </div>
-          ) : null;
-        })}
+            className={classNames({
+              [styles.border]: filteredSubRows?.entries.length,
+            })}
+          >
+            <IndividualResultsTable
+              isLoading={loadingPanelData}
+              subRows={filteredSubRows}
+              index={index}
+              title={filteredSubRows.key}
+            />
+          </div>
+        ) : null;
+      })}
     </Layer>
   );
 };

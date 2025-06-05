@@ -32,21 +32,6 @@ import {
   Tile,
 } from '@carbon/react';
 import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  getDrugOrderByUuid,
-  launchPatientWorkspace,
-  PatientChartPagination,
-  type Order,
-  type OrderBasketItem,
-  type OrderType,
-  useLaunchWorkspaceRequiringVisit,
-  useOrderBasket,
-  useOrderTypes,
-  usePatientOrders,
-} from '@openmrs/esm-patient-common-lib';
-import {
   AddIcon,
   age,
   ExtensionSlot,
@@ -59,8 +44,23 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  getDrugOrderByUuid,
+  launchPatientWorkspace,
+  type Order,
+  type OrderBasketItem,
+  type OrderType,
+  PatientChartPagination,
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
+  useOrderTypes,
+  usePatientOrders,
+} from '@openmrs/esm-patient-common-lib';
 import GeneralOrderTable from './general-order-table.component';
+import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
@@ -450,6 +450,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           kind="ghost"
                           renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
+                          PrintComponent
                           onClick={launchOrderBasket}
                         >
                           {t('add', 'Add')}
