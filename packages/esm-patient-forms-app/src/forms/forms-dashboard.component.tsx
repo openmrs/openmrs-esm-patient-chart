@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-framework';
@@ -31,12 +31,26 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const {
     data: forms,
     allForms,
     error,
     mutateForms,
-  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+    totalCount,
+  } = useForms(
+    patientUuid,
+    currentVisit?.uuid,
+    undefined,
+    undefined,
+    !isOnline,
+    config.orderBy,
+    searchTerm,
+    pageSize,
+    currentPage,
+  );
 
   const htmlFormEntryForms = useMemo(() => {
     return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
@@ -93,7 +107,17 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList
+          completedForms={forms}
+          totalForms={totalCount}
+          error={error}
+          pageSize={pageSize}
+          handleFormOpen={handleFormOpen}
+          searchTerm={searchTerm}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          onSearchTermChange={setSearchTerm}
+        />
       ) : (
         sections.map((section) => {
           return (
@@ -102,7 +126,12 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
               sectionName={section.name}
               completedForms={section.availableForms}
               error={error}
+              pageSize={pageSize}
               handleFormOpen={handleFormOpen}
+              searchTerm={searchTerm}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              onSearchTermChange={setSearchTerm}
             />
           );
         })
