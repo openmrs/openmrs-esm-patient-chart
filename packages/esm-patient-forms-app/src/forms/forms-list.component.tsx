@@ -13,6 +13,12 @@ export type FormsListProps = {
   error?: any;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  totalForms?: number;
+  pageSize: number;
+  searchTerm?: string;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  onSearchTermChange?: (searchTerm: string) => void;
 };
 
 /*
@@ -20,9 +26,19 @@ export type FormsListProps = {
  * t('forms', 'Forms')
  */
 
-const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionName = 'forms', handleFormOpen }) => {
+const FormsList: React.FC<FormsListProps> = ({
+  completedForms,
+  error,
+  sectionName = 'forms',
+  handleFormOpen,
+  totalForms,
+  pageSize,
+  searchTerm = '',
+  onPageChange,
+  onPageSizeChange,
+  onSearchTermChange,
+}) => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
   const [locale, setLocale] = useState(window.i18next.language ?? navigator.language);
 
@@ -34,7 +50,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     }
   }, []);
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((term) => onSearchTermChange?.(term), 300), [onSearchTermChange]);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
@@ -92,6 +108,13 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
           isTablet={isTablet}
           handleSearch={handleSearch}
           handleFormOpen={handleFormOpen}
+          totalItems={totalForms}
+          pageSize={pageSize}
+          completedForms={completedForms}
+          currentPage={1}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          searchTerm={searchTerm}
         />
       </ResponsiveWrapper>
     );
@@ -107,6 +130,13 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
           isTablet={isTablet}
           handleSearch={handleSearch}
           handleFormOpen={handleFormOpen}
+          pageSize={pageSize}
+          totalItems={totalForms}
+          completedForms={completedForms}
+          currentPage={1}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          searchTerm={searchTerm}
         />
       </ResponsiveWrapper>
     );
