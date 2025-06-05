@@ -37,22 +37,36 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   };
 }
 
-export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
-  const { url, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
+export function useFormEncounters(
+  cachedOfflineFormsOnly = false,
+  patientUuid: string = '',
+  visitUuid: string = '',
+  searchTerm: string = '',
+  pageSize?: number,
+  currentPage?: number,
+) {
+  const { url: baseUrl, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
 
+  let url = baseUrl;
+  if (pageSize && currentPage) {
+    const startIndex = (currentPage - 1) * pageSize;
+    url += `&limit=${pageSize}&startIndex=${startIndex}`;
+  } else if (searchTerm) {
+    url = `${baseUrl}&q=${searchTerm}`;
+  }
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
-    // show published forms and hide component forms
     const forms = hasCustomFormsUrl
       ? res?.data.results
       : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 
     if (!cachedOfflineFormsOnly) {
-      return forms;
+      return { forms, totalCount: res.data.totalCount };
     }
 
     const dynamicFormData = await getDynamicOfflineDataEntries('form');
-    return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
+    const filteredForms = forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
+    return { forms: filteredForms, totalCount: res.data.totalCount };
   });
 }
 
@@ -77,12 +91,22 @@ export function useForms(
   endDate?: Date,
   cachedOfflineFormsOnly = false,
   orderBy: 'name' | 'most-recent' = 'name',
+  searchTerm?: string,
+  pageSize?: number,
+  currentPage?: number,
 ) {
-  const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
-  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
+  const { htmlFormEntryForms } = useConfig<ConfigObject>();
+  const allFormsRes = useFormEncounters(
+    cachedOfflineFormsOnly,
+    patientUuid,
+    visitUuid,
+    searchTerm,
+    pageSize,
+    currentPage,
+  );
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
-  const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
+  const data = allFormsRes.data?.forms ? mapToFormCompletedInfo(allFormsRes.data?.forms, pastEncounters) : undefined;
   const session = useSession();
 
   const mutateForms = () => {
@@ -122,7 +146,9 @@ export function useForms(
     data: formsToDisplay,
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
+    allForms: allFormsRes.data?.forms,
     mutateForms,
+    totalCount: allFormsRes.data?.totalCount ?? 0,
   };
 }
 
