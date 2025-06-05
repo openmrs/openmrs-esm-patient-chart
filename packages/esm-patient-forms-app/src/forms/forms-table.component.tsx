@@ -13,9 +13,16 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  Pagination,
 } from '@carbon/react';
-import { type Form } from '../types';
 import styles from './forms-table.scss';
+import { type CompletedFormInfo, type Form } from '../types';
+import { usePagination } from '@openmrs/esm-framework';
+
+interface PaginationLinks {
+  next?: { uri: string };
+  prev?: { uri: string };
+}
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -33,10 +40,32 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  currentPage: number;
+  totalItems: number;
+  completedForms: Array<CompletedFormInfo>;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  searchTerm: string;
 }
 
-const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
+const FormsTable = ({
+  tableHeaders,
+  tableRows,
+  isTablet,
+  handleSearch,
+  handleFormOpen,
+  totalItems,
+  completedForms,
+  pageSize,
+  currentPage,
+  onPageChange,
+  onPageSizeChange,
+}: FormsTableProps) => {
   const { t } = useTranslation();
+  const { goTo } = usePagination(completedForms, pageSize);
+  const pageSizes = [50];
+
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -88,6 +117,22 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
               </Table>
             )}
           </TableContainer>
+          <Pagination
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
+            page={currentPage}
+            pageSize={pageSize}
+            size="sm"
+            pageSizes={pageSizes}
+            totalItems={totalItems}
+            onChange={({ page, pageSize: newPageSize }) => {
+              if (newPageSize !== pageSize) {
+                onPageSizeChange(newPageSize);
+              }
+              onPageChange(page);
+              goTo(page);
+            }}
+          />
         </>
       )}
     </DataTable>

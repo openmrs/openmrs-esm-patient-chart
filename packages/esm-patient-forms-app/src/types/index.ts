@@ -68,6 +68,12 @@ export interface EncounterType {
 
 export interface ListResponse<T> {
   results: Array<T>;
+  links: Array<{
+    rel: string;
+    uri: string;
+    resourcesAlias: string;
+  }>;
+  totalCount?: number;
 }
 
 export interface CompletedFormInfo {

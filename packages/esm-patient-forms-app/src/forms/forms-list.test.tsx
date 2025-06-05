@@ -9,8 +9,12 @@ jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 const defaultProps: FormsListProps & { reset: () => void } = {
   forms: [],
   handleFormOpen: jest.fn(),
+  pageSize: 10,
+  onPageChange: jest.fn(),
+  onPageSizeChange: jest.fn(),
+  searchTerm: '',
   reset() {
-    this.completedForms = [];
+    this.handleFormOpen.mockReset();
   },
 };
 
