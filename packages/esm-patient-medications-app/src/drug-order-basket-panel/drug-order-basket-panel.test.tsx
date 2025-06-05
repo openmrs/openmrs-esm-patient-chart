@@ -8,10 +8,22 @@ import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-s
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
 
 const mockUseOrderBasket = jest.fn();
+const mockLaunchPatientWorkspace = jest.fn();
+const mockCloseWorkspace = jest
+  .fn()
+  .mockImplementation((workspace, closeworkspaceOptions) => closeworkspaceOptions?.onWorkspaceClose?.());
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderBasket: () => mockUseOrderBasket(),
+  launchPatientWorkspace: (...args: any[]) => mockLaunchPatientWorkspace(...args),
+}));
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  closeWorkspace: (...args: any[]) => {
+    mockCloseWorkspace(...args);
+  },
 }));
 
 describe('OrderBasketPanel', () => {
@@ -51,5 +63,65 @@ describe('OrderBasketPanel', () => {
     await user.click(removeAspirin81Button);
     rerender(<DrugOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
     await expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument();
+  });
+
+  test('opens drug search', async () => {
+    const user = userEvent.setup();
+    const medications = [
+      getTemplateOrderBasketItem(mockDrugSearchResultApiData[0]),
+      ...mockPatientDrugOrdersApiData.slice(0, 3),
+    ] as Array<DrugOrderBasketItem>;
+    medications[1].action = 'REVISE';
+    medications[2].action = 'RENEW';
+    medications[3].action = 'DISCONTINUE';
+    let orders = [...medications];
+    const mockSetOrders = jest.fn((newOrders: Array<DrugOrderBasketItem>) => {
+      orders = newOrders;
+    });
+    mockUseOrderBasket.mockImplementation(() => ({
+      orders: orders,
+      setOrders: mockSetOrders,
+    }));
+
+    render(<DrugOrderBasketPanel outsideOrderBasketWorkspace={true} />);
+
+    const addDrugButton = screen.getByRole('button', { name: /Add/ });
+    await user.click(addDrugButton);
+
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(
+      'add-drug-order',
+      expect.objectContaining({ outsideOrderBasketWorkspace: true }),
+    );
+  });
+
+  test('opens drug form', async () => {
+    const user = userEvent.setup();
+    const medications = [
+      getTemplateOrderBasketItem(mockDrugSearchResultApiData[0]),
+      ...mockPatientDrugOrdersApiData.slice(0, 3),
+    ] as Array<DrugOrderBasketItem>;
+    medications[1].action = 'REVISE';
+    medications[2].action = 'RENEW';
+    medications[3].action = 'DISCONTINUE';
+    let orders = [...medications];
+    const mockSetOrders = jest.fn((newOrders: Array<DrugOrderBasketItem>) => {
+      orders = newOrders;
+    });
+    mockUseOrderBasket.mockImplementation(() => ({
+      orders: orders,
+      setOrders: mockSetOrders,
+    }));
+
+    render(<DrugOrderBasketPanel outsideOrderBasketWorkspace={true} />);
+
+    const drugName = getByTextWithMarkup(/New\s*Aspirin 81mg — 81mg — Tablet/i);
+    await user.click(drugName);
+
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith(
+      'add-drug-order',
+      expect.objectContaining({ order: orders[0], outsideOrderBasketWorkspace: true }),
+    );
   });
 });
