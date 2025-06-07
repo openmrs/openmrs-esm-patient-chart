@@ -57,7 +57,6 @@ export const configSchema = {
     _type: Type.Array,
     _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
     _elements: {
-      _type: Type.Object,
       orderTypeUuid: {
         _type: Type.UUID,
         _description: 'UUID for the new order type',

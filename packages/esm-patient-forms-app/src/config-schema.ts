@@ -1,4 +1,4 @@
-import { validator, Type } from '@openmrs/esm-framework';
+import { validator, Type, validators } from '@openmrs/esm-framework';
 import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 
 export const configSchema = {
@@ -22,25 +22,13 @@ export const configSchema = {
         _type: Type.String,
         _description:
           'The HTMLFormEntry page to use to show this form. Should be one of "enterHtmlFormWithStandardUi" or "enterHtmlFormWithSimpleUi"',
-        _validators: [
-          validator(
-            (v: unknown) =>
-              typeof v === 'string' && (v === 'enterHtmlFormWithStandardUi' || v === 'enterHtmlFormWithSimpleUi'),
-            'Must be one of "enterHtmlFormWithStandardUi" or "enterHtmlFormWithSimpleUi"',
-          ),
-        ],
+        _validators: [validators.oneOf(['enterHtmlFormWithStandardUi', 'enterHtmlFormWithSimpleUi'])],
       },
       formEditUiPage: {
         _type: Type.String,
         _description:
           'The HTMLFormEntry page to use to edit this form. Should be one of "editHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
-        _validators: [
-          validator(
-            (v: unknown) =>
-              typeof v === 'string' && (v === 'editHtmlFormWithStandardUi' || v === 'editHtmlFormWithSimpleUi'),
-            'Must be one of "editHtmlFormWithStandardUi" or "editHtmlFormWithSimpleUi"',
-          ),
-        ],
+        _validators: [validators.oneOf(['editHtmlFormWithStandardUi', 'editHtmlFormWithSimpleUi'])],
       },
     },
     _default: [
@@ -96,12 +84,7 @@ export const configSchema = {
     _description:
       'Describes how forms should be ordered. Set to "name" to order forms alphabetically by name or "most-recent" to order forms by the most recently filled-in.',
     _default: 'name',
-    _validators: [
-      validator(
-        (s: unknown) => typeof s === 'string' && (s === 'name' || s === 'most-recent'),
-        "orderBy must be either 'name' or 'most-recent'",
-      ),
-    ],
+    _validators: [validators.oneOf(['name', 'most-recent'])],
   },
   formSections: {
     _type: Type.Array,
@@ -109,9 +92,7 @@ export const configSchema = {
       name: {
         _type: Type.String,
         _description: 'Name of the section. Also used as a label for translations.',
-        _validators: [
-          validator((v: unknown) => typeof v === 'string' && v.trim() !== '', 'Each form section must have a name.'),
-        ],
+        _validators: [validator((v: string) => v.trim() !== '', 'Each form section must have a name.')],
       },
       forms: {
         _type: Type.Array,
@@ -120,12 +101,7 @@ export const configSchema = {
         _elements: {
           _type: Type.String,
           _description: 'Name or UUID of form to be included in the section',
-          _validators: [
-            validator(
-              (v: unknown) => typeof v === 'string' && v.trim() !== '',
-              'Each form must be specified by name or UUID.',
-            ),
-          ],
+          _validators: [validator((v: string) => v.trim() !== '', 'Each form must be specified by name or UUID.')],
         },
         _default: [],
       },
