@@ -17,8 +17,8 @@ export const esmPatientChartSchema = {
     _description: 'Disable notes/tests/medications/encounters tabs when empty',
   },
   freeTextFieldConceptUuid: {
-    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
+    _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   logo: {
     alt: {
@@ -28,18 +28,21 @@ export const esmPatientChartSchema = {
     },
     name: {
       _type: Type.String,
-      _default: null,
+      _default: '',
       _description: 'The organization name displayed when image is absent',
     },
     src: {
       _type: Type.String,
-      _default: null,
+      _default: '',
       _description: 'A path or URL to an image. Defaults to the OpenMRS SVG sprite.',
     },
   },
   notesConceptUuids: {
     _type: Type.Array,
     _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    _elements: {
+      _type: Type.ConceptUuid,
+    },
   },
   obsConceptUuidsToHide: {
     _type: Type.Array,
@@ -120,8 +123,8 @@ export const esmPatientChartSchema = {
     ],
   },
   visitDiagnosisConceptUuid: {
-    _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
+    _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   visitTypeResourceUrl: {
     _type: Type.String,
@@ -129,17 +132,17 @@ export const esmPatientChartSchema = {
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
   trueConceptUuid: {
-    _type: Type.String,
+    _type: Type.ConceptUuid,
     _description: 'Default concept uuid for true in forms',
     _default: '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   falseConceptUuid: {
-    _type: Type.String,
+    _type: Type.ConceptUuid,
     _description: 'Default concept uuid for false in forms',
     _default: '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   otherConceptUuid: {
-    _type: Type.String,
+    _type: Type.ConceptUuid,
     _description: 'Default concept uuid for other in forms',
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
