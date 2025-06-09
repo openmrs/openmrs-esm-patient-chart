@@ -450,7 +450,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           kind="ghost"
                           renderIcon={AddIcon}
                           iconDescription={t('launchOrderBasket', 'Launch order basket')}
-                          PrintComponent
                           onClick={launchOrderBasket}
                         >
                           {t('add', 'Add')}
