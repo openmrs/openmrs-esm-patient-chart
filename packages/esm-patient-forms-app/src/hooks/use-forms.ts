@@ -18,6 +18,7 @@ import {
   formEncounterUrlPoc,
 } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import { useFormsContext } from './use-forms-context';
 
 function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
@@ -37,23 +38,19 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   };
 }
 
-export function useFormEncounters(
-  cachedOfflineFormsOnly = false,
-  patientUuid: string = '',
-  visitUuid: string = '',
-  searchTerm: string = '',
-  pageSize?: number,
-  currentPage?: number,
-) {
+export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
+  const { searchTerm, pageSize, currentPage } = useFormsContext();
   const { url: baseUrl, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
 
   let url = baseUrl;
   if (pageSize && currentPage) {
     const startIndex = (currentPage - 1) * pageSize;
     url += `&limit=${pageSize}&startIndex=${startIndex}`;
-  } else if (searchTerm) {
-    url = `${baseUrl}&q=${searchTerm}`;
   }
+  if (searchTerm) {
+    url += `&q=${searchTerm}`;
+  }
+
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
     const forms = hasCustomFormsUrl
@@ -91,19 +88,9 @@ export function useForms(
   endDate?: Date,
   cachedOfflineFormsOnly = false,
   orderBy: 'name' | 'most-recent' = 'name',
-  searchTerm?: string,
-  pageSize?: number,
-  currentPage?: number,
 ) {
   const { htmlFormEntryForms } = useConfig<ConfigObject>();
-  const allFormsRes = useFormEncounters(
-    cachedOfflineFormsOnly,
-    patientUuid,
-    visitUuid,
-    searchTerm,
-    pageSize,
-    currentPage,
-  );
+  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
   const data = allFormsRes.data?.forms ? mapToFormCompletedInfo(allFormsRes.data?.forms, pastEncounters) : undefined;
