@@ -16,8 +16,8 @@ import {
   Pagination,
 } from '@carbon/react';
 import styles from './forms-table.scss';
-import { type CompletedFormInfo, type Form } from '../types';
-import { usePagination } from '@openmrs/esm-framework';
+import { type Form } from '../types';
+import { useFormsContext } from '../hooks/use-forms-context';
 
 interface PaginationLinks {
   next?: { uri: string };
@@ -40,13 +40,7 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
-  currentPage: number;
   totalItems: number;
-  completedForms: Array<CompletedFormInfo>;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: number) => void;
-  searchTerm: string;
 }
 
 const FormsTable = ({
@@ -56,14 +50,9 @@ const FormsTable = ({
   handleSearch,
   handleFormOpen,
   totalItems,
-  completedForms,
-  pageSize,
-  currentPage,
-  onPageChange,
-  onPageSizeChange,
 }: FormsTableProps) => {
   const { t } = useTranslation();
-  const { goTo } = usePagination(completedForms, pageSize);
+  const { pageSize, currentPage, setPageSize, setCurrentPage } = useFormsContext();
   const pageSizes = [50];
 
   return (
@@ -127,10 +116,9 @@ const FormsTable = ({
             totalItems={totalItems}
             onChange={({ page, pageSize: newPageSize }) => {
               if (newPageSize !== pageSize) {
-                onPageSizeChange(newPageSize);
+                setPageSize(newPageSize);
               }
-              onPageChange(page);
-              goTo(page);
+              setCurrentPage(page);
             }}
           />
         </>
