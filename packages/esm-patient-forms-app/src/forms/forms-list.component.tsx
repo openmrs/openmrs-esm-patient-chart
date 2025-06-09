@@ -13,12 +13,6 @@ export type FormsListProps = {
   error?: any;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
-  totalForms?: number;
-  pageSize: number;
-  searchTerm?: string;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  onSearchTermChange?: (searchTerm: string) => void;
 };
 
 /*
@@ -26,22 +20,12 @@ export type FormsListProps = {
  * t('forms', 'Forms')
  */
 
-const FormsList: React.FC<FormsListProps> = ({
-  completedForms,
-  error,
-  sectionName = 'forms',
-  handleFormOpen,
-  totalForms,
-  pageSize,
-  searchTerm = '',
-  onPageChange,
-  onPageSizeChange,
-  onSearchTermChange,
-}) => {
+const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handleFormOpen }) => {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
 
-  const handleSearch = useMemo(() => debounce((term) => onSearchTermChange?.(term), 300), [onSearchTermChange]);
+  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
@@ -90,48 +74,22 @@ const FormsList: React.FC<FormsListProps> = ({
     return <></>;
   }
 
-  if (sectionName === 'forms') {
-    return (
-      <ResponsiveWrapper>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-          totalItems={totalForms}
-          pageSize={pageSize}
-          completedForms={completedForms}
-          currentPage={1}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          searchTerm={searchTerm}
-        />
-      </ResponsiveWrapper>
-    );
-  } else {
-    return (
-      <ResponsiveWrapper>
+  return (
+    <ResponsiveWrapper>
+      {sectionName && (
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{t(sectionName)}</h4>
         </div>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-          pageSize={pageSize}
-          totalItems={totalForms}
-          completedForms={completedForms}
-          currentPage={1}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          searchTerm={searchTerm}
-        />
-      </ResponsiveWrapper>
-    );
-  }
+      )}
+      <FormsTable
+        tableHeaders={tableHeaders}
+        tableRows={tableRows}
+        isTablet={isTablet}
+        handleSearch={handleSearch}
+        handleFormOpen={handleFormOpen}
+      />
+    </ResponsiveWrapper>
+  );
 };
 
 export default FormsList;
