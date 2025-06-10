@@ -386,7 +386,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           </section>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">

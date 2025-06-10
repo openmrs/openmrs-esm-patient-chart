@@ -576,7 +576,7 @@ function AllergyForm({
         <ButtonSet
           className={classNames(styles.actionButtons, isTablet ? styles.tabletButtons : styles.desktopButtons)}
         >
-          <Button className={styles.button} onClick={() => closeWorkspace({ ignoreChanges: true })} kind="secondary">
+          <Button className={styles.button} onClick={() => closeWorkspace()} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button
