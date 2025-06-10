@@ -155,7 +155,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               ref={ref}
                               style={{ ...fieldStyles }}
                               title={fieldProperty.name}
-                              type={fieldProperty.type}
+                              type="number"
                               value={value}
                             />
                           );

@@ -4476,7 +4476,8 @@ __metadata:
     openmrs: "npm:next"
     protractor: "npm:~7.0.0"
     reflect-metadata: "npm:^0.1.13"
-    rxjs: "npm:^6.6.7"
+    rxjs: "npm:^7.5.0"
+    rxjs-compat: "npm:^6.6.7"
     single-spa-angular: "npm:^9.0.1"
     slick-carousel: "npm:^1.8.1"
     style-loader: "npm:2.x"
@@ -22649,6 +22650,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs-compat@npm:^6.6.7":
+  version: 6.6.7
+  resolution: "rxjs-compat@npm:6.6.7"
+  checksum: 10/1e0e4b1a4c5dc05d41aac95b88b024f7e631e199f2203966200873a704807c88a005696adaad465f1920685722d66a39b350cc7e4bc1488e3930fffa6231a4ba
+  languageName: node
+  linkType: hard
+
 "rxjs@npm:7.8.1":
   version: 7.8.1
   resolution: "rxjs@npm:7.8.1"
@@ -22667,7 +22675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.4.0, rxjs@npm:^7.8.1":
+"rxjs@npm:^7.4.0, rxjs@npm:^7.5.0, rxjs@npm:^7.8.1":
   version: 7.8.2
   resolution: "rxjs@npm:7.8.2"
   dependencies:

@@ -97,8 +97,12 @@
     "ngx-build-plus": "^17.0.0",
     "openmrs": "next",
     "protractor": "~7.0.0",
-    "rxjs": "^6.6.7",
+    "rxjs": "^7.5.0",
+    "rxjs-compat": "^6.6.7",
     "style-loader": "2.x",
     "webpack": "~5.94.0"
+  },
+  "installConfig": {
+    "hoistingLimits": "dependencies"
   }
 }

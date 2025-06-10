@@ -1,16 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { getCurrentUser, openmrsObservableFetch, Session } from '@openmrs/esm-framework';
+import { from, fromEventPattern, Observable } from 'rxjs';
+import { getSessionStore, openmrsFetch, Session } from '@openmrs/esm-framework';
 
 @Injectable()
 export class OpenmrsEsmApiService {
   constructor() {}
 
   public getCurrentSession(): Observable<Session> {
-    return getCurrentUser();
+    return fromEventPattern(
+      (handler) => {
+        const sessionStore = getSessionStore();
+        handler(sessionStore.getState());
+        sessionStore.subscribe((state) => handler(state));
+      },
+      (_, signal) => signal(),
+    );
   }
 
   public openmrsFetch(url): Observable<any> {
-    return openmrsObservableFetch(url);
+    return from(openmrsFetch(url));
   }
 }
