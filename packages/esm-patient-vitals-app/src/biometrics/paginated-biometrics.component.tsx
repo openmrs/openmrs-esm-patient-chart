@@ -43,18 +43,13 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   const handleSorting = (
     cellA,
     cellB,
-    {
-      sortDirection,
-      sortStates,
-    }: {
-      sortDirection: string;
-      sortStates: any;
-      locale: string;
-    },
+    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
   ) => {
-    const key = Object.keys(sortStates).find((k) => sortStates[k] === sortDirection);
-    setSortParams({ key: key ?? '', sortDirection: sortDirection as 'ASC' | 'DESC' | 'NONE' });
-    return 0;
+    if (sortDirection === 'NONE') {
+      setSortParams({ key: '', sortDirection });
+    } else {
+      setSortParams({ key, sortDirection });
+    }
   };
 
   const sortedData: Array<BiometricsTableRow> = useMemo(() => {
