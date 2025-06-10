@@ -439,15 +439,15 @@ function AllergyForm({
                       id="allergen"
                       invalid={!!errors.allergen}
                       invalidText={errors.allergen?.message}
-                      itemToString={(item: Allergen) => item?.display}
-                      items={allergenItems}
-                      onChange={(props: { selectedItem?: Record<string, unknown> }) => {
+                      itemToString={(item: unknown) => (item as Allergen)?.display}
+                      items={allergenItems as unknown as Array<Record<string, unknown>>}
+                      onChange={(props: { selectedItem?: unknown }) => {
                         if (typeof props?.selectedItem !== 'undefined') {
-                          onChange(props.selectedItem);
+                          onChange(props.selectedItem as Allergen);
                         }
                       }}
                       placeholder={t('selectAllergen', 'Select the allergen')}
-                      selectedItem={value}
+                      selectedItem={value as unknown as Allergen}
                       titleText={t('allergen', 'Allergen')}
                     />
                   )}
@@ -576,7 +576,7 @@ function AllergyForm({
         <ButtonSet
           className={classNames(styles.actionButtons, isTablet ? styles.tabletButtons : styles.desktopButtons)}
         >
-          <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
+          <Button className={styles.button} onClick={() => closeWorkspace({ ignoreChanges: true })} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button

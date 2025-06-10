@@ -78,9 +78,10 @@
     "@angular/cli": "^17.3.8",
     "@angular/language-service": "^17.3.12",
     "@angular/localize": "^17.3.12",
-    "@types/jasmine": "~3.6.11",
+    "@types/jasmine": "^5.1.8",
     "@types/jasminewd2": "~2.0.3",
-    "@types/webpack-env": "^1.18.2",
+    "@types/node": "^22.15.30",
+    "@types/webpack-env": "^1.18.8",
     "@typescript-eslint/eslint-plugin": "5.48.2",
     "@typescript-eslint/parser": "5.48.2",
     "codelyzer": "^6.0.2",
@@ -96,8 +97,8 @@
     "ngx-build-plus": "^17.0.0",
     "openmrs": "next",
     "protractor": "~7.0.0",
-    "rxjs": "^7.8.0",
+    "rxjs": "^6.6.7",
     "style-loader": "2.x",
-    "webpack": "~5.94.0"
+    "webpack": "^5.99.0"
   }
 }

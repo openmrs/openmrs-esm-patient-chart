@@ -45,7 +45,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   }, [locale, amount]);
 
   if (isLoading) {
-    return <SkeletonText width="100px" role="progressbar" />;
+    return <SkeletonText width="100px" />;
   }
 
   if (!priceData || !amount || error) {

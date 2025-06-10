@@ -236,7 +236,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           [styles.desktop]: !isTablet,
         })}
       >
-        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button

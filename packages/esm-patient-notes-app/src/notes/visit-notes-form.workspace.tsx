@@ -550,7 +550,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               <>
                 {selectedSecondaryDiagnoses.map((diagnosis, index) => (
                   <Tag
-                    classname={styles.tag}
+                    className={styles.tag}
                     filter
                     key={index}
                     onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
@@ -709,10 +709,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         </Stack>
       </div>
       <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" onClick={handleSubmit} disabled={isSubmitting} type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={() => handleSubmit}
+          disabled={isSubmitting}
+          type="submit"
+        >
           {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
@@ -766,7 +772,7 @@ function DiagnosisSearch({
                 onChange(e);
                 handleSearch(name);
               }}
-              value={value}
+              value={value instanceof Date ? value.toISOString() : value}
               onBlur={onBlur}
             />
           </ResponsiveWrapper>

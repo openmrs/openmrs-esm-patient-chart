@@ -3,8 +3,6 @@ import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  type DataTableHeader,
-  type DataTableRow,
   DataTableSkeleton,
   Layer,
   Link,
@@ -37,7 +35,7 @@ function PatientListsWorkspace() {
     launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 
-  const tableHeaders: Array<typeof DataTableHeader> = [
+  const tableHeaders = [
     {
       key: 'name',
       header: t('listName', 'List name'),
@@ -67,7 +65,7 @@ function PatientListsWorkspace() {
       : patientLists;
   }, [debouncedSearchTerm, patientLists]);
 
-  const tableRows: Array<typeof DataTableRow> = useMemo(
+  const tableRows = useMemo(
     () =>
       filteredLists?.map((list) => ({
         ...list,

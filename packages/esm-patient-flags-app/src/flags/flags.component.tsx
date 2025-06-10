@@ -26,7 +26,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
     return (
       <>
         {infoFlags?.map((infoFlag) => (
-          <Toggletip key={infoFlag.uuid} align="bottom-left" direction="right">
+          <Toggletip key={infoFlag.uuid} align="bottom-left">
             <ToggletipButton label="Info flag">
               <Tag key={infoFlag.uuid} className={styles.infoFlagTag}>
                 {infoFlag.flag.display}
@@ -51,7 +51,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
     return (
       <>
         {riskFlags.map((riskFlag) => (
-          <Toggletip key={riskFlag.uuid} align="bottom-left" direction="right">
+          <Toggletip key={riskFlag.uuid} align="bottom-left">
             <ToggletipButton label="Risk flag">
               <Tag key={riskFlag.uuid} type="high-contrast" className={styles.flagTag}>
                 <span className={styles.flagIcon}>&#128681;</span> {riskFlag.flag.display}

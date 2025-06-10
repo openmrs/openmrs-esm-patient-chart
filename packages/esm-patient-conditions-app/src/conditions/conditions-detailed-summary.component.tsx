@@ -19,7 +19,7 @@ import {
 import { AddIcon, formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { useConditions, type ConditionTableHeader, useConditionsSorting } from './conditions.resource';
+import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -150,10 +150,9 @@ function ConditionsDetailedSummary({ patient }) {
                           className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable,
                           })}
                         >
-                          {header.header?.content ?? header.header}
+                          {header.header}
                         </TableHeader>
                       ))}
                       <TableHeader />
@@ -166,7 +165,7 @@ function ConditionsDetailedSummary({ patient }) {
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu patientUuid={patient.id} condition={row} />
+                          <ConditionsActionMenu patientUuid={patient.id} condition={row as unknown as Condition} />
                         </TableCell>
                       </TableRow>
                     ))}

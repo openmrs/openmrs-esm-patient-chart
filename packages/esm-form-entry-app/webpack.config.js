@@ -1,5 +1,4 @@
-const { DefinePlugin, container } = require('webpack');
-const { ModuleFederationPlugin } = container;
+const { DefinePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const { existsSync, statSync } = require('fs');
@@ -62,28 +61,37 @@ module.exports = {
   optimization: {
     runtimeChunk: false,
   },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          {
+            loader: 'swc-loader',
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                  decorators: true,
+                },
+                transform: {
+                  legacyDecorator: true,
+                  decoratorMetadata: true,
+                },
+                target: 'es2020',
+              },
+            },
+          },
+        ],
+        exclude: /node_modules/,
+      },
+    ],
+  },
   plugins: [
     new DefinePlugin({
       __VERSION__: mode === production ? JSON.stringify(version) : JSON.stringify(inc(version, 'prerelease', 'local')),
       'process.env.FRAMEWORK_VERSION': JSON.stringify(frameworkVersion),
-    }),
-    new ModuleFederationPlugin({
-      name,
-      library: { type: 'var', name: '_openmrs_esm_form_entry_app' },
-      filename,
-      exposes: {
-        './start': srcFile,
-      },
-      shared: [...Object.keys(peerDependencies), '@openmrs/esm-framework/src/internal'].reduce((obj, depName) => {
-        obj[depName] = {
-          requiredVersion: peerDependencies[depName] ?? false,
-          singleton: true,
-          import: depName,
-          shareKey: depName,
-          shareScope: 'default',
-        };
-        return obj;
-      }, {}),
     }),
     new StatsWriterPlugin({
       filename: `${filename}.buildmanifest.json`,

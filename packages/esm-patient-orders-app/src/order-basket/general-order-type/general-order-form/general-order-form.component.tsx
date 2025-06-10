@@ -265,7 +265,6 @@ export function OrderForm({
                       maxCount={500}
                       onBlur={onBlur}
                       onChange={onChange}
-                      size={responsiveSize}
                       value={value}
                     />
                   )}

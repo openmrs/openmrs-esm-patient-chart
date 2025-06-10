@@ -30,8 +30,8 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
   const hasNoMatchingSearchResults = debouncedSearchTerm.trim() !== '' && searchResults.length === 0;
 
-  const handleSearchTermChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  const handleSearchTermChange = useCallback((e: { target: HTMLInputElement; type: 'change' }) => {
+    setSearchTerm(e.target.value);
   }, []);
 
   return (

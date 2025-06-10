@@ -279,7 +279,6 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                       <TableHeader
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
                         {header.header}
@@ -331,16 +330,9 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
 
 function InfoTooltip({ orderer }: { orderer: string }) {
   return (
-    <IconButton
-      className={styles.tooltip}
-      align="top-left"
-      direction="top"
-      label={orderer}
-      renderIcon={(props: ComponentProps<typeof UserIcon>) => <UserIcon size={16} {...props} />}
-      iconDescription={orderer}
-      kind="ghost"
-      size="sm"
-    />
+    <IconButton className={styles.tooltip} align="top-left" label={orderer} kind="ghost" size="sm">
+      <UserIcon size={16} />
+    </IconButton>
   );
 }
 
@@ -515,13 +507,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, openOrderBasket]);
 
   return (
-    <OverflowMenu
-      aria-label="Actions menu"
-      selectorPrimaryFocus={'#modify'}
-      flipped
-      size={isTablet ? 'lg' : 'md'}
-      align="left"
-    >
+    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

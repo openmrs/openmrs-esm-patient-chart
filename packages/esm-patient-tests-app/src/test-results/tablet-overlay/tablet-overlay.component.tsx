@@ -16,7 +16,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsG
 
   return (
     <div className={styles.tabletOverlay}>
-      <Header aria-label={headerText} className={styles.tabletOverlayHeader}>
+      <Header aria-label={typeof headerText === 'string' ? headerText : ''} className={styles.tabletOverlayHeader}>
         <IconButton className={styles.backButton} label={t('back', 'Back')} onClick={close}>
           <ArrowLeftIcon size={16} />
         </IconButton>

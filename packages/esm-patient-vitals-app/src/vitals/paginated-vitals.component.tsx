@@ -59,13 +59,18 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const handleSorting = (
     cellA,
     cellB,
-    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+    {
+      sortDirection,
+      sortStates,
+    }: {
+      sortDirection: string;
+      sortStates: any;
+      locale: string;
+    },
   ) => {
-    if (sortDirection === 'NONE') {
-      setSortParams({ key: '', sortDirection });
-    } else {
-      setSortParams({ key, sortDirection });
-    }
+    const key = Object.keys(sortStates).find((k) => sortStates[k] === sortDirection);
+    setSortParams({ key: key ?? '', sortDirection: sortDirection as 'ASC' | 'DESC' | 'NONE' });
+    return 0;
   };
 
   const sortedData: Array<VitalsTableRow> = useMemo(() => {
@@ -108,8 +113,8 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header, isSortable: header.isSortable })} key={header.key}>
-                      {header.header?.content ?? header.header}
+                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                      {header.header}
                     </TableHeader>
                   ))}
                   <TableHeader aria-label={t('actions', 'Actions')} />

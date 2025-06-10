@@ -149,10 +149,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                         className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
-                        {header.header?.content ?? header.header}
+                        {header.header}
                       </TableHeader>
                     ))}
                   </TableRow>

@@ -1,7 +1,7 @@
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type FHIRCondition, type FHIRConditionResponse } from '../types';
-import { useMemo, useState } from 'react';
 
 export type Condition = {
   clinicalStatus: string;
@@ -248,9 +248,13 @@ export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, 
     key: ConditionTableHeader['key'] | '';
     sortDirection: 'ASC' | 'DESC' | 'NONE';
   }>({ key: '', sortDirection: 'NONE' });
-  const sortRow = (cellA, cellB, { key, sortDirection }) => {
-    setSortParams({ key, sortDirection });
+
+  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
+    const key = Object.keys(sortStates).find((k) => sortStates[k] === sortDirection);
+    setSortParams({ key: key as ConditionTableHeader['key'], sortDirection });
+    return 0;
   };
+
   const sortedRows = useMemo(() => {
     if (sortParams.sortDirection === 'NONE') {
       return tableRows;

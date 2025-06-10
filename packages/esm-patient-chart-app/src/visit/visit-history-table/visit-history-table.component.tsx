@@ -51,13 +51,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
 
   const layout = useLayoutType();
 
-  const rowData = visits?.map((visit) => {
-    const row: Record<string, JSX.Element | string> = { id: visit.uuid };
-    for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} />;
-    }
-    return row;
-  });
+  const rowData = visits?.map((visit) => ({
+    id: visit.uuid,
+    cells: columns.map(({ key, CellComponent }) => ({
+      id: `${visit.uuid}-${key}`,
+      value: <CellComponent key={key} visit={visit} />,
+    })),
+  }));
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />;
@@ -88,7 +88,6 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                       <TableHeader
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                           className: header.key === 'actions' ? styles.actionsColumn : '',
                         })}
                       >

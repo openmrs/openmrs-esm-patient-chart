@@ -37,7 +37,6 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid }: VitalsAndBiomet
         aria-label={t('editOrDeleteVitalsAndBiometrics', 'Edit or delete Vitals and Biometrics')}
         size={isTablet ? 'lg' : 'sm'}
         flipped
-        align="left"
         id={encounterUuid}
       >
         <OverflowMenuItem

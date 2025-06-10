@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
@@ -92,7 +92,7 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
               <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
             )
           ) : (
-            <DataTableSkeleton columns={3} role="progressbar" />
+            <DataTableSkeleton data-testid="cds--data-table-container" />
           )}
         </div>
         {activePanel ? (
@@ -144,7 +144,7 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
                 <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
               )
             ) : (
-              <DataTableSkeleton columns={3} role="progressbar" />
+              <DataTableSkeleton data-testid="cds--data-table-container" />
             )}
           </>
         </div>
@@ -154,7 +154,7 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
       >
         <div className={styles.stickySection}>
           {isLoading ? (
-            <DataTableSkeleton columns={3} role="progressbar" />
+            <DataTableSkeleton data-testid="cds--data-table-container" />
           ) : activePanel ? (
             <div className={styles.overlay}>
               <TimelineDataGroup
@@ -243,7 +243,12 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
               size="sm"
               value={localSearchTerm}
             />
-            <Button data-testid="execute-search-button" kind="secondary" size="sm" onClick={handleSearchTerm}>
+            <Button
+              data-testid="execute-search-button"
+              kind="secondary"
+              size="sm"
+              onClick={() => handleSearchTerm(null)}
+            >
               {t('search', 'Search')}
             </Button>
           </Form>
@@ -263,12 +268,12 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
               <Search
                 autoFocus
                 labelText=""
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setLocalSearchTerm(e.target.value)}
+                onChange={(e) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
                 size="lg"
                 value={localSearchTerm}
               />
-              <Button data-testid="execute-search-button" kind="secondary" onClick={handleSearchTerm}>
+              <Button data-testid="execute-search-button" kind="secondary" onClick={() => handleSearchTerm(null)}>
                 {t('search', 'Search')}
               </Button>
             </Form>

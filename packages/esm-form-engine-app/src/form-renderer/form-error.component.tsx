@@ -31,7 +31,7 @@ const FormError: React.FC<FormErrorProps> = ({
           </span>
         </div>
         <div className={styles.separator}>{t('or', 'or')}</div>
-        <Button onClick={closeWorkspace} kind="ghost">
+        <Button onClick={() => closeWorkspace()} kind="ghost">
           {t('closeThisPanel', 'Close this panel')}
         </Button>
       </div>

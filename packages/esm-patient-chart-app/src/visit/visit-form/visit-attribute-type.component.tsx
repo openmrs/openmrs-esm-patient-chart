@@ -9,7 +9,6 @@ import {
   TextInput,
   TextInputSkeleton,
 } from '@carbon/react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerFieldState, type ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
@@ -167,6 +166,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <NumberInput
             {...fieldProps}
+            id={uuid}
             label={labelText}
             hideSteppers
             invalid={!!fieldState?.error?.message}
@@ -197,6 +197,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <Checkbox
             {...fieldProps}
+            id={uuid}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
@@ -216,6 +217,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <TextInput
             {...fieldProps}
+            id={uuid}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}

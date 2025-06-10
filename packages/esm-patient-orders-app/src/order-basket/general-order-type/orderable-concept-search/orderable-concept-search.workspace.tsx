@@ -167,7 +167,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
           labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
             orderType: orderType?.display ?? '',
           })}
-          onChange={handleSearchTermChange}
+          onChange={(e) => setSearchTerm(e.target.value ?? '')}
           ref={searchInputRef}
           value={searchTerm}
         />
