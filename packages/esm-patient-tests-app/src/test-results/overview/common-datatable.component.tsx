@@ -101,8 +101,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
 
 const TypedTableRow: React.FC<{
   interpretation: OBSERVATION_INTERPRETATION;
-  children?: React.ReactNode;
-}> = ({ interpretation, children, ...props }) => {
+}> = ({ interpretation, ...props }) => {
   switch (interpretation) {
     case 'OFF_SCALE_HIGH':
       return <TableRow {...props} className={styles['off-scale-high']} />;
