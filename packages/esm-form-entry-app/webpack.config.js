@@ -1,4 +1,5 @@
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, container } = require('webpack');
+const { ModuleFederationPlugin } = container;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const { existsSync, statSync } = require('fs');
@@ -92,6 +93,24 @@ module.exports = {
     new DefinePlugin({
       __VERSION__: mode === production ? JSON.stringify(version) : JSON.stringify(inc(version, 'prerelease', 'local')),
       'process.env.FRAMEWORK_VERSION': JSON.stringify(frameworkVersion),
+    }),
+    new ModuleFederationPlugin({
+      name,
+      library: { type: 'var', name: '_openmrs_esm_form_entry_app' },
+      filename,
+      exposes: {
+        './start': srcFile,
+      },
+      shared: [...Object.keys(peerDependencies), '@openmrs/esm-framework/src/internal'].reduce((obj, depName) => {
+        obj[depName] = {
+          requiredVersion: peerDependencies[depName] ?? false,
+          singleton: true,
+          import: depName,
+          shareKey: depName,
+          shareScope: 'default',
+        };
+        return obj;
+      }, {}),
     }),
     new StatsWriterPlugin({
       filename: `${filename}.buildmanifest.json`,

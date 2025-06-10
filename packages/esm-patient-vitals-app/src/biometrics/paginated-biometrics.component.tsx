@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  type DataTableCell,
+  type DataTableSortState,
   Table,
   TableCell,
   TableContainer,

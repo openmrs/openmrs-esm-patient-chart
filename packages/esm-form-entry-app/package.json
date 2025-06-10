@@ -99,6 +99,6 @@
     "protractor": "~7.0.0",
     "rxjs": "^6.6.7",
     "style-loader": "2.x",
-    "webpack": "^5.99.0"
+    "webpack": "~5.94.0"
   }
 }

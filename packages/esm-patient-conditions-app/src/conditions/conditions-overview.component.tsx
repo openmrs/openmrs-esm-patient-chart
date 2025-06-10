@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
+  type DataTableHeader,
+  type DataTableRow,
   DataTableSkeleton,
   Dropdown,
   InlineLoading,
@@ -24,14 +26,9 @@ import {
   useLayoutType,
   usePagination,
   useConfig,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
-import {
-  EmptyState,
-  ErrorState,
-  PatientChartPagination,
-  launchPatientWorkspace,
-  CardHeader,
-} from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, PatientChartPagination, CardHeader } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
@@ -70,7 +67,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
-      launchPatientWorkspace('conditions-form-workspace', {
+      launchWorkspace('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],
@@ -183,7 +180,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                 <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
-                      {headers.map((header) => (
+                      {(headers as Array<DataTableHeader & ConditionTableHeader>).map((header) => (
                         <TableHeader
                           className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
@@ -191,21 +188,23 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                             isSortable: header.isSortable,
                           })}
                         >
-                          {header.header?.content ?? header.header}
+                          {header.header}
                         </TableHeader>
                       ))}
                       <TableHeader aria-label={t('actions', 'Actions')} />
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => (
+                    {(rows as Array<DataTableRow<Array<ConditionTableRow>>>).map((row) => (
                       <TableRow key={row.id}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          <>
+                            <TableCell key={cell.id}>{cell.value.display}</TableCell>
+                            <TableCell className="cds--table-column-menu">
+                              <ConditionsActionMenu condition={cell.value} patientUuid={patientUuid} />
+                            </TableCell>
+                          </>
                         ))}
-                        <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu condition={row} patientUuid={patientUuid} />
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

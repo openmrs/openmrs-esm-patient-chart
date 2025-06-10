@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
   DataTable,
+  type DataTableCell,
+  type DataTableSortState,
   Table,
   TableCell,
   TableContainer,
@@ -108,7 +110,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
           headers,
           rows,
         }) => (
-          <TableContainer {...getTableContainerProps}>
+          <TableContainer {...getTableContainerProps()}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>

@@ -1,4 +1,4 @@
-import React, { useId, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
@@ -79,7 +79,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
     [filteredListMembers],
   );
 
-  const handleSearchTermChange = (e: { target: HTMLInputElement; type: 'change' }) => setSearchTerm(e.target.value);
+  const handleSearchTermChange = (e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
   if (isLoading) {
     return (
