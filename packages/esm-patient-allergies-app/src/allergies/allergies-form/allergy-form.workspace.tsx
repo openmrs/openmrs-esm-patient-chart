@@ -131,11 +131,10 @@ function AllergyForm({
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
-  const { mutate } = useAllergies(patientUuid);
+  const { allergies, mutate } = useAllergies(patient.id);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const formValuesLoadedRef = useRef(false);
-
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
     [concepts],
@@ -387,8 +386,14 @@ function AllergyForm({
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
   const allergenItems = useMemo(
-    () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER }],
-    [allergens, otherConceptUuid, t],
+    () => [
+      ...allergens.map((allergen) => ({
+        ...allergen,
+        disabled: allergies?.some((allergy) => allergy.display === allergen.display),
+      })),
+      { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER, disabled: false },
+    ],
+    [allergens, otherConceptUuid, t, allergies],
   );
 
   const allergicReactionsItems = useMemo(
@@ -442,10 +447,13 @@ function AllergyForm({
                       itemToString={(item: Allergen) => item?.display}
                       items={allergenItems}
                       onChange={(props: { selectedItem?: Record<string, unknown> }) => {
-                        if (typeof props?.selectedItem !== 'undefined') {
+                        if (typeof props?.selectedItem !== 'undefined' && !props.selectedItem.disabled) {
                           onChange(props.selectedItem);
                         }
                       }}
+                      renderItem={(item: Allergen) => (
+                        <span className={item.disabled ? styles.disabledAllergen : ''}>{item.display}</span>
+                      )}
                       placeholder={t('selectAllergen', 'Select the allergen')}
                       selectedItem={value}
                       titleText={t('allergen', 'Allergen')}
