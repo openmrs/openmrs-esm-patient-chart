@@ -101,7 +101,7 @@ test('Add and edit an immunization', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the newly updated immunization details reflected in the table', async () => {
-    await expect(page.getByRole('cell', { name: /measles vaccination/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
     await expect(page.getByRole('cell', { name: /single dose on 02-Jan-2025/i })).toBeVisible();
   });
 
