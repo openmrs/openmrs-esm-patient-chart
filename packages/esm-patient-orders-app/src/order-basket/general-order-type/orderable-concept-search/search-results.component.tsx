@@ -1,11 +1,7 @@
-import React, { type ComponentProps, useCallback } from 'react';
-import {
-  launchPatientWorkspace,
-  useOrderBasket,
-  type OrderBasketItem,
-  useOrderableConceptSets,
-  type OrderableConcept,
-} from '@openmrs/esm-patient-common-lib';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
+import classNames from 'classnames';
+import { ShoppingCartArrowUp } from '@carbon/react/icons';
+import { Tile, Button, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRightIcon,
@@ -13,13 +9,16 @@ import {
   ShoppingCartArrowDownIcon,
   useLayoutType,
   useSession,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
-import { ShoppingCartArrowUp } from '@carbon/react/icons';
-import { useMemo } from 'react';
-import classNames from 'classnames';
-import { Tile, Button, SkeletonText, ButtonSkeleton } from '@carbon/react';
-import styles from './search-results.scss';
+import {
+  useOrderBasket,
+  type OrderBasketItem,
+  useOrderableConceptSets,
+  type OrderableConcept,
+} from '@openmrs/esm-patient-common-lib';
 import { createEmptyOrder, prepOrderPostData } from '../resources';
+import styles from './search-results.scss';
 
 interface OrderableConceptSearchResultsProps {
   searchTerm: string;
@@ -186,7 +185,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     setOrders([...orders, orderBasketItem]);
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace]);

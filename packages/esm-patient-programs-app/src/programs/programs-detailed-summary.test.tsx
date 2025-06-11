@@ -1,24 +1,15 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getDefaultsFromConfigSchema, launchWorkspace, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('ProgramsDetailedSummary', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
@@ -86,12 +77,12 @@ describe('ProgramsDetailedSummary', () => {
     expect(addButton).toBeEnabled();
     await user.click(addButton);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
     await user.click(actionMenuButton);
     await user.click(screen.getByText('Edit'));
 
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
       workspaceTitle: 'Edit program enrollment',
     });
