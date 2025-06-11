@@ -68,12 +68,12 @@ test('Add and edit an immunization', async ({ page, patient }) => {
 
   await test.step('Then I should see the immunization form in edit mode with the current values', async () => {
     await expect(page.getByText(/immunization form/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
   });
 
-  await test.step('And I select Measles vaccination from the immunization dropdown', async () => {
-    await page.getByRole('combobox', { name: /immunization/i }).click();
-    await page.getByText(/measles vaccination/i).click();
+  await test.step('Then the vaccine dropdown should show Hepatitis B vaccination and be disabled', async () => {
+    const dropdown = page.getByRole('combobox', { name: /immunization/i });
+    await expect(dropdown).toBeDisabled();
+    await expect(dropdown).toHaveText(/hepatitis b vaccination/i);
   });
 
   await test.step('And I enter the vaccination date as 02/01/2025', async () => {
