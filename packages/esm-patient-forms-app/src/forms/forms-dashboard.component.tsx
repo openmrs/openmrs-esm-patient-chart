@@ -11,6 +11,7 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
+import { FormsProvider } from '../hooks/use-forms-context';
 import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
@@ -21,7 +22,15 @@ interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
   htmlFormEntryWorkspaceName?: string;
 }
 
-const FormsDashboard: React.FC<FormsDashboardProps> = ({
+const FormsDashboard: React.FC<FormsDashboardProps> = (props) => {
+  return (
+    <FormsProvider>
+      <FormsDashboardContent {...props} />
+    </FormsProvider>
+  );
+};
+
+const FormsDashboardContent: React.FC<FormsDashboardProps> = ({
   patientUuid,
   clinicalFormsWorkspaceName,
   formEntryWorkspaceName,
@@ -36,6 +45,7 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
     allForms,
     error,
     mutateForms,
+    totalCount,
   } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const htmlFormEntryForms = useMemo(() => {
@@ -93,19 +103,17 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList completedForms={forms} totalForms={totalCount} error={error} handleFormOpen={handleFormOpen} />
       ) : (
-        sections.map((section) => {
-          return (
-            <FormsList
-              key={`form-section-${section.name}`}
-              sectionName={section.name}
-              completedForms={section.availableForms}
-              error={error}
-              handleFormOpen={handleFormOpen}
-            />
-          );
-        })
+        sections.map((section) => (
+          <FormsList
+            key={`form-section-${section.name}`}
+            sectionName={section.name}
+            completedForms={section.availableForms}
+            error={error}
+            handleFormOpen={handleFormOpen}
+          />
+        ))
       )}
     </div>
   );
