@@ -51,13 +51,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
 
   const layout = useLayoutType();
 
-  const rowData = visits?.map((visit) => ({
-    id: visit.uuid,
-    cells: columns.map(({ key, CellComponent }) => ({
-      id: `${visit.uuid}-${key}`,
-      value: <CellComponent key={key} visit={visit} />,
-    })),
-  }));
+  const rowData = visits?.map((visit) => {
+    const row: Record<string, JSX.Element | string> = { id: visit.uuid };
+    for (const { key, CellComponent } of columns) {
+      row[key] = <CellComponent key={key} visit={visit} />;
+    }
+    return row;
+  });
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />;
@@ -76,6 +76,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   }
   return (
     <div className={styles.container}>
+      {/* @ts-ignore */}
       <DataTable headers={columns} rows={rowData} size={desktopLayout ? 'sm' : 'lg'} useZebraStyles>
         {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
           <>

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
@@ -10,17 +11,15 @@ import {
   parseDate,
   useAssignedExtensions,
   useConfig,
-  useLayoutType,
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
 import { type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import styles from './visit-summary.scss';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
+import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -33,7 +32,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
-  const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -108,63 +106,61 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <div className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}>
-        <Tabs selectedIndex={0}>
-          <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-            <Tab
-              className={classNames(styles.tab, styles.bodyLong01)}
-              id="notes-tab"
-              disabled={notes.length <= 0 && config.disableEmptyTabs}
-            >
-              {t('notes', 'Notes')}
+      <Tabs>
+        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab
+            className={classNames(styles.tab, styles.bodyLong01)}
+            id="notes-tab"
+            disabled={notes.length <= 0 && config.disableEmptyTabs}
+          >
+            {t('notes', 'Notes')}
+          </Tab>
+          <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
+            {t('tests', 'Tests')}
+          </Tab>
+          <Tab
+            className={styles.tab}
+            id="medications-tab"
+            disabled={medications.length <= 0 && config.disableEmptyTabs}
+          >
+            {t('medications', 'Medications')}
+          </Tab>
+          <Tab
+            className={styles.tab}
+            id="encounters-tab"
+            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+          >
+            {t('encounters_title', 'Encounters')}
+          </Tab>
+          {extensions?.map((extension, index) => (
+            <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
+              {t(extension.meta.title, {
+                ns: extension.moduleName,
+                defaultValue: extension.meta.title,
+              })}
             </Tab>
-            <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
-              {t('tests', 'Tests')}
-            </Tab>
-            <Tab
-              className={styles.tab}
-              id="medications-tab"
-              disabled={medications.length <= 0 && config.disableEmptyTabs}
-            >
-              {t('medications', 'Medications')}
-            </Tab>
-            <Tab
-              className={styles.tab}
-              id="encounters-tab"
-              disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
-            >
-              {t('encounters_title', 'Encounters')}
-            </Tab>
-            {extensions?.map((extension, index) => (
-              <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
-                {t(extension.meta.title, {
-                  ns: extension.moduleName,
-                  defaultValue: extension.meta.title,
-                })}
-              </Tab>
-            ))}
-          </TabList>
-          <TabPanels>
+          ))}
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <NotesSummary notes={notes} />
+          </TabPanel>
+          <TabPanel>
+            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
+          </TabPanel>
+          <TabPanel>
+            <MedicationSummary medications={medications} />
+          </TabPanel>
+          <TabPanel>
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+          </TabPanel>
+          <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
-              <NotesSummary notes={notes} />
+              <Extension state={{ patientUuid, visit }} />
             </TabPanel>
-            <TabPanel>
-              <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
-            </TabPanel>
-            <TabPanel>
-              <MedicationSummary medications={medications} />
-            </TabPanel>
-            <TabPanel>
-              <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
-            </TabPanel>
-            <ExtensionSlot name={visitSummaryPanelSlot}>
-              <TabPanel>
-                <Extension state={{ patientUuid, visit }} />
-              </TabPanel>
-            </ExtensionSlot>
-          </TabPanels>
-        </Tabs>
-      </div>
+          </ExtensionSlot>
+        </TabPanels>
+      </Tabs>
     </div>
   );
 };

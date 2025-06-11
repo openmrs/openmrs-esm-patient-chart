@@ -1,14 +1,4 @@
-import React, {
-  type ChangeEvent,
-  type ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FocusEventHandler,
-  type FocusEvent,
-} from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -28,20 +18,6 @@ import {
   TextArea,
   TextInput,
   Toggle,
-  ContentSwitcher,
-  DataTable,
-  DataTableHeader,
-  DataTableRow,
-  DatePicker,
-  DatePickerInput,
-  Modal,
-  Pagination,
-  Search,
-  Select,
-  SelectItem,
-  Switch,
-  Tab,
-  Tabs,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
@@ -841,8 +817,6 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
     </div>
   );
 };
-
-type MedicationOrderFormValue = MedicationOrderFormData[keyof MedicationOrderFormData];
 
 interface BaseControlledFieldInputProps {
   control: Control<MedicationOrderFormData>;
