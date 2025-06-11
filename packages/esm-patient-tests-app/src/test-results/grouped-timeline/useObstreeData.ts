@@ -46,7 +46,9 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
 const deduplicateObsData = (data: Array<ObsTreeNode>) => {
   const seen = new Map();
   function deduplicateNode(node: ObsTreeNode, depth = 0) {
-    if (!node || typeof node !== 'object') return null;
+    if (!node || typeof node !== 'object') {
+    	return null;
+    }
 
     const isContainer = Array.isArray(node.subSets);
     const key = node.display;
