@@ -76,7 +76,13 @@ jobs:
 
       - name: 🛑 Stop dev server
         if: '!cancelled()'
-        run: docker stop $(docker ps -a -q)
+        run: |
+          CONTAINERS=$(docker ps -a -q)
+          if [ -n "$CONTAINERS" ]; then
+            docker stop $CONTAINERS
+          else
+            echo "No containers to stop."
+          fi
 
       - name: 📤 Upload report
         uses: actions/upload-artifact@v4
