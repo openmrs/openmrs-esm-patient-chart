@@ -47,7 +47,7 @@ const deduplicateObsData = (data: Array<ObsTreeNode>) => {
   const seen = new Map();
   function deduplicateNode(node: ObsTreeNode, depth = 0) {
     if (!node || typeof node !== 'object') {
-    	return null;
+      return null;
     }
 
     const isContainer = Array.isArray(node.subSets);
@@ -134,11 +134,11 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
     );
   }, [data]);
   const allRootsData = result.map((item) => item.data);
-  const allRoots: ObsTreeNode[] = allRootsData.filter((node): node is ObsTreeNode => Object.keys(node).length > 0);
   const isLoading = result.some((item) => item.loading);
   const roots = useMemo(() => {
+    const allRoots: ObsTreeNode[] = allRootsData.filter((node): node is ObsTreeNode => Object.keys(node).length > 0);
     return deduplicateObsData(allRoots);
-  }, [allRoots]);
+  }, [allRootsData]);
   return { roots, isLoading, error };
 };
 
