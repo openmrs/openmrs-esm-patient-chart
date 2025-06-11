@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { type DataTableSortState } from '@carbon/react';
 import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type FHIRCondition, type FHIRConditionResponse } from '../types';
 
@@ -246,12 +247,11 @@ export interface ConditionTableHeader {
 export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, tableRows: Array<ConditionTableRow>) {
   const [sortParams, setSortParams] = useState<{
     key: ConditionTableHeader['key'] | '';
-    sortDirection: 'ASC' | 'DESC' | 'NONE';
+    sortDirection: DataTableSortState;
   }>({ key: '', sortDirection: 'NONE' });
 
-  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
-    const key = Object.keys(sortStates).find((k) => sortStates[k] === sortDirection);
-    setSortParams({ key: key as ConditionTableHeader['key'], sortDirection });
+  const sortRow = (cellA, cellB, { key, sortDirection }) => {
+    setSortParams({ key, sortDirection });
     return 0;
   };
 
@@ -262,6 +262,10 @@ export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, 
 
     const { key, sortDirection } = sortParams;
     const tableHeader = tableHeaders.find((h) => h.key === key);
+
+    if (!tableHeader) {
+      return tableRows;
+    }
 
     return tableRows?.slice().sort((a, b) => {
       const sortingNum = tableHeader.sortFunc(a, b);

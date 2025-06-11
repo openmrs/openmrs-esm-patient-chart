@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  type DataTableCell,
-  type DataTableSortState,
   Table,
   TableCell,
   TableContainer,
@@ -11,6 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -43,15 +42,16 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   });
 
   const handleSorting = (
-    cellA,
-    cellB,
-    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+    cellA: any,
+    cellB: any,
+    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {
       setSortParams({ key: '', sortDirection });
     } else {
       setSortParams({ key, sortDirection });
     }
+    return 0;
   };
 
   const sortedData: Array<BiometricsTableRow> = useMemo(() => {

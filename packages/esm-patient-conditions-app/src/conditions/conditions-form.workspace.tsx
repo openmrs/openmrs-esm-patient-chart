@@ -7,12 +7,12 @@ import { z } from 'zod';
 import { Button, ButtonSet, Form, InlineLoading, InlineNotification } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { type ConditionDataTableRow, useConditions } from './conditions.resource';
+import { type Condition, useConditions } from './conditions.resource';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
 
 interface ConditionFormProps extends DefaultPatientWorkspaceProps {
-  condition?: ConditionDataTableRow;
+  condition?: Condition;
   formContext: 'creating' | 'editing';
 }
 
