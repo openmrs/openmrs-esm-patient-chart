@@ -126,18 +126,18 @@ test('Edit start date and time for a past visit', async ({ page, patient, pastVi
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
-  await test.step('Navigate to visits page for patient', async () => {
+  await test.step('When I Navigate to visits page for patient', async () => {
     await visitsPage.goTo(patient.uuid);
   });
 
-  await test.step('Click edit on past visit', async () => {
+  await test.step('Then I click edit icn on past visit', async () => {
     await expect(chartPage.page.getByRole('cell', { name: '30-May-2025 - 30-May-2025' })).toBeVisible();
     await visitsPage.page
       .getByRole('row', { name: /30-May/i })
       .getByLabel('Edit')
       .click();
   });
-  await test.step('Then i should see the eisting start date', async () => {
+  await test.step('Then I should see the eisting start date', async () => {
     const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
     const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
     const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
@@ -152,7 +152,7 @@ test('Edit start date and time for a past visit', async ({ page, patient, pastVi
     expect(startDateYearInputValue).toBe('2025');
   });
 
-  await test.step('Edit start date', async () => {
+  await test.step('When I edit start date', async () => {
     const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
     await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('30');
     await startDateInput.getByRole('spinbutton', { name: /month/i }).fill('4');
@@ -161,7 +161,7 @@ test('Edit start date and time for a past visit', async ({ page, patient, pastVi
     await chartPage.page.getByRole('button', { name: /update visit/i }).click();
   });
 
-  await test.step('Verify success message and new start date', async () => {
+  await test.step('Then I should see success message and new start date updated', async () => {
     await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
     await expect(chartPage.page.getByRole('cell', { name: '30-Apr-2025 - 30-May-2025' })).toBeVisible();
   });
