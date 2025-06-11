@@ -43,6 +43,35 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   return { ...outData } as ObsTreeNode;
 };
 
+const deduplicateObsData = (data: Array<ObsTreeNode>) => {
+  const seen = new Map();
+  function deduplicateNode(node: ObsTreeNode, depth = 0) {
+    if (!node || typeof node !== 'object') return null;
+
+    const isContainer = Array.isArray(node.subSets);
+    const key = node.display;
+
+    if (isContainer) {
+      if (seen.has(key)) {
+        const prevDepth = seen.get(key);
+        if (depth >= prevDepth) {
+          return null;
+        }
+      }
+      seen.set(key, depth);
+    }
+    const newSubSets = isContainer
+      ? node.subSets.map((child) => deduplicateNode(child, depth + 1)).filter(Boolean)
+      : node.subSets;
+
+    return {
+      ...node,
+      subSets: newSubSets,
+    } as ObsTreeNode;
+  }
+  return data.map((item) => deduplicateNode(item, 0)).filter(Boolean);
+};
+
 const useGetObstreeData = (conceptUuid: string) => {
   const { patientUuid } = usePatientChartStore();
   const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
@@ -102,9 +131,12 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
       ]
     );
   }, [data]);
-  const roots = result.map((item) => item.data);
+  const allRootsData = result.map((item) => item.data);
+  const allRoots: ObsTreeNode[] = allRootsData.filter((node): node is ObsTreeNode => Object.keys(node).length > 0);
   const isLoading = result.some((item) => item.loading);
-
+  const roots = useMemo(() => {
+    return deduplicateObsData(allRoots);
+  }, [allRoots]);
   return { roots, isLoading, error };
 };
 
