@@ -3,72 +3,40 @@ import { type LabOrderConcept, useOrderConceptByUuid } from './lab-results.resou
 
 type SchemaRecord = Record<string, z.ZodType>;
 
+function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord {
+  const schema = {};
+  const conceptSchema = createSchema(labOrderConcept);
+  if (conceptSchema) {
+    schema[labOrderConcept.uuid] = conceptSchema;
+  }
+
+  const setMembersSchema = labOrderConcept.set
+    ? labOrderConcept.setMembers.reduce((acc, member) => {
+        return {
+          ...acc,
+          ...createSchemaForConcept(member),
+        };
+      }, {})
+    : {};
+
+  return {
+    ...schema,
+    ...setMembersSchema,
+  };
+}
+
 /**
  * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
  * @param labOrderConceptUuid - The UUID of the lab order concept.
  * @returns A Zod schema object for the lab results form.
  */
-export const useLabResultsFormSchema = (labOrderConceptUuid: string) => {
-  const { concept, isLoading: isLoadingConcept } = useOrderConceptByUuid(labOrderConceptUuid);
-
-  if (isLoadingConcept || !concept) {
-    if (!concept) {
-      console.warn(`Couldn't load concept ${labOrderConceptUuid}`);
-    }
+export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) => {
+  if (!labOrderConcepts) {
     return z.object({});
   }
+  const schema = createSchemaForConcept(labOrderConcepts);
 
-  const setMembers = concept?.setMembers ?? [];
-
-  if (setMembers.length > 0) {
-    return createSetMembersSchema(setMembers);
-  }
-
-  return createSingleConceptSchema(concept);
-};
-
-/**
- * Creates a Zod schema for a single lab order concept.
- * @param labOrderConcept - The lab order concept to create a schema for.
- * @returns A Zod schema object for the single concept.
- */
-const createSingleConceptSchema = (labOrderConcept: LabOrderConcept) => {
-  const {
-    hiAbsolute: upperLimit,
-    lowAbsolute: lowerLimit,
-    datatype: { hl7Abbreviation },
-  } = labOrderConcept;
-
-  let zodObject: z.ZodType;
-
-  switch (hl7Abbreviation) {
-    // hl7Abbreviation for numeric is NM
-    case 'NM':
-      zodObject = createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
-      break;
-    default:
-      zodObject = z.any();
-  }
-
-  return z.object({
-    [labOrderConcept.uuid]: zodObject,
-  });
-};
-
-/**
- * Creates a Zod schema for a set of lab order concepts.
- * @param labOrderConcepts - An array of lab order concepts.
- * @returns A Zod schema object for the set of concepts.
- */
-const createSetMembersSchema = (labOrderConcepts: Array<LabOrderConcept>): z.ZodObject<SchemaRecord> => {
-  const schema = z.object(
-    labOrderConcepts.reduce<SchemaRecord>((acc, member) => {
-      acc[member.uuid] = createSchema(member);
-      return acc;
-    }, {}),
-  );
-
-  return schema;
+  return z.object(schema);
 };
 
 /**
@@ -88,8 +56,12 @@ const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType => {
       return z.string().optional();
     case 'NM':
       return createNumericSchema(labOrderConcept, upperLimit, lowerLimit);
+    case 'CWE': {
+      const answers = labOrderConcept.answers?.map((answer) => answer.uuid) ?? [];
+      return answers.length > 0 ? z.enum(answers as [string, ...string[]]).optional() : z.string().optional();
+    }
     default:
-      return z.any();
+      return null;
   }
 };
 
