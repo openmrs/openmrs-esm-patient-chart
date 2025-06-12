@@ -4,7 +4,6 @@ import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import {} from 'swr/_internal';
 import type { OrderPost, PatientOrderFetchResponse, TestOrderPost } from '@openmrs/esm-patient-common-lib';
-import type { TestOrderBasketItem } from '../types';
 import {
   type FetchResponse,
   openmrsFetch,
@@ -14,6 +13,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import type { TestOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
