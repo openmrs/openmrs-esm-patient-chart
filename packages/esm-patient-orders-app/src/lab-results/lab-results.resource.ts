@@ -74,6 +74,12 @@ function getUrlForConcept(conceptUuid: string) {
   return `${restBaseUrl}/concept/${conceptUuid}?v=${labConceptRepresentation}`;
 }
 
+/**
+ * This function fetches all the different levels of set members for a concept,
+ * while fetching 2 levels of set members at one go.
+ * @param conceptUuid - The UUID of the concept to fetch.
+ * @returns The concept with all its set members and their set members.
+ */
 async function fetchAllSetMembers(conceptUuid: string): Promise<LabOrderConcept> {
   const conceptResponse = await openmrsFetch<LabOrderConcept>(getUrlForConcept(conceptUuid));
   let concept = conceptResponse.data;
