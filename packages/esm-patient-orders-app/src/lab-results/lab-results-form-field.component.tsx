@@ -1,5 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
-import { NumberInput, Select, SelectItem, TextInput, InlineNotification } from '@carbon/react';
+import {
+  Accordion,
+  AccordionItem,
+  NumberInput,
+  Select,
+  SelectItem,
+  TextInput,
+  InlineNotification,
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
@@ -68,7 +76,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
 
   if (isTextField || isNumericField || isCodedField || isPanelField) {
     return (
-      <>
+      <div className={styles.formField}>
         <Controller
           control={control}
           name={concept.uuid}
@@ -76,7 +84,6 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             isTextField ? (
               <TextInput
                 {...field}
-                className={styles.textInput}
                 id={concept.uuid}
                 key={concept.uuid}
                 labelText={labelText}
@@ -88,7 +95,6 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
               <NumberInput
                 {...field}
                 allowEmpty
-                className={styles.numberInput}
                 disableWheel
                 id={concept.uuid}
                 key={concept.uuid}
@@ -102,7 +108,6 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             ) : isCodedField ? (
               <Select
                 {...field}
-                className={styles.textInput}
                 defaultValue={getSavedMemberValue(concept.uuid, concept.datatype.hl7Abbreviation)}
                 id={`select-${concept.uuid}`}
                 key={concept.uuid}
@@ -121,22 +126,28 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             ) : null
           }
         />
-        {isPanelField
-          ? concept.setMembers.map((member) => (
-              <ResultFormField
-                key={member.uuid}
-                concept={member}
-                control={control}
-                defaultValue={getSavedMemberDefaultObservation(member.uuid)}
-              />
-            ))
-          : null}
-      </>
+        {isPanelField ? (
+          <Accordion>
+            <AccordionItem title={concept.display} open>
+              {concept.setMembers.map((member) => (
+                <div>
+                  <ResultFormField
+                    key={member.uuid}
+                    concept={member}
+                    control={control}
+                    defaultValue={getSavedMemberDefaultObservation(member.uuid)}
+                  />
+                </div>
+              ))}
+            </AccordionItem>
+          </Accordion>
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <>
+    <div className={styles.formField}>
       <label className={styles.label}>{labelText}</label>
       <InlineNotification
         kind="error"
@@ -147,7 +158,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
           'This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.',
         )}
       />
-    </>
+    </div>
   );
 };
 

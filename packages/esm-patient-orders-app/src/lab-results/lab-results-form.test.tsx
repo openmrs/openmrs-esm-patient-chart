@@ -651,6 +651,93 @@ describe('LabResultsForm', () => {
     expect(errorNotification).toBeInTheDocument();
   });
 
+  test.only('should display second level of set members for a given concept, if present', () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        set: true,
+        setMembers: [
+          {
+            uuid: 'set-member-uuid-1',
+            display: 'Set Member 1',
+            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 100,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mg/dL',
+          },
+          {
+            uuid: 'set-member-uuid-2',
+            display: 'Set Member 2',
+            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 80,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mmol/L',
+          },
+          {
+            uuid: 'set-member-uuid-3',
+            display: 'Set Member 3',
+            concept: { uuid: 'concept-uuid-3', display: 'Concept 3' },
+            datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+            set: true,
+            setMembers: [
+              {
+                uuid: 'set-member-uuid-3.1',
+                display: 'Set Member 3.1',
+                concept: { uuid: 'concept-uuid-3.1', display: 'Concept 3.1' },
+                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                hiAbsolute: 80,
+                lowAbsolute: 0,
+                lowCritical: null,
+                lowNormal: null,
+                units: 'mg/dL',
+              },
+              {
+                uuid: 'set-member-uuid-3.2',
+                display: 'Set Member 3.2',
+                concept: { uuid: 'concept-uuid-3.2', display: 'Concept 3.2' },
+                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                hiAbsolute: 80,
+                lowAbsolute: 0,
+                lowCritical: null,
+                units: 'mg/dL',
+              },
+            ],
+          },
+        ],
+        datatype: { display: 'Numeric' },
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+      } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    expect(screen.getByText('Set Member 3')).toBeInTheDocument();
+    expect(screen.getByLabelText('Set Member 3.1 (0 - 80 mg/dL)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Set Member 3.2 (0 - 80 mg/dL)')).toBeInTheDocument();
+  });
+
   test('should handle empty form submission', async () => {
     const user = userEvent.setup();
     render(<LabResultsForm {...testProps} />);

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -205,54 +205,55 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   };
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
-      <div className={styles.grid}>
-        {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
-        {concept && (
-          <Stack gap={5}>
-            {!isLoading ? (
-              <ResultFormField
-                defaultValue={completeLabResult}
-                concept={concept}
-                control={control as unknown as Control<Record<string, unknown>>}
-              />
-            ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
-            )}
-          </Stack>
-        )}
-        {showEmptyFormErrorNotification && (
-          <InlineNotification
-            className={styles.emptyFormError}
-            lowContrast
-            title={t('error', 'Error')}
-            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
-          />
-        )}
-      </div>
-      <ButtonSet
-        className={classNames({
-          [styles.tablet]: isTablet,
-          [styles.desktop]: !isTablet,
-        })}
-      >
-        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          disabled={isSubmitting || Object.keys(errors).length > 0}
-          type="submit"
-        >
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            t('saveAndClose', 'Save and close')
+    <Layer level={isTablet ? 1 : 0}>
+      <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
+        <div className={styles.grid}>
+          {concept && (
+            <Stack gap={5}>
+              {!isLoading ? (
+                <ResultFormField
+                  defaultValue={completeLabResult}
+                  concept={concept}
+                  control={control as unknown as Control<Record<string, unknown>>}
+                />
+              ) : (
+                <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+              )}
+            </Stack>
           )}
-        </Button>
-      </ButtonSet>
-    </Form>
+          {showEmptyFormErrorNotification && (
+            <InlineNotification
+              className={styles.emptyFormError}
+              lowContrast
+              title={t('error', 'Error')}
+              subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+            />
+          )}
+        </div>
+        <ButtonSet
+          className={classNames({
+            [styles.tablet]: isTablet,
+            [styles.desktop]: !isTablet,
+          })}
+        >
+          <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            kind="primary"
+            disabled={isSubmitting || Object.keys(errors).length > 0}
+            type="submit"
+          >
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              t('saveAndClose', 'Save and close')
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Layer>
   );
 };
 
