@@ -126,30 +126,35 @@ test('Edit start date and time for a past visit', async ({ page, patient, pastVi
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
+  const formattedStart = pastVisit.start.format('DD-MMM-YYYY');
+  const formattedEnd = pastVisit.end.format('DD-MMM-YYYY');
+
   await test.step('When I Navigate to visits page for patient', async () => {
     await visitsPage.goTo(patient.uuid);
   });
 
   await test.step('Then I click edit icn on past visit', async () => {
-    await expect(chartPage.page.getByRole('cell', { name: '30-May-2025 - 30-May-2025' })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: `${formattedStart} - ${formattedEnd}` })).toBeVisible();
     await visitsPage.page
-      .getByRole('row', { name: /30-May/i })
+      .getByRole('row', { name: new RegExp(formattedStart, 'i') })
       .getByLabel('Edit')
       .click();
   });
-  await test.step('Then I should see the eisting start date', async () => {
+
+  await test.step('Then I should see the existing start date', async () => {
     const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    await expect(startDateInput).toBeVisible();
+
+    const day = pastVisit.start.format('DD');
+    const month = pastVisit.start.format('MM');
+    const year = pastVisit.start.format('YYYY');
     const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
     const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
     const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
 
-    await expect(startDateInput).toBeVisible();
-    const startDateDayInputValue = await startDateDayInput.textContent();
-    expect(startDateDayInputValue).toBe('30');
-    const startDateMonthInputValue = await startDateMonthInput.textContent();
-    expect(startDateMonthInputValue).toBe('05');
-    const startDateYearInputValue = await startDateYearInput.textContent();
-    expect(startDateYearInputValue).toBe('2025');
+    await expect(startDateDayInput).toHaveText(day);
+    await expect(startDateMonthInput).toHaveText(month);
+    await expect(startDateYearInput).toHaveText(year);
   });
 
   await test.step('When I edit start date', async () => {
@@ -163,6 +168,6 @@ test('Edit start date and time for a past visit', async ({ page, patient, pastVi
 
   await test.step('Then I should see success message and new start date updated', async () => {
     await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
-    await expect(chartPage.page.getByRole('cell', { name: '30-Apr-2025 - 30-May-2025' })).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: '30-Apr-2025 - ' + formattedEnd })).toBeVisible();
   });
 });

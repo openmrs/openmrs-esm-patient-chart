@@ -19,7 +19,10 @@ export const startVisit = async (api: APIRequestContext, patientId: string): Pro
   return await visitRes.json();
 };
 
-export const createPastEndedVisit = async (api: APIRequestContext, patientId: string): Promise<Visit> => {
+export const createPastEndedVisit = async (
+  api: APIRequestContext,
+  patientId: string,
+): Promise<{ visit: Visit; start: dayjs.Dayjs; end: dayjs.Dayjs }> => {
   const start = dayjs().subtract(5, 'days');
   const end = start.add(30, 'minutes');
 
@@ -35,7 +38,8 @@ export const createPastEndedVisit = async (api: APIRequestContext, patientId: st
   });
 
   expect(visitRes.ok()).toBeTruthy();
-  return await visitRes.json();
+  const visit = await visitRes.json();
+  return { visit, start, end };
 };
 
 export const endVisit = async (api: APIRequestContext, visit: Visit) => {

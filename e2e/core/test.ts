@@ -55,12 +55,20 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     },
     { scope: 'test', auto: true },
   ],
+
   pastVisit: [
     async ({ api, patient }, use) => {
-      const pastVisit = await createPastEndedVisit(api, patient.uuid);
-      await use(pastVisit);
+      const { visit, start, end } = await createPastEndedVisit(api, patient.uuid);
+      await use({
+        visit,
+        start,
+        end,
+        visitType: undefined,
+        startDatetime: '',
+        uuid: '',
+      });
       try {
-        if (pastVisit) await endVisit(api, pastVisit);
+        if (visit) await endVisit(api, visit);
       } catch (e) {
         console.warn('Failed to end pastVisit:', e);
       }
