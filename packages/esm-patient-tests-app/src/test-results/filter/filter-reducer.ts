@@ -68,16 +68,16 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         lowestParents: Array<LowestNode> = [];
       action.trees?.forEach((tree) => {
         // if anyone knows a shorthand for this i'm stoked to learn it :)
-        const {
-          parents: newParents,
-          leaves: newLeaves,
-          tests: newTests,
-          lowestParents: newLP,
-        } = computeParents('', tree);
+        const { parents: newParents, leaves: newLeaves, lowestParents: newLP } = computeParents('', tree);
         parents = { ...parents, ...newParents };
         leaves = [...leaves, ...newLeaves];
-        tests = [...tests, ...newTests];
         lowestParents = [...lowestParents, ...newLP];
+      });
+
+      action.filteredTrees?.forEach((tree) => {
+        // if anyone knows a shorthand for this i'm stoked to learn it :)
+        const { tests: newTests } = computeParents('', tree);
+        tests = [...tests, ...newTests];
       });
 
       const flatTests = Object.fromEntries(tests);

@@ -20,7 +20,7 @@ describe('PanelView', () => {
 
   it('renders a loading state when data is loading', () => {
     render(
-      <FilterProvider roots={mockResults as Roots} isLoading={true}>
+      <FilterProvider roots={mockResults as Roots} filteredRoots={mockResults as Roots} isLoading={true}>
         <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
       </FilterProvider>,
     );
@@ -31,7 +31,7 @@ describe('PanelView', () => {
 
   it('renders an empty state when there are no panels to display', () => {
     render(
-      <FilterProvider roots={[]} isLoading={false}>
+      <FilterProvider roots={[]} filteredRoots={[]} isLoading={false}>
         <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
       </FilterProvider>,
     );
@@ -45,7 +45,7 @@ describe('PanelView', () => {
     mockIsDesktop.mockReturnValue(true);
 
     render(
-      <FilterProvider roots={mockResults as Roots} isLoading={false}>
+      <FilterProvider roots={mockResults as Roots} filteredRoots={mockResults as Roots} isLoading={false}>
         <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
       </FilterProvider>,
     );
@@ -62,7 +62,7 @@ describe('PanelView', () => {
 
     mockUseLayoutType.mockReturnValue('tablet');
     render(
-      <FilterProvider roots={mockResults as Roots} isLoading={false}>
+      <FilterProvider roots={mockResults as Roots} filteredRoots={mockResults as Roots} isLoading={false}>
         <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
       </FilterProvider>,
     );
@@ -94,7 +94,7 @@ describe('PanelView', () => {
     mockIsDesktop.mockReturnValue(true);
 
     render(
-      <FilterProvider roots={mockResults as Roots} isLoading={false}>
+      <FilterProvider roots={mockResults as Roots} filteredRoots={mockResults as Roots} isLoading={false}>
         <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
       </FilterProvider>,
     );

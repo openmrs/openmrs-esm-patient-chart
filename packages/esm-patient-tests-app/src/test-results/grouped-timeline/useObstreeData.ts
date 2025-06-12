@@ -52,16 +52,13 @@ const deduplicateObsData = (data: Array<ObsTreeNode>) => {
 
     const isContainer = Array.isArray(node.subSets);
     const key = node.display;
-
-    if (isContainer) {
-      if (seen.has(key)) {
-        const prevDepth = seen.get(key);
-        if (depth >= prevDepth) {
-          return null;
-        }
+    if (seen.has(key)) {
+      const prevDepth = seen.get(key);
+      if (depth >= prevDepth) {
+        return null;
       }
-      seen.set(key, depth);
     }
+    seen.set(key, depth);
     const newSubSets = isContainer
       ? node.subSets.map((child) => deduplicateNode(child, depth + 1)).filter(Boolean)
       : node.subSets;
@@ -133,13 +130,13 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
       ]
     );
   }, [data]);
-  const allRootsData = result.map((item) => item.data);
+  const roots = result.map((item) => item.data);
   const isLoading = result.some((item) => item.loading);
-  const roots = useMemo(() => {
-    const allRoots: ObsTreeNode[] = allRootsData.filter((node): node is ObsTreeNode => Object.keys(node).length > 0);
+  const filteredRoots = useMemo(() => {
+    const allRoots: ObsTreeNode[] = roots.filter((node): node is ObsTreeNode => Object.keys(node).length > 0);
     return deduplicateObsData(allRoots);
-  }, [allRootsData]);
-  return { roots, isLoading, error };
+  }, [roots]);
+  return { roots, isLoading, error, filteredRoots };
 };
 
 export default useGetManyObstreeData;
