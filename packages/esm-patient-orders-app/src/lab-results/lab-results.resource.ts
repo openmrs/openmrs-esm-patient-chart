@@ -9,7 +9,7 @@ const labEncounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType:(uuid,display),location:(uuid,name),patient:(uuid,display,person:(uuid,display,gender,age)),encounterProviders:(uuid,provider:(uuid,name)),obs:(uuid,obsDatetime,voided,groupMembers,formFieldNamespace,formFieldPath,order:(uuid,display),concept:(uuid,name:(uuid,name)),value:(uuid,display,name:(uuid,name),names:(uuid,conceptNameType,name)))';
 const labConceptRepresentation =
   'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
-  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,set,setMembers))';
+  'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,set,setMembers:(uuid)))';
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
 type NullableNumber = number | null | undefined;
@@ -70,17 +70,49 @@ export interface Mapping {
   resourceVersion: string;
 }
 
+function getUrlForConcept(conceptUuid: string) {
+  return `${restBaseUrl}/concept/${conceptUuid}?v=${labConceptRepresentation}`;
+}
+
+async function fetchAllSetMembers(conceptUuid: string): Promise<LabOrderConcept> {
+  const conceptResponse = await openmrsFetch<LabOrderConcept>(getUrlForConcept(conceptUuid));
+  let concept = conceptResponse.data;
+  const secondLevelSetMembers = concept.set
+    ? concept.setMembers
+        .map((member) => (member.set ? member.setMembers.map((lowerMember) => lowerMember.uuid) : []))
+        .flat()
+    : [];
+  if (secondLevelSetMembers.length > 0) {
+    const concepts = await Promise.all(secondLevelSetMembers.map((uuid) => fetchAllSetMembers(uuid)));
+    const uuidMap = concepts.reduce(
+      (acc, c) => {
+        acc[c.uuid] = c;
+        return acc;
+      },
+      {} as Record<string, LabOrderConcept>,
+    );
+    concept.setMembers = concept.setMembers.map((member) => {
+      if (member.set) {
+        member.setMembers = member.setMembers.map((lowerMember) => uuidMap[lowerMember.uuid]);
+      }
+      return member;
+    });
+  }
+
+  return concept;
+}
+
 export function useOrderConceptByUuid(uuid: string) {
   const apiUrl = `${restBaseUrl}/concept/${uuid}?v=${labConceptRepresentation}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: LabOrderConcept }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, isValidating, mutate } = useSWR<LabOrderConcept, Error>(uuid, fetchAllSetMembers);
+  /**
+   * We are fetching 2 levels of set members at one go.
+   */
 
   const results = useMemo(
     () => ({
-      concept: data?.data,
+      concept: data,
       isLoading,
       error,
       isValidating,

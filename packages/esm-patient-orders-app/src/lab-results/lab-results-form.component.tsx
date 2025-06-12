@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
 import { type Control, useForm } from 'react-hook-form';
@@ -19,7 +19,8 @@ import {
   useCompletedLabResults,
   useOrderConceptByUuid,
 } from './lab-results.resource';
-import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import { createLabResultsFormSchema } from './lab-results-schema.resource';
+
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 
@@ -44,7 +45,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useLabResultsFormSchema(order.concept.uuid);
+  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
 
   const mutateOrderData = useCallback(() => {
