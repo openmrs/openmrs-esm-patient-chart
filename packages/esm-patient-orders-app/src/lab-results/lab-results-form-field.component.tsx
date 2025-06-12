@@ -13,6 +13,7 @@ import { type Control, Controller } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
@@ -22,6 +23,8 @@ interface ResultFormFieldProps {
 
 const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveFieldSize = isTablet ? 'lg' : 'sm';
 
   // TODO: Reference ranges should be dynamically adjusted based on patient demographics:
   // - Age-specific ranges (e.g., pediatric vs adult values)
@@ -90,6 +93,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 type="text"
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
               />
             ) : isNumericField ? (
               <NumberInput
@@ -104,6 +108,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 value={field.value || ''}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
               />
             ) : isCodedField ? (
               <Select
@@ -114,6 +119,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 labelText={labelText}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
               >
                 <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
                 {concept?.answers?.length &&

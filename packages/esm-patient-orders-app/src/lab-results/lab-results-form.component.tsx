@@ -205,8 +205,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   };
 
   return (
-    <Layer level={isTablet ? 1 : 0}>
-      <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
+    <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
+      <Layer level={isTablet ? 1 : 0}>
         <div className={styles.grid}>
           {concept && (
             <Stack gap={5}>
@@ -230,30 +230,31 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
             />
           )}
         </div>
-        <ButtonSet
-          className={classNames({
-            [styles.tablet]: isTablet,
-            [styles.desktop]: !isTablet,
-          })}
+      </Layer>
+
+      <ButtonSet
+        className={classNames({
+          [styles.tablet]: isTablet,
+          [styles.desktop]: !isTablet,
+        })}
+      >
+        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
+        </Button>
+        <Button
+          className={styles.button}
+          kind="primary"
+          disabled={isSubmitting || Object.keys(errors).length > 0}
+          type="submit"
         >
-          <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
-            {t('discard', 'Discard')}
-          </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            disabled={isSubmitting || Object.keys(errors).length > 0}
-            type="submit"
-          >
-            {isSubmitting ? (
-              <InlineLoading description={t('saving', 'Saving') + '...'} />
-            ) : (
-              t('saveAndClose', 'Save and close')
-            )}
-          </Button>
-        </ButtonSet>
-      </Form>
-    </Layer>
+          {isSubmitting ? (
+            <InlineLoading description={t('saving', 'Saving') + '...'} />
+          ) : (
+            t('saveAndClose', 'Save and close')
+          )}
+        </Button>
+      </ButtonSet>
+    </Form>
   );
 };
 
