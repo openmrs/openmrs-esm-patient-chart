@@ -14,30 +14,30 @@ export const configSchema = {
   },
   printPatientSticker: {
     header: {
-      _type: Type.Object,
       _description: 'Configuration properties for patient identifier stickers',
       showBarcode: {
         _type: Type.Boolean,
         _description: 'Whether to display a barcode on the patient sticker',
+        _default: true,
       },
       showLogo: {
         _type: Type.Boolean,
         _description: 'Whether to display a logo on the patient sticker',
+        _default: true,
       },
       logo: {
         _type: Type.String,
         _description: 'The URL of the logo to display in the patient sticker',
-      },
-      _default: {
-        showBarcode: true,
-        showLogo: true,
-        logo: '',
+        _default: '',
       },
     },
     fields: {
       _type: Type.Array,
       _description: 'Patient demographics to include in the patient sticker printout',
       _default: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
+      _elements: {
+        _type: Type.String,
+      },
     },
     pageSize: {
       _type: Type.String,

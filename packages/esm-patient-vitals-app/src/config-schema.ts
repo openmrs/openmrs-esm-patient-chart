@@ -61,7 +61,7 @@ export const configSchema = {
     logo: {
       src: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description: 'A path or URL to an image. Defaults to the OpenMRS SVG sprite.',
       },
       alt: {
@@ -71,7 +71,7 @@ export const configSchema = {
       },
       name: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description: 'The organization name displayed when image is absent',
       },
     },
@@ -109,6 +109,12 @@ export interface BiometricsConfigObject {
   weightUnit: string;
 }
 
+export interface LogoConfigObject {
+  src: string;
+  alt: string;
+  name: string;
+}
+
 export interface ConfigObject {
   concepts: {
     systolicBloodPressureUuid: string;
@@ -119,12 +125,14 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
+    generalPatientNoteUuid: string;
     midUpperArmCircumferenceUuid: string;
     vitalSignsConceptSetUuid: string;
   };
   vitals: {
     useFormEngine: boolean;
     encounterTypeUuid: string;
+    logo: LogoConfigObject;
     formUuid: string;
     formName: string;
     useMuacColors: boolean;

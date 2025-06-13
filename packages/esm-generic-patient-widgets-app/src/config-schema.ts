@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   title: {
@@ -29,7 +29,7 @@ export const configSchema = {
       },
       label: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description: 'The text to display. Defaults to the concept display name.',
       },
       color: {
@@ -78,6 +78,7 @@ export const configSchema = {
     _type: Type.String,
     _description: 'Type of display for data',
     _default: 'dateTime',
+    _validators: [validators.oneOf(['data', 'time', 'dateTime'])],
   },
   showEncounterType: {
     _type: Type.Boolean,
