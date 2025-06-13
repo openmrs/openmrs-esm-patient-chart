@@ -62,33 +62,6 @@ module.exports = {
   optimization: {
     runtimeChunk: false,
   },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'swc-loader',
-            options: {
-              jsc: {
-                parser: {
-                  syntax: 'typescript',
-                  tsx: true,
-                  decorators: true,
-                },
-                transform: {
-                  legacyDecorator: true,
-                  decoratorMetadata: true,
-                },
-                target: 'es2020',
-              },
-            },
-          },
-        ],
-        exclude: /node_modules/,
-      },
-    ],
-  },
   plugins: [
     new DefinePlugin({
       __VERSION__: mode === production ? JSON.stringify(version) : JSON.stringify(inc(version, 'prerelease', 'local')),
