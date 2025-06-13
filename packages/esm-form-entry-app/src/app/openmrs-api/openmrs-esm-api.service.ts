@@ -7,14 +7,16 @@ export class OpenmrsEsmApiService {
   constructor() {}
 
   public getCurrentSession(): Observable<Session> {
-    return fromEventPattern(
-      (handler) => {
-        const sessionStore = getSessionStore();
-        handler(sessionStore.getState());
-        sessionStore.subscribe((state) => handler(state));
-      },
-      (_, signal) => signal(),
-    );
+    return new Observable<Session>((observer) => {
+      const sessionStore = getSessionStore();
+      const state = sessionStore.getState();
+      if (state.loaded) {
+        observer.next(state.session);
+      }
+
+      const unsubscribe = sessionStore.subscribe((state) => state.loaded && observer.next(state.session));
+      return () => unsubscribe();
+    });
   }
 
   public openmrsFetch(url): Observable<any> {
