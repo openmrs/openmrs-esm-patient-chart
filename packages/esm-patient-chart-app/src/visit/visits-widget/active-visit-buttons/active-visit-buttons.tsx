@@ -161,13 +161,13 @@ const VisitActionsComponent: React.FC<VisitActionsProps> = ({ patientUuid }) => 
   return (
     <MenuButton label={t('endVisit', 'End visit')} kind="ghost">
       <MenuItem
-        // kind="danger"
+        kind="default"
         label={t('endVisit', 'End visit')}
         onClick={() => openModal('end-visit-dialog')}
         renderIcon={AddIcon}
       />
       <MenuItem
-        // kind="danger"
+        kind="default"
         label={t('deleteVisit', 'Delete visit')}
         onClick={() => openModal('delete-visit-dialog')}
         renderIcon={AddIcon}

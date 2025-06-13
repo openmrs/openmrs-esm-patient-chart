@@ -427,7 +427,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
                     // For some reason, Carbon throws NPE when trying to conditionally
                     // render a <Switch> component
                     return visitToEdit ? (
-                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="sm">
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
                         <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
                         <Switch name="past" text={t('ended', 'Ended')} />
                       </ContentSwitcher>
