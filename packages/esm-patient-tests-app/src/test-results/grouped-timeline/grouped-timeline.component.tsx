@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -7,6 +7,7 @@ import type { DateHeaderGridProps, PanelNameCornerProps } from './grouped-timeli
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.scss';
 import TimelineDataGroup from './timeline-data-group.component';
+import { RowData } from '../filter/filter-types';
 
 const TimeSlots: React.FC<{
   children?: React.ReactNode;
@@ -134,9 +135,8 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               shownGroups += 1;
               const subRows = someChecked
-                ? rowData?.filter(
-                    (row: { flatName: string }) =>
-                      parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
+                ? rowData?.filter((row: { flatName: string }) =>
+                    parents[parent.flatName].map((f) => f.split('-').pop()).includes(row.flatName.split('-').pop()),
                   )
                 : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
 

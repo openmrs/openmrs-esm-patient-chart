@@ -66,16 +66,18 @@ export type Roots = Array<TreeNode>;
 
 export interface FilterProviderProps {
   roots: Roots;
+  filteredRoots: Roots;
   isLoading: boolean;
   children: React.ReactNode;
 }
 
-const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => {
+const FilterProvider = ({ roots, filteredRoots, isLoading, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
     () => ({
-      initialize: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.INITIALIZE, trees: trees }),
+      initialize: (trees: Array<TreeNode>, filteredTrees: Array<TreeNode>) =>
+        dispatch({ type: ReducerActionType.INITIALIZE, trees: trees, filteredTrees: filteredTrees }),
       toggleVal: (name: string) => {
         dispatch({ type: ReducerActionType.TOGGLEVAL, name: name });
       },
@@ -101,7 +103,11 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       };
     }
     const tests: ReducerState['tests'] = activeTests?.length
-      ? Object.fromEntries(Object.entries(state.tests).filter(([name]) => activeTests.includes(name)))
+      ? Object.fromEntries(
+          Object.entries(state.tests).filter(([name]) =>
+            activeTests.map((t) => t.split('-').pop()).includes(name.split('-').pop()),
+          ),
+        )
       : state.tests;
 
     const allTimes = [
@@ -170,9 +176,9 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
 
   useEffect(() => {
     if (roots?.length && !Object.keys(state?.parents).length) {
-      actions.initialize(roots);
+      actions.initialize(roots, filteredRoots);
     }
-  }, [actions, state, roots]);
+  }, [actions, state, roots, filteredRoots]);
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
