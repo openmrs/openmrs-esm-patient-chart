@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, fromEventPattern, Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { getSessionStore, openmrsFetch, Session } from '@openmrs/esm-framework';
 
 @Injectable()
