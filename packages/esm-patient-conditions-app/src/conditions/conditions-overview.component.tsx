@@ -15,25 +15,21 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  type DataTableHeader,
 } from '@carbon/react';
 import {
   AddIcon,
   formatDate,
-  parseDate,
   isDesktop as isDesktopLayout,
+  launchWorkspace,
+  parseDate,
+  useConfig,
   useLayoutType,
   usePagination,
-  useConfig,
 } from '@openmrs/esm-framework';
-import {
-  EmptyState,
-  ErrorState,
-  PatientChartPagination,
-  launchPatientWorkspace,
-  CardHeader,
-} from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../config-schema';
+import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
+import { type ConfigObject } from '../config-schema';
 import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-overview.scss';
 
@@ -42,6 +38,7 @@ interface ConditionTableRow extends Condition {
   condition: string;
   abatementDateTime: string;
   onsetDateTimeRender: string;
+  status: string;
 }
 
 interface ConditionTableHeader {
@@ -70,7 +67,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
-      launchPatientWorkspace('conditions-form-workspace', {
+      launchWorkspace('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],
@@ -109,7 +106,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         key: 'status',
         header: t('status', 'Status'),
         isSortable: true,
-        sortFunc: (valueA, valueB) => valueA.clinicalStatus?.localeCompare(valueB.clinicalStatus),
+        sortFunc: (valueA, valueB) => valueA.status?.localeCompare(valueB.status),
       },
     ],
     [t],
@@ -136,8 +133,14 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
@@ -169,13 +172,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
         </CardHeader>
         <DataTable
           aria-label="conditions overview"
-          rows={paginatedConditions}
           headers={headers}
           isSortable
-          size={isTablet ? 'lg' : 'sm'}
-          useZebraStyles
           overflowMenuOnHover={isDesktop}
+          rows={paginatedConditions}
+          size={isTablet ? 'lg' : 'sm'}
           sortRow={sortRow}
+          useZebraStyles
         >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
@@ -183,7 +186,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                 <Table {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
-                      {headers.map((header) => (
+                      {(headers as Array<DataTableHeader & ConditionTableHeader>).map((header) => (
                         <TableHeader
                           className={classNames(styles.productiveHeading01, styles.text02)}
                           {...getHeaderProps({
@@ -191,23 +194,26 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                             isSortable: header.isSortable,
                           })}
                         >
-                          {header.header?.content ?? header.header}
+                          {header.header}
                         </TableHeader>
                       ))}
                       <TableHeader aria-label={t('actions', 'Actions')} />
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                        <TableCell className="cds--table-column-menu">
-                          <ConditionsActionMenu condition={row} patientUuid={patientUuid} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {rows.map((row) => {
+                      const matchingCondition = conditions.find((condition) => condition.id == row.id);
+                      return (
+                        <TableRow key={row.id}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          ))}
+                          <TableCell className="cds--table-column-menu">
+                            <ConditionsActionMenu condition={matchingCondition} patientUuid={patientUuid} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>

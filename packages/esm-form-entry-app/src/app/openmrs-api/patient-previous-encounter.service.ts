@@ -1,6 +1,6 @@
+import { find } from 'lodash-es';
 import { take } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import find from 'lodash-es/find';
 import { EncounterResourceService } from './encounter-resource.service';
 import { Encounter } from '../types';
 

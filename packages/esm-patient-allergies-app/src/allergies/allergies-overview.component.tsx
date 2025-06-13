@@ -98,10 +98,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                         className={styles.tableHeader}
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
-                        {header.header?.content ?? header.header}
+                        {header.header}
                       </TableHeader>
                     ))}
                   </TableRow>

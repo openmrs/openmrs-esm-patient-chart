@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash-es';
 import {
   makeUrl,
   messageOmrsServiceWorker,
@@ -10,10 +11,8 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { launchFormEntry } from '@openmrs/esm-patient-common-lib';
-import { type Form } from './types';
-import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
 import { formEncounterUrl, formEncounterUrlPoc } from './constants';
-import escapeRegExp from 'lodash-es/escapeRegExp';
+import { type Form } from './types';
 
 // General note on the following imports and this file in general:
 // Yes, the imports below are super super dirty.

@@ -31,7 +31,7 @@ describe('Trendline', () => {
 
     render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByRole('paragraph')).toBeInTheDocument();
   });
 
   it('renders an empty state when there are no observations', () => {

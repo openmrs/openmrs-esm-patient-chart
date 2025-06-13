@@ -19,13 +19,25 @@ export const renderTag = (
       <Tag
         type={
           typeof columnStatusObs?.value === 'object' && 'uuid' in columnStatusObs.value
-            ? statusColorMappings[columnStatusObs.value.uuid]
+            ? (statusColorMappings[columnStatusObs.value.uuid] as
+                | 'red'
+                | 'magenta'
+                | 'purple'
+                | 'blue'
+                | 'cyan'
+                | 'teal'
+                | 'green'
+                | 'gray'
+                | 'cool-gray'
+                | 'warm-gray'
+                | 'high-contrast'
+                | 'outline')
             : undefined
         }
-        title={columnStatus}
+        title={typeof columnStatus === 'string' ? columnStatus : ''}
         style={{ minWidth: '80px' }}
       >
-        {columnStatus}
+        {typeof columnStatus === 'string' ? columnStatus : ''}
       </Tag>
     );
   }

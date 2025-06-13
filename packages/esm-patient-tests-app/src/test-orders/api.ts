@@ -1,9 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { chunk } from 'lodash-es';
-import useSWR, { mutate } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import type { OrderPost, PatientOrderFetchResponse, TestOrderPost } from '@openmrs/esm-patient-common-lib';
-import type { TestOrderBasketItem } from '../types';
 import {
   type FetchResponse,
   openmrsFetch,
@@ -13,6 +12,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import type { TestOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -23,8 +23,9 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
  * @param status Allows fetching either all orders or only active orders.
  */
 export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
-  const { labOrderTypeUuid: labOrderTypeUUID } = (useConfig() as ConfigObject).orders;
+  const { labOrderTypeUuid: labOrderTypeUUID } = useConfig<ConfigObject>().orders;
   const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${labOrderTypeUUID}`;
+  const { mutate } = useSWRConfig();
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     patientUuid ? ordersUrl : null,
@@ -33,7 +34,7 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
 
   const mutateOrders = useCallback(
     () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
-    [patientUuid],
+    [mutate, patientUuid],
   );
 
   const labOrders = useMemo(

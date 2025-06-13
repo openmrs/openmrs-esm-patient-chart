@@ -37,15 +37,17 @@ const RangeSelector: React.FC<{ setLowerRange: (lowerRange: Date) => void; upper
   ];
 
   return (
-    <Tabs selected={6} className={styles['range-tabs']}>
-      <TabList aria-label="Trendline range tabs" className={styles.tabPanel}>
-        {ranges.map(([label, onClick], index) => (
-          <Tab onClick={onClick} key={index}>
-            {label}
-          </Tab>
-        ))}
-      </TabList>
-    </Tabs>
+    <div className={styles['range-tabs']}>
+      <Tabs selectedIndex={6}>
+        <TabList aria-label="Trendline range tabs" className={styles.tabPanel}>
+          {ranges.map(([label, onClick], index) => (
+            <Tab onClick={onClick} key={index}>
+              {label}
+            </Tab>
+          ))}
+        </TabList>
+      </Tabs>
+    </div>
   );
 };
 

@@ -35,7 +35,6 @@ export const ProgramsActionMenu = ({ patientUuid, programEnrollmentId }: Program
   return (
     <Layer className={styles.layer}>
       <OverflowMenu
-        align="left"
         aria-label={t('editOrDeleteProgram', 'Edit or delete program')}
         flipped
         size={isTablet ? 'lg' : 'sm'}

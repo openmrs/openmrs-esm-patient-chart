@@ -20,9 +20,9 @@ describe('RangeSelector', () => {
     expect(screen.getByRole('tab', { name: /5 years/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument();
 
-    // first tab is selected by default
-    expect(screen.getByRole('tab', { name: /1 day/i })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tab', { name: /5 days/i })).toHaveAttribute('aria-selected', 'false');
+    // last tab is selected by default
+    expect(screen.getByRole('tab', { name: /all/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /1 day/i })).toHaveAttribute('aria-selected', 'false');
   });
 
   it.each([

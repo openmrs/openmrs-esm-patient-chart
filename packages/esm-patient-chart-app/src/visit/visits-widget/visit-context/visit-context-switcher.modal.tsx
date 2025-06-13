@@ -152,7 +152,8 @@ const VisitCardRow: React.FC<VisitCardRowProps> = ({ visit, setSelectedVisit: se
           id={`visit-card-row-${visit.uuid}`}
           value={visit.uuid}
           checked={isSelected}
-          onChange={(value) => setSelected(value)}
+          labelText={visit.visitType.display}
+          onChange={(value) => setSelected(String(value))}
         />
       </div>
       <button className={styles.visitCardRowButton} onClick={() => setSelected(visit.uuid)}></button>

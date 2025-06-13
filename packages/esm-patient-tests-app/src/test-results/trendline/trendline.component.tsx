@@ -192,7 +192,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   );
 
   if (isLoading) {
-    return <SkeletonText role="progressbar" />;
+    return <SkeletonText />;
   }
 
   if (obs.length === 0) {

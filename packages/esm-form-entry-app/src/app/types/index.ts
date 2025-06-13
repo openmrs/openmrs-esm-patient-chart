@@ -1,5 +1,3 @@
-import { Form } from '@openmrs/ngx-formentry';
-
 interface OpenmrsResource {
   display: string;
   uuid: string;

@@ -96,7 +96,11 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
           <div className={styles.biometricsHeaderActionItems}>
-            <ContentSwitcher onChange={(evt) => setChartView(evt.name === 'chartView')} size={isTablet ? 'md' : 'sm'}>
+            <ContentSwitcher
+              onChange={(evt) => setChartView(evt.name === 'chartView')}
+              size={isTablet ? 'md' : 'sm'}
+              selectedIndex={chartView ? 1 : 0}
+            >
               <IconSwitch name="tableView" text="Table view">
                 <Table size={16} />
               </IconSwitch>
