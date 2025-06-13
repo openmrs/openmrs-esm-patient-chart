@@ -22,7 +22,7 @@ const mockUseDrugSearch = jest.mocked(useDrugSearch);
 const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
 const usePatientOrdersMock = jest.fn();
 
-mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
+mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose?.());
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
@@ -136,6 +136,23 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
+  test('should not return to order basket if opened from a workspace other than order basket', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace({ outsideOrderBasketWorkspace: true });
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+
+    const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('div').parentElement;
+    const aspirin325AddButton = within(aspirin325Div).getByText(/Add to basket/i);
+    await user.click(aspirin325AddButton);
+
+    expect(mockLaunchPatientWorkspace).not.toHaveBeenCalled();
+  });
+
   test('can open the drug form ', async () => {
     const user = userEvent.setup();
 
@@ -189,7 +206,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
   });
 });
 
-function renderAddDrugOrderWorkspace() {
+function renderAddDrugOrderWorkspace(props?: { outsideOrderBasketWorkspace?: boolean }) {
   render(
     <AddDrugOrderWorkspace
       order={undefined as any}
@@ -199,6 +216,7 @@ function renderAddDrugOrderWorkspace() {
       patientUuid={mockPatient.id}
       patient={mockPatient}
       setTitle={jest.fn()}
+      outsideOrderBasketWorkspace={props?.outsideOrderBasketWorkspace}
     />,
   );
 }
