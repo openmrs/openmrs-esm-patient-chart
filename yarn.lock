@@ -4739,7 +4739,6 @@ __metadata:
     typescript: "npm:^4.0.3"
     webpack: "npm:^5.99.9"
     webpack-cli: "npm:^6.0.1"
-    webpack-dev-server: "npm:^5.2.1"
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
