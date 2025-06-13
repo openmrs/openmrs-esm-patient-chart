@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import {} from 'swr/_internal';
 import { type FetchResponse, openmrsFetch, restBaseUrl, translateFrom } from '@openmrs/esm-framework';
 import type { PatientOrderFetchResponse, PriorityOption } from './types';
 

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
+import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
-import {} from 'swr/_internal';
+import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
@@ -47,6 +46,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const schema = useLabResultsFormSchema(order.concept.uuid);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const { mutate } = useSWRConfig();
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -54,7 +54,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       undefined,
       { revalidate: true },
     );
-  }, [order.patient.uuid]);
+  }, [mutate, order.patient.uuid]);
 
   const {
     control,

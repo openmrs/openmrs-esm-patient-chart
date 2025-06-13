@@ -14,8 +14,7 @@ import {
   PatientFormSyncItemContent,
   queuePatientFormSyncItem,
 } from '../offline/sync';
-import isEmpty from 'lodash-es/isEmpty';
-import cloneDeep from 'lodash-es/cloneDeep';
+import { cloneDeep, isEmpty } from 'lodash-es';
 import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMutation';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { v4 } from 'uuid';

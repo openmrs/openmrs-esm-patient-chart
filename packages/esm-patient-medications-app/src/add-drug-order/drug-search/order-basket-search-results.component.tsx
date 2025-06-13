@@ -124,13 +124,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, openO
     [activeOrders, drug],
   );
 
-  const {
-    templates,
-    isLoading: isLoadingTemplates,
-    error: fetchingDrugOrderTemplatesError,
-  } = useDrugTemplate(drug?.uuid);
+  const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const drugItemTemplateOptions: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length

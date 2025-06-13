@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import type { DrugOrderPost, PatientOrderFetchResponse, Order } from '@openmrs/esm-patient-common-lib';
@@ -35,6 +35,7 @@ function sortOrdersByDateActivated(orders: Order[]) {
  */
 export function usePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
+  const { mutate } = useSWRConfig();
 
   const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
 
@@ -45,7 +46,7 @@ export function usePatientOrders(patientUuid: string) {
 
   const mutateOrders = useCallback(
     () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
-    [patientUuid],
+    [mutate, patientUuid],
   );
 
   const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
@@ -66,6 +67,8 @@ export function usePatientOrders(patientUuid: string) {
  */
 export function useActivePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
+  const { mutate } = useSWRConfig();
+
   const ordersUrl = useMemo(
     () =>
       patientUuid
