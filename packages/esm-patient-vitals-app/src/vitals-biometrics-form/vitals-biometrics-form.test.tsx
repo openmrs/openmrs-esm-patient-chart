@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
+import { mockConceptUnits, mockCurrentVisit, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
 
@@ -142,6 +142,24 @@ function setupMockUseEncounterVitalsAndBiometrics() {
     }),
   });
 }
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+  return {
+    ...originalModule,
+    usePatientChartStore: () => ({
+      visits: {
+        activeVisit: mockCurrentVisit,
+        currentVisit: mockCurrentVisit,
+        currentVisitIsRetrospective: false,
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: null,
+      },
+    }),
+  };
+});
 
 describe('VitalsBiometricsForm', () => {
   it('renders the vitals and biometrics form', async () => {

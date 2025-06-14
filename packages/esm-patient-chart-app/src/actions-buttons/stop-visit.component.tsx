@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showModal, useVisit } from '@openmrs/esm-framework';
 import { OverflowMenuItem } from '@carbon/react';
+import { showModal } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import styles from './action-button.scss';
 
 interface StopVisitOverflowMenuItemProps {
@@ -14,7 +15,7 @@ interface StopVisitOverflowMenuItemProps {
  */
 const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit } = usePatientChartStore().visits;
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('end-visit-dialog', {
