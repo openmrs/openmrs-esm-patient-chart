@@ -4400,8 +4400,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 3.1.5-pre.1890
-  resolution: "@openmrs/esm-form-engine-lib@npm:3.1.5-pre.1890"
+  version: 3.1.5-pre.1901
+  resolution: "@openmrs/esm-form-engine-lib@npm:3.1.5-pre.1901"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     classnames: "npm:^2.5.1"
@@ -4419,7 +4419,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     swr: 2.x
-  checksum: 10/aeba1033ed8993b32d295c3fa02b3b06c7dd5417580f0f4dc5e5ae3a304f4c32423ae8cfd2880761f3b2c99dc855f9533c7b3d5e95b3a9ced0a5d28973bbf566
+  checksum: 10/e4571344fb0707d38269a7c55e99e6bc5a041b418ca9466e5b87248a9da0ba2422a9e6ec0b05ec44ca4d4dbe02ca3db76cb81d7e7629b1a67bcac1e408916b38
   languageName: node
   linkType: hard
 
@@ -25305,21 +25305,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.2.0":
+"use-sync-external-store@npm:^1.2.0, use-sync-external-store@npm:^1.4.0":
   version: 1.5.0
   resolution: "use-sync-external-store@npm:1.5.0"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10/ddae7c4572511f7f641d6977bd0725340aa7dbeda8250418b54c1a57ec285083d96cf50d1a1acbd6cf729f7a87071b2302c6fbd29310432bf1b21a961a313279
-  languageName: node
-  linkType: hard
-
-"use-sync-external-store@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "use-sync-external-store@npm:1.4.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10/08bf581a8a2effaefc355e9d18ed025d436230f4cc973db2f593166df357cf63e47b9097b6e5089b594758bde322e1737754ad64905e030d70f8ff7ee671fd01
   languageName: node
   linkType: hard
 
