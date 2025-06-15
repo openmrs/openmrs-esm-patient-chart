@@ -27,7 +27,12 @@ import {
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import {
+  type DefaultPatientWorkspaceProps,
+  type amPm,
+  convertTime12to24,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -52,7 +57,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const { t } = useTranslation();
   const { immunizationsConfig } = useConfig<ConfigObject>();
   const currentUser = useSession();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
   const isTablet = useLayoutType() === 'tablet';
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
   const { mutate } = useImmunizations(patientUuid);

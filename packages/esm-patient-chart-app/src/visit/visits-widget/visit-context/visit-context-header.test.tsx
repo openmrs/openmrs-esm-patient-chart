@@ -1,4 +1,4 @@
-import { useVisit, useVisitContextStore } from '@openmrs/esm-framework';
+import { useVisitContextStore } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
@@ -19,19 +19,22 @@ jest.mocked(useVisitContextStore).mockReturnValue({
   mutateVisit: jest.fn(),
 });
 
-jest.mocked(useVisit).mockReturnValue({
-  currentVisit: mockCurrentVisit,
-  error: null,
-  mutate: jest.fn(),
-  isValidating: false,
-  activeVisit: null,
-  currentVisitIsRetrospective: false,
-  isLoading: false,
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  return {
+    useSystemVisitSetting: () => mockUseSystemVisitSetting(),
+    usePatientChartStore: () => ({
+      visits: {
+        currentVisit: mockCurrentVisit,
+        error: null,
+        mutate: jest.fn(),
+        isValidating: false,
+        activeVisit: null,
+        currentVisitIsRetrospective: false,
+        isLoading: false,
+      },
+    }),
+  };
 });
-
-jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
-  useSystemVisitSetting: () => mockUseSystemVisitSetting(),
-}));
 
 describe('VisitContextHeader', () => {
   it('should not show header if system does not support visits', () => {

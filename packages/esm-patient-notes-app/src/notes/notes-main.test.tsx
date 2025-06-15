@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import { mockVisitNotes } from '__mocks__';
+import { mockCurrentVisit, mockVisitNotes } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
 import NotesMain from './notes-main.component';
@@ -16,6 +16,24 @@ const mockUseVisitNotes = jest.mocked(useVisitNotes);
 
 jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+  return {
+    ...originalModule,
+    usePatientChartStore: () => ({
+      visits: {
+        activeVisit: mockCurrentVisit,
+        currentVisit: mockCurrentVisit,
+        currentVisitIsRetrospective: false,
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: null,
+      },
+    }),
+  };
 });
 
 describe('NotesMain', () => {

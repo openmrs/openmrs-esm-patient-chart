@@ -32,6 +32,7 @@ import {
   ErrorState,
   launchPatientWorkspace,
   PatientChartPagination,
+  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
 import { type ExistingDoses, type Sequence } from '../types';
@@ -55,7 +56,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const headerTitle = t('immunizations', 'Immunizations');
   const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
   const urlLabel = t('goToSummary', 'Go to Summary');
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
   const isTablet = useLayoutType() === 'tablet';
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
