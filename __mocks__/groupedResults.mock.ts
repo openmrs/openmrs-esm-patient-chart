@@ -268,7 +268,7 @@ export const mockGroupedResults = {
           interpretation: 'NORMAL' as OBSERVATION_INTERPRETATION,
         },
       ],
-    }
+    },
   ],
   activeTests: [],
   lowestParents: [

@@ -1407,11 +1407,13 @@ export const mockResults = [
     display: 'HIV viral load',
     subSets: [
       {
-        obs: [{
-          obsDatetime: '2024-11-04 05:48:00.0',
-          value: '600',
-          interpretation: 'NORMAL',
-        }],
+        obs: [
+          {
+            obsDatetime: '2024-11-04 05:48:00.0',
+            value: '600',
+            interpretation: 'NORMAL',
+          },
+        ],
         datatype: 'Numeric',
         lowAbsolute: 0,
         display: 'HIV viral load',
@@ -1423,5 +1425,5 @@ export const mockResults = [
     ],
     flatName: 'HIV viral load',
     hasData: true,
-  }
+  },
 ];

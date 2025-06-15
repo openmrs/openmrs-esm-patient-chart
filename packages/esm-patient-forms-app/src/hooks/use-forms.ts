@@ -23,7 +23,11 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
   const hasCustomFormsUrl = Boolean(customFormsUrl);
 
-  const baseUrl = hasCustomFormsUrl ? customFormsUrl : showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
+  const baseUrl = hasCustomFormsUrl
+    ? customFormsUrl
+    : showHtmlFormEntryForms
+    ? formEncounterUrl
+    : formEncounterUrlPoc;
 
   const url = interpolateUrl(baseUrl, {
     patientUuid: patientUuid,
@@ -113,8 +117,8 @@ export function useForms(
   } else {
     formsToDisplay?.sort(
       (formInfo1, formInfo2) =>
-        (formInfo1.lastCompletedDate ?? MINIMUM_DATE).getDate() -
-        (formInfo2.lastCompletedDate ?? MINIMUM_DATE).getDate(),
+        (formInfo1.lastCompletedDate ?? MINIMUM_DATE).getTime() -
+        (formInfo2.lastCompletedDate ?? MINIMUM_DATE).getTime(),
     );
   }
 
