@@ -106,7 +106,6 @@ test('Add and edit an immunization', async ({ page, patient }) => {
   });
 
   await test.step('Then expanding the immunization details section should reveal the correct details', async () => {
-    await page.getByRole('button', { name: /expand current row/i }).click();
     await expect(page.getByText(/dose number within series/i)).toBeVisible();
     await expect(page.getByText(/vaccination date/i)).toBeVisible();
     await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
