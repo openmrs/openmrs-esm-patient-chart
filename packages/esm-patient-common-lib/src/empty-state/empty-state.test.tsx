@@ -1,17 +1,10 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { launchPatientWorkspace } from '..';
+import { render, screen } from '@testing-library/react';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { EmptyState } from '.';
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 describe('EmptyState', () => {
   it('renders an empty state widget card', () => {
@@ -19,7 +12,7 @@ describe('EmptyState', () => {
       <EmptyState
         headerTitle="appointments"
         displayText="appointments"
-        launchForm={() => launchPatientWorkspace('sample-form-workspace')}
+        launchForm={() => launchWorkspace('sample-form-workspace')}
       />,
     );
 
@@ -35,7 +28,7 @@ describe('EmptyState', () => {
       <EmptyState
         headerTitle="appointments"
         displayText="appointments"
-        launchForm={() => launchPatientWorkspace('sample-form-workspace')}
+        launchForm={() => launchWorkspace('sample-form-workspace')}
       />,
     );
 
@@ -44,7 +37,7 @@ describe('EmptyState', () => {
 
     await user.click(recordAppointmentsLink);
 
-    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('sample-form-workspace');
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('sample-form-workspace');
   });
 });
