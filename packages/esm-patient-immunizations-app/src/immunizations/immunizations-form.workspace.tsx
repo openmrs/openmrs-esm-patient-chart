@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   ButtonSet,
@@ -25,18 +28,15 @@ import {
   OpenmrsDatePicker,
   getCoreTranslation,
 } from '@openmrs/esm-framework';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { savePatientImmunization } from './immunizations.resource';
-import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
+import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
+import { savePatientImmunization } from './immunizations.resource';
 import { type ConfigObject } from '../config-schema';
 import { type ImmunizationFormData } from '../types';
-import { immunizationFormSub } from './utils';
-import { DoseInput } from './components/dose-input.component';
 import { useImmunizations } from '../hooks/useImmunizations';
+import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
+import { DoseInput } from './components/dose-input.component';
 import styles from './immunizations-form.scss';
 
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
@@ -46,13 +46,14 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
-  const { t } = useTranslation();
-  const { immunizationsConfig } = useConfig<ConfigObject>();
   const currentUser = useSession();
-  const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
+  const { t } = useTranslation();
+  const { currentVisit } = useVisit(patientUuid);
+  const { immunizationsConfig } = useConfig<ConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
   const { mutate } = useImmunizations(patientUuid);
+
   const [immunizationToEditMeta, setImmunizationToEditMeta] = useState<{
     immunizationObsUuid: string;
     visitUuid?: string;
@@ -64,7 +65,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccinationDate: z
         .date()
         .min(new Date(patient.birthDate), {
-          message: t('vaccinationDateCannotBeBeforeBirth', 'Vaccination date cannot precede date of birth'),
+          message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
         })
         .refine((vaccinationDate) => vaccinationDate <= new Date(), {
           message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
@@ -285,7 +286,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   <div className={styles.row}>
                     <Dropdown
                       id="immunization"
-                      label={t('pleaseSelect', 'Please select')}
+                      label={t('selectImmunization', 'Select immunization')}
                       titleText={t('immunization', 'Immunization')}
                       items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
                       itemToString={(item) =>
