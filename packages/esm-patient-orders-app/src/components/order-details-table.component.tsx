@@ -10,8 +10,6 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -30,22 +28,9 @@ import {
   TableRow,
   TableToolbarContent,
   Tile,
+  DatePicker,
+  DatePickerInput,
 } from '@carbon/react';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  getDrugOrderByUuid,
-  launchPatientWorkspace,
-  PatientChartPagination,
-  type Order,
-  type OrderBasketItem,
-  type OrderType,
-  useLaunchWorkspaceRequiringVisit,
-  useOrderBasket,
-  useOrderTypes,
-  usePatientOrders,
-} from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   age,
@@ -59,16 +44,27 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  getDrugOrderByUuid,
+  launchPatientWorkspace,
+  type Order,
+  type OrderBasketItem,
+  type OrderType,
+  PatientChartPagination,
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
+  useOrderTypes,
+  usePatientOrders,
+} from '@openmrs/esm-patient-common-lib';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
-import GeneralOrderTable from './general-order-table.component';
 import MedicationRecord from './medication-record.component';
-import PrintComponent from '../print/print.component';
-import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
-
-dayjs.extend(isSameOrBefore);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(utc);
+import GeneralOrderTable from './general-order-table.component';
+import TestOrder from './test-order.component';
+import PrintComponent from '../print/print.component';
 
 interface OrderDetailsProps {
   patientUuid: string;
