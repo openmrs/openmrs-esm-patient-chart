@@ -66,6 +66,10 @@ import GeneralOrderTable from './general-order-table.component';
 import TestOrder from './test-order.component';
 import PrintComponent from '../print/print.component';
 
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(utc);
+
 interface OrderDetailsProps {
   patientUuid: string;
   patient: fhir.Patient;
