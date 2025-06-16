@@ -1,5 +1,5 @@
 import React from 'react';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';

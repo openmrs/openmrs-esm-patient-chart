@@ -31,18 +31,14 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
     searchInputRef.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(event.target.value ?? '');
-
   return (
     <div className={styles.searchPopupContainer}>
       <ResponsiveWrapper>
         <Search
-          autoFocus
           size="lg"
           placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-          onChange={handleSearchTermChange}
+          onChange={(e) => setSearchTerm(e.target.value ?? '')}
           ref={searchInputRef}
           value={searchTerm}
         />

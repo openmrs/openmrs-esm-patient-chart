@@ -83,6 +83,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 type="text"
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
               />
             ) : isNumericField ? (
               <NumberInput
@@ -95,7 +96,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 label={labelText}
                 onChange={(_, { value }) => field.onChange(value !== '' ? value : undefined)}
                 step={concept.allowDecimal ? 0.01 : 1}
-                value={field.value || ''}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
               />
@@ -109,6 +110,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
                 labelText={labelText}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
               >
                 <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
                 {concept?.answers?.length &&

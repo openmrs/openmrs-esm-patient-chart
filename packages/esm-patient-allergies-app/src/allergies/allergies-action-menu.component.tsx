@@ -38,7 +38,6 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
         aria-label={t('editOrDeleteAllergy', 'Edit or delete allergy')}
         size={isTablet ? 'lg' : 'sm'}
         flipped
-        align="left"
       >
         <OverflowMenuItem
           className={styles.menuItem}

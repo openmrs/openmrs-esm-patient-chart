@@ -289,7 +289,7 @@ export function LabOrderForm({
                       itemToString={(item) => item?.display}
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
-                      selectedItem={''}
+                      selectedItem={null}
                       shouldFilterItem={filterItemsByName}
                       size={responsiveSize}
                       titleText={t('orderReason', 'Order reason')}
@@ -316,7 +316,6 @@ export function LabOrderForm({
                     maxCount={500}
                     onBlur={onBlur}
                     onChange={onChange}
-                    size={responsiveSize}
                     value={value}
                   />
                 )}

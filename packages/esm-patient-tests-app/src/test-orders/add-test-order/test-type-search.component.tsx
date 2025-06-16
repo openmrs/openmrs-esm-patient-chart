@@ -65,7 +65,7 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
         <Search
           autoFocus
           labelText={t('searchFieldPlaceholder', 'Search for a test type')}
-          onChange={handleSearchTermChange}
+          onChange={(e) => setSearchTerm(e.target.value ?? '')}
           placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           ref={searchInputRef}
           size="lg"

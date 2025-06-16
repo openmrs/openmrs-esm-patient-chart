@@ -1,11 +1,11 @@
-import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { type amPm } from '@openmrs/esm-patient-common-lib';
+import React from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import React from 'react';
 import { type Control, Controller, type FieldPath, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { convertToDate, type VisitFormData } from './visit-form.resource';
 import styles from './visit-form.scss';
 
@@ -155,7 +155,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                 onBlur={onBlur}
                 onChange={(event) => onChange(event.target.value as amPm)}
                 pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
-                value={value}
+                value={value as amPm}
                 disabled={disabled}
               >
                 <Controller
@@ -169,7 +169,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                       })}
                       id={`${timeFormatField.name}Input`}
                       onChange={(event) => onChange(event.target.value as amPm)}
-                      value={value}
+                      value={value as amPm}
                       disabled={disabled}
                     >
                       <SelectItem value="AM" text={t('AM', 'AM')} />

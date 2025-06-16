@@ -45,7 +45,7 @@ interface ProgramsOverviewProps {
 const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUuid }) => {
   const programsCount = 5;
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
@@ -149,10 +149,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                         className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
-                        {header.header?.content ?? header.header}
+                        {header.header}
                       </TableHeader>
                     ))}
                   </TableRow>

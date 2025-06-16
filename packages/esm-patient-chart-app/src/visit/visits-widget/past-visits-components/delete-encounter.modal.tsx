@@ -5,7 +5,7 @@ import styles from './delete-encounter.scss';
 
 interface DeleteEncounterConfirmationProps {
   encounterTypeName?: string;
-  close: Function;
+  close: (event: React.MouseEvent<Element, MouseEvent>) => void;
   onConfirmation: Function;
 }
 
@@ -15,7 +15,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   encounterTypeName,
 }) => {
   const { t } = useTranslation();
-  const handleCancel = () => close();
+  const handleCancel = (event: React.MouseEvent<Element, MouseEvent>) => close(event);
   const handleDelete = () => onConfirmation?.();
 
   return (

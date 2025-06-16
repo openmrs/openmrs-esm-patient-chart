@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
@@ -45,7 +44,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
 
   const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(() => {
+  const tableHeaders = useMemo(() => {
     const headers = [
       {
         key: 'display',
@@ -146,10 +145,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                         className={classNames(styles.productiveHeading01, styles.text02)}
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
-                        {header.header?.content ?? header.header}
+                        {header.header}
                       </TableHeader>
                     ))}
                     <TableHeader />

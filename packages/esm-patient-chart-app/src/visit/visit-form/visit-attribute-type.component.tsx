@@ -9,7 +9,6 @@ import {
   TextInput,
   TextInputSkeleton,
 } from '@carbon/react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerFieldState, type ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
@@ -115,7 +114,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     error: errorFetchingVisitAttributeAnswers,
   } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
-  const id = useId();
+  const baseId = useId();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
   const {
@@ -151,7 +150,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
 
         return (
           <Select
-            id={`select-${id}`}
+            id={`select-${baseId}`}
             {...fieldProps}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
@@ -167,6 +166,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <NumberInput
             {...fieldProps}
+            id={`number-${baseId}`}
             label={labelText}
             hideSteppers
             invalid={!!fieldState?.error?.message}
@@ -177,7 +177,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <TextInput
             {...fieldProps}
-            id={uuid}
+            id={`text-${baseId}`}
             labelText={labelText}
             placeholder={labelText}
             invalid={!!fieldState?.error?.message}
@@ -188,6 +188,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <TextArea
             {...fieldProps}
+            id={`textarea-${baseId}`}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
@@ -197,6 +198,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <Checkbox
             {...fieldProps}
+            id={`checkbox-${baseId}`}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
@@ -206,7 +208,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <OpenmrsDatePicker
             {...fieldProps}
-            id={`date-picker-${uuid}`}
+            id={`date-${baseId}`}
             labelText={labelText}
             aria-invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
@@ -216,6 +218,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         return (
           <TextInput
             {...fieldProps}
+            id={`text-${baseId}`}
             labelText={labelText}
             invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
@@ -228,13 +231,12 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     data?.datatypeClassname,
     isLoadingAnswers,
     errorFetchingVisitAttributeAnswers,
-    id,
+    baseId,
     fieldProps,
     labelText,
     fieldState?.error?.message,
     t,
     answers,
-    uuid,
   ]);
 
   if (isLoading) {

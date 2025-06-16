@@ -93,10 +93,9 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                         className={styles.tableHeader}
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                         })}
                       >
-                        {header.header?.content ?? header.header}
+                        {header.header}
                       </TableHeader>
                     ))}
                     <TableHeader />

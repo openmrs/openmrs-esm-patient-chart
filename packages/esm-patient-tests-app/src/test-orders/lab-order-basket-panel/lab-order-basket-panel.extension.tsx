@@ -42,7 +42,7 @@ export default function LabOrderBasketPanelExtension() {
   return (
     <>
       {allOrderTypes.map((orderTypeConfig) => (
-        <LabOrderBasketPanel {...orderTypeConfig} />
+        <LabOrderBasketPanel key={orderTypeConfig.orderTypeUuid} {...orderTypeConfig} />
       ))}
     </>
   );
