@@ -40,9 +40,11 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   }
+
   if (error) {
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
+
   if (!visitNotes?.length) {
     return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
   }

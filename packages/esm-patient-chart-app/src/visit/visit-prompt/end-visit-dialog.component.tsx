@@ -50,6 +50,10 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ closeModal }) => {
     }
   };
 
+  if (!activeVisit) {
+    return null;
+  }
+
   return (
     <div>
       <ModalHeader

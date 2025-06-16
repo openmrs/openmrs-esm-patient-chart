@@ -21,15 +21,17 @@ const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = 
     });
   }, [patientUuid, activeVisit]);
 
+  if (!activeVisit) {
+    return null;
+  }
+
   return (
-    activeVisit && (
-      <OverflowMenuItem
-        className={styles.menuitem}
-        itemText={t('deleteActiveVisit', 'Delete active visit')}
-        onClick={handleLaunchModal}
-        isDelete
-      />
-    )
+    <OverflowMenuItem
+      className={styles.menuitem}
+      isDelete
+      itemText={t('deleteActiveVisit', 'Delete active visit')}
+      onClick={handleLaunchModal}
+    />
   );
 };
 

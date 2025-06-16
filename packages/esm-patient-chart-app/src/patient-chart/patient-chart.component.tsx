@@ -19,13 +19,15 @@ import SideMenuPanel from '../side-nav/side-menu.component';
 import styles from './patient-chart.scss';
 
 const PatientChart: React.FC = () => {
+  const { workspaceWindowState, active } = useWorkspaces();
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
-  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const visits = useVisit(patientUuid);
-  const state = useMemo(() => ({ patient, patientUuid, visits }), [patient, patientUuid, visits]);
-  const { workspaceWindowState, active } = useWorkspaces();
+  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
+
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
+  const state = useMemo(() => ({ patient, patientUuid, visits }), [patient, patientUuid, visits]);
+
   // Keep state updated with the current patient. Anything used outside the patient
   // chart (e.g., the current visit is used by the Active Visit Tag used in the
   // patient search) must be updated in the callback, which is called when the patient
@@ -74,8 +76,8 @@ const PatientChart: React.FC = () => {
                     <ChartReview
                       patient={state.patient}
                       patientUuid={state.patientUuid}
-                      view={view}
                       setDashboardLayoutMode={setLayoutMode}
+                      view={view}
                     />
                   </div>
                 </div>
@@ -85,9 +87,9 @@ const PatientChart: React.FC = () => {
         </>
       </main>
       <WorkspaceContainer
-        showSiderailAndBottomNav
-        contextKey={`patient/${patientUuid}`}
         additionalWorkspaceProps={state}
+        contextKey={`patient/${patientUuid}`}
+        showSiderailAndBottomNav
       />
     </>
   );
