@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Button,
   ButtonSet,
   Dropdown,
   Form,
-  InlineNotification,
+  InlineLoading,
   SelectItem,
   Stack,
   TextInput,
@@ -23,39 +26,34 @@ import {
   showSnackbar,
   ResponsiveWrapper,
   OpenmrsDatePicker,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { savePatientImmunization } from './immunizations.resource';
-import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
+import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
+import { savePatientImmunization } from './immunizations.resource';
 import { type ConfigObject } from '../config-schema';
 import { type ImmunizationFormData } from '../types';
-import { immunizationFormSub } from './utils';
-import { DoseInput } from './components/dose-input.component';
 import { useImmunizations } from '../hooks/useImmunizations';
+import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
+import { DoseInput } from './components/dose-input.component';
 import styles from './immunizations-form.scss';
 
-interface ResponsiveWrapperProps {
-  children: React.ReactNode;
-  isTablet: boolean;
-}
-
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
+  patient,
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
-  const { t } = useTranslation();
-  const { immunizationsConfig } = useConfig<ConfigObject>();
   const currentUser = useSession();
-  const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
+  const { t } = useTranslation();
+  const { currentVisit } = useVisit(patientUuid);
+  const { immunizationsConfig } = useConfig<ConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
   const { mutate } = useImmunizations(patientUuid);
+
   const [immunizationToEditMeta, setImmunizationToEditMeta] = useState<{
     immunizationObsUuid: string;
     visitUuid?: string;
@@ -63,8 +61,15 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   const immunizationFormSchema = useMemo(() => {
     return z.object({
-      vaccineUuid: z.string().refine((value) => !!value, t('vaccineRequired', 'Vaccine required')),
-      vaccinationDate: z.date().refine((value) => !!value, t('vaccinationDateRequired', 'Vaccination date required')),
+      vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine is required')),
+      vaccinationDate: z
+        .date()
+        .min(new Date(patient.birthDate), {
+          message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
+        })
+        .refine((vaccinationDate) => vaccinationDate <= new Date(), {
+          message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
+        }),
       vaccinationTime: z.string(),
       timeFormat: z.enum(['PM', 'AM']),
       doseNumber: z
@@ -77,7 +82,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       lotNumber: z.string().nullable(),
       manufacturer: z.string().nullable(),
     });
-  }, [t]);
+  }, [patient.birthDate, t]);
 
   type ImmunizationFormInputData = z.infer<typeof immunizationFormSchema>;
   const formProps = useForm<ImmunizationFormInputData>({
@@ -135,72 +140,69 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   }, [reset]);
 
   const onSubmit = useCallback(
-    (data: ImmunizationFormInputData) => {
-      const {
-        vaccineUuid,
-        vaccinationDate,
-        doseNumber,
-        expirationDate,
-        lotNumber,
-        manufacturer,
-        timeFormat,
-        vaccinationTime,
-      } = data;
-      const abortController = new AbortController();
+    async (data: ImmunizationFormInputData) => {
+      try {
+        const {
+          vaccineUuid,
+          vaccinationDate,
+          doseNumber,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+          timeFormat,
+          vaccinationTime,
+        } = data;
+        const abortController = new AbortController();
 
-      const [hours, minutes] = convertTime12to24(vaccinationTime, timeFormat);
+        const [hours, minutes] = convertTime12to24(vaccinationTime, timeFormat);
 
-      const immunization: ImmunizationFormData = {
-        patientUuid,
-        immunizationId: immunizationToEditMeta?.immunizationObsUuid,
-        vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
-        vaccineUuid: vaccineUuid,
-        vaccinationDate: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(
-              dayjs(vaccinationDate).year(),
-              dayjs(vaccinationDate).month(),
-              dayjs(vaccinationDate).date(),
-              hours,
-              minutes,
+        const immunization: ImmunizationFormData = {
+          patientUuid,
+          immunizationId: immunizationToEditMeta?.immunizationObsUuid,
+          vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
+          vaccineUuid: vaccineUuid,
+          vaccinationDate: toDateObjectStrict(
+            toOmrsIsoString(
+              new Date(
+                dayjs(vaccinationDate).year(),
+                dayjs(vaccinationDate).month(),
+                dayjs(vaccinationDate).date(),
+                hours,
+                minutes,
+              ),
             ),
           ),
-        ),
-        doseNumber,
-        expirationDate,
-        lotNumber,
-        manufacturer,
-      };
+          doseNumber,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+        };
 
-      savePatientImmunization(
-        mapToFHIRImmunizationResource(
-          immunization,
-          immunizationToEditMeta?.visitUuid || currentVisit?.uuid,
-          currentUser?.sessionLocation?.uuid,
-          currentUser?.currentProvider?.uuid,
-        ),
-        immunizationToEditMeta?.immunizationObsUuid,
-        abortController,
-      ).then(
-        () => {
-          closeWorkspaceWithSavedChanges();
-          mutate();
-          showSnackbar({
-            kind: 'success',
-            title: t('vaccinationSaved', 'Vaccination saved successfully'),
-            isLowContrast: true,
-          });
-        },
-        (err) => {
-          showSnackbar({
-            title: t('errorSaving', 'Error saving vaccination'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: err?.message,
-          });
-        },
-      );
-      return () => abortController.abort();
+        await savePatientImmunization(
+          mapToFHIRImmunizationResource(
+            immunization,
+            immunizationToEditMeta?.visitUuid || currentVisit?.uuid,
+            currentUser?.sessionLocation?.uuid,
+            currentUser?.currentProvider?.uuid,
+          ),
+          immunizationToEditMeta?.immunizationObsUuid,
+          abortController,
+        );
+        closeWorkspaceWithSavedChanges();
+        mutate();
+        showSnackbar({
+          kind: 'success',
+          title: t('vaccinationSaved', 'Vaccination saved successfully'),
+          isLowContrast: true,
+        });
+      } catch (err) {
+        showSnackbar({
+          title: t('errorSaving', 'Error saving vaccination'),
+          kind: 'error',
+          isLowContrast: false,
+          subtitle: err?.message,
+        });
+      }
     },
     [
       currentUser?.sessionLocation?.uuid,
@@ -284,7 +286,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   <div className={styles.row}>
                     <Dropdown
                       id="immunization"
-                      label={t('pleaseSelect', 'Please select')}
+                      label={t('selectImmunization', 'Select immunization')}
                       titleText={t('immunization', 'Immunization')}
                       items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
                       itemToString={(item) =>
@@ -293,26 +295,14 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       onChange={(val) => onChange(val.selectedItem)}
                       selectedItem={value}
                       invalid={!!errors?.vaccineUuid}
+                      invalidText={errors?.vaccineUuid?.message}
+                      disabled={!!immunizationToEditMeta}
                     />
                   </div>
                 )}
               />
             </ResponsiveWrapper>
           </section>
-          {errors?.vaccineUuid && (
-            <section>
-              <div className={styles.row}>
-                <InlineNotification
-                  role="alert"
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={errors.vaccineUuid.message}
-                />
-              </div>
-            </section>
-          )}
           {vaccineUuid && (
             <section>
               <ResponsiveWrapper>
@@ -324,6 +314,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               </ResponsiveWrapper>
             </section>
           )}
+          <div className={styles.vaccineBatchHeading}> {t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <section>
             <ResponsiveWrapper>
               <Controller
@@ -390,7 +381,11 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">
-            {t('save', 'Save')}
+            {isSubmitting ? (
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save')}</span>
+            )}
           </Button>
         </ButtonSet>
       </Form>
