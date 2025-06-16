@@ -23,6 +23,7 @@ import {
   showSnackbar,
   ResponsiveWrapper,
   OpenmrsDatePicker,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,11 +60,11 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   const immunizationFormSchema = useMemo(() => {
     return z.object({
-      vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine required')),
+      vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine is required')),
       vaccinationDate: z
         .date()
         .min(new Date(patient.birthDate), {
-          message: t('vaccinationDateCannotBeBeforeBirth', 'Vaccination date cannot be before birth'),
+          message: t('vaccinationDateCannotBeBeforeBirth', 'Vaccination date cannot precede date of birth'),
         })
         .refine((vaccinationDate) => vaccinationDate <= new Date(), {
           message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
@@ -312,7 +313,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               </ResponsiveWrapper>
             </section>
           )}
-          <div className={styles.vaccineBatchHeading}> {t('vaccinebatchInformation', 'Vaccine Batch Information')}</div>
+          <div className={styles.vaccineBatchHeading}> {t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <section>
             <ResponsiveWrapper>
               <Controller
@@ -382,7 +383,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
             {isSubmitting ? (
               <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
             ) : (
-              <span>{t('save', 'Save')}</span>
+              <span>{getCoreTranslation('save')}</span>
             )}
           </Button>
         </ButtonSet>

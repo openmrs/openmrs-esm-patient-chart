@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/type' as type;
 
 .container {
   margin: layout.$spacing-05;
@@ -60,13 +61,5 @@
 }
 
 .vaccineBatchHeading {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #161616;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: layout.$spacing-05 0;
+  @include type.type-style('heading-compact-02');
 }
