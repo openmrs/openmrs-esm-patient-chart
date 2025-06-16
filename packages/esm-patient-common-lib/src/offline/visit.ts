@@ -1,15 +1,15 @@
+import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import {
   getSynchronizationItems,
-  type NewVisitPayload,
-  type QueueItemDescriptor,
   queueSynchronizationItem,
   useConnectivity,
   useSession,
+  type NewVisitPayload,
+  type QueueItemDescriptor,
   type useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
 import { usePatientChartStore } from '../store/patient-chart-store';
 
 /**

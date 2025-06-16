@@ -1,11 +1,11 @@
-import { Button, Loading } from '@carbon/react';
-import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+import { Button, Loading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import styles from './visit-context-header.scss';
-import VisitContextInfo from './visit-context-info.component';
+import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
 import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import VisitContextInfo from './visit-context-info.component';
+import styles from './visit-context-header.scss';
 
 interface VisitContextHeaderProps {
   patientUuid: string;
@@ -13,11 +13,11 @@ interface VisitContextHeaderProps {
 
 const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { currentVisit, isLoading } = usePatientChartStore().visits;
   const { systemVisitEnabled } = useSystemVisitSetting();
+
   const isRdeEnabled = useFeatureFlag('rde');
   const showVisitContextHeader = systemVisitEnabled && isRdeEnabled;
-
-  const { currentVisit, isLoading } = usePatientChartStore().visits;
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
 
   const openVisitSwitcherModal = () => {
@@ -31,6 +31,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   if (!showVisitContextHeader) {
     return null;
   }
+
   if (isLoading) {
     return (
       <div className={styles.visitContextHeader}>
@@ -38,6 +39,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
       </div>
     );
   }
+
   return (
     <div
       className={classNames(styles.visitContextHeader, isActiveVisit ? styles.activeVisit : styles.retroactiveVisit)}

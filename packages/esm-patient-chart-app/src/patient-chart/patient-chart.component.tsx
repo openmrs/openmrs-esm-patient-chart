@@ -1,3 +1,6 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import { useParams } from 'react-router-dom';
 import {
   ExtensionSlot,
   WorkspaceContainer,
@@ -8,14 +11,11 @@ import {
   useLeftNav,
 } from '@openmrs/esm-framework';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { type LayoutMode } from './chart-review/dashboard-view.component';
 import { spaBasePath } from '../constants';
 import Loader from '../loader/loader.component';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import SideMenuPanel from '../side-nav/side-menu.component';
-import { type LayoutMode } from './chart-review/dashboard-view.component';
 import styles from './patient-chart.scss';
 
 const PatientChart: React.FC = () => {
