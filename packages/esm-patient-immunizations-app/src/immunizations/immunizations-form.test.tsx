@@ -129,6 +129,7 @@ describe('Immunizations Form', () => {
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /PM/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Immunization/i })).toBeInTheDocument();
+    expect(screen.getByText(/Vaccine Batch Information/i)).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Manufacturer/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Lot Number/i })).toBeInTheDocument();
 
@@ -265,14 +266,14 @@ describe('Immunizations Form', () => {
     // verify the form values
     expect(vaccinationDateField).toHaveDisplayValue(/03\/01\/2024/i);
     expect(vaccinationTimeField).toHaveValue('03:44');
-    expect(vaccineField.title).toBe('Bacillus Calmette–Guérin vaccine');
+    expect(vaccineField).toBeDisabled();
+    expect(vaccineField).toHaveAttribute('title', 'Bacillus Calmette–Guérin vaccine');
     expect(doseField).toHaveValue(2);
     expect(lotField).toHaveValue('A123456');
     expect(manufacturerField).toHaveValue('Merck & Co., Inc.');
     expect(expirationDateField).toHaveValue('19/05/2024');
 
     // edit the form
-    await selectOption(vaccineField, 'Hepatitis B vaccination');
     await user.clear(doseField);
     await user.type(doseField, '2');
     await user.click(saveButton);
@@ -294,7 +295,9 @@ describe('Immunizations Form', () => {
         protocolApplied: [{ doseNumberPositiveInt: 2, series: null }],
         resourceType: 'Immunization',
         status: 'completed',
-        vaccineCode: { coding: [{ code: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Hepatitis B vaccination' }] },
+        vaccineCode: {
+          coding: [{ code: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Bacillus Calmette–Guérin vaccine' }],
+        },
       }),
       '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
       new AbortController(),

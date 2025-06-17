@@ -1,5 +1,4 @@
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { age, formatDate, parseDate, type Visit } from '@openmrs/esm-framework';
+import { age, formatDate, launchWorkspace, parseDate, type Visit } from '@openmrs/esm-framework';
 import type {
   ConfigConcepts,
   Encounter,
@@ -21,7 +20,7 @@ export function launchEncounterForm(
   intent: string = '*',
   patientUuid?: string,
 ) {
-  launchPatientWorkspace('patient-form-entry-workspace', {
+  launchWorkspace('patient-form-entry-workspace', {
     workspaceTitle: form?.name,
     mutateForm: onFormSave,
     formInfo: {

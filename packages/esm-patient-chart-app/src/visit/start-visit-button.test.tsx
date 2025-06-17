@@ -1,15 +1,11 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import StartVisitButton from './start-visit-button.component';
 
-const mockLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
-
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  launchPatientWorkspace: jest.fn(),
-}));
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 describe('StartVisitButton', () => {
   it('renders the start visit button', () => {
@@ -26,8 +22,8 @@ describe('StartVisitButton', () => {
     const startVisitButton = screen.getByRole('button', { name: /start visit/i });
     await user.click(startVisitButton);
 
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
       patientUuid: mockPatient.id,
       openedFrom: 'patient-chart-start-visit',
     });
