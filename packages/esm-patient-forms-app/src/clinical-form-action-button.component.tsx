@@ -33,6 +33,7 @@ const ClinicalFormActionButton: React.FC = () => {
     else if (isHtmlFormOpen) {
       launchWorkspace(htmlFormEntryWorkspace, {
         workspaceTitle: recentlyOpenedHtmlForm?.additionalProps?.['workspaceTitle'],
+        formInfo: recentlyOpenedHtmlForm?.additionalProps?.['formInfo'],
       });
     } else {
       launchFormsWorkspace();
