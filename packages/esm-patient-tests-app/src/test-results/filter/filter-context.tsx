@@ -9,6 +9,7 @@ import {
   type TimelineData,
 } from './filter-types';
 import reducer from './filter-reducer';
+import { getDisplayFromFlatName } from '../grouped-timeline';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 
 function parseTime(sortedTimes: Array<string>) {
@@ -105,7 +106,7 @@ const FilterProvider = ({ roots, filteredRoots, isLoading, children }: FilterPro
     const tests: ReducerState['tests'] = activeTests?.length
       ? Object.fromEntries(
           Object.entries(state.tests).filter(([name]) =>
-            activeTests.map((t) => t.split('-').pop()).includes(name.split('-').pop()),
+            activeTests.map((t) => getDisplayFromFlatName(t)).includes(getDisplayFromFlatName(name)),
           ),
         )
       : state.tests;

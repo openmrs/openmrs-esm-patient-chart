@@ -6,6 +6,7 @@ import {
   type TreeNode,
   type TreeParents,
 } from './filter-types';
+import { getDisplayFromFlatName } from '../grouped-timeline';
 
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
@@ -91,7 +92,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     }
     case ReducerActionType.TOGGLEVAL: {
-      const suffix = action.name.split('-').pop();
+      const suffix = getDisplayFromFlatName(action.name);
       const affectedLeaves = Object.keys(state.checkboxes).filter((key) => key.endsWith(suffix));
       const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
@@ -104,7 +105,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
 
     case ReducerActionType.UDPATEPARENT: {
       const checkedLeaves = state.parents[action.name];
-      const suffixes = checkedLeaves.map((target) => target.split('-').pop());
+      const suffixes = checkedLeaves.map((target) => getDisplayFromFlatName(target));
       const affectedLeaves = [];
 
       for (const key in state.parents) {

@@ -7,7 +7,7 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import { type GroupedObservation, type viewOpts } from '../../types';
 import FilterSet, { FilterContext } from '../filter';
-import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
+import GroupedTimeline, { useGetManyObstreeData , getDisplayFromFlatName } from '../grouped-timeline';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 import TabletOverlay from '../tablet-overlay';
 import styles from '../results-viewer/results-viewer.scss';
@@ -35,7 +35,8 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
             !someChecked ||
             row.entries?.some((entry) =>
               selectedCheckboxes.some(
-                (selectedKey) => entry.flatName === selectedKey || entry.display === selectedKey.split('-').pop(),
+                (selectedKey) =>
+                  entry.flatName === selectedKey || entry.display === getDisplayFromFlatName(selectedKey),
               ),
             ),
         )
@@ -49,7 +50,7 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
                   (selectedKey) =>
                     entry.flatName === selectedKey ||
                     entry.key === selectedKey ||
-                    entry.display === selectedKey.split('-').pop(),
+                    entry.display === getDisplayFromFlatName(selectedKey),
                 ),
             ),
           };
