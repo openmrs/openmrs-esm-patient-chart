@@ -11,43 +11,101 @@
 .modalBody {
   display: flex;
   flex-direction: row;
-  gap: layout.$spacing-05;
+  gap: layout.$spacing-06;
   flex: 1;
   padding: layout.$spacing-05;
+  min-height: 200px;
 }
+
+.patientPanel {
+  flex: 1;
+  min-width: 0;
+}
+
 .selectionPanel {
-  width: 30%;
-  padding: layout.$spacing-05;
-  border-right: layout.$spacing-01 solid themes.$border-subtle-01;
-  margin-top: 1.25rem;
+  flex: 1;
+  min-width: 0;
+  padding-left: layout.$spacing-05;
+  border-left: 1px solid themes.$border-subtle-01;
 }
 
-.previewPanel {
-  width: 70%;
-  display: flex;
-  flex-direction: column;
+.sectionHeader {
+  @include type.type-style('label-02');
+  margin-bottom: layout.$spacing-04;
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+  margin-top: 0;
 }
 
-.printContent {
+.titleHeader {
+  @include type.type-style('label-02');
+  margin-bottom: layout.$spacing-05;
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+}
+
+.patientContent {
   background: transparent;
   width: 100%;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.patientDetailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+}
+
+.encounterDetails {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+  padding-top: layout.$spacing-04;
+  border-top: 1px solid themes.$border-subtle-01;
+}
+
+.itemLabel {
+  @include type.type-style('body-02');
+  color: colors.$cool-gray-90;
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0;
+}
+
+.labelKey {
+  font-weight: 600;
+  min-width: 80px;
+  margin-right: layout.$spacing-03;
+  color: colors.$cool-gray-70;
+}
+
+.labelValue {
+  color: colors.$cool-gray-90;
+  flex: 1;
 }
 
 .radioGroup {
   display: flex;
   flex-direction: column;
-  gap: layout.$spacing-10;
+  gap: layout.$spacing-03;
 }
 
 .radioItem {
   display: flex;
   align-items: center;
   gap: layout.$spacing-02;
-  margin-top: layout.$spacing-04;
+  margin-top: 0;
+  padding: layout.$spacing-02 0;
 }
 
 .radioLabel {
-  @include type.type-style('label-02');
+  @include type.type-style('body-02');
+  color: colors.$cool-gray-90;
 }
 
 .modalFooter {
@@ -58,42 +116,20 @@
   gap: layout.$spacing-03;
 }
 
-.patientHeader {
-  display: flex;
-  flex-direction: row;
-  margin: layout.$spacing-05 0;
-}
+:global(.omrs-breakpoint-lt-desktop) {
+  .modalBody {
+    flex-direction: column;
+    gap: layout.$spacing-05;
+  }
 
-.facilityDetails {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: layout.$spacing-05;
-}
+  .selectionPanel {
+    border-left: none;
+    border-top: 1px solid themes.$border-subtle-01;
+    padding-left: 0;
+    padding-top: layout.$spacing-05;
+  }
 
-.titleHeader {
-  @include type.type-style('label-02');
-  margin-bottom: 0.25rem;
-  font-weight: bold;
-  color: colors.$cool-gray-90;
-}
-
-.itemHeading {
-  @include type.type-style('label-02');
-  margin-bottom: layout.$spacing-02;
-  font-weight: bold;
-  color: colors.$cool-gray-90;
-}
-
-.patientDetailsBody {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.itemLabel {
-  @include type.type-style('label-02');
-  color: colors.$cool-gray-90;
-  margin-bottom: layout.$spacing-03;
+  .labelKey {
+    min-width: 60px;
+  }
 }
