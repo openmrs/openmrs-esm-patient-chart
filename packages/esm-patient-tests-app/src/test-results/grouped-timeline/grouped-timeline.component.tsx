@@ -7,7 +7,6 @@ import type { DateHeaderGridProps, PanelNameCornerProps } from './grouped-timeli
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.scss';
 import TimelineDataGroup from './timeline-data-group.component';
-import { RowData } from '../filter/filter-types';
 
 const TimeSlots: React.FC<{
   children?: React.ReactNode;
