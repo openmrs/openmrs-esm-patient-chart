@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@carbon/charts-react": "^1.23.0",
-    "@carbon/react": "^1.76.0",
+    "@carbon/react": "^1.83.0",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
@@ -53,6 +53,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.94.0"
+    "webpack": "^5.99.9"
   }
 }

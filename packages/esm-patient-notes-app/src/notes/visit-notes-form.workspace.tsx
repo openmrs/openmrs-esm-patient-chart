@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
-import debounce from 'lodash-es/debounce';
+import { debounce } from 'lodash-es';
 import { useTranslation, type TFunction } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller, type Control } from 'react-hook-form';
@@ -198,9 +198,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutateVisit } = useVisitContextStore();
+  const { mutate } = useSWRConfig();
 
-  const mutateAttachments = () =>
-    mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
+  const mutateAttachments = useCallback(
+    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
+    [mutate],
+  );
 
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
@@ -481,6 +484,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       formConceptUuid,
       isEditing,
       locationUuid,
+      mutateAttachments,
       mutateVisit,
       mutateVisitNotes,
       patientUuid,
@@ -550,7 +554,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               <>
                 {selectedSecondaryDiagnoses.map((diagnosis, index) => (
                   <Tag
-                    classname={styles.tag}
+                    className={styles.tag}
                     filter
                     key={index}
                     onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
@@ -709,10 +713,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         </Stack>
       </div>
       <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" onClick={handleSubmit} disabled={isSubmitting} type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={() => handleSubmit}
+          disabled={isSubmitting}
+          type="submit"
+        >
           {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
@@ -766,7 +776,7 @@ function DiagnosisSearch({
                 onChange(e);
                 handleSearch(name);
               }}
-              value={value}
+              value={value instanceof Date ? value.toISOString() : value}
               onBlur={onBlur}
             />
           </ResponsiveWrapper>

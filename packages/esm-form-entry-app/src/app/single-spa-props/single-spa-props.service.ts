@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { SingleSpaProps, singleSpaPropsSubject } from 'src/single-spa-props';
+import { SingleSpaProps, singleSpaPropsSubject } from '../../single-spa-props';
 
 /**
  * A utility service simplifying common interactions with the MFs single SPA props.

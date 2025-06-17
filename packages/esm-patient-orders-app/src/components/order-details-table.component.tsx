@@ -36,7 +36,6 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
-  launchPatientWorkspace,
   PatientChartPagination,
   type Order,
   type OrderBasketItem,
@@ -53,6 +52,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
+  launchWorkspace,
   parseDate,
   PrinterIcon,
   useConfig,
@@ -82,7 +82,7 @@ interface OrderBasketItemActionsProps {
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
-  responsiveSize: string;
+  responsiveSize: 'lg' | 'md' | 'sm';
 }
 
 interface OrderHeaderProps {
@@ -487,9 +487,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                 <TableToolbarContent>
                                   <Layer>
                                     <Search
-                                      expanded
+                                      isExpanded
                                       labelText=""
-                                      onChange={onInputChange}
+                                      onChange={(e) =>
+                                        onInputChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
+                                      }
                                       placeholder={t('searchTable', 'Search table')}
                                       size="lg"
                                     />
@@ -501,16 +503,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                               <TableHead>
                                 <TableRow>
                                   <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                                  {headers.map((header: { header: string }) => (
-                                    <TableHeader key={header.header} {...getHeaderProps({ header })}>
-                                      {header.header}
-                                    </TableHeader>
+                                  {headers.map((header) => (
+                                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                                   ))}
                                   <TableExpandHeader />
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {rows.map((row: DataTableRow) => {
+                                {rows.map((row) => {
                                   const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
 
                                   return (
@@ -647,7 +647,7 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm, orders, setOrders]);
 
   const handleAddResultsClick = useCallback(() => {
-    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
+    launchWorkspace('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {
@@ -671,7 +671,6 @@ function OrderBasketItemActions({
   return (
     <Layer className={styles.layer}>
       <OverflowMenu
-        align="left"
         aria-label={t('actionsMenu', 'Actions menu')}
         flipped
         selectorPrimaryFocus={'#modify'}

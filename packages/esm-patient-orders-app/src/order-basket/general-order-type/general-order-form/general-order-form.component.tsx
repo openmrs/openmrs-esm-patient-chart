@@ -1,16 +1,6 @@
 import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
-  type OrderBasketItem,
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-  useOrderBasket,
-  useOrderType,
-  priorityOptions,
-  type OrderUrgency,
-} from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useSession, useConfig, ExtensionSlot, OpenmrsDatePicker } from '@openmrs/esm-framework';
-import {
   Button,
   ButtonSet,
   Column,
@@ -27,9 +17,25 @@ import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import {
+  priorityOptions,
+  type DefaultPatientWorkspaceProps,
+  type OrderBasketItem,
+  type OrderUrgency,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
+import {
+  useLayoutType,
+  useSession,
+  useConfig,
+  ExtensionSlot,
+  OpenmrsDatePicker,
+  launchWorkspace,
+} from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
-import styles from './general-order-form.scss';
 import { type ConfigObject } from '../../../config-schema';
+import styles from './general-order-form.scss';
 
 export interface OrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: OrderBasketItem;
@@ -125,7 +131,7 @@ export function OrderForm({
       setOrders(newOrders);
 
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
         closeWorkspaceGroup: false,
       });
     },
@@ -135,7 +141,7 @@ export function OrderForm({
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
@@ -265,7 +271,6 @@ export function OrderForm({
                       maxCount={500}
                       onBlur={onBlur}
                       onChange={onChange}
-                      size={responsiveSize}
                       value={value}
                     />
                   )}

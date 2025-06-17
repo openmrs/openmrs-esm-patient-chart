@@ -81,9 +81,11 @@ test('typing in the diagnosis search input triggers a search', async () => {
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
-  const targetSearchResult = screen.getByText('Diabetes Mellitus');
+
+  // Wait for the search results to appear
+  const targetSearchResult = await screen.findByRole('menuitem', { name: 'Diabetes Mellitus' });
   expect(targetSearchResult).toBeInTheDocument();
-  expect(screen.getByText('Diabetes Mellitus, Type II')).toBeInTheDocument();
+  expect(screen.getByRole('menuitem', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
   // clicking on a search result displays the selected diagnosis as a tag
   await user.click(targetSearchResult);
@@ -107,6 +109,7 @@ test('renders an error message when no matching diagnoses are found', async () =
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'COVID-21');
 
+  const errorMessage = await screen.findByText(/No diagnoses found/i);
   expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
 });
 
@@ -159,7 +162,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
-  const targetSearchResult = screen.getByText('Diabetes Mellitus');
+  const targetSearchResult = await screen.findByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
   await user.click(targetSearchResult);
@@ -196,7 +199,7 @@ test('renders an error snackbar if there was a problem recording a condition', a
 
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
-  const targetSearchResult = screen.getByText('Diabetes Mellitus');
+  const targetSearchResult = await screen.findByText('Diabetes Mellitus');
   expect(targetSearchResult).toBeInTheDocument();
 
   await user.click(targetSearchResult);
@@ -367,7 +370,7 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   // Add new diagnosis
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
-  const targetSearchResult = screen.getByText('Diabetes Mellitus');
+  const targetSearchResult = await screen.findByText('Diabetes Mellitus');
   await user.click(targetSearchResult);
 
   // Verify new diagnosis is displayed

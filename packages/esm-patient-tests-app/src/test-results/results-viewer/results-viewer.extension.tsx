@@ -106,6 +106,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
             <ContentSwitcher
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
+              size={responsiveSize}
             >
               <Switch name="panel" text={t('individualTests', 'Individual tests')} />
               <Switch name="tree" text={t('overTime', 'Over time')} />

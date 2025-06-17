@@ -1,4 +1,5 @@
 import { LocalStorageService } from './local-storage.service';
+import { TestBed } from '@angular/core/testing';
 
 describe('LocalStorageService Tests', () => {
   let service: LocalStorageService;
@@ -9,7 +10,8 @@ describe('LocalStorageService Tests', () => {
     property2: 'another property',
   };
   beforeEach(() => {
-    service = new LocalStorageService();
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(LocalStorageService);
   });
 
   beforeEach(() => {
@@ -28,7 +30,7 @@ describe('LocalStorageService Tests', () => {
     } catch (e) {
       console.error('Error getting item', e);
     }
-    expect(v).toEqual(value, 'setItem() should store values');
+    expect(v).toEqual(value);
   });
   it('should return the correct length of localStorage', () => {
     window.localStorage.setItem(keyName, 'some value');
@@ -38,7 +40,7 @@ describe('LocalStorageService Tests', () => {
   it('should store javascript object literals', () => {
     service.setObject(keyName, objectValue);
     const stored = window.localStorage.getItem(keyName);
-    expect(JSON.parse(stored)).toEqual(objectValue, 'setObject()');
+    expect(JSON.parse(stored)).toEqual(objectValue);
   });
   it('should retrieve a stored value', () => {
     try {
@@ -46,7 +48,7 @@ describe('LocalStorageService Tests', () => {
     } catch (e) {
       console.error('Error getting item', e);
     }
-    expect(service.getItem(keyName)).toEqual(value, 'getItem()');
+    expect(service.getItem(keyName)).toEqual(value);
   });
   it('should remove an existing item', () => {
     window.localStorage.setItem(keyName, 'some value');
@@ -60,6 +62,6 @@ describe('LocalStorageService Tests', () => {
 
   it('should retrieve the stored javascript object literal', () => {
     window.localStorage.setItem(keyName, JSON.stringify(objectValue));
-    expect(service.getObject(keyName)).toEqual(objectValue, 'getObject()');
+    expect(service.getObject(keyName)).toEqual(objectValue);
   });
 });

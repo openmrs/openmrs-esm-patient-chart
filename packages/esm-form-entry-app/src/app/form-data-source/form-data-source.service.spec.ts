@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, inject, tick, waitForAsync } from '@angular/core/testing';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { FormDataSourceService } from './form-data-source.service';
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
