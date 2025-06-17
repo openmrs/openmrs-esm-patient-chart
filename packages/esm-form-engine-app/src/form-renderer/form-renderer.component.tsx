@@ -16,6 +16,7 @@ interface FormRendererProps extends DefaultPatientWorkspaceProps {
   visit?: Visit;
   visitUuid?: string;
   clinicalFormsWorkspaceName?: string;
+  isSubmissionTriggeredExternally?: boolean;
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
@@ -29,6 +30,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   visit: visitRaw,
   visitUuid,
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  isSubmissionTriggeredExternally,
 }) => {
   const { t } = useTranslation();
   const { schema, error, isLoading } = useFormSchema(formUuid);
@@ -99,6 +101,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           onSubmit={closeWorkspaceWithSavedChanges}
           patientUUID={patientUuid}
           visit={visit}
+          isSubmissionTriggeredExternally={isSubmissionTriggeredExternally}
         />
       )}
     </>
