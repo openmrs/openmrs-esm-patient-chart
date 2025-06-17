@@ -91,17 +91,32 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     }
     case ReducerActionType.TOGGLEVAL: {
+      const suffix = action.name.split('-').pop();
+      const affectedLeaves = Object.keys(state.checkboxes).filter((key) => key.endsWith(suffix));
+      const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
+      const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
+      affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
       return {
         ...state,
-        checkboxes: {
-          ...state.checkboxes,
-          [action.name]: !state.checkboxes[action.name],
-        },
+        checkboxes: checkboxes,
       };
     }
 
     case ReducerActionType.UDPATEPARENT: {
-      const affectedLeaves = state.parents[action.name];
+      const checkedLeaves = state.parents[action.name];
+      const suffixes = checkedLeaves.map((target) => target.split('-').pop());
+      const affectedLeaves = [];
+
+      for (const key in state.parents) {
+        const values = state.parents[key];
+        for (const item of values) {
+          for (const suffix of suffixes) {
+            if (item.endsWith(suffix)) {
+              affectedLeaves.push(item);
+            }
+          }
+        }
+      }
       const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
       affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
