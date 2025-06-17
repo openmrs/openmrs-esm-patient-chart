@@ -8,8 +8,7 @@ import {
   ReducerActionType,
   type TimelineData,
 } from './filter-types';
-import reducer from './filter-reducer';
-import { getDisplayFromFlatName } from '../grouped-timeline';
+import reducer, { getDisplayFromFlatName } from './filter-reducer';
 import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 
 function parseTime(sortedTimes: Array<string>) {

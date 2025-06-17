@@ -6,10 +6,13 @@ import {
   type TreeNode,
   type TreeParents,
 } from './filter-types';
-import { getDisplayFromFlatName } from '../grouped-timeline';
 
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
+};
+
+export const getDisplayFromFlatName = (flatName: string) => {
+  return flatName.split('-').pop();
 };
 
 const computeParents = (

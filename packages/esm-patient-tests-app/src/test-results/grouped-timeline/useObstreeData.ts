@@ -9,10 +9,6 @@ export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-export const getDisplayFromFlatName = (flatName: string) => {
-  return flatName.split('-').pop();
-};
-
 interface ObsTreeNode {
   flatName?: string;
   display: string;
