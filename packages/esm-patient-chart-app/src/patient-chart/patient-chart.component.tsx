@@ -53,38 +53,34 @@ const PatientChart: React.FC = () => {
     <>
       <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
-        <>
-          <div
-            className={classNames(
-              styles.innerChartContainer,
-              workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
-            )}
-          >
-            {isLoadingPatient ? (
-              <Loader />
-            ) : (
-              <>
-                <aside>
-                  <ExtensionSlot name="patient-header-slot" state={state} />
-                  <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
-                  <ExtensionSlot name="patient-info-slot" state={state} />
-                </aside>
-                <div className={styles.grid}>
-                  <div
-                    className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
-                  >
-                    <ChartReview
-                      patient={state.patient}
-                      patientUuid={state.patientUuid}
-                      setDashboardLayoutMode={setLayoutMode}
-                      view={view}
-                    />
-                  </div>
+        <div
+          className={classNames(
+            styles.innerChartContainer,
+            workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
+          )}
+        >
+          {isLoadingPatient ? (
+            <Loader />
+          ) : (
+            <>
+              <aside>
+                <ExtensionSlot name="patient-header-slot" state={state} />
+                <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
+                <ExtensionSlot name="patient-info-slot" state={state} />
+              </aside>
+              <div className={styles.grid}>
+                <div className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}>
+                  <ChartReview
+                    patient={state.patient}
+                    patientUuid={state.patientUuid}
+                    setDashboardLayoutMode={setLayoutMode}
+                    view={view}
+                  />
                 </div>
-              </>
-            )}
-          </div>
-        </>
+              </div>
+            </>
+          )}
+        </div>
       </main>
       <WorkspaceContainer
         additionalWorkspaceProps={state}

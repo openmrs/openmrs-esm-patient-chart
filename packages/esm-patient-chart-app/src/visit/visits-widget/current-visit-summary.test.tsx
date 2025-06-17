@@ -6,6 +6,7 @@ import CurrentVisitSummary from './current-visit-summary.component';
 
 const mockGetConfig = jest.mocked(getConfig);
 const mockUsePatientChartStore = jest.fn();
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...jest.requireActual('@openmrs/esm-patient-common-lib'),
