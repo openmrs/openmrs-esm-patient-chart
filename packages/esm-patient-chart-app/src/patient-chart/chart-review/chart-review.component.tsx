@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { type ConfigObject, useExtensionStore } from '@openmrs/esm-framework';
-import { useNavGroups } from '@openmrs/esm-patient-common-lib';
 import { DashboardView, type DashboardConfig, type LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
@@ -20,7 +19,7 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
 }
 
 function getDashboardDefinition(meta: object, config: ConfigObject, moduleName: string) {
-  return { ...meta, ...config, moduleName };
+  return { ...meta, ...config, moduleName } as DashboardConfig;
 }
 
 interface ChartReviewProps {
@@ -32,21 +31,17 @@ interface ChartReviewProps {
 
 const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setDashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
-  const { navGroups } = useNavGroups();
 
-  const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
-    getDashboardDefinition(e.meta, e.config, e.moduleName),
-  );
-  const groupedDashboards = navGroups
-    .map((slotName) =>
-      extensionStore.slots[slotName].assignedExtensions.map((e) =>
+  const dashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.flatMap((e) => {
+    if (e.config?.slotName) {
+      return extensionStore.slots[e.config.slotName].assignedExtensions.map((e) =>
         getDashboardDefinition(e.meta, e.config, e.moduleName),
-      ),
-    )
-    .flat();
-  const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
+      );
+    }
+    return getDashboardDefinition(e.meta, e.config, e.moduleName);
+  });
 
-  const defaultDashboard = dashboards.filter((dashboard) => dashboard.path)[0];
+  const defaultDashboard = dashboards.filter((dashboard) => Boolean(dashboard.path))?.[0];
   const dashboard = useMemo(() => {
     return dashboards.find((dashboard) => dashboard.path === view);
   }, [dashboards, view]);
