@@ -135,8 +135,9 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               shownGroups += 1;
               const subRows = someChecked
-                ? rowData?.filter((row: { flatName: string }) =>
-                    parents[parent.flatName].map((f) => f.split('-').pop()).includes(row.flatName.split('-').pop()),
+                ? rowData?.filter(
+                    (row: { flatName: string }) =>
+                      parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
                   )
                 : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
 
