@@ -79,7 +79,6 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       });
 
       action.filteredTrees?.forEach((tree) => {
-        // if anyone knows a shorthand for this i'm stoked to learn it :)
         const { tests: newTests } = computeParents('', tree);
         tests = [...tests, ...newTests];
       });
