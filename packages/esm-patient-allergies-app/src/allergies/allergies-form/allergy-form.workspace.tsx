@@ -51,16 +51,6 @@ interface AllergyFormProps extends DefaultPatientWorkspaceProps {
   formContext: 'creating' | 'editing';
 }
 
-interface DefaultAllergy {
-  allergen: Allergen | null;
-  allergicReactions: string[];
-  comment: string;
-  nonCodedAllergen: string;
-  nonCodedAllergicReaction: string;
-  reactionManifestations?: string[];
-  severityOfWorstReaction: string | null;
-}
-
 interface FormValues {
   allergen: Allergen | null;
   allergicReactions: string[];
@@ -131,15 +121,15 @@ function AllergyForm({
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
-  const { mutate } = useAllergies(patientUuid);
+  const { allergies, mutate } = useAllergies(patient.id);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const formValuesLoadedRef = useRef(false);
-
   const { mildReactionUuid, moderateReactionUuid, otherConceptUuid, severeReactionUuid } = useMemo(
     () => concepts,
     [concepts],
   );
+  const inEditMode = Boolean(allergy) && formContext === 'editing';
 
   const severityLevels = useMemo(
     () => [
@@ -283,7 +273,7 @@ function AllergyForm({
   });
 
   useEffect(() => {
-    if (!formValuesLoadedRef.current && !isLoadingReactions && allergy && formContext === 'editing') {
+    if (!formValuesLoadedRef.current && !isLoadingReactions && inEditMode) {
       const defaultValues = getAllergyFormDefaultValues(allergy, formContext);
 
       Object.entries(defaultValues).forEach(([key, value]) => {
@@ -292,7 +282,7 @@ function AllergyForm({
 
       formValuesLoadedRef.current = true;
     }
-  }, [allergy, formContext, getAllergyFormDefaultValues, isLoadingReactions, setValue]);
+  }, [allergy, formContext, getAllergyFormDefaultValues, inEditMode, isLoadingReactions, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -358,8 +348,7 @@ function AllergyForm({
         showSnackbar({
           isLowContrast: true,
           kind: 'success',
-          title:
-            formContext === 'editing' ? t('allergyUpdated', 'Allergy updated') : t('allergySaved', 'Allergy saved'),
+          title: inEditMode ? t('allergyUpdated', 'Allergy updated') : t('allergySaved', 'Allergy saved'),
           subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
         });
       };
@@ -374,21 +363,27 @@ function AllergyForm({
         });
       };
 
-      return formContext === 'editing'
+      return inEditMode
         ? updatePatientAllergy(allergyPayload, patientUuid, allergy?.id, abortController).then(
             handleSuccess,
             handleError,
           )
         : saveAllergy(allergyPayload, patientUuid, abortController).then(handleSuccess, handleError);
     },
-    [allergy?.id, closeWorkspace, createAllergyPayload, formContext, mutate, patientUuid, t],
+    [allergy?.id, closeWorkspace, createAllergyPayload, inEditMode, mutate, patientUuid, t],
   );
 
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
   const allergenItems = useMemo(
-    () => [...allergens, { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER }],
-    [allergens, otherConceptUuid, t],
+    () => [
+      ...allergens.map((allergen) => ({
+        ...allergen,
+        disabled: allergies?.some((allergy) => allergy.display === allergen.display),
+      })),
+      { uuid: otherConceptUuid, display: t('other', 'Other'), type: ALLERGEN_TYPES.OTHER, disabled: false },
+    ],
+    [allergens, otherConceptUuid, t, allergies],
   );
 
   const allergicReactionsItems = useMemo(
@@ -446,6 +441,7 @@ function AllergyForm({
                           onChange(props.selectedItem as Allergen);
                         }
                       }}
+                      readOnly={inEditMode}
                       placeholder={t('selectAllergen', 'Select the allergen')}
                       selectedItem={value as unknown as Allergen}
                       titleText={t('allergen', 'Allergen')}
@@ -468,6 +464,7 @@ function AllergyForm({
                       onBlur={onBlur}
                       onChange={onChange}
                       placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
+                      readOnly={inEditMode}
                       value={value}
                     />
                   )}
@@ -581,7 +578,7 @@ function AllergyForm({
           </Button>
           <Button
             className={styles.button}
-            disabled={isSubmitting || (formContext === 'editing' && isLoadingReactions)}
+            disabled={isSubmitting || (inEditMode && isLoadingReactions)}
             kind="primary"
             type="submit"
           >
