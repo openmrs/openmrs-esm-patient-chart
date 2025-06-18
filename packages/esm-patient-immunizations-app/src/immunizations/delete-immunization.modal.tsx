@@ -1,29 +1,39 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ModalHeader, ModalBody, ModalFooter, Button, InlineLoading } from '@carbon/react';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { type ConfigObject } from '../config-schema';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './delete-immunization.scss';
-import { deletePatientImmunization } from '../hooks/useImmunizations';
+import { deletePatientImmunization, useImmunizations } from '../hooks/useImmunizations';
 
 interface DeleteConfirmModelProps {
   close: () => void;
-  handleDeleteDose: () => void;
   doseNumber: number;
   vaccineUuid: string;
   immunizationId: string;
+  patientUuid: string;
 }
 
-const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({ close, doseNumber, vaccineUuid, immunizationId }) => {
+const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
+  close,
+  doseNumber,
+  vaccineUuid,
+  immunizationId,
+  patientUuid,
+}) => {
   const { t } = useTranslation();
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { immunizationsConfig } = useConfig<ConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
+  const { mutate } = useImmunizations(patientUuid);
 
-  const vaccineName =
-    immunizationsConceptSet?.answers.find((answer) => answer.uuid === vaccineUuid)?.display ??
-    t('unknownVaccine', 'Unknown vaccine');
+  const vaccineName = useMemo(() => {
+    return (
+      immunizationsConceptSet?.answers.find((answer) => answer.uuid === vaccineUuid)?.display ??
+      t('unknownVaccine', 'Unknown vaccine')
+    );
+  }, [immunizationsConceptSet, vaccineUuid, t]);
 
   const handleDeleteDose = async (immunizationId: string) => {
     setIsDeleting(true);
@@ -31,18 +41,19 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({ close, doseNumb
       await deletePatientImmunization(immunizationId);
 
       showSnackbar({
-        title: t('immunizationDeleted', 'Immunization Deleted'),
-        description: t('immunizationDeletedSuccess', 'The immunization dose has been successfully deleted'),
+        title: t('immunizationDeleted', 'Immunization deleted'),
+        subtitle: t('immunizationDeletedSuccess', 'The immunization dose has been successfully deleted'),
         kind: 'success',
-      } as any);
+      });
 
+      await mutate();
       close();
     } catch (error) {
       showSnackbar({
         title: t('error', 'Error'),
-        description: t('immunizationDeleteError', 'Failed to delete immunization: ') + error.message,
+        subtitle: t('immunizationDeleteError', 'Failed to delete immunization: ') + error.message,
         kind: 'error',
-      } as any);
+      });
     }
     setIsDeleting(false);
   };
@@ -51,7 +62,7 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({ close, doseNumb
     <>
       <ModalHeader
         closeModal={close}
-        title={t('immunizationDelete', 'Delete Immunization')}
+        title={t('immunizationDelete', 'Delete immunization')}
         className={styles.modalHeader}
       />
       <ModalBody>
@@ -64,13 +75,13 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({ close, doseNumb
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={close}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button kind="danger" disabled={isDeleting} onClick={() => handleDeleteDose(immunizationId)}>
           {isDeleting ? (
             <InlineLoading className={styles.spinner} description={t('deleting', 'Deleting') + '...'} />
           ) : (
-            <span>{t('delete', 'Delete')}</span>
+            <span>{getCoreTranslation('delete')}</span>
           )}
         </Button>
       </ModalFooter>

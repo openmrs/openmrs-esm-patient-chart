@@ -20,9 +20,14 @@ import styles from './immunizations-sequence-table.scss';
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
   launchPatientImmunizationForm: () => void;
+  patientUuid: string;
 }
 
-const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, launchPatientImmunizationForm }) => {
+const SequenceTable: React.FC<SequenceTableProps> = ({
+  immunizationsByVaccine,
+  launchPatientImmunizationForm,
+  patientUuid,
+}) => {
   const { t } = useTranslation();
   const { existingDoses, sequences, vaccineUuid } = immunizationsByVaccine;
 
@@ -30,15 +35,16 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
     () => [
       { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
-      { key: 'expirationDate', header: t('validlUntil', 'Valid until') },
-      { key: 'edit', header: t('edit', 'Edit') },
-      { key: 'delete', header: t('delete', 'Delete') },
+      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
+      { key: 'edit', header: getCoreTranslation('edit') },
+      { key: 'delete', header: getCoreTranslation('delete') },
     ],
     [t, sequences.length],
   );
 
   const ConfirmDelete = (immunizationId: string, vaccineUuid: string, doseNumber: number) => {
     const dispose = showModal('immunization-delete-confirmation-modal', {
+      patientUuid,
       immunizationId,
       doseNumber,
       vaccineUuid,
@@ -81,7 +87,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
         <Button
           kind="ghost"
           className={styles.deleteButton}
-          iconDescription={getCoreTranslation('delete', 'Delete')}
+          iconDescription={getCoreTranslation('delete')}
           renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
           onClick={() => ConfirmDelete(dose.immunizationObsUuid, vaccineUuid, dose.doseNumber)}
         >
