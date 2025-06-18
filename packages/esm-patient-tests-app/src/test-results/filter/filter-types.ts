@@ -69,6 +69,7 @@ export interface ReducerAction {
   type: ReducerActionType;
   name?: string;
   trees?: Array<TreeNode>;
+  filteredTrees?: Array<TreeNode>;
   basePath?: string;
 }
 
@@ -108,7 +109,7 @@ export interface FilterContextProps extends ReducerState {
   someChecked: boolean;
   totalResultsCount: number;
   isLoading: boolean;
-  initialize: (trees: Array<TreeNode>) => void;
+  initialize: (trees: Array<TreeNode>, filteredTrees: Array<TreeNode>) => void;
   toggleVal: (name: string) => void;
   updateParent: (name: string) => void;
   resetTree: () => void;
