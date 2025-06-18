@@ -41,6 +41,5 @@
   "vaccinationSaved": "Vaccination saved successfully",
   "vaccine": "Vaccine",
   "vaccineBatchInformation": "Vaccine Batch Information",
-  "vaccineRequired": "Vaccine is required",
-  "validlUntil": "Valid until"
+  "vaccineRequired": "Vaccine is required"
 }
