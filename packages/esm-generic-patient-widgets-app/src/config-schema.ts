@@ -24,6 +24,7 @@ export const configSchema = {
   data: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       concept: {
         _type: Type.ConceptUuid,
       },

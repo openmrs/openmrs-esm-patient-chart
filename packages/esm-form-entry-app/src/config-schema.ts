@@ -13,6 +13,7 @@ export const configSchema = {
   customDataSources: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       name: {
         _type: Type.String,
         _default: 'customDataSource',
