@@ -33,6 +33,8 @@
   "goToSummary": "עבור לסיכום",
   "heartRate": "קצב לב",
   "height": "גובה",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "טוען",
   "male": "זכר",
   "muac": "MUAC",
