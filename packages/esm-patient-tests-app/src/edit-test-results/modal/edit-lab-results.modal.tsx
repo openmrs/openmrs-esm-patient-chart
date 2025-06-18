@@ -82,7 +82,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                     </p>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('dateOrdered', 'Date Ordered')}:</span>
-                      <span className={styles.labelValue}>{formatDate(new Date(firstOrder.dateActivated))}</span>
+                      <span className={styles.labelValue}>{firstOrder.dateActivated}</span>
                     </p>
                   </div>
                 </div>
