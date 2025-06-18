@@ -33,6 +33,8 @@
   "goToSummary": "Accéder au résumé patient",
   "heartRate": "Fréquence cardiaque",
   "height": "Taille",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "En cours de chargement",
   "male": "Homme",
   "muac": "Périmètre brachial",
