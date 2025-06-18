@@ -66,15 +66,17 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
     const now = dayjs();
     const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
     const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;
-    const vitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
+    const areVitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
     const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
-
+    const hoursSinceVitalsTaken = Math.round(vitalsTakenTimeAgo.asHours());
     let overdueVitalsTagContent: React.ReactNode = null;
+
     if (vitalsOverdueDayCount < 1) {
       overdueVitalsTagContent = (
-        <Trans i18nKey="hoursOldVitals" count={Math.round(vitalsTakenTimeAgo.asHours())}>
+        <Trans i18nKey="hoursOldVitals" count={hoursSinceVitalsTaken}>
           <span>
-            These vitals are <strong>{Math.round(vitalsTakenTimeAgo.asHours())} hours old</strong>
+            {/* @ts-ignore: See comment below */}
+            These vitals are <strong>{{ count: hoursSinceVitalsTaken }} hour old</strong>
           </span>
         </Trans>
       );
@@ -113,7 +115,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
             <span className={styles.bodyText}>
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
-            {vitalsOverdue ? (
+            {areVitalsOverdue ? (
               <Tag className={styles.tag} type="red">
                 <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
               </Tag>
