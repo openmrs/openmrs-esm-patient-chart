@@ -1,22 +1,13 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { screen } from '@testing-library/react';
+import { launchWorkspace, openmrsFetch } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 it('renders an empty state view if conditions data is unavailable', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
@@ -91,6 +82,6 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
 
   await user.click(recordConditionsLink);
 
-  expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
+  expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
 });
