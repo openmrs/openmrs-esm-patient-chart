@@ -55,7 +55,10 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
   const { data: existingImmunizations, isLoading, error, isValidating } = useImmunizations(patientUuid);
-  const consolidatedImmunizations = linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
+
+  const consolidatedImmunizations = useMemo(() => {
+    return linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
+  }, [existingImmunizations, sequenceDefinitions]);
 
   const launchImmunizationsForm = React.useCallback(() => {
     if (!currentVisit) {
@@ -65,11 +68,21 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     launchWorkspace('immunization-form-workspace');
   }, [currentVisit, launchStartVisitPrompt]);
 
-  const sortedImmunizations = orderBy(
-    consolidatedImmunizations,
-    [(immunization) => get(immunization, 'existingDoses.length', 0)],
-    ['desc'],
-  );
+  const sortedImmunizations = useMemo(() => {
+    return orderBy(
+      consolidatedImmunizations,
+      [
+        (immunization) => {
+          const latest = immunization.existingDoses?.reduce((latest, current) => {
+            return new Date(current.occurrenceDateTime) > new Date(latest.occurrenceDateTime) ? current : latest;
+          }, immunization.existingDoses?.[0]);
+
+          return latest ? new Date(latest.occurrenceDateTime).getTime() : 0;
+        },
+      ],
+      ['desc'],
+    );
+  }, [consolidatedImmunizations]);
 
   const tableHeader = useMemo(
     () => [
@@ -83,18 +96,22 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const tableRows = useMemo(
     () =>
       sortedImmunizations?.map((immunization) => {
-        const occurrenceDate =
-          !immunization.sequences?.length && immunization.existingDoses?.length
-            ? `${t('singleDoseOn', 'Single Dose on')} ${formatDate(
-                parseDate(first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime),
-                { time: false, noToday: true },
-              )}`
-            : immunization.existingDoses?.length
-              ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${formatDate(
-                  parseDate(first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime),
-                  { time: false, noToday: true },
-                )} `
-              : '';
+        const sortedDoses = [...immunization.existingDoses].sort(latestFirst);
+        const latestDose = sortedDoses?.[0];
+
+        const hasDoses = !!latestDose;
+        const hasSequences = immunization.sequences?.length > 0;
+
+        const sequenceLabel = hasSequences
+          ? immunization.sequences.find((seq) => seq.sequenceNumber === latestDose?.doseNumber)?.sequenceLabel
+          : null;
+
+        const occurrenceDate = hasDoses
+          ? `${t('lastDoseon', 'Last Dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
+              time: false,
+              noToday: true,
+            })}, ${sequenceLabel ?? `${t('dose', 'Dose')} ${latestDose.doseNumber}`}`
+          : '';
 
         return {
           id: immunization.vaccineUuid,
