@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
+import dayjs from 'dayjs';
 import { test } from '../core';
 import { MarkPatientDeceasedPage } from '../pages/mark-patient-deceased-page';
-import dayjs from 'dayjs';
 
 test('Mark a patient as deceased', async ({ page, patient }) => {
   const markPatientDeceasedPage = new MarkPatientDeceasedPage(page);
@@ -10,7 +10,6 @@ test('Mark a patient as deceased', async ({ page, patient }) => {
   const markDeceasedMenuItem = () => page.getByRole('menuitem', { name: /mark patient deceased/i });
   const deathDetailsForm = () => page.locator('form');
   const dateOfDeathInput = () => page.getByTestId('deceasedDate');
-  const saveAndCloseButton = () => page.getByRole('button', { name: /save and close/i });
 
   await test.step('Given that I have a patient and I am on the Patient’s chart page', async () => {
     await markPatientDeceasedPage.goTo(patient.uuid);
