@@ -1,6 +1,3 @@
-import React, { type ComponentProps, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { isEmpty } from 'lodash-es';
 import {
   Button,
   DataTable,
@@ -12,9 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { EditIcon, formatDate, getCoreTranslation, parseDate } from '@openmrs/esm-framework';
-import { immunizationFormSub } from '../utils';
+import { EditIcon, formatDate, getCoreTranslation, parseDate, showModal, TrashCanIcon } from '@openmrs/esm-framework';
+import { isEmpty } from 'lodash-es';
+import React, { type ComponentProps, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type ImmunizationGrouped } from '../../types';
+import { immunizationFormSub } from '../utils';
 import styles from './immunizations-sequence-table.scss';
 
 interface SequenceTableProps {
@@ -30,20 +30,31 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
     () => [
       { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
-      { key: 'edit', header: '' },
+      { key: 'expirationDate', header: t('validlUntil', 'Valid until') },
+      { key: 'edit', header: t('edit', 'Edit') },
+      { key: 'delete', header: t('delete', 'Delete') },
     ],
     [t, sequences.length],
   );
 
+  const ConfirmDelete = (immunizationId: string, vaccineUuid: string, doseNumber: number) => {
+    const dispose = showModal('immunization-delete-confirmation-modal', {
+      immunizationId,
+      doseNumber,
+      vaccineUuid,
+      close: () => {
+        dispose?.();
+      },
+    });
+  };
   const tableRows = existingDoses?.map((dose) => {
     return {
       id: dose?.immunizationObsUuid,
       sequence: isEmpty(sequences)
         ? dose.doseNumber || 0
         : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
-      vaccinationDate: dose?.occurrenceDateTime && formatDate(parseDate(dose.occurrenceDateTime), { noToday: true }),
-      expirationDate: dose?.expirationDate && formatDate(parseDate(dose.expirationDate), { noToday: true }),
+      vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
+      expirationDate: (dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true })) || '--',
       edit: (
         <Button
           kind="ghost"
@@ -63,7 +74,18 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
             launchPatientImmunizationForm();
           }}
         >
-          {getCoreTranslation('edit', 'Edit')}
+          {t('edit', 'Edit')}
+        </Button>
+      ),
+      delete: (
+        <Button
+          kind="ghost"
+          className={styles.deleteButton}
+          iconDescription={getCoreTranslation('delete', 'Delete')}
+          renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
+          onClick={() => ConfirmDelete(dose.immunizationObsUuid, vaccineUuid, dose.doseNumber)}
+        >
+          {t('delete', 'Delete')}
         </Button>
       ),
     };

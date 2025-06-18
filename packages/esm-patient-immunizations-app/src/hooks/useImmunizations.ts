@@ -20,3 +20,13 @@ export function useImmunizations(patientUuid: string) {
     mutate,
   };
 }
+
+export async function deletePatientImmunization(immunizationUuid: string) {
+  const controller = new AbortController();
+  const url = `${fhirBaseUrl}/Immunization/${immunizationUuid}`;
+
+  await openmrsFetch(url, {
+    method: 'DELETE',
+    signal: controller.signal,
+  });
+}
