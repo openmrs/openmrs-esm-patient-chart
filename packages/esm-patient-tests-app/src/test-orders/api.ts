@@ -104,6 +104,7 @@ export function prepTestOrderPostData(
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
+      dateActivated: order.dateActivated,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -120,6 +121,7 @@ export function prepTestOrderPostData(
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
+      dateActivated: order.dateActivated,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -135,6 +137,7 @@ export function prepTestOrderPostData(
       accessionNumber: order.accessionNumber,
       urgency: order.urgency,
       scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
+      dateActivated: order.dateActivated,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);

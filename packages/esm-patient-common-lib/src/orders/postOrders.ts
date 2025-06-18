@@ -41,7 +41,8 @@ export async function postOrdersOnNewEncounter(
 
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {
-      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null));
+      const preparedOrder = postDataPrepFunctions[grouping](order, patientUuid, null);
+      orders.push({ ...preparedOrder, dateActivated: encounterDate.toISOString() });
     });
   });
 

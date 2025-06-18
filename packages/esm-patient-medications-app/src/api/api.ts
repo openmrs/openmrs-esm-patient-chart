@@ -152,6 +152,7 @@ export function prepMedicationOrderPostData(
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
+      dateActivated: order.dateActivated,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -161,6 +162,7 @@ export function prepMedicationOrderPostData(
       previousOrder: order.previousOrder,
       careSetting: order.careSetting,
       orderer: order.orderer,
+      dateActivated: order.dateActivated,
       encounter: encounterUuid,
       drug: order.drug.uuid,
       dose: order.dosage,
