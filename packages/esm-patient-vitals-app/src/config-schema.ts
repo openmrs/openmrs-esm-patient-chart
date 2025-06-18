@@ -58,6 +58,11 @@ export const configSchema = {
       _type: Type.UUID,
       _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
     },
+    vitalsOverdueThresholdHours: {
+      _type: Type.Number,
+      _default: 12,
+      _description: 'Hours at or above which vitals are considered overdue',
+    },
     logo: {
       src: {
         _type: Type.String,
@@ -132,6 +137,7 @@ export interface ConfigObject {
   vitals: {
     useFormEngine: boolean;
     encounterTypeUuid: string;
+    vitalsOverdueThresholdHours: number;
     logo: LogoConfigObject;
     formUuid: string;
     formName: string;
