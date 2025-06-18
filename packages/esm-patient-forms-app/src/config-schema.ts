@@ -5,6 +5,7 @@ export const configSchema = {
   htmlFormEntryForms: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       formUuid: {
         _type: Type.UUID,
         _description: 'The UUID of the form',
@@ -92,17 +93,24 @@ export const configSchema = {
       name: {
         _type: Type.String,
         _description: 'Name of the section. Also used as a label for translations.',
-        _validators: [validator((v: string) => v.trim() !== '', 'Each form section must have a name.')],
+        _validators: [
+          validator((v: unknown) => typeof v === 'string' && v.trim() !== '', 'Each form section must have a name.'),
+        ],
       },
       forms: {
         _type: Type.Array,
-        _description:
-          'List of forms to be included in this section. Each form should be specified as a form name or UUID.',
         _elements: {
           _type: Type.String,
           _description: 'Name or UUID of form to be included in the section',
-          _validators: [validator((v: string) => v.trim() !== '', 'Each form must be specified by name or UUID.')],
+          _validators: [
+            validator(
+              (v: unknown) => typeof v === 'string' && v.trim() !== '',
+              'Each form must be specified by name or UUID.',
+            ),
+          ],
         },
+        _description:
+          'List of forms to be included in this section. Each form should be specified as a form name or UUID.',
         _default: [],
       },
     },

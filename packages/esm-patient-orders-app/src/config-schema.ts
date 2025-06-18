@@ -14,20 +14,19 @@ export const configSchema = {
   },
   orderTypes: {
     _type: Type.Array,
-    _default: [],
-    _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
     _elements: {
+      _type: Type.Object,
       orderTypeUuid: {
         _type: Type.UUID,
         _description: 'The UUID of the order type listed in the order basket',
       },
       orderableConceptSets: {
         _type: Type.Array,
-        _description:
-          "UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the `orderableConcepts`. If the orderableConcepts are not given, then it'll search concepts by concept class.",
         _elements: {
           _type: Type.UUID,
         },
+        _description:
+          "UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the `orderableConcepts`. If the orderableConcepts are not given, then it'll search concepts by concept class.",
       },
       label: {
         _type: Type.String,
@@ -40,6 +39,8 @@ export const configSchema = {
         _default: '',
       },
     },
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
+    _default: [],
   },
   showReferenceNumberField: {
     _type: Type.Boolean,

@@ -68,17 +68,17 @@ export const configSchema = {
   },
   encounterTypes: {
     _type: Type.Array,
-    _description: 'Encounter types used to filter the requests',
     _elements: {
       _type: Type.String,
     },
+    _description: 'Encounter types used to filter the requests',
     _default: [],
   },
   dateFormat: {
     _type: Type.String,
     _description: 'Type of display for data',
     _default: 'dateTime',
-    _validators: [validators.oneOf(['data', 'time', 'dateTime'])],
+    _validators: [validators.oneOf(['date', 'time', 'dateTime'])],
   },
   showEncounterType: {
     _type: Type.Boolean,

@@ -39,10 +39,10 @@ export const esmPatientChartSchema = {
   },
   notesConceptUuids: {
     _type: Type.Array,
-    _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     _elements: {
       _type: Type.ConceptUuid,
     },
+    _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
   },
   obsConceptUuidsToHide: {
     _type: Type.Array,
@@ -92,8 +92,8 @@ export const esmPatientChartSchema = {
   },
   visitAttributeTypes: {
     _type: Type.Array,
-    _description: 'List of visit attribute types shown when filling the visit form',
     _elements: {
+      _type: Type.Object,
       uuid: {
         _type: Type.UUID,
         _description: 'UUID of the visit attribute type',
@@ -109,6 +109,7 @@ export const esmPatientChartSchema = {
         _default: true,
       },
     },
+    _description: 'List of visit attribute types shown when filling the visit form',
     _default: [
       {
         uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
