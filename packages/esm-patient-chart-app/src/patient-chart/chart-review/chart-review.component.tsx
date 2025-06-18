@@ -18,8 +18,33 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   return parts.join('/');
 }
 
-function getDashboardDefinition(meta: object, config: ConfigObject, moduleName: string) {
-  return { ...meta, ...config, moduleName } as DashboardConfig;
+function isDashboardConfig(obj: unknown): obj is DashboardConfig {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'path' in obj &&
+    typeof obj.path === 'string' &&
+    'title' in obj &&
+    (typeof obj.title === 'string' || typeof obj.title === 'function') &&
+    'slot' in obj &&
+    typeof obj.slot === 'string'
+  );
+}
+
+const seenMessages = new Set<string>();
+
+function getDashboardDefinition(meta: object, config: ConfigObject, moduleName: string, name: string) {
+  const mergedDefinition = { ...meta, ...config, moduleName };
+  if (isDashboardConfig(mergedDefinition)) {
+    return mergedDefinition;
+  } else {
+    const msg = `Could not find a valid dashboard definition for the dashboard ${name} located in ${moduleName}`;
+    if (!seenMessages.has(msg)) {
+      console.warn(msg);
+      seenMessages.add(msg);
+    }
+    return null;
+  }
 }
 
 interface ChartReviewProps {
@@ -32,14 +57,16 @@ interface ChartReviewProps {
 const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setDashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
 
-  const dashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.flatMap((e) => {
-    if (e.config?.slotName) {
-      return extensionStore.slots[e.config.slotName].assignedExtensions.map((e) =>
-        getDashboardDefinition(e.meta, e.config, e.moduleName),
-      );
-    }
-    return getDashboardDefinition(e.meta, e.config, e.moduleName);
-  });
+  const dashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions
+    .flatMap((e) => {
+      if (e.config?.slotName) {
+        return extensionStore.slots[e.config.slotName].assignedExtensions.map((e) =>
+          getDashboardDefinition(e.meta, e.config, e.moduleName, e.name),
+        );
+      }
+      return getDashboardDefinition(e.meta, e.config, e.moduleName, e.name);
+    })
+    .filter(Boolean);
 
   const defaultDashboard = dashboards.filter((dashboard) => Boolean(dashboard.path))?.[0];
   const dashboard = useMemo(() => {
