@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
-import { formatDate, launchWorkspace, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './edit-lab-results.scss';
 
@@ -13,31 +13,23 @@ type EditLabResultModalProps = {
 
 const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeModal }) => {
   const { t } = useTranslation();
-  const [selectedOrder, setSelectedOrder] = useState<string>(orders?.[0]?.uuid);
+  const [selectedOrder, setSelectedOrder] = useState<Order>(orders?.[0]);
   const { sessionLocation } = useSession();
   const location = sessionLocation?.display;
 
   const handleOrderSelection = (orderId: string) => {
-    setSelectedOrder(orderId);
-  };
-
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => order.uuid === selectedOrder);
-  }, [orders, selectedOrder]);
-
-  const handleLaunchWorkspace = () => {
-    const orderToEdit = orders.find((order) => order.uuid === selectedOrder);
-    if (orderToEdit) {
-      launchWorkspace('test-results-form-workspace', { order: orderToEdit });
-      closeModal();
+    const order = orders.find((order) => order.uuid === orderId);
+    if (order) {
+      setSelectedOrder(order);
     }
   };
 
-  const firstOrder = filteredOrders[0];
-
-  // Determine modal title and description based on number of orders
-  const modalTitle =
-    orders.length > 1 ? t('selectTestToEdit', 'Select test to edit') : t('editLabResults', 'Edit lab results');
+  const handleLaunchWorkspace = () => {
+    if (selectedOrder) {
+      launchWorkspace('test-results-form-workspace', { order: selectedOrder });
+      closeModal();
+    }
+  };
 
   const confirmationText =
     orders.length > 1
@@ -48,7 +40,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={modalTitle} />
+      <ModalHeader closeModal={closeModal} title={t('editLabResults', 'Edit lab results')} />
       <ModalBody>
         <p className={styles.titleHeader}>{confirmationText}</p>
         <div className={classNames(styles.modalBody, styles.modalContentWrapper)}>
@@ -56,21 +48,21 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
           <div className={styles.patientPanel}>
             <h4 className={styles.sectionHeader}>{t('patientDetails', 'Patient Details')}</h4>
             <div className={styles.patientContent}>
-              {filteredOrders.length > 0 && (
+              {selectedOrder && (
                 <div className={styles.patientInfo}>
                   <div className={styles.patientDetailsSection}>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('name', 'Name')}:</span>
-                      <span className={styles.labelValue}>{firstOrder?.patient?.person?.display}</span>
+                      <span className={styles.labelValue}>{selectedOrder.patient?.person?.display}</span>
                     </p>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('age', 'Age')}:</span>
-                      <span className={styles.labelValue}>{firstOrder?.patient?.person?.age}</span>
+                      <span className={styles.labelValue}>{selectedOrder.patient?.person?.age}</span>
                     </p>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('gender', 'Gender')}:</span>
                       <span className={styles.labelValue}>
-                        {firstOrder?.patient?.person?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')}
+                        {selectedOrder.patient?.person?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')}
                       </span>
                     </p>
                   </div>
@@ -82,7 +74,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                     </p>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('dateOrdered', 'Date Ordered')}:</span>
-                      <span className={styles.labelValue}>{firstOrder.dateActivated}</span>
+                      <span className={styles.labelValue}>{selectedOrder.dateActivated}</span>
                     </p>
                   </div>
                 </div>
@@ -97,7 +89,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                 <RadioButtonGroup
                   name="order-selection-group"
                   orientation="vertical"
-                  valueSelected={selectedOrder}
+                  valueSelected={selectedOrder?.uuid}
                   onChange={handleOrderSelection}
                   className={styles.radioGroup}
                 >
