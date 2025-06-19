@@ -62,7 +62,7 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
     <>
       <ModalHeader
         closeModal={close}
-        title={t('immunizationDelete', 'Delete immunization')}
+        title={t('deleteImmunization', 'Delete immunization')}
         className={styles.modalHeader}
       />
       <ModalBody>

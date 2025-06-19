@@ -64,7 +64,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
       edit: (
         <Button
           kind="ghost"
-          iconDescription={getCoreTranslation('edit', 'Edit')}
+          iconDescription={getCoreTranslation('edit')}
           renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
           onClick={() => {
             immunizationFormSub.next({
@@ -80,7 +80,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
             launchPatientImmunizationForm();
           }}
         >
-          {t('edit', 'Edit')}
+          {getCoreTranslation('edit')}
         </Button>
       ),
       delete: (
@@ -91,7 +91,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
           renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
           onClick={() => ConfirmDelete(dose.immunizationObsUuid, vaccineUuid, dose.doseNumber)}
         >
-          {t('delete', 'Delete')}
+          {getCoreTranslation('delete')}
         </Button>
       ),
     };
