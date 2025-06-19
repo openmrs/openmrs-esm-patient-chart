@@ -59,6 +59,7 @@ export const generateRandomPatient = async (
   const { identifier } = await identifierRes.json();
 
   const patientRes = await api.post('patient', {
+    // TODO: This is not configurable right now. It probably should be.
     data: {
       identifiers: [
         {
@@ -72,6 +73,7 @@ export const generateRandomPatient = async (
         addresses: [
           {
             address1: 'Bom Jesus Street',
+            address2: '',
             cityVillage: 'Recife',
             country: 'Brazil',
             postalCode: '50030-310',
@@ -87,6 +89,7 @@ export const generateRandomPatient = async (
           {
             familyName: `Smith${Math.floor(Math.random() * 10000)}`,
             givenName: `John${Math.floor(Math.random() * 10000)}`,
+            middleName: '',
             preferred: true,
           },
         ],
