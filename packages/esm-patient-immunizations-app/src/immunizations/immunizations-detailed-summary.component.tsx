@@ -73,9 +73,11 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
       consolidatedImmunizations,
       [
         (immunization) => {
-          const latest = immunization.existingDoses?.reduce((latest, current) => {
-            return new Date(current.occurrenceDateTime) > new Date(latest.occurrenceDateTime) ? current : latest;
-          }, immunization.existingDoses?.[0]);
+          const latest = immunization.existingDoses?.length
+            ? immunization.existingDoses.reduce((latest, current) => {
+                return new Date(current.occurrenceDateTime) > new Date(latest.occurrenceDateTime) ? current : latest;
+              }, immunization.existingDoses[0])
+            : null;
 
           return latest ? new Date(latest.occurrenceDateTime).getTime() : 0;
         },
@@ -96,7 +98,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const tableRows = useMemo(
     () =>
       sortedImmunizations?.map((immunization) => {
-        const sortedDoses = [...immunization.existingDoses].sort(latestFirst);
+        const sortedDoses = immunization.existingDoses ? [...immunization.existingDoses].sort(latestFirst) : [];
         const latestDose = sortedDoses?.[0];
 
         const hasDoses = !!latestDose;
@@ -107,7 +109,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           : null;
 
         const occurrenceDate = hasDoses
-          ? `${t('lastDoseon', 'Last Dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
+          ? `${t('lastDoseOn', 'Last dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
               time: false,
               noToday: true,
             })}, ${sequenceLabel ?? `${t('dose', 'Dose')} ${latestDose.doseNumber}`}`
