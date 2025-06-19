@@ -1,3 +1,6 @@
+import React, { type ComponentProps, useMemo } from 'react';
+import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -9,18 +12,29 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { EditIcon, formatDate, getCoreTranslation, parseDate, showModal, TrashCanIcon } from '@openmrs/esm-framework';
-import { isEmpty } from 'lodash-es';
-import React, { type ComponentProps, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { type ImmunizationGrouped } from '../../types';
+import {
+  EditIcon,
+  formatDate,
+  getCoreTranslation,
+  parseDate,
+  showModal,
+  showSnackbar,
+  TrashCanIcon,
+} from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
+import { type ImmunizationGrouped } from '../../types';
 import styles from './immunizations-sequence-table.scss';
 
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
   launchPatientImmunizationForm: () => void;
   patientUuid: string;
+}
+
+interface DeleteImmunizationParams {
+  doseNumber: number;
+  immunizationId: string;
+  vaccineUuid: string;
 }
 
 const SequenceTable: React.FC<SequenceTableProps> = ({
@@ -42,17 +56,16 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
     [t, sequences.length],
   );
 
-  const ConfirmDelete = (immunizationId: string, vaccineUuid: string, doseNumber: number) => {
+  const handleDeleteImmunization = ({ doseNumber, immunizationId, vaccineUuid }: DeleteImmunizationParams) => {
     const dispose = showModal('immunization-delete-confirmation-modal', {
-      patientUuid,
-      immunizationId,
       doseNumber,
+      immunizationId,
+      patientUuid,
       vaccineUuid,
-      close: () => {
-        dispose?.();
-      },
+      close: () => dispose?.(),
     });
   };
+
   const tableRows = existingDoses?.map((dose) => {
     return {
       id: dose?.immunizationObsUuid,
@@ -89,7 +102,13 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
           className={styles.deleteButton}
           iconDescription={getCoreTranslation('delete')}
           renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
-          onClick={() => ConfirmDelete(dose.immunizationObsUuid, vaccineUuid, dose.doseNumber)}
+          onClick={() =>
+            handleDeleteImmunization({
+              doseNumber: dose.doseNumber,
+              immunizationId: dose.immunizationObsUuid,
+              vaccineUuid,
+            })
+          }
         >
           {getCoreTranslation('delete')}
         </Button>

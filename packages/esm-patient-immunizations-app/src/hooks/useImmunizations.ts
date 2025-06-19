@@ -21,6 +21,7 @@ export function useImmunizations(patientUuid: string) {
   };
 }
 
+// Deletes a single FHIR Immunization resource (i.e., a single dose/event)
 export async function deletePatientImmunization(immunizationUuid: string) {
   const controller = new AbortController();
   const url = `${fhirBaseUrl}/Immunization/${immunizationUuid}`;

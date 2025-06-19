@@ -1,39 +1,39 @@
 import React, { useMemo, useState } from 'react';
-import { ModalHeader, ModalBody, ModalFooter, Button, InlineLoading } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { Button, InlineLoading, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
+import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { deletePatientImmunization, useImmunizations } from '../hooks/useImmunizations';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { type ConfigObject } from '../config-schema';
-import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import styles from './delete-immunization.scss';
-import { deletePatientImmunization, useImmunizations } from '../hooks/useImmunizations';
 
 interface DeleteConfirmModelProps {
   close: () => void;
   doseNumber: number;
-  vaccineUuid: string;
   immunizationId: string;
   patientUuid: string;
+  vaccineUuid: string;
 }
 
 const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
   close,
   doseNumber,
-  vaccineUuid,
   immunizationId,
   patientUuid,
+  vaccineUuid,
 }) => {
   const { t } = useTranslation();
-  const [isDeleting, setIsDeleting] = useState(false);
   const { immunizationsConfig } = useConfig<ConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
   const { mutate } = useImmunizations(patientUuid);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const vaccineName = useMemo(() => {
-    return (
+  const vaccineName = useMemo(
+    () =>
       immunizationsConceptSet?.answers.find((answer) => answer.uuid === vaccineUuid)?.display ??
-      t('unknownVaccine', 'Unknown vaccine')
-    );
-  }, [immunizationsConceptSet, vaccineUuid, t]);
+      t('unknownVaccine', 'Unknown vaccine'),
+    [immunizationsConceptSet, vaccineUuid, t],
+  );
 
   const handleDeleteDose = async (immunizationId: string) => {
     setIsDeleting(true);
