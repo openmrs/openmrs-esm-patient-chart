@@ -42,7 +42,6 @@ export const patientSummaryDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...summaryDashboardMeta,
-      moduleName,
     }),
     {
       featureName: 'summary-dashboard',
@@ -95,7 +94,6 @@ export const encountersSummaryDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...encountersDashboardMeta,
-      moduleName,
     }),
     { featureName: 'encounter', moduleName },
   );
