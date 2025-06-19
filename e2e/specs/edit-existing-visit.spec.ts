@@ -1,7 +1,8 @@
 import { expect } from '@playwright/test';
-import { getVisit, visitStartDatetime } from '../commands';
+import { createPastEndedVisit, getVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
+import { formatDate } from '@openmrs/esm-framework/src';
 
 test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => {
   const chartPage = new ChartPage(page);
@@ -119,5 +120,58 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   await test.step('And the visit should have ended', async () => {
     const updatedVisit = await getVisit(api, visit.uuid);
     expect(updatedVisit.stopDatetime).not.toBeNull();
+  });
+});
+
+test('Edit start date and time for a past visit', async ({ api, page, patient }) => {
+  const chartPage = new ChartPage(page);
+  const visitsPage = new VisitsPage(page);
+  const pastVisitResult = await createPastEndedVisit(api, patient.uuid, { daysAgo: 5, durationMinutes: 30 });
+
+  const formattedStartDate = formatDate(new Date(pastVisitResult.start.toDate()));
+  const formattedEndDate = formatDate(new Date(pastVisitResult.end.toDate()));
+
+  await test.step('When I navigate to the Visits page in the patient chart', async () => {
+    await visitsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the edit icon on a past visit in the visit history table', async () => {
+    await expect(
+      chartPage.page.getByRole('cell', { name: `${formattedStartDate} - ${formattedEndDate}` }),
+    ).toBeVisible();
+    await visitsPage.page
+      .getByRole('row', { name: new RegExp(formattedStartDate, 'i') })
+      .getByLabel('Edit')
+      .click();
+  });
+
+  await test.step('Then I should see the visit form launched in the workspace in edit mode', async () => {
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    await expect(startDateInput).toBeVisible();
+
+    const day = pastVisitResult.start.format('DD');
+    const month = pastVisitResult.start.format('MM');
+    const year = pastVisitResult.start.format('YYYY');
+    const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
+    const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
+    const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
+
+    await expect(startDateDayInput).toHaveText(day);
+    await expect(startDateMonthInput).toHaveText(month);
+    await expect(startDateYearInput).toHaveText(year);
+  });
+
+  await test.step('And when I edit the value of the start date field', async () => {
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('30');
+    await startDateInput.getByRole('spinbutton', { name: /month/i }).fill('4');
+    await startDateInput.getByRole('spinbutton', { name: /year/i }).fill('2025');
+    await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('09:30');
+    await chartPage.page.getByRole('button', { name: /update visit/i }).click();
+  });
+
+  await test.step('Then I should see a success message after submitting the form and the newly updated start date reflected in the past visit', async () => {
+    await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
+    await expect(chartPage.page.getByRole('cell', { name: '30-Apr-2025 - ' + formattedEndDate })).toBeVisible();
   });
 });

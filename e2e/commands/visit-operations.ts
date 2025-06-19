@@ -19,6 +19,36 @@ export const startVisit = async (api: APIRequestContext, patientId: string): Pro
   return await visitRes.json();
 };
 
+export const createPastEndedVisit = async (
+  api: APIRequestContext,
+  patientId: string,
+  options: {
+    daysAgo?: number;
+    durationMinutes?: number;
+  } = {},
+): Promise<{ visit: Visit; start: dayjs.Dayjs; end: dayjs.Dayjs }> => {
+  const daysAgo = options.daysAgo ?? 5;
+  const durationMinutes = options.durationMinutes ?? 30;
+
+  const start = dayjs().subtract(daysAgo, 'days');
+  const end = start.add(durationMinutes, 'minutes');
+
+  const visitRes = await api.post('visit', {
+    data: {
+      startDatetime: start.format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      stopDatetime: end.format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
+      patient: patientId,
+      location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
+      visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+      attributes: [],
+    },
+  });
+
+  expect(visitRes.ok()).toBeTruthy();
+  const visit = await visitRes.json();
+  return { visit, start, end };
+};
+
 export const endVisit = async (api: APIRequestContext, visit: Visit) => {
   const visitRes = await api.post(`visit/${visit.uuid}`, {
     data: {
