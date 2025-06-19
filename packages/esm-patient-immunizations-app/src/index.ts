@@ -37,3 +37,8 @@ export const immunizationFormWorkspace = getAsyncLifecycle(
   () => import('./immunizations/immunizations-form.workspace'),
   options,
 );
+
+export const deleteImmunizationConfirmationModal = getAsyncLifecycle(
+  () => import('./immunizations/delete-immunization.modal'),
+  options,
+);
