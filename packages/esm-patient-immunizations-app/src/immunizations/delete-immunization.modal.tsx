@@ -41,9 +41,8 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
       await deletePatientImmunization(immunizationId);
 
       showSnackbar({
-        title: t('immunizationDeleted', 'Immunization deleted'),
-        subtitle: t('immunizationDeletedSuccess', 'The immunization dose has been successfully deleted'),
-        kind: 'success',
+        title: t('immunizationDeleted', 'Immunization dose deleted'),
+        subtitle: t('immunizationDeletedSuccess', 'Immunization dose deleted successfully'),
       });
 
       await mutate();

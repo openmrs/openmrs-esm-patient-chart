@@ -1,9 +1,8 @@
-import React, { type ComponentProps, useMemo } from 'react';
-import { isEmpty } from 'lodash-es';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
   DataTable,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -18,8 +17,8 @@ import {
   getCoreTranslation,
   parseDate,
   showModal,
-  showSnackbar,
   TrashCanIcon,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
 import { type ImmunizationGrouped } from '../../types';
@@ -44,14 +43,18 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const { existingDoses, sequences, vaccineUuid } = immunizationsByVaccine;
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
 
   const tableHeaders = useMemo(
     () => [
-      { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
+      {
+        key: 'sequence',
+        header: sequences.length ? t('sequence', 'Sequence') : t('doseNumberWithinSeries', 'Dose number within series'),
+      },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
-      { key: 'edit', header: getCoreTranslation('edit') },
-      { key: 'delete', header: getCoreTranslation('delete') },
+      { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
+      { key: 'actions', header: t('actions', 'Actions') },
     ],
     [t, sequences.length],
   );
@@ -66,19 +69,18 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
     });
   };
 
-  const tableRows = existingDoses?.map((dose) => {
-    return {
-      id: dose?.immunizationObsUuid,
-      sequence: isEmpty(sequences)
-        ? dose.doseNumber || 0
-        : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
-      vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
-      expirationDate: (dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true })) || '--',
-      edit: (
-        <Button
+  const tableRows = existingDoses?.map((dose) => ({
+    id: dose?.immunizationObsUuid,
+    sequence: !sequences.length
+      ? dose.doseNumber || 0
+      : sequences?.find((s) => s.sequenceNumber === dose.doseNumber)?.sequenceLabel || dose.doseNumber,
+    vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
+    expirationDate: (dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true })) || '--',
+    actions: (
+      <div className={styles.actionButtons}>
+        <IconButton
           kind="ghost"
-          iconDescription={getCoreTranslation('edit')}
-          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
+          label={getCoreTranslation('edit')}
           onClick={() => {
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,
@@ -92,16 +94,13 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
             });
             launchPatientImmunizationForm();
           }}
+          size={responsiveSize}
         >
-          {getCoreTranslation('edit')}
-        </Button>
-      ),
-      delete: (
-        <Button
+          <EditIcon size={16} />
+        </IconButton>
+        <IconButton
           kind="ghost"
-          className={styles.deleteButton}
-          iconDescription={getCoreTranslation('delete')}
-          renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => <TrashCanIcon size={16} {...props} />}
+          label={getCoreTranslation('delete')}
           onClick={() =>
             handleDeleteImmunization({
               doseNumber: dose.doseNumber,
@@ -109,17 +108,18 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               vaccineUuid,
             })
           }
+          size={responsiveSize}
         >
-          {getCoreTranslation('delete')}
-        </Button>
-      ),
-    };
-  });
+          <TrashCanIcon size={16} />
+        </IconButton>
+      </div>
+    ),
+  }));
 
-  return (
-    tableRows.length > 0 && (
+  if (tableRows?.length) {
+    return (
       <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer className={styles.sequenceTable}>
             <Table {...getTableProps()}>
               <TableHead>
@@ -132,7 +132,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               <TableBody>
                 {rows.map((row) => {
                   return (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell?.id} className={styles.tableCell}>
                           {cell?.value}
@@ -146,8 +146,8 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
           </TableContainer>
         )}
       </DataTable>
-    )
-  );
+    );
+  }
 };
 
 export default SequenceTable;
