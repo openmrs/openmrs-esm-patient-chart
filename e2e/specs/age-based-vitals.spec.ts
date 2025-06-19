@@ -7,6 +7,14 @@ import { type Visit } from '@openmrs/esm-framework';
 const createdPatients: Patient[] = [];
 const createdVisits: Visit[] = [];
 
+// Helper function to calculate birthdate from age
+function calculateBirthdate(age: { years?: number; months?: number }): string {
+  const date = new Date();
+  if (age.years) date.setFullYear(date.getFullYear() - age.years);
+  if (age.months) date.setMonth(date.getMonth() - age.months);
+  return date.toISOString().split('T')[0];
+}
+
 const ageGroups = [
   {
     name: 'newborn',
@@ -37,7 +45,8 @@ const ageGroups = [
 test.describe('Vitals validation for different age groups', () => {
   ageGroups.forEach((group) => {
     test(`Normal vitals validation for ${group.name} patient`, async ({ api, page }) => {
-      const patient = await generateRandomPatient(api, { age: group.age });
+      const birthdate = calculateBirthdate(group.age);
+      const patient = await generateRandomPatient(api, { birthdate });
       createdPatients.push(patient);
       const visit = await startVisit(api, patient.uuid);
       createdVisits.push(visit);
@@ -46,7 +55,7 @@ test.describe('Vitals validation for different age groups', () => {
       const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
       const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
 
-      await test.step('When I visit the vitals and biometrics page', async () => {
+      await test.step(`When I visit the vitals and biometrics page for ${group.name} patient`, async () => {
         await vitalsPage.goTo(patient.uuid);
       });
 
@@ -58,7 +67,7 @@ test.describe('Vitals validation for different age groups', () => {
         await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
       });
 
-      await test.step('When I fill the normal vitals', async () => {
+      await test.step(`When I fill normal vitals: Temp=${group.normalVitals.temp}, BP=${group.normalVitals.systolic}/${group.normalVitals.diastolic}, Respiration=${group.normalVitals.respiration}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill(group.normalVitals.temp);
         await vitalsPage.page.getByRole('spinbutton', { name: /systolic/i }).fill(group.normalVitals.systolic);
         await vitalsPage.page.getByRole('spinbutton', { name: /diastolic/i }).fill(group.normalVitals.diastolic);
@@ -67,15 +76,15 @@ test.describe('Vitals validation for different age groups', () => {
           .fill(group.normalVitals.respiration);
       });
 
-      await test.step('And I click on the `Save and close` button', async () => {
+      await test.step('And I click on the `Save and close` button to save the vitals', async () => {
         await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
       });
 
-      await test.step('Then I should see a success notification', async () => {
+      await test.step('Then I should see a success notification confirming vitals were saved', async () => {
         await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeVisible();
       });
 
-      await test.step('And I should see the newly recorded vital signs on the page', async () => {
+      await test.step(`And I should see the newly recorded normal vital signs on the page: Temp=${group.normalVitals.temp}, BP=${group.normalVitals.systolic}/${group.normalVitals.diastolic}, Respiration=${group.normalVitals.respiration}`, async () => {
         await expect(headerRow).toContainText(/temp/i);
         await expect(headerRow).toContainText(/bp/i);
         await expect(headerRow).toContainText(/r. rate/i);
@@ -96,7 +105,8 @@ test.describe('Vitals validation for different age groups', () => {
     });
 
     test(`Critical range vitals validation flagging for ${group.name} patient`, async ({ api, page }) => {
-      const patient = await generateRandomPatient(api, { age: group.age });
+      const birthdate = calculateBirthdate(group.age);
+      const patient = await generateRandomPatient(api, { birthdate });
       createdPatients.push(patient);
       const visit = await startVisit(api, patient.uuid);
       createdVisits.push(visit);
@@ -105,7 +115,7 @@ test.describe('Vitals validation for different age groups', () => {
       const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
       const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
 
-      await test.step('When I visit the vitals and biometrics page', async () => {
+      await test.step(`When I visit the vitals and biometrics page for ${group.name} patient`, async () => {
         await vitalsPage.goTo(patient.uuid);
       });
 
@@ -117,7 +127,7 @@ test.describe('Vitals validation for different age groups', () => {
         await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
       });
 
-      await test.step('When I fill the critical vitals', async () => {
+      await test.step(`When I fill critical vitals: Temp=${group.criticalVitals.temp}, BP=${group.criticalVitals.systolic}/${group.criticalVitals.diastolic}, Respiration=${group.criticalVitals.respiration}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill(group.criticalVitals.temp);
         await vitalsPage.page.getByRole('spinbutton', { name: /systolic/i }).fill(group.criticalVitals.systolic);
         await vitalsPage.page.getByRole('spinbutton', { name: /diastolic/i }).fill(group.criticalVitals.diastolic);
@@ -126,15 +136,15 @@ test.describe('Vitals validation for different age groups', () => {
           .fill(group.criticalVitals.respiration);
       });
 
-      await test.step('And I click on the `Save and close` button', async () => {
+      await test.step('And I click on the `Save and close` button to save the critical vitals', async () => {
         await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
       });
 
-      await test.step('Then I should see a success notification', async () => {
+      await test.step('Then I should see a success notification confirming critical vitals were saved', async () => {
         await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeVisible();
       });
 
-      await test.step('And I should see the newly recorded vital signs on the page', async () => {
+      await test.step(`And I should see the newly recorded critical vital signs on the page: Temp=${group.criticalVitals.temp}, BP=${group.criticalVitals.systolic}/${group.criticalVitals.diastolic}, Respiration=${group.criticalVitals.respiration}`, async () => {
         await expect(headerRow).toContainText(/temp/i);
         await expect(headerRow).toContainText(/bp/i);
         await expect(headerRow).toContainText(/r. rate/i);
@@ -157,19 +167,7 @@ test.describe('Vitals validation for different age groups', () => {
 });
 
 test.afterEach(async ({ api }) => {
-  await Promise.all(
-    createdVisits.map((visit) =>
-      endVisit(api, visit).catch((e) => console.error(`Error ending visit ${visit.uuid}:`, e)),
-    ),
-  );
+  await Promise.all(createdVisits.map((visit) => endVisit(api, visit)));
 
-  await Promise.all(
-    createdPatients.map((patient) =>
-      deletePatient(api, patient.uuid).catch((e) => console.error(`Error deleting patient ${patient.uuid}:`, e)),
-    ),
-  );
-
-  // Clear the arrays for the next test
-  createdPatients.length = 0;
-  createdVisits.length = 0;
+  await Promise.all(createdPatients.map((patient) => deletePatient(api, patient.uuid)));
 });
