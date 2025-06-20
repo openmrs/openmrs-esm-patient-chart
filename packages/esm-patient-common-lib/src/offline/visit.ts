@@ -1,15 +1,15 @@
+import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import {
   getSynchronizationItems,
-  type NewVisitPayload,
-  type QueueItemDescriptor,
   queueSynchronizationItem,
   useConnectivity,
   useSession,
   useVisit,
+  type NewVisitPayload,
+  type QueueItemDescriptor,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
 
 /**
  * The identifier of a visit in the sync queue.

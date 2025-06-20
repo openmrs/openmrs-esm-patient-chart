@@ -1,10 +1,10 @@
-import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
+import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag } from '@openmrs/esm-framework';
 import styles from './restrospective-date-time-picker.scss';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 type FormValues = {
   retrospectiveDate: Date;
@@ -26,7 +26,7 @@ const RetrospectiveDateTimePicker = ({
   const { t } = useTranslation();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
   const maxDate = currentVisit?.stopDatetime;
   const minDate = currentVisit?.startDatetime;

@@ -17,18 +17,23 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import {
-  useSession,
-  useVisit,
-  useLayoutType,
-  useConfig,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  ResponsiveWrapper,
-  OpenmrsDatePicker,
   getCoreTranslation,
+  OpenmrsDatePicker,
+  ResponsiveWrapper,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  useLayoutType,
+  useSession,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import {
+  type amPm,
+  type DefaultPatientWorkspaceProps,
+  convertTime12to24,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
+import { DoseInput } from './components/dose-input.component';
 import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { savePatientImmunization } from './immunizations.resource';
@@ -36,7 +41,6 @@ import { type ConfigObject } from '../config-schema';
 import { type ImmunizationFormData } from '../types';
 import { useImmunizations } from '../hooks/useImmunizations';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
-import { DoseInput } from './components/dose-input.component';
 import styles from './immunizations-form.scss';
 
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
@@ -49,7 +53,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const currentUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = usePatientChartStore().visits;
   const { immunizationsConfig } = useConfig<ConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
   const { mutate } = useImmunizations(patientUuid);

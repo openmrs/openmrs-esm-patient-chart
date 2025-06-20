@@ -26,12 +26,14 @@ const ClinicalFormActionButton: React.FC = () => {
     if (isFormOpen) {
       launchWorkspace(formEntryWorkspace, {
         workspaceTitle: recentlyOpenedForm?.additionalProps?.['workspaceTitle'],
+        formInfo: recentlyOpenedForm?.additionalProps?.['formInfo'],
       });
     }
     // we aren't currently supporting keeping HTML Form workspaces open, but just in case
     else if (isHtmlFormOpen) {
       launchWorkspace(htmlFormEntryWorkspace, {
         workspaceTitle: recentlyOpenedHtmlForm?.additionalProps?.['workspaceTitle'],
+        formInfo: recentlyOpenedHtmlForm?.additionalProps?.['formInfo'],
       });
     } else {
       launchFormsWorkspace();
