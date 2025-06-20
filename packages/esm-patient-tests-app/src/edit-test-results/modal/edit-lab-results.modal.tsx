@@ -44,7 +44,6 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
       <ModalBody>
         <p className={styles.titleHeader}>{confirmationText}</p>
         <div className={classNames(styles.modalBody, styles.modalContentWrapper)}>
-          {/* Patient Details Panel - Now on the left */}
           <div className={styles.patientPanel}>
             <h4 className={styles.sectionHeader}>{t('patientDetails', 'Patient Details')}</h4>
             <div className={styles.patientContent}>
