@@ -24,8 +24,6 @@ function isDashboardConfig(obj: unknown): obj is DashboardConfig {
     obj !== null &&
     'path' in obj &&
     typeof obj.path === 'string' &&
-    'title' in obj &&
-    (typeof obj.title === 'string' || typeof obj.title === 'function') &&
     'slot' in obj &&
     typeof obj.slot === 'string'
   );
