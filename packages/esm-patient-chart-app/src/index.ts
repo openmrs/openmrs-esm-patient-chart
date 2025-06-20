@@ -7,8 +7,6 @@ import {
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
-import genericDashboardComponent, { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
-import genericNavGroupComponent, { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 import { moduleName } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
@@ -35,8 +33,6 @@ export function startupApp() {
   setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
-  defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
-  defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 }
 
 export const root = getSyncLifecycle(patientChartPageComponent, { featureName: 'patient-chart', moduleName });
@@ -46,7 +42,6 @@ export const patientSummaryDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...summaryDashboardMeta,
-      moduleName,
     }),
     {
       featureName: 'summary-dashboard',
@@ -99,7 +94,6 @@ export const encountersSummaryDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...encountersDashboardMeta,
-      moduleName,
     }),
     { featureName: 'encounter', moduleName },
   );
@@ -121,16 +115,6 @@ export const patientDetailsTile = getSyncLifecycle(patientDetailsTileComponent, 
 
 export const visitAttributeTags = getSyncLifecycle(visitAttributeTagsComponent, {
   featureName: 'visit-attribute-tags',
-  moduleName,
-});
-
-export const genericNavGroup = getSyncLifecycle(genericNavGroupComponent, {
-  featureName: 'Nav group',
-  moduleName,
-});
-
-export const genericDashboard = getSyncLifecycle(genericDashboardComponent, {
-  featureName: 'Dashboard',
   moduleName,
 });
 

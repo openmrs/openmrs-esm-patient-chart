@@ -21,7 +21,6 @@ export const attachmentsOverview = getSyncLifecycle(attachmentsOverviewComponent
 export const attachmentsSummaryResultsDashboard = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,
-    moduleName,
   }),
   {
     featureName: 'attachments-dashboard-link',
