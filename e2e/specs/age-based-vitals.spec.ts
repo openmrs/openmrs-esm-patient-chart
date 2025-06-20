@@ -7,7 +7,6 @@ import { type Visit } from '@openmrs/esm-framework';
 const createdPatients: Patient[] = [];
 const createdVisits: Visit[] = [];
 
-// Helper function to calculate birthdate from age
 function calculateBirthdate(age: { years?: number; months?: number }): string {
   const date = new Date();
   if (age.years) date.setFullYear(date.getFullYear() - age.years);
@@ -67,10 +66,19 @@ test.describe('Vitals validation for different age groups', () => {
         await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
       });
 
-      await test.step(`When I fill normal vitals: Temp=${group.normalVitals.temp}, BP=${group.normalVitals.systolic}/${group.normalVitals.diastolic}, Respiration=${group.normalVitals.respiration}`, async () => {
+      await test.step(`When I enter the patient's temperature: ${group.normalVitals.temp}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill(group.normalVitals.temp);
+      });
+
+      await test.step(`And I enter the systolic blood pressure: ${group.normalVitals.systolic}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /systolic/i }).fill(group.normalVitals.systolic);
+      });
+
+      await test.step(`And I enter the diastolic blood pressure: ${group.normalVitals.diastolic}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /diastolic/i }).fill(group.normalVitals.diastolic);
+      });
+
+      await test.step(`And I enter the respiration rate: ${group.normalVitals.respiration}`, async () => {
         await vitalsPage.page
           .getByRole('spinbutton', { name: /respiration rate/i })
           .fill(group.normalVitals.respiration);
@@ -84,14 +92,25 @@ test.describe('Vitals validation for different age groups', () => {
         await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeVisible();
       });
 
-      await test.step(`And I should see the newly recorded normal vital signs on the page: Temp=${group.normalVitals.temp}, BP=${group.normalVitals.systolic}/${group.normalVitals.diastolic}, Respiration=${group.normalVitals.respiration}`, async () => {
+      await test.step('And I should see the vitals table headers', async () => {
         await expect(headerRow).toContainText(/temp/i);
         await expect(headerRow).toContainText(/bp/i);
         await expect(headerRow).toContainText(/r. rate/i);
-        await expect(dataRow).toContainText(group.normalVitals.temp);
-        await expect(dataRow).toContainText(`${group.normalVitals.systolic} / ${group.normalVitals.diastolic}`);
-        await expect(dataRow).toContainText(group.normalVitals.respiration);
+      });
 
+      await test.step(`And I should see the temperature value of ${group.normalVitals.temp} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(group.normalVitals.temp);
+      });
+
+      await test.step(`And I should see the blood pressure value of ${group.normalVitals.systolic}/${group.normalVitals.diastolic} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(`${group.normalVitals.systolic} / ${group.normalVitals.diastolic}`);
+      });
+
+      await test.step(`And I should see the respiration rate of ${group.normalVitals.respiration} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(group.normalVitals.respiration);
+      });
+
+      await test.step('And the temperature cell should have normal styling', async () => {
         const normalCell = vitalsPage.page.getByRole('cell', { name: group.normalVitals.temp });
         const backgroundColor = await normalCell.evaluate((el) => window.getComputedStyle(el).backgroundColor);
         expect(backgroundColor).toBe('rgb(255, 255, 255)');
@@ -127,31 +146,51 @@ test.describe('Vitals validation for different age groups', () => {
         await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
       });
 
-      await test.step(`When I fill critical vitals: Temp=${group.criticalVitals.temp}, BP=${group.criticalVitals.systolic}/${group.criticalVitals.diastolic}, Respiration=${group.criticalVitals.respiration}`, async () => {
+      await test.step(`When I enter the patient's temperature: ${group.criticalVitals.temp}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /temperature/i }).fill(group.criticalVitals.temp);
+      });
+
+      await test.step(`And I enter the systolic blood pressure: ${group.criticalVitals.systolic}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /systolic/i }).fill(group.criticalVitals.systolic);
+      });
+
+      await test.step(`And I enter the diastolic blood pressure: ${group.criticalVitals.diastolic}`, async () => {
         await vitalsPage.page.getByRole('spinbutton', { name: /diastolic/i }).fill(group.criticalVitals.diastolic);
+      });
+
+      await test.step(`And I enter the respiration rate: ${group.criticalVitals.respiration}`, async () => {
         await vitalsPage.page
           .getByRole('spinbutton', { name: /respiration rate/i })
           .fill(group.criticalVitals.respiration);
       });
 
-      await test.step('And I click on the `Save and close` button to save the critical vitals', async () => {
+      await test.step('And I click on the `Save and close` button to save the vitals', async () => {
         await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
       });
 
-      await test.step('Then I should see a success notification confirming critical vitals were saved', async () => {
+      await test.step('Then I should see a success notification confirming vitals were saved', async () => {
         await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeVisible();
       });
 
-      await test.step(`And I should see the newly recorded critical vital signs on the page: Temp=${group.criticalVitals.temp}, BP=${group.criticalVitals.systolic}/${group.criticalVitals.diastolic}, Respiration=${group.criticalVitals.respiration}`, async () => {
+      await test.step('And I should see the vitals table headers', async () => {
         await expect(headerRow).toContainText(/temp/i);
         await expect(headerRow).toContainText(/bp/i);
         await expect(headerRow).toContainText(/r. rate/i);
-        await expect(dataRow).toContainText(group.criticalVitals.temp);
-        await expect(dataRow).toContainText(`${group.criticalVitals.systolic} / ${group.criticalVitals.diastolic}`);
-        await expect(dataRow).toContainText(group.criticalVitals.respiration);
+      });
 
+      await test.step(`And I should see the temperature value of ${group.criticalVitals.temp} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(group.criticalVitals.temp);
+      });
+
+      await test.step(`And I should see the blood pressure value of ${group.criticalVitals.systolic}/${group.criticalVitals.diastolic} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(`${group.criticalVitals.systolic} / ${group.criticalVitals.diastolic}`);
+      });
+
+      await test.step(`And I should see the respiration rate of ${group.criticalVitals.respiration} in the vitals table`, async () => {
+        await expect(dataRow).toContainText(group.criticalVitals.respiration);
+      });
+
+      await test.step('And the temperature cell should have warning styling', async () => {
         const criticalCell = vitalsPage.page.getByRole('cell', { name: group.criticalVitals.temp });
         const backgroundColor = await criticalCell.evaluate((el) => window.getComputedStyle(el).backgroundColor);
         expect(backgroundColor).toBe('rgb(255, 242, 232)');
