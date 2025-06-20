@@ -203,6 +203,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                           <SequenceTable
                             immunizationsByVaccine={sortedImmunizations[index]}
                             launchPatientImmunizationForm={launchImmunizationsForm}
+                            patientUuid={patientUuid}
                           />
                         </TableExpandedRow>
                       ) : (
