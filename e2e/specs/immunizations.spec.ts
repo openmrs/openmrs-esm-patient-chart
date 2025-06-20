@@ -50,7 +50,7 @@ test('Add and edit an immunization', async ({ page, patient }) => {
 
   await test.step('And I should see the a table row with the correct immunization details', async () => {
     await expect(immunizationType).toContainText(/hepatitis b vaccination/i);
-    await expect(vaccinationDate).toContainText(/single dose on 08-Mar-2024/i);
+    await expect(vaccinationDate).toContainText(/last dose on 08-Mar-2024, dose 1/i);
   });
 
   await test.step('When I click the Expand all rows button', async () => {
@@ -102,7 +102,7 @@ test('Add and edit an immunization', async ({ page, patient }) => {
 
   await test.step('Then I should see the newly updated immunization details reflected in the table', async () => {
     await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
-    await expect(page.getByRole('cell', { name: /single dose on 02-Jan-2025/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /last dose on 02-Jan-2025, dose 2/i })).toBeVisible();
   });
 
   await test.step('Then expanding the immunization details section should reveal the correct details', async () => {
