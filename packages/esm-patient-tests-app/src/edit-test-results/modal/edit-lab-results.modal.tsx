@@ -72,7 +72,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                       <span className={styles.labelValue}>{location}</span>
                     </p>
                     <p className={styles.itemLabel}>
-                      <span className={styles.labelKey}>{t('dateOrdered', 'Date Ordered')}:</span>
+                      <span className={styles.labelKey}>{t('dateOrdered', 'Date ordered')}:</span>
                       <span className={styles.labelValue}>{selectedOrder.dateActivated}</span>
                     </p>
                   </div>
@@ -112,7 +112,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
           {t('cancel', 'Cancel')}
         </Button>
         <Button type="submit" onClick={handleLaunchWorkspace} disabled={!selectedOrder}>
-          {t('editResult', 'Edit Result')}
+          {t('editTestResults', 'Edit test results')}
         </Button>
       </ModalFooter>
     </>

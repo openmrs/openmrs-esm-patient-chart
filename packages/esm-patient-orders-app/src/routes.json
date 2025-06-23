@@ -97,11 +97,5 @@
       "component": "printLabResultModal",
       "name": "print-lab-results-modal"
     }
-  ],
-  "modals": [
-    {
-      "name": "edit-lab-results-modal",
-      "component": "editLabResultsModal"
-    }
   ]
 }

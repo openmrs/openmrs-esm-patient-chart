@@ -107,6 +107,7 @@
   @include type.type-style('body-02');
   color: colors.$cool-gray-90;
 }
+
 :global(.omrs-breakpoint-lt-desktop) {
   .modalBody {
     flex-direction: column;
