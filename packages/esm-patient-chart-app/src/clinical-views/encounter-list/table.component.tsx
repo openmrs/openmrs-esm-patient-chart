@@ -31,10 +31,9 @@ export const EncounterListDataTable: React.FC<EncounterListDataTableProps> = ({ 
                     className={`${styles.productiveHeading01} ${styles.text02}`}
                     {...getHeaderProps({
                       header,
-                      isSortable: header.isSortable,
                     })}
                   >
-                    {header.header?.content ?? header.header}
+                    {header.header}
                   </TableHeader>
                 ))}
               </TableRow>

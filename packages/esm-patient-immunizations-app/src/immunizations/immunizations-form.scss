@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/type';
 
 .container {
   margin: layout.$spacing-05;
@@ -51,4 +52,14 @@
   .dateTimeSection {
     flex-direction: column;
   }
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+}
+
+.vaccineBatchHeading {
+  @include type.type-style('heading-compact-02');
 }

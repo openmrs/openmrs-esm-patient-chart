@@ -28,24 +28,6 @@
   }
 }
 
-.verticalTabs {
-  margin: layout.$spacing-05 0;
-  scroll-behavior: smooth;
-
-  > ul {
-    flex-direction: column !important;
-  }
-
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
-    margin-left: 0;
-  }
-
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
-    border-bottom: 0 !important;
-    border-left: layout.$spacing-01 solid $color-gray-30;
-  }
-}
-
 .tab {
   outline: 0;
   outline-offset: 0;

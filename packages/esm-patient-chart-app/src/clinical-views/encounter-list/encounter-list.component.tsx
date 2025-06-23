@@ -162,7 +162,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                 }
               }}
             >
-              {val}
+              {typeof val === 'string' ? val : ''}
             </Link>
           );
         }

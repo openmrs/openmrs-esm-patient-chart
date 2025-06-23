@@ -3,7 +3,7 @@ import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stac
 import classNames from 'classnames';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
@@ -47,6 +47,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const { mutate } = useSWRConfig();
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -54,7 +55,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       undefined,
       { revalidate: true },
     );
-  }, [order.patient.uuid]);
+  }, [mutate, order.patient.uuid]);
 
   const {
     control,
@@ -239,7 +240,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           [styles.desktop]: !isTablet,
         })}
       >
-        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button

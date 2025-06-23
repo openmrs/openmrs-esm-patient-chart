@@ -49,7 +49,6 @@ export const ordersDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...ordersDashboardMeta,
-      moduleName,
     }),
     options,
   );

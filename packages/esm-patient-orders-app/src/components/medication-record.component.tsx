@@ -1,5 +1,5 @@
 import React from 'react';
-import capitalize from 'lodash-es/capitalize';
+import { capitalize } from 'lodash-es';
 import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { formatDate, UserIcon } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';

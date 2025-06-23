@@ -26,11 +26,7 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     async ({ api }, use) => {
       const patient = await generateRandomPatient(api);
       await use(patient);
-      try {
-        if (patient) await deletePatient(api, patient.uuid);
-      } catch (e) {
-        console.warn('Failed to delete patient:', e);
-      }
+      await deletePatient(api, patient.uuid);
     },
     { scope: 'test', auto: true },
   ],
@@ -39,11 +35,7 @@ export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
     async ({ api, patient }, use) => {
       const visit = await startVisit(api, patient.uuid);
       await use(visit);
-      try {
-        if (visit) await endVisit(api, visit);
-      } catch (e) {
-        console.warn('Failed to end visit:', e);
-      }
+      await endVisit(api, visit);
     },
     { scope: 'test', auto: true },
   ],

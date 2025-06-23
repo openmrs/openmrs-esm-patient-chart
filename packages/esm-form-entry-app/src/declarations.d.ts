@@ -8,3 +8,8 @@ declare global {
     i18next: i18n;
   }
 }
+
+declare module '*.scss' {
+  const content: { [className: string]: string };
+  export default content;
+}

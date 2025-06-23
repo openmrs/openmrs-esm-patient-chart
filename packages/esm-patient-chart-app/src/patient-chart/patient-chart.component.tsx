@@ -2,10 +2,9 @@ import {
   ExtensionSlot,
   WorkspaceContainer,
   setCurrentVisit,
-  setLeftNav,
-  unsetLeftNav,
   usePatient,
   useWorkspaces,
+  useLeftNav,
 } from '@openmrs/esm-framework';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
@@ -43,10 +42,8 @@ const PatientChart: React.FC = () => {
   }, [state]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
-  useEffect(() => {
-    setLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
-    return () => unsetLeftNav('patient-chart-dashboard-slot');
-  }, [leftNavBasePath]);
+
+  useLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
 
   return (
     <>

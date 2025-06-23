@@ -1,7 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import debounce from 'lodash-es/debounce';
-import isEmpty from 'lodash-es/isEmpty';
-import orderBy from 'lodash-es/orderBy';
+import { debounce, isEmpty, orderBy } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -202,7 +200,7 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button
@@ -210,7 +208,7 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
           disabled={isEnabling || isDisabling}
           kind="primary"
           type="submit"
-          onClick={closeWorkspaceWithSavedChanges}
+          onClick={() => closeWorkspaceWithSavedChanges()}
         >
           {(() => {
             if (isEnabling) return t('enablingFlag', 'Enabling flag...');
