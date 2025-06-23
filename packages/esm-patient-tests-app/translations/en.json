@@ -24,7 +24,7 @@
   "directlyAddToBasket": "Add to basket",
   "discard": "Discard",
   "editLabResults": "Edit laboratory tests",
-  "editResult": "Edit Result",
+  "editTestResults": "Edit test results",
   "endDate": "End date",
   "error": "Error",
   "errorFetchingTestTypes": "Error fetching results for \"{{searchTerm}}\"",
