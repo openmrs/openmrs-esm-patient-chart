@@ -138,14 +138,12 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
           <Accordion>
             <AccordionItem title={concept.display} open>
               {concept.setMembers.map((member) => (
-                <div>
-                  <ResultFormField
-                    key={member.uuid}
-                    concept={member}
-                    control={control}
-                    defaultValue={getSavedMemberDefaultObservation(member.uuid)}
-                  />
-                </div>
+                <ResultFormField
+                  key={member.uuid}
+                  concept={member}
+                  control={control}
+                  defaultValue={getSavedMemberDefaultObservation(member.uuid)}
+                />
               ))}
             </AccordionItem>
           </Accordion>

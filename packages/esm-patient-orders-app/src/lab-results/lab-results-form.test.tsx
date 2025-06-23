@@ -651,7 +651,7 @@ describe('LabResultsForm', () => {
     expect(errorNotification).toBeInTheDocument();
   });
 
-  test.only('should display second level of set members for a given concept, if present', () => {
+  test('should display second level of set members for a given concept, if present', () => {
     const user = userEvent.setup();
     mockUseOrderConceptByUuid.mockReturnValue({
       concept: {

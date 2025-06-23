@@ -27,6 +27,7 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
 
 /**
  * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
+ * This function is used to generate the schema for the lab results form.
  * @param labOrderConceptUuid - The UUID of the lab order concept.
  * @returns A Zod schema object for the lab results form.
  */
