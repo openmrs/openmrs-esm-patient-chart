@@ -56,3 +56,8 @@ export const timelineResultsModal = getAsyncLifecycle(() => import('./test-resul
   featureName: 'Timeline results',
   moduleName,
 });
+
+export const editLabResultsModal = getAsyncLifecycle(
+  () => import('./edit-test-results/modal/edit-lab-results.modal'),
+  options,
+);
