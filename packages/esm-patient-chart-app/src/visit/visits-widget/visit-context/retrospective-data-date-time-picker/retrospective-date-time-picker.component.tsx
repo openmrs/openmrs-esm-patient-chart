@@ -27,7 +27,7 @@ const RetrospectiveDateTimePicker = ({
 
   const { currentVisit } = useVisit(patientUuid);
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
-  const maxDate = currentVisit?.stopDatetime;
+  const maxDate = currentVisit?.stopDatetime ?? new Date();
   const minDate = currentVisit?.startDatetime;
 
   const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
