@@ -219,7 +219,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
               className={styles.inlineNotification}
             />
           )}
-          {hasRdeDateBoundsError && (
+          {hasRdeDateBoundsError && currentVisit && (
             <InlineNotification
               kind="error"
               title={t('rdeDateOutOfBounds', 'Retrospective date is out of bounds')}

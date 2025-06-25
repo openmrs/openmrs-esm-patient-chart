@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 type FormValues = {
-  retrospectiveDate: Date;
+  retrospectiveDate: string;
   retrospectiveTime: string;
   retrospectiveTimeFormat: string;
 };
@@ -56,6 +55,18 @@ const RetrospectiveDateTimePicker = ({
       });
     }
   }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+
+  // each time the current visit changes, reset the form values
+  useEffect(() => {
+    if (currentVisit) {
+      form.reset({
+        retrospectiveDate: '',
+        retrospectiveTime: '',
+        retrospectiveTimeFormat: '',
+      });
+      setManuallyEnableDateTimePicker(false);
+    }
+  }, [currentVisit, form]);
 
   if (!isRdeEnabled) {
     return null;
