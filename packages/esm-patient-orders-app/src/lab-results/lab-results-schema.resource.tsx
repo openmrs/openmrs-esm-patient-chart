@@ -10,7 +10,7 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
     schema[labOrderConcept.uuid] = conceptSchema;
   }
 
-  const setMembersSchema = labOrderConcept.set
+  const setMembersSchema = labOrderConcept?.setMembers
     ? labOrderConcept.setMembers.reduce((acc, member) => {
         return {
           ...acc,
