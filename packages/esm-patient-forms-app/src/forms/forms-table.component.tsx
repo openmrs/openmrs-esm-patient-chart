@@ -53,7 +53,7 @@ const FormsTable = ({
 }: FormsTableProps) => {
   const { t } = useTranslation();
   const { pageSize, currentPage, setPageSize, setCurrentPage } = useFormsContext();
-  const pageSizes = [50];
+  const pageSizes = [50, 100, 200];
 
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
