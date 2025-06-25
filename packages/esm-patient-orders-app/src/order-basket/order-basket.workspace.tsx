@@ -24,7 +24,7 @@ import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
-import { set } from 'date-fns';
+import { format, isWithinInterval, parse, set } from 'date-fns';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -48,6 +48,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   } = useOrderEncounter(patientUuid);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
+  const [hasRdeDateBoundsError, setHasRdeDateBoundsError] = useState(false);
   const [rdeDate, setRdeDate] = useState<Date>();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
   const { mutateVisit } = useVisitContextStore();
@@ -90,8 +91,27 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       });
 
       setRdeDate(completeDate);
+
+      if (!currentVisit) {
+        return;
+      }
+
+      // check if the date is within the bounds of the current visit
+      const isWithinBounds = isWithinInterval(completeDate, {
+        start: new Date(currentVisit.startDatetime),
+        end: currentVisit.stopDatetime ? new Date(currentVisit.stopDatetime) : new Date(),
+      });
+
+      if (!isWithinBounds) {
+        setHasRdeDateBoundsError(true);
+        return;
+      }
+
+      if (isWithinBounds && hasRdeDateBoundsError) {
+        setHasRdeDateBoundsError(false);
+      }
     },
-    [],
+    [currentVisit, hasRdeDateBoundsError],
   );
 
   const handleSave = useCallback(async () => {
@@ -199,6 +219,24 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
               className={styles.inlineNotification}
             />
           )}
+          {hasRdeDateBoundsError && (
+            <InlineNotification
+              kind="error"
+              title={t('rdeDateOutOfBounds', 'Retrospective date is out of bounds')}
+              subtitle={t(
+                'rdeDateOutOfBoundsMessage',
+                `The retrospective date must be within {{startDate}} and {{endDate}}.`,
+                {
+                  startDate: format(currentVisit!.startDatetime, 'PPP hh:mm a'),
+                  endDate: currentVisit!.stopDatetime
+                    ? format(currentVisit!.stopDatetime, 'PPP hh:mm a')
+                    : t('currentDate', 'current date'),
+                },
+              )}
+              lowContrast={true}
+              className={styles.inlineNotification}
+            />
+          )}
           {ordersWithErrors.map((order) => (
             <InlineNotification
               lowContrast
@@ -222,7 +260,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 isLoadingEncounterUuid ||
                 (visitRequired && !currentVisit) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
-                (currentVisitIsRetrospective && !rdeDate)
+                (currentVisitIsRetrospective && !rdeDate) ||
+                hasRdeDateBoundsError
               }
             >
               {isSavingOrders ? (
