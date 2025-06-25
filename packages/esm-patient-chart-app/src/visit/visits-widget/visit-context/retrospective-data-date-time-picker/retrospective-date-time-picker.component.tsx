@@ -94,6 +94,13 @@ const RetrospectiveDateTimePicker = ({
           labelText={t('enable', 'Enable')}
           onChange={(_, { checked, id }) => {
             setManuallyEnableDateTimePicker(checked);
+            if (!checked) {
+              form.reset({
+                retrospectiveDate: '',
+                retrospectiveTime: '',
+                retrospectiveTimeFormat: '',
+              });
+            }
           }}
         />
       )}
