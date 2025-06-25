@@ -118,6 +118,24 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     const abortController = new AbortController();
     setCreatingEncounterError('');
     let orderEncounterUuid = encounterUuid;
+    if (hasRdeDateBoundsError && currentVisit) {
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: t('rdeDateOutOfBounds', 'Retrospective date is out of bounds'),
+        subtitle: t(
+          'rdeDateOutOfBoundsMessage',
+          `The retrospective date must be within {{startDate}} and {{endDate}}.`,
+          {
+            startDate: format(currentVisit.startDatetime, 'PPP hh:mm a'),
+            endDate: currentVisit.stopDatetime
+              ? format(currentVisit.stopDatetime, 'PPP hh:mm a')
+              : t('currentDate', 'current date'),
+          },
+        ),
+      });
+      return;
+    }
     setIsSavingOrders(true);
 
     // If there's no encounter present or we are adding retrospective data, create an encounter along with the orders.
@@ -173,6 +191,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     closeWorkspaceWithSavedChanges,
     t,
     orders,
+    hasRdeDateBoundsError,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -260,8 +279,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 isLoadingEncounterUuid ||
                 (visitRequired && !currentVisit) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
-                (currentVisitIsRetrospective && !rdeDate) ||
-                hasRdeDateBoundsError
+                (currentVisitIsRetrospective && !rdeDate)
               }
             >
               {isSavingOrders ? (
