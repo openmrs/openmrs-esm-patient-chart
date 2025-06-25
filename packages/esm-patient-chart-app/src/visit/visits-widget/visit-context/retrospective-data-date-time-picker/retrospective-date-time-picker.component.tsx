@@ -54,7 +54,18 @@ const RetrospectiveDateTimePicker = ({
         retrospectiveTimeFormat: retrospectiveTimeFormat,
       });
     }
-  }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+
+    // if the user passes a time that is not the selected format, we reset the time format
+    if (retrospectiveTime && retrospectiveTimeFormat) {
+      const [hours, minutes] = retrospectiveTime.split(':');
+      const isAm = retrospectiveTimeFormat === 'AM';
+      const isPm = retrospectiveTimeFormat === 'PM';
+
+      if (isAm && parseInt(hours, 10) >= 12) {
+        form.setValue('retrospectiveTimeFormat', 'PM');
+      }
+    }
+  }, [form, onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
 
   // each time the current visit changes, reset the form values
   useEffect(() => {
