@@ -81,7 +81,7 @@ export const generateRandomPatient = async (
           },
         ],
         attributes: [],
-        birthdate: options.birthdate || '2020-02-01',
+        birthdate: options.birthdate ?? '2020-02-01',
         birthdateEstimated: true,
         dead: false,
         gender: 'M',
