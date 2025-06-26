@@ -6,7 +6,7 @@ import { DataTableSkeleton } from '@carbon/react';
 import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import type { CompletedFormInfo, Form } from '../types';
 import FormsTable from './forms-table.component';
-import { useFormsContext } from '../hooks/use-forms-context';
+import { useFormsContext } from './forms-context';
 import styles from './forms-list.scss';
 
 export type FormsListProps = {
@@ -37,7 +37,7 @@ const FormsList: React.FC<FormsListProps> = ({
     }
   }, []);
 
-  const handleSearch = useMemo(() => debounce(setSearchTerm, 300), [setSearchTerm]);
+  const handleSearch = useMemo(() => debounce(setSearchTerm, 1000), [setSearchTerm]);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {

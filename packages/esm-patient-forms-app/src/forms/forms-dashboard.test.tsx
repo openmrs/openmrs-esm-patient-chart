@@ -6,7 +6,7 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { mockCurrentVisit } from '__mocks__';
 import FormsDashboard from './forms-dashboard.component';
 import { mockPatient } from 'tools';
-import { FormsProvider } from '../hooks/use-forms-context';
+import { FormsProvider } from './forms-context';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
@@ -41,7 +41,7 @@ describe('FormsDashboard', () => {
     });
 
     render(
-      <FormsProvider>
+      <FormsProvider defaultPageSize={50} defaultCurrentPage={1}>
         <FormsDashboard
           promptBeforeClosing={jest.fn()}
           closeWorkspace={jest.fn()}
@@ -50,7 +50,6 @@ describe('FormsDashboard', () => {
           patient={mockPatient}
           setTitle={jest.fn()}
         />
-        ,
       </FormsProvider>,
     );
 

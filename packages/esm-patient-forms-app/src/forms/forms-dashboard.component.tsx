@@ -11,7 +11,7 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import { FormsProvider } from '../hooks/use-forms-context';
+import { FormsProvider } from './forms-context';
 import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
@@ -21,14 +21,6 @@ interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
   formEntryWorkspaceName?: string;
   htmlFormEntryWorkspaceName?: string;
 }
-
-const FormsDashboard: React.FC<FormsDashboardProps> = (props) => {
-  return (
-    <FormsProvider>
-      <FormsDashboardContent {...props} />
-    </FormsProvider>
-  );
-};
 
 const FormsDashboardContent: React.FC<FormsDashboardProps> = ({
   patientUuid,
@@ -116,6 +108,14 @@ const FormsDashboardContent: React.FC<FormsDashboardProps> = ({
         ))
       )}
     </div>
+  );
+};
+
+const FormsDashboard: React.FC<FormsDashboardProps> = (props) => {
+  return (
+    <FormsProvider defaultPageSize={50} defaultCurrentPage={1}>
+      <FormsDashboardContent {...props} />
+    </FormsProvider>
   );
 };
 

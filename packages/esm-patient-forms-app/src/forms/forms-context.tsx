@@ -11,9 +11,19 @@ interface FormsContextState {
 
 const FormsContext = createContext<FormsContextState | undefined>(undefined);
 
-export const FormsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [pageSize, setPageSize] = useState(50);
-  const [currentPage, setCurrentPage] = useState(1);
+interface FormsProviderProps {
+  children: React.ReactNode;
+  defaultPageSize?: number;
+  defaultCurrentPage?: number;
+}
+
+export const FormsProvider: React.FC<FormsProviderProps> = ({
+  children,
+  defaultPageSize = 50,
+  defaultCurrentPage = 1,
+}) => {
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [currentPage, setCurrentPage] = useState(defaultCurrentPage);
   const [searchTerm, setSearchTerm] = useState('');
 
   const value = useMemo(
