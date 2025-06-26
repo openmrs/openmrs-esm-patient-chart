@@ -18,7 +18,7 @@ import {
   formEncounterUrlPoc,
 } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
-import { useFormsContext } from './use-forms-context';
+import { useFormsContext } from '../forms/forms-context';
 
 function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<FormEntryConfigSchema>();

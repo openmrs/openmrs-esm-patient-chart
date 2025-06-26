@@ -17,12 +17,7 @@ import {
 } from '@carbon/react';
 import styles from './forms-table.scss';
 import { type Form } from '../types';
-import { useFormsContext } from '../hooks/use-forms-context';
-
-interface PaginationLinks {
-  next?: { uri: string };
-  prev?: { uri: string };
-}
+import { useFormsContext } from './forms-context';
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -109,6 +104,7 @@ const FormsTable = ({
           <Pagination
             forwardText={t('nextPage', 'Next page')}
             backwardText={t('previousPage', 'Previous page')}
+            itemsPerPageText={t('forms', 'Forms')}
             page={currentPage}
             pageSize={pageSize}
             size="sm"

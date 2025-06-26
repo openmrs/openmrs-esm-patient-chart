@@ -28,9 +28,18 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+import { FormsProvider } from '../forms/forms-context';
 import styles from './offline-forms.scss';
 
 export interface OfflineFormsProps {}
+
+const OfflineFormsWithProvider: React.FC<OfflineFormsProps> = (props) => {
+  return (
+    <FormsProvider defaultPageSize={50} defaultCurrentPage={1}>
+      <OfflineForms {...props} />
+    </FormsProvider>
+  );
+};
 
 const OfflineForms: React.FC<OfflineFormsProps> = () => {
   const { t } = useTranslation();
@@ -164,4 +173,4 @@ function OfflineFormToggle({ form, disabled }: { form: Form; disabled: boolean }
   );
 }
 
-export default OfflineForms;
+export default OfflineFormsWithProvider;
