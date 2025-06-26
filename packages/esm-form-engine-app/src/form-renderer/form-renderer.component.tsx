@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
-import { launchWorkspace, showModal, type Visit, getGlobalStore } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, type Visit } from '@openmrs/esm-framework';
 import { clinicalFormsWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
@@ -29,9 +29,8 @@ interface FormRendererProps
   setTitle?: DefaultPatientWorkspaceProps['setTitle'];
   hideControls?: boolean;
   handlePostResponse?: (encounter: any) => void;
+  preFilledQuestions?: Record<string, string>;
 }
-
-const formSessionStore = getGlobalStore('rfe-FormSession');
 
 const FormRenderer: React.FC<FormRendererProps> = ({
   additionalProps,
@@ -45,13 +44,9 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   hideControls,
   handlePostResponse,
+  preFilledQuestions,
 }) => {
   const { t } = useTranslation();
-
-  formSessionStore.setState({
-    formUuid: formUuid,
-    patientUuid: patientUuid,
-  })
 
   const { schema, error, isLoading } = useFormSchema(formUuid);
   const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
@@ -85,7 +80,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   const handleOnSubmit = (encounter?: any) => {
     closeWorkspaceWithSavedChanges?.();
     handlePostResponse?.(encounter[0]);
-  }
+  };
 
   if (isLoading) {
     return (
@@ -118,6 +113,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           patientUUID={patientUuid}
           visit={visit}
           hideControls={hideControls}
+          preFilledQuestions={preFilledQuestions}
         />
       )}
     </>
