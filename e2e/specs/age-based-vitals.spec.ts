@@ -3,16 +3,10 @@ import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
 import { type Patient, deletePatient, endVisit, generateRandomPatient, startVisit } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
+import { calculateBirthdate, getAfterContent, getBackgroundColor } from '../commands/test-helps';
 
 const createdPatients: Patient[] = [];
 const createdVisits: Visit[] = [];
-
-function calculateBirthdate(age: { years?: number; months?: number }): string {
-  const date = new Date();
-  if (age.years) date.setFullYear(date.getFullYear() - age.years);
-  if (age.months) date.setMonth(date.getMonth() - age.months);
-  return date.toISOString().split('T')[0];
-}
 
 const ageGroups = [
   {
@@ -43,16 +37,26 @@ const ageGroups = [
 
 test.describe('Vitals validation for different age groups', () => {
   ageGroups.forEach((group) => {
-    test(`Normal vitals validation for ${group.name} patient`, async ({ api, page }) => {
-      const birthdate = calculateBirthdate(group.age);
-      const patient = await generateRandomPatient(api, { birthdate });
-      createdPatients.push(patient);
-      const visit = await startVisit(api, patient.uuid);
-      createdVisits.push(visit);
+    let patient: Patient;
+    let visit: Visit;
 
+    test.beforeEach(async ({ api }) => {
+      const birthdate = await calculateBirthdate(group.age);
+      patient = await generateRandomPatient(api, { birthdate });
+      createdPatients.push(patient);
+      visit = await startVisit(api, patient.uuid);
+      createdVisits.push(visit);
+    });
+
+    test.afterEach(async ({ api }) => {
+      await endVisit(api, visit);
+      await deletePatient(api, patient.uuid);
+    });
+
+    test(`Normal vitals validation for ${group.name} patient`, async ({ api, page }) => {
       const vitalsPage = new BiometricsAndVitalsPage(page);
-      const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-      const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+      const headerRow = vitalsPage.vitalsHeader();
+      const dataRow = vitalsPage.vitalsFirstRow();
 
       await test.step(`When I visit the vitals and biometrics page for ${group.name} patient`, async () => {
         await vitalsPage.goTo(patient.uuid);
@@ -112,27 +116,18 @@ test.describe('Vitals validation for different age groups', () => {
 
       await test.step('And the temperature cell should have normal styling', async () => {
         const normalCell = vitalsPage.page.getByRole('cell', { name: group.normalVitals.temp });
-        const backgroundColor = await normalCell.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-        expect(backgroundColor).toBe('rgb(255, 255, 255)');
+        const backgroundColor = await getBackgroundColor(normalCell);
 
-        const afterContent = await normalCell.evaluate((el) => {
-          const after = window.getComputedStyle(el, '::after');
-          return after.content;
-        });
+        expect(backgroundColor).toBe('rgb(255, 255, 255)');
+        const afterContent = await getAfterContent(normalCell);
         expect(afterContent).toBe('none');
       });
     });
 
     test(`Critical range vitals validation flagging for ${group.name} patient`, async ({ api, page }) => {
-      const birthdate = calculateBirthdate(group.age);
-      const patient = await generateRandomPatient(api, { birthdate });
-      createdPatients.push(patient);
-      const visit = await startVisit(api, patient.uuid);
-      createdVisits.push(visit);
-
       const vitalsPage = new BiometricsAndVitalsPage(page);
-      const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-      const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+      const headerRow = vitalsPage.vitalsHeader();
+      const dataRow = vitalsPage.vitalsFirstRow();
 
       await test.step(`When I visit the vitals and biometrics page for ${group.name} patient`, async () => {
         await vitalsPage.goTo(patient.uuid);
@@ -192,21 +187,12 @@ test.describe('Vitals validation for different age groups', () => {
 
       await test.step('And the temperature cell should have warning styling', async () => {
         const criticalCell = vitalsPage.page.getByRole('cell', { name: group.criticalVitals.temp });
-        const backgroundColor = await criticalCell.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+        const backgroundColor = await getBackgroundColor(criticalCell);
         expect(backgroundColor).toBe('rgb(255, 242, 232)');
 
-        const afterContent = await criticalCell.evaluate((el) => {
-          const after = window.getComputedStyle(el, '::after');
-          return after.content;
-        });
+        const afterContent = await getAfterContent(criticalCell);
         expect(afterContent).toBe('" ↑"');
       });
     });
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await Promise.all(createdVisits.map((visit) => endVisit(api, visit)));
-
-  await Promise.all(createdPatients.map((patient) => deletePatient(api, patient.uuid)));
 });

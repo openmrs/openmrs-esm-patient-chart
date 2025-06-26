@@ -9,4 +9,7 @@ export class BiometricsAndVitalsPage {
   async goTo(uuid: string) {
     await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/Vitals%20%26%20Biometrics');
   }
+
+  readonly vitalsHeader = () => this.vitalsTable().locator('thead > tr');
+  readonly vitalsFirstRow = () => this.vitalsTable().locator('tbody > tr').first();
 }
