@@ -76,7 +76,7 @@ const ImmunizationHistoryCard = ({ patientUuid }) => {
       </div>
 
       <div>
-        <Table size="xl" useZebraStyles={false} aria-label="Immunization Schedule">
+        <Table size="xl" useZebraStyles={false} aria-label="Immunization History">
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id}>
