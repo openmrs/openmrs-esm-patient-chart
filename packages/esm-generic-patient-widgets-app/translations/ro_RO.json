@@ -1,7 +1,7 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "chartView": "Vizualizare grafica",
+  "dateAndTime": "Data si ora",
+  "displaying": "Se afiseaza",
+  "encounterType": "Tip intalnire",
+  "tableView": "Vizualizare tabel"
 }
