@@ -53,7 +53,7 @@ const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps>
     );
   }
 
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchImmunizationsForm} />;
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
 };
 
 export default ImmunizationHistoryDashboard;
