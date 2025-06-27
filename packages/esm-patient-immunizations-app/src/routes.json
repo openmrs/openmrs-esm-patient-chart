@@ -12,7 +12,19 @@
     {
       "name": "immunization-details-widget",
       "component": "immunizationsDetailedSummary",
-      "slot": "patient-chart-immunizations-dashboard-slot"
+      "slot": "patient-chart-immunizations-dashboard-slot",
+      "meta": {
+  "fullWidth": true
+      }
+    },
+    {
+"name": "immunization-detailed-history-card",
+"component": "immunizationHistorySummary",
+"slot": "patient-chart-immunizations-dashboard-slot",
+"meta": {
+  "fullWidth": true
+}
+
     },
     {
       "name": "immunization-summary-dashboard",
