@@ -1,0 +1,46 @@
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+.content {
+  background-color: $ui-background;
+}
+
+.doseCell {
+  min-width: 140px;
+  padding: 0.5rem;
+  display: inline-block;
+  text-align: center;
+}
+.headerRow {
+  position: sticky;
+  top: 0;
+  background-color: #f4f4f4;
+  z-index: 2;
+  border-bottom: 1px solid #ddd;
+}
+.headerCell {
+  min-width: 200px;
+  padding: 0.5rem;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  position: sticky;
+  left: 0;
+  background-color: #f4f4f4;
+}
+
+.vaccineName {
+  width: 200px;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  vertical-align: top;
+}
+.vaccineDose {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 0.5rem 0;
+}
