@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
+import { showSnackbar, updateVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.component';
 
@@ -12,22 +12,25 @@ const endVisitPayload = {
 const mockCloseModal = jest.fn();
 const mockMutate = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
 
-describe('End visit dialog', () => {
-  beforeEach(() => {
-    mockUseVisit.mockReturnValue({
-      activeVisit: mockCurrentVisit,
-      currentVisit: mockCurrentVisit,
-      currentVisitIsRetrospective: false,
-      error: null,
-      isLoading: false,
-      isValidating: false,
-      mutate: mockMutate,
-    });
-  });
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  return {
+    usePatientChartStore: () => ({
+      visits: {
+        activeVisit: mockCurrentVisit,
+        currentVisit: mockCurrentVisit,
+        currentVisitIsRetrospective: false,
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: mockMutate,
+      },
+    }),
+  };
+});
 
+describe('End visit dialog', () => {
   test('displays a success snackbar when the visit is ended successfully', async () => {
     const user = userEvent.setup();
 
@@ -40,7 +43,7 @@ describe('End visit dialog', () => {
       },
     } as unknown as FetchResponse<Visit>);
 
-    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+    render(<EndVisitDialog closeModal={mockCloseModal} />);
 
     const closeModalButton = screen.getByRole('button', { name: /close/i });
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -81,7 +84,7 @@ describe('End visit dialog', () => {
 
     mockUpdateVisit.mockRejectedValue(error);
 
-    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+    render(<EndVisitDialog closeModal={mockCloseModal} />);
 
     expect(
       screen.getByText(/You can add additional encounters to this visit in the visit summary/i),

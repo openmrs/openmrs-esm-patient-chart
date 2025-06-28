@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity, useFeatureFlag, useVisitContextStore } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useVisitContextStore } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   type DefaultPatientWorkspaceProps,

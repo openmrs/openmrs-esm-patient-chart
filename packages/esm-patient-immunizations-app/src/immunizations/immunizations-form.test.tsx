@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -9,7 +9,6 @@ import {
   toOmrsIsoString,
   useConfig,
   useSession,
-  useVisit,
 } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { type ImmunizationWidgetConfigObject } from '../types/fhir-immunization-domain';
@@ -26,7 +25,6 @@ const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 const mockSetTitle = jest.fn();
 const mockUseConfig = jest.mocked<() => { immunizationsConfig: ImmunizationWidgetConfigObject }>(useConfig);
 const mockUseSession = jest.mocked(useSession);
-const mockUseVisit = jest.mocked(useVisit);
 const mockMutate = jest.fn();
 const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
 const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
@@ -97,14 +95,22 @@ mockUseConfig.mockReturnValue({
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-mockUseVisit.mockReturnValue({
-  activeVisit: mockCurrentVisit,
-  currentVisit: mockCurrentVisit,
-  currentVisitIsRetrospective: false,
-  error: null,
-  isLoading: false,
-  isValidating: false,
-  mutate: mockMutate,
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  return {
+    ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+    usePatientChartStore: () => ({
+      visits: {
+        activeVisit: mockCurrentVisit,
+        currentVisit: mockCurrentVisit,
+        currentVisitIsRetrospective: false,
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: mockMutate,
+      },
+    }),
+  };
 });
 
 describe('Immunizations Form', () => {
