@@ -4,8 +4,8 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Form } from '../types';
 
 export function useFormsJson(formUuid: string) {
-  const url = formUuid ? `${restBaseUrl}/form/${formUuid}` : null;
-  const { data, isLoading, error } = useSWR<{ data: Form }, Error>(url, openmrsFetch);
+  const url = `${restBaseUrl}/form/${formUuid}`;
+  const { data, isLoading, error } = useSWR<{ data: Form }, Error>(formUuid ? url : null, openmrsFetch);
 
   return {
     formsJson: data?.data ?? null,
