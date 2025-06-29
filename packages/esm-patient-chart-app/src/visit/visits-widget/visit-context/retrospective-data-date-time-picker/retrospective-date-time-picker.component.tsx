@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 type FormValues = {
-  retrospectiveDate: Date;
+  retrospectiveDate: string;
   retrospectiveTime: string;
   retrospectiveTimeFormat: string;
 };
@@ -28,7 +27,7 @@ const RetrospectiveDateTimePicker = ({
 
   const { currentVisit } = useVisit(patientUuid);
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
-  const maxDate = currentVisit?.stopDatetime;
+  const maxDate = currentVisit?.stopDatetime ?? new Date();
   const minDate = currentVisit?.startDatetime;
 
   const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
@@ -55,7 +54,30 @@ const RetrospectiveDateTimePicker = ({
         retrospectiveTimeFormat: retrospectiveTimeFormat,
       });
     }
-  }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+
+    // if the user passes a time that is not the selected format, we reset the time format
+    if (retrospectiveTime && retrospectiveTimeFormat) {
+      const [hours, minutes] = retrospectiveTime.split(':');
+      const isAm = retrospectiveTimeFormat === 'AM';
+      const isPm = retrospectiveTimeFormat === 'PM';
+
+      if (isAm && parseInt(hours, 10) >= 12) {
+        form.setValue('retrospectiveTimeFormat', 'PM');
+      }
+    }
+  }, [form, onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+
+  // each time the current visit changes, reset the form values
+  useEffect(() => {
+    if (currentVisit) {
+      form.reset({
+        retrospectiveDate: '',
+        retrospectiveTime: '',
+        retrospectiveTimeFormat: '',
+      });
+      setManuallyEnableDateTimePicker(false);
+    }
+  }, [currentVisit, form]);
 
   if (!isRdeEnabled) {
     return null;
@@ -72,6 +94,13 @@ const RetrospectiveDateTimePicker = ({
           labelText={t('enable', 'Enable')}
           onChange={(_, { checked, id }) => {
             setManuallyEnableDateTimePicker(checked);
+            if (!checked) {
+              form.reset({
+                retrospectiveDate: '',
+                retrospectiveTime: '',
+                retrospectiveTimeFormat: '',
+              });
+            }
           }}
         />
       )}
