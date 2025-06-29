@@ -9,6 +9,7 @@ import FileReviewContainer from './file-review.component';
 import MediaUploaderComponent from './media-uploader.component';
 import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
+import PasteImageUrlComponent from './paste-image-url.component';
 
 interface CameraMediaUploaderModalProps {
   cameraOnly?: boolean;
@@ -128,6 +129,7 @@ const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) 
             <TabList aria-label="Attachments-upload-section" className={styles.tabList}>
               <Tab onClick={() => setView('camera')}>{t('webcam', 'Webcam')}</Tab>
               <Tab onClick={() => setView('upload')}>{t('uploadFiles', 'Upload files')}</Tab>
+              <Tab onClick={() => setView('pasteUrl')}>{t('pasteUrl', 'Paste URL')}</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -142,9 +144,12 @@ const CameraMediaUploadTabs: React.FC<CameraMediaUploadTabsProps> = ({ title }) 
                 ) : null}
                 {view === 'camera' && <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />}
               </TabPanel>
+
               <TabPanel>
                 <MediaUploaderComponent />
               </TabPanel>
+
+              <TabPanel>{view === 'pasteUrl' && <PasteImageUrlComponent />}</TabPanel>
             </TabPanels>
           </Tabs>
         </div>
