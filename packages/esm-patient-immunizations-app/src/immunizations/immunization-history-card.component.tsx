@@ -1,29 +1,45 @@
-import React, { useState, useMemo } from 'react';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { Table, TableRow, TableBody, TableCell, DataTableSkeleton } from '@carbon/react';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './immunization-history-card.scss';
 import { useImmunizations } from '../hooks/useImmunizations';
 
-const ImmunizationHistoryCard = ({ patientUuid }) => {
+interface ImmunizationHistoryCardProps {
+  patientUuid: string;
+}
+
+const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const { data: immunizations, error, isLoading } = useImmunizations(patientUuid);
-  const [currentPage, setCurrentPage] = useState(1);
+  const headerTitle = t('immunizations', 'Immunizations');
   const pageSize = 5;
 
-  const formatDates = (date: string): string => {
-    return formatDate(parseDate(date), { mode: 'standard', time: 'for today' });
-  };
+  const sortedImmunizations = useMemo(() => {
+    return (immunizations || []).map((immunization) => ({
+      ...immunization,
+      existingDoses: (immunization?.existingDoses || []).sort(
+        (a, b) => new Date(a?.occurrenceDateTime).getTime() - new Date(b?.occurrenceDateTime).getTime(),
+      ),
+    }));
+  }, [immunizations]);
 
-  const sortedImmunizations = useMemo(
-    () =>
-      (immunizations ?? []).map((immunization) => ({
-        ...immunization,
-        existingDoses: [...immunization.existingDoses].sort(
-          (a, b) => new Date(a.occurrenceDateTime).getTime() - new Date(b.occurrenceDateTime).getTime(),
-        ),
-      })),
-    [immunizations],
-  );
+  const tableRows = useMemo(() => {
+    return (sortedImmunizations || []).map((immunization) => ({
+      id: immunization.vaccineUuid,
+      vaccine: immunization.vaccineName,
+      doses: immunization.existingDoses.map((dose, index) => (
+        <div key={index} className={styles.doseCell}>
+          {'Dose ' + dose.doseNumber}
+          <br />
+          {formatDate(parseDate(dose.occurrenceDateTime), { mode: 'standard', time: 'for today' })}
+        </div>
+      )),
+    }));
+  }, [sortedImmunizations]);
+
+  const { results: row, currentPage, goTo } = usePagination(tableRows || [], pageSize);
 
   if (isLoading) {
     return (
@@ -33,37 +49,14 @@ const ImmunizationHistoryCard = ({ patientUuid }) => {
     );
   }
 
-  if (error) return <div>Error loading immunizations</div>;
-
-  const totalItems = sortedImmunizations.length;
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedImmunizations = sortedImmunizations.slice(startIndex, endIndex);
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
 
   const headers = [
     { key: 'vaccine', header: 'Vaccine' },
     { key: 'doses', header: 'Doses' },
   ];
-
-  const rows = paginatedImmunizations.map((immunization) => {
-    const vaccineName = immunization.vaccineName;
-
-    return {
-      id: immunization.vaccineUuid,
-      vaccine: vaccineName,
-      doses: immunization.existingDoses.map((dose, index) => (
-        <div key={index} className={styles.doseCell}>
-          {'Dose ' + dose.doseNumber}
-          <br />
-          {formatDates(dose.occurrenceDateTime)}
-        </div>
-      )),
-    };
-  });
-
-  const goTo = ({ page }) => {
-    setCurrentPage(page);
-  };
 
   return (
     <div className={styles.widgetCard}>
@@ -78,7 +71,7 @@ const ImmunizationHistoryCard = ({ patientUuid }) => {
       <div>
         <Table size="xl" useZebraStyles={false} aria-label="Immunization History">
           <TableBody>
-            {rows.map((row) => (
+            {row?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell
                   className={styles.vaccineName}
@@ -107,11 +100,13 @@ const ImmunizationHistoryCard = ({ patientUuid }) => {
       </div>
 
       <PatientChartPagination
-        totalItems={totalItems}
+        totalItems={tableRows?.length || 0}
         pageSize={pageSize}
         pageNumber={currentPage}
-        currentItems={paginatedImmunizations.length}
-        onPageNumberChange={goTo}
+        currentItems={row?.length || 0}
+        onPageNumberChange={({ page }) => {
+          goTo(page);
+        }}
       />
     </div>
   );
