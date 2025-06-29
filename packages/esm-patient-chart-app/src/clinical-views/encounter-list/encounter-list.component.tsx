@@ -7,7 +7,7 @@ import { EncounterListDataTable } from './table.component';
 import { launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../utils/encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
-import type { TableRow, Encounter, Mode, ColumnValue, FormattedColumn } from '../types';
+import type { TableRow, Encounter, Mode, FormattedColumn } from '../types';
 import styles from './encounter-list.scss';
 
 export interface EncounterListProps {
@@ -229,7 +229,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   }, [columns, t]);
 
   const formLauncher = useMemo(() => {
-    if (formsJson && !formsJson['availableIntents']?.length) {
+    if (formsJson) {
       return (
         <Button
           kind="ghost"
@@ -275,7 +275,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         </>
       ) : (
         <EmptyState
-          displayText={description}
+          displayText={t(description)}
           headerTitle={t(headerTitle)}
           launchForm={
             hideFormLauncher || deathStatus
