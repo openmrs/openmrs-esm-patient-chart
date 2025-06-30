@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar, updateVisit, useVisit, useVisitContextStore } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -16,8 +16,7 @@ interface EndVisitDialogProps {
  */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { activeVisit, mutate: mutateCurrentVisit } = useVisit(patientUuid);
 
   const handleEndVisit = () => {
     if (activeVisit) {
@@ -29,7 +28,8 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
 
       updateVisit(activeVisit.uuid, endVisitPayload, abortController)
         .then((response) => {
-          mutateVisit();
+          // Single targeted revalidation to update visit end time
+          mutateCurrentVisit();
           closeModal();
 
           showSnackbar({

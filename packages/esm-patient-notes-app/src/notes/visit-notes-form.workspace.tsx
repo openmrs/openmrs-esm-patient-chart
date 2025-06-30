@@ -6,7 +6,7 @@ import { useTranslation, type TFunction } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, type Control } from 'react-hook-form';
+import { Controller, useForm, type Control } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -23,24 +23,27 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
-  type Encounter,
   ExtensionSlot,
   OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
   showSnackbar,
-  type UploadedFile,
   useConfig,
   useLayoutType,
   useSession,
-  useVisitContextStore,
+  type Encounter,
+  type UploadedFile,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  invalidateVisitAndEncounterData,
+  useAllowedFileExtensions,
+  type DefaultPatientWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -197,7 +200,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
   const { mutate } = useSWRConfig();
 
   const mutateAttachments = useCallback(
@@ -445,7 +447,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then(() => {
-          mutateVisit();
+          // Invalidate encounter and notes data since we created a new encounter with notes
+          // Also invalidate visit history table since the visit now has new encounters
+          invalidateVisitAndEncounterData(mutate, patientUuid);
           mutateVisitNotes();
 
           if (images?.length) {
@@ -484,8 +488,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       formConceptUuid,
       isEditing,
       locationUuid,
+      mutate,
       mutateAttachments,
-      mutateVisit,
       mutateVisitNotes,
       patientUuid,
       providerUuid,
