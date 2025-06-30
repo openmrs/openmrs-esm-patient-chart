@@ -43,6 +43,7 @@
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "No image to display",
   "options": "Options",
+  "pasteUrl": "Paste URL",
   "successfullyDeleted": "successfully deleted",
   "supportedFiletypes": "Supported files are {{supportedFiles}}",
   "tableView": "Table view",

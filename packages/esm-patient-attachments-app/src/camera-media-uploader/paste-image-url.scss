@@ -1,0 +1,29 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as vars;
+
+.pasteUrlContainer {
+  color: vars.$ui-02;
+  width: 100%;
+  height: 406px; // match esm-media-uploader
+  padding: layout.$spacing-05;
+  box-sizing: border-box;
+
+  .urlInput {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: layout.$spacing-05;
+  }
+
+  .loadButton {
+    margin-top: layout.$spacing-03;
+  }
+
+  .previewImage {
+    margin-top: layout.$spacing-05;
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid vars.$ui-03;
+    border-radius: 4px;
+    display: block;
+  }
+}
