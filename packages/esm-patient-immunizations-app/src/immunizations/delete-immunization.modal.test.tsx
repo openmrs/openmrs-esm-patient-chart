@@ -1,10 +1,13 @@
-import { showSnackbar } from '@openmrs/esm-framework';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { deletePatientImmunization } from '../hooks/useImmunizations';
 import DeleteImmunizationModal from './delete-immunization.modal';
+import type { ConfigObject } from '../config-schema';
+
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('../hooks/useImmunizations', () => ({
   ...jest.requireActual('../hooks/useImmunizations'),
@@ -25,14 +28,14 @@ jest.mock('../hooks/useImmunizationsConceptSet', () => ({
   }),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-  useConfig: jest.fn().mockReturnValue({
-    immunizationsConfig: {},
-  }),
-  getCoreTranslation: (key: string) => key,
-}));
+beforeEach(() => {
+  return mockUseConfig.mockReturnValue({
+    immunizationsConfig: {
+      immunizationConceptSet: '',
+      sequenceDefinitions: [],
+    },
+  });
+});
 
 const mockDeleteImmunization = jest.mocked(deletePatientImmunization);
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -46,10 +49,6 @@ const defaultProps = {
 };
 
 describe('<DeleteImmunizationModal />', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders modal with correct elements', () => {
     render(<DeleteImmunizationModal {...defaultProps} />);
     expect(screen.getByRole('heading', { name: /delete immunization/i })).toBeInTheDocument();
