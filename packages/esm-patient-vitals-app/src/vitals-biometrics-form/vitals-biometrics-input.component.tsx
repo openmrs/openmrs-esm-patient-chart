@@ -6,8 +6,8 @@ import { Warning } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
-import styles from './vitals-biometrics-input.scss';
 import { type VitalsBiometricsFormData } from './schema';
+import styles from './vitals-biometrics-input.scss';
 
 type fieldId =
   | 'computedBodyMassIndex'
@@ -148,16 +148,14 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               min={fieldProperty.min ?? undefined}
                               name={fieldProperty.name}
                               onBlur={() => handleFocusChange(false)}
-                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                checkValidity(event.target.value, onChange)
-                              }
+                              onChange={(event, { value }) => checkValidity(value, onChange)}
                               onFocus={() => handleFocusChange(true)}
                               placeholder={generatePlaceholder(fieldProperty.name)}
                               readOnly={readOnly}
                               ref={ref}
                               style={{ ...fieldStyles }}
                               title={fieldProperty.name}
-                              type={fieldProperty.type}
+                              type="number"
                               value={value}
                             />
                           );

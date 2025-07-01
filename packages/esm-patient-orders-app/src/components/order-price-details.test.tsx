@@ -29,7 +29,7 @@ describe('OrderPriceDetailsComponent', () => {
     });
 
     renderWithSwr(<OrderPriceDetailsComponent orderItemUuid={mockOrderItemUuid} />);
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByRole('paragraph')).toBeInTheDocument();
   });
 
   it('renders nothing when amount is null', () => {

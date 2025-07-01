@@ -43,6 +43,7 @@ export interface Allergen {
   uuid: string;
   display: string;
   type: AllergenType;
+  disabled?: boolean;
 }
 
 export interface AllergicReaction {

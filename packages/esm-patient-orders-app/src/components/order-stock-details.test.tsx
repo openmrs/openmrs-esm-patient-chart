@@ -1,10 +1,10 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import OrderStockDetailsComponent from './order-stock-details.component';
-import { useOrderStockInfo } from '../hooks/useOrderStockInfo';
-import { renderWithSwr } from 'tools';
 import { useTranslation } from 'react-i18next';
+import { screen } from '@testing-library/react';
 import { mockOrderStockData } from '__mocks__';
+import { renderWithSwr } from 'tools';
+import { useOrderStockInfo } from '../hooks/useOrderStockInfo';
+import OrderStockDetailsComponent from './order-stock-details.component';
 
 const mockUseOrderStockInfo = jest.mocked(useOrderStockInfo);
 
@@ -12,21 +12,8 @@ jest.mock('../hooks/useOrderStockInfo', () => ({
   useOrderStockInfo: jest.fn(),
 }));
 
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
-}));
-
-const mockUseTranslation = useTranslation as jest.Mock;
-
 describe('OrderStockDetailsComponent', () => {
   const mockOrderItemUuid = 'test-uuid';
-
-  beforeEach(() => {
-    jest.resetAllMocks();
-    mockUseTranslation.mockImplementation(() => ({
-      t: (key: string, fallback: string) => fallback,
-    }));
-  });
 
   it('renders loading skeleton when data is loading', () => {
     mockUseOrderStockInfo.mockReturnValue({
@@ -36,7 +23,7 @@ describe('OrderStockDetailsComponent', () => {
     });
 
     renderWithSwr(<OrderStockDetailsComponent orderItemUuid={mockOrderItemUuid} />);
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByRole('paragraph')).toBeInTheDocument();
   });
 
   it('renders nothing when stock data is null', () => {

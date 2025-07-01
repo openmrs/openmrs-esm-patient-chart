@@ -344,7 +344,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         ))}
       </Stack>
       <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {getCoreTranslation('cancel')}
         </Button>
         <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

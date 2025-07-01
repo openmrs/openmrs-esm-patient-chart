@@ -197,6 +197,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                       setChartView(evt.name === 'chartView')
                     }
                     size={isTablet ? 'md' : 'sm'}
+                    selectedIndex={chartView ? 1 : 0}
                   >
                     <IconSwitch name="tableView" text="Table view">
                       <Table size={16} />

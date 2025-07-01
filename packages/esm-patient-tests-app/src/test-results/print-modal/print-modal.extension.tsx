@@ -171,7 +171,6 @@ function PrintModal({
 
           {testResults?.length > 0 && (
             <DataTable
-              className={styles.table}
               rows={testResults}
               headers={tableHeaders}
               isSortable
@@ -180,7 +179,7 @@ function PrintModal({
             >
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <TableContainer>
-                  <Table {...getTableProps()}>
+                  <Table className={styles.table} {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
@@ -188,10 +187,9 @@ function PrintModal({
                             className={styles.heading}
                             {...getHeaderProps({
                               header,
-                              isSortable: header.isSortable,
                             })}
                           >
-                            {header.header?.content ?? header.header}
+                            {header.header}
                           </TableHeader>
                         ))}
                       </TableRow>

@@ -10,18 +10,14 @@ import {
   useLayoutType,
   useConfig,
   MaybeIcon,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
-import {
-  launchPatientWorkspace,
-  type OrderBasketItem,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import type { ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepTestOrderPostData } from '../api';
 import styles from './lab-order-basket-panel.scss';
-import type { ConfigObject } from '../../config-schema';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
@@ -42,7 +38,7 @@ export default function LabOrderBasketPanelExtension() {
   return (
     <>
       {allOrderTypes.map((orderTypeConfig) => (
-        <LabOrderBasketPanel {...orderTypeConfig} />
+        <LabOrderBasketPanel key={orderTypeConfig.orderTypeUuid} {...orderTypeConfig} />
       ))}
     </>
   );
@@ -99,7 +95,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () =>
-        launchPatientWorkspace('add-lab-order', {
+        launchWorkspace('add-lab-order', {
           orderTypeUuid: orderTypeUuid,
         }),
       closeWorkspaceGroup: false,
@@ -111,7 +107,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
       closeWorkspace('order-basket', {
         ignoreChanges: true,
         onWorkspaceClose: () =>
-          launchPatientWorkspace('add-lab-order', {
+          launchWorkspace('add-lab-order', {
             order,
             orderTypeUuid: orderTypeUuid,
           }),

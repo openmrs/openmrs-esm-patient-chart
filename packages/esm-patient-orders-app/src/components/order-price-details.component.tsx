@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { useOrderPrice } from '../hooks/useOrderPrice';
-import styles from './order-price-details.scss';
 import { SkeletonText, Tooltip } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getLocale, InformationIcon } from '@openmrs/esm-framework';
+import { useOrderPrice } from '../hooks/useOrderPrice';
+import styles from './order-price-details.scss';
 
 interface OrderPriceDetailsComponentProps {
   orderItemUuid: string;
@@ -45,7 +45,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
   }, [locale, amount]);
 
   if (isLoading) {
-    return <SkeletonText width="100px" role="progressbar" />;
+    return <SkeletonText width="100px" />;
   }
 
   if (!priceData || !amount || error) {
@@ -57,7 +57,7 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
       <span className={styles.priceLabel}>{t('price', 'Price')}:</span>
       {formattedPrice}
       <Tooltip
-        align="bottom-left"
+        align="bottom-start"
         className={styles.priceToolTip}
         label={t(
           'priceDisclaimer',

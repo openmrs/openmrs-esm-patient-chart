@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';

@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash-es';
 import {
   makeUrl,
   messageOmrsServiceWorker,
@@ -10,10 +11,8 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { launchFormEntry } from '@openmrs/esm-patient-common-lib';
-import { type Form } from './types';
-import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
 import { formEncounterUrl, formEncounterUrlPoc } from './constants';
-import escapeRegExp from 'lodash-es/escapeRegExp';
+import { type Form } from './types';
 
 // General note on the following imports and this file in general:
 // Yes, the imports below are super super dirty.
@@ -24,7 +23,7 @@ import escapeRegExp from 'lodash-es/escapeRegExp';
 // work. Trust me, I tried. But by now, I don't want to waste any more time on this issue when this
 // workaround here exists.
 // If anyone reading this comment wants to take on the challenge, please feel
-// free to do so and, if successful, notify me when `launchPatientWorkspace` can be called
+// free to do so and, if successful, notify me when `launchWorkspace` can be called
 // from `esm-form-entry-app` and/or directly migrate this file's content to the appropriate location.
 import type { PatientFormSyncItemContent } from '../../esm-form-entry-app/src/app/offline/sync';
 import type { EncounterCreate } from '../../esm-form-entry-app/src/app/types';

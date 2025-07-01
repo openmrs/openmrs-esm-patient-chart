@@ -130,11 +130,9 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                   <TableHeader
                     {...getHeaderProps({
                       header,
-                      isSortable: header.isSortable,
-                      colSpan: header.colSpan,
                     })}
                   >
-                    {header.header?.content ?? header.header}
+                    {header.header}
                   </TableHeader>
                 ))}
               </TableRow>
@@ -146,7 +144,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
                   <TableCell className="cds--table-column-menu">
-                    <OverflowMenu align="left" flipped size={responsiveSize}>
+                    <OverflowMenu flipped size={responsiveSize}>
                       <OverflowMenuItem
                         className={styles.menuItem}
                         itemText={t('delete', 'Delete')}

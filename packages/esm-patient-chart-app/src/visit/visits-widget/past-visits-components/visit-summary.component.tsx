@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
@@ -10,17 +11,15 @@ import {
   parseDate,
   useAssignedExtensions,
   useConfig,
-  useLayoutType,
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
 import { type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import styles from './visit-summary.scss';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
+import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -33,7 +32,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
-  const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -108,7 +106,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <Tabs className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}>
+      <Tabs>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab
             className={classNames(styles.tab, styles.bodyLong01)}

@@ -448,8 +448,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           )}
           <Stack gap={4} className={styles.container}>
             <section>
-              <div className={styles.sectionTitle}>{t('theVisitIs', 'The visit is')}</div>
-              <FormGroup>
+              <FormGroup legendText={t('theVisitIs', 'The visit is')}>
                 <Controller
                   name="visitStatus"
                   control={control}
@@ -460,12 +459,12 @@ const VisitForm: React.FC<VisitFormProps> = ({
                     // For some reason, Carbon throws NPE when trying to conditionally
                     // render a <Switch> component
                     return visitToEdit ? (
-                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
                         <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
                         <Switch name="past" text={t('ended', 'Ended')} />
                       </ContentSwitcher>
                     ) : (
-                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
                         <Switch name="new" text={t('new', 'New')} />
                         <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
                         <Switch name="past" text={t('inThePast', 'In the past')} />
@@ -536,6 +535,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
                       <ContentSwitcher
                         selectedIndex={visitTypeContentSwitcherIndex}
                         onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
+                        size="md"
                       >
                         <Switch name="recommended" text={t('recommended', 'Recommended')} />
                         <Switch name="all" text={t('all', 'All')} />
