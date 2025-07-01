@@ -1,8 +1,8 @@
 import { expect } from '@playwright/test';
-import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
-import { test } from '../core';
-import { type Encounter, type Provider } from '../commands/types';
 import { type Order } from '@openmrs/esm-patient-common-lib';
+import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
+import { type Encounter, type Provider } from '../commands/types';
+import { test } from '../core';
 import { OrdersPage } from '../pages';
 
 let testOrder: Order;
@@ -93,8 +93,8 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
     await test.step('When I click the overflow menu in the table row', async () => {
       await page
-      	.locator('tr')
-      	.filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) })
+        .locator('tr')
+        .filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) })
         .getByRole('button', { name: /options/i })
         .click();
     });

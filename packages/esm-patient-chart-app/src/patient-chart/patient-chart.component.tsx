@@ -29,6 +29,7 @@ const PatientChart: React.FC = () => {
   // patient search) must be updated in the callback, which is called when the patient
   // chart unmounts.
   useEffect(() => {
+    setCurrentVisit(patientUuid, null);
     return () => {
       setCurrentVisit(null, null);
     };
