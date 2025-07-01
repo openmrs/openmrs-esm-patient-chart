@@ -75,7 +75,11 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
             </TableHead>
             <TableBody>
               {rows.map((row, i) => (
-                <TypedTableRow key={row.id} interpretation={data[i]?.value?.interpretation} {...getRowProps({ row })}>
+                <TypedTableRow
+                  key={row.id}
+                  interpretation={data[i]?.value?.interpretation as OBSERVATION_INTERPRETATION}
+                  {...getRowProps({ row })}
+                >
                   {row.cells.map((cell) => {
                     return cell.value?.interpretation ? (
                       <TableCell className={styles[interpretationToCSS[cell.value.interpretation]]} key={cell.id}>
@@ -95,9 +99,11 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
   );
 };
 
-const TypedTableRow: React.FC<{
-  interpretation: OBSERVATION_INTERPRETATION;
-}> = ({ interpretation, ...props }) => {
+const TypedTableRow: React.FC<
+  {
+    interpretation: OBSERVATION_INTERPRETATION;
+  } & React.ComponentProps<typeof TableRow>
+> = ({ interpretation, ...props }) => {
   switch (interpretation) {
     case 'OFF_SCALE_HIGH':
       return <TableRow {...props} className={styles['off-scale-high']} />;

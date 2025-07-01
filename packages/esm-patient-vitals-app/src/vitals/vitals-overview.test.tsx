@@ -25,21 +25,11 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
-
 jest.mock('../common', () => {
   const originalModule = jest.requireActual('../common');
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
     useConceptUnits: jest.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,

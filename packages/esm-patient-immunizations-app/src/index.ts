@@ -27,7 +27,6 @@ export const immunizationsDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      moduleName,
     }),
     options,
   );
@@ -35,5 +34,10 @@ export const immunizationsDashboardLink =
 // t('immunizationWorkspaceTitle', 'Immunization Form')
 export const immunizationFormWorkspace = getAsyncLifecycle(
   () => import('./immunizations/immunizations-form.workspace'),
+  options,
+);
+
+export const deleteImmunizationConfirmationModal = getAsyncLifecycle(
+  () => import('./immunizations/delete-immunization.modal'),
   options,
 );

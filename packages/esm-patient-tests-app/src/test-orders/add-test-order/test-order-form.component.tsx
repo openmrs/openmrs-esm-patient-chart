@@ -1,14 +1,6 @@
 import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import {
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-  type OrderUrgency,
-  priorityOptions,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, OpenmrsDatePicker, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+
 import {
   Button,
   ButtonSet,
@@ -25,10 +17,25 @@ import {
 } from '@carbon/react';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import {
+  type DefaultPatientWorkspaceProps,
+  type OrderUrgency,
+  priorityOptions,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
+import {
+  ExtensionSlot,
+  launchWorkspace,
+  OpenmrsDatePicker,
+  useConfig,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import { ordersEqual } from './test-order';
-import { z } from 'zod';
 import { type ConfigObject } from '../../config-schema';
 import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
@@ -150,7 +157,7 @@ export function LabOrderForm({
       setOrders(newOrders);
 
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
         closeWorkspaceGroup: false,
       });
     },
@@ -160,7 +167,7 @@ export function LabOrderForm({
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
@@ -289,7 +296,7 @@ export function LabOrderForm({
                       itemToString={(item) => item?.display}
                       onBlur={onBlur}
                       onChange={({ selectedItem }) => onChange(selectedItem?.uuid || '')}
-                      selectedItem={''}
+                      selectedItem={null}
                       shouldFilterItem={filterItemsByName}
                       size={responsiveSize}
                       titleText={t('orderReason', 'Order reason')}
@@ -316,7 +323,6 @@ export function LabOrderForm({
                     maxCount={500}
                     onBlur={onBlur}
                     onChange={onChange}
-                    size={responsiveSize}
                     value={value}
                   />
                 )}

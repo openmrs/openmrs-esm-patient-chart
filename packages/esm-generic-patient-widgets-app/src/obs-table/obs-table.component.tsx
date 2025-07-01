@@ -56,8 +56,9 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               break;
 
             case 'Number': {
-              const decimalPlaces: number | undefined = config.data.find((ele: any) => ele.concept === obs.conceptUuid)
-                ?.decimalPlaces;
+              const decimalPlaces: number | undefined = config.data.find(
+                (ele: any) => ele.concept === obs.conceptUuid,
+              )?.decimalPlaces;
 
               if (obs.valueQuantity?.value % 1 !== 0) {
                 if (decimalPlaces > 0) {
@@ -111,10 +112,9 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                       className={styles.tableHeader}
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}
                     >
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

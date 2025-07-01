@@ -164,7 +164,7 @@ describe('AllergyForm', () => {
     it('should call the saveAllergy function with updated payload', async () => {
       renderAllergyForm({ allergy: mockAllergy, formContext: 'editing' });
 
-      const aspirinAllergen = mockAllergens.find((allergen) => allergen.display === 'Aspirin');
+      const aceInhibitorsAllergen = mockAllergens.find((allergen) => allergen.display === 'ACE inhibitors');
       const rashReaction = mockAllergicReactions.find((reaction) => reaction.display === 'Rash');
 
       // Clear existing reactions first
@@ -173,8 +173,6 @@ describe('AllergyForm', () => {
         await user.click(reaction);
       }
 
-      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
-      await user.click(screen.getByText(aspirinAllergen.display));
       await user.click(screen.getByRole('checkbox', { name: rashReaction.display }));
       await user.click(screen.getByRole('radio', { name: /moderate/i }));
       await user.clear(screen.getByLabelText(/comments/i));
@@ -187,7 +185,7 @@ describe('AllergyForm', () => {
       expect(mockUpdatePatientAllergy).toHaveBeenCalledTimes(1);
 
       const expectedPayload: NewAllergy = buildExpectedPayload(
-        aspirinAllergen,
+        aceInhibitorsAllergen,
         rashReaction,
         mockConcepts.moderateReactionUuid,
         'Patient developed a rash after taking aspirin. The rash resolved after discontinuing the medication.',

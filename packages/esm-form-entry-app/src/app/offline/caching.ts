@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash-es';
 import {
   makeUrl,
   messageOmrsServiceWorker,
@@ -7,7 +8,6 @@ import {
   setupDynamicOfflineDataHandler,
   subscribePrecacheStaticDependencies,
 } from '@openmrs/esm-framework';
-import escapeRegExp from 'lodash-es/escapeRegExp';
 import type { FormSchema } from '../types';
 
 export function setupStaticDataOfflinePrecaching() {

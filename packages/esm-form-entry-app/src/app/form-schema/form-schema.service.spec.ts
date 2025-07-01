@@ -64,7 +64,7 @@ describe('Service: FormSchemaService', () => {
     });
     formSchemaService = TestBed.inject(FormSchemaService);
     formsResourceService = TestBed.inject(FormResourceService);
-    localStorageService = TestBed.geinjectt(LocalStorageService);
+    localStorageService = TestBed.inject(LocalStorageService);
   });
 
   afterEach(() => {

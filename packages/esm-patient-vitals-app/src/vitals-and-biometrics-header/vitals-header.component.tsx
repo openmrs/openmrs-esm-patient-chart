@@ -63,14 +63,24 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
 
   if (latestVitals && Object.keys(latestVitals)?.length && conceptRanges?.length) {
     const hasActiveVisit = Boolean(currentVisit?.uuid);
-    const vitalsTakenToday = Boolean(dayjs(latestVitals?.date).isToday());
-    const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
     const now = dayjs();
-    const vitalsOverdueDayCount = Math.round(dayjs.duration(now.diff(latestVitals?.date)).asDays());
-
+    const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
+    const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;
+    const areVitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
+    const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
+    const hoursSinceVitalsTaken = Math.round(vitalsTakenTimeAgo.asHours());
     let overdueVitalsTagContent: React.ReactNode = null;
 
-    if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
+    if (vitalsOverdueDayCount < 1) {
+      overdueVitalsTagContent = (
+        <Trans i18nKey="hoursOldVitals" count={hoursSinceVitalsTaken}>
+          <span>
+            {/* @ts-ignore: See comment below */}
+            These vitals are <strong>{{ count: hoursSinceVitalsTaken }} hour old</strong>
+          </span>
+        </Trans>
+      );
+    } else if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
       overdueVitalsTagContent = (
         <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
           <span>
@@ -105,7 +115,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
             <span className={styles.bodyText}>
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
-            {vitalsOverdue ? (
+            {areVitalsOverdue ? (
               <Tag className={styles.tag} type="red">
                 <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
               </Tag>
