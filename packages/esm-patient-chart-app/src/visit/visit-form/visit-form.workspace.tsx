@@ -103,7 +103,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutate } = useSWRConfig();
+  const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -309,7 +309,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
             // (current visit is already updated with mutateCurrentVisit)
-            invalidateVisitAndEncounterData(mutate, patientUuid);
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
@@ -347,12 +347,12 @@ const VisitForm: React.FC<VisitFormProps> = ({
           config.offlineVisitTypeUuid,
           payload.startDatetime,
         ).then(
-          (offlineVisit) => {
+          () => {
             // Use same targeted approach for offline visits for consistency
             mutateCurrentVisit();
 
             // Also invalidate visit history and encounter tables
-            invalidateVisitAndEncounterData(mutate, patientUuid);
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -381,9 +381,9 @@ const VisitForm: React.FC<VisitFormProps> = ({
       config.offlineVisitTypeUuid,
       config.showExtraVisitAttributesSlot,
       extraVisitInfo,
+      globalMutate,
       handleVisitAttributes,
       isOnline,
-      mutate,
       mutateCurrentVisit,
       patientUuid,
       t,

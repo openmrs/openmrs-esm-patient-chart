@@ -31,7 +31,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   const [showForm, setShowForm] = useState(true);
   const isOnline = useConnectivity();
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutate } = useSWRConfig();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const state = useMemo(
     () => ({
@@ -55,7 +55,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
         mutateCurrentVisit();
 
         // Also invalidate visit history and encounter tables since form submission may create/update encounters
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         closeWorkspaceWithSavedChanges();
       },
@@ -64,27 +64,27 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       clinicalFormsWorkspaceName,
     }),
     [
-      formUuid,
-      visitUuid,
-      visitTypeUuid,
-      encounterUuid,
-      visitStartDatetime,
-      visitStopDatetime,
-      currentVisit?.uuid,
-      currentVisit?.visitType?.uuid,
-      currentVisit?.startDatetime,
-      currentVisit?.stopDatetime,
-      patientUuid,
-      patient,
-      isOnline,
-      mutate,
-      mutateForm,
-      mutateCurrentVisit,
-      closeWorkspace,
-      closeWorkspaceWithSavedChanges,
-      promptBeforeClosing,
       additionalProps,
       clinicalFormsWorkspaceName,
+      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
+      currentVisit?.startDatetime,
+      currentVisit?.stopDatetime,
+      currentVisit?.uuid,
+      currentVisit?.visitType?.uuid,
+      encounterUuid,
+      formUuid,
+      globalMutate,
+      isOnline,
+      mutateCurrentVisit,
+      mutateForm,
+      patient,
+      patientUuid,
+      promptBeforeClosing,
+      visitStartDatetime,
+      visitStopDatetime,
+      visitTypeUuid,
+      visitUuid,
     ],
   );
 

@@ -7,7 +7,7 @@ import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
+  const { mutate: globalMutate } = useSWRConfig();
   const { mutate: mutateCurrentVisit } = useVisit(visit?.patient?.uuid || '');
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
   const patientUuid = visit?.patient?.uuid || '';
@@ -19,7 +19,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
         mutateCurrentVisit();
 
         // Use targeted SWR invalidation instead of global mutateVisit
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
           title: t('visitRestored', 'Visit restored'),
@@ -33,7 +33,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
       .catch(() => {
         // On error, revalidate to get correct state
         mutateCurrentVisit();
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
           subtitle: t('errorWhenRestoringVisit', 'Error occurred when restoring {{visit}}', {
@@ -53,7 +53,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
         mutateCurrentVisit();
 
         // Use targeted SWR invalidation instead of global mutateVisit
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
           title: t('visitDeleted', '{{visit}} deleted', {
@@ -71,7 +71,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
       .catch(() => {
         // On error, revalidate to get correct state
         mutateCurrentVisit();
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
           title: t('errorDeletingVisit', 'Error deleting visit'),

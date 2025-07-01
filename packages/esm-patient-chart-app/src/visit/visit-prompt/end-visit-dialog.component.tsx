@@ -16,7 +16,7 @@ interface EndVisitDialogProps {
  */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
-  const { activeVisit, mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { activeVisit, mutate } = useVisit(patientUuid);
 
   const handleEndVisit = () => {
     if (activeVisit) {
@@ -28,8 +28,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
 
       updateVisit(activeVisit.uuid, endVisitPayload, abortController)
         .then((response) => {
-          // Single targeted revalidation to update visit end time
-          mutateCurrentVisit();
+          mutate();
           closeModal();
 
           showSnackbar({

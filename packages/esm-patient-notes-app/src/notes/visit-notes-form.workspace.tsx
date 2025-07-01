@@ -200,11 +200,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutate } = useSWRConfig();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const mutateAttachments = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
-    [mutate],
+    () => globalMutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
+    [globalMutate],
   );
 
   const locationUuid = session?.sessionLocation?.uuid;
@@ -449,7 +449,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         .then(() => {
           // Invalidate encounter and notes data since we created a new encounter with notes
           // Also invalidate visit history table since the visit now has new encounters
-          invalidateVisitAndEncounterData(mutate, patientUuid);
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
           mutateVisitNotes();
 
           if (images?.length) {
@@ -486,9 +486,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       encounterNoteTextConceptUuid,
       encounterTypeUuid,
       formConceptUuid,
+      globalMutate,
       isEditing,
       locationUuid,
-      mutate,
       mutateAttachments,
       mutateVisitNotes,
       patientUuid,
