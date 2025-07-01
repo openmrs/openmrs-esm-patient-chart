@@ -76,6 +76,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   }
   return (
     <div className={styles.container}>
+      {/* @ts-ignore */}
       <DataTable headers={columns} rows={rowData} size={desktopLayout ? 'sm' : 'lg'} useZebraStyles>
         {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
           <>
@@ -88,7 +89,6 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                       <TableHeader
                         {...getHeaderProps({
                           header,
-                          isSortable: header.isSortable,
                           className: header.key === 'actions' ? styles.actionsColumn : '',
                         })}
                       >

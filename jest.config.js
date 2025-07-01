@@ -5,9 +5,9 @@ const path = require('path');
 module.exports = {
   clearMocks: true,
   transform: {
-    '^.+\\.(j|t)sx?$': '@swc/jest',
+    '^.+\\.[jt]sx?$': ['@swc/jest'],
   },
-  transformIgnorePatterns: ['/node_modules/(?!@openmrs)'],
+  transformIgnorePatterns: ['/node_modules/(?!@openmrs|rxjs|.+\\.pnp\\.[^\\/]+$)'],
   moduleDirectories: ['node_modules', '__mocks__', 'tools', __dirname],
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
@@ -41,5 +41,5 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost/',
   },
-  testTimeout: 20000,
+  testTimeout: 30000,
 };

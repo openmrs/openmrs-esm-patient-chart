@@ -45,6 +45,10 @@
     {
       "name": "print-modal",
       "component": "printModal"
+    },
+    {
+      "name": "edit-lab-results-modal",
+      "component": "editLabResultsModal"
     }
   ],
   "workspaces": [

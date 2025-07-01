@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
-import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { Button } from '@carbon/react';
+import { launchWorkspace, showSnackbar } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
@@ -21,7 +20,7 @@ const StartVisitButton = ({ patientUuid, handleReturnToSearchList, hidePatientSe
     hidePatientSearch?.();
 
     try {
-      launchPatientWorkspace(startVisitWorkspaceForm, {
+      launchWorkspace(startVisitWorkspaceForm, {
         patientUuid,
         openedFrom: 'patient-chart-start-visit',
         handleReturnToSearchList,

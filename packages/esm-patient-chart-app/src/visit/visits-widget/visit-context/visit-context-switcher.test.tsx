@@ -1,15 +1,15 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
 import { useVisitContextStore } from '@openmrs/esm-framework';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
-import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
-import React from 'react';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextSwitcherModal from './visit-context-switcher.modal';
 
 const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
-  systemVisitEnabled: true,
   errorFetchingSystemVisitSetting: null,
   isLoadingSystemVisitSetting: false,
+  systemVisitEnabled: true,
 });
 
 jest.mocked(useVisitContextStore).mockReturnValue({
@@ -50,8 +50,8 @@ describe('VisitContextSwitcherModal', () => {
     renderVisitContextSwitcherModal();
     // location
     expect(screen.getAllByText('Registration Desk')).toHaveLength(3);
-    // visit type
-    expect(screen.getAllByText('Facility Visit')).toHaveLength(3);
+    // visit type - only check the visitType div elements
+    expect(screen.getAllByText('Facility Visit', { selector: '.visitType' })).toHaveLength(3);
   });
 });
 

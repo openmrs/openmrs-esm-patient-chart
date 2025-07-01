@@ -167,8 +167,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getToolbarProps,
           getTableProps,
         }: {
-          headers: typeof tableHeaders;
-          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
+          headers: Array<{ header: React.ReactNode; key: string }>;
+          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
           [key: string]: any;
         }) => (
           <>
@@ -220,7 +220,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
                               <OverflowMenu
-                                align="left"
                                 aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                 flipped
                                 size={responsiveSize}
@@ -230,7 +229,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      size={responsiveSize}
                                       onClick={() => {
                                         if (isVisitNoteEncounter(encounter)) {
                                           launchWorkspace('visit-notes-form-workspace', {
@@ -242,10 +240,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                           launchFormEntryOrHtmlForms(
                                             htmlFormEntryForms,
                                             patientUuid,
-                                            encounter.form?.uuid,
+                                            encounter.form,
                                             encounter.visitUuid,
                                             encounter.id,
-                                            encounter.form?.display,
                                             encounter.visitTypeUuid,
                                             encounter.visitStartDatetime,
                                             encounter.visitStopDatetime,
@@ -261,7 +258,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     isDelete
                                     itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    size={responsiveSize}
                                   />
                                 )}
                               </OverflowMenu>
@@ -288,10 +284,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                           launchFormEntryOrHtmlForms(
                                             htmlFormEntryForms,
                                             patientUuid,
-                                            encounter.form?.uuid,
+                                            encounter.form,
                                             encounter.visitUuid,
                                             encounter.id,
-                                            encounter.form?.display,
                                             encounter.visitTypeUuid,
                                             encounter.visitStartDatetime,
                                             encounter.visitStopDatetime,

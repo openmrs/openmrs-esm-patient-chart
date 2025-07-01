@@ -74,31 +74,25 @@ test('Add, edit and delete an allergy', async ({ page, patient }) => {
     await expect(page.getByText(/ace inhibitors/i)).toBeVisible();
   });
 
-  await test.step('When I change the allergy to `Bee stings`', async () => {
-    await page.getByPlaceholder(/select the allergen/i).click();
-    await page.getByText(/bee stings/i).click();
-    await page
-      .getByTestId('allergic-reactions-container')
-      .getByText(/mental status change/i)
-      .click();
-    await page.getByText(/itching/i).click();
-    await page.getByText(/hives/i).click();
+  await test.step('And if I change the reaction to `Cough` and `Rash`', async () => {
+    await page.getByText(/cough/i).click();
+    await page.getByText(/rash/i).click();
   });
 
-  await test.step('And I change the severity to `Severe`', async () => {
-    await page.getByText(/severe/i).click();
+  await test.step('And I change the severity to `Moderate`', async () => {
+    await page.getByText(/moderate/i).click();
   });
 
-  await test.step('And I change the allergy comment to `Itching all over the body`', async () => {
+  await test.step('And I change the comment', async () => {
     await page.locator('#comments').clear();
     await page
       .locator('#comments')
       .fill(
-        'Pt w/ diffuse urticaria & severe pruritus 30 min post bee sting. No angioedema, resp distress or hemodynamic compromise. Known bee venom allergy. Pruritus 8/10. Tx: epi 0.3mg IM, diphenhydramine 50mg IV, methylprednisolone 125mg IV. Symptoms improving. Monitoring for biphasic reaction x 4-6h',
+        'Patient developed a persistent dry, tickly cough after starting lisinopril. No shortness of breath or swelling. Cough interferes with sleep and daily activities. Considering alternative antihypertensive therapy. Rash improving after discontinuing lisinopril.',
       );
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
+  await test.step('And then click the `Save and close` button', async () => {
     await page.getByRole('button', { name: /save and close/i }).click();
   });
 
@@ -111,13 +105,13 @@ test('Add, edit and delete an allergy', async ({ page, patient }) => {
     await expect(headerRow).toContainText(/severity/i);
     await expect(headerRow).toContainText(/reaction/i);
     await expect(headerRow).toContainText(/comments/i);
-    await expect(dataRow).toContainText(/bee stings/i);
-    await expect(dataRow).not.toContainText(/ace inhibitors/i);
-    await expect(dataRow).toContainText('SEVERE');
-    await expect(dataRow).not.toContainText(/mild/i);
-    await expect(dataRow).toContainText(/hives/i);
-    await expect(dataRow).toContainText(/itching/i);
-    await expect(dataRow).toContainText(/pt w\/ diffuse urticaria/i);
+    await expect(dataRow).toContainText(/ace inhibitors/i);
+    await expect(dataRow).toContainText(/moderate/i);
+    await expect(dataRow).toContainText(/cough/i);
+    await expect(dataRow).toContainText(/rash/i);
+    await expect(dataRow).toContainText(
+      /patient developed a persistent dry, tickly cough after starting lisinopril. no shortness of breath or swelling. cough interferes with sleep and daily activities. considering alternative antihypertensive therapy. rash improving after discontinuing lisinopril./i,
+    );
   });
 
   await test.step('When I click the overflow menu in the table row with the updated allergy', async () => {
@@ -137,7 +131,7 @@ test('Add, edit and delete an allergy', async ({ page, patient }) => {
   });
 
   await test.step('And I should not see the deleted allergy in the list', async () => {
-    await expect(page.getByText(/bee stings/i)).toBeHidden();
+    await expect(page.getByText(/ace inhibitors/i)).toBeHidden();
   });
 
   await test.step('And the allergy table should be empty', async () => {

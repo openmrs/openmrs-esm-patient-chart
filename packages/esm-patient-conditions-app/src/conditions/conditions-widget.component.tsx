@@ -20,7 +20,7 @@ import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePi
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
-  type ConditionDataTableRow,
+  type Condition,
   type FormFields,
   createCondition,
   updateCondition,
@@ -32,7 +32,7 @@ import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
-  conditionToEdit?: ConditionDataTableRow;
+  conditionToEdit?: Condition;
   isEditing?: boolean;
   isSubmittingForm: boolean;
   patientUuid: string;
@@ -79,19 +79,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
-  const getFieldValue = (
-    tableCells: Array<{
-      info: {
-        header: string;
-      };
-      value: string;
-    }>,
-    fieldName,
-  ): string => tableCells?.find((cell) => cell?.info?.header === fieldName)?.value;
-
-  const displayName = getFieldValue(conditionToEdit?.cells, 'display');
-  const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
-  const editableAbatementDateTime = getFieldValue(conditionToEdit?.cells, 'abatementDateTime');
+  const displayName = conditionToEdit?.display;
+  const editableClinicalStatus = conditionToEdit?.clinicalStatus;
+  const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);

@@ -1,10 +1,19 @@
 import React, { useCallback, useMemo } from 'react';
-import { NumberInput, Select, SelectItem, TextInput, InlineNotification } from '@carbon/react';
+import {
+  Accordion,
+  AccordionItem,
+  NumberInput,
+  Select,
+  SelectItem,
+  TextInput,
+  InlineNotification,
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
@@ -14,6 +23,8 @@ interface ResultFormFieldProps {
 
 const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, defaultValue }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveFieldSize = isTablet ? 'lg' : 'sm';
 
   // TODO: Reference ranges should be dynamically adjusted based on patient demographics:
   // - Age-specific ranges (e.g., pediatric vs adult values)
@@ -68,7 +79,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
 
   if (isTextField || isNumericField || isCodedField || isPanelField) {
     return (
-      <>
+      <div className={styles.formField}>
         <Controller
           control={control}
           name={concept.uuid}
@@ -76,39 +87,41 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             isTextField ? (
               <TextInput
                 {...field}
-                className={styles.textInput}
                 id={concept.uuid}
                 key={concept.uuid}
                 labelText={labelText}
                 type="text"
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
               />
             ) : isNumericField ? (
               <NumberInput
                 {...field}
                 allowEmpty
-                className={styles.numberInput}
                 disableWheel
                 id={concept.uuid}
                 key={concept.uuid}
                 label={labelText}
                 onChange={(_, { value }) => field.onChange(value !== '' ? value : undefined)}
                 step={concept.allowDecimal ? 0.01 : 1}
-                value={field.value || ''}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
               />
             ) : isCodedField ? (
               <Select
                 {...field}
-                className={styles.textInput}
                 defaultValue={getSavedMemberValue(concept.uuid, concept.datatype.hl7Abbreviation)}
                 id={`select-${concept.uuid}`}
                 key={concept.uuid}
                 labelText={labelText}
                 invalidText={error?.message}
                 invalid={Boolean(error?.message)}
+                size={responsiveFieldSize}
+                value={typeof field.value === 'string' || typeof field.value === 'number' ? field.value : ''}
               >
                 <SelectItem text={t('chooseAnOption', 'Choose an option')} value="" />
                 {concept?.answers?.length &&
@@ -121,22 +134,26 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             ) : null
           }
         />
-        {isPanelField
-          ? concept.setMembers.map((member) => (
-              <ResultFormField
-                key={member.uuid}
-                concept={member}
-                control={control}
-                defaultValue={getSavedMemberDefaultObservation(member.uuid)}
-              />
-            ))
-          : null}
-      </>
+        {isPanelField ? (
+          <Accordion>
+            <AccordionItem title={concept.display} open>
+              {concept.setMembers.map((member) => (
+                <ResultFormField
+                  key={member.uuid}
+                  concept={member}
+                  control={control}
+                  defaultValue={getSavedMemberDefaultObservation(member.uuid)}
+                />
+              ))}
+            </AccordionItem>
+          </Accordion>
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <>
+    <div className={styles.formField}>
       <label className={styles.label}>{labelText}</label>
       <InlineNotification
         kind="error"
@@ -147,7 +164,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
           'This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.',
         )}
       />
-    </>
+    </div>
   );
 };
 

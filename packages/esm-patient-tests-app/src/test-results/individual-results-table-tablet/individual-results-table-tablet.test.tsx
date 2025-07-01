@@ -2,10 +2,9 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { mockPanelData, mockResults } from '__mocks__';
-import IndividualResultsTableTablet from './individual-results-table-tablet.component';
-import usePanelData from './usePanelData';
+import { mockResults } from '__mocks__';
 import { FilterProvider, type Roots } from '../filter/filter-context';
+import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 
 const mockIsDesktop = jest.mocked(isDesktop);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -25,8 +24,8 @@ describe('PanelView', () => {
       </FilterProvider>,
     );
 
-    const progressBars = screen.getAllByRole('progressbar');
-    expect(progressBars.length).toBeGreaterThan(0);
+    const skeletonTables = screen.getAllByTestId('cds--data-table-container');
+    expect(skeletonTables.length).toBeGreaterThan(0);
   });
 
   it('renders an empty state when there are no panels to display', () => {

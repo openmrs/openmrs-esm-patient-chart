@@ -1,10 +1,8 @@
-import React, { useId, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  type DataTableHeader,
-  type DataTableRow,
   DataTableSkeleton,
   Layer,
   Search,
@@ -35,7 +33,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
 
-  const tableHeaders: Array<typeof DataTableHeader> = useMemo(
+  const tableHeaders = useMemo(
     () => [
       {
         key: 'name',
@@ -72,7 +70,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
       : listMembers;
   }, [debouncedSearchTerm, listMembers]);
 
-  const tableRows: Array<typeof DataTableRow> = useMemo(
+  const tableRows = useMemo(
     () =>
       filteredListMembers?.map((member) => ({
         id: member.patientUuid,
@@ -81,7 +79,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
     [filteredListMembers],
   );
 
-  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
+  const handleSearchTermChange = (e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
   if (isLoading) {
     return (
@@ -120,10 +118,9 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
                         <TableHeader
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable,
                           })}
                         >
-                          {header.header?.content ?? header.header}
+                          {header.header}
                         </TableHeader>
                       ))}
                     </TableRow>

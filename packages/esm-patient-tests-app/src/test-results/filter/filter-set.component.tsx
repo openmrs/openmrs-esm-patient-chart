@@ -119,6 +119,7 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
             disabled={!root.hasData}
           />
         }
+        // @ts-ignore
         style={{ paddingLeft: `${level > 0 ? 1 : 0}rem` }}
         open={open ?? false}
       >
