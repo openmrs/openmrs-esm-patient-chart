@@ -32,6 +32,12 @@
       "title": "immunizationWorkspaceTitle",
       "component": "immunizationFormWorkspace"
     }
+  ],
+  "modals": [
+    {
+      "name": "immunization-delete-confirmation-modal",
+      "component": "deleteImmunizationConfirmationModal"
+    }
   ]
 }
 

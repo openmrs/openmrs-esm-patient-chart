@@ -8,9 +8,8 @@ export const immunizationWidgetSchema = {
   },
   sequenceDefinitions: {
     _type: Type.Array,
-    _description:
-      'Doses/Schedules definitions for each vaccine configured if applicable. If not provided the vaccine would be treated as a vaccine without schedules',
     _elements: {
+      _type: Type.Object,
       vaccineConceptUuid: {
         _type: Type.UUID,
         _description: 'The UUID of the individual vaccine concept',
@@ -18,6 +17,7 @@ export const immunizationWidgetSchema = {
       sequences: {
         _type: Type.Array,
         _elements: {
+          _type: Type.Object,
           sequenceLabel: {
             _type: Type.String,
             _description: 'Name of the dose/booster/schedule.. This will be used as a translation key as well.',
@@ -30,6 +30,8 @@ export const immunizationWidgetSchema = {
         },
       },
     },
+    _description:
+      'Doses/Schedules definitions for each vaccine configured if applicable. If not provided the vaccine would be treated as a vaccine without schedules',
     _default: [
       {
         vaccineConceptUuid: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',

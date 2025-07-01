@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockCurrentVisit } from '__mocks__';
@@ -8,6 +8,7 @@ import FormsDashboard from './forms-dashboard.component';
 import { mockPatient } from 'tools';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('../hooks/use-forms', () => ({
@@ -24,7 +25,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn(),
   };
 });

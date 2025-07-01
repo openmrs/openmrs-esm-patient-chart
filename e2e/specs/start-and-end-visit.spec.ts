@@ -12,7 +12,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('Ensure no active visits for the patient', async () => {
     const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
     const data = await res.json();
-    const visits = data?.results || [];
+    const { results: visits = [] } = data;
 
     for (const visit of visits) {
       await api.post(`visit/${visit.uuid}`, { data: { voided: true } });

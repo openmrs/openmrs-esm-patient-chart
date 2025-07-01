@@ -4,6 +4,7 @@ export const configSchema = {
   resultsViewerConcepts: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       conceptUuid: {
         _type: Type.UUID,
         _description: `UUID of a test or a concept set containing tests as members, members' members, and so on. Test results will be loaded by querying the REST /obstree endpoint with this concept.`,
@@ -40,10 +41,10 @@ export const configSchema = {
     },
     labOrderableConcepts: {
       _type: Type.Array,
-      _description: 'UUIDs of concepts that represent orderable lab tests or lab sets.',
       _elements: {
         _type: Type.UUID,
       },
+      _description: 'UUIDs of concepts that represent orderable lab tests or lab sets.',
       _default: ['1748a953-d12e-4be1-914c-f6b096c6cdef'],
     },
   },
@@ -55,7 +56,6 @@ export const configSchema = {
   },
   additionalTestOrderTypes: {
     _type: Type.Array,
-    _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
     _elements: {
       _type: Type.Object,
       orderTypeUuid: {
@@ -68,7 +68,10 @@ export const configSchema = {
           'The custom label to be shown for the order type. The label will be translated using the label as the key itself.',
       },
       orderableConceptSets: {
-        _type: Type.UUID,
+        _type: Type.Array,
+        _elements: {
+          _type: Type.UUID,
+        },
         _description:
           'UUIDs of concepts that represent orderable concept sets. If an empty array `[]` is provided, every concept with class mentioned in the `orderableConceptClasses` will be considered orderable.',
       },
@@ -78,11 +81,13 @@ export const configSchema = {
         _default: '',
       },
     },
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
     _default: [],
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       labTestUuid: {
         _type: Type.UUID,
         _description: 'UUID of the lab test that requires a reason for ordering',
@@ -99,12 +104,12 @@ export const configSchema = {
           _type: Type.ConceptUuid,
           _description: 'Array of coded concepts that represent reasons for ordering a lab test',
         },
-        _default: [],
         _description: 'Coded Lab test order reason options',
+        _default: [],
       },
     },
-    _default: [],
     _description: 'Whether to allow for provision of coded order reason',
+    _default: [],
   },
 };
 

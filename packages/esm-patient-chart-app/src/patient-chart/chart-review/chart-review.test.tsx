@@ -13,12 +13,6 @@ import ChartReview from './chart-review.component';
 const mockUseExtensionStore = jest.mocked(useExtensionStore);
 const mockUseExtensionSlotMeta = jest.mocked(useExtensionSlotMeta);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  return {
-    useNavGroups: jest.fn().mockReturnValue({ navGroups: [] }),
-  };
-});
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   Redirect: jest.fn(),

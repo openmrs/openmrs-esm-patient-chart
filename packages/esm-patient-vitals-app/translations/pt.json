@@ -33,6 +33,8 @@
   "goToSummary": "Ir para o resumo",
   "heartRate": "Frequência cardíaca",
   "height": "Altura",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "Carregando",
   "male": "Masculino",
   "muac": "MUAC",

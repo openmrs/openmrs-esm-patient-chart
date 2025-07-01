@@ -8,6 +8,7 @@ import {
   ArrowLeftIcon,
   getPatientName,
   formatDate,
+  launchWorkspace,
   parseDate,
   useLayoutType,
   useConfig,
@@ -15,15 +16,14 @@ import {
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
-  launchPatientWorkspace,
   useOrderType,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../../config-schema';
+import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
 import styles from './add-test-order.scss';
-import { type ConfigObject } from '../../config-schema';
-import type { TestOrderBasketItem } from '../../types';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
@@ -75,7 +75,7 @@ export default function AddLabOrderWorkspace({
   const cancelOrder = useCallback(() => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [closeWorkspace]);

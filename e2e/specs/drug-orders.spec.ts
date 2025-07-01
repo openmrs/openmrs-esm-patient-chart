@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { generateRandomDrugOrder, deleteDrugOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
 import { type Encounter, type Provider } from '../commands/types';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import { test } from '../core';
 import { OrdersPage } from '../pages';
 

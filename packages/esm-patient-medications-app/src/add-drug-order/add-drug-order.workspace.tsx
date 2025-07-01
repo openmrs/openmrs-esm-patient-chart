@@ -1,12 +1,8 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, useLayoutType, useSession } from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  launchPatientWorkspace,
-  useOrderBasket,
-} from '@openmrs/esm-patient-common-lib';
+import { ArrowLeftIcon, launchWorkspace, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import type { DrugOrderBasketItem } from '../types';
@@ -34,7 +30,7 @@ export default function AddDrugOrderWorkspace({
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [closeWorkspace]);
@@ -68,7 +64,7 @@ export default function AddDrugOrderWorkspace({
       }
       setOrders(newOrders);
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+        onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
     [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],

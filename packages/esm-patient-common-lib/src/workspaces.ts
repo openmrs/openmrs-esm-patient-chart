@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   type DefaultWorkspaceProps,
   launchWorkspace,
@@ -5,21 +6,15 @@ import {
   showModal,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { useCallback } from 'react';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
-import { useVisitOrOfflineVisit } from './offline/visit';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
+import { useVisitOrOfflineVisit } from './offline/visit';
 
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
   patientUuid: string;
 }
-
-/**
- * @deprecated Use `launchWorkspace()` instead
- */
-export const launchPatientWorkspace = launchWorkspace;
 
 export function launchPatientChartWithWorkspaceOpen({
   patientUuid,
@@ -55,7 +50,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
           const dispose = showModal('visit-context-switcher', {
             patientUuid,
             closeModal: () => dispose(),
-            onAfterVisitSelected: () => launchPatientWorkspace(workspaceName, additionalProps),
+            onAfterVisitSelected: () => launchWorkspace(workspaceName, additionalProps),
             size: 'sm',
           });
         } else {

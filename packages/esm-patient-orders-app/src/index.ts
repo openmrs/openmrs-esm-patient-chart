@@ -49,7 +49,6 @@ export const ordersDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...ordersDashboardMeta,
-      moduleName,
     }),
     options,
   );
@@ -60,6 +59,7 @@ export const printLabResultModal = getAsyncLifecycle(
   () => import('./lab-results/print-results/print-modal/print-results-modal'),
   options,
 );
+
 // t('searchOrderables','Search orderables')
 export const orderableConceptSearch = getAsyncLifecycle(
   () => import('./order-basket/general-order-type/orderable-concept-search/orderable-concept-search.workspace'),

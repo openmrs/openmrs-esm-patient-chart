@@ -47,7 +47,6 @@ export const allergiesDetailedSummary = getSyncLifecycle(allergiesDetailedSummar
 export const allergiesDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,
-    moduleName,
   }),
   options,
 );

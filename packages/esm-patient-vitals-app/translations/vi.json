@@ -33,6 +33,8 @@
   "goToSummary": "Go to Summary",
   "heartRate": "Heart rate",
   "height": "Chiều cao",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "Đang tải",
   "male": "Nam",
   "muac": "MUAC",

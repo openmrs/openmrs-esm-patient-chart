@@ -6,7 +6,7 @@ export interface DashboardLinkConfig {
   path: string;
   title: string;
   icon: string;
-  moduleName: string;
+  moduleName?: string;
 }
 
 export interface DashboardConfig extends DashboardLinkConfig {

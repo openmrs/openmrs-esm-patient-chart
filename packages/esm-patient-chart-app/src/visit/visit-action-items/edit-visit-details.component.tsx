@@ -1,8 +1,14 @@
 import React from 'react';
 import { Button, IconButton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { EditIcon, UserHasAccess, type Visit, getCoreTranslation, useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import {
+  EditIcon,
+  UserHasAccess,
+  type Visit,
+  getCoreTranslation,
+  launchWorkspace,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 
 interface EditVisitDetailsActionItemProps {
   patientUuid: string;
@@ -21,7 +27,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const editVisitDetails = () => {
-    launchPatientWorkspace('start-visit-workspace-form', {
+    launchWorkspace('start-visit-workspace-form', {
       workspaceTitle: t('editVisitDetails', 'Edit visit details'),
       visitToEdit: visit,
       openedFrom: 'patient-chart-edit-visit',

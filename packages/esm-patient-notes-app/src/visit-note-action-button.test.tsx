@@ -1,6 +1,6 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render } from '@testing-library/react';
 import { type LayoutType, useLayoutType, useWorkspaces, ActionMenuButton } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import VisitNoteActionButton from './visit-note-action-button.extension';
@@ -26,7 +26,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockReturnValue({ currentVisit: null }),
     useLaunchWorkspaceRequiringVisit: jest.fn(),
   };

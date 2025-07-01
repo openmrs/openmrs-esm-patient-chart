@@ -36,7 +36,6 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
-  launchPatientWorkspace,
   PatientChartPagination,
   type Order,
   type OrderBasketItem,
@@ -53,6 +52,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
+  launchWorkspace,
   parseDate,
   PrinterIcon,
   useConfig,
@@ -647,7 +647,7 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm, orders, setOrders]);
 
   const handleAddResultsClick = useCallback(() => {
-    launchPatientWorkspace('test-results-form-workspace', { order: orderItem });
+    launchWorkspace('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {

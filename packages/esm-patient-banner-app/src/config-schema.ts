@@ -3,14 +3,14 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   contactAttributeTypes: {
     _type: Type.Array,
+    _elements: {
+      _type: Type.UUID,
+    },
     _description: 'The UUIDs of person attribute types that store contact information',
     _default: [
       // Telephone number
       '14d4f066-15f5-102d-96e4-000c29c2a5d7',
     ],
-    _elements: {
-      _type: Type.UUID,
-    },
   },
   printPatientSticker: {
     header: {
@@ -36,6 +36,9 @@ export const configSchema = {
     },
     fields: {
       _type: Type.Array,
+      _elements: {
+        _type: Type.String,
+      },
       _description: 'Patient demographics to include in the patient sticker printout',
       _default: ['name', 'dob', 'gender', 'identifier', 'age', 'contact', 'address'],
     },
@@ -53,12 +56,12 @@ export const configSchema = {
     },
     identifiersToDisplay: {
       _type: Type.Array,
-      _description:
-        'List of UUIDs of patient identifier types to include on the patient sticker. If empty, all identifiers will be displayed.',
-      _default: [],
       _elements: {
         _type: Type.UUID,
       },
+      _description:
+        'List of UUIDs of patient identifier types to include on the patient sticker. If empty, all identifiers will be displayed.',
+      _default: [],
     },
   },
   useRelationshipNameLink: {

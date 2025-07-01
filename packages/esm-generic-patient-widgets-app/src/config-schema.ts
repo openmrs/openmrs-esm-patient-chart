@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   title: {
@@ -24,12 +24,13 @@ export const configSchema = {
   data: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       concept: {
         _type: Type.ConceptUuid,
       },
       label: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description: 'The text to display. Defaults to the concept display name.',
       },
       color: {
@@ -68,16 +69,17 @@ export const configSchema = {
   },
   encounterTypes: {
     _type: Type.Array,
-    _description: 'Encounter types used to filter the requests',
     _elements: {
       _type: Type.String,
     },
+    _description: 'Encounter types used to filter the requests',
     _default: [],
   },
   dateFormat: {
     _type: Type.String,
     _description: 'Type of display for data',
     _default: 'dateTime',
+    _validators: [validators.oneOf(['date', 'time', 'dateTime'])],
   },
   showEncounterType: {
     _type: Type.Boolean,

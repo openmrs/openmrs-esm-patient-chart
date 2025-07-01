@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
 import { getVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';

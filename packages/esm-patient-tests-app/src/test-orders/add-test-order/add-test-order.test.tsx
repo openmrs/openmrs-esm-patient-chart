@@ -7,6 +7,7 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
+  launchWorkspace,
   useConfig,
   useLayoutType,
   useSession,
@@ -23,6 +24,7 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
@@ -55,11 +57,8 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-const mockLaunchPatientWorkspace = jest.fn();
-
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchPatientWorkspace: (...args) => mockLaunchPatientWorkspace(...args),
   useOrderType: jest.fn(),
 }));
 
@@ -173,7 +172,7 @@ describe('AddLabOrder', () => {
     });
 
     expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('from lab search, click add directly to order basket', async () => {
@@ -211,7 +210,7 @@ describe('AddLabOrder', () => {
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('should display a patient header on tablet', () => {

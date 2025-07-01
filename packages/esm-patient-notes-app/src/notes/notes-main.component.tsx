@@ -1,14 +1,8 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { AddIcon, useLayoutType, useVisit } from '@openmrs/esm-framework';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  launchPatientWorkspace,
-  launchStartVisitPrompt,
-} from '@openmrs/esm-patient-common-lib';
+import { AddIcon, launchWorkspace, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useVisitNotes } from './visit-notes.resource';
 import PaginatedNotes from './paginated-notes.component';
 import styles from './notes-overview.scss';
@@ -31,7 +25,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, pageSize, urlLab
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
-      launchPatientWorkspace('visit-notes-form-workspace');
+      launchWorkspace('visit-notes-form-workspace');
     } else {
       launchStartVisitPrompt();
     }
