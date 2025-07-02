@@ -135,6 +135,8 @@
   "selectProgramType": "Select program type",
   "selectVisitType": "Please select a visit type",
   "showVisitOnOrPriorTo": "Show visit on or prior to:",
+  "someActionsFailed": "Some actions failed",
+  "someActionsFailedDescription": "The visit was created but some additional actions failed. You may need to retry these actions later.",
   "startDate": "Start date",
   "startingVisit": "Starting visit",
   "startNewVisit": "Start new visit",
