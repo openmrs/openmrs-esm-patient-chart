@@ -35,17 +35,7 @@ const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps>
   if (data?.length > 0) {
     return (
       <div className={styles.widgetCard}>
-        <CardHeader title={headerTitle}>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <AddIcon size={16} {...props} />}
-            iconDescription={t('add', 'Add')}
-            onClick={launchImmunizationsForm}
-          >
-            {t('add', 'Add')}
-          </Button>
-        </CardHeader>
-
+        <CardHeader title={headerTitle} children={''} />
         <div className={styles.content}>
           <ImmunizationHistoryCard patientUuid={patientUuid} />
         </div>
