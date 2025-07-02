@@ -1,9 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { TextInput, Button, InlineNotification } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './paste-image-url.scss';
 
 const PasteImageUrlComponent: React.FC = () => {
+  const { t } = useTranslation();
   const [url, setUrl] = useState('');
   const [error, setError] = useState(false);
   const { setFilesToUpload } = useContext(CameraMediaUploaderContext);
@@ -34,7 +36,7 @@ const PasteImageUrlComponent: React.FC = () => {
         setFilesToUpload([
           {
             base64Content: base64,
-            fileName: 'Image from URL',
+            fileName: t('imageFromUrl.fileName', 'Image from URL'),
             fileType: 'image',
             fileDescription: '',
             status: 'uploading',
@@ -59,23 +61,26 @@ const PasteImageUrlComponent: React.FC = () => {
     <div className={styles.pasteUrlContainer}>
       <TextInput
         id="image-url"
-        labelText="Paste Image URL"
-        placeholder="https://example.com/photo.png"
+        labelText={t('imageUrl.label', 'Paste Image URL')}
+        placeholder={t('imageUrl.placeholder', 'https://example.com/photo.png')}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         invalid={error}
-        invalidText="Image failed to load or convert. Please check the URL."
+        invalidText={t('imageUrl.invalidText', 'Image failed to load or convert. Please check the URL.')}
         className={styles.urlInput}
       />
       <Button kind="primary" onClick={handleLoadImage} className={styles.loadButton}>
-        Load Image
+        {t('imageUrl.loadButton', 'Load Image')}
       </Button>
 
       {error && (
         <InlineNotification
           kind="error"
-          title="Error"
-          subtitle="The image could not be loaded or converted. Make sure the URL is valid and publicly accessible."
+          title={t('error.title', 'Error')}
+          subtitle={t(
+            'imageUrlLoadErrorText',
+            'The image could not be loaded or converted. Make sure the URL is valid and publicly accessible.',
+          )}
           lowContrast
         />
       )}

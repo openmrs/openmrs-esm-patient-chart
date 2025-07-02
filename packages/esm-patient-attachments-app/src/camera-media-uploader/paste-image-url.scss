@@ -1,8 +1,8 @@
 @use '@carbon/layout';
-@use '@openmrs/esm-styleguide/src/vars' as vars;
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .pasteUrlContainer {
-  color: vars.$ui-02;
+  color: $ui-02;
   width: 100%;
   height: 406px; // match esm-media-uploader
   padding: layout.$spacing-05;
@@ -22,7 +22,7 @@
     margin-top: layout.$spacing-05;
     max-width: 300px;
     max-height: 300px;
-    border: 1px solid vars.$ui-03;
+    border: 1px solid $ui-03;
     border-radius: 4px;
     display: block;
   }
