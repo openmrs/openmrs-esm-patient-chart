@@ -44,6 +44,10 @@ test('Add and edit an immunization', async ({ page, patient }) => {
     await expect(page.getByText(/vaccination saved successfully/i)).toBeVisible();
   });
 
+  await test.step('Then I should see the immunizations summary table', async () => {
+    await expect(immunizationsSummaryTable).toBeVisible();
+  });
+
   await test.step('And I should see the immunization table with the correct headers', async () => {
     await expect(headerRow).toContainText(/vaccine/i);
     await expect(headerRow).toContainText(/recent vaccination/i);
@@ -52,10 +56,6 @@ test('Add and edit an immunization', async ({ page, patient }) => {
   await test.step('And I should see the a table row with the correct immunization details', async () => {
     await expect(immunizationType).toContainText(/hepatitis b vaccination/i);
     await expect(vaccinationDate).toContainText(/last dose on 08-Mar-2024, dose 1/i);
-  });
-
-  await test.step('Then I should see the immunizations summary table', async () => {
-    await expect(immunizationsSummaryTable).toBeVisible();
   });
 
   await test.step('When I click the Expand all rows button', async () => {
