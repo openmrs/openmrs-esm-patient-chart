@@ -39,8 +39,6 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const currentVisitIsRetrospective = Boolean(currentVisit?.stopDatetime);
 
-  console.log('DEBUG: currentVisit', { currentVisit, currentVisitIsRetrospective });
-
   const { orders, clearOrders } = useOrderBasket();
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
