@@ -63,7 +63,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly ngZone: NgZone,
     private readonly programService: ProgramResourceService,
     private readonly formDataSourceService: FormDataSourceService,
-    private readonly patientResourceService: PatientResourceService,
     private readonly visitResourceService: VisitResourceService,
   ) {}
 
@@ -202,57 +201,46 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   private handleFormSubmission() {
     this.changeState('submitting');
-    this.patientResourceService.validateIdentifiers(this.form).subscribe((resp) => {
-      if (resp.length > 0) {
-        this.changeState('readyWithValidationErrors');
+
+    this.formSubmissionService.submitPayload(this.form).subscribe(
+      ({ encounter }) => {
+        this.onPostResponse(encounter);
+        const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
+
+        if (!isOffline && encounter?.uuid) {
+          this.encounterResourceService
+            .getEncounterByUuid(encounter.uuid)
+            .pipe(take(1))
+            .subscribe((encounter) => {
+              if (Array.isArray(encounter?.orders)) {
+                const submittedOrders = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
+                this.showLabOrdersNotification(submittedOrders);
+              }
+            });
+        }
+
+        this.programService.handlePatientCareProgram(this.form, encounter.uuid);
         showSnackbar({
-          title: this.translateService.instant('patientIdentifierDuplication'),
-          subtitle: this.translateService.instant('patientIdentifierDuplicationDescription'),
-          kind: 'error',
-          isLowContrast: false,
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: this.translateService.instant('formSubmittedSuccessfully'),
+          title: this.form.schema.display ?? this.form.schema.name,
+          timeoutInMs: 5000,
         });
-      } else {
-        this.formSubmissionService.submitPayload(this.form).subscribe(
-          ({ encounter }) => {
-            this.onPostResponse(encounter);
-            const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-
-            if (!isOffline && encounter?.uuid) {
-              this.encounterResourceService
-                .getEncounterByUuid(encounter.uuid)
-                .pipe(take(1))
-                .subscribe((encounter) => {
-                  if (Array.isArray(encounter?.orders)) {
-                    const submittedOrders = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
-                    this.showLabOrdersNotification(submittedOrders);
-                  }
-                });
-            }
-
-            this.programService.handlePatientCareProgram(this.form, encounter.uuid);
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: this.translateService.instant('formSubmittedSuccessfully'),
-              title: this.form.schema.display ?? this.form.schema.name,
-              timeoutInMs: 5000,
-            });
-            this.changeState('submitted');
-            this.closeFormWithSavedChanges();
-          },
-          (error: Error) => {
-            this.changeState('submissionError');
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'error',
-              subtitle: this.translateService.instant('formSubmissionFailed').replace('{error}', error.message),
-              title: this.form.schema.display ?? this.form.schema.name,
-              timeoutInMs: 5000,
-            });
-          },
-        );
-      }
-    });
+        this.changeState('submitted');
+        this.closeFormWithSavedChanges();
+      },
+      (error: Error) => {
+        this.changeState('submissionError');
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'error',
+          subtitle: this.translateService.instant('formSubmissionFailed').replace('{error}', error.message),
+          title: this.form.schema.display ?? this.form.schema.name,
+          timeoutInMs: 5000,
+        });
+      },
+    );
   }
 
   private modifyVisitDate(visitUuid: string, visitStartDatetime: string, visitStopDatetime: string) {
