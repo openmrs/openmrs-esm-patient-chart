@@ -167,14 +167,14 @@ export function getObsFromEncounter({
   // format format obs date or datetime based on the obs value's type
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
-      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
+      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide', time: false });
     } else if (typeof obs.value === 'string') {
-      return formatDate(parseDate(obs.value), { mode: 'wide' });
+      return formatDate(parseDate(obs.value), { mode: 'wide', time: false });
     }
   }
 
   if (typeof obs.value === 'object' && obs.value?.name) {
-    return obs.value?.name?.display;
+    return obs.value?.name?.display ?? obs.value?.name?.name ?? '--';
   }
   return obs.value;
 }
