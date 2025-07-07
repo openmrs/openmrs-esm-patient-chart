@@ -3,7 +3,7 @@ import type { Encounter, ColumnDefinition, ConfigConcepts, EncounterTileColumn, 
 import dayjs from 'dayjs';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
-  return `${dayjs().diff(dayjs(givenDate), 'days')} days`;
+  return `${Math.abs(dayjs().diff(dayjs(givenDate), 'days'))} days`;
 };
 
 export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: ConfigConcepts) => {
@@ -61,7 +61,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
             const primaryDate = getObsFromEncounter({
               encounter: encounter,
               obsConcept: column.summaryConcept.primaryConcept,
-              isDate: column.summaryConcept.isDate,
+              isDate: false,
               config,
             });
 
