@@ -1,12 +1,10 @@
-import { useCallback } from 'react';
 import {
   openmrsFetch,
   restBaseUrl,
-  useOpenmrsInfinite,
   type OpenmrsResource,
   type Visit,
+  useOpenmrsInfinite,
   useOpenmrsPagination,
-  useVisitContextStore,
 } from '@openmrs/esm-framework';
 
 const customRepresentation =
@@ -26,8 +24,6 @@ export function useInfiniteVisits(
   }
 
   const { data, mutate, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
-  const mutateVisit = useCallback(() => mutate(), [mutate]);
-  useVisitContextStore(mutateVisit);
 
   return { visits: data, mutate, ...rest };
 }
@@ -46,9 +42,6 @@ export function usePaginatedVisits(
   }
 
   const ret = useOpenmrsPagination<Visit>(url, pageSize);
-  const { mutate } = ret;
-  const mutateVisit = useCallback(() => mutate(), [mutate]);
-  useVisitContextStore(mutateVisit);
 
   return ret;
 }

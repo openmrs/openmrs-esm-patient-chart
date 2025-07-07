@@ -18,11 +18,11 @@ import {
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
+import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
-import VisitActionsCell from './visit-actions-cell.component';
 import styles from './visit-history-table.scss';
 
 interface VisitHistoryTableProps {
