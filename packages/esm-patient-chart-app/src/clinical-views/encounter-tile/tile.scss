@@ -18,6 +18,12 @@
   @include type.type-style('body-long-01');
   display: block;
   padding-top: layout.$spacing-05;
+  font-size: var(--cds-label-01-font-size, 0.75rem);
+  font-weight: var(--cds-label-01-font-weight, 400);
+  line-height: var(--cds-label-01-line-height, 1.33333);
+  letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
+  color: $text-02;
+  display: block;
 }
 
 .columnContainer {
@@ -43,6 +49,7 @@
   flex-direction: row;
   flex: 1;
   gap: layout.$spacing-05;
+  justify-content: space-around;
 }
 
 .desktopHeading {

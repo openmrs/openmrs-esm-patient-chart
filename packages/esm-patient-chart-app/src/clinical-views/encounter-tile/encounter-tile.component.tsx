@@ -71,9 +71,6 @@ const EncounterData: React.FC<{
                 <span className={styles.tileValue}>
                   <p>{column.getSummaryObsValue(lastEncounter)}</p>
                 </span>
-                <span className={styles.tileValue}>
-                  <p>{column.getObsValue(lastEncounter)}</p>
-                </span>
               </>
             )}
           </div>
