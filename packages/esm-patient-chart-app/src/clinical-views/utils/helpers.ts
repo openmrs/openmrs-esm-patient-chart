@@ -1,4 +1,5 @@
 import { age, formatDate, launchWorkspace, parseDate, type Visit } from '@openmrs/esm-framework';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib/src';
 import type {
   ConfigConcepts,
   Encounter,
@@ -20,21 +21,24 @@ export function launchEncounterForm(
   intent: string = '*',
   patientUuid?: string,
 ) {
-  launchWorkspace('patient-form-entry-workspace', {
-    workspaceTitle: form?.name,
-    mutateForm: onFormSave,
-    formInfo: {
-      encounterUuid,
-      formUuid: form?.uuid,
-      patientUuid: patientUuid,
-      visit: visit,
-      additionalProps: {
-        mode: action === 'add' ? 'enter' : action,
-        formSessionIntent: intent,
-        openClinicalFormsWorkspaceOnFormClose: false,
+  if (!visit) {
+    launchStartVisitPrompt();
+  } else
+    launchWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: form?.name,
+      mutateForm: onFormSave,
+      formInfo: {
+        encounterUuid,
+        formUuid: form?.uuid,
+        patientUuid: patientUuid,
+        visit: visit,
+        additionalProps: {
+          mode: action === 'add' ? 'enter' : action,
+          formSessionIntent: intent,
+          openClinicalFormsWorkspaceOnFormClose: false,
+        },
       },
-    },
-  });
+    });
 }
 
 export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
