@@ -85,6 +85,11 @@ export const esmPatientChartSchema = {
     _description: 'Whether start visit form should display service queue fields`',
     _default: false,
   },
+  defaultInitialServiceQueue: {
+    _type: Type.String,
+    _description: 'The name of the default service queue to be selected when the start visit form is opened',
+    _default: 'Outpatient Triage',
+  },
   showUpcomingAppointments: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display upcoming appointments',

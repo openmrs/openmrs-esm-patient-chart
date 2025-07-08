@@ -1,5 +1,6 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ComboBox,
@@ -26,18 +27,22 @@ import {
 import {
   EditIcon,
   isDesktop,
+  launchWorkspace,
   showModal,
   showSnackbar,
   TrashCanIcon,
-  useLayoutType,
-  useSession,
-  userHasAccess,
   useConfig,
+  useLayoutType,
+  userHasAccess,
+  useSession,
+  useVisit,
   type EncounterType,
-  launchWorkspace,
-  useVisitContextStore,
 } from '@openmrs/esm-framework';
-import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import {
+  type HtmlFormEntryForm,
+  launchFormEntryOrHtmlForms,
+  invalidateVisitAndEncounterData,
+} from '@openmrs/esm-patient-common-lib';
 import {
   deleteEncounter,
   mapEncounter,
@@ -71,7 +76,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -118,7 +124,11 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              mutateVisit();
+              // Update current visit data for critical components
+              mutateCurrentVisit();
+
+              // Also invalidate visit history and encounter tables since the encounter was deleted
+              invalidateVisitAndEncounterData(mutate, patientUuid);
 
               showSnackbar({
                 isLowContrast: true,
@@ -142,7 +152,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         },
       });
     },
-    [mutateVisit, t],
+    [mutate, mutateCurrentVisit, patientUuid, t],
   );
 
   if (isLoadingEncounterTypes || isLoading) {

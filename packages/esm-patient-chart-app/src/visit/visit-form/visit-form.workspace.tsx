@@ -1,4 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -25,28 +31,20 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
-  useVisitContextStore,
+  useVisit,
   type AssignedExtension,
   type NewVisitPayload,
   type Visit,
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeSection from './visit-date-time.component';
 import {
   convertToDate,
   createVisitAttribute,
@@ -61,7 +59,12 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeSection from './visit-date-time.component';
 import styles from './visit-form.scss';
+
 dayjs.extend(isSameOrBefore);
 
 interface VisitFormProps extends DefaultPatientWorkspaceProps {
@@ -99,7 +102,8 @@ const VisitForm: React.FC<VisitFormProps> = ({
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -295,6 +299,18 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // to update visit attributes or any other OnVisitCreatedOrUpdated actions
             const visit = response.data;
 
+            // For visit creation, we need to update:
+            // 1. Current visit data (for critical components like visit summary, action buttons)
+            // 2. Visit history table (for the paginated visit list)
+
+            // Update current visit data for critical components (useVisit hook)
+            mutateCurrentVisit();
+
+            // Use targeted SWR invalidation instead of global mutateVisit
+            // This will invalidate visit history and encounter tables for this patient
+            // (current visit is already updated with mutateCurrentVisit)
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
+
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
             const visitAttributesRequest = handleVisitAttributes(visitAttributes, response.data.uuid).then(
@@ -323,9 +339,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
-          })
-          .finally(() => {
-            mutateVisit();
           });
       } else {
         createOfflineVisitForPatient(
@@ -335,7 +348,11 @@ const VisitForm: React.FC<VisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            mutateVisit();
+            // Use same targeted approach for offline visits for consistency
+            mutateCurrentVisit();
+
+            // Also invalidate visit history and encounter tables
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -364,12 +381,13 @@ const VisitForm: React.FC<VisitFormProps> = ({
       config.offlineVisitTypeUuid,
       config.showExtraVisitAttributesSlot,
       extraVisitInfo,
+      globalMutate,
       handleVisitAttributes,
       isOnline,
-      mutateVisit,
-      visitFormCallbacks,
+      mutateCurrentVisit,
       patientUuid,
       t,
+      visitFormCallbacks,
       visitToEdit,
     ],
   );

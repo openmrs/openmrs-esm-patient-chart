@@ -9,7 +9,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisitContextStore,
+  useVisit,
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
@@ -21,8 +21,8 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
-import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
+import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -47,7 +47,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -76,7 +76,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           abortController,
         );
         mutateEncounterUuid();
-        mutateVisit();
+        // Only revalidate current visit since orders create new encounters
+        mutateCurrentVisit();
         clearOrders();
         await mutateOrders();
         closeWorkspaceWithSavedChanges();
@@ -91,7 +92,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      mutateVisit();
+      // Only revalidate current visit since orders create new encounters
+      mutateCurrentVisit();
       await mutateOrders();
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();
@@ -111,7 +113,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     mutateEncounterUuid,
     mutateOrders,
-    mutateVisit,
+    mutateCurrentVisit,
     orders,
     patientUuid,
     session,
