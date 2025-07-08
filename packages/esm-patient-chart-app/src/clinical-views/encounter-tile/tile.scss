@@ -16,11 +16,7 @@
 
 .tileTitle {
   @include type.type-style('body-long-01');
-  display: block;
-  padding-top: layout.$spacing-05;
-  font-size: var(--cds-label-01-font-size, 0.75rem);
-  line-height: var(--cds-label-01-line-height, 1.33333);
-  letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
+  @include type.type-style('label-01');
   color: $text-02;
   display: block;
 }

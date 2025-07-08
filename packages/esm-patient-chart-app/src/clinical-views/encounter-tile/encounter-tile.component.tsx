@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { CodeSnippetSkeleton, Tile, Layer, Grid, Column } from '@carbon/react';
+import { isNil } from 'lodash-es';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { useLastEncounter } from '../hooks';
 import type { EncounterTileColumn, EncounterTileProps } from '../types';
 import styles from './tile.scss';
@@ -17,18 +18,17 @@ export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: Encoun
           <h4 className={styles.title}>{headerTitle}</h4>
         </div>
         <Grid fullWidth>
-          {columns.map((column, index) => {
-            return (
-              <Column
-                key={`${column.encounterTypeUuid}-${column.title}-${index}`}
-                sm={columnSpan}
-                md={columnSpan}
-                lg={columnSpan}
-              >
-                <EncounterData patientUuid={patientUuid} column={column} />
-              </Column>
-            );
-          })}
+          {columns.map((column, index) => (
+            <Column
+              key={`${column.encounterTypeUuid}-${column.title}-${index}`}
+              sm={columnSpan}
+              md={columnSpan}
+              lg={columnSpan}
+              span={columnSpan}
+            >
+              <EncounterData patientUuid={patientUuid} column={column} />
+            </Column>
+          ))}
         </Grid>
       </Tile>
     </Layer>
@@ -63,13 +63,13 @@ const EncounterData: React.FC<{
   return (
     <>
       <span className={styles.tileTitle}>{t(column.header)}</span>
-      {!(obsValue === '--' && summaryValue !== '--' && summaryValue !== null) && (
+      {!(obsValue === '--' && summaryValue !== '--' && !isNil(summaryValue)) && (
         <span className={styles.tileValue}>
           <p>{obsValue}</p>
         </span>
       )}
 
-      {summaryValue !== null && summaryValue !== '--' && (
+      {!isNil(summaryValue) && summaryValue !== '--' && (
         <span className={styles.tileValue}>
           <p>{summaryValue}</p>
         </span>
