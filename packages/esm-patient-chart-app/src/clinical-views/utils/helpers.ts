@@ -20,8 +20,9 @@ export function launchEncounterForm(
   encounterUuid?: string,
   intent: string = '*',
   patientUuid?: string,
+  requireActiveVisitForEncounterTile: boolean = true,
 ) {
-  if (!visit) {
+  if (!visit && requireActiveVisitForEncounterTile) {
     launchStartVisitPrompt();
   } else
     launchWorkspace('patient-form-entry-workspace', {
