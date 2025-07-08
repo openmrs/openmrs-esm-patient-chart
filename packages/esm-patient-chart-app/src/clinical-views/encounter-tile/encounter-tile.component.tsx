@@ -1,15 +1,14 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { CodeSnippetSkeleton, Tile, Column, Layer } from '@carbon/react';
-import { groupColumnsByEncounterType } from '../utils/helpers';
+import { CodeSnippetSkeleton, Tile, Layer, Grid, Column } from '@carbon/react';
 import { useLastEncounter } from '../hooks';
 import type { EncounterTileColumn, EncounterTileProps } from '../types';
 import styles from './tile.scss';
 
 export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
-  const columnsByEncounterType = useMemo(() => groupColumnsByEncounterType(columns), [columns]);
   const isTablet = useLayoutType() === 'tablet';
+  const columnSpan = Math.floor(16 / columns.length);
 
   return (
     <Layer className={styles.layer}>
@@ -17,16 +16,20 @@ export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: Encoun
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4 className={styles.title}>{headerTitle}</h4>
         </div>
-        <Column className={styles.columnContainer}>
-          {Object.entries(columnsByEncounterType).map(([encounterTypeUuid, columns]) => (
-            <EncounterData
-              key={encounterTypeUuid}
-              patientUuid={patientUuid}
-              encounterType={encounterTypeUuid}
-              columns={columns}
-            />
-          ))}
-        </Column>
+        <Grid fullWidth>
+          {columns.map((column, index) => {
+            return (
+              <Column
+                key={`${column.encounterTypeUuid}-${column.title}-${index}`}
+                sm={columnSpan}
+                md={columnSpan}
+                lg={columnSpan}
+              >
+                <EncounterData patientUuid={patientUuid} column={column} />
+              </Column>
+            );
+          })}
+        </Grid>
       </Tile>
     </Layer>
   );
@@ -34,11 +37,15 @@ export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: Encoun
 
 const EncounterData: React.FC<{
   patientUuid: string;
-  encounterType: string;
-  columns: EncounterTileColumn[];
-}> = ({ patientUuid, encounterType, columns }) => {
-  const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, encounterType);
+  column: EncounterTileColumn;
+}> = ({ patientUuid, column }) => {
   const { t } = useTranslation();
+  const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, column.encounterTypeUuid);
+  const obsValue = column.getObsValue(lastEncounter);
+  const summaryValue =
+    column.hasSummary === true && column.getSummaryObsValue && typeof column.getSummaryObsValue === 'function'
+      ? column.getSummaryObsValue(lastEncounter)
+      : null;
 
   if (isLoading || isValidating) {
     return <CodeSnippetSkeleton type="multi" className="skeleton" />;
@@ -46,36 +53,27 @@ const EncounterData: React.FC<{
 
   if (error || lastEncounter === undefined) {
     return (
-      <div className={styles.tileBox}>
-        {columns.map((column, ind) => (
-          <div key={ind}>
-            <span className={styles.tileTitle}>{t(column.title)}</span>
-            <span className={styles.tileValue}>{error?.message}</span>
-          </div>
-        ))}
-      </div>
+      <>
+        <span className={styles.tileTitle}>{t(column.title)}</span>
+        <span className={styles.tileValue}>{error?.message}</span>
+      </>
     );
   }
 
   return (
-    <div className={styles.tileBox}>
-      {columns.map((column, ind) => {
-        return (
-          <div key={ind}>
-            <span className={styles.tileTitle}>{t(column.header)}</span>
-            <span className={styles.tileValue}>
-              <p>{column.getObsValue(lastEncounter)}</p>
-            </span>
-            {column.hasSummary && (
-              <>
-                <span className={styles.tileValue}>
-                  <p>{column.getSummaryObsValue(lastEncounter)}</p>
-                </span>
-              </>
-            )}
-          </div>
-        );
-      })}
-    </div>
+    <>
+      <span className={styles.tileTitle}>{t(column.header)}</span>
+      {!(obsValue === '--' && summaryValue !== '--' && summaryValue !== null) && (
+        <span className={styles.tileValue}>
+          <p>{obsValue}</p>
+        </span>
+      )}
+
+      {summaryValue !== null && summaryValue !== '--' && (
+        <span className={styles.tileValue}>
+          <p>{summaryValue}</p>
+        </span>
+      )}
+    </>
   );
 };
