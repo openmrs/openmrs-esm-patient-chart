@@ -16,4 +16,5 @@ export * from './time-helper';
 export * from './types';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
+export * from './visit';
 export * from './workspaces';
