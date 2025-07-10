@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton } from '@carbon/react';
-import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { formatDatetime, useLayoutType, ResponsiveWrapper, showSnackbar } from '@openmrs/esm-framework';
 import type { CompletedFormInfo, Form } from '../types';
+import { useFormsContext } from './forms-context';
 import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
 
@@ -13,17 +14,19 @@ export type FormsListProps = {
   error?: any;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  totalForms?: number;
 };
 
-/*
- * For the benefit of our automated translations:
- * t('forms', 'Forms')
- */
-
-const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionName = 'forms', handleFormOpen }) => {
+const FormsList: React.FC<FormsListProps> = ({
+  completedForms,
+  error,
+  sectionName = 'forms',
+  handleFormOpen,
+  totalForms,
+}) => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
+  const { searchTerm, setSearchTerm } = useFormsContext();
   const [locale, setLocale] = useState(window.i18next.language ?? navigator.language);
 
   useEffect(() => {
@@ -34,7 +37,7 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     }
   }, []);
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce(setSearchTerm, 1000), [setSearchTerm]);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
@@ -75,6 +78,16 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     [filteredForms],
   );
 
+  if (error) {
+    const errorMessage = error?.responseBody?.error?.message ?? error?.message;
+    showSnackbar({
+      title: t('errorLoadingForms', 'Error loading forms'),
+      kind: 'error',
+      isLowContrast: false,
+      subtitle: errorMessage,
+    });
+  }
+
   if (!completedForms && !error) {
     return <DataTableSkeleton role="progressbar" />;
   }
@@ -83,34 +96,23 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     return <></>;
   }
 
-  if (sectionName === 'forms') {
-    return (
-      <ResponsiveWrapper>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-        />
-      </ResponsiveWrapper>
-    );
-  } else {
-    return (
-      <ResponsiveWrapper>
+  return (
+    <ResponsiveWrapper>
+      {sectionName !== 'forms' && (
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{t(sectionName)}</h4>
         </div>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-        />
-      </ResponsiveWrapper>
-    );
-  }
+      )}
+      <FormsTable
+        tableHeaders={tableHeaders}
+        tableRows={tableRows}
+        isTablet={isTablet}
+        handleSearch={handleSearch}
+        handleFormOpen={handleFormOpen}
+        totalItems={totalForms}
+      />
+    </ResponsiveWrapper>
+  );
 };
 
 export default FormsList;

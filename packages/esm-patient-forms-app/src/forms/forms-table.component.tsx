@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Link,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -15,6 +16,7 @@ import {
   TableToolbarSearch,
 } from '@carbon/react';
 import { type Form } from '../types';
+import { useFormsContext } from './forms-context';
 import styles from './forms-table.scss';
 
 interface FormsTableProps {
@@ -33,10 +35,21 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  totalItems: number;
 }
 
-const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
+const FormsTable = ({
+  tableHeaders,
+  tableRows,
+  isTablet,
+  handleSearch,
+  handleFormOpen,
+  totalItems,
+}: FormsTableProps) => {
   const { t } = useTranslation();
+  const { pageSize, currentPage, setPageSize, setCurrentPage } = useFormsContext();
+  const pageSizes = [50, 100, 200];
+
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -60,13 +73,15 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => (
-                    <TableRow {...getRowProps({ row })}>
+                    <TableRow {...getRowProps({ row })} key={row.id}>
                       <TableCell key={row.cells[0].id}>
                         <Link
                           style={{ cursor: 'pointer' }}
@@ -88,6 +103,22 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
               </Table>
             )}
           </TableContainer>
+          <Pagination
+            backwardText={t('previousPage', 'Previous page')}
+            forwardText={t('nextPage', 'Next page')}
+            itemsPerPageText={t('forms', 'Forms')}
+            onChange={({ page, pageSize: newPageSize }) => {
+              if (newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+              setCurrentPage(page);
+            }}
+            page={currentPage}
+            pageSize={pageSize}
+            pageSizes={pageSizes}
+            size="sm"
+            totalItems={totalItems}
+          />
         </>
       )}
     </DataTable>
