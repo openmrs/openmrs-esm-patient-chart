@@ -8,7 +8,6 @@ import { OrdersPage } from '../pages';
 let drugOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
-const url = process.env.E2E_BASE_URL;
 
 test.beforeEach(async ({ api, patient, visit }) => {
   orderer = await getProvider(api);
@@ -21,7 +20,7 @@ test.describe('Drug Order Tests', () => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await page.goto(`/openmrs/spa/patient/${patient.uuid}/chart/Medications`);
     });
 
     await test.step('And I click the Add button on the medications details table', async () => {
@@ -131,7 +130,7 @@ test.describe('Drug Order Tests', () => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await page.goto(`/openmrs/spa/patient/${patient.uuid}/chart/Medications`);
     });
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
@@ -213,7 +212,7 @@ test.describe('Drug Order Tests', () => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await page.goto(`/openmrs/spa/patient/${patient.uuid}/chart/Medications`);
     });
 
     await test.step('And I click on the "Discontinue" button', async () => {
