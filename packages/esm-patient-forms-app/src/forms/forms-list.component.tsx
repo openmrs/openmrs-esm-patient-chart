@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton } from '@carbon/react';
-import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { formatDatetime, useLayoutType, ResponsiveWrapper, showSnackbar } from '@openmrs/esm-framework';
 import type { CompletedFormInfo, Form } from '../types';
-import FormsTable from './forms-table.component';
 import { useFormsContext } from './forms-context';
+import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
 
 export type FormsListProps = {
@@ -77,6 +77,16 @@ const FormsList: React.FC<FormsListProps> = ({
       }) ?? [],
     [filteredForms],
   );
+
+  if (error) {
+    const errorMessage = error?.responseBody?.error?.message ?? error?.message;
+    showSnackbar({
+      title: t('errorLoadingForms', 'Error loading forms'),
+      kind: 'error',
+      isLowContrast: false,
+      subtitle: errorMessage,
+    });
+  }
 
   if (!completedForms && !error) {
     return <DataTableSkeleton role="progressbar" />;

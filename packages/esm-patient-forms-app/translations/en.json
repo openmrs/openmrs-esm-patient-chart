@@ -1,6 +1,7 @@
 {
   "clinicalForm": "Clinical Form",
   "clinicalForms": "Clinical forms",
+  "errorLoadingForms": "Error loading forms",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
   "homeOverviewCardView": "View",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Link,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -13,11 +14,10 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
 } from '@carbon/react';
-import styles from './forms-table.scss';
 import { type Form } from '../types';
 import { useFormsContext } from './forms-context';
+import styles from './forms-table.scss';
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -73,13 +73,15 @@ const FormsTable = ({
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => (
-                    <TableRow {...getRowProps({ row })}>
+                    <TableRow {...getRowProps({ row })} key={row.id}>
                       <TableCell key={row.cells[0].id}>
                         <Link
                           style={{ cursor: 'pointer' }}
@@ -102,20 +104,20 @@ const FormsTable = ({
             )}
           </TableContainer>
           <Pagination
-            forwardText={t('nextPage', 'Next page')}
             backwardText={t('previousPage', 'Previous page')}
+            forwardText={t('nextPage', 'Next page')}
             itemsPerPageText={t('forms', 'Forms')}
-            page={currentPage}
-            pageSize={pageSize}
-            size="sm"
-            pageSizes={pageSizes}
-            totalItems={totalItems}
             onChange={({ page, pageSize: newPageSize }) => {
               if (newPageSize !== pageSize) {
                 setPageSize(newPageSize);
               }
               setCurrentPage(page);
             }}
+            page={currentPage}
+            pageSize={pageSize}
+            pageSizes={pageSizes}
+            size="sm"
+            totalItems={totalItems}
           />
         </>
       )}
