@@ -108,7 +108,7 @@ test('clicking the Record active medications link opens the order basket form', 
   renderWithSwr(<ActiveMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
-  const orderLink = screen.getByText('Record active medications');
+  const orderLink = screen.getByText(/Record active medications/i);
   await user.click(orderLink);
   expect(mockLaunchWorkspace).toHaveBeenCalledWith('add-drug-order');
 });
