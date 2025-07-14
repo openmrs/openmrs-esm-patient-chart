@@ -24,13 +24,13 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         <EmptyDataIllustration />
         <p className={styles.content}>
           {t('emptyStateText', 'There are no {{displayText}} to display for this patient', {
-            displayText: props.displayText.toLowerCase(),
+            displayText: props.displayText,
           })}
         </p>
         <p className={styles.action}>
           {props.launchForm && (
             <Button onClick={() => props.launchForm()} kind="ghost" size={isTablet ? 'lg' : 'sm'}>
-              {t('record', 'Record')} {props.displayText.toLowerCase()}
+              {t('record', 'Record')} {t(props.displayText)}
             </Button>
           )}
         </p>
