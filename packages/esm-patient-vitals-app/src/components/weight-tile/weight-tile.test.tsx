@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { getByTextWithMarkup, mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { formattedBiometrics, mockBiometricsConfig, mockConceptMetadata, mockVitalsSignsConcepts } from '__mocks__';
+import { formattedBiometrics, mockBiometricsConfig, mockVitalsSignsConcepts } from '__mocks__';
 import { useVitalsAndBiometrics } from '../../common';
 import WeightTile from './weight-tile.component';
 
@@ -18,9 +18,10 @@ jest.mock('../../common', () => {
 
   return {
     ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
+      isLoading: false,
     })),
     useVitalsAndBiometrics: jest.fn(),
   };

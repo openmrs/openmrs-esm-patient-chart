@@ -1,16 +1,12 @@
 {
   "clinicalForm": "Clinical Form",
   "clinicalForms": "ទម្រង់វេជ្ជសាស្ត្រ",
-  "editForm": "កែទម្រង់",
   "formName": "ឈ្មោះទម្រង់ (ក-ហ្ស)",
   "forms": "ទម្រង់ទាំងអស់",
-  "formSearchHint": "ព្យាយាមស្វែងរកទម្រង់ដោយប្រើឈ្មោះជំនួស ឬពាក្យគន្លឹះ",
   "homeOverviewCardView": "ពិនិត្យមើល",
   "lastCompleted": "បញ្ចប់ចុងក្រោយ",
   "never": "មិនដែលសោះ",
   "noFormsToDisplay": "មិនមានទម្រង់ដែលត្រូវបង្ហាញទេ.",
-  "noMatchingFormsAvailable": "មិនមានទម្រង់ {{formCategory}} ដែលត្រូវបង្ហាញទេ",
-  "noMatchingFormsToDisplay": "មិនមានទម្រង់ដែលត្រូវគ្នាដើម្បីបង្ហាញទេ",
   "offlineForms": "ទម្រង់មិនមានភ្ជាប់អ៊ីនធើណេត",
   "offlineForms__lower": "ទម្រង់មិនមានភ្ជាប់អ៊ីនធើណេត",
   "offlineFormsOverviewCardAvailableOffline": "ភាពអាចរកបាននៅក្រៅបណ្តាញ (អត់មានបណ្តាញ)",
@@ -20,6 +16,5 @@
   "offlinePatientsTableSearchLabel": "ស្វែងរកបញ្ជីនេះ។",
   "offlinePatientsTableSearchPlaceholder": "ស្វែងរកបញ្ជីនេះ។",
   "offlineToggle": "បិទបើកក្រៅបណ្តាញ",
-  "searchForAForm": "ស្វែងរកទម្រង់",
   "searchThisList": "ស្វែងរកបញ្ជីនេះ"
 }

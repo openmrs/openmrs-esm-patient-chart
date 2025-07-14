@@ -20,7 +20,7 @@ import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePi
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
-  type ConditionDataTableRow,
+  type Condition,
   type FormFields,
   createCondition,
   updateCondition,
@@ -33,7 +33,7 @@ import styles from './conditions-form.scss';
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   onConditionSave?: ConditionFormProps['onConditionSave'];
-  conditionToEdit?: ConditionDataTableRow;
+  conditionToEdit?: Condition;
   isEditing?: boolean;
   isSubmittingForm: boolean;
   patientUuid: string;
@@ -81,19 +81,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
-  const getFieldValue = (
-    tableCells: Array<{
-      info: {
-        header: string;
-      };
-      value: string;
-    }>,
-    fieldName,
-  ): string => tableCells?.find((cell) => cell?.info?.header === fieldName)?.value;
-
-  const displayName = getFieldValue(conditionToEdit?.cells, 'display');
-  const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
-  const editableAbatementDateTime = getFieldValue(conditionToEdit?.cells, 'abatementDateTime');
+  const displayName = conditionToEdit?.display;
+  const editableClinicalStatus = conditionToEdit?.clinicalStatus;
+  const editableAbatementDateTime = conditionToEdit?.abatementDateTime;
   const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -238,11 +228,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       })}
                       disabled={isEditing}
                       id="conditionsSearch"
+                      aria-labelledby={errors?.conditionName ? 'conditionsSearchError' : undefined}
                       labelText={t('enterCondition', 'Enter condition')}
                       onChange={(event) => {
-                        const value = event.target.value;
-                        onChange(value);
-                        handleSearchTermChange(value);
+                        const val = event.target.value;
+                        onChange(val);
+                        handleSearchTermChange(val);
                       }}
                       onClear={() => {
                         setSearchTerm('');
@@ -263,7 +254,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && <p className={styles.errorMessage}>{errors?.conditionName?.message}</p>}
+              {errors?.conditionName && (
+                <p id="conditionsSearchError" className={styles.errorMessage}>
+                  {errors.conditionName.message}
+                </p>
+              )}
               <SearchResults
                 isSearching={isSearching}
                 onConditionChange={handleConditionChange}
@@ -307,13 +302,18 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 onChange={onChange}
                 orientation="vertical"
                 valueSelected={value.toLowerCase()}
+                aria-labelledby={errors?.clinicalStatus ? 'clinicalStatusError' : undefined}
               >
                 <RadioButton id="active" labelText={t('active', 'Active')} value="active" />
                 <RadioButton id="inactive" labelText={t('inactive', 'Inactive')} value="inactive" />
               </RadioButtonGroup>
             )}
           />
-          {errors?.clinicalStatus && <p className={styles.errorMessage}>{errors?.clinicalStatus?.message}</p>}
+          {errors?.clinicalStatus && (
+            <p id="clinicalStatusError" className={styles.errorMessage}>
+              {errors.clinicalStatus.message}
+            </p>
+          )}
         </FormGroup>
         {(clinicalStatus.match(/inactive/i) || matchingCondition?.clinicalStatus?.match(/inactive/i)) && (
           <FormGroup legendText="">

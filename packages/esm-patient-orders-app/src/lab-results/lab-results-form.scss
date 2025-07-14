@@ -6,6 +6,10 @@
   margin-bottom: layout.$spacing-05;
 }
 
+.label {
+  @include type.type-style('label-01');
+}
+
 .loaderContainer {
   display: flex;
   justify-content: center;
@@ -27,7 +31,7 @@
   padding-bottom: layout.$spacing-05;
 }
 
-.textInput {
+.formField {
   margin: layout.$spacing-02 0 layout.$spacing-05;
 }
 
@@ -53,7 +57,6 @@
 
 .tablet {
   padding: layout.$spacing-06 layout.$spacing-05;
-  background-color: $ui-02;
 }
 
 .desktop {
@@ -67,16 +70,13 @@
   height: 100%;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .form {
-  background-color: #ededed;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .form {
-  background-color: $ui-02;
+.form :global(.cds--accordion__content) {
+  padding-inline-end: 0;
 }
 
 .grid {
   margin: layout.$spacing-05;
+  flex: 1;
 }
 
 .row {

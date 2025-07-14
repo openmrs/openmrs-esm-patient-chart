@@ -1,18 +1,8 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import { generateRandomPatient, type Patient, startVisit, deletePatient } from '../commands';
 import { test } from '../core';
 import { ImmunizationsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Add and edit an immunization', async ({ page }) => {
+test('Add and edit an immunization', async ({ page, patient }) => {
   const immunizationsPage = new ImmunizationsPage(page);
   const headerRow = immunizationsPage.immunizationsTable().locator('thead > tr');
   const immunizationType = immunizationsPage.immunizationsTable().locator('tbody td:nth-child(2)');
@@ -60,7 +50,7 @@ test('Add and edit an immunization', async ({ page }) => {
 
   await test.step('And I should see the a table row with the correct immunization details', async () => {
     await expect(immunizationType).toContainText(/hepatitis b vaccination/i);
-    await expect(vaccinationDate).toContainText(/single dose on 08-Mar-2024/i);
+    await expect(vaccinationDate).toContainText(/last dose on 08-Mar-2024, dose 1/i);
   });
 
   await test.step('When I click the Expand all rows button', async () => {
@@ -78,12 +68,12 @@ test('Add and edit an immunization', async ({ page }) => {
 
   await test.step('Then I should see the immunization form in edit mode with the current values', async () => {
     await expect(page.getByText(/immunization form/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
   });
 
-  await test.step('And I select Measles vaccination from the immunization dropdown', async () => {
-    await page.getByRole('combobox', { name: /immunization/i }).click();
-    await page.getByText(/measles vaccination/i).click();
+  await test.step('Then the vaccine dropdown should show Hepatitis B vaccination and be disabled', async () => {
+    const dropdown = page.getByRole('combobox', { name: /immunization/i });
+    await expect(dropdown).toBeDisabled();
+    await expect(dropdown).toHaveText(/hepatitis b vaccination/i);
   });
 
   await test.step('And I enter the vaccination date as 02/01/2025', async () => {
@@ -111,19 +101,14 @@ test('Add and edit an immunization', async ({ page }) => {
   });
 
   await test.step('Then I should see the newly updated immunization details reflected in the table', async () => {
-    await expect(page.getByRole('cell', { name: /measles vaccination/i })).toBeVisible();
-    await expect(page.getByRole('cell', { name: /single dose on 02-Jan-2025/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /last dose on 02-Jan-2025, dose 2/i })).toBeVisible();
   });
 
   await test.step('Then expanding the immunization details section should reveal the correct details', async () => {
-    await page.getByRole('button', { name: /expand current row/i }).click();
     await expect(page.getByText(/dose number within series/i)).toBeVisible();
     await expect(page.getByText(/vaccination date/i)).toBeVisible();
     await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
     await expect(page.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

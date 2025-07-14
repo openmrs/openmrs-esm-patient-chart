@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Table,
@@ -8,6 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -32,9 +34,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   tableRows,
   urlLabel,
 }) => {
+  const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
+  const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
     switch (interpretation) {
       case 'critically_high':
         return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
@@ -55,15 +58,16 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   });
 
   const handleSorting = (
-    cellA,
-    cellB,
-    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+    cellA: any,
+    cellB: any,
+    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {
       setSortParams({ key: '', sortDirection });
     } else {
       setSortParams({ key, sortDirection });
     }
+    return 0;
   };
 
   const sortedData: Array<VitalsTableRow> = useMemo(() => {
@@ -106,11 +110,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header, isSortable: header.isSortable })} key={header.key}>
-                      {header.header?.content ?? header.header}
+                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                      {header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
+                  <TableHeader aria-label={t('actions', 'Actions')} />
                 </TableRow>
               </TableHead>
               <TableBody>

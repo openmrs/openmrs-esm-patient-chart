@@ -12,6 +12,7 @@
   "enterSecondaryDiagnoses": "输入次要诊断",
   "error": "错误",
   "errorFetchingConcepts": "获取概念时出现问题",
+  "errorTransformingDiagnoses": "Error transforming diagnoses",
   "image": "图像",
   "imageRemoved": "图像已移除",
   "imageUploadHelperText": "上传一张图像或使用此设备的摄像头拍摄一张图像",

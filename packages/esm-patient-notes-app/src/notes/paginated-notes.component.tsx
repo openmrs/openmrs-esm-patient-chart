@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
   DataTable,
+  type DataTableCell,
+  type DataTableSortState,
   Table,
   TableCell,
   TableContainer,
@@ -59,9 +61,21 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
         ? orderBy(notes, [key], ['desc'])
         : orderBy(notes, [key], ['asc']);
 
-  function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
-    const { key } = props;
-    setSortParams({ key, order: sortDirection });
+  function customSortRow(
+    cellA,
+    cellB,
+    {
+      sortDirection,
+      sortStates,
+    }: {
+      sortDirection: string;
+      sortStates: any;
+      locale: string;
+    },
+  ) {
+    const key = Object.keys(sortStates).find((k) => sortStates[k] === sortDirection);
+    setSortParams({ key: key ?? '', order: sortDirection });
+    return 0;
   }
 
   const { results: paginatedNotes, goTo, currentPage } = usePagination(sortedData, pageSize);
@@ -96,7 +110,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
           headers,
           rows,
         }) => (
-          <TableContainer {...getTableContainerProps}>
+          <TableContainer {...getTableContainerProps()}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>

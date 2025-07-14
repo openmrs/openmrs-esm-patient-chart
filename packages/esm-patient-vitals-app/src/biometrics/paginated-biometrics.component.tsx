@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Table,
@@ -8,6 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -32,21 +34,24 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
+  const { t } = useTranslation();
+
   const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
     key: '',
     sortDirection: 'NONE',
   });
 
   const handleSorting = (
-    cellA,
-    cellB,
-    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+    cellA: any,
+    cellB: any,
+    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {
       setSortParams({ key: '', sortDirection });
     } else {
       setSortParams({ key, sortDirection });
     }
+    return 0;
   };
 
   const sortedData: Array<BiometricsTableRow> = useMemo(() => {
@@ -90,13 +95,12 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}
                     >
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader />
+                  <TableHeader aria-label={t('actions', 'Actions')} />
                 </TableRow>
               </TableHead>
               <TableBody>

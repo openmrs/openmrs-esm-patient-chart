@@ -9,13 +9,11 @@ import { type EncountersTableProps, useEncounterTypes } from './encounters-table
 
 const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
-  paginated: false,
   paginatedEncounters: mockEncountersAlice,
   totalCount: mockEncountersAlice.length,
   currentPage: 1,
   goTo: jest.fn(),
   isLoading: false,
-  onEncountersUpdated: jest.fn(),
   showVisitType: true,
   showEncounterTypeFilter: false,
   pageSize: 10,

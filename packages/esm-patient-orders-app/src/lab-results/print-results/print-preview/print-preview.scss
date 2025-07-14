@@ -1,0 +1,24 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.testResultDetails {
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+}
+
+.printResults {
+  margin-top: layout.$spacing-05;
+}
+
+.testDoneHeader {
+  @include type.type-style('label-02');
+  margin-top: layout.$spacing-05;
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+}
+.testCell {
+  @include type.type-style('label-02');
+  text-transform: uppercase;
+}

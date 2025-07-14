@@ -41,10 +41,10 @@ const EncounterData: React.FC<{
   const { t } = useTranslation();
 
   if (isLoading || isValidating) {
-    return <CodeSnippetSkeleton type="multi" role="progressbar" />;
+    return <CodeSnippetSkeleton type="multi" className="skeleton" />;
   }
 
-  if (error || lastEncounter == undefined) {
+  if (error || lastEncounter === undefined) {
     return (
       <div className={styles.tileBox}>
         {columns.map((column, ind) => (
@@ -62,7 +62,7 @@ const EncounterData: React.FC<{
       {columns.map((column, ind) => {
         return (
           <div key={ind}>
-            <span className={styles.tileTitle}>{column.header}</span>
+            <span className={styles.tileTitle}>{t(column.header)}</span>
             <span className={styles.tileValue}>
               <p>{column.getObsValue(lastEncounter)}</p>
             </span>

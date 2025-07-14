@@ -15,22 +15,6 @@ export interface DateHeaderGridProps {
   setXScroll: any;
 }
 
-interface DataEntry {
-  value: number | string;
-  effectiveDateTime: string;
-  interpretation: OBSERVATION_INTERPRETATION;
-}
-
-interface DataRow extends TreeNode {
-  entries: Array<DataEntry>;
-  display: string;
-  name: string;
-  type: string;
-  uuid: string;
-  units: string;
-  range: string;
-}
-
 export interface NewRowStartCellProps {
   title: string;
   range: string;

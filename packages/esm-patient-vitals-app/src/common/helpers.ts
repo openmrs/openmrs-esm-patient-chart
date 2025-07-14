@@ -1,8 +1,8 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from '../common';
+import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
-import type { ObsReferenceRanges, ObservationInterpretation } from './types';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
   if (weight > 0 && height > 0) {

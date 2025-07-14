@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import capitalize from 'lodash-es/capitalize';
 import {
   fhirBaseUrl,
   openmrsFetch,
@@ -47,7 +46,7 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
     id: allergy?.id,
     clinicalStatus: allergy?.clinicalStatus?.coding[0]?.display,
     criticality: allergy?.criticality,
-    display: allergy?.code?.text,
+    display: allergy?.code?.text ?? allergy?.code?.coding[0]?.display,
     recordedDate: allergy?.recordedDate,
     recordedBy: allergy?.recorder?.display,
     recorderType: allergy?.recorder?.type,

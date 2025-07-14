@@ -47,6 +47,7 @@ export interface DiagnosisData {
   };
   names: Array<ConceptNames>;
   mappings: Array<ConceptMapping>;
+  voided: boolean;
 }
 
 export interface ConceptNames {

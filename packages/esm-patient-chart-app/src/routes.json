@@ -118,18 +118,6 @@
       "offline": true
     },
     {
-      "name": "nav-group",
-      "component": "genericNavGroup",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "dashboard",
-      "component": "genericDashboard",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "start-visit-button-patient-search",
       "slot": "start-visit-button-slot",
       "component": "startVisitPatientSearchActionButton",
@@ -180,6 +168,11 @@
       "name": "visit-context-header",
       "slot": "visit-context-header-slot",
       "component": "visitContextHeader"
+    },
+    {
+      "name": "retrospective-date-time-picker",
+      "slot": "restrospective-date-time-picker-slot",
+      "component": "retrospectiveDateTimePicker"
     }
   ],
   "featureFlags": [

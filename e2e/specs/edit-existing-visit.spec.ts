@@ -1,36 +1,18 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
-import {
-  deletePatient,
-  generateRandomPatient,
-  getVisit,
-  type Patient,
-  startVisit,
-  visitStartDatetime,
-} from '../commands';
+import { getVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Edit an existing ongoing visit', async ({ page, api }) => {
+test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
-  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
+  await test.step('When I navigate to the visit history table', async () => {
     await visitsPage.goTo(patient.uuid);
-    await page.getByRole('tab', { name: /summary cards/i }).click();
-    await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
   });
 
-  await test.step('And I click on the `Edit visit details` button on an active visit', async () => {
-    await visitsPage.page.getByRole('button', { name: /edit visit details/i }).click();
+  await test.step('And I click on the `Edit` button on an active visit', async () => {
+    await visitsPage.page.getByRole('button', { name: /edit/i }).click();
   });
 
   await test.step('Then I should see the `Edit Visit` form launch in the workspace', async () => {
@@ -97,17 +79,17 @@ test('Edit an existing ongoing visit', async ({ page, api }) => {
   });
 });
 
-test('Edit an existing ongoing visit to have an end time', async ({ page, api }) => {
+test('Edit an existing ongoing visit to have an end time', async ({ page, api, patient, visit }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
   await test.step('When I visit the Visits summary page', async () => {
     await visitsPage.goTo(patient.uuid);
-    await expect(visitsPage.page.getByRole('button', { name: /edit visit details/i })).toBeVisible();
+    await expect(visitsPage.page.getByRole('button', { name: /edit/i })).toBeVisible();
   });
 
-  await test.step('And I click on the `Edit visit details` button on an active visit', async () => {
-    await visitsPage.page.getByRole('button', { name: /edit visit details/i }).click();
+  await test.step('And I click on the `Edit` button on an active visit', async () => {
+    await visitsPage.page.getByRole('button', { name: /edit/i }).click();
   });
 
   await test.step('Then I should see the visit status `Ongoing` and `Ended` tabs', async () => {
@@ -138,8 +120,4 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api })
     const updatedVisit = await getVisit(api, visit.uuid);
     expect(updatedVisit.stopDatetime).not.toBeNull();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
 });

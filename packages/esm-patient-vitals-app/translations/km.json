@@ -1,5 +1,6 @@
 {
   "abnormalValue": "Abnormal value",
+  "actions": "Actions",
   "add": "បន្ថែម",
   "additionalNoteText": "វាយបញ្ចូលកំណត់ចំណាំបន្ថែមនៅទីនេះ",
   "biometricDisplayed": "ជីវមាត្របានបង្ហាញ",
@@ -32,6 +33,8 @@
   "goToSummary": "ចូលទៅកាន់ ការសង្ខេប",
   "heartRate": "ចង្វាក់បេះដូង",
   "height": "កម្ពស់",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "កំពុងផ្ទុក",
   "male": "ប្រុស",
   "muac": "រង្វង់ដើមដៃពាក់ផ្នែកខាងលើ(MUAC)",

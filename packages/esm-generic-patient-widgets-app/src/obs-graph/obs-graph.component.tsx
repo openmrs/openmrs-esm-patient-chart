@@ -75,37 +75,39 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           <label className={styles.conceptLabel} htmlFor="concept-tab-group">
             {t('displaying', 'Displaying')}
           </label>
-          <TabsVertical id="concept-tab-group" className={styles.verticalTabs} type="default">
-            <TabListVertical aria-label="Obs tabs">
-              {config.data.map(({ concept, label }, index) => {
-                const tabClasses = classNames(styles.tab, styles.bodyLong01, {
-                  [styles.selectedTab]: selectedConcept.label === label,
-                });
+          <div className={styles.verticalTabs}>
+            <TabsVertical>
+              <TabListVertical aria-label="Obs tabs">
+                {config.data.map(({ concept, label }, index) => {
+                  const tabClasses = classNames(styles.tab, styles.bodyLong01, {
+                    [styles.selectedTab]: selectedConcept.label === label,
+                  });
 
-                return (
-                  <Tab
-                    className={tabClasses}
-                    key={concept}
-                    onClick={() =>
-                      setSelectedConcept({
-                        label,
-                        uuid: concept,
-                      })
-                    }
-                  >
-                    {label}
-                  </Tab>
-                );
-              })}
-            </TabListVertical>
-            <TabPanels>
-              {config.data.map(({ concept, label }) => (
-                <TabPanel key={concept}>
-                  <LineChart data={chartData.flat()} options={chartOptions} />
-                </TabPanel>
-              ))}
-            </TabPanels>
-          </TabsVertical>
+                  return (
+                    <Tab
+                      className={tabClasses}
+                      key={concept}
+                      onClick={() =>
+                        setSelectedConcept({
+                          label,
+                          uuid: concept,
+                        })
+                      }
+                    >
+                      {label}
+                    </Tab>
+                  );
+                })}
+              </TabListVertical>
+              <TabPanels>
+                {config.data.map(({ concept, label }) => (
+                  <TabPanel key={concept}>
+                    <LineChart data={chartData.flat()} options={chartOptions} />
+                  </TabPanel>
+                ))}
+              </TabPanels>
+            </TabsVertical>
+          </div>
         </div>
       </div>
       {config.interpretationSlot ? (

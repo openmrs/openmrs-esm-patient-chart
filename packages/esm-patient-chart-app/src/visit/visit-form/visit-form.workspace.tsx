@@ -1,4 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -32,22 +38,13 @@ import {
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { type ChartConfig } from '../../config-schema';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import { useInfiniteVisits } from '../visits-widget/visit.resource';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeSection from './visit-date-time.component';
 import {
   convertToDate,
   createVisitAttribute,
@@ -62,7 +59,12 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeSection from './visit-date-time.component';
 import styles from './visit-form.scss';
+
 dayjs.extend(isSameOrBefore);
 
 interface VisitFormProps extends DefaultPatientWorkspaceProps {
@@ -101,7 +103,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const { mutate: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
@@ -297,6 +299,18 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // to update visit attributes or any other OnVisitCreatedOrUpdated actions
             const visit = response.data;
 
+            // For visit creation, we need to update:
+            // 1. Current visit data (for critical components like visit summary, action buttons)
+            // 2. Visit history table (for the paginated visit list)
+
+            // Update current visit data for critical components (useVisit hook)
+            mutateCurrentVisit();
+
+            // Use targeted SWR invalidation instead of global mutateVisit
+            // This will invalidate visit history and encounter tables for this patient
+            // (current visit is already updated with mutateCurrentVisit)
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
+
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
             const visitAttributesRequest = handleVisitAttributes(visitAttributes, response.data.uuid).then(
@@ -325,10 +339,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
-          })
-          .finally(() => {
-            mutateCurrentVisit();
-            mutateInfiniteVisits();
           });
       } else {
         createOfflineVisitForPatient(
@@ -338,7 +348,11 @@ const VisitForm: React.FC<VisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
+            // Use same targeted approach for offline visits for consistency
             mutateCurrentVisit();
+
+            // Also invalidate visit history and encounter tables
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -367,13 +381,13 @@ const VisitForm: React.FC<VisitFormProps> = ({
       config.offlineVisitTypeUuid,
       config.showExtraVisitAttributesSlot,
       extraVisitInfo,
+      globalMutate,
       handleVisitAttributes,
       isOnline,
       mutateCurrentVisit,
-      mutateInfiniteVisits,
-      visitFormCallbacks,
       patientUuid,
       t,
+      visitFormCallbacks,
       visitToEdit,
     ],
   );
@@ -420,8 +434,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           )}
           <Stack gap={4} className={styles.container}>
             <section>
-              <div className={styles.sectionTitle}>{t('theVisitIs', 'The visit is')}</div>
-              <FormGroup>
+              <FormGroup legendText={t('theVisitIs', 'The visit is')}>
                 <Controller
                   name="visitStatus"
                   control={control}
@@ -432,12 +445,12 @@ const VisitForm: React.FC<VisitFormProps> = ({
                     // For some reason, Carbon throws NPE when trying to conditionally
                     // render a <Switch> component
                     return visitToEdit ? (
-                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
                         <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
                         <Switch name="past" text={t('ended', 'Ended')} />
                       </ContentSwitcher>
                     ) : (
-                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)}>
+                      <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
                         <Switch name="new" text={t('new', 'New')} />
                         <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
                         <Switch name="past" text={t('inThePast', 'In the past')} />
@@ -451,7 +464,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
             {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
             {config.showUpcomingAppointments && (
               <section>
-                <h1 className={styles.sectionTitle}></h1>
                 <div className={styles.sectionField}>
                   <VisitFormExtensionSlot
                     name="visit-form-top-slot"
@@ -509,6 +521,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
                       <ContentSwitcher
                         selectedIndex={visitTypeContentSwitcherIndex}
                         onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
+                        size="md"
                       >
                         <Switch name="recommended" text={t('recommended', 'Recommended')} />
                         <Switch name="all" text={t('all', 'All')} />
@@ -534,7 +547,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
                 {errors?.visitType && (
                   <section>
-                    <h1 className={styles.sectionTitle}></h1>
                     <div className={styles.sectionField}>
                       <InlineNotification
                         role="alert"
@@ -563,7 +575,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
             {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
                 or when the form is opened from the queues app */}
             <section>
-              <h1 className={styles.sectionTitle}></h1>
               <div className={styles.sectionField}>
                 <VisitFormExtensionSlot
                   name="visit-form-bottom-slot"

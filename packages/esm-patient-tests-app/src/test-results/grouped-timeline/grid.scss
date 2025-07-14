@@ -1,0 +1,23 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.grid {
+  width: fit-content;
+  display: grid;
+  grid-auto-rows: auto;
+  gap: 0;
+  justify-items: center;
+  align-items: center;
+
+  > div {
+    border: 0.5px solid colors.$gray-50;
+    border-bottom: none;
+    border-left: none;
+  }
+}
+
+.grid:hover {
+  border: none;
+}

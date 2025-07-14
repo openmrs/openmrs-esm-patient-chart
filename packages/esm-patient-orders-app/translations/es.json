@@ -32,6 +32,8 @@
   "indication": "Indicación",
   "inStock": "En stock",
   "instructions": "Instrucciones",
+  "invalidLabTestConfiguration": "Invalid lab test configuration",
+  "invalidLabTestConfigurationSubtitle": "This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.",
   "labResultError": "Error al cargar resultados de laboratorio",
   "launchOrderBasket": "Abrir canasta de órdenes",
   "loading": "Cargando",
@@ -46,6 +48,7 @@
   "noMatchingOrdersToDisplay": "No hay órdenes coincidentes para mostrar",
   "noResultsForTestTypeSearch": "No hay resultados para mostrar para '{{searchTerm}}'",
   "normalRange": "Rango normal",
+  "noTestData": "No test data available",
   "onDate": "en",
   "or": "o",
   "order": "Orden",
@@ -108,6 +111,7 @@
   "status": "Estado",
   "successfullyCancelledOrder": "La orden {{orderNumber}} ha sido cancelada exitosamente",
   "successfullySavedLabResults": "Los resultados de laboratorio para la orden {{orderNumber}} han sido actualizados exitosamente",
+  "test": "Test",
   "Test Order_few": "Órdenes de prueba",
   "testType": "Tipo de prueba",
   "tryReopeningTheWorkspaceAgain": "Por favor, intente iniciar el espacio de trabajo nuevamente",
@@ -115,5 +119,5 @@
   "tryTo": "Intente",
   "updated": "Actualizado",
   "usingADifferentTerm": "utilizando un término diferente",
-  "visitRequired": "A visit is required to make orders"
+  "visitRequired": "Se requiere una consulta para realizar órdenes"
 }

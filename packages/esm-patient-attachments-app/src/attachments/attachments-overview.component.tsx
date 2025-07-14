@@ -149,6 +149,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
             <div className={styles.attachmentHeaderActionItems}>
               <ContentSwitcher
                 onChange={(event: SwitchEventHandlersParams) => setView(event.name.toString() as ViewType)}
+                selectedIndex={view === 'grid' ? 0 : 1}
                 size={isTablet ? 'md' : 'sm'}
               >
                 <IconSwitch name="grid" text={t('gridView', 'Grid view')}>

@@ -53,7 +53,6 @@ export const vitalsAndBiometricsDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      moduleName,
     }),
     options,
   );

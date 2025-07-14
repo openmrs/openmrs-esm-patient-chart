@@ -3,12 +3,16 @@ import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { mockVitalsConfig, mockCurrentVisit, mockConceptUnits, mockConceptMetadata, formattedVitals } from '__mocks__';
+import {
+  formattedVitals,
+  mockConceptUnits,
+  mockCurrentVisit,
+  mockVitalsConceptMetadata,
+  mockVitalsConfig,
+} from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { invalidateCachedVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
@@ -17,7 +21,6 @@ const testProps = {
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockLaunchPatientWorkspace = jest.mocked(launchPatientWorkspace);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
 
@@ -32,22 +35,22 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    launchPatientWorkspace: jest.fn(),
     useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
-jest.mock('../common', () => {
-  const originalModule = jest.requireActual('../common');
+jest.mock('../common/data.resource', () => {
+  const originalModule = jest.requireActual('../common/data.resource');
 
   return {
     ...originalModule,
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: mockConceptUnits,
-      conceptMetadata: mockConceptMetadata,
+    useConceptUnits: jest.fn().mockImplementation(() => ({
+      conceptUnits: mockConceptUnits,
+      error: null,
       isLoading: false,
     })),
+    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
     useVitalsAndBiometrics: jest.fn(),
   };
 });
@@ -74,7 +77,20 @@ describe('VitalsHeader', () => {
 
   it('renders the most recently recorded values in the vitals header', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
-      data: formattedVitals,
+      data: [
+        {
+          id: '0',
+          date: '2021-05-19T04:26:51.000Z',
+          pulse: 76,
+          temperature: 37,
+          respiratoryRate: 12,
+          diastolic: 89,
+          systolic: 121,
+          bmi: null,
+          muac: 23,
+          bloodPressureRenderInterpretation: 'normal',
+        },
+      ],
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderWithSwr(<VitalsHeader {...testProps} />);
@@ -134,8 +150,23 @@ describe('VitalsHeader', () => {
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
+    const normalVitals = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 75, // Within normal range (60-80)
+        systolic: 115, // Within normal range (90-120)
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
     mockUseVitalsAndBiometrics.mockReturnValue({
-      data: formattedVitals,
+      data: normalVitals,
     } as ReturnType<typeof useVitalsAndBiometrics>);
 
     renderWithSwr(<VitalsHeader {...testProps} />);

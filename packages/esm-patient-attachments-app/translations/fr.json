@@ -24,7 +24,7 @@
   "enterAttachmentName": "Entrer un nom",
   "error": "Erreur",
   "failed": "échec",
-  "failedDeleting": "n'a pu être supprimé",
+  "failedDeleting": "n’a pu être supprimé",
   "file": "Fichier",
   "fileDeleted": "Fichier supprimé",
   "fileName": "Nom du fichier",
@@ -35,9 +35,9 @@
   "gridView": "Galerie",
   "image": "Image",
   "imageDescription": "Description de l'image",
-  "imagePlaceholder": "Image placeholder",
+  "imagePlaceholder": "Espace réservé aux images",
   "imagePreview": "Aperçu de l'image",
-  "keepAttachment": "Keep attachment",
+  "keepAttachment": "Conserver la pièce jointe",
   "name": "Nom",
   "nameIsRequired": "Le nom est requis",
   "noAttachmentsToDisplay": "Aucune pièce jointe pour ce patient",
@@ -47,8 +47,8 @@
   "supportedFiletypes": "Les fichiers compatibles sont {{supportedFiles}}",
   "tableView": "Table",
   "type": "Type",
-  "unsavedAttachment": "Unsaved attachment",
-  "unsavedAttachmentMessage": "You have an unsaved attachment. Are you sure you want to discard it?",
+  "unsavedAttachment": "Pièce jointe non enregistrée",
+  "unsavedAttachmentMessage": "Vous avez une pièce jointe non enregistrée. Êtes-vous sûr de vouloir la supprimer ?",
   "unsupportedFileType": "Type de fichier non pris en charge",
   "uploadComplete": "Ajout terminé",
   "uploadedSuccessfully": "Ajouté",
@@ -56,5 +56,5 @@
   "uploadFiles": "Ajouter des fichiers",
   "uploading": "En cours d'ajout",
   "uploadWillContinueInTheBackground": "Les fichiers seront ajoutés en arrière-plan. Vous pouvez fermer cette fenêtre.",
-  "webcam": "Webcam"
+  "webcam": "Caméra Web"
 }

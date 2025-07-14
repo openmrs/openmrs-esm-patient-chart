@@ -1,11 +1,18 @@
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, RadioButton } from '@carbon/react';
-import { ErrorState, type Visit } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import dayjs from 'dayjs';
+import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import {
+  ErrorState,
+  launchWorkspace,
+  OpenmrsDatePicker,
+  useDebounce,
+  useOnVisible,
+  useVisitContextStore,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { useInfiniteVisits } from '../visit.resource';
-import { useVisitContextStore } from './visit-context';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
 
@@ -21,30 +28,58 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   onAfterVisitSelected,
 }) => {
   const { t } = useTranslation();
-  // TODO: add pagination for the visits list.
-  const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
+  const [maxStartDate, setMaxStartDate] = useState(new Date());
+  const maxStartDateDebounced = useDebounce(maxStartDate);
+
+  const rep = 'custom:(uuid,display,visitType,startDatetime,stopDatetime,location,patient)';
+  const { visits, isLoading, error, hasMore, loadMore } = useInfiniteVisits(
+    patientUuid,
+    { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() },
+    rep,
+  );
   const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
   const [selectedVisit, setSelectedVisit] = useState<string>(
     selectedVisitPatientUuid === patientUuid ? manuallySetVisitUuid : null,
   );
 
+  const onScrollToEnd = useCallback(() => {
+    if (hasMore) {
+      loadMore();
+    }
+  }, [hasMore, loadMore]);
+  const ref = useOnVisible(onScrollToEnd);
+
   const openStartVisitWorkspace = () => {
     closeModal();
-    launchPatientWorkspace('start-visit-workspace-form', {
+    launchWorkspace('start-visit-workspace-form', {
       openedFrom: 'visit-context-switcher',
     });
   };
 
   return (
     <>
-      <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')} />
+      <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')}>
+        <OpenmrsDatePicker
+          id={'visit-context-swticher-date-picker'}
+          className={styles.datepicker}
+          labelText={t('showVisitOnOrPriorTo', 'Show visit on or prior to:')}
+          maxDate={Date.now()}
+          value={maxStartDate}
+          onChange={setMaxStartDate}
+        />
+      </ModalHeader>
       <ModalBody>
-        {isLoading ? (
-          <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
-        ) : error ? (
+        {error ? (
           <ErrorState headerTitle={t('visits', 'visits')} error={error} />
+        ) : visits?.length == 0 ? (
+          <Tile className={styles.tile}>
+            <div className={styles.tileContent}>
+              <p className={styles.content}>{t('noVisitsToDisplay', 'No visits to display')}</p>
+              <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+            </div>
+          </Tile>
         ) : (
-          <div className={styles.visitCardRowsContainer}>
+          <div>
             {visits?.map((visit) => {
               return (
                 <VisitCardRow
@@ -55,12 +90,15 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
                 />
               );
             })}
+            {isLoading ? <InlineLoading description={t('loading', 'Loading')} /> : <span ref={ref} />}
           </div>
         )}
+      </ModalBody>
+      <div className={styles.createVisitButtonContainer}>
         <Button kind="ghost" size="sm" onClick={openStartVisitWorkspace}>
           {t('createNewVisit', 'Create new visit...')}
         </Button>
-      </ModalBody>
+      </div>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
@@ -114,7 +152,8 @@ const VisitCardRow: React.FC<VisitCardRowProps> = ({ visit, setSelectedVisit: se
           id={`visit-card-row-${visit.uuid}`}
           value={visit.uuid}
           checked={isSelected}
-          onChange={(value) => setSelected(value)}
+          labelText={visit.visitType.display}
+          onChange={(value) => setSelected(String(value))}
         />
       </div>
       <button className={styles.visitCardRowButton} onClick={() => setSelected(visit.uuid)}></button>

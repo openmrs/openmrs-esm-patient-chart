@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
@@ -10,17 +10,11 @@ import FilterSet, { FilterContext } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 import TabletOverlay from '../tablet-overlay';
-import Trendline from '../trendline/trendline.component';
-import usePanelData from '../panel-view/usePanelData';
 import styles from '../results-viewer/results-viewer.scss';
 
 interface TreeViewProps {
   patientUuid: string;
-  basePath: string;
-  testUuid: string;
-  isLoading: boolean;
   expanded: boolean;
-  type: string;
   view?: viewOpts;
   error?: string;
 }
@@ -33,20 +27,16 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
   const selectedCheckboxes = Object.keys(checkboxes).filter((key) => checkboxes[key]);
 
-  if (!tableData?.length) {
-    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
-  }
-
-  return (
-    <Layer className={className}>
-      {tableData
+  const tableFilteredSubRows = useMemo(
+    () =>
+      tableData
         ?.filter(
           (row) =>
             !someChecked ||
             row.entries?.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey)),
         )
         .map((subRows: GroupedObservation, index) => {
-          const filteredSubRows = {
+          return {
             ...subRows,
             entries: subRows.entries?.filter(
               (entry) =>
@@ -54,9 +44,20 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
                 selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey),
             ),
           };
-          return filteredSubRows.entries?.length > 0 ? (
-            <div
-              key={index}
+        }),
+    [tableData, someChecked, selectedCheckboxes],
+  );
+
+  if (!tableData?.length) {
+    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data timeline')} />;
+  }
+
+  return (
+    <Layer className={className}>
+      {tableFilteredSubRows.map((filteredSubRows, index) => {
+        return filteredSubRows.entries?.length > 0 ? (
+          <div
+            key={index}
               className={classNames({
                 [styles.border]: filteredSubRows?.entries.length,
               })}
@@ -74,7 +75,7 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
   );
 };
 
-const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, isLoading, expanded, type, view }) => {
+const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
@@ -82,8 +83,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, error } = useGetManyObstreeData(conceptUuids);
 
-  const { timelineData, resetTree } = useContext(FilterContext);
-  const { isLoading: isLoadingPanelData } = usePanelData(patientUuid);
+  const { timelineData, resetTree, isLoading } = useContext(FilterContext);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
@@ -117,7 +117,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
             headerText={t('tree', 'Tree')}
             close={() => setShowTreeOverlay(false)}
             buttonsGroup={
-              <>
+              <div className={styles.overlay}>
                 <Button kind="secondary" size="xl" onClick={resetTree} disabled={isLoading}>
                   {t('resetTreeText', 'Reset tree')}
                 </Button>
@@ -126,7 +126,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
                     !isLoading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
                   } ${t('resultsText', 'results')}`}
                 </Button>
-              </>
+              </div>
             }
           >
             {!isLoading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
@@ -144,9 +144,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, is
         </div>
       )}
       <div className={classNames(styles.rightSection, expanded ? styles.fullView : styles.splitView)}>
-        {testUuid && type === 'trendline' ? (
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : isLoading || isLoadingPanelData ? (
+        {isLoading ? (
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>

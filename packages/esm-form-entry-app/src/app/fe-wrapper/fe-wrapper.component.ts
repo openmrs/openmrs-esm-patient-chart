@@ -136,7 +136,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       /* webpackInclude: /\.mjs$/ */
       /* webpackChunkName: "./assets/l10n/locales/[request]"*/
       /* webpackMode: "lazy" */
-      `@/../../../node_modules/@angular/common/locales/${locale}.mjs`
+      `../../../node_modules/@angular/common/locales/${locale}.mjs`
     ).then((module) => registerLocaleData(module.default));
 
     return forkJoin({

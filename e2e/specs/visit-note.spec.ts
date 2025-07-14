@@ -1,18 +1,8 @@
 import { expect } from '@playwright/test';
-import { type Visit } from '@openmrs/esm-framework';
 import { test } from '../core';
-import { type Patient, generateRandomPatient, startVisit, endVisit, deletePatient } from '../commands';
 import { ChartPage, VisitsPage } from '../pages';
 
-let patient: Patient;
-let visit: Visit;
-
-test.beforeEach(async ({ api }) => {
-  patient = await generateRandomPatient(api);
-  visit = await startVisit(api, patient.uuid);
-});
-
-test('Add and delete a visit note', async ({ page }) => {
+test('Add and delete a visit note', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -21,7 +11,7 @@ test('Add and delete a visit note', async ({ page }) => {
   });
 
   await test.step('And I click the `Visit note` button on the siderail', async () => {
-    await page.getByLabel(/visit note/i).click();
+    await page.getByRole('button', { name: /note/i }).click();
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
@@ -65,14 +55,20 @@ test('Add and delete a visit note', async ({ page }) => {
     await expect(page.getByText(/visit note saved/i)).toBeVisible();
   });
 
-  await test.step('When I navigate to the visits dashboard Summary Cards view', async () => {
+  await test.step('When I navigate to the visits dashboard', async () => {
     await visitsPage.goTo(patient.uuid);
-    await page.getByRole('tab', { name: /summary cards/i }).click();
   });
 
-  await test.step('Then I should see the newly added visit note added to the list', async () => {
+  await test.step('Then I should see the newly added diagnoses', async () => {
     await expect(page.getByText(/asthma/i)).toBeVisible();
     await expect(page.getByText(/gi upset/i)).toBeVisible();
+  });
+
+  await test.step('When I expand the visit row', async () => {
+    await page.getByRole('button', { name: /expand current row/i }).click();
+  });
+
+  await test.step('Then I should see the newly added visit note', async () => {
     await expect(page.getByText(/this is a note/i)).toBeVisible();
   });
 
@@ -99,9 +95,4 @@ test('Add and delete a visit note', async ({ page }) => {
   await test.step('And the encounters table should be empty', async () => {
     await expect(page.getByLabel(/all encounters/i).getByText(/No encounters to display/i)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await endVisit(api, visit);
-  await deletePatient(api, patient.uuid);
 });

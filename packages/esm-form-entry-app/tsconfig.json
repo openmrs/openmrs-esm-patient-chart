@@ -9,25 +9,36 @@
     "declaration": true,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "module": "esnext",
+    "module": "es2020",
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2022",
+    "target": "ES2020",
     "types": [
       "node",
-      "webpack-env"
+      "webpack-env",
+      "jasmine"
     ],
     "lib": [
       "dom",
       "es2015",
-      "es2022",
+      "es2020"
     ],
     "skipLibCheck": true,
     "useDefineForClassFields": false,
+    "esModuleInterop": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "src/types"
+    ]
   },
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true,
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ]
 }

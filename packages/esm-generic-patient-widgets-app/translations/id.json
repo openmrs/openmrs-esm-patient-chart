@@ -1,7 +1,7 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "chartView": "Tampilan Grafik",
+  "dateAndTime": "Tanggal dan waktu",
+  "displaying": "Menampilkan",
+  "encounterType": "Jenis pertemuan",
+  "tableView": "Tampilan Tabel"
 }

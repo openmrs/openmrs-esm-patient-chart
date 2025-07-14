@@ -1,0 +1,21 @@
+{
+  "backToPatientLists": "Inapoi la listele de pacienti",
+  "checkFilters": "Verifica filtrele de mai sus",
+  "createdOn": "Creat in data de",
+  "identifier": "Identificator",
+  "listName": "Nume lista",
+  "listType": "Tip lista",
+  "name": "Nume",
+  "noMatchingListsFound": "Nu exista liste potrivite de afisat",
+  "noMatchingPatients": "Nu exista pacienti potriviti de afisat",
+  "noPatientListsToDisplay": "Nu exista liste de pacienti de afisat",
+  "noPatientsInList": "Nu exista pacienti in aceasta lista",
+  "numberOfPatients": "Nr. pacienti",
+  "patientListDetailWorkspaceTitle": "Detalii lista pacienti",
+  "patientLists": "Liste pacienti",
+  "patientListsWorkspaceTitle": "Liste pacienti",
+  "patients": "pacienti",
+  "searchThisList": "Cauta in aceasta lista",
+  "sex": "Sex",
+  "startDate": "Data inceperii"
+}

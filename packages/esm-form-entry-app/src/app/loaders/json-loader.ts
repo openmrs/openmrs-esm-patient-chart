@@ -1,9 +1,9 @@
 import { TranslateLoader } from '@ngx-translate/core';
-import { Observable, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 
 export class JsonLoader implements TranslateLoader {
   constructor() {}
   getTranslation(lang: string): Observable<any> {
-    return of(require(`../../../translations/${lang}.json`));
+    return from(import(`../../../translations/${lang}.json`));
   }
 }

@@ -83,10 +83,12 @@ yarn turbo run test -- visit-notes-form
 
 The above command will only run tests in the file or files that match the provided string.
 
-You can also run the matching tests from above in watch mode by running:
+You can also run the matching tests from above in watch mode. In order to interact with the
+test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
+and then press "enter" in the Turbo UI to activate interactive mode.
 
 ```bash
-yarn turbo run test:watch -- visit-notes-form
+yarn turbo run test:watch --ui tui -- visit-notes-form
 ```
 
 To generate a `coverage` report, run:

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
-import debounce from 'lodash-es/debounce';
+import { debounce } from 'lodash-es';
 import { useTranslation, type TFunction } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, type Control } from 'react-hook-form';
+import { Controller, useForm, type Control } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -23,30 +23,35 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
   ExtensionSlot,
+  OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
   showSnackbar,
-  type UploadedFile,
   useConfig,
-  useFeatureFlag,
   useLayoutType,
   useSession,
-  OpenmrsDatePicker,
+  type Encounter,
+  type UploadedFile,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  invalidateVisitAndEncounterData,
+  useAllowedFileExtensions,
+  type DefaultPatientWorkspaceProps,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
+  deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
   savePatientDiagnosis,
   saveVisitNote,
-  useInfiniteVisits,
+  updateVisitNote,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
@@ -86,12 +91,20 @@ const createSchema = (t: TFunction) => {
   });
 };
 
-const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
+interface VisitNotesFormProps extends DefaultPatientWorkspaceProps {
+  encounter?: Encounter;
+  formContext: 'creating' | 'editing';
+}
+
+const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   patientUuid,
   promptBeforeClosing,
+  encounter,
+  formContext = 'creating',
 }) => {
+  const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -147,7 +160,10 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
-      noteDate: new Date(),
+      noteDate: isEditing ? new Date(encounter.datetime) : new Date(),
+      clinicalNote: isEditing
+        ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
+        : '',
     },
   });
 
@@ -155,13 +171,41 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
+  useEffect(() => {
+    if (encounter?.diagnoses?.length) {
+      try {
+        const transformedDiagnoses = encounter.diagnoses.map((d) => ({
+          patient: patientUuid,
+          diagnosis: {
+            coded: d.diagnosis.coded?.uuid,
+          },
+          certainty: d.certainty,
+          rank: d.rank,
+          display: d.display,
+        }));
+
+        const primaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 1);
+        const secondaryDiagnoses = transformedDiagnoses.filter((d) => d.rank === 2);
+
+        setSelectedPrimaryDiagnoses(primaryDiagnoses);
+        setSelectedSecondaryDiagnoses(secondaryDiagnoses);
+        setCombinedDiagnoses([...primaryDiagnoses, ...secondaryDiagnoses]);
+      } catch (err) {
+        setError(new Error(t('errorTransformingDiagnoses', 'Error transforming diagnoses')));
+        createErrorHandler();
+      }
+    }
+  }, [encounter, patientUuid, t]);
+
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisits: mutateInfiniteVisits } = useInfiniteVisits(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
 
-  const mutateAttachments = () =>
-    mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`));
+  const mutateAttachments = useCallback(
+    () => globalMutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
+    [globalMutate],
+  );
 
   const locationUuid = session?.sessionLocation?.uuid;
   const providerUuid = session?.currentProvider?.uuid;
@@ -321,6 +365,8 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         finalNoteDate = null;
       }
 
+      const existingClinicalNoteObs = encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid);
+
       const visitNotePayload: VisitNotePayload = {
         encounterDatetime: finalNoteDate?.format(),
         form: formConceptUuid,
@@ -334,31 +380,53 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         ],
         encounterType: encounterTypeUuid,
         obs: clinicalNote
-          ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: clinicalNote }]
+          ? [
+              {
+                concept: { uuid: encounterNoteTextConceptUuid, display: '' },
+                value: clinicalNote,
+                ...(existingClinicalNoteObs && { uuid: existingClinicalNoteObs.uuid }),
+              },
+            ]
           : [],
       };
 
       const abortController = new AbortController();
 
-      saveVisitNote(abortController, visitNotePayload)
+      const savePromise = isEditing
+        ? updateVisitNote(abortController, encounter.id, visitNotePayload)
+        : saveVisitNote(abortController, visitNotePayload);
+
+      savePromise
         .then((response) => {
-          if (response.status === 201) {
-            return Promise.all(
-              combinedDiagnoses.map((diagnosis, position: number) => {
-                const diagnosesPayload: DiagnosisPayload = {
-                  encounter: response.data.uuid,
-                  patient: patientUuid,
-                  condition: null,
-                  diagnosis: {
-                    coded: diagnosis.diagnosis.coded,
-                  },
-                  certainty: diagnosis.certainty,
-                  rank: diagnosis.rank,
-                };
-                return savePatientDiagnosis(abortController, diagnosesPayload);
-              }),
-            );
+          if (response.status === 201 || response.status === 200) {
+            const encounterUuid = encounter?.id || response.data.uuid;
+
+            // If editing, first delete existing diagnoses
+            if (isEditing && encounter?.diagnoses?.length) {
+              return Promise.all(
+                encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+              ).then(() => encounterUuid);
+            }
+
+            return encounterUuid;
           }
+        })
+        .then((encounterUuid) => {
+          return Promise.all(
+            combinedDiagnoses.map((diagnosis) => {
+              const diagnosesPayload: DiagnosisPayload = {
+                encounter: encounterUuid,
+                patient: patientUuid,
+                condition: null,
+                diagnosis: {
+                  coded: diagnosis.diagnosis.coded,
+                },
+                certainty: diagnosis.certainty,
+                rank: diagnosis.rank,
+              };
+              return savePatientDiagnosis(abortController, diagnosesPayload);
+            }),
+          );
         })
         .then(() => {
           if (images?.length) {
@@ -379,7 +447,9 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
           }
         })
         .then(() => {
-          mutateInfiniteVisits();
+          // Invalidate encounter and notes data since we created a new encounter with notes
+          // Also invalidate visit history table since the visit now has new encounters
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
           mutateVisitNotes();
 
           if (images?.length) {
@@ -410,11 +480,16 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
       clinicianEncounterRole,
       closeWorkspaceWithSavedChanges,
       combinedDiagnoses,
+      encounter?.diagnoses,
+      encounter?.id,
+      encounter?.obs,
       encounterNoteTextConceptUuid,
       encounterTypeUuid,
       formConceptUuid,
+      globalMutate,
+      isEditing,
       locationUuid,
-      mutateInfiniteVisits,
+      mutateAttachments,
       mutateVisitNotes,
       patientUuid,
       providerUuid,
@@ -450,12 +525,13 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   <ResponsiveWrapper>
                     <OpenmrsDatePicker
                       {...field}
-                      maxDate={new Date()}
-                      id="visitDateTimePicker"
                       data-testid="visitDateTimePicker"
-                      labelText={t('visitDate', 'Visit date')}
+                      id="visitDateTimePicker"
                       invalid={Boolean(fieldState?.error?.message)}
                       invalidText={fieldState?.error?.message}
+                      isDisabled={isEditing}
+                      labelText={t('visitDate', 'Visit date')}
+                      maxDate={new Date()}
                     />
                   </ResponsiveWrapper>
                 )}
@@ -482,7 +558,7 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <>
                 {selectedSecondaryDiagnoses.map((diagnosis, index) => (
                   <Tag
-                    classname={styles.tag}
+                    className={styles.tag}
                     filter
                     key={index}
                     onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
@@ -641,10 +717,16 @@ const VisitNotesForm: React.FC<DefaultPatientWorkspaceProps> = ({
         </Stack>
       </div>
       <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" onClick={handleSubmit} disabled={isSubmitting} type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={() => handleSubmit}
+          disabled={isSubmitting}
+          type="submit"
+        >
           {isSubmitting ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (
@@ -698,7 +780,7 @@ function DiagnosisSearch({
                 onChange(e);
                 handleSearch(name);
               }}
-              value={value}
+              value={value instanceof Date ? value.toISOString() : value}
               onBlur={onBlur}
             />
           </ResponsiveWrapper>

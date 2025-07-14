@@ -1,6 +1,6 @@
+import { useConfig } from '@openmrs/esm-framework';
 import { useFormEncounters } from '../hooks/use-forms';
 import { isValidOfflineFormEncounter } from './offline-form-helpers';
-import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 
 /**
@@ -8,7 +8,7 @@ import { type ConfigObject } from '../config-schema';
  */
 export function useValidOfflineFormEncounters() {
   const formEncountersSwr = useFormEncounters();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   return {
     ...formEncountersSwr,
     data: formEncountersSwr.data?.filter((form) => isValidOfflineFormEncounter(form, config.htmlFormEntryForms)),

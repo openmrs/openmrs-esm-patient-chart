@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { type ObservationValue } from '../types/encounter';
 import {
   createObservationPayload,
   isCoded,
@@ -18,7 +19,8 @@ import {
   useCompletedLabResults,
   useOrderConceptByUuid,
 } from './lab-results.resource';
-import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import { createLabResultsFormSchema } from './lab-results-schema.resource';
+
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 
@@ -43,8 +45,9 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useLabResultsFormSchema(order.concept.uuid);
+  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const { mutate } = useSWRConfig();
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -52,39 +55,39 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       undefined,
       { revalidate: true },
     );
-  }, [order.patient.uuid]);
+  }, [mutate, order.patient.uuid]);
 
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
     setValue,
     handleSubmit,
-  } = useForm<{ testResult: Record<string, unknown> }>({
-    defaultValues: {},
+  } = useForm<Record<string, ObservationValue>>({
+    defaultValues: {} as Record<string, ObservationValue>,
     resolver: zodResolver(schema),
     mode: 'all',
   });
 
   useEffect(() => {
     if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
-      if (isCoded(concept) && completeLabResult?.value?.uuid) {
-        setValue(concept.uuid as any, completeLabResult?.value?.uuid);
+      if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
+        setValue(concept.uuid, completeLabResult.value.uuid);
       } else if (isNumeric(concept) && completeLabResult?.value) {
-        setValue(concept.uuid as any, parseFloat(completeLabResult?.value as any));
+        setValue(concept.uuid, parseFloat(completeLabResult.value as string));
       } else if (isText(concept) && completeLabResult?.value) {
-        setValue(concept.uuid as any, completeLabResult?.value);
+        setValue(concept.uuid, completeLabResult?.value);
       } else if (isPanel(concept)) {
         concept.setMembers.forEach((member) => {
           const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
-          let value: any;
+          let value: ObservationValue;
           if (isCoded(member)) {
-            value = obs?.value?.uuid;
+            value = typeof obs?.value === 'object' ? obs.value.uuid : obs?.value;
           } else if (isNumeric(member)) {
-            value = obs?.value ? parseFloat(obs?.value as any) : undefined;
+            value = obs?.value ? parseFloat(obs.value as string) : undefined;
           } else if (isText(member)) {
             value = obs?.value;
           }
-          if (value) setValue(member.uuid as any, value);
+          if (value) setValue(member.uuid, value);
         });
       }
     }
@@ -205,38 +208,39 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
-      <div className={styles.grid}>
-        {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
-        {concept && (
-          <Stack gap={5}>
-            {!isLoading ? (
-              <ResultFormField
-                defaultValue={completeLabResult}
-                concept={concept}
-                control={control as unknown as Control<Record<string, unknown>>}
-                errors={errors}
-              />
-            ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
-            )}
-          </Stack>
-        )}
-        {showEmptyFormErrorNotification && (
-          <InlineNotification
-            className={styles.emptyFormError}
-            lowContrast
-            title={t('error', 'Error')}
-            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
-          />
-        )}
-      </div>
+      <Layer level={isTablet ? 1 : 0}>
+        <div className={styles.grid}>
+          {concept && (
+            <Stack gap={5}>
+              {!isLoading ? (
+                <ResultFormField
+                  defaultValue={completeLabResult}
+                  concept={concept}
+                  control={control as unknown as Control<Record<string, unknown>>}
+                />
+              ) : (
+                <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+              )}
+            </Stack>
+          )}
+          {showEmptyFormErrorNotification && (
+            <InlineNotification
+              className={styles.emptyFormError}
+              lowContrast
+              title={t('error', 'Error')}
+              subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+            />
+          )}
+        </div>
+      </Layer>
+
       <ButtonSet
         className={classNames({
           [styles.tablet]: isTablet,
           [styles.desktop]: !isTablet,
         })}
       >
-        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button

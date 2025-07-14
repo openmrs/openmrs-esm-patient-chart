@@ -2,21 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
-import { mockGroupedResults, mockResults } from '__mocks__';
+import { mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import { type FilterContextProps } from '../filter/filter-types';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import TreeView from './tree-view.component';
-import FilterContext from '../filter/filter-context';
+import { FilterProvider, type Roots } from '../filter/filter-context';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseGetManyObstreeData = jest.mocked(useGetManyObstreeData);
-
-jest.mock('../panel-timeline/helpers', () => ({
-  ...jest.requireActual('../panel-timeline/helpers'),
-  parseTime: jest.fn(),
-}));
 
 jest.mock('../grouped-timeline', () => ({
   ...jest.requireActual('../grouped-timeline'),
@@ -25,38 +19,15 @@ jest.mock('../grouped-timeline', () => ({
 
 const mockProps = {
   patientUuid: mockPatient.id,
-  patient: mockPatient,
-  basePath: '/test-base-path',
-  testUuid: 'test-uuid',
   expanded: false,
-  type: 'default',
   view: 'individual-test' as const,
-  isLoading: false,
 };
 
-const mockFilterContext: FilterContextProps = {
-  activeTests: ['Bloodwork-Chemistry', 'Bloodwork'],
-  timelineData: mockGroupedResults.timelineData,
-  tableData: null,
-  trendlineData: null,
-  parents: mockGroupedResults.parents,
-  checkboxes: { Bloodwork: false, Chemistry: true },
-  someChecked: true,
-  lowestParents: mockGroupedResults['lowestParents'],
-  totalResultsCount: 0,
-  initialize: jest.fn(),
-  toggleVal: jest.fn(),
-  updateParent: jest.fn(),
-  resetTree: jest.fn(),
-  roots: mockResults,
-  tests: {},
-};
-
-const renderTreeViewWithMockContext = (contextValue = mockFilterContext) => {
+const renderTreeViewWithMockContext = () => {
   render(
-    <FilterContext.Provider value={contextValue}>
+    <FilterProvider roots={mockResults as Roots} isLoading={false}>
       <TreeView {...mockProps} />
-    </FilterContext.Provider>,
+    </FilterProvider>,
   );
 };
 
@@ -129,7 +100,7 @@ describe('TreeView', () => {
 
     renderTreeViewWithMockContext();
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('table')).toHaveLength(3);
     expect(screen.getAllByText('Complete blood count').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Haemoglobin').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Hematocrit').length).toBeGreaterThan(0);

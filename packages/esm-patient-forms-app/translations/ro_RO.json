@@ -1,0 +1,20 @@
+{
+  "clinicalForm": "Formular clinic",
+  "clinicalForms": "Formulare clinice",
+  "formName": "Nume formular (A-Z)",
+  "forms": "Formulare",
+  "homeOverviewCardView": "Vezi",
+  "lastCompleted": "Ultima completare",
+  "never": "Niciodata",
+  "noFormsToDisplay": "Nu exista formulare de afisat.",
+  "offlineForms": "Formulare offline",
+  "offlineForms__lower": "formulare offline",
+  "offlineFormsOverviewCardAvailableOffline": "Disponibil offline",
+  "offlineFormsTableFormAvailableOffline": "Offline",
+  "offlineFormsTableFormNameHeader": "Nume formular",
+  "offlineFormsTitle": "Formulare offline",
+  "offlinePatientsTableSearchLabel": "Cauta in aceasta lista",
+  "offlinePatientsTableSearchPlaceholder": "Cauta in aceasta lista",
+  "offlineToggle": "Comutare offline",
+  "searchThisList": "Cauta in aceasta lista"
+}

@@ -37,7 +37,6 @@ export const testResultsDashboardLink =
   getSyncLifecycle(
     createDashboardLink({
       ...dashboardMeta,
-      moduleName,
     }),
     options,
   );
@@ -53,10 +52,12 @@ export const addLabOrderWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const timelineResultsModal = getAsyncLifecycle(
-  () => import('./test-results/panel-timeline/timeline-results.modal'),
-  {
-    featureName: 'Timeline results',
-    moduleName,
-  },
+export const timelineResultsModal = getAsyncLifecycle(() => import('./test-results/trendline/timeline-results.modal'), {
+  featureName: 'Timeline results',
+  moduleName,
+});
+
+export const editLabResultsModal = getAsyncLifecycle(
+  () => import('./edit-test-results/modal/edit-lab-results.modal'),
+  options,
 );

@@ -27,10 +27,6 @@ jest.mock('./lab-results.resource', () => ({
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
   useCompletedLabResults: jest.fn(),
-  isCoded: (concept) => concept?.datatype?.display === 'Coded',
-  isText: (concept) => concept?.datatype?.display === 'Text',
-  isNumeric: (concept) => concept?.datatype?.display === 'Numeric',
-  isPanel: (concept) => concept?.setMembers?.length > 0,
 }));
 
 const mockOrder = {
@@ -629,6 +625,117 @@ describe('LabResultsForm', () => {
       },
       expect.anything(),
     );
+  });
+
+  test('display error notification when the concept datatype is N/A', async () => {
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        setMembers: [],
+        datatype: { display: 'N/A' },
+      } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    render(<LabResultsForm {...testProps} />);
+
+    const label = screen.getByText('Test Concept');
+    expect(label).toBeInTheDocument();
+
+    const errorNotification = screen.getByText(
+      'This test needs to be configured with a specific type (like number, text, or choice list) to record results properly. Please contact your system administrator to fix this.',
+    );
+    expect(errorNotification).toBeInTheDocument();
+  });
+
+  test('should display second level of set members for a given concept, if present', () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuid.mockReturnValue({
+      concept: {
+        uuid: 'concept-uuid',
+        display: 'Test Concept',
+        set: true,
+        setMembers: [
+          {
+            uuid: 'set-member-uuid-1',
+            display: 'Set Member 1',
+            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 100,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mg/dL',
+          },
+          {
+            uuid: 'set-member-uuid-2',
+            display: 'Set Member 2',
+            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+            hiAbsolute: 80,
+            lowAbsolute: 0,
+            lowCritical: null,
+            lowNormal: null,
+            hiCritical: null,
+            hiNormal: null,
+            units: 'mmol/L',
+          },
+          {
+            uuid: 'set-member-uuid-3',
+            display: 'Set Member 3',
+            concept: { uuid: 'concept-uuid-3', display: 'Concept 3' },
+            datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+            set: true,
+            setMembers: [
+              {
+                uuid: 'set-member-uuid-3.1',
+                display: 'Set Member 3.1',
+                concept: { uuid: 'concept-uuid-3.1', display: 'Concept 3.1' },
+                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                hiAbsolute: 80,
+                lowAbsolute: 0,
+                lowCritical: null,
+                lowNormal: null,
+                units: 'mg/dL',
+              },
+              {
+                uuid: 'set-member-uuid-3.2',
+                display: 'Set Member 3.2',
+                concept: { uuid: 'concept-uuid-3.2', display: 'Concept 3.2' },
+                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                hiAbsolute: 80,
+                lowAbsolute: 0,
+                lowCritical: null,
+                units: 'mg/dL',
+              },
+            ],
+          },
+        ],
+        datatype: { display: 'Numeric' },
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        lowCritical: null,
+        lowNormal: null,
+        hiCritical: null,
+        hiNormal: null,
+        units: 'mg/dL',
+      } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    expect(screen.getByText('Set Member 3')).toBeInTheDocument();
+    expect(screen.getByLabelText('Set Member 3.1 (0 - 80 mg/dL)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Set Member 3.2 (0 - 80 mg/dL)')).toBeInTheDocument();
   });
 
   test('should handle empty form submission', async () => {

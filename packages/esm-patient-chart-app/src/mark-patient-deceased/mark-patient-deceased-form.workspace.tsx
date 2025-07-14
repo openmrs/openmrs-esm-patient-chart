@@ -170,7 +170,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
               {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
                   <Search
-                    labelText=""
+                    labelText={t('searchForCauseOfDeath', 'Search for a cause of death')}
                     onChange={handleSearchTermChange}
                     placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
                   />
@@ -250,7 +250,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
         )}
       </div>
       <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
