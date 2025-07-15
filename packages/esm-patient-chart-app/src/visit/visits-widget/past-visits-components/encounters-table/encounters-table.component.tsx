@@ -86,7 +86,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     externalModuleName: '@openmrs/esm-patient-forms-app',
   });
   const { htmlFormEntryForms } = formsConfig;
-  const paginatedMappedEncounters = useMemo(() => paginatedEncounters?.map(mapEncounter), [paginatedEncounters]);
+  const paginatedMappedEncounters = useMemo(
+    () => (paginatedEncounters ?? []).map(mapEncounter).filter(Boolean),
+    [paginatedEncounters],
+  );
 
   const tableHeaders = [
     {
