@@ -1,4 +1,5 @@
 import { age, formatDate, launchWorkspace, parseDate, type Visit } from '@openmrs/esm-framework';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import type {
   ConfigConcepts,
   Encounter,
@@ -19,22 +20,26 @@ export function launchEncounterForm(
   encounterUuid?: string,
   intent: string = '*',
   patientUuid?: string,
+  requireActiveVisitForEncounterTile: boolean = true,
 ) {
-  launchWorkspace('patient-form-entry-workspace', {
-    workspaceTitle: form?.name,
-    mutateForm: onFormSave,
-    formInfo: {
-      encounterUuid,
-      formUuid: form?.uuid,
-      patientUuid: patientUuid,
-      visit: visit,
-      additionalProps: {
-        mode: action === 'add' ? 'enter' : action,
-        formSessionIntent: intent,
-        openClinicalFormsWorkspaceOnFormClose: false,
+  if (!visit && requireActiveVisitForEncounterTile) {
+    launchStartVisitPrompt();
+  } else
+    launchWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: form?.name,
+      mutateForm: onFormSave,
+      formInfo: {
+        encounterUuid,
+        formUuid: form?.uuid,
+        patientUuid: patientUuid,
+        visit: visit,
+        additionalProps: {
+          mode: action === 'add' ? 'enter' : action,
+          formSessionIntent: intent,
+          openClinicalFormsWorkspaceOnFormClose: false,
+        },
       },
-    },
-  });
+    });
 }
 
 export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
@@ -167,14 +172,14 @@ export function getObsFromEncounter({
   // format format obs date or datetime based on the obs value's type
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
-      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
+      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide', time: false });
     } else if (typeof obs.value === 'string') {
-      return formatDate(parseDate(obs.value), { mode: 'wide' });
+      return formatDate(parseDate(obs.value), { mode: 'wide', time: false });
     }
   }
 
   if (typeof obs.value === 'object' && obs.value?.name) {
-    return obs.value?.name?.display;
+    return obs.value?.name?.display ?? obs.value?.name?.name ?? '--';
   }
   return obs.value;
 }
