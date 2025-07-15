@@ -301,9 +301,12 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
+    const encountersToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
 
-    const isEncounterDatetimeValid = this.validateEncounterDatetimeWithVisit(encounterToSubmit);
+    // Validate the first encounter for visit date compatibility
+    const isEncounterDatetimeValid = encountersToSubmit?.[0]
+      ? this.validateEncounterDatetimeWithVisit(encountersToSubmit[0])
+      : true;
 
     if (isEncounterDatetimeValid) {
       this.handleFormSubmission();
