@@ -104,10 +104,26 @@ export class FormDataSourceService {
 
   private getMostRecentObsDataSource(formSchema: FormSchema) {
     const conceptIdentifiers: Set<string> = new Set();
-    for (const page of formSchema.pages) {
-      for (const section of page.sections) {
-        this.extractMostRecentObsConceptIds(section.questions, conceptIdentifiers);
+
+    if (!formSchema) {
+      console.warn('FormSchema is undefined or null in getMostRecentObsDataSource');
+      return (patient: string) => {
+        return this.fetchMostRecentObsValue(patient, [...conceptIdentifiers]);
+      };
+    }
+
+    if (formSchema.pages && Array.isArray(formSchema.pages)) {
+      for (const page of formSchema.pages) {
+        if (page.sections && Array.isArray(page.sections)) {
+          for (const section of page.sections) {
+            if (section.questions && Array.isArray(section.questions)) {
+              this.extractMostRecentObsConceptIds(section.questions, conceptIdentifiers);
+            }
+          }
+        }
       }
+    } else {
+      console.warn('FormSchema pages is not an array or is undefined:', formSchema.pages);
     }
 
     return (patient: string) => {
@@ -116,7 +132,13 @@ export class FormDataSourceService {
   }
 
   private extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
+    if (!questions || !Array.isArray(questions)) {
+      return;
+    }
+
     for (const question of questions) {
+      if (!question) continue;
+
       const useMostRecentValue = question.questionOptions?.useMostRecentValue ?? false;
       if (useMostRecentValue === 'true' || (typeof useMostRecentValue === 'boolean' && useMostRecentValue)) {
         if (typeof question.concept === 'string') {
