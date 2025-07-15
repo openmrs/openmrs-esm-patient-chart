@@ -182,14 +182,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     rdeDate,
     mutateEncounterUuid,
     clearOrders,
-    closeWorkspaceWithSavedChanges,
     mutateOrders,
     mutateCurrentVisit,
     orders,
-    patientUuid,
-    session,
     t,
-    orders,
+    closeWorkspaceWithSavedChanges,
     hasRdeDateBoundsError,
   ]);
 
