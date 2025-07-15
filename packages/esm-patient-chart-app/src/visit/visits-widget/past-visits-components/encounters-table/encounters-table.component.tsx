@@ -221,6 +221,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   {rows?.map((row, i) => {
                     const encounter = paginatedMappedEncounters[i];
 
+                    if (!encounter) return null;
+
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
