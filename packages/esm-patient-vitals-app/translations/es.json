@@ -75,6 +75,6 @@
   "vitalsAndBiometricsUpdateError": "Error al actualizar signos vitales y biométricos",
   "vitalsHistory": "Historial de signos vitales",
   "vitalSignDisplayed": "Signo vital mostrado",
-  "vitalSigns": "Signos vitales",
+  "vitalSigns": "vital signs",
   "weight": "Peso"
 }
