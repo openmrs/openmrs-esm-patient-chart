@@ -13,6 +13,8 @@ import {
   useVisitContextStore,
 } from '@openmrs/esm-framework';
 import {
+  type amPm,
+  convertTime12to24,
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   postOrders,
@@ -67,23 +69,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   }, [patientUuid]);
 
   const handleRdeDateTimeChange = useCallback(
-    (dateTime: { retrospectiveDate: Date; retrospectiveTime: string; retrospectiveTimeFormat: string }) => {
+    (dateTime: { retrospectiveDate: Date; retrospectiveTime: string; retrospectiveTimeFormat: amPm }) => {
       if (!dateTime.retrospectiveDate || !dateTime.retrospectiveTime || !dateTime.retrospectiveTimeFormat) {
         setRdeDate(undefined);
         return;
       }
 
-      let [rawHour, minute] = dateTime.retrospectiveTime.split(':').map(Number);
-
-      // Adjust hour for AM/PM
-      let hour = rawHour;
-      if (dateTime.retrospectiveTimeFormat === 'PM' && hour < 12) {
-        hour += 12;
-      }
-
-      if (dateTime.retrospectiveTimeFormat === 'AM' && hour === 12) {
-        hour = 0;
-      }
+      let [hour, minute] = convertTime12to24(dateTime.retrospectiveTime, dateTime.retrospectiveTimeFormat);
 
       const completeDate = set(dateTime.retrospectiveDate, {
         hours: hour,

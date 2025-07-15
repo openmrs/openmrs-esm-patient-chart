@@ -1,5 +1,5 @@
 import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, ResponsiveWrapper, showSnackbar, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -53,17 +53,6 @@ const RetrospectiveDateTimePicker = ({
         retrospectiveTime: retrospectiveTime,
         retrospectiveTimeFormat: retrospectiveTimeFormat,
       });
-    }
-
-    // if the user passes a time that is not the selected format, we reset the time format
-    if (retrospectiveTime && retrospectiveTimeFormat) {
-      const [hours, minutes] = retrospectiveTime.split(':');
-      const isAm = retrospectiveTimeFormat === 'AM';
-      const isPm = retrospectiveTimeFormat === 'PM';
-
-      if (isAm && parseInt(hours, 10) >= 12) {
-        form.setValue('retrospectiveTimeFormat', 'PM');
-      }
     }
   }, [form, onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
 
@@ -133,7 +122,24 @@ const RetrospectiveDateTimePicker = ({
                 <TimePicker
                   id={'retrospective-time-picker-input'}
                   labelText={t('time', 'Time')}
-                  onBlur={onBlur}
+                  onBlur={(event) => {
+                    const timeValue = event.target.value;
+                    if (timeValue) {
+                      const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
+                      if (!pattern.test(timeValue)) {
+                        showSnackbar({
+                          title: t('invalidTimeFormat', 'Invalid time format.'),
+                          kind: 'error',
+                          subtitle: t(
+                            'invalidTimeFormatSubtitle',
+                            'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
+                          ),
+                          autoClose: true,
+                        });
+                        form.setValue('retrospectiveTime', '');
+                      }
+                    }
+                  }}
                   onChange={(event) => onChange(event.target.value)}
                   pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
                   value={value}
