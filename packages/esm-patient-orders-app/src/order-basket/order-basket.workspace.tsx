@@ -10,7 +10,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisitContextStore,
+  useVisit,
 } from '@openmrs/esm-framework';
 import {
   type amPm,
@@ -24,9 +24,9 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
-import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 import { format, isWithinInterval, parse, set } from 'date-fns';
+import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -55,7 +55,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [hasRdeDateBoundsError, setHasRdeDateBoundsError] = useState(false);
   const [rdeDate, setRdeDate] = useState<Date>();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -144,7 +144,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           rdeDate,
         );
         mutateEncounterUuid();
-        mutateVisit();
+        // Only revalidate current visit since orders create new encounters
+        mutateCurrentVisit();
         clearOrders();
         await mutateOrders();
         closeWorkspaceWithSavedChanges();
@@ -159,7 +160,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      mutateVisit();
+      // Only revalidate current visit since orders create new encounters
+      mutateCurrentVisit();
       await mutateOrders();
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();
@@ -179,10 +181,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     session?.sessionLocation?.uuid,
     rdeDate,
     mutateEncounterUuid,
-    mutateVisit,
     clearOrders,
-    mutateOrders,
     closeWorkspaceWithSavedChanges,
+    mutateOrders,
+    mutateCurrentVisit,
+    orders,
+    patientUuid,
+    session,
     t,
     orders,
     hasRdeDateBoundsError,
