@@ -9,7 +9,7 @@ import styles from './tile.scss';
 
 export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
   const isTablet = useLayoutType() === 'tablet';
-  const columnSpan = Math.floor(16 / columns.length);
+  const columnSpan = columns.length > 0 ? Math.floor(16 / columns.length) : 16;
 
   return (
     <Layer className={styles.layer}>
