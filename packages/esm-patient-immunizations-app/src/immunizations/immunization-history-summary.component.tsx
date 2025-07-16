@@ -15,15 +15,6 @@ interface ImmunizationScheduleDashboardProps {
 const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, isLoading } = useImmunizations(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
-
-  const launchImmunizationsForm = React.useCallback(() => {
-    if (!currentVisit) {
-      launchStartVisitPrompt();
-      return;
-    }
-    launchWorkspace('immunization-form-workspace');
-  }, [currentVisit]);
 
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizationsHistory', 'Immunizations History');
