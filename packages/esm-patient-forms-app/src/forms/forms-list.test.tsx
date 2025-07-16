@@ -3,7 +3,6 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithSwr } from 'tools';
 import FormsList, { type FormsListProps } from './forms-list.component';
-import { FormsProvider } from './forms-context';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -11,16 +10,12 @@ const defaultProps: FormsListProps & { reset: () => void } = {
   forms: [],
   handleFormOpen: jest.fn(),
   reset() {
-    this.handleFormOpen.mockReset();
+    this.completedForms = [];
   },
 };
 
 function renderFormsList(props = {}) {
-  renderWithSwr(
-    <FormsProvider>
-      <FormsList {...defaultProps} {...props} />
-    </FormsProvider>,
-  );
+  renderWithSwr(<FormsList {...defaultProps} {...props} />);
 }
 
 beforeEach(async () => {

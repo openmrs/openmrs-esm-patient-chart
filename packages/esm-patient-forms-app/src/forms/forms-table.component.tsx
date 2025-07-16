@@ -13,11 +13,9 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
 } from '@carbon/react';
-import styles from './forms-table.scss';
 import { type Form } from '../types';
-import { useFormsContext } from './forms-context';
+import styles from './forms-table.scss';
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -35,21 +33,10 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
-  totalItems: number;
 }
 
-const FormsTable = ({
-  tableHeaders,
-  tableRows,
-  isTablet,
-  handleSearch,
-  handleFormOpen,
-  totalItems,
-}: FormsTableProps) => {
+const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
   const { t } = useTranslation();
-  const { pageSize, currentPage, setPageSize, setCurrentPage } = useFormsContext();
-  const pageSizes = [50, 100, 200];
-
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -101,22 +88,6 @@ const FormsTable = ({
               </Table>
             )}
           </TableContainer>
-          <Pagination
-            forwardText={t('nextPage', 'Next page')}
-            backwardText={t('previousPage', 'Previous page')}
-            itemsPerPageText={t('forms', 'Forms')}
-            page={currentPage}
-            pageSize={pageSize}
-            size="sm"
-            pageSizes={pageSizes}
-            totalItems={totalItems}
-            onChange={({ page, pageSize: newPageSize }) => {
-              if (newPageSize !== pageSize) {
-                setPageSize(newPageSize);
-              }
-              setCurrentPage(page);
-            }}
-          />
         </>
       )}
     </DataTable>
