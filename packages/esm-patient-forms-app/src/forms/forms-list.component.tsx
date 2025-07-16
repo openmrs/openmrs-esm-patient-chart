@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
-import { DataTableSkeleton } from '@carbon/react';
+import { DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import type { CompletedFormInfo, Form } from '../types';
 import FormsTable from './forms-table.component';
@@ -13,6 +13,14 @@ export type FormsListProps = {
   error?: any;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  // Infinite scrolling props
+  onSearch?: (searchTerm: string) => void;
+  isValidating?: boolean;
+  loadMore?: () => void;
+  hasMore?: boolean;
+  isLoading?: boolean;
+  totalLoaded?: number;
+  enableInfiniteScrolling?: boolean;
 };
 
 /*
@@ -25,9 +33,69 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
   const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  // Handle search with debounce
+  const handleSearch = useMemo(
+    () =>
+      debounce((searchTerm: string) => {
+        setSearchTerm(searchTerm);
+        onSearch?.(searchTerm);
+      }, 1000),
+    [onSearch],
+  );
+
+  // Set up intersection observer for infinite scrolling
+  useEffect(() => {
+    if (!enableInfiniteScrolling || !loadMore || !hasMore) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+
+        if (first.isIntersecting && !isValidating) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observerRef.current = observer;
+
+    // Observe the element if it's already available
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [enableInfiniteScrolling, loadMore, hasMore, isValidating]);
+
+  // Create a callback ref to observe the element when it becomes available
+  const setLoadMoreRef = useCallback((node: HTMLDivElement | null) => {
+    if (loadMoreRef.current) {
+      // Clean up previous observation
+      if (observerRef.current) {
+        observerRef.current.unobserve(loadMoreRef.current);
+      }
+    }
+
+    loadMoreRef.current = node;
+
+    if (node && observerRef.current) {
+      observerRef.current.observe(node);
+    }
+  }, []);
 
   const filteredForms = useMemo(() => {
+    // If using infinite scrolling with server-side search, don't filter client-side
+    if (enableInfiniteScrolling && onSearch) {
+      return completedForms;
+    }
+
     if (!searchTerm) {
       return forms;
     }
