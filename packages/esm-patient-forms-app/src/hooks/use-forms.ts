@@ -18,7 +18,6 @@ import {
   formEncounterUrlPoc,
 } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
-import { useFormsContext } from '../forms/forms-context';
 
 function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
   const { customFormsUrl, showHtmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
@@ -39,31 +38,21 @@ function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
 }
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '', visitUuid: string = '') {
-  const { searchTerm, pageSize, currentPage } = useFormsContext();
-  const { url: baseUrl, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
-
-  let url = baseUrl;
-  if (pageSize && currentPage) {
-    const startIndex = (currentPage - 1) * pageSize;
-    url += `&limit=${pageSize}&startIndex=${startIndex}`;
-  }
-  if (searchTerm) {
-    url += `&q=${searchTerm}`;
-  }
+  const { url, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
+    // show published forms and hide component forms
     const forms = hasCustomFormsUrl
       ? res?.data.results
       : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 
     if (!cachedOfflineFormsOnly) {
-      return { forms, totalCount: res.data.totalCount };
+      return forms;
     }
 
     const dynamicFormData = await getDynamicOfflineDataEntries('form');
-    const filteredForms = forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
-    return { forms: filteredForms, totalCount: res.data.totalCount };
+    return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
   });
 }
 
@@ -93,7 +82,7 @@ export function useForms(
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
-  const data = allFormsRes.data?.forms ? mapToFormCompletedInfo(allFormsRes.data?.forms, pastEncounters) : undefined;
+  const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
   const session = useSession();
 
   const mutateForms = () => {
@@ -133,9 +122,8 @@ export function useForms(
     data: formsToDisplay,
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
-    allForms: allFormsRes.data?.forms,
+    allForms: allFormsRes.data,
     mutateForms,
-    totalCount: allFormsRes.data?.totalCount ?? 0,
   };
 }
 
