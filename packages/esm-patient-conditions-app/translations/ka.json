@@ -12,6 +12,7 @@
   "conditionRequired": "მდგომარეობის მითითება აუცილებელია",
   "conditions": "მდგომარეობები",
   "Conditions": "მდგომარეობები",
+  "conditions_lower": "conditions",
   "conditionSaved": "მდგომარეობა წარმატებით იქნა შენახული",
   "conditionUpdated": "მდგომარეობა განახლდა",
   "dateOfOnset": "დაწყების თარიღი",
