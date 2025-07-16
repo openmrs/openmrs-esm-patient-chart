@@ -54,3 +54,27 @@ html[dir='rtl'] {
     margin-right: layout.$spacing-03;
   }
 }
+
+// Infinite scrolling styles
+.infiniteScrollContainer {
+  width: 100%;
+}
+
+.loadMoreTrigger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: layout.$spacing-09;
+  padding: layout.$spacing-05;
+  color: $text-02;
+}
+
+.endOfResults {
+  text-align: center;
+  padding: layout.$spacing-05;
+  color: $text-02;
+  font-style: italic;
+  border-top: 1px solid $ui-03;
+  margin-top: layout.$spacing-03;
+  @include type.type-style('body-compact-01');
+}

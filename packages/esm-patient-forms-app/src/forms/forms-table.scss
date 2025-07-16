@@ -43,6 +43,10 @@
   }
 }
 
+.customSearchWrapper {
+  margin-bottom: layout.$spacing-05;
+}
+
 .table tr:last-of-type {
   td {
     border-bottom: none;
@@ -130,4 +134,11 @@
   width: layout.$spacing-07;
   padding-top: 0.188rem;
   border-bottom: 0.375rem solid var(--brand-03);
+}
+
+.resultsInfo {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  margin-top: layout.$spacing-03;
+  text-align: right;
 }

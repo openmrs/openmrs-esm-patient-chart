@@ -31,30 +31,42 @@ interface FormsTableProps {
     form: Form;
   }>;
   isTablet: boolean;
-  handleSearch: (search: string) => void;
+  handleSearch?: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  customSearchComponent?: React.ReactNode;
+  totalLoaded?: number;
 }
 
-const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
+const FormsTable = ({
+  tableHeaders,
+  tableRows,
+  isTablet,
+  handleSearch,
+  handleFormOpen,
+  customSearchComponent,
+}: FormsTableProps) => {
   const { t } = useTranslation();
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
         <>
+          {customSearchComponent && <div className={styles.customSearchWrapper}>{customSearchComponent}</div>}
           <TableContainer className={styles.tableContainer}>
-            <div className={styles.toolbarWrapper}>
-              <TableToolbar className={styles.tableToolbar}>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    className={styles.search}
-                    expanded
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)}
-                    placeholder={t('searchThisList', 'Search this list')}
-                    size="sm"
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
-            </div>
+            {!customSearchComponent && (
+              <div className={styles.toolbarWrapper}>
+                <TableToolbar className={styles.tableToolbar}>
+                  <TableToolbarContent>
+                    <TableToolbarSearch
+                      className={styles.search}
+                      expanded
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleSearch?.(event.target.value)}
+                      placeholder={t('searchThisList', 'Search this list')}
+                      size="sm"
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
+              </div>
+            )}
             {rows.length > 0 && (
               <Table aria-label="forms" {...getTableProps()} className={styles.table}>
                 <TableHead>

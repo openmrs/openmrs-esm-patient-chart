@@ -1,10 +1,13 @@
 {
+  "allFormsLoaded_one": "All forms loaded ({{count}} total)",
+  "allFormsLoaded_other": "All forms loaded ({{count}} total)",
   "clinicalForm": "Clinical Form",
   "clinicalForms": "Clinical forms",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
   "homeOverviewCardView": "View",
   "lastCompleted": "Last completed",
+  "loadingMoreForms": "Loading more forms...",
   "never": "Never",
   "noFormsToDisplay": "There are no forms to display.",
   "off": "Off",
@@ -19,5 +22,6 @@
   "offlineToggle": "Offline toggle",
   "on": "On",
   "previousPage": "Previous page",
+  "scrollToLoadMore": "Scroll to load more forms...",
   "searchThisList": "Search this list"
 }

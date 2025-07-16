@@ -18,11 +18,39 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
   const { t } = useTranslation();
   const config = useConfig<FormEntryConfigSchema>();
   const isOnline = useConnectivity();
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  const useInfiniteScrolling = enableInfiniteScrolling ?? config.enableInfiniteScrolling;
+
+  // Always use infinite forms for search to support server-side filtering
+  const infiniteFormsResult = useInfiniteForms(
+    patientUuid,
+    visitContext?.uuid,
+    undefined,
+    undefined,
+    !isOnline,
+    config.orderBy,
+    searchQuery,
+  );
+
+  // Only use regular forms when not searching
+  const regularFormsResult = useForms(patientUuid, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
+
+  // Use infinite forms result when searching or when infinite scrolling is enabled
   const {
     data: forms,
     error,
     mutateForms,
   } = useForms(patient.id, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
+
+  // Use a memoized debounced search function
+  const handleSearch = useMemo(() => {
+    return debounce((query: string) => {
+      setIsSearching(true);
+      setSearchQuery(query);
+    }, 500);
+  }, []); // Empty dependencies since setIsSearching and setSearchQuery are stable
 
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({
@@ -33,7 +61,22 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
     }));
   }, [config.formSections, forms]);
 
-  if (forms?.length === 0) {
+  // Show loading state when searching
+  if (isSearching) {
+    return (
+      <ResponsiveWrapper>
+        <div className={styles.searchingContainer}>
+          <div className={styles.searchingMessage}>
+            <InlineLoading description={t('searchingForms', 'Searching forms...')} status="active" />
+          </div>
+          <DataTableSkeleton role="progressbar" />
+        </div>
+      </ResponsiveWrapper>
+    );
+  }
+
+  // Don't show empty state during search or initial loading
+  if (forms?.length === 0 && !isSearching && !isLoading && !isValidating) {
     return (
       <ResponsiveWrapper>
         <Tile className={styles.emptyState}>
@@ -57,6 +100,14 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
               forms={section.availableForms}
               error={error}
               handleFormOpen={handleFormOpen}
+              onSearch={handleSearch}
+              isValidating={isValidating}
+              loadMore={loadMore}
+              hasMore={hasMore}
+              isLoading={isLoading}
+              totalLoaded={totalLoaded}
+              enableInfiniteScrolling={useInfiniteScrolling}
+              isSearching={isSearching}
             />
           );
         })
