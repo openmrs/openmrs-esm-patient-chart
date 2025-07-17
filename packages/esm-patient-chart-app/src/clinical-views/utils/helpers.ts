@@ -137,7 +137,8 @@ export function getObsFromEncounter({
   config,
 }: GetObsFromEncounterParams) {
   let obs = findObs(encounter, obsConcept);
-  if (!encounter || !obsConcept) {
+
+  if (!encounter && !obsConcept) {
     return '--';
   }
 
@@ -149,7 +150,7 @@ export function getObsFromEncounter({
 
   // handles things like location, provider, visit type, etc. that are not in the encounter
   if (type) {
-    getEncounterProperty(encounter, type);
+    return getEncounterProperty(encounter, type);
   }
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
@@ -203,12 +204,23 @@ export const getEncounterProperty = (encounter: Encounter, type: EncounterProper
     return encounter.encounterProviders.map((p) => p.provider.name).join(' | ');
   }
 
-  if (type === 'visitType') {
+  if (type === 'encounterType') {
     return encounter.encounterType.name;
   }
 
   if (type === 'ageAtEncounter') {
     return age(encounter.patient.birthDate, encounter.encounterDatetime);
+  }
+
+  if (type === 'visitDate') {
+    if (encounter.visit?.startDatetime) {
+      return formatDate(parseDate(encounter.visit.startDatetime), { mode: 'wide' });
+    }
+    return '--';
+  }
+
+  if (type === 'visitType') {
+    return encounter.visit?.visitType?.display ?? '--';
   }
 };
 
