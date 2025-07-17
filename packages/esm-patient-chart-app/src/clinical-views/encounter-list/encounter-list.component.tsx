@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
-import { AddIcon, navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { AddIcon, navigate, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { EncounterListDataTable } from './table.component';
 import { launchEncounterForm } from '../utils/helpers';
@@ -48,6 +48,8 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   deathStatus,
 }) => {
   const { t } = useTranslation();
+  const config = useConfig();
+  const requireActiveVisitForEncounterTile = config.requireActiveVisitForEncounterTile;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -96,9 +98,18 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   const createLaunchFormAction = useCallback(
     (encounter: Encounter, mode: Mode) => () => {
-      launchEncounterForm(formsJson, currentVisit, mode, onFormSave, encounter.uuid, null, patientUuid);
+      launchEncounterForm(
+        formsJson,
+        currentVisit,
+        mode,
+        onFormSave,
+        encounter.uuid,
+        null,
+        patientUuid,
+        requireActiveVisitForEncounterTile,
+      );
     },
-    [formsJson, onFormSave, patientUuid, currentVisit],
+    [formsJson, onFormSave, patientUuid, currentVisit, requireActiveVisitForEncounterTile],
   );
 
   const handleDeleteEncounter = useCallback(
@@ -195,6 +206,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                           encounter.uuid,
                           actionItem.intent,
                           patientUuid,
+                          requireActiveVisitForEncounterTile,
                         );
                   }}
                 />
@@ -217,6 +229,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     onFormSave,
     patientUuid,
     currentVisit,
+    requireActiveVisitForEncounterTile,
   ]);
 
   const headers = useMemo(() => {
@@ -237,7 +250,16 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
-            launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid);
+            launchEncounterForm(
+              formsJson,
+              currentVisit,
+              'add',
+              onFormSave,
+              '',
+              '*',
+              patientUuid,
+              requireActiveVisitForEncounterTile,
+            );
           }}
         >
           {t(displayText)}
@@ -245,7 +267,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       );
     }
     return null;
-  }, [formsJson, displayText, onFormSave, patientUuid, t, currentVisit]);
+  }, [formsJson, displayText, onFormSave, patientUuid, t, currentVisit, requireActiveVisitForEncounterTile]);
 
   if (isLoading === true || isLoadingFormsJson === true) {
     return <DataTableSkeleton rowCount={10} />;
@@ -280,7 +302,17 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           launchForm={
             hideFormLauncher || deathStatus
               ? null
-              : () => launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid)
+              : () =>
+                  launchEncounterForm(
+                    formsJson,
+                    currentVisit,
+                    'add',
+                    onFormSave,
+                    '',
+                    '*',
+                    patientUuid,
+                    requireActiveVisitForEncounterTile,
+                  )
           }
         />
       )}
