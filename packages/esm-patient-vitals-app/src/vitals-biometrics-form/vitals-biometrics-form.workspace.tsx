@@ -22,9 +22,8 @@ import {
   useLayoutType,
   useSession,
   useVisit,
-  useVisitContextStore,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,
@@ -82,7 +81,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
-  const { mutateVisit } = useVisitContextStore();
+  const { invalidateVisitRelatedData } = useOptimisticVisitMutations(patientUuid);
 
   const isLoadingInitialValues = useMemo(
     () => (formContext === 'creating' ? false : isLoadingEncounter),
@@ -198,7 +197,8 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
             if (mutateEncounter) {
               mutateEncounter();
             }
-            mutateVisit();
+            // Only invalidate observations data since we created new vitals/biometrics observations
+            invalidateVisitRelatedData({ observations: true, encounters: true });
             invalidateCachedVitalsAndBiometrics();
             closeWorkspaceWithSavedChanges();
             showSnackbar({
@@ -237,7 +237,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
       formContext,
       initialFieldValuesMap,
       mutateEncounter,
-      mutateVisit,
+      invalidateVisitRelatedData,
       patientUuid,
       session?.sessionLocation?.uuid,
       t,

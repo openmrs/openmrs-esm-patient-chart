@@ -23,8 +23,8 @@ describe('ProgramsOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(screen.getByText(/There are no program enrollments to display for this patient/)).toBeInTheDocument();
-    expect(screen.getByText(/Record program enrollments/)).toBeInTheDocument();
+    expect(screen.getByText(/There are no program enrollments to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record program enrollments/i)).toBeInTheDocument();
   });
 
   it('renders an error state view if there is a problem fetching program enrollments', async () => {

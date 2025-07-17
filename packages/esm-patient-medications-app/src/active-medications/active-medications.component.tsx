@@ -11,8 +11,8 @@ interface ActiveMedicationsProps {
 
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('activeMedicationsDisplayText', 'Active medications');
-  const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
+  const displayText = t('activeMedicationsDisplayText', 'active medications');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 

@@ -12,6 +12,7 @@
   "conditionRequired": "病情是必填项",
   "conditions": "病情",
   "Conditions": "病情",
+  "conditions_lower": "conditions",
   "conditionSaved": "病情保存成功",
   "conditionUpdated": "病情已更新",
   "dateOfOnset": "发病日期",

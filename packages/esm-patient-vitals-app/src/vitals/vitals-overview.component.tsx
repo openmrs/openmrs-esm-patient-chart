@@ -34,6 +34,7 @@ interface VitalsOverviewProps {
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
+  const displayText = t('vitalSigns', 'vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
@@ -249,11 +250,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
           );
         }
         return (
-          <EmptyState
-            displayText={t('vitalSigns', 'Vital signs')}
-            headerTitle={headerTitle}
-            launchForm={launchVitalsBiometricsForm}
-          />
+          <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
         );
       })()}
     </>

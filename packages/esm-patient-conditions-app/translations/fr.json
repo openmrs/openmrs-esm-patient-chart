@@ -12,6 +12,7 @@
   "conditionRequired": "Une condition est requise",
   "conditions": "Pathologies",
   "Conditions": "Pathologies",
+  "conditions_lower": "conditions",
   "conditionSaved": "Patologie enregistrée",
   "conditionUpdated": "Pathologie modifiée",
   "dateOfOnset": "Date d'apparition",

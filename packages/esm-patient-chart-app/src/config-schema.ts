@@ -85,6 +85,11 @@ export const esmPatientChartSchema = {
     _description: 'Whether start visit form should display service queue fields`',
     _default: false,
   },
+  defaultInitialServiceQueue: {
+    _type: Type.String,
+    _description: 'The name of the default service queue to be selected when the start visit form is opened',
+    _default: 'Outpatient Triage',
+  },
   showUpcomingAppointments: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display upcoming appointments',
@@ -147,6 +152,11 @@ export const esmPatientChartSchema = {
     _description: 'Default concept uuid for other in forms',
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  requireActiveVisitForEncounterTile: {
+    _type: Type.Boolean,
+    _description: 'Whether to require an active visit for the encounter tile',
+    _default: true,
+  },
 };
 
 export interface ChartConfig {
@@ -174,6 +184,7 @@ export interface ChartConfig {
     uuid: string;
   }>;
   visitDiagnosisConceptUuid: string;
+  requireActiveVisitForEncounterTile: boolean;
   trueConceptUuid: string;
   falseConceptUuid: string;
   otherConceptUuid: string;
