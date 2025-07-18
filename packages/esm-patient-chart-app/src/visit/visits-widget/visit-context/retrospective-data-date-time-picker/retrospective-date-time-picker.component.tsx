@@ -74,7 +74,7 @@ const RetrospectiveDateTimePicker = ({
 
   return (
     <section className={styles.wrapper}>
-      <h4 className={styles.heading}>Encounter time</h4>
+      <h4 className={styles.heading}>Order time</h4>
       {isActiveVisit && (
         <Checkbox
           checked={manuallyEnableDateTimePicker}

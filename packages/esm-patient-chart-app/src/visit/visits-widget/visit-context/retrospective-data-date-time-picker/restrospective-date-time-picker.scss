@@ -1,12 +1,15 @@
 @use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
 
 .wrapper {
   margin-top: layout.$spacing-05;
 }
 
 .heading {
-  font-weight: 600;
   margin-bottom: layout.$spacing-03;
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
 }
 
 .pickerWrapper {
