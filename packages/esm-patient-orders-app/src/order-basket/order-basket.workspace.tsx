@@ -92,7 +92,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
 
       // check if the date is within the bounds of the current visit
       const isWithinBounds = isWithinInterval(completeDate, {
-        start: new Date(currentVisit.startDatetime),
+        // setting seconds to 0 for consistency to avoid issues like 2023-10-01T00:00:00.000Z vs 2023-10-01T00:00:09.000Z
+        start: set(new Date(currentVisit.startDatetime), { seconds: 0 }),
         end: currentVisit.stopDatetime ? new Date(currentVisit.stopDatetime) : new Date(),
       });
 

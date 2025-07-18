@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
+import { format } from 'date-fns';
 
 type FormValues = {
   retrospectiveDate: string;
@@ -59,6 +60,18 @@ const RetrospectiveDateTimePicker = ({
   // each time the current visit changes, reset the form values
   useEffect(() => {
     if (currentVisit) {
+      const currentVisitIsRetrospective = Boolean(currentVisit.stopDatetime);
+      const timeFormat = new Date(currentVisit.startDatetime).getHours() >= 12 ? 'PM' : 'AM';
+
+      if (currentVisitIsRetrospective) {
+        form.reset({
+          retrospectiveDate: currentVisit.startDatetime,
+          retrospectiveTime: format(new Date(currentVisit.startDatetime), 'hh:mm'),
+          retrospectiveTimeFormat: timeFormat,
+        });
+        return;
+      }
+
       form.reset({
         retrospectiveDate: '',
         retrospectiveTime: '',
