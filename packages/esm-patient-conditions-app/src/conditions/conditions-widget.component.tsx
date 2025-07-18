@@ -27,11 +27,12 @@ import {
   useConditions,
   useConditionsSearch,
 } from './conditions.resource';
-import { type ConditionsFormSchema } from './conditions-form.workspace';
+import { type ConditionsFormSchema, type ConditionFormProps } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
+  onConditionSave?: ConditionFormProps['onConditionSave'];
   conditionToEdit?: Condition;
   isEditing?: boolean;
   isSubmittingForm: boolean;
@@ -58,6 +59,7 @@ interface SearchResultsProps {
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   closeWorkspaceWithSavedChanges,
+  onConditionSave,
   conditionToEdit,
   isEditing,
   isSubmittingForm,
@@ -107,7 +109,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      await createCondition(payload);
+      const res = await createCondition(payload);
       await mutate();
 
       showSnackbar({
@@ -116,13 +118,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         title: t('conditionSaved', 'Condition saved'),
       });
 
-      closeWorkspaceWithSavedChanges();
+      closeWorkspaceWithSavedChanges(res.data);
+      onConditionSave?.(res.data);
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorCreating(error);
     }
   }, [
     closeWorkspaceWithSavedChanges,
+    onConditionSave,
     getValues,
     mutate,
     patientUuid,
@@ -149,7 +153,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     };
 
     try {
-      await updateCondition(conditionToEdit?.id, payload);
+      const res = await updateCondition(conditionToEdit?.id, payload);
       await mutate();
 
       showSnackbar({
@@ -158,13 +162,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         title: t('conditionUpdated', 'Condition updated'),
       });
 
-      closeWorkspaceWithSavedChanges();
+      closeWorkspaceWithSavedChanges(res.data);
+      onConditionSave?.(res.data);
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorUpdating(error);
     }
   }, [
     closeWorkspaceWithSavedChanges,
+    onConditionSave,
     conditionToEdit?.id,
     displayName,
     editableClinicalStatus,
