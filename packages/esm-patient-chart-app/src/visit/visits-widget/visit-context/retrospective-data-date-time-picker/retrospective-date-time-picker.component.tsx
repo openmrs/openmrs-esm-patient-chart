@@ -147,14 +147,12 @@ const RetrospectiveDateTimePicker = ({
                     if (timeValue) {
                       const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
                       if (!pattern.test(timeValue)) {
-                        showSnackbar({
-                          title: t('invalidTimeFormat', 'Invalid time format.'),
-                          kind: 'error',
-                          subtitle: t(
-                            'invalidTimeFormatSubtitle',
+                        form.setError('retrospectiveTime', {
+                          type: 'manual',
+                          message: t(
+                            'invalidTimeFormatMessage',
                             'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
                           ),
-                          autoClose: true,
                         });
                         form.setValue('retrospectiveTime', '');
                       }
@@ -165,6 +163,8 @@ const RetrospectiveDateTimePicker = ({
                   value={value}
                   disabled={disableInputs}
                   className={styles.timePicker}
+                  invalid={Boolean(form.formState.errors.retrospectiveTime)}
+                  invalidText={form.formState.errors.retrospectiveTime?.message}
                 >
                   <Controller
                     name={'retrospectiveTimeFormat'}
