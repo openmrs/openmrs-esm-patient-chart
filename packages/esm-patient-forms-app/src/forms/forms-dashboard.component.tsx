@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-framework';
@@ -11,7 +11,7 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import { useForms } from '../hooks/use-forms';
+import { useForms, useInfiniteForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
@@ -19,6 +19,7 @@ interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
   clinicalFormsWorkspaceName?: string;
   formEntryWorkspaceName?: string;
   htmlFormEntryWorkspaceName?: string;
+  enableInfiniteScrolling?: boolean;
 }
 
 const FormsDashboard: React.FC<FormsDashboardProps> = ({
@@ -26,17 +27,46 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   clinicalFormsWorkspaceName,
   formEntryWorkspaceName,
   htmlFormEntryWorkspaceName,
+  enableInfiniteScrolling,
 }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const useInfiniteScrolling = enableInfiniteScrolling ?? config.enableInfiniteScrolling;
+  const infiniteFormsResult = useInfiniteForms(
+    patientUuid,
+    currentVisit?.uuid,
+    undefined,
+    undefined,
+    !isOnline,
+    config.orderBy,
+    searchQuery,
+  );
+
+  const regularFormsResult = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+
   const {
     data: forms,
     allForms,
     error,
     mutateForms,
-  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+    isValidating,
+    loadMore,
+    hasMore,
+    isLoading,
+    totalLoaded,
+  } = useInfiniteScrolling
+    ? infiniteFormsResult
+    : {
+        ...regularFormsResult,
+        loadMore: undefined,
+        hasMore: false,
+        isLoading: false,
+        totalLoaded: regularFormsResult.allForms?.length || 0,
+      };
 
   const htmlFormEntryForms = useMemo(() => {
     return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
@@ -70,6 +100,10 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
     ],
   );
 
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({
       ...formSection,
@@ -93,7 +127,18 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList
+          completedForms={forms}
+          error={error}
+          handleFormOpen={handleFormOpen}
+          onSearch={handleSearch}
+          isValidating={isValidating}
+          loadMore={loadMore}
+          hasMore={hasMore}
+          isLoading={isLoading}
+          totalLoaded={totalLoaded}
+          enableInfiniteScrolling={useInfiniteScrolling}
+        />
       ) : (
         sections.map((section) => {
           return (
@@ -103,6 +148,13 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
               completedForms={section.availableForms}
               error={error}
               handleFormOpen={handleFormOpen}
+              onSearch={handleSearch}
+              isValidating={isValidating}
+              loadMore={loadMore}
+              hasMore={hasMore}
+              isLoading={isLoading}
+              totalLoaded={totalLoaded}
+              enableInfiniteScrolling={useInfiniteScrolling}
             />
           );
         })
