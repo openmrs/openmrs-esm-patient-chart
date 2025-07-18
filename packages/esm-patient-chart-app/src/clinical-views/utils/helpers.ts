@@ -222,6 +222,10 @@ export const getEncounterProperty = (encounter: Encounter, type: EncounterProper
   if (type === 'visitType') {
     return encounter.visit?.visitType?.display ?? '--';
   }
+
+  if (type === 'encounterDatetime') {
+    return formatDate(parseDate(encounter.encounterDatetime), { mode: 'wide' });
+  }
 };
 
 export const filter = (encounter: Encounter, formUuid: string) => encounter?.form?.uuid === formUuid;
