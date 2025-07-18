@@ -97,7 +97,7 @@ const RetrospectiveDateTimePicker = ({
           checked={manuallyEnableDateTimePicker}
           className={styles.checkbox}
           id={'enable-date-time-picker'}
-          labelText={t('enable', 'Enable')}
+          labelText={t('inThePast', 'In the past')}
           onChange={(_, { checked, id }) => {
             setManuallyEnableDateTimePicker(checked);
             if (checked) {
