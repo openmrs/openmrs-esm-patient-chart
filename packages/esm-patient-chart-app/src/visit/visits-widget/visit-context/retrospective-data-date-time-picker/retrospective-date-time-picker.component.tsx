@@ -1,6 +1,6 @@
 import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
 import { OpenmrsDatePicker, ResponsiveWrapper, showSnackbar, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
@@ -57,18 +57,22 @@ const RetrospectiveDateTimePicker = ({
     }
   }, [form, onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
 
+  const resetFormForRetrospectiveVisit = useCallback(() => {
+    const timeFormat = new Date(currentVisit.startDatetime).getHours() >= 12 ? 'PM' : 'AM';
+    form.reset({
+      retrospectiveDate: currentVisit.startDatetime,
+      retrospectiveTime: format(new Date(currentVisit.startDatetime), 'hh:mm'),
+      retrospectiveTimeFormat: timeFormat,
+    });
+  }, [currentVisit, form]);
+
   // each time the current visit changes, reset the form values
   useEffect(() => {
     if (currentVisit) {
       const currentVisitIsRetrospective = Boolean(currentVisit.stopDatetime);
-      const timeFormat = new Date(currentVisit.startDatetime).getHours() >= 12 ? 'PM' : 'AM';
 
       if (currentVisitIsRetrospective) {
-        form.reset({
-          retrospectiveDate: currentVisit.startDatetime,
-          retrospectiveTime: format(new Date(currentVisit.startDatetime), 'hh:mm'),
-          retrospectiveTimeFormat: timeFormat,
-        });
+        resetFormForRetrospectiveVisit();
         return;
       }
 
@@ -79,7 +83,7 @@ const RetrospectiveDateTimePicker = ({
       });
       setManuallyEnableDateTimePicker(false);
     }
-  }, [currentVisit, form]);
+  }, [currentVisit, form, resetFormForRetrospectiveVisit]);
 
   if (!isRdeEnabled) {
     return null;
@@ -96,6 +100,9 @@ const RetrospectiveDateTimePicker = ({
           labelText={t('enable', 'Enable')}
           onChange={(_, { checked, id }) => {
             setManuallyEnableDateTimePicker(checked);
+            if (checked) {
+              resetFormForRetrospectiveVisit();
+            }
             if (!checked) {
               form.reset({
                 retrospectiveDate: '',
