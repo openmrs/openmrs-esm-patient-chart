@@ -26,7 +26,7 @@ export function launchEncounterForm(
     launchStartVisitPrompt();
   } else
     launchWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: form?.name,
+      workspaceTitle: form?.display ?? form?.name,
       mutateForm: onFormSave,
       formInfo: {
         encounterUuid,
