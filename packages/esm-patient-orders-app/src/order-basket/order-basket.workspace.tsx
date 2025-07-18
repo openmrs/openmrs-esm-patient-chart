@@ -116,17 +116,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       showSnackbar({
         isLowContrast: true,
         kind: 'error',
-        title: t('rdeDateOutOfBounds', 'Retrospective date is out of bounds'),
-        subtitle: t(
-          'rdeDateOutOfBoundsMessage',
-          `The retrospective date must be within {{startDate}} and {{endDate}}.`,
-          {
-            startDate: format(currentVisit.startDatetime, 'PPP hh:mm a'),
-            endDate: currentVisit.stopDatetime
-              ? format(currentVisit.stopDatetime, 'PPP hh:mm a')
-              : t('currentDate', 'current date'),
-          },
-        ),
+        title: t('orderDateOutOfBounds', 'Order date is out of bounds'),
+        subtitle: t('orderDateOutOfBoundsMessage', `The order date must be within {{startDate}} and {{endDate}}.`, {
+          startDate: format(currentVisit.startDatetime, 'PPP hh:mm a'),
+          endDate: currentVisit.stopDatetime
+            ? format(currentVisit.stopDatetime, 'PPP hh:mm a')
+            : t('currentDate', 'current date'),
+        }),
       });
       return;
     }
@@ -237,10 +233,10 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           {hasRdeDateBoundsError && currentVisit && (
             <InlineNotification
               kind="error"
-              title={t('rdeDateOutOfBounds', 'Retrospective date is out of bounds')}
+              title={t('orderDateOutOfBounds', 'Order date is out of bounds')}
               subtitle={t(
-                'rdeDateOutOfBoundsMessage',
-                `The retrospective date must be within {{startDate}} and {{endDate}}.`,
+                'orderDateOutOfBoundsMessage',
+                `The order date must be within {{startDate}} and {{endDate}}.`,
                 {
                   startDate: format(currentVisit!.startDatetime, 'PPP hh:mm a'),
                   endDate: currentVisit!.stopDatetime
