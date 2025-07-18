@@ -165,6 +165,7 @@ const RetrospectiveDateTimePicker = ({
                   className={styles.timePicker}
                   invalid={Boolean(form.formState.errors.retrospectiveTime)}
                   invalidText={form.formState.errors.retrospectiveTime?.message}
+                  onFocus={() => form.clearErrors('retrospectiveTime')}
                 >
                   <Controller
                     name={'retrospectiveTimeFormat'}
