@@ -288,6 +288,7 @@ export enum EncounterPropertyType {
   visitType = 'visitType',
   ageAtEncounter = 'ageAtEncounter',
   visitDate = 'visitDate',
+  encounterDatetime = 'encounterDatetime',
 }
 
 export interface GetObsFromEncounterParams {
