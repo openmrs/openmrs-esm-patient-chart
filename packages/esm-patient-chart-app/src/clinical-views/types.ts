@@ -7,7 +7,7 @@ export type TableHeaderType = {
 };
 
 export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
+  encounterDatetime: string;
   encounterType: { uuid: string; name: string };
   patient: {
     uuid: string;
@@ -288,6 +288,7 @@ export enum EncounterPropertyType {
   visitType = 'visitType',
   ageAtEncounter = 'ageAtEncounter',
   visitDate = 'visitDate',
+  encounterDatetime = 'encounterDatetime',
 }
 
 export interface GetObsFromEncounterParams {
