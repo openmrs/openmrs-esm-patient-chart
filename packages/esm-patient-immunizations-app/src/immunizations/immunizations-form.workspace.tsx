@@ -4,18 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  Button,
-  ButtonSet,
-  Dropdown,
-  Form,
-  InlineLoading,
-  SelectItem,
-  Stack,
-  TextInput,
-  TimePicker,
-  TimePickerSelect,
-} from '@carbon/react';
+import { Button, ButtonSet, Dropdown, Form, InlineLoading, SelectItem, Stack, TextInput } from '@carbon/react';
 import {
   useSession,
   useVisit,
@@ -28,7 +17,7 @@ import {
   OpenmrsDatePicker,
   getCoreTranslation,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { savePatientImmunization } from './immunizations.resource';
@@ -70,8 +59,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         .refine((vaccinationDate) => vaccinationDate <= new Date(), {
           message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
         }),
-      vaccinationTime: z.string(),
-      timeFormat: z.enum(['PM', 'AM']),
       doseNumber: z
         .number()
         .nullable()
@@ -91,8 +78,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     defaultValues: {
       vaccineUuid: '',
       vaccinationDate: new Date(),
-      vaccinationTime: dayjs(new Date()).format('hh:mm'),
-      timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
       doseNumber: 1,
       expirationDate: null,
       lotNumber: '',
@@ -121,8 +106,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         reset({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
-          vaccinationTime: dayjs(vaccinationDateOrNow).format('hh:mm'),
-          timeFormat: vaccinationDateOrNow.getHours() >= 12 ? 'PM' : 'AM',
           doseNumber: props.doseNumber,
           expirationDate: props.expirationDate,
           lotNumber: props.lotNumber,
@@ -142,19 +125,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
       try {
-        const {
-          vaccineUuid,
-          vaccinationDate,
-          doseNumber,
-          expirationDate,
-          lotNumber,
-          manufacturer,
-          timeFormat,
-          vaccinationTime,
-        } = data;
+        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer } = data;
         const abortController = new AbortController();
-
-        const [hours, minutes] = convertTime12to24(vaccinationTime, timeFormat);
 
         const immunization: ImmunizationFormData = {
           patientUuid,
@@ -163,13 +135,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(
             toOmrsIsoString(
-              new Date(
-                dayjs(vaccinationDate).year(),
-                dayjs(vaccinationDate).month(),
-                dayjs(vaccinationDate).date(),
-                hours,
-                minutes,
-              ),
+              new Date(dayjs(vaccinationDate).year(), dayjs(vaccinationDate).month(), dayjs(vaccinationDate).date()),
             ),
           ),
           doseNumber,
@@ -222,7 +188,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={1} className={styles.container}>
           <section className={` ${styles.row}`}>
-            <div className={styles.dateTimeSection}>
+            <div className={styles.dateSection}>
               <ResponsiveWrapper>
                 <Controller
                   name="vaccinationDate"
@@ -238,40 +204,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       invalid={Boolean(fieldState?.error?.message)}
                       invalidText={fieldState?.error?.message}
                     />
-                  )}
-                />
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Controller
-                  name="vaccinationTime"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <div className={styles.timePickerContainer}>
-                      <TimePicker
-                        id="vaccinationTime"
-                        labelText={t('time', 'Time')}
-                        onChange={(event) => onChange(event.target.value as amPm)}
-                        pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                        value={value}
-                        onBlur={onBlur}
-                      >
-                        <Controller
-                          name="timeFormat"
-                          control={control}
-                          render={({ field: { onChange, value } }) => (
-                            <TimePickerSelect
-                              id="timeFormatSelect"
-                              onChange={(event) => onChange(event.target.value as amPm)}
-                              value={value}
-                              aria-label={t('timeFormat ', 'Time Format')}
-                            >
-                              <SelectItem value="AM" text={t('AM', 'AM')} />
-                              <SelectItem value="PM" text={t('PM', 'PM')} />
-                            </TimePickerSelect>
-                          )}
-                        />
-                      </TimePicker>
-                    </div>
                   )}
                 />
               </ResponsiveWrapper>
