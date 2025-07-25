@@ -262,6 +262,7 @@ interface SummaryConcept {
   secondaryConcept?: string;
   isDate?: boolean;
   hasCalculatedDate?: boolean;
+  type?: EncounterPropertyType;
 }
 
 export interface FormattedCardColumn {

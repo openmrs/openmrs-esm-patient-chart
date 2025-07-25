@@ -76,6 +76,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
               obsConcept: column.summaryConcept?.primaryConcept,
               isDate: column.summaryConcept?.isDate,
               config: config,
+              type: column.summaryConcept?.type,
             });
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';
