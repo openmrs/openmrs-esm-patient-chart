@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, DataTableSkeleton } from '@carbon/react';
-import { CardHeader, EmptyState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-import { AddIcon, launchWorkspace, useVisit } from '@openmrs/esm-framework';
+import { DataTableSkeleton } from '@carbon/react';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 
 import styles from './immunization-history-card.scss';
@@ -16,7 +15,6 @@ const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps>
   const { t } = useTranslation();
   const { data, isLoading } = useImmunizations(patientUuid);
 
-  const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizationsHistory', 'Immunizations History');
 
   if (isLoading) {
@@ -34,7 +32,7 @@ const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps>
     );
   }
 
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+  return null;
 };
 
 export default ImmunizationHistoryDashboard;
