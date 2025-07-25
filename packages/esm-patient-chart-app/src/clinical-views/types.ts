@@ -7,7 +7,7 @@ export type TableHeaderType = {
 };
 
 export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
+  encounterDatetime: string;
   encounterType: { uuid: string; name: string };
   patient: {
     uuid: string;
@@ -25,7 +25,15 @@ export interface Encounter extends OpenmrsResource {
   form?: {
     uuid: string;
   };
-  visit?: string;
+  visit?: {
+    uuid: string;
+    startDatetime: string;
+    stopDatetime?: string;
+    visitType?: {
+      uuid: string;
+      display: string;
+    };
+  };
 }
 
 export interface Observation {
@@ -273,33 +281,14 @@ export interface ConfigConcepts {
   otherConceptUuid: string;
 }
 
-export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
-  encounterType: { uuid: string; name: string };
-  patient: {
-    uuid: string;
-    display: string;
-    age: number;
-    birthDate: string;
-  };
-  location: {
-    uuid: string;
-    display: string;
-    name: string;
-  };
-  encounterProviders?: Array<{ encounterRole: string; provider: { uuid: string; name: string } }>;
-  obs: Array<Observation>;
-  form?: {
-    uuid: string;
-  };
-  visit?: string;
-}
-
 export enum EncounterPropertyType {
   location = 'location',
   provider = 'provider',
+  encounterType = 'encounterType',
   visitType = 'visitType',
   ageAtEncounter = 'ageAtEncounter',
+  visitDate = 'visitDate',
+  encounterDatetime = 'encounterDatetime',
 }
 
 export interface GetObsFromEncounterParams {
