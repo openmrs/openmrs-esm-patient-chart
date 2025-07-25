@@ -197,6 +197,7 @@ export async function updateOrderResult(
   orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
+  // updates an encounter with the observation payload
   const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
@@ -207,6 +208,7 @@ export async function updateOrderResult(
   });
 
   if (saveEncounter.ok) {
+    // updates the order with the order payload
     const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
       method: 'POST',
       headers: {
@@ -217,6 +219,7 @@ export async function updateOrderResult(
     });
 
     if (updateOrderCall.status === 201) {
+      // update the orders fulfiller details
       const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
         method: 'POST',
         headers: {
@@ -236,6 +239,7 @@ export function createObservationPayload(
   order: Order,
   values: Record<string, unknown>,
   status: string,
+  obsDatetime: string,
 ) {
   if (concept.set && concept.setMembers.length > 0) {
     const groupMembers = concept.setMembers
@@ -246,17 +250,18 @@ export function createObservationPayload(
       return { obs: [] };
     }
 
-    return { obs: [createObservation(order, groupMembers, null, status)] };
+    return { obs: [createObservation(order, groupMembers, null, status, obsDatetime)] };
   } else {
     const value = getValue(concept, values);
     if (value === null || value === undefined) {
       return { obs: [] };
     }
-    return { obs: [createObservation(order, null, value, status)] };
+    return { obs: [createObservation(order, null, value, status, obsDatetime)] };
   }
 }
 
 export function updateObservation(observationUuid: string, payload: Record<string, any>) {
+  console.log('DEBUG: Updating observation with payload', payload);
   return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
     method: 'POST',
     headers: {
@@ -279,13 +284,14 @@ function createGroupMember(member: LabOrderConcept, order: Order, values: Record
   };
 }
 
-function createObservation(order: Order, groupMembers = null, value = null, status: string) {
+function createObservation(order: Order, groupMembers = null, value = null, status: string, obsDatetime: string) {
   return {
     concept: { uuid: order.concept.uuid },
     status: status,
     order: { uuid: order.uuid },
     ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
     ...(value !== null && value !== undefined && { value }),
+    obsDatetime,
   };
 }
 

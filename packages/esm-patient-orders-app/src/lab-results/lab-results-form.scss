@@ -93,3 +93,26 @@
 .emptyFormError {
   margin: 0.625rem 0;
 }
+
+.pickerWrapper {
+  display: flex;
+  align-items: center;
+  margin: layout.$spacing-05;
+  flex: 1;
+}
+
+.datePicker {
+  :global(.cds--date-picker-input__wrapper) {
+    inline-size: layout.$spacing-13;
+  }
+}
+
+.timePicker {
+  display: flex;
+  align-items: baseline;
+
+  :global(.cds--form-requirement) {
+    max-width: layout.$spacing-12;
+    max-height: 0 !important;
+  }
+}

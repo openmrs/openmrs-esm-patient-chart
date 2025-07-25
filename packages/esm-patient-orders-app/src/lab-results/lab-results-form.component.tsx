@@ -1,12 +1,36 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import {
+  Button,
+  ButtonSet,
+  Form,
+  Layer,
+  InlineLoading,
+  InlineNotification,
+  Stack,
+  TimePicker,
+  TimePickerSelect,
+  SelectItem,
+} from '@carbon/react';
 import classNames from 'classnames';
-import { type Control, useForm } from 'react-hook-form';
+import { type Control, Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  OpenmrsDatePicker,
+  ResponsiveWrapper,
+  restBaseUrl,
+  showSnackbar,
+  useAbortController,
+  useFeatureFlag,
+  useLayoutType,
+} from '@openmrs/esm-framework';
+import {
+  type amPm,
+  convertTime12to24,
+  type DefaultPatientWorkspaceProps,
+  type Order,
+} from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
   createObservationPayload,
@@ -23,6 +47,8 @@ import { createLabResultsFormSchema } from './lab-results-schema.resource';
 
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import { z } from 'zod';
+import { format, isBefore, isFuture, set } from 'date-fns';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
@@ -45,9 +71,46 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
+  const labResultsFormSchema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
   const { mutate } = useSWRConfig();
+  const isRdeEnabled = useFeatureFlag('rde');
+
+  const rdeFieldsSchema = z.object({
+    retrospectiveDate: z.date().optional(),
+    retrospectiveTime: z.string().optional(),
+    retrospectiveTimeFormat: z.string().optional(),
+  });
+  type LabResultsFormSchemaType = Record<string, ObservationValue>;
+  type RdeFieldsSchemaType = z.infer<typeof rdeFieldsSchema>;
+  type SchemaType = LabResultsFormSchemaType & RdeFieldsSchemaType;
+
+  const schema = useMemo(() => {
+    if (isRdeEnabled) {
+      return labResultsFormSchema.merge(rdeFieldsSchema).superRefine((data, ctx) => {
+        if (isRdeEnabled) {
+          if (data.retrospectiveDate) {
+            if (!data.retrospectiveTime) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['retrospectiveTime'],
+                message: t('timeIsRequired', 'time is required'),
+              });
+            }
+            if (!data.retrospectiveTimeFormat) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['retrospectiveTimeFormat'],
+                message: t('retrospectiveTimeFormatRequired', 'Time format (AM/PM) is required'),
+              });
+            }
+          }
+        }
+      });
+    } else {
+      return labResultsFormSchema;
+    }
+  }, [isRdeEnabled, labResultsFormSchema, rdeFieldsSchema, t]);
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -62,8 +125,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     formState: { errors, isDirty, isSubmitting },
     setValue,
     handleSubmit,
-  } = useForm<Record<string, ObservationValue>>({
-    defaultValues: {} as Record<string, ObservationValue>,
+    clearErrors,
+    setError,
+  } = useForm<SchemaType>({
+    defaultValues: {},
     resolver: zodResolver(schema),
     mode: 'all',
   });
@@ -110,8 +175,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }
 
-  const saveLabResults = async (formValues: Record<string, unknown>) => {
-    const isEmptyForm = Object.values(formValues).every(
+  const saveLabResults: SubmitHandler<SchemaType> = async (formValues) => {
+    // Remove RDE-specific keys before checking if form is empty
+    const rdeKeys = ['retrospectiveDate', 'retrospectiveTime', 'retrospectiveTimeFormat'];
+    const labResultsOnly = Object.fromEntries(Object.entries(formValues).filter(([key]) => !rdeKeys.includes(key)));
+
+    const isEmptyForm = Object.values(labResultsOnly).every(
       (value) => value === '' || value === null || value === undefined,
     );
     if (isEmptyForm) {
@@ -161,8 +230,38 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
     // Handle Creation logic
 
+    let rdeDate: Date | undefined = new Date();
+
+    if (formValues.retrospectiveDate || formValues.retrospectiveTime || formValues.retrospectiveTimeFormat) {
+      let [hour, minute] = convertTime12to24(formValues.retrospectiveTime, formValues.retrospectiveTimeFormat as amPm);
+      rdeDate = set(formValues.retrospectiveDate, {
+        hours: hour,
+        minutes: minute,
+        seconds: 0,
+        milliseconds: 0,
+      });
+    }
+
+    if (isBefore(rdeDate, new Date(order.dateActivated))) {
+      setError('retrospectiveTime', {
+        type: 'manual',
+        message: t('timeCannotBeBeforeOrderDate', 'time cannot be before {{time}}', {
+          time: format(order.dateActivated, 'hh:mm a'),
+        }),
+      });
+      return;
+    }
+
+    if (isFuture(rdeDate)) {
+      setError('retrospectiveTime', {
+        type: 'manual',
+        message: t('timeCannotBeInTheFuture', 'time cannot be in the future'),
+      });
+      return;
+    }
+
     // Set the observation status to 'FINAL' as we're not capturing it in the form
-    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL', rdeDate.toISOString());
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
@@ -232,6 +331,82 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
             />
           )}
         </div>
+        {isRdeEnabled && (
+          <div className={styles.pickerWrapper}>
+            <Controller
+              name={'retrospectiveDate'}
+              control={control}
+              render={({ field, fieldState }) => (
+                <ResponsiveWrapper>
+                  <OpenmrsDatePicker
+                    {...field}
+                    id={'retrospective-date-picker-input'}
+                    labelText={t('date', 'Date')}
+                    invalid={Boolean(fieldState?.error?.message)}
+                    invalidText={fieldState?.error?.message}
+                    maxDate={new Date()}
+                    minDate={new Date(order?.dateActivated)}
+                    className={styles.datePicker}
+                  />
+                </ResponsiveWrapper>
+              )}
+            />
+            <ResponsiveWrapper>
+              <Controller
+                name={'retrospectiveTime'}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.timePickerWrapper}>
+                    <TimePicker
+                      id={'retrospective-time-picker-input'}
+                      labelText={t('time', 'Time')}
+                      onBlur={(event) => {
+                        const timeValue = event.target.value;
+                        if (timeValue) {
+                          const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
+                          if (!pattern.test(timeValue)) {
+                            setError('retrospectiveTime', {
+                              type: 'manual',
+                              message: t(
+                                'invalidTimeFormatMessage',
+                                'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
+                              ),
+                            });
+                            setValue('retrospectiveTime', '');
+                          }
+                        }
+                      }}
+                      onChange={(event) => onChange(event.target.value)}
+                      pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
+                      value={value}
+                      className={styles.timePicker}
+                      invalid={Boolean(errors.retrospectiveTime)}
+                      invalidText={errors.retrospectiveTime?.message}
+                      onFocus={() => clearErrors('retrospectiveTime')}
+                    >
+                      <Controller
+                        name={'retrospectiveTimeFormat'}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <TimePickerSelect
+                            aria-label={t('timeFormat ', 'Time Format')}
+                            id={`am-pm-input`}
+                            onChange={(event) => onChange(event.target.value)}
+                            value={value}
+                          >
+                            <SelectItem value="" text="" />
+                            <SelectItem value="AM" text={t('AM', 'AM')} />
+                            <SelectItem value="PM" text={t('PM', 'PM')} />
+                          </TimePickerSelect>
+                        )}
+                      />
+                    </TimePicker>
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
+          </div>
+        )}
       </Layer>
 
       <ButtonSet
