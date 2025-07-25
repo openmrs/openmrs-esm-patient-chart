@@ -1,5 +1,7 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/layout';
+
 
 .widgetCard {
   border: 1px solid $ui-03;
@@ -10,8 +12,8 @@
 }
 
 .doseCell {
-  min-width: 140px;
-  padding: 0.5rem;
+  min-width: 10rem;
+  padding: layout.$spacing-03;
   display: inline-block;
   text-align: center;
 }
@@ -34,8 +36,8 @@
 }
 
 .headerCell {
-  min-width: 200px;
-  padding: 0.5rem;
+  min-width: 13rem;
+  padding: layout.$spacing-03;
   display: inline-block;
   text-align: center;
   font-weight: bold;
@@ -66,5 +68,5 @@
 .vaccineDose {
   overflow-x: auto;
   white-space: nowrap;
-  padding: 0.5rem 0;
+  padding: layout.$spacing-03;
 }
