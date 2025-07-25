@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { Table, TableRow, TableBody, TableCell, DataTableSkeleton } from '@carbon/react';
+import { DataTableSkeleton, Table, TableBody, TableCell, TableRow } from '@carbon/react';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
-import styles from './immunization-history-card.scss';
+import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useImmunizations } from '../hooks/useImmunizations';
+import styles from './immunization-history-card.scss';
 
 interface ImmunizationHistoryCardProps {
   patientUuid: string;
@@ -25,21 +25,33 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
     }));
   }, [immunizations]);
 
+  const headers = [
+    { key: 'vaccine', header: 'Vaccine' },
+    { key: 'doses', header: 'Doses' },
+  ];
+
   const tableRows = useMemo(() => {
     return (sortedImmunizations || []).map((immunization) => ({
       id: immunization.vaccineUuid,
       vaccine: immunization.vaccineName,
       doses: immunization.existingDoses.map((dose, index) => (
         <div key={index} className={styles.doseCell}>
-          {'Dose ' + dose.doseNumber}
-          <br />
-          {formatDate(parseDate(dose.occurrenceDateTime), { mode: 'standard', time: 'for today' })}
+          <div className={styles.doseLabel}>{`Dose ${dose.doseNumber}`}</div>
+          {dose.occurrenceDateTime && (
+            <div className={styles.doseDate}>
+              {formatDate(parseDate(dose.occurrenceDateTime), {
+                mode: 'standard',
+                time: false,
+                noToday: true,
+              })}
+            </div>
+          )}
         </div>
       )),
     }));
   }, [sortedImmunizations]);
 
-  const { results: row, currentPage, goTo } = usePagination(tableRows || [], pageSize);
+  const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
 
   if (isLoading) {
     return (
@@ -53,11 +65,6 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  const headers = [
-    { key: 'vaccine', header: 'Vaccine' },
-    { key: 'doses', header: 'Doses' },
-  ];
-
   return (
     <div className={styles.widgetCard}>
       <div className={styles.headerRow}>
@@ -69,28 +76,16 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
       </div>
 
       <div>
-        <Table size="xl" useZebraStyles={false} aria-label="Immunization History">
-          <TableBody>
-            {row?.map((row) => (
+        <Table size="xl" useZebraStyles={false} aria-label={t('immunizationHistory', 'Immunization History')}>
+          <TableBody className={styles.tableBody}>
+            {paginatedRows?.map((row) => (
               <TableRow key={row.id}>
-                <TableCell
-                  className={styles.vaccineName}
-                  style={{
-                    backgroundColor: '#ffffff',
-                  }}
-                >
-                  <div style={{ width: '200px' }}>
+                <TableCell className={styles.vaccineNameCell}>
+                  <div className={styles.vaccineNameContent}>
                     <strong>{row.vaccine}</strong>
-                    <br />
                   </div>
                 </TableCell>
-                <TableCell
-                  style={{
-                    backgroundColor: '#ffffff',
-                    padding: 0,
-                    width: '100%',
-                  }}
-                >
+                <TableCell className={styles.dosesCell}>
                   <div className={styles.vaccineDose}>{row.doses}</div>
                 </TableCell>
               </TableRow>
@@ -103,7 +98,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
         totalItems={tableRows?.length || 0}
         pageSize={pageSize}
         pageNumber={currentPage}
-        currentItems={row?.length || 0}
+        currentItems={paginatedRows?.length || 0}
         onPageNumberChange={({ page }) => {
           goTo(page);
         }}
