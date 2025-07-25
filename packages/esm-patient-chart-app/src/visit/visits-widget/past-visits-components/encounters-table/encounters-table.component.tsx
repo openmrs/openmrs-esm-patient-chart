@@ -43,6 +43,7 @@ import {
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
+import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import {
   deleteEncounter,
   mapEncounter,
@@ -226,6 +227,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
+                    const isFormAttached = encounter.form?.uuid;
+
                     return (
                       <React.Fragment key={encounter.id}>
                         <TableExpandRow {...getRowProps({ row })}>
@@ -240,7 +243,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 size={responsiveSize}
                               >
                                 {userHasAccess(encounter.editPrivilege, session?.user) &&
-                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
+                                  (isFormAttached || isVisitNoteEncounter(encounter)) && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
@@ -282,10 +285,19 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              <EncounterObservations observations={encounter.obs} />
+                              {isFormAttached ? (
+                                <FormEngine
+                                  mode="embedded-view"
+                                  patientUUID={patientUuid}
+                                  formUUID={encounter?.form?.uuid}
+                                  encounterUUID={encounter?.id}
+                                />
+                              ) : (
+                                <EncounterObservations observations={encounter.obs} />
+                              )}
                               {userHasAccess(encounter.editPrivilege, session?.user) && (
                                 <>
-                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
+                                  {(isFormAttached || isVisitNoteEncounter(encounter)) && (
                                     <Button
                                       kind="ghost"
                                       onClick={() => {
