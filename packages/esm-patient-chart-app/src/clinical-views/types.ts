@@ -189,7 +189,7 @@ export interface TabSchema {
   launchOptions: LaunchOptions;
 }
 
-export type Mode = 'edit' | 'view';
+export type Mode = 'edit' | 'view' | 'delete';
 
 export interface Action {
   label: string;
@@ -200,7 +200,7 @@ export interface Action {
 
 export interface TableRow {
   id: string;
-  actions: Action[] | ReactElement | null;
+  actions?: ReactElement;
 }
 
 export interface FormColumn {
