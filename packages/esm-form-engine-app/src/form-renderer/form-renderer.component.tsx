@@ -8,13 +8,28 @@ import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
 
-interface FormRendererProps extends DefaultPatientWorkspaceProps {
+interface FormRendererProps
+  extends Omit<
+    DefaultPatientWorkspaceProps,
+    'closeWorkspace' | 'promptBeforeClosing' | 'closeWorkspaceWithSavedChanges' | 'setTitle'
+  > {
   additionalProps?: Record<string, any>;
   encounterUuid?: string;
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
   clinicalFormsWorkspaceName?: string;
+  /**
+   * These workspace control props are made optional to support usage in non-workspace contexts,
+   * such as the Fast Data Entry app or other standalone form zones.
+   */
+  closeWorkspace?: DefaultPatientWorkspaceProps['closeWorkspace'];
+  promptBeforeClosing?: DefaultPatientWorkspaceProps['promptBeforeClosing'];
+  closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
+  setTitle?: DefaultPatientWorkspaceProps['setTitle'];
+  hideControls?: boolean;
+  handlePostResponse?: (encounter: any) => void;
+  preFilledQuestions?: Record<string, string>;
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
@@ -27,14 +42,18 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   promptBeforeClosing,
   visit,
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  hideControls,
+  handlePostResponse,
+  preFilledQuestions,
 }) => {
   const { t } = useTranslation();
+
   const { schema, error, isLoading } = useFormSchema(formUuid);
   const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
   const formSessionIntent = additionalProps?.formSessionIntent ?? '*';
 
   const handleCloseForm = useCallback(() => {
-    closeWorkspace();
+    closeWorkspace?.();
     !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchWorkspace(clinicalFormsWorkspaceName);
   }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose, clinicalFormsWorkspaceName]);
 
@@ -54,9 +73,14 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   }, []);
 
   const handleMarkFormAsDirty = useCallback(
-    (isDirty: boolean) => promptBeforeClosing(() => isDirty),
+    (isDirty: boolean) => promptBeforeClosing?.(() => isDirty),
     [promptBeforeClosing],
   );
+
+  const handleOnSubmit = (encounter?: any) => {
+    closeWorkspaceWithSavedChanges?.();
+    handlePostResponse?.(encounter[0]);
+  };
 
   if (isLoading) {
     return (
@@ -85,9 +109,11 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           markFormAsDirty={handleMarkFormAsDirty}
           mode={additionalProps?.mode}
           formSessionIntent={formSessionIntent}
-          onSubmit={closeWorkspaceWithSavedChanges}
+          onSubmit={handleOnSubmit}
           patientUUID={patientUuid}
           visit={visit}
+          hideControls={hideControls}
+          preFilledQuestions={preFilledQuestions}
         />
       )}
     </>
