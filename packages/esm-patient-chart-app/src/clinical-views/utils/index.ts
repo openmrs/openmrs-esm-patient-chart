@@ -35,7 +35,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
           config: config,
         });
       }
-      return typeof obsValue === 'string' || typeof obsValue === 'number' ? obsValue : obsValue?.name?.name ?? '--';
+      return typeof obsValue === 'string' || (typeof obsValue === 'number' && !isNaN(obsValue)) ? obsValue : obsValue?.name?.name ?? '--';
     },
     getSummaryObsValue: column.hasSummary
       ? (encounter: Encounter) => {
