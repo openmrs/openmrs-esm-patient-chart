@@ -49,6 +49,7 @@ interface AllergyFormData {
 interface AllergyFormProps extends DefaultPatientWorkspaceProps {
   allergy?: Allergy;
   formContext: 'creating' | 'editing';
+  onAllergySave?: (allergy: Allergy) => void;
 }
 
 interface FormValues {
@@ -117,6 +118,7 @@ function AllergyForm({
   allergy,
   formContext,
   promptBeforeClosing,
+  onAllergySave,
 }: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
@@ -342,7 +344,7 @@ function AllergyForm({
       const abortController = new AbortController();
       const allergyPayload = createAllergyPayload(data);
 
-      const handleSuccess = () => {
+      const handleSuccess = (response) => {
         mutate();
         closeWorkspace({ ignoreChanges: true });
         showSnackbar({
@@ -351,6 +353,7 @@ function AllergyForm({
           title: inEditMode ? t('allergyUpdated', 'Allergy updated') : t('allergySaved', 'Allergy saved'),
           subtitle: t('allergyNowVisible', 'It is now visible on the Allergies page'),
         });
+        onAllergySave?.(response.data);
       };
 
       const handleError = (err: Error) => {
@@ -370,7 +373,7 @@ function AllergyForm({
           )
         : saveAllergy(allergyPayload, patientUuid, abortController).then(handleSuccess, handleError);
     },
-    [allergy?.id, closeWorkspace, createAllergyPayload, inEditMode, mutate, patientUuid, t],
+    [allergy?.id, closeWorkspace, createAllergyPayload, formContext, mutate, patientUuid, t, onAllergySave],
   );
 
   const extensionSlotState = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
