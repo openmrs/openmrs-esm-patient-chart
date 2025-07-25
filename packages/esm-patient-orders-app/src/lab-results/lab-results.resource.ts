@@ -10,7 +10,7 @@ const labEncounterRepresentation =
 const labConceptRepresentation =
   'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,' +
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,allowDecimal,set,setMembers:(uuid)))';
-const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
+const conceptObsRepresentation = 'custom:(uuid,obsDatetime,display,concept:(uuid,display),groupMembers,value)';
 
 type NullableNumber = number | null | undefined;
 export interface LabOrderConcept {
@@ -149,6 +149,7 @@ export function useLabEncounter(encounterUuid: string) {
 
 export function useObservation(obsUuid: string) {
   const url = `${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`;
+  // const url = `${restBaseUrl}/obs/${obsUuid}?v=full`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(
     obsUuid ? url : null,
@@ -261,7 +262,6 @@ export function createObservationPayload(
 }
 
 export function updateObservation(observationUuid: string, payload: Record<string, any>) {
-  console.log('DEBUG: Updating observation with payload', payload);
   return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
     method: 'POST',
     headers: {

@@ -156,7 +156,17 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         });
       }
     }
-  }, [concept, completeLabResult, order, setValue]);
+
+    if (completeLabResult && order?.fulfillerStatus === 'COMPLETED' && isRdeEnabled) {
+      // "2025-07-25T15:12:00.000+0000"
+      const retrospectiveDate = new Date(completeLabResult.obsDatetime);
+      setValue('retrospectiveDate', retrospectiveDate);
+      const retrospectiveTime = format(retrospectiveDate, 'hh:mm');
+      const retrospectiveTimeFormat = format(retrospectiveDate, 'a');
+      setValue('retrospectiveTime', retrospectiveTime);
+      setValue('retrospectiveTimeFormat', retrospectiveTimeFormat);
+    }
+  }, [concept, completeLabResult, order, setValue, isRdeEnabled]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -199,37 +209,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       });
     };
 
-    // Handle update operation for completed lab order results
-    if (order.fulfillerStatus === 'COMPLETED') {
-      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-        return updateObservation(obs?.uuid, { value });
-      });
-      const updateResults = await Promise.allSettled(updateTasks);
-      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-        if (curr.status === 'rejected') {
-          return [...prev, Object.keys(formValues).at(index)];
-        }
-        return prev;
-      }, []);
-
-      if (failedObsconceptUuids.length) {
-        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
-      } else {
-        closeWorkspaceWithSavedChanges();
-        showNotification(
-          'success',
-          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-            orderNumber: order?.orderNumber,
-          }),
-        );
-      }
-      mutateResults();
-      return setShowEmptyFormErrorNotification(false);
-    }
-
-    // Handle Creation logic
-
     let rdeDate: Date | undefined = new Date();
 
     if (formValues.retrospectiveDate || formValues.retrospectiveTime || formValues.retrospectiveTimeFormat) {
@@ -259,6 +238,37 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       });
       return;
     }
+
+    // Handle update operation for completed lab order results
+    if (order.fulfillerStatus === 'COMPLETED') {
+      const updateTasks = Object.entries(labResultsOnly).map(([conceptUuid, value]) => {
+        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+        return updateObservation(obs?.uuid, { value, obsDatetime: rdeDate.toISOString() });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+        if (curr.status === 'rejected') {
+          return [...prev, Object.keys(labResultsOnly).at(index)];
+        }
+        return prev;
+      }, []);
+
+      if (failedObsconceptUuids.length) {
+        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+      } else {
+        closeWorkspaceWithSavedChanges();
+        showNotification(
+          'success',
+          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+            orderNumber: order?.orderNumber,
+          }),
+        );
+      }
+      mutateResults();
+      return setShowEmptyFormErrorNotification(false);
+    }
+
+    // Handle Creation logic
 
     // Set the observation status to 'FINAL' as we're not capturing it in the form
     const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL', rdeDate.toISOString());
