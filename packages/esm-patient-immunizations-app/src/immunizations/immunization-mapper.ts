@@ -8,8 +8,7 @@ import {
 } from '../types/fhir-immunization-domain';
 import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
-const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEntry): ExistingDoses => {
-  const immunizationResource = immunizationBundleEntry?.resource;
+const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses => {
   const immunizationObsUuid = immunizationResource?.id;
   const manufacturer = immunizationResource?.manufacturer?.display;
   const lotNumber = immunizationResource?.lotNumber;
@@ -36,14 +35,23 @@ const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationRe
 };
 
 export const mapFromFHIRImmunizationBundle = (
-  immunizationBundle: FHIRImmunizationBundle,
+  immunizationData: FHIRImmunizationBundle | FHIRImmunizationResource[],
 ): Array<ImmunizationGrouped> => {
-  const groupByImmunization = groupBy(immunizationBundle.entry, (immunizationResourceEntry) => {
-    return findCodeWithoutSystem(immunizationResourceEntry.resource)?.code;
+  let immunizations: FHIRImmunizationResource[] = [];
+
+  if (Array.isArray(immunizationData)) {
+    immunizations = immunizationData;
+  } else if (immunizationData?.entry) {
+    immunizations = immunizationData.entry.map((entry) => entry.resource);
+  }
+
+  const groupByImmunization = groupBy(immunizations, (immunizationResource) => {
+    return findCodeWithoutSystem(immunizationResource)?.code;
   });
-  return map(groupByImmunization, (immunizationsForOneVaccine: Array<FHIRImmunizationBundleEntry>) => {
-    const existingDoses: Array<ExistingDoses> = map(immunizationsForOneVaccine, mapToImmunizationDose);
-    const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]?.resource);
+
+  return map(groupByImmunization, (immunizationsForOneVaccine: Array<FHIRImmunizationResource>) => {
+    const existingDoses: Array<ExistingDoses> = map(immunizationsForOneVaccine, mapToImmunizationDoseFromResource);
+    const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]);
 
     return {
       vaccineName: codeWithoutSystem?.display,
