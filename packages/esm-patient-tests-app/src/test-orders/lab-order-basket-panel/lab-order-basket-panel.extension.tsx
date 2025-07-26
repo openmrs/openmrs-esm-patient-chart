@@ -4,15 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import {
   AddIcon,
-  closeWorkspace,
   ChevronDownIcon,
   ChevronUpIcon,
   useLayoutType,
   useConfig,
   MaybeIcon,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketExtensionProps, type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
@@ -22,7 +20,7 @@ import styles from './lab-order-basket-panel.scss';
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
  */
-export default function LabOrderBasketPanelExtension() {
+export default function LabOrderBasketPanelExtension({ launchChildWorkspace }: OrderBasketExtensionProps) {
   const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
@@ -38,7 +36,7 @@ export default function LabOrderBasketPanelExtension() {
   return (
     <>
       {allOrderTypes.map((orderTypeConfig) => (
-        <LabOrderBasketPanel key={orderTypeConfig.orderTypeUuid} {...orderTypeConfig} />
+        <LabOrderBasketPanel key={orderTypeConfig.orderTypeUuid} {...orderTypeConfig} launchChildWorkspace={launchChildWorkspace} />
       ))}
     </>
   );
@@ -46,9 +44,11 @@ export default function LabOrderBasketPanelExtension() {
 
 type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
-interface LabOrderBasketPanelProps extends OrderTypeConfig {}
+interface LabOrderBasketPanelProps extends OrderTypeConfig {
+  launchChildWorkspace: OrderBasketExtensionProps['launchChildWorkspace'];
+}
 
-function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanelProps) {
+function LabOrderBasketPanel({ orderTypeUuid, label, icon, launchChildWorkspace }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -92,27 +92,12 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
   }, [orders]);
 
   const openNewLabForm = useCallback(() => {
-    closeWorkspace('order-basket', {
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('add-lab-order', {
-          orderTypeUuid: orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
-    });
+    launchChildWorkspace('add-lab-order', { orderTypeUuid });
   }, [orderTypeUuid]);
 
   const openEditLabForm = useCallback(
     (order: OrderBasketItem) => {
-      closeWorkspace('order-basket', {
-        ignoreChanges: true,
-        onWorkspaceClose: () =>
-          launchWorkspace('add-lab-order', {
-            order,
-            orderTypeUuid: orderTypeUuid,
-          }),
-        closeWorkspaceGroup: false,
-      });
+      launchChildWorkspace('add-lab-order', { order, orderTypeUuid });
     },
     [orderTypeUuid],
   );

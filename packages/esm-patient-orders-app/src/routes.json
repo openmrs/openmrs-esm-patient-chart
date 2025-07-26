@@ -22,14 +22,6 @@
       "order": 1
     },
     {
-      "name": "order-basket-action-menu",
-      "component": "orderBasketActionMenu",
-      "slots": [
-        "action-menu-patient-chart-items-slot",
-        "action-menu-ward-patient-items-slot"
-      ]
-    },
-    {
       "name": "lab-result",
       "component": "labResult",
       "slot": "completed-lab-order-results-slot",
@@ -63,33 +55,38 @@
       }
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "order-basket",
-      "title": "orderBasketWorkspaceTitle",
       "component": "orderBasketWorkspace",
-      "type": "order",
+      "window": "order",
       "canHide": true
     },
     {
       "name": "patient-orders-form-workspace",
-      "title": "orderCancellation",
       "component": "patientOrdersFormWorkspace",
-      "type": "order",
+      "window": "order",
       "canHide": false
     },
     {
       "name": "test-results-form-workspace",
-      "title": "enterTestResults",
       "component": "testResultsFormWorkspace",
-      "type": "lab-results",
+      "window": "lab-results",
       "canHide": false
     },
     {
       "name": "orderable-concept-workspace",
-      "title": "searchOrderables",
       "component": "orderableConceptSearch",
-      "type": "order"
+      "window": "order"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "order",
+      "icon": "shopping-cart",
+      "canHide": true,
+      "group": "patient-chart",
+      "order": 1
     }
   ],
   "modals": [

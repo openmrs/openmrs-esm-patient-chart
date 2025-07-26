@@ -5,6 +5,8 @@ import {
   usePatient,
   useWorkspaces,
   useLeftNav,
+  launchWorkspaceGroup2,
+  closeWorkspaceGroup2,
 } from '@openmrs/esm-framework';
 import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
@@ -29,8 +31,10 @@ const PatientChart: React.FC = () => {
   // patient search) must be updated in the callback, which is called when the patient
   // chart unmounts.
   useEffect(() => {
+    launchWorkspaceGroup2('patient-chart', { patientUuid });
     setCurrentVisit(patientUuid, null);
     return () => {
+      closeWorkspaceGroup2();
       setCurrentVisit(null, null);
     };
   }, [patientUuid]);

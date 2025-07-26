@@ -12,6 +12,7 @@ import {
   parseDate,
   useLayoutType,
   useConfig,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
@@ -81,7 +82,8 @@ export default function AddLabOrderWorkspace({
   }, [closeWorkspace]);
 
   return (
-    <div className={styles.container}>
+    <Workspace2 title={t('addLabOrderWorkspaceTitle', 'Add lab order')} hasUnsavedChanges={false}>
+      <div className={styles.container}>
       {isTablet && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
@@ -124,5 +126,6 @@ export default function AddLabOrderWorkspace({
         />
       )}
     </div>
+    </Workspace2>
   );
 }

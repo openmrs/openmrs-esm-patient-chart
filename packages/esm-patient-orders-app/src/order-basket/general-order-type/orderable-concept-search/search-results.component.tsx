@@ -27,7 +27,6 @@ interface OrderableConceptSearchResultsProps {
   cancelOrder: () => void;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
 }
 
 const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps> = ({
@@ -37,7 +36,6 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   cancelOrder,
   orderableConceptSets,
   orderTypeUuid,
-  closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -88,7 +86,6 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
                 openOrderForm={openOrderForm}
                 concept={concept}
                 orderTypeUuid={orderTypeUuid}
-                closeWorkspace={closeWorkspace}
               />
             ))}
           </div>

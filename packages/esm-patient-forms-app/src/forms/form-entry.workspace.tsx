@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useVisit, Workspace2 } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   invalidateVisitAndEncounterData,
@@ -99,10 +99,12 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   }, [state]);
 
   return (
-    <div>
-      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
-      {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
-    </div>
+    <Workspace2 title={formInfo?.formName || 'Clinical form'} hasUnsavedChanges={false}>
+      <div>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
+      </div>
+    </Workspace2>
   );
 };
 

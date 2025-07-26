@@ -3,13 +3,12 @@ import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './general-order-panel.scss';
 import {
+  type Workspace2DefinitionProps,
   AddIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  type DefaultWorkspaceProps,
   MaybeIcon,
   useLayoutType,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
@@ -18,10 +17,11 @@ import { prepOrderPostData } from './resources';
 import { type OrderTypeDefinition } from '../../config-schema';
 
 interface GeneralOrderTypeProps extends OrderTypeDefinition {
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label, icon }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label, icon, launchChildWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -66,24 +66,26 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
 
   const openConceptSearch = () => {
     closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
+      discardUnsavedChanges: true,
+    }).then((didClose) => {
+      if (didClose) {
+        launchChildWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
+        });
+      }
     });
   };
 
   const openOrderForm = (order: OrderBasketItem) => {
     closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
+      discardUnsavedChanges: true,
+    }).then((didClose) => {
+      if (didClose) {
+        launchChildWorkspace('orderable-concept-workspace', {
           order,
           orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
+        });
+      }
     });
   };
 

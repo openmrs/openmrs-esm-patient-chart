@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, launchWorkspace, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, launchWorkspace, useLayoutType, useSession, Workspace2 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
@@ -20,7 +20,6 @@ export default function AddDrugOrderWorkspace({
   order: initialOrder,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -72,7 +71,7 @@ export default function AddDrugOrderWorkspace({
 
   if (!currentOrder) {
     return (
-      <>
+      <Workspace2 title={t('addDrugOrderWorkspaceTitle', 'Add drug order')} hasUnsavedChanges={false}>
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
@@ -87,7 +86,7 @@ export default function AddDrugOrderWorkspace({
           </div>
         )}
         <DrugSearch openOrderForm={openOrderForm} />
-      </>
+      </Workspace2>
     );
   } else {
     return (
@@ -95,7 +94,6 @@ export default function AddDrugOrderWorkspace({
         initialOrderBasketItem={currentOrder}
         onSave={saveDrugOrder}
         onCancel={cancelDrugOrder}
-        promptBeforeClosing={promptBeforeClosing}
       />
     );
   }

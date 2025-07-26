@@ -1,4 +1,4 @@
-import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { OpenmrsResource, Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 export interface Concept extends OpenmrsResource {
   name?: {
@@ -214,3 +214,8 @@ export type PostDataPrepFunction = (
   patientUuid: string,
   encounterUuid: string | null,
 ) => OrderPost;
+
+export interface OrderBasketExtensionProps {
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+}

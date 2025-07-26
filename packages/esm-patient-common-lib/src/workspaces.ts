@@ -1,19 +1,21 @@
 import { useCallback } from 'react';
 import {
-  type DefaultWorkspaceProps,
   launchWorkspace,
   navigateAndLaunchWorkspace,
   showModal,
   useFeatureFlag,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 import { useVisitOrOfflineVisit } from './offline/visit';
 
-export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
-  patient: fhir.Patient;
-  patientUuid: string;
+export interface PatientWorkspace2DefinitionProps extends Workspace2DefinitionProps {
+  groupProps: {
+    patient: fhir.Patient;
+    patientUuid: string;
+  };
 }
 
 export function launchPatientChartWithWorkspaceOpen({

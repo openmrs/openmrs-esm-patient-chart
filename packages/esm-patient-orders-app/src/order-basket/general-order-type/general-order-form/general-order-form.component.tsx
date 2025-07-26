@@ -32,15 +32,17 @@ import {
   ExtensionSlot,
   OpenmrsDatePicker,
   launchWorkspace,
+  Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
 import styles from './general-order-form.scss';
 
-export interface OrderFormProps extends DefaultPatientWorkspaceProps {
+export interface OrderFormProps extends Pick<Workspace2DefinitionProps, 'closeWorkspace'> {
   initialOrder: OrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 // Designs:
@@ -49,8 +51,7 @@ export interface OrderFormProps extends DefaultPatientWorkspaceProps {
 export function OrderForm({
   initialOrder,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
+  setHasUnsavedChanges,
   orderTypeUuid,
 }: OrderFormProps) {
   const { t } = useTranslation();
@@ -130,20 +131,16 @@ export function OrderForm({
 
       setOrders(newOrders);
 
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-        closeWorkspaceGroup: false,
-      });
+      // TODO: Do not prompt
+      closeWorkspace();
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [orders, setOrders, session?.currentProvider?.uuid, initialOrder],
   );
 
   const cancelOrder = useCallback(() => {
+    // TODO: Do prompt, only do this setOrders thing if the prompt is confirmed
     setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace();
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
   const onError = (errors: FieldErrors<OrderBasketItem>) => {
@@ -163,8 +160,8 @@ export function OrderForm({
   };
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
 

@@ -41,11 +41,11 @@
       "component": "conditionDeleteConfirmationDialog"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "conditions-form-workspace",
-      "title": "recordCondition",
-      "component": "conditionsFormWorkspace"
+      "component": "conditionsFormWorkspace",
+      "window": "form"
     }
   ]
 }

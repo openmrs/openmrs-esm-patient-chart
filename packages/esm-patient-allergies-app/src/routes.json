@@ -37,12 +37,11 @@
       "component": "allergyDeleteConfirmationDialog"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-allergy-form-workspace",
-      "title": "recordNewAllergy",
       "component": "allergyFormWorkspace",
-      "type": "form"
+      "window": "form"
     }
   ]
 }

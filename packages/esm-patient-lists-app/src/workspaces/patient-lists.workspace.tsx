@@ -19,7 +19,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import { launchWorkspace, useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, useDebounce, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
@@ -78,14 +78,17 @@ function PatientListsWorkspace() {
 
   if (isLoading)
     return (
-      <div className={styles.skeletonContainer}>
-        <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />
-      </div>
+      <Workspace2 title={t('patientListsWorkspaceTitle', 'Patient Lists')} hasUnsavedChanges={false}>
+        <div className={styles.skeletonContainer}>
+          <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />
+        </div>
+      </Workspace2>
     );
 
   if (patientLists?.length > 0) {
     return (
-      <section className={styles.container}>
+      <Workspace2 title={t('patientListsWorkspaceTitle', 'Patient Lists')} hasUnsavedChanges={false}>
+        <section className={styles.container}>
         <DataTable headers={tableHeaders} rows={tableRows} size={responsiveSize} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <>
@@ -146,20 +149,23 @@ function PatientListsWorkspace() {
           )}
         </DataTable>
       </section>
+      </Workspace2>
     );
   }
 
   return (
-    <div className={styles.emptyStateContainer}>
-      <Layer>
-        <Tile className={styles.emptyStateTile}>
-          <div className={styles.tileContent}>
-            <EmptyDataIllustration />
-            <p className={styles.emptyStateContent}>{t('noPatientListsToDisplay', 'No patient lists to display')}</p>
-          </div>
-        </Tile>
-      </Layer>
-    </div>
+    <Workspace2 title={t('patientListsWorkspaceTitle', 'Patient Lists')} hasUnsavedChanges={false}>
+      <div className={styles.emptyStateContainer}>
+        <Layer>
+          <Tile className={styles.emptyStateTile}>
+            <div className={styles.tileContent}>
+              <EmptyDataIllustration />
+              <p className={styles.emptyStateContent}>{t('noPatientListsToDisplay', 'No patient lists to display')}</p>
+            </div>
+          </Tile>
+        </Layer>
+      </div>
+    </Workspace2>
   );
 }
 

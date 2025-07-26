@@ -8,6 +8,8 @@ import {
   useConfig,
   useDebounce,
   useLayoutType,
+  Workspace2,
+  Workspace2DefinitionProps,
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
 import {
@@ -22,7 +24,7 @@ import { type ConfigObject } from '../../../config-schema';
 import OrderableConceptSearchResults from './search-results.component';
 import styles from './orderable-concept-search.scss';
 
-interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
+interface OrderableConceptSearchWorkspaceProps extends Workspace2DefinitionProps {
   order: OrderBasketItem;
   orderTypeUuid: string;
   orderableConceptClasses: Array<string>;
@@ -41,9 +43,6 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   order: initialOrder,
   orderTypeUuid,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  setTitle,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -52,16 +51,15 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { orderType } = useOrderType(orderTypeUuid);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  useEffect(() => {
+  const title = useMemo(() => {
     if (orderType) {
-      setTitle(
-        t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
-          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
-        }),
-      );
+      return t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
+        orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+      });
     }
-  }, [orderType, t, setTitle]);
+  }, [orderType, t]);
 
   const orderableConceptSets = useMemo(
     () => orderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets,
@@ -69,10 +67,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   );
 
   const cancelDrugOrder = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace();
   }, [closeWorkspace]);
 
   const openOrderForm = useCallback(
@@ -88,7 +83,8 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   );
 
   return (
-    <div className={styles.workspaceWrapper}>
+    <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
+      <div className={styles.workspaceWrapper}>
       {!isTablet && (
         <div className={styles.backButton}>
           <Button
@@ -106,13 +102,9 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
         <OrderForm
           initialOrder={currentOrder}
           closeWorkspace={closeWorkspace}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          promptBeforeClosing={promptBeforeClosing}
+          setHasUnsavedChanges={setHasUnsavedChanges}
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
-          patientUuid={patientUuid}
-          patient={patient}
-          setTitle={() => {}}
         />
       ) : (
         <ConceptSearch
@@ -122,12 +114,13 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           orderTypeUuid={orderTypeUuid}
         />
       )}
-    </div>
+      </div>
+    </Workspace2>
   );
 };
 
 interface ConceptSearchProps {
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   openOrderForm: (search: OrderBasketItem) => void;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
@@ -142,9 +135,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
   const searchInputRef = useRef(null);
 
   const cancelDrugOrder = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-    });
+    closeWorkspace();
   }, [closeWorkspace]);
 
   const focusAndClearSearchInput = () => {
@@ -176,7 +167,6 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
-        closeWorkspace={closeWorkspace}
         orderTypeUuid={orderTypeUuid}
         cancelOrder={() => {}}
         orderableConceptSets={orderableConceptSets}

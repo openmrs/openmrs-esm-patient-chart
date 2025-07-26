@@ -220,18 +220,16 @@
       "offline": true
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "mark-patient-deceased-workspace-form",
       "component": "markPatientDeceasedForm",
-      "title": "Mark patient deceased",
-      "type": "form"
+      "window": "form"
     },
     {
       "name": "start-visit-workspace-form",
       "component": "startVisitWorkspace",
-      "title": "startVisitWorkspaceTitle",
-      "type": "start-visit"
+      "window": "start-visit"
     }
   ]
 }

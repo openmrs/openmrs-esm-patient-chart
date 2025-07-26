@@ -27,6 +27,9 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  ExtensionSlot,
+  usePatient,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -59,7 +62,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   programEnrollmentId,
-  promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -113,10 +115,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   });
 
   const selectedProgram = useWatch({ control, name: 'selectedProgram' });
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
@@ -326,36 +324,38 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   }
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-      <Stack className={styles.formContainer} gap={7}>
-        {!availablePrograms.length && (
-          <InlineNotification
-            className={styles.notification}
-            kind="error"
-            lowContrast
-            subtitle={t('configurePrograms', 'Please configure programs to continue.')}
-            title={t('noProgramsConfigured', 'No programs configured')}
-          />
-        )}
-        {formGroups.map((group, i) => (
-          <FormGroup style={group.style} legendText={group.legendText} key={i}>
-            <div className={styles.selectContainer}>{isTablet ? <Layer>{group.value}</Layer> : group.value}</div>
-          </FormGroup>
-        ))}
-      </Stack>
-      <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-          {getCoreTranslation('cancel')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            <span>{t('saveAndClose', 'Save and close')}</span>
+    <Workspace2 title={t('programEnrollmentWorkspaceTitle', 'Program enrollment')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <Stack className={styles.formContainer} gap={7}>
+          {!availablePrograms.length && (
+            <InlineNotification
+              className={styles.notification}
+              kind="error"
+              lowContrast
+              subtitle={t('configurePrograms', 'Please configure programs to continue.')}
+              title={t('noProgramsConfigured', 'No programs configured')}
+            />
           )}
-        </Button>
-      </ButtonSet>
-    </Form>
+          {formGroups.map((group, i) => (
+            <FormGroup style={group.style} legendText={group.legendText} key={i}>
+              <div className={styles.selectContainer}>{isTablet ? <Layer>{group.value}</Layer> : group.value}</div>
+            </FormGroup>
+          ))}
+        </Stack>
+        <ButtonSet className={classNames(isTablet ? styles.tablet : styles.desktop)}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            {getCoreTranslation('cancel')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{t('saveAndClose', 'Save and close')}</span>
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 

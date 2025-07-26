@@ -30,11 +30,11 @@
     }
   ],
   "pages": [],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "programs-form-workspace",
-      "title": "programEnrollmentWorkspaceTitle",
-      "component": "programsFormWorkspace"
+      "component": "programsFormWorkspace",
+      "window": "form"
     }
   ],
   "modals": [

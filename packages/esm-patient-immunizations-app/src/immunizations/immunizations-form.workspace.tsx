@@ -27,6 +27,8 @@ import {
   ResponsiveWrapper,
   OpenmrsDatePicker,
   getCoreTranslation,
+  ExtensionSlot,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub } from './utils';
@@ -39,12 +41,17 @@ import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet'
 import { DoseInput } from './components/dose-input.component';
 import styles from './immunizations-form.scss';
 
-const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
-  patient,
-  patientUuid,
+interface ImmunizationFormProps extends DefaultPatientWorkspaceProps {
+  immunization?: Immunization;
+  formContext: 'creating' | 'editing';
+}
+
+const ImmunizationsForm: React.FC<ImmunizationFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
+  formContext,
+  immunization,
+  patientUuid,
 }) => {
   const currentUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
@@ -107,12 +114,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
-
-  const vaccineUuid = watch('vaccineUuid');
 
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
@@ -218,7 +219,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   );
 
   return (
-    <FormProvider {...formProps}>
+    <Workspace2 title={t('immunizationWorkspaceTitle', 'Immunization')} hasUnsavedChanges={isDirty}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={1} className={styles.container}>
           <section className={` ${styles.row}`}>
@@ -303,11 +304,11 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               />
             </ResponsiveWrapper>
           </section>
-          {vaccineUuid && (
+          {watch('vaccineUuid') && (
             <section>
               <ResponsiveWrapper>
                 <DoseInput
-                  vaccine={vaccineUuid}
+                  vaccine={watch('vaccineUuid')}
                   sequences={immunizationsConfig.sequenceDefinitions}
                   control={control}
                 />
@@ -389,7 +390,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           </Button>
         </ButtonSet>
       </Form>
-    </FormProvider>
+    </Workspace2>
   );
 };
 

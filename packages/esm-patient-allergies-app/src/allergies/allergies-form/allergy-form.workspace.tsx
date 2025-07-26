@@ -22,7 +22,7 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper, Workspace2 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type Allergen,
@@ -116,7 +116,6 @@ function AllergyForm({
   patientUuid,
   allergy,
   formContext,
-  promptBeforeClosing,
 }: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
@@ -284,9 +283,7 @@ function AllergyForm({
     }
   }, [allergy, formContext, getAllergyFormDefaultValues, inEditMode, isLoadingReactions, setValue]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [promptBeforeClosing, isDirty]);
+
 
   const selectedAllergen = useWatch({
     control,
@@ -398,7 +395,8 @@ function AllergyForm({
   );
 
   return (
-    <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+    <Workspace2 title={t('recordNewAllergy', 'Record new allergy')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
       {isTablet ? (
         <Row className={styles.header}>
           <ExtensionSlot className={styles.content} name="patient-details-header-slot" state={extensionSlotState} />
@@ -591,6 +589,7 @@ function AllergyForm({
         </ButtonSet>
       </div>
     </Form>
+    </Workspace2>
   );
 }
 

@@ -3,29 +3,28 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "extensions": [
-    {
-      "name": "patient-lists-action-menu",
-      "component": "patientListsActionMenu",
-      "slot": "action-menu-patient-chart-items-slot"
-    }
-  ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-lists",
-      "title": "patientListsWorkspaceTitle",
       "component": "patientListsWorkspace",
-      "type": "patient-lists",
+      "window": "patient-lists",
       "canHide": false,
       "width": "wider"
     },
     {
       "name": "patient-list-details",
-      "title": "patientListDetailWorkspaceTitle",
       "component": "patientListDetailsWorkspace",
-      "type": "patient-lists",
+      "window": "patient-lists",
       "canHide": false,
       "width": "wider"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-lists",
+      "icon": "events",
+      "width": "wider",
+      "order": 4
     }
   ]
 }

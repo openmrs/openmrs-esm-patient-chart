@@ -36,6 +36,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  Workspace2,
   type Encounter,
   type UploadedFile,
 } from '@openmrs/esm-framework';
@@ -100,7 +101,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   patientUuid,
-  promptBeforeClosing,
   encounter,
   formContext = 'creating',
 }) => {
@@ -167,9 +167,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     },
   });
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+
 
   useEffect(() => {
     if (encounter?.diagnoses?.length) {
@@ -501,8 +499,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const onError = (errors) => console.error(errors);
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
       {isTablet && (
         <Row className={styles.headerGridRow}>
@@ -735,6 +734,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         </Button>
       </ButtonSet>
     </Form>
+    </Workspace2>
   );
 };
 

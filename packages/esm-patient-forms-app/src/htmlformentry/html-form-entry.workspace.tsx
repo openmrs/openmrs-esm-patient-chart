@@ -1,4 +1,5 @@
 import React from 'react';
+import { Workspace2 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type FormEntryProps,
@@ -14,14 +15,10 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   patientUuid,
   patient,
   closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
   formInfo,
 }) => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { encounterUuid, visitUuid, htmlForm } = formInfo || {};
-
-  // we always want to prompt the user before closing/hiding the workspace because we can't guarantee maintaining the state of the form
-  promptBeforeClosing(() => true);
 
   // urls for entering a new form and editing an existing form; note that we specify the returnUrl as post-message:close-workspace,
   // which tells HFE-UI to send a message to the parent window to close the workspace when the form is saved or cancelled
@@ -45,14 +42,16 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
 
   const showFormAndLoadedData = formInfo && patientUuid;
   return (
-    <div>
-      {showFormAndLoadedData && (
-        <HtmlFormEntryWrapper
-          src={url + searchParams}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-        />
-      )}
-    </div>
+    <Workspace2 title={htmlForm?.formName || 'Clinical form'} hasUnsavedChanges={true}>
+      <div>
+        {showFormAndLoadedData && (
+          <HtmlFormEntryWrapper
+            src={url + searchParams}
+            closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+          />
+        )}
+      </div>
+    </Workspace2>
   );
 };
 

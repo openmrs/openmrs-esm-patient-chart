@@ -32,6 +32,7 @@ import {
   useEmrConfiguration,
   useLayoutType,
   useVisit,
+  Workspace2,
   type AssignedExtension,
   type NewVisitPayload,
   type Visit,
@@ -88,7 +89,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
   openedFrom,
   patient,
   patientUuid,
-  promptBeforeClosing,
   showPatientHeader = false,
   visitToEdit,
 }) => {
@@ -135,9 +135,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
     reset(defaultValues);
   }, [defaultValues, reset]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -401,8 +399,9 @@ const VisitForm: React.FC<VisitFormProps> = ({
   }, [handleReturnToSearchList, closeWorkspace]);
 
   return (
-    <FormProvider {...methods}>
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
+    <Workspace2 title={t('startVisitWorkspaceTitle', 'Start a visit')} hasUnsavedChanges={isDirty}>
+      <FormProvider {...methods}>
+        <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
         {showPatientHeader && patient && (
           <ExtensionSlot
             name="patient-header-slot"
@@ -617,6 +616,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
         </ButtonSet>
       </Form>
     </FormProvider>
+    </Workspace2>
   );
 };
 

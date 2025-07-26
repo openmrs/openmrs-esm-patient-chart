@@ -26,11 +26,11 @@
     }
   ],
   "pages": [],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "immunization-form-workspace",
-      "title": "immunizationWorkspaceTitle",
-      "component": "immunizationFormWorkspace"
+      "component": "immunizationFormWorkspace",
+      "window": "form"
     }
   ],
   "modals": [

@@ -28,6 +28,7 @@ import {
   ResponsiveWrapper,
   useConfig,
   OpenmrsDatePicker,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import { type ChartConfig } from '../config-schema';
@@ -78,7 +79,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
 
   const {
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     handleSubmit,
     watch,
   } = useForm<MarkPatientDeceasedFormSchema>({
@@ -117,8 +118,9 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
   const onError = (errors) => console.error(errors);
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <div>
+    <Workspace2 title={t('markPatientDeceased', 'Mark patient deceased')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedPatientUuid} />
@@ -262,6 +264,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
         </Button>
       </ButtonSet>
     </Form>
+    </Workspace2>
   );
 };
 
