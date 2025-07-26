@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-
 export const mockImmunizationConfig = {
   immunizationsConfig: {
     vaccinesConceptSet: 'vaccinationsUuid',
@@ -105,252 +103,56 @@ export const mockPatientImmunization = {
   ],
 };
 
-export const mockPatientImmunizationsSearchResponse = {
-  resourceType: 'Bundle',
-  entry: [
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21a82-aed3-11ea-b3de-0242ac130001',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'RotavirusUuid',
-              display: 'Rotavirus',
-            },
-          ],
+export const mockImmunizationData = [
+  {
+    resourceType: 'Immunization',
+    id: '1',
+    status: 'completed',
+    vaccineCode: {
+      coding: [
+        {
+          code: 'rotavirus-uuid',
+          display: 'Rotavirus',
         },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        occurrenceDateTime: dayjs('2018-09-21').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '12345',
-        protocolApplied: [
-          {
-            series: '4 Months',
-            doseNumberPositiveInt: 2,
-          },
-        ],
-      },
+      ],
     },
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21a82-aed3-11ea-b3de-0242ac130001',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'RotavirusUuid',
-              display: 'Rotavirus',
-            },
-          ],
+    patient: { reference: 'Patient/test-patient' },
+    encounter: { reference: 'Encounter/test-encounter' },
+    occurrenceDateTime: '2018-09-15T00:00:00.000Z',
+    protocolApplied: [{ doseNumberPositiveInt: 1 }],
+  },
+  {
+    resourceType: 'Immunization',
+    id: '2',
+    status: 'completed',
+    vaccineCode: {
+      coding: [
+        {
+          code: 'polio-uuid',
+          display: 'Polio',
         },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        occurrenceDateTime: dayjs('2018-06-18').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '12345',
-        protocolApplied: [
-          {
-            series: '2 Months',
-            doseNumberPositiveInt: 1,
-          },
-        ],
-      },
+      ],
     },
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21d5c-aed3-11ea-b3de-0242ac130002',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'PolioUuid',
-              display: 'Polio',
-            },
-          ],
+    patient: { reference: 'Patient/test-patient' },
+    encounter: { reference: 'Encounter/test-encounter' },
+    occurrenceDateTime: '2018-11-20T00:00:00.000Z',
+    protocolApplied: [{ doseNumberPositiveInt: 1 }],
+  },
+  {
+    resourceType: 'Immunization',
+    id: '3',
+    status: 'completed',
+    vaccineCode: {
+      coding: [
+        {
+          code: 'influenza-uuid',
+          display: 'Influenza',
         },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '12345',
-        occurrenceDateTime: dayjs('2018-05-21').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        protocolApplied: [
-          {
-            series: '2 Months',
-            doseNumberPositiveInt: 1,
-          },
-        ],
-      },
+      ],
     },
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21d5c-aed3-11ea-b3de-0242ac130002',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'PolioUuid',
-              display: 'Polio',
-            },
-          ],
-        },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '1234',
-        occurrenceDateTime: dayjs('2018-11-01').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        protocolApplied: [
-          {
-            series: '4 Months',
-            doseNumberPositiveInt: 2,
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21e6a-aed3-11ea-b3de-0242ac130003',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'InfluenzaUuid',
-              display: 'Influenza',
-            },
-          ],
-        },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '12345',
-        occurrenceDateTime: dayjs('2018-05-21').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        protocolApplied: [
-          {
-            doseNumberPositiveInt: 1,
-          },
-        ],
-      },
-    },
-    {
-      fullUrl: '',
-      resource: {
-        resourceType: 'Immunization',
-        id: 'b9c21e6a-aed3-11ea-b3de-0242ac130003',
-        vaccineCode: {
-          coding: [
-            {
-              code: 'InfluenzaUuid',
-              display: 'Influenza',
-            },
-          ],
-        },
-        status: 'completed',
-        patient: {
-          type: 'Patient',
-          reference: 'Patient/D1A903924D4443A7A388778D77D86155',
-        },
-        encounter: {
-          type: 'Encounter',
-          reference: 'Encounter/Example',
-        },
-        location: {
-          type: 'Location',
-          reference: 'Location/1',
-        },
-        performer: [{ actor: { type: 'Practitioner', reference: 'Practitioner/12334' } }],
-        manufacturer: {
-          display: 'Organization/hl7',
-        },
-        lotNumber: '12345',
-        occurrenceDateTime: dayjs('2018-05-21').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
-        protocolApplied: [
-          {
-            doseNumberPositiveInt: 1,
-          },
-        ],
-      },
-    },
-  ],
-};
+    patient: { reference: 'Patient/test-patient' },
+    encounter: { reference: 'Encounter/test-encounter' },
+    occurrenceDateTime: '2018-05-10T00:00:00.000Z',
+    protocolApplied: [{ doseNumberPositiveInt: 1 }],
+  },
+];
