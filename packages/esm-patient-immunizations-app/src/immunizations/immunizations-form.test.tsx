@@ -1,3 +1,7 @@
+import React from 'react';
+import dayjs from 'dayjs';
+import userEvent from '@testing-library/user-event';
+import { render, screen, within } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -7,17 +11,15 @@ import {
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
-import dayjs from 'dayjs';
-import React from 'react';
-import { mockPatient } from 'tools';
 import { configSchema } from '../config-schema';
 import { type ImmunizationWidgetConfigObject } from '../types/fhir-immunization-domain';
-import ImmunizationsForm from './immunizations-form.workspace';
-import { savePatientImmunization } from './immunizations.resource';
 import { immunizationFormSub } from './utils';
+import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
+
+import { mockPatient } from 'tools';
+import { savePatientImmunization } from './immunizations.resource';
+
+import ImmunizationsForm from './immunizations-form.workspace';
 
 const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
