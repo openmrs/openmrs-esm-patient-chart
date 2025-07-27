@@ -16,13 +16,16 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const lotNumber = immunizationResource?.lotNumber;
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
+
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
   const expirationDate = immunizationResource?.expirationDate?.toString();
+  const note = immunizationResource?.note?.length > 0 && immunizationResource?.note[0]?.text;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
     doseNumber,
+    note: note ? [{ text: note }] : [],
     occurrenceDateTime,
     expirationDate,
     visitUuid: fromReference(immunizationResource?.encounter),
@@ -121,6 +124,7 @@ export const mapToFHIRImmunizationResource = (
     encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
     occurrenceDateTime: immunizationFormData.vaccinationDate,
     expirationDate: immunizationFormData.expirationDate,
+    note: [{ text: immunizationFormData.note }],
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
     manufacturer: { display: immunizationFormData.manufacturer },

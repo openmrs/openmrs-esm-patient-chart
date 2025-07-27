@@ -89,6 +89,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
           time: false,
         })) ||
       '--',
+    note: dose?.note[0]?.text || '--',
     actions: (
       <div className={styles.actionButtons}>
         <IconButton
@@ -100,6 +101,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               immunizationId: dose.immunizationObsUuid,
               vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               doseNumber: dose.doseNumber,
+              note: dose.note[0]?.text,
               expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
               lotNumber: dose.lotNumber,
               manufacturer: dose.manufacturer,

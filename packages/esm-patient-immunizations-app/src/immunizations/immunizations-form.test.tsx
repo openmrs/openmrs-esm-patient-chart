@@ -125,6 +125,7 @@ describe('Immunizations Form', () => {
     // expect(screen.getByTestId('vaccinationDate')).toBeInTheDocument();
     expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Immunization/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /note/i })).toBeInTheDocument();
     expect(screen.getByText(/Vaccine Batch Information/i)).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Manufacturer/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Lot Number/i })).toBeInTheDocument();
@@ -175,6 +176,7 @@ describe('Immunizations Form', () => {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       doseNumber: 1,
       manufacturer: 'Pfizer',
+      note: 'Given as part of routine schedule.',
     };
 
     mockSavePatientImmunization.mockResolvedValue({
@@ -191,6 +193,9 @@ describe('Immunizations Form', () => {
     const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
     await user.clear(doseField);
     await user.type(doseField, formValues.doseNumber.toString());
+    const NoteField = screen.getByRole('textbox', { name: /note/i });
+    await user.clear(NoteField);
+    await user.type(NoteField, formValues.note);
     const manufacturer = screen.getByRole('textbox', { name: /Manufacturer/i });
     await user.type(manufacturer, formValues.manufacturer);
     const saveButton = screen.getByRole('button', { name: /Save/i });
@@ -201,6 +206,7 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/17f512b4-d264-4113-a6fe-160cb38cb46e', type: 'Encounter' },
         expirationDate: null,
+        note: [{ text: formValues.note }],
         id: undefined,
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: '',
@@ -235,6 +241,7 @@ describe('Immunizations Form', () => {
       vaccinationDate: new Date('2024-01-03'),
       doseNumber: 2,
       expirationDate: new Date('2024-05-19'),
+      note: 'Given as part of routine schedule.',
       lotNumber: 'A123456',
       manufacturer: 'Merck & Co., Inc.',
       visitId: 'ce589c9c-2f30-42ec-b289-a153f812ea5e',
@@ -254,6 +261,7 @@ describe('Immunizations Form', () => {
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
     const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
     const lotField = screen.getByRole('textbox', { name: /Lot number/i });
+    const NoteField = screen.getByRole('textbox', { name: /note/i });
     const manufacturerField = screen.getByRole('textbox', { name: /Manufacturer/i });
     const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
     const saveButton = screen.getByRole('button', { name: /Save/i });
@@ -279,6 +287,7 @@ describe('Immunizations Form', () => {
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
         expirationDate: dayjs(new Date('2024-05-19'), isoFormat).toDate(),
+        note: [{ text: immunizationToEdit.note }],
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: 'A123456',
         manufacturer: { display: 'Merck & Co., Inc.' },

@@ -25,6 +25,9 @@ export type FHIRImmunizationResource = {
   encounter: Reference;
   occurrenceDateTime: Date;
   expirationDate: Date;
+  note?: Array<{
+    text: string;
+  }>;
   location: Reference;
   performer: Array<{ actor: Reference }>;
   manufacturer: { display: string };

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextInput } from '@carbon/react';
+import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextArea, TextInput } from '@carbon/react';
 import {
   getCoreTranslation,
   OpenmrsDatePicker,
@@ -65,6 +65,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         // The backend will attempt to convert the dose number to a positive integer
         // so we need to set it to null if the value is less than 1
         .transform((value) => (value < 1 ? null : value)),
+      note: z.string().optional(),
       expirationDate: z.date().nullable(),
       lotNumber: z.string().nullable(),
       manufacturer: z.string().nullable(),
@@ -79,6 +80,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccineUuid: '',
       vaccinationDate: new Date(),
       doseNumber: 1,
+      note: '',
       expirationDate: null,
       lotNumber: '',
       manufacturer: '',
@@ -107,6 +109,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
           doseNumber: props.doseNumber,
+          note: props.note,
           expirationDate: props.expirationDate,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
@@ -125,7 +128,15 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
       try {
-        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer } = data;
+        const {
+          vaccineUuid,
+          vaccinationDate,
+          doseNumber,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+          note,
+        } = data;
         const abortController = new AbortController();
 
         const immunization: ImmunizationFormData = {
@@ -135,6 +146,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
+          note,
           expirationDate,
           lotNumber,
           manufacturer,
@@ -178,8 +190,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       mutate,
     ],
   );
-
-  return (
+return (
     <FormProvider {...formProps}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={5} className={styles.container}>
@@ -232,6 +243,28 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <DoseInput vaccine={vaccineUuid} sequences={immunizationsConfig.sequenceDefinitions} control={control} />
             </ResponsiveWrapper>
           )}
+          <section>
+            <ResponsiveWrapper>
+              <Controller
+                name="note"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <TextArea
+                      enableCounter
+                      id="note"
+                      invalidText={errors?.note?.message}
+                      labelText={t('note', 'Note')}
+                      placeholder={t('immunizationNotePlaceholder', 'E.g. mild redness at injection site')}
+                      maxCount={255}
+                      value={value}
+                      onChange={(evt) => onChange(evt.target.value)}
+                    />
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
+          </section>
           <div className={styles.vaccineBatchHeading}> {t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <ResponsiveWrapper>
             <Controller

@@ -24,6 +24,7 @@ export interface ImmunizationFormState {
   immunizationId?: string;
   vaccinationDate: Date;
   doseNumber: number;
+  note: string;
   expirationDate: Date;
   lotNumber: string;
   manufacturer: string;
@@ -45,6 +46,9 @@ export interface Sequence {
 export interface ExistingDoses {
   expirationDate: string;
   immunizationObsUuid: string;
+  note: Array<{
+    text: string;
+  }>;
   visitUuid?: string;
   lotNumber: string;
   manufacturer: string;
