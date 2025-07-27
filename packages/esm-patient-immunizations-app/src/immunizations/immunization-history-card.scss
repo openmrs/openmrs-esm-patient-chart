@@ -10,7 +10,7 @@
 }
 
 .doseCell {
-  min-width: 140px;
+  min-width: 10rem;
   padding: 0.5rem;
   display: inline-block;
   text-align: center;
@@ -21,46 +21,50 @@
 }
 
 .doseDate {
-  font-size: 0.875rem;
+  @include type.type-style('label-02');
   color: $text-02;
 }
 
 .headerRow {
   position: sticky;
   top: 0;
-  background-color: #f4f4f4;
-  z-index: 2;
-  border-bottom: 1px solid #ddd;
+  background-color: $ui-01;
+  z-index: 1;
+  border-bottom: 1px solid $ui-01;
 }
 
 .headerCell {
-  min-width: 200px;
+  min-width: 13rem;
   padding: 0.5rem;
   display: inline-block;
   text-align: center;
   font-weight: bold;
   position: sticky;
   left: 0;
-  background-color: #f4f4f4;
+  background-color: $ui-01;
 }
 
-.vaccineNameCell {
-  background-color: #f4f4f4;
-  width: 200px;
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  vertical-align: top;
+.widgetCard {
+  :global(.cds--data-table) {
+    .vaccineNameCell {
+      width: 12rem;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      vertical-align: top;
+      background-color: white !important;
+    }
+
+    .dosesCell {
+      background-color: white !important;
+      padding: 0;
+      width: 100%;
+    }
+  }
 }
 
 .vaccineNameContent {
-  width: 200px;
-}
-
-.dosesCell {
-  background-color: #f4f4f4;
-  padding: 0;
-  width: 100%;
+  width: 13rem;
 }
 
 .vaccineDose {

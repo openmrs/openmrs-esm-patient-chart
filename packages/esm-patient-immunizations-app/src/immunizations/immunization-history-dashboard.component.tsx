@@ -7,15 +7,15 @@ import styles from './immunization-history-card.scss';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationHistoryCard from './immunization-history-card.component';
 
-interface ImmunizationScheduleDashboardProps {
+interface ImmunizationHistoryDashboardProps {
   patientUuid: string;
 }
 
-const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps> = ({ patientUuid }) => {
+const ImmunizationHistoryDashboard: React.FC<ImmunizationHistoryDashboardProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, isLoading } = useImmunizations(patientUuid);
 
-  const headerTitle = t('immunizationsHistory', 'Immunizations History');
+  const headerTitle = t('immunizationsHistory', 'Immunizations history');
 
   if (isLoading) {
     return <DataTableSkeleton columnCount={2} rowCount={5} showHeader zebra />;
@@ -24,7 +24,7 @@ const ImmunizationHistoryDashboard: React.FC<ImmunizationScheduleDashboardProps>
   if (data?.length > 0) {
     return (
       <div className={styles.widgetCard}>
-        <CardHeader title={headerTitle} children={''} />
+        <CardHeader title={headerTitle}>{null}</CardHeader>
         <div className={styles.content}>
           <ImmunizationHistoryCard patientUuid={patientUuid} />
         </div>

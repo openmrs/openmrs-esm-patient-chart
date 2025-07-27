@@ -4,7 +4,7 @@ import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import immunizationsOverviewComponent from './immunizations/immunizations-overview.component';
 import immunizationsDetailedSummaryComponent from './immunizations/immunizations-detailed-summary.component';
-import immunizationHistorySummaryComponent from './immunizations/immunization-history-summary.component';
+import immunizationHistorySummaryComponent from './immunizations/immunization-history-dashboard.component';
 
 const moduleName = '@openmrs/esm-patient-immunizations-app';
 

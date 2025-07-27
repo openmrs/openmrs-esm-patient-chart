@@ -35,8 +35,10 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
       id: immunization.vaccineUuid,
       vaccine: immunization.vaccineName,
       doses: immunization.existingDoses.map((dose, index) => (
-        <div key={index} className={styles.doseCell}>
-          <div className={styles.doseLabel}>{`Dose ${dose.doseNumber}`}</div>
+        <div key={dose.immunizationObsUuid} className={styles.doseCell}>
+          <div className={styles.doseLabel}>
+            {t('dose', 'Dose')} {`${dose.doseNumber}`}
+          </div>
           {dose.occurrenceDateTime && (
             <div className={styles.doseDate}>
               {formatDate(parseDate(dose.occurrenceDateTime), {
@@ -49,7 +51,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
         </div>
       )),
     }));
-  }, [sortedImmunizations]);
+  }, [sortedImmunizations, t]);
 
   const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
 
@@ -76,7 +78,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
       </div>
 
       <div>
-        <Table size="xl" useZebraStyles={false} aria-label={t('immunizationHistory', 'Immunization History')}>
+        <Table size="xl" useZebraStyles={false} aria-label={t('immunizationHistory', 'Immunization history')}>
           <TableBody className={styles.tableBody}>
             {paginatedRows?.map((row) => (
               <TableRow key={row.id}>
