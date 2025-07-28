@@ -65,7 +65,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         // The backend will attempt to convert the dose number to a positive integer
         // so we need to set it to null if the value is less than 1
         .transform((value) => (value < 1 ? null : value)),
-      note: z.string().optional(),
+      note: z.string().trim().max(255).optional(),
       expirationDate: z.date().nullable(),
       lotNumber: z.string().nullable(),
       manufacturer: z.string().nullable(),
@@ -255,8 +255,6 @@ return (
                       id="note"
                       invalidText={errors?.note?.message}
                       labelText={t('note', 'Note')}
-                      placeholder={t('immunizationNotePlaceholder', 'E.g. mild redness at injection site')}
-                      maxCount={255}
                       value={value}
                       onChange={(evt) => onChange(evt.target.value)}
                     />
