@@ -1,4 +1,4 @@
-import { find, get, groupBy, isUndefined, orderBy } from 'lodash-es';
+import { find, groupBy, isUndefined, orderBy } from 'lodash-es';
 import {
   type Code,
   type FHIRImmunizationBundle,
