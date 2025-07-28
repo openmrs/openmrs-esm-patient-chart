@@ -57,7 +57,7 @@ export function useOrderEncounter(
   const nowDateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
   const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
     !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
-      ? `${restBaseUrl}/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterTypeUuid}&fromdate=${nowDateString}&limit=1`
       : null,
     openmrsFetch,
   );
@@ -86,9 +86,7 @@ export function useOrderEncounter(
       : {
           visitRequired: false,
           isLoading: todayEncounter?.isLoading,
-          encounterUuid: todayEncounter?.data?.data?.results?.find(
-            (encounter) => encounter.encounterType.uuid === encounterTypeUuid,
-          )?.uuid,
+          encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
           error: todayEncounter?.error,
           mutate: todayEncounter?.mutate,
         };
