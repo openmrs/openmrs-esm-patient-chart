@@ -62,7 +62,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
         <OpenmrsDatePicker
           id={'visit-context-swticher-date-picker'}
           className={styles.datepicker}
-          labelText={t('showVisitOnOrPriorTo', 'Show visit on or prior to:')}
+          labelText={t('showVisitWithStartDateOnOrPriorTo', 'Show visit with start date on or prior to:')}
           maxDate={Date.now()}
           value={maxStartDate}
           onChange={setMaxStartDate}
