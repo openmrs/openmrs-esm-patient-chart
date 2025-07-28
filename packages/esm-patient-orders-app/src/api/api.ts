@@ -41,7 +41,10 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
   );
 }
 
-export function useOrderEncounter(patientUuid: string): {
+export function useOrderEncounter(
+  patientUuid: string,
+  encounterTypeUuid: string,
+): {
   visitRequired: boolean;
   isLoading: boolean;
   error: Error;
@@ -74,17 +77,28 @@ export function useOrderEncounter(patientUuid: string): {
       ? {
           visitRequired: true,
           isLoading: visit?.isLoading,
-          encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
+          encounterUuid: visit?.currentVisit?.encounters?.find(
+            (encounter) => encounter.encounterType?.uuid === encounterTypeUuid,
+          )?.uuid,
           error: visit?.error,
           mutate: visit?.mutate,
         }
       : {
           visitRequired: false,
           isLoading: todayEncounter?.isLoading,
-          encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
+          encounterUuid: todayEncounter?.data?.data?.results?.find(
+            (encounter) => encounter.encounterType.uuid === encounterTypeUuid,
+          )?.uuid,
           error: todayEncounter?.error,
           mutate: todayEncounter?.mutate,
         };
-  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
+  }, [
+    isLoadingSystemVisitSetting,
+    errorFetchingSystemVisitSetting,
+    visit,
+    todayEncounter,
+    systemVisitEnabled,
+    encounterTypeUuid,
+  ]);
   return results;
 }
