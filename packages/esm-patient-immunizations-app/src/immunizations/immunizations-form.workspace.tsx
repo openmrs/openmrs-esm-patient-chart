@@ -255,8 +255,7 @@ return (
                       id="note"
                       invalidText={errors?.note?.message}
                       labelText={t('note', 'Note')}
-                      helperText={t('addImmunizationDoseComments', 'Add comments related to this immunization dose')}
-                      placeholder={t('e.gMildRednessAtInjectionSite', 'E.g. mild redness at injection site')}
+                      placeholder={t('gMildRednessAtInjectionSite', 'E.g. mild redness at injection site')}
                       maxCount={255}
                       value={value}
                       onChange={(evt) => onChange(evt.target.value)}

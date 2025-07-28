@@ -1,18 +1,15 @@
 {
   "actions": "Actions",
   "add": "Add",
-  "addImmunizationDoseComments": "Add comments related to this immunization dose",
   "addImmunizations": "Add immunizations",
   "deleteImmunization": "Delete immunization",
   "deleting": "Deleting",
   "dose": "Dose",
   "doseNumberWithinSeries": "Dose number within series",
-  "e": {
-    "gMildRednessAtInjectionSite": "E.g. mild redness at injection site"
-  },
   "error": "Error",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
+  "gMildRednessAtInjectionSite": "E.g. mild redness at injection site",
   "goToSummary": "Go to Summary",
   "immunization": "Immunization",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
