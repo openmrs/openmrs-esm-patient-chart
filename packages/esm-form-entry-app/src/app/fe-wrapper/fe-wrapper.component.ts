@@ -219,7 +219,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           }
           return this.formSubmissionService.submitPayload(this.form);
         }),
-        switchMap(({ encounter }) => {
+        switchMap(({ encounters }) => {
+          const encounter = encounters?.[0]; // Get the first encounter
           this.onPostResponse(encounter);
           const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
 

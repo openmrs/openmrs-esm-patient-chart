@@ -25,9 +25,20 @@ export class FormPrepopulationService {
 
   private collectQuestionsForPrepopulation(form: Form): Set<Question> {
     const questionsSet = new Set<Question>();
-    for (const page of form.schema.pages) {
-      for (const section of page.sections) {
-        this.extractQuestionsWithRecentValues(section.questions, questionsSet);
+    for (const page of form?.schema?.pages) {
+      // Check if this page is a subform
+      if (page.isSubform && page.subform?.form?.pages) {
+        // Recursively process subform pages
+        for (const subformPage of page.subform.form.pages) {
+          for (const section of subformPage?.sections) {
+            this.extractQuestionsWithRecentValues(section.questions, questionsSet);
+          }
+        }
+      } else {
+        // Process regular pages
+        for (const section of page?.sections) {
+          this.extractQuestionsWithRecentValues(section.questions, questionsSet);
+        }
       }
     }
     return questionsSet;

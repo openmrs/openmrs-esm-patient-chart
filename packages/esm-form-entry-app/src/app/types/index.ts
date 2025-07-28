@@ -137,7 +137,7 @@ export interface FormSchema {
   encounterType: OpenmrsResource;
   formField: Array<unknown>;
   name: string;
-  pages: Array<{ label: string; sections: Array<Sections> }>;
+  pages: Array<FormPage>;
   processor: string;
   published: boolean;
   referencedForms: Array<unknown>;
@@ -146,6 +146,17 @@ export interface FormSchema {
   translations?: Record<string, string>;
   uuid: string;
   version: string;
+}
+
+export interface FormPage {
+  label: string;
+  sections: Array<Sections>;
+  isSubform?: boolean;
+  subform?: {
+    name: string;
+    package: string;
+    form: FormSchema;
+  };
 }
 
 export interface FormMetadataObject {
