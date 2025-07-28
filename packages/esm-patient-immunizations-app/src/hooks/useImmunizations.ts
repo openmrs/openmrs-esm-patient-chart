@@ -5,9 +5,9 @@ import { mapFromFHIRImmunizationBundle } from '../immunizations/immunization-map
 export function useImmunizations(patientUuid: string) {
   const immunizationsUrl = `${fhirBaseUrl}/Immunization?patient=${patientUuid}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll(immunizationsUrl);
+  const { data, error, isLoading, isValidating, mutate } = useFhirFetchAll<FHIRImmunizationResource>(immunizationsUrl);
 
-  const existingImmunizations = data ? mapFromFHIRImmunizationBundle(data as FHIRImmunizationResource[]) : [];
+  const existingImmunizations = data ? mapFromFHIRImmunizationBundle(data) : [];
 
   return {
     data: existingImmunizations,

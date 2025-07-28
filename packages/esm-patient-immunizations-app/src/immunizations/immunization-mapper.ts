@@ -7,7 +7,7 @@ import {
 } from '../types/fhir-immunization-domain';
 import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
-const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses => {
+const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses | null => {
   if (!immunizationResource) {
     return null;
   }
@@ -16,8 +16,8 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const lotNumber = immunizationResource?.lotNumber;
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
-  const occurrenceDateTime = immunizationResource?.occurrenceDateTime as any as string;
-  const expirationDate = immunizationResource?.expirationDate as any as string;
+  const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
+  const expirationDate = immunizationResource?.expirationDate?.toString();
   return {
     immunizationObsUuid,
     manufacturer,
@@ -29,14 +29,15 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   };
 };
 
-const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationResource) {
+const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationResource): Code | null {
   if (!immunizationResource?.vaccineCode?.coding) {
     return null;
   }
-
-  return find(immunizationResource.vaccineCode.coding, function (code: Code) {
-    return isUndefined(code.system);
-  });
+  return (
+    find(immunizationResource.vaccineCode.coding, function (code: Code) {
+      return isUndefined(code.system);
+    }) || null
+  );
 };
 
 export const mapFromFHIRImmunizationBundle = (
@@ -63,10 +64,10 @@ export const mapFromFHIRImmunizationBundle = (
   }
 
   const groupByImmunization = groupBy(immunizations, (immunizationResource) => {
-    return findCodeWithoutSystem(immunizationResource).code;
+    return findCodeWithoutSystem(immunizationResource)?.code;
   });
 
-  const validGroups = Object.entries(groupByImmunization).filter(([key]) => key && key !== 'undefined');
+  const validGroups = Object.entries(groupByImmunization).filter(([key]) => key);
 
   return validGroups.map(([key, immunizationsForOneVaccine]) => {
     const existingDoses: Array<ExistingDoses> = immunizationsForOneVaccine
@@ -78,7 +79,7 @@ export const mapFromFHIRImmunizationBundle = (
     return {
       vaccineName: codeWithoutSystem?.display,
       vaccineUuid: codeWithoutSystem?.code,
-      existingDoses: orderBy(existingDoses, [(dose) => get(dose, 'occurrenceDateTime')], ['desc']),
+      existingDoses: orderBy(existingDoses, [(dose) => dose.occurrenceDateTime], ['desc']),
     };
   });
 };
