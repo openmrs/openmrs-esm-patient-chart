@@ -10,7 +10,7 @@ import type {
   Observation,
 } from '../types';
 
-type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
+export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
   form: Form,
