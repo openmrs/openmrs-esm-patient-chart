@@ -128,15 +128,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
       try {
-        const {
-          vaccineUuid,
-          vaccinationDate,
-          doseNumber,
-          expirationDate,
-          lotNumber,
-          manufacturer,
-          note,
-        } = data;
+        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer, note } = data;
         const abortController = new AbortController();
 
         const immunization: ImmunizationFormData = {
@@ -190,7 +182,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       mutate,
     ],
   );
-return (
+  return (
     <FormProvider {...formProps}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={5} className={styles.container}>
@@ -255,7 +247,7 @@ return (
                       id="note"
                       invalidText={errors?.note?.message}
                       labelText={t('note', 'Note')}
-                      placeholder={t('immunizationNotePlaceholder', 'E.g. mild redness at injection site')}
+                      placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
                       maxCount={255}
                       value={value}
                       onChange={(evt) => onChange(evt.target.value)}

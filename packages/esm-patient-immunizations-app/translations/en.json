@@ -15,7 +15,7 @@
   "immunizationDeleted": "Immunization deleted",
   "immunizationDeletedSuccess": "Immunization dose deleted successfully",
   "immunizationDeleteError": "Failed to delete immunization: ",
-  "immunizationNotePlaceholder": "E.g. mild redness at injection site",
+  "immunizationNotePlaceholder": "For example: mild redness at injection site",
   "immunizations": "Immunizations",
   "Immunizations": "Immunizations",
   "immunizations__lower": "immunizations",
