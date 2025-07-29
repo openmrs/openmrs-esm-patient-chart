@@ -4,10 +4,6 @@
 
 .container {
   margin: layout.$spacing-05;
-
-  & section {
-    margin: layout.$spacing-05 0;
-  }
 }
 
 .form {
@@ -37,20 +33,6 @@
 .datePicker {
   :global(.cds--date-picker-input__wrapper) {
     inline-size: layout.$spacing-13;
-  }
-}
-
-.dateTimeSection {
-  display: flex;
-}
-
-.timePickerContainer {
-  display: flex;
-  flex-direction: column;
-}
-@media screen and (max-width: 600px) {
-  .dateTimeSection {
-    flex-direction: column;
   }
 }
 
