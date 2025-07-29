@@ -35,7 +35,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
           config: config,
         });
       }
-      return typeof obsValue === 'string' ? obsValue : obsValue?.name?.name ?? '--';
+      return typeof obsValue === 'string' || (typeof obsValue === 'number' && !isNaN(obsValue)) ? obsValue : obsValue?.name?.name ?? '--';
     },
     getSummaryObsValue: column.hasSummary
       ? (encounter: Encounter) => {
@@ -76,6 +76,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
               obsConcept: column.summaryConcept?.primaryConcept,
               isDate: column.summaryConcept?.isDate,
               config: config,
+              type: column.summaryConcept?.type,
             });
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';

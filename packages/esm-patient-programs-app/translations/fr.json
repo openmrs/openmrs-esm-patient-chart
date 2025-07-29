@@ -12,7 +12,7 @@
   "dateCompleted": "Date de fin",
   "dateEnrolled": "Date d'enregistrement",
   "delete": "Supprimer",
-  "deleteModalConfirmationText": "Are you sure you want to delete this program enrollment?",
+  "deleteModalConfirmationText": "Êtes-vous sûr de vouloir supprimer cette inscription au programme ?",
   "deletePatientProgramEnrollment": "Supprimer l'inscription au programme",
   "deleting": "Suppression en cours",
   "edit": "Modifier",
