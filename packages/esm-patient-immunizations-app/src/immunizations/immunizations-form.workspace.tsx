@@ -191,18 +191,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               name="vaccinationDate"
               control={control}
               render={({ field, fieldState }) => (
-                <div className={styles.row}>
-                  <OpenmrsDatePicker
-                    {...field}
-                    className={styles.datePicker}
-                    data-testid="vaccinationDate"
-                    id="vaccinationDate"
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                    labelText={t('vaccinationDate', 'Vaccination date')}
-                    maxDate={new Date()}
-                  />
-                </div>
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="vaccinationDate"
+                  id="vaccinationDate"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('vaccinationDate', 'Vaccination date')}
+                  maxDate={new Date()}
+                />
               )}
             />
           </ResponsiveWrapper>
@@ -211,22 +209,20 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               name="vaccineUuid"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <Dropdown
-                    disabled={!!immunizationToEditMeta}
-                    id="immunization"
-                    invalid={!!errors?.vaccineUuid}
-                    invalidText={errors?.vaccineUuid?.message}
-                    itemToString={(item) =>
-                      immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
-                    }
-                    items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
-                    label={t('selectImmunization', 'Select immunization')}
-                    onChange={(val) => onChange(val.selectedItem)}
-                    selectedItem={value}
-                    titleText={t('immunization', 'Immunization')}
-                  />
-                </div>
+                <Dropdown
+                  disabled={!!immunizationToEditMeta}
+                  id="immunization"
+                  invalid={!!errors?.vaccineUuid}
+                  invalidText={errors?.vaccineUuid?.message}
+                  itemToString={(item) =>
+                    immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
+                  }
+                  items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
+                  label={t('selectImmunization', 'Select immunization')}
+                  onChange={(val) => onChange(val.selectedItem)}
+                  selectedItem={value}
+                  titleText={t('immunization', 'Immunization')}
+                />
               )}
             />
           </ResponsiveWrapper>
@@ -235,43 +231,37 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <DoseInput vaccine={vaccineUuid} sequences={immunizationsConfig.sequenceDefinitions} control={control} />
             </ResponsiveWrapper>
           )}
-          <section>
-            <ResponsiveWrapper>
-              <Controller
-                name="note"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <div className={styles.row}>
-                    <TextArea
-                      enableCounter
-                      id="note"
-                      invalidText={errors?.note?.message}
-                      labelText={t('note', 'Note')}
-                      placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
-                      maxCount={255}
-                      value={value}
-                      onChange={(evt) => onChange(evt.target.value)}
-                    />
-                  </div>
-                )}
-              />
-            </ResponsiveWrapper>
-          </section>
-          <div className={styles.vaccineBatchHeading}> {t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
+          <ResponsiveWrapper>
+            <Controller
+              name="note"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextArea
+                  enableCounter
+                  id="note"
+                  invalidText={errors?.note?.message}
+                  labelText={t('note', 'Note')}
+                  maxCount={255}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
+                  value={value}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <div className={styles.vaccineBatchHeading}>{t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <ResponsiveWrapper>
             <Controller
               name="manufacturer"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <TextInput
-                    id="manufacturer"
-                    labelText={t('manufacturer', 'Manufacturer')}
-                    onChange={(evt) => onChange(evt.target.value)}
-                    type="text"
-                    value={value}
-                  />
-                </div>
+                <TextInput
+                  id="manufacturer"
+                  labelText={t('manufacturer', 'Manufacturer')}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  type="text"
+                  value={value}
+                />
               )}
             />
           </ResponsiveWrapper>
@@ -280,15 +270,13 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               name="lotNumber"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <TextInput
-                    id="lotNumber"
-                    labelText={t('lotNumber', 'Lot Number')}
-                    onChange={(evt) => onChange(evt.target.value)}
-                    type="text"
-                    value={value}
-                  />
-                </div>
+                <TextInput
+                  id="lotNumber"
+                  labelText={t('lotNumber', 'Lot Number')}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  type="text"
+                  value={value}
+                />
               )}
             />
           </ResponsiveWrapper>
@@ -297,18 +285,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               name="expirationDate"
               control={control}
               render={({ field, fieldState }) => (
-                <div className={styles.row}>
-                  <OpenmrsDatePicker
-                    {...field}
-                    className={styles.datePicker}
-                    data-testid="vaccinationExpiration"
-                    id="vaccinationExpiration"
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                    labelText={t('expirationDate', 'Expiration date')}
-                    minDate={immunizationToEditMeta ? null : new Date()}
-                  />
-                </div>
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="vaccinationExpiration"
+                  id="vaccinationExpiration"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('expirationDate', 'Expiration date')}
+                  minDate={immunizationToEditMeta ? null : new Date()}
+                />
               )}
             />
           </ResponsiveWrapper>
