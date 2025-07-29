@@ -133,7 +133,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           immunizationId: immunizationToEditMeta?.immunizationObsUuid,
           vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
           vaccineUuid: vaccineUuid,
-          vaccinationDate: dayjs(vaccinationDate).startOf('day').toDate(),
+          vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
           expirationDate,
           lotNumber,
