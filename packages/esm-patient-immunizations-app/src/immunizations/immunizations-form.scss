@@ -4,10 +4,6 @@
 
 .container {
   margin: layout.$spacing-05;
-
-  & section {
-    margin: layout.$spacing-05 0;
-  }
 }
 
 .form {
