@@ -26,8 +26,8 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
   }, [immunizations]);
 
   const headers = [
-    { key: 'vaccine', header: 'Vaccine' },
-    { key: 'doses', header: 'Doses' },
+    { key: 'vaccine', header: t('vaccine', 'Vaccine') },
+    { key: 'doses', header: t('doses', 'Doses') },
   ];
 
   const tableRows = useMemo(() => {
