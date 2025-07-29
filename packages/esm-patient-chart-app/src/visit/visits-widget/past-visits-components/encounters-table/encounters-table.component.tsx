@@ -32,6 +32,7 @@ import {
   showSnackbar,
   TrashCanIcon,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   userHasAccess,
   useSession,
@@ -82,6 +83,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
+  const disableInlineSummary = useFeatureFlag('disable-inline-o3-form-summary');
 
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
@@ -285,7 +287,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              {isFormAttached ? (
+                              {isFormAttached && !disableInlineSummary ? (
                                 <FormEngine
                                   mode="embedded-view"
                                   patientUUID={patientUuid}
