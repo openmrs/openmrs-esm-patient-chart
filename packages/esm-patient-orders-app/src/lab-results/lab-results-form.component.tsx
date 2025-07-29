@@ -97,6 +97,22 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 message: t('timeIsRequired', 'time is required'),
               });
             }
+
+            if (data.retrospectiveTime) {
+              const timeValue = data.retrospectiveTime;
+              const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
+              if (!pattern.test(timeValue)) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  path: ['retrospectiveTime'],
+                  message: t(
+                    'invalidTimeFormatMessage',
+                    'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
+                  ),
+                });
+              }
+            }
+
             if (!data.retrospectiveTimeFormat) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
@@ -365,29 +381,13 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               <Controller
                 name={'retrospectiveTime'}
                 control={control}
-                render={({ field: { onChange, value } }) => (
+                render={({ field: { onChange, value, onBlur } }) => (
                   <div className={styles.timePickerWrapper}>
                     <TimePicker
                       id={'retrospective-time-picker-input'}
                       labelText={t('time', 'Time')}
-                      onBlur={(event) => {
-                        const timeValue = event.target.value;
-                        if (timeValue) {
-                          const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
-                          if (!pattern.test(timeValue)) {
-                            setError('retrospectiveTime', {
-                              type: 'manual',
-                              message: t(
-                                'invalidTimeFormatMessage',
-                                'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
-                              ),
-                            });
-                            setValue('retrospectiveTime', '');
-                          }
-                        }
-                      }}
+                      onBlur={onBlur}
                       onChange={(event) => onChange(event.target.value)}
-                      pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
                       value={value}
                       className={styles.timePicker}
                       invalid={Boolean(errors.retrospectiveTime)}
