@@ -133,11 +133,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           immunizationId: immunizationToEditMeta?.immunizationObsUuid,
           vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
           vaccineUuid: vaccineUuid,
-          vaccinationDate: toDateObjectStrict(
-            toOmrsIsoString(
-              new Date(dayjs(vaccinationDate).year(), dayjs(vaccinationDate).month(), dayjs(vaccinationDate).date()),
-            ),
-          ),
+          vaccinationDate: dayjs(vaccinationDate).startOf('day').toDate(),
           doseNumber,
           expirationDate,
           lotNumber,
@@ -187,13 +183,13 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     <FormProvider {...formProps}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
         <Stack gap={1} className={styles.container}>
-          <section className={` ${styles.row}`}>
-            <div className={styles.dateSection}>
-              <ResponsiveWrapper>
-                <Controller
-                  name="vaccinationDate"
-                  control={control}
-                  render={({ field, fieldState }) => (
+          <section>
+            <ResponsiveWrapper>
+              <Controller
+                name="vaccinationDate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div className={styles.row}>
                     <OpenmrsDatePicker
                       {...field}
                       id="vaccinationDate"
@@ -204,10 +200,10 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                       invalid={Boolean(fieldState?.error?.message)}
                       invalidText={fieldState?.error?.message}
                     />
-                  )}
-                />
-              </ResponsiveWrapper>
-            </div>
+                  </div>
+                )}
+              />
+            </ResponsiveWrapper>
           </section>
           <section>
             <ResponsiveWrapper>
