@@ -40,6 +40,7 @@
   "fieldErrorDescriptionTitle": "أخطاء التحقق",
   "fileUploadDescription": "",
   "fileUploadDescriptionAny": "تحميل أي نوع من الملفات",
+  "formActionFailed": "Form action failed",
   "invalidWorkspaceName": "اسم مساحة العمل غير صالح.",
   "invalidWorkspaceNameSubtitle": "يرجى إدخال اسم صالح لمساحة العمل.",
   "launchWorkspace": "فتح مساحة العمل",

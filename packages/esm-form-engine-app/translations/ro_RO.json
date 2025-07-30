@@ -40,6 +40,7 @@
   "fieldErrorDescriptionTitle": "Erori de validare",
   "fileUploadDescription": "",
   "fileUploadDescriptionAny": "Încarcă orice tip de fișier",
+  "formActionFailed": "Acțiunea formularului a eșuat",
   "invalidWorkspaceName": "Nume spațiu de lucru invalid.",
   "invalidWorkspaceNameSubtitle": "Te rugăm să furnizezi un nume valid pentru spațiul de lucru.",
   "launchWorkspace": "Deschide spațiul de lucru",
