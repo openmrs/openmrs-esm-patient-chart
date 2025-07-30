@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
@@ -14,6 +14,7 @@ interface FormRendererProps extends DefaultPatientWorkspaceProps {
   formUuid: string;
   patientUuid: string;
   visit?: Visit;
+  visitUuid?: string;
   clinicalFormsWorkspaceName?: string;
 }
 
@@ -25,7 +26,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   formUuid,
   patientUuid,
   promptBeforeClosing,
-  visit,
+  visit: visitRaw,
+  visitUuid,
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -37,6 +39,15 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     closeWorkspace();
     !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchWorkspace(clinicalFormsWorkspaceName);
   }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose, clinicalFormsWorkspaceName]);
+
+  const visit = useMemo(() => {
+    if (visitRaw) {
+      return visitRaw;
+    }
+    if (visitUuid) {
+      return { uuid: visitUuid } as Visit;
+    }
+  }, [visitRaw, visitUuid]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
