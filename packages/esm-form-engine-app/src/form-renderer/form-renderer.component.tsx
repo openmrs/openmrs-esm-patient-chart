@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
-import { launchWorkspace, showModal, type Visit } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, type Visit, type Encounter } from '@openmrs/esm-framework';
 import { clinicalFormsWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
@@ -88,10 +88,13 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     [promptBeforeClosing],
   );
 
-  const handleOnSubmit = (encounter?: any) => {
-    closeWorkspaceWithSavedChanges?.();
-    handlePostResponse?.(encounter[0]);
-  };
+  const handleOnSubmit = useCallback(
+    (encounters?: Array<Encounter>) => {
+      closeWorkspaceWithSavedChanges?.();
+      handlePostResponse?.(encounters[0]);
+    },
+    [closeWorkspaceWithSavedChanges, handlePostResponse],
+  );
 
   if (isLoading) {
     return (
