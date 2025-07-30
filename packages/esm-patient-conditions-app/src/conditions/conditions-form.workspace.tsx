@@ -14,6 +14,7 @@ import styles from './conditions-form.scss';
 interface ConditionFormProps extends DefaultPatientWorkspaceProps {
   condition?: Condition;
   formContext: 'creating' | 'editing';
+  onConditionSave?: (data: Condition) => void;
 }
 
 const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
@@ -45,6 +46,7 @@ export type ConditionsFormSchema = z.infer<ReturnType<typeof createSchema>>;
 const ConditionsForm: React.FC<ConditionFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
+  onConditionSave,
   condition,
   formContext,
   patientUuid,
@@ -95,6 +97,7 @@ const ConditionsForm: React.FC<ConditionFormProps> = ({
       <Form className={styles.form} onSubmit={methods.handleSubmit(onSubmit, onError)}>
         <ConditionsWidget
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+          onConditionSave={onConditionSave}
           conditionToEdit={condition}
           isEditing={isEditing}
           isSubmittingForm={isSubmittingForm}
