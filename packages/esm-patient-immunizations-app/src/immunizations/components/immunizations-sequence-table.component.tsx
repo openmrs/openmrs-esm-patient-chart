@@ -54,6 +54,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
       },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
       { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
+      { key: 'note', header: t('note', 'Note') },
       { key: 'actions', header: t('actions', 'Actions') },
     ],
     [t, sequences.length],
@@ -74,8 +75,22 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
     sequence: !sequences.length
       ? dose.doseNumber || 0
       : sequences?.find((s) => s.sequenceNumber === dose.doseNumber)?.sequenceLabel || dose.doseNumber,
-    vaccinationDate: dose?.occurrenceDateTime && formatDate(new Date(dose.occurrenceDateTime)),
-    expirationDate: (dose?.expirationDate && formatDate(new Date(dose.expirationDate), { noToday: true })) || '--',
+    vaccinationDate:
+      dose?.occurrenceDateTime &&
+      formatDate(new Date(dose.occurrenceDateTime), {
+        mode: 'standard',
+        noToday: true,
+        time: false,
+      }),
+    expirationDate:
+      (dose?.expirationDate &&
+        formatDate(new Date(dose.expirationDate), {
+          mode: 'standard',
+          noToday: true,
+          time: false,
+        })) ||
+      '--',
+    note: dose?.note[0]?.text || '--',
     actions: (
       <div className={styles.actionButtons}>
         <IconButton
@@ -87,6 +102,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               immunizationId: dose.immunizationObsUuid,
               vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               doseNumber: dose.doseNumber,
+              note: dose.note[0]?.text,
               expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
               lotNumber: dose.lotNumber,
               manufacturer: dose.manufacturer,

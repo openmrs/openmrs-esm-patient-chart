@@ -110,8 +110,9 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
         const occurrenceDate = hasDoses
           ? `${t('lastDoseOn', 'Last dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
-              time: false,
+              mode: 'standard',
               noToday: true,
+              time: false,
             })}, ${sequenceLabel ?? `${t('dose', 'Dose')} ${latestDose.doseNumber}`}`
           : '';
 
@@ -130,6 +131,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   immunizationId: null,
                   vaccinationDate: null,
                   doseNumber: 0,
+                  note: null,
                   expirationDate: null,
                   lotNumber: null,
                   manufacturer: null,
