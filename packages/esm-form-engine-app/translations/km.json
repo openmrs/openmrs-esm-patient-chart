@@ -40,6 +40,7 @@
   "fieldErrorDescriptionTitle": "Validation Errors",
   "fileUploadDescription": "",
   "fileUploadDescriptionAny": "ផ្ទុកឡើងឯកសារប្រភេទណាមួយ",
+  "formActionFailed": "Form action failed",
   "invalidWorkspaceName": "Invalid workspace name.",
   "invalidWorkspaceNameSubtitle": "Please provide a valid workspace name.",
   "launchWorkspace": "Launch Workspace",

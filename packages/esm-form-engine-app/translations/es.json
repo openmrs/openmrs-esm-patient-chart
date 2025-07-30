@@ -40,6 +40,7 @@
   "fieldErrorDescriptionTitle": "Errores de Validación",
   "fileUploadDescription": "",
   "fileUploadDescriptionAny": "Subir cualquier tipo de archivo",
+  "formActionFailed": "Form action failed",
   "invalidWorkspaceName": "Nombre de espacio de trabajo inválido.",
   "invalidWorkspaceNameSubtitle": "Por favor, proporcione un nombre de espacio de trabajo válido.",
   "launchWorkspace": "Abrir Espacio de Trabajo",
