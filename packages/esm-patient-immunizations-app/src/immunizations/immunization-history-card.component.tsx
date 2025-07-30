@@ -1,19 +1,17 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton, Table, TableBody, TableCell, TableRow } from '@carbon/react';
+import { Table, TableBody, TableCell, TableRow } from '@carbon/react';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
-import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useImmunizations } from '../hooks/useImmunizations';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
 
 interface ImmunizationHistoryCardProps {
-  patientUuid: string;
+  immunizations: Immunization[];
 }
 
-const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patientUuid }) => {
+const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ immunizations }) => {
   const { t } = useTranslation();
-  const { data: immunizations, error, isLoading } = useImmunizations(patientUuid);
-  const headerTitle = t('immunizations', 'Immunizations');
   const pageSize = 5;
 
   const sortedImmunizations = useMemo(() => {
@@ -54,18 +52,6 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
   }, [sortedImmunizations, t]);
 
   const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
-
-  if (isLoading) {
-    return (
-      <div className={styles.widgetCard}>
-        <DataTableSkeleton role="progressbar" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <ErrorState error={error} headerTitle={headerTitle} />;
-  }
 
   return (
     <div className={styles.widgetCard}>
