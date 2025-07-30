@@ -2,7 +2,6 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 @use '@carbon/layout';
 
-
 .widgetCard {
   border: 1px solid $ui-03;
 }
@@ -12,14 +11,14 @@
 }
 
 .doseCell {
-  min-width: 10rem;
+  min-width: layout.$spacing-13;
   padding: layout.$spacing-03;
   display: inline-block;
   text-align: center;
 }
 
 .doseLabel {
-  margin-bottom: 0.5rem;
+  margin-bottom: layout.$spacing-03;
 }
 
 .doseDate {
