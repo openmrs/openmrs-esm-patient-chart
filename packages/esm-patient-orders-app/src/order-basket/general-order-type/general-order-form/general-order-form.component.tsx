@@ -30,7 +30,7 @@ import {
   useConfig,
   ExtensionSlot,
   OpenmrsDatePicker,
-  Workspace2DefinitionProps,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
@@ -46,12 +46,7 @@ export interface OrderFormProps {
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function OrderForm({
-  initialOrder,
-  orderTypeUuid,
-  closeWorkspace,
-  setHasUnsavedChanges,
-}: OrderFormProps) {
+export function OrderForm({ initialOrder, orderTypeUuid, closeWorkspace, setHasUnsavedChanges }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -129,16 +124,17 @@ export function OrderForm({
 
       setOrders(newOrders);
 
-      // TODO: Do not prompt
-      closeWorkspace();
+      closeWorkspace({ discardUnsavedChanges: true });
     },
     [orders, setOrders, session?.currentProvider?.uuid, initialOrder, closeWorkspace],
   );
 
   const cancelOrder = useCallback(() => {
-    // TODO: Do prompt, only do this setOrders thing if the prompt is confirmed
-    setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
-    closeWorkspace();
+    closeWorkspace().then((didClose: boolean) => {
+      if (didClose) {
+        setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
+      }
+    });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
   const onError = (errors: FieldErrors<OrderBasketItem>) => {

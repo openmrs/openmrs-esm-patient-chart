@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
-import EndVisitDialog from './end-visit-dialog.component';
+import EndVisitDialog from './end-visit-dialog.modal';
 
 const endVisitPayload = {
   stopDatetime: expect.any(Date),
