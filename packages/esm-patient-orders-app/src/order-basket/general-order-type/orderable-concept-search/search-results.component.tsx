@@ -9,7 +9,7 @@ import {
   ShoppingCartArrowDownIcon,
   useLayoutType,
   useSession,
-  launchWorkspace,
+  launchWorkspace2,
 } from '@openmrs/esm-framework';
 import {
   useOrderBasket,

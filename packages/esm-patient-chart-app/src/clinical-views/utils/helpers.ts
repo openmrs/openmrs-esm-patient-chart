@@ -1,4 +1,4 @@
-import { age, formatDate, launchWorkspace, parseDate, type Visit } from '@openmrs/esm-framework';
+import { age, formatDate, launchWorkspace2, parseDate, type Visit } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import type {
   ConfigConcepts,
@@ -25,7 +25,7 @@ export function launchEncounterForm(
   if (!visit && requireActiveVisitForEncounterTile) {
     launchStartVisitPrompt();
   } else
-    launchWorkspace('patient-form-entry-workspace', {
+    launchWorkspace2('patient-form-entry-workspace', {
       workspaceTitle: form?.display ?? form?.name,
       mutateForm: onFormSave,
       formInfo: {

@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { clinicalFormsWorkspace } from '@openmrs/esm-patient-common-lib';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import styles from './form-error.scss';
 
 interface FormErrorProps {
@@ -18,7 +18,7 @@ const FormError: React.FC<FormErrorProps> = ({
 
   const handleOpenFormList = () => {
     closeWorkspace();
-    launchWorkspace(clinicalFormsWorkspaceName);
+    launchWorkspace2(clinicalFormsWorkspaceName);
   };
 
   return (

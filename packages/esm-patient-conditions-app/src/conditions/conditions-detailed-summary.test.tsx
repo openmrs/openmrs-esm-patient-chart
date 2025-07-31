@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { launchWorkspace, openmrsFetch } from '@openmrs/esm-framework';
+import { launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';

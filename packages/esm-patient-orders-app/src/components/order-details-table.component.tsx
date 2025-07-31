@@ -52,7 +52,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
-  launchWorkspace,
+  launchWorkspace2,
   parseDate,
   PrinterIcon,
   useConfig,
@@ -647,7 +647,7 @@ function OrderBasketItemActions({
   }, [orderItem, openOrderForm, orders, setOrders]);
 
   const handleAddResultsClick = useCallback(() => {
-    launchWorkspace('test-results-form-workspace', { order: orderItem });
+    launchWorkspace2('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
 
   const handleCancelClick = useCallback(() => {

@@ -1,6 +1,6 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenuButton, DocumentIcon, launchWorkspace, useWorkspaces } from '@openmrs/esm-framework';
+import { ActionMenuButton, DocumentIcon, launchWorkspace2, useWorkspaces } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   formEntryWorkspace,
@@ -24,13 +24,13 @@ const ClinicalFormActionButton: React.FC = () => {
 
   const launchPatientWorkspaceCb = () => {
     if (isFormOpen) {
-      launchWorkspace(formEntryWorkspace, {
+      launchWorkspace2(formEntryWorkspace, {
         workspaceTitle: recentlyOpenedForm?.additionalProps?.['workspaceTitle'],
       });
     }
     // we aren't currently supporting keeping HTML Form workspaces open, but just in case
     else if (isHtmlFormOpen) {
-      launchWorkspace(htmlFormEntryWorkspace, {
+      launchWorkspace2(htmlFormEntryWorkspace, {
         workspaceTitle: recentlyOpenedHtmlForm?.additionalProps?.['workspaceTitle'],
       });
     } else {

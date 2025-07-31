@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, launchWorkspace, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace2, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';

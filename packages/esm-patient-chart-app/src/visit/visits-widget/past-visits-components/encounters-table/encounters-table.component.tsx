@@ -27,7 +27,7 @@ import {
 import {
   EditIcon,
   isDesktop,
-  launchWorkspace,
+  launchWorkspace2,
   showModal,
   showSnackbar,
   TrashCanIcon,
@@ -246,7 +246,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
                                       onClick={() => {
                                         if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
+                                          launchWorkspace2('visit-notes-form-workspace', {
                                             encounter,
                                             formContext: 'editing',
                                             patientUuid,
@@ -290,7 +290,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       kind="ghost"
                                       onClick={() => {
                                         if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
+                                          launchWorkspace2('visit-notes-form-workspace', {
                                             encounter,
                                             formContext: 'editing',
                                             patientUuid,

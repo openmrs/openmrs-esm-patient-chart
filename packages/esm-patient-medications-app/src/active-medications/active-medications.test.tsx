@@ -1,5 +1,5 @@
 import React from 'react';
-import { launchWorkspace, openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
@@ -10,7 +10,7 @@ const mockUseSession = jest.mocked(useSession);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
-  return () => mockLaunchWorkspace(name);
+  return () => mocklaunchWorkspace2(name);
 });
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 

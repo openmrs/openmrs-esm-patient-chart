@@ -7,7 +7,7 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
-  launchWorkspace,
+  launchWorkspace2,
   useConfig,
   useLayoutType,
   useSession,

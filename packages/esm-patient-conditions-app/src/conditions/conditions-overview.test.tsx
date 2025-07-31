@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
-  launchWorkspace,
+  launchWorkspace2,
   openmrsFetch,
   useConfig,
 } from '@openmrs/esm-framework';

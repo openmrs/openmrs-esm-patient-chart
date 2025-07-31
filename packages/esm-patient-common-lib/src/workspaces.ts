@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import {
-  launchWorkspace,
-  navigateAndLaunchWorkspace,
+  launchWorkspace2,
+  navigateAndlaunchWorkspace2,
   showModal,
   useFeatureFlag,
   type Workspace2DefinitionProps,
@@ -16,7 +16,8 @@ export interface PatientWorkspaceGroupProps {
   patientUuid: string;
 }
 
-export interface PatientWorkspace2DefinitionProps<WorkspaceProps, WindowProps> extends Workspace2DefinitionProps<WorkspaceProps, WindowProps, PatientWorkspaceGroupProps> {};
+export interface PatientWorkspace2DefinitionProps<WorkspaceProps, WindowProps>
+  extends Workspace2DefinitionProps<WorkspaceProps, WindowProps, PatientWorkspaceGroupProps> {}
 
 export function launchPatientChartWithWorkspaceOpen({
   patientUuid,
@@ -29,7 +30,7 @@ export function launchPatientChartWithWorkspaceOpen({
   dashboardName?: string;
   additionalProps?: object;
 }) {
-  navigateAndLaunchWorkspace({
+  navigateAndlaunchWorkspace2({
     targetUrl: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` + (dashboardName ? `/${dashboardName}` : ''),
     workspaceName: workspaceName,
     contextKey: `patient/${patientUuid}`,
@@ -39,12 +40,13 @@ export function launchPatientChartWithWorkspaceOpen({
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
   const startVisitIfNeeded = useStartVisitIfNeeded();
-  const launchPatientWorkspaceCb = useCallback((additionalProps?: T) => {
-    startVisitIfNeeded().then((didStartVisit) => {
-      if (didStartVisit) {
-        launchWorkspace(workspaceName, additionalProps);
-      }
-    });
+  const launchPatientWorkspaceCb = useCallback(
+    (additionalProps?: T) => {
+      startVisitIfNeeded().then((didStartVisit) => {
+        if (didStartVisit) {
+          launchWorkspace2(workspaceName, additionalProps);
+        }
+      });
     },
     [startVisitIfNeeded, workspaceName],
   );
@@ -57,32 +59,31 @@ export function useStartVisitIfNeeded() {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const startVisitIfNeeded = useCallback(
-    async (): Promise<boolean> => {
-      if (!systemVisitEnabled || currentVisit) {
-        return true;
-      } else {
-        return new Promise<boolean>((resolve) => {
-          if (isRdeEnabled) {
-              const dispose = showModal('visit-context-switcher', {
-                patientUuid,
-                closeModal: () => { dispose(); resolve(false); },
-                onAfterVisitSelected: () => {
-                  resolve(true);
-                },
-                size: 'sm',
-              });
-            } else {
-              const dispose = showModal('start-visit-dialog', {
-                closeModal: () => dispose(),
-                onVisitStarted: () => resolve(true),
-              });
-          }
-        });
-      }
-    },
-    [currentVisit, systemVisitEnabled, isRdeEnabled, patientUuid],
-  );
+  const startVisitIfNeeded = useCallback(async (): Promise<boolean> => {
+    if (!systemVisitEnabled || currentVisit) {
+      return true;
+    } else {
+      return new Promise<boolean>((resolve) => {
+        if (isRdeEnabled) {
+          const dispose = showModal('visit-context-switcher', {
+            patientUuid,
+            closeModal: () => {
+              dispose();
+              resolve(false);
+            },
+            onAfterVisitSelected: () => {
+              resolve(true);
+            },
+            size: 'sm',
+          });
+        } else {
+          const dispose = showModal('start-visit-dialog', {
+            closeModal: () => dispose(),
+            onVisitStarted: () => resolve(true),
+          });
+        }
+      });
+    }
+  }, [currentVisit, systemVisitEnabled, isRdeEnabled, patientUuid]);
   return startVisitIfNeeded;
-
 }

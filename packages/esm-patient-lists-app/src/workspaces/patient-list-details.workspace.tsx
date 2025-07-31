@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, formatDate, launchWorkspace, parseDate, Workspace2 } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, formatDate, launchWorkspace2, parseDate, Workspace2 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { type MappedList, usePatientListMembers } from '../patient-lists.resource';
 import PatientListDetailsTable from './patient-list-details-table.component';
@@ -16,11 +16,14 @@ function PatientListDetailsWorkspace({ list }: PatientListDetailsWorkspaceProps)
   const { listMembers, isLoading } = usePatientListMembers(list.id);
 
   const closeListDetailsWorkspace = useCallback(() => {
-    launchWorkspace('patient-lists');
+    launchWorkspace2('patient-lists');
   }, []);
 
   return (
-    <Workspace2 title={list.name || t('patientListDetailWorkspaceTitle', 'Patient List Details')} hasUnsavedChanges={false}>
+    <Workspace2
+      title={list.name || t('patientListDetailWorkspaceTitle', 'Patient List Details')}
+      hasUnsavedChanges={false}
+    >
       <main className={styles.container}>
         <section className={styles.header}>
           <h4 className={styles.description}>{list.description ?? '--'}</h4>

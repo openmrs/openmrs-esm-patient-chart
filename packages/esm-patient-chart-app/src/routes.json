@@ -236,6 +236,10 @@
     {
       "name": "start-visit",
       "group": "patient-chart"
+    },
+    {
+      "name": "form",
+      "group": "patient-chart"
     }
   ],
   "workspaceGroups2": [{

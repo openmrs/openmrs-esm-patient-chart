@@ -6,7 +6,7 @@ import {
   UserHasAccess,
   type Visit,
   getCoreTranslation,
-  launchWorkspace,
+  launchWorkspace2,
   useLayoutType,
 } from '@openmrs/esm-framework';
 
@@ -27,7 +27,7 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const editVisitDetails = () => {
-    launchWorkspace('start-visit-workspace-form', {
+    launchWorkspace2('start-visit-workspace-form', {
       workspaceTitle: t('editVisitDetails', 'Edit visit details'),
       visitToEdit: visit,
       openedFrom: 'patient-chart-edit-visit',

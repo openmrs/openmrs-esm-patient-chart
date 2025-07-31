@@ -19,7 +19,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import { launchWorkspace, useDebounce, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { launchWorkspace2, useDebounce, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
@@ -32,7 +32,7 @@ function PatientListsWorkspace() {
   const { patientLists, isLoading } = usePatientLists();
 
   const launchListDetailsWorkspace = useCallback((list) => {
-    launchWorkspace('patient-list-details', { list, workspaceTitle: list.name });
+    launchWorkspace2('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 
   const tableHeaders = [
@@ -89,66 +89,66 @@ function PatientListsWorkspace() {
     return (
       <Workspace2 title={t('patientListsWorkspaceTitle', 'Patient Lists')} hasUnsavedChanges={false}>
         <section className={styles.container}>
-        <DataTable headers={tableHeaders} rows={tableRows} size={responsiveSize} useZebraStyles>
-          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <>
-              <TableContainer className={styles.tableContainer}>
-                <div className={styles.toolbarWrapper}>
-                  <TableToolbar className={styles.tableToolbar}>
-                    <TableToolbarContent>
-                      <TableToolbarSearch
-                        className={styles.search}
-                        expanded
-                        onChange={handleSearchTermChange}
-                        placeholder={t('searchThisList', 'Search this list')}
-                        size={responsiveSize}
-                      />
-                    </TableToolbarContent>
-                  </TableToolbar>
-                </div>
-                {rows.length > 0 ? (
-                  <Table aria-label="patient lists" className={styles.table} {...getTableProps()}>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row) => {
-                        const currentList = patientLists?.find((list) => list?.id === row.id);
+          <DataTable headers={tableHeaders} rows={tableRows} size={responsiveSize} useZebraStyles>
+            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+              <>
+                <TableContainer className={styles.tableContainer}>
+                  <div className={styles.toolbarWrapper}>
+                    <TableToolbar className={styles.tableToolbar}>
+                      <TableToolbarContent>
+                        <TableToolbarSearch
+                          className={styles.search}
+                          expanded
+                          onChange={handleSearchTermChange}
+                          placeholder={t('searchThisList', 'Search this list')}
+                          size={responsiveSize}
+                        />
+                      </TableToolbarContent>
+                    </TableToolbar>
+                  </div>
+                  {rows.length > 0 ? (
+                    <Table aria-label="patient lists" className={styles.table} {...getTableProps()}>
+                      <TableHead>
+                        <TableRow>
+                          {headers.map((header) => (
+                            <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {rows.map((row) => {
+                          const currentList = patientLists?.find((list) => list?.id === row.id);
 
-                        return (
-                          <TableRow {...getRowProps({ row })} key={row.id}>
-                            <TableCell>
-                              <Link className={styles.link} onClick={() => launchListDetailsWorkspace(currentList)}>
-                                {currentList?.name ?? ''}
-                              </Link>
-                            </TableCell>
-                            <TableCell>{currentList?.type ?? ''}</TableCell>
-                            <TableCell>{currentList?.size ?? ''}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                          return (
+                            <TableRow {...getRowProps({ row })} key={row.id}>
+                              <TableCell>
+                                <Link className={styles.link} onClick={() => launchListDetailsWorkspace(currentList)}>
+                                  {currentList?.name ?? ''}
+                                </Link>
+                              </TableCell>
+                              <TableCell>{currentList?.type ?? ''}</TableCell>
+                              <TableCell>{currentList?.size ?? ''}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  ) : null}
+                </TableContainer>
+                {filteredLists?.length === 0 ? (
+                  <div className={styles.tileContainer}>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists to display')}</p>
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      </div>
+                    </Tile>
+                  </div>
                 ) : null}
-              </TableContainer>
-              {filteredLists?.length === 0 ? (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noMatchingListsFound', 'No matching lists to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
-                </div>
-              ) : null}
-            </>
-          )}
-        </DataTable>
-      </section>
+              </>
+            )}
+          </DataTable>
+        </section>
       </Workspace2>
     );
   }
