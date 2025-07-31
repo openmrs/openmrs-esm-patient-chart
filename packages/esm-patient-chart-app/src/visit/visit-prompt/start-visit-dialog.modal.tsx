@@ -9,9 +9,10 @@ interface StartVisitDialogProps {
   patientUuid: string;
   closeModal: () => void;
   launchPatientChart?: boolean;
+  onVisitStarted?: () => void;
 }
 
-const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeModal, launchPatientChart }) => {
+const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeModal, launchPatientChart, onVisitStarted }) => {
   const { t } = useTranslation();
 
   const handleStartNewVisit = useCallback(() => {
@@ -22,11 +23,11 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeM
         additionalProps: { openedFrom: 'patient-chart-start-visit' },
       });
     } else {
-      launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit' });
+      launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit', onVisitStarted });
     }
 
     closeModal();
-  }, [closeModal, patientUuid, launchPatientChart]);
+  }, [closeModal, patientUuid, launchPatientChart, onVisitStarted]);
 
   const modalHeaderText = t('noActiveVisit', 'No active visit');
 

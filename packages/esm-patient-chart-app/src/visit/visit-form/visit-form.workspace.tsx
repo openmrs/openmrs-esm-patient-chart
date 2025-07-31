@@ -78,6 +78,7 @@ interface VisitFormProps {
   openedFrom: string;
   showPatientHeader?: boolean;
   visitToEdit?: Visit;
+  onVisitStarted?: () => void;
 }
 
 /**
@@ -90,6 +91,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
   openedFrom,
   showPatientHeader = false,
   visitToEdit,
+  onVisitStarted,
   },
   groupProps: {
     patient,
@@ -339,6 +341,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
           })
           .then(() => {
             closeWorkspace({ discardUnsavedChanges: true });
+            onVisitStarted?.();
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
@@ -365,6 +368,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
               }),
               title: t('visitStarted', 'Visit started'),
             });
+            onVisitStarted?.();
           },
           (error: Error) => {
             showSnackbar({
@@ -388,6 +392,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
       handleVisitAttributes,
       isOnline,
       mutateCurrentVisit,
+      onVisitStarted,
       patientUuid,
       t,
       visitFormCallbacks,

@@ -76,22 +76,23 @@ export function useStartVisitIfNeeded() {
       if (!systemVisitEnabled || currentVisit) {
         return true;
       } else {
-        if (isRdeEnabled) {
-          return new Promise<boolean>((resolve) => {
-            const dispose = showModal('visit-context-switcher', {
-              patientUuid,
-              closeModal: () => { dispose(); resolve(false); },
-              onAfterVisitSelected: () => {
-                resolve(true);
-              },
-              size: 'sm',
-            });
-          });
-        } else {
-          launchStartVisitPrompt();
-          // TODO: give start visit prompt/form a callback so we can resolve true/false here.
-          return false;
-        }
+        return new Promise<boolean>((resolve) => {
+          if (isRdeEnabled) {
+              const dispose = showModal('visit-context-switcher', {
+                patientUuid,
+                closeModal: () => { dispose(); resolve(false); },
+                onAfterVisitSelected: () => {
+                  resolve(true);
+                },
+                size: 'sm',
+              });
+            } else {
+              const dispose = showModal('start-visit-dialog', {
+                closeModal: () => dispose(),
+                onVisitStarted: () => resolve(true),
+              });
+          }
+        });
       }
     },
     [currentVisit, systemVisitEnabled, isRdeEnabled, patientUuid],
