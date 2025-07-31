@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 // Get packages from command line arguments
 const packages = process.argv.slice(2);
@@ -8,6 +9,21 @@ if (packages.length === 0) {
   console.log('Usage: yarn serve <package1> <package2> ...');
   console.log('Example: yarn serve esm-patient-vitals-app esm-patient-notes-app');
   process.exit(1);
+}
+
+// Validate all packages exist before starting any
+const packagesDir = path.join(__dirname, '..', 'packages');
+for (const pkg of packages) {
+  const packagePath = path.join(packagesDir, pkg);
+  if (!fs.existsSync(packagePath)) {
+    console.error(`❌ Error: Package '${pkg}' does not exist at ${packagePath}`);
+    console.error(`Available packages:`);
+    const availablePackages = fs.readdirSync(packagesDir).filter(dir => 
+      fs.statSync(path.join(packagesDir, dir)).isDirectory()
+    );
+    availablePackages.forEach(p => console.error(`  - ${p}`));
+    process.exit(1);
+  }
 }
 
 console.log(`Starting serve for packages: ${packages.join(', ')}`);
