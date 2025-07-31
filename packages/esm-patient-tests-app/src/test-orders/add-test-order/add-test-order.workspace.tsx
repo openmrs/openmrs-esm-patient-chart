@@ -104,6 +104,7 @@ export default function AddLabOrderWorkspace({
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
           openLabForm={setCurrentLabOrder}
+          closeWorkspace={closeWorkspace}
         />
       )}
     </div>

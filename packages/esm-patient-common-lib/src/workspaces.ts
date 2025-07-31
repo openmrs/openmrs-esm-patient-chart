@@ -38,29 +38,15 @@ export function launchPatientChartWithWorkspaceOpen({
 }
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid } = usePatientChartStore();
-  const { systemVisitEnabled } = useSystemVisitSetting();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const isRdeEnabled = useFeatureFlag('rde');
-
-  const launchPatientWorkspaceCb = useCallback(
-    (additionalProps?: T) => {
-      if (!systemVisitEnabled || currentVisit) {
+  const startVisitIfNeeded = useStartVisitIfNeeded();
+  const launchPatientWorkspaceCb = useCallback((additionalProps?: T) => {
+    startVisitIfNeeded().then((didStartVisit) => {
+      if (didStartVisit) {
         launchWorkspace(workspaceName, additionalProps);
-      } else {
-        if (isRdeEnabled) {
-          const dispose = showModal('visit-context-switcher', {
-            patientUuid,
-            closeModal: () => dispose(),
-            onAfterVisitSelected: () => launchWorkspace(workspaceName, additionalProps),
-            size: 'sm',
-          });
-        } else {
-          launchStartVisitPrompt();
-        }
       }
+    });
     },
-    [currentVisit, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
+    [startVisitIfNeeded, workspaceName],
   );
   return launchPatientWorkspaceCb;
 }
