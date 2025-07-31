@@ -29,7 +29,7 @@ interface FormRendererProps
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   setTitle?: DefaultPatientWorkspaceProps['setTitle'];
   hideControls?: boolean;
-  handlePostResponse?: (encounter: any) => void;
+  handlePostResponse?: (encounter: Encounter) => void;
   preFilledQuestions?: Record<string, string>;
 }
 
