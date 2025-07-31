@@ -5,8 +5,8 @@ import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import { restBaseUrl, showSnackbar, useAbortController, useLayoutType, Workspace2, Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type Order, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
   createObservationPayload,
@@ -24,21 +24,17 @@ import { createLabResultsFormSchema } from './lab-results-schema.resource';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 
-export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
+export interface LabResultsFormProps {
   order: Order;
-  invalidateLabOrders?: () => void;
+  /** Callback to refresh lab orders in the Laboratory app after results are saved.
+   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
+   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
+   invalidateLabOrders?: () => void;
 }
 
-const LabResultsForm: React.FC<LabResultsFormProps> = ({
+const LabResultsForm: React.FC<PatientWorkspace2DefinitionProps<LabResultsFormProps, {}>> = ({
+  workspaceProps: { order, invalidateLabOrders },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  order,
-  promptBeforeClosing,
-  /* Callback to refresh lab orders in the Laboratory app after results are saved.
-   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
-   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
-   */
-  invalidateLabOrders,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -93,10 +89,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     }
   }, [concept, completeLabResult, order, setValue]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
-
   if (isLoadingConcepts) {
     return (
       <div className={styles.loaderContainer}>
@@ -147,7 +139,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       if (failedObsconceptUuids.length) {
         showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
       } else {
-        closeWorkspaceWithSavedChanges();
+        closeWorkspace({ discardUnsavedChanges: true });
         showNotification(
           'success',
           t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
@@ -188,7 +180,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         abortController,
       );
 
-      closeWorkspaceWithSavedChanges();
+      closeWorkspace({ discardUnsavedChanges: true });
       mutateOrderData();
       mutateResults();
       invalidateLabOrders?.();
@@ -207,6 +199,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   };
 
   return (
+    <Workspace2 title={t('enterTestResults', 'Enter test results')} hasUnsavedChanges={isDirty}>
     <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
       <Layer level={isTablet ? 1 : 0}>
         <div className={styles.grid}>
@@ -257,6 +250,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         </Button>
       </ButtonSet>
     </Form>
+    </Workspace2>
   );
 };
 

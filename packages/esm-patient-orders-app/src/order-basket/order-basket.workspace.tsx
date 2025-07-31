@@ -26,7 +26,7 @@ import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 import styles from './order-basket.scss';
 
-const OrderBasket: React.FC<PatientWorkspace2DefinitionProps> = ({
+const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   groupProps: { patientUuid },
   closeWorkspace,
   launchChildWorkspace,

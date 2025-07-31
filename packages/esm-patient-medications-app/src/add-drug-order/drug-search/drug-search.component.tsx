@@ -1,13 +1,12 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import {
   useConfig,
   useDebounce,
   ResponsiveWrapper,
-  closeWorkspace,
   useLayoutType,
-  launchWorkspace,
+  Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type DrugOrderBasketItem } from '../../types';
@@ -16,9 +15,10 @@ import styles from './order-basket-search.scss';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace']
 }
 
-export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
+export default function DrugSearch({ closeWorkspace, openOrderForm }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,16 +26,11 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
-  const cancelDrugOrder = useCallback(() => {
-    closeWorkspace('add-drug-order', {
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-    });
-  }, []);
-
   const focusAndClearSearchInput = () => {
     setSearchTerm('');
     searchInputRef.current?.focus();
   };
+
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -51,13 +46,14 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
       </ResponsiveWrapper>
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
+        closeWorkspace={closeWorkspace}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>
           <p className={styles.separator}>{t('or', 'or')}</p>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={cancelDrugOrder}>
+          <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

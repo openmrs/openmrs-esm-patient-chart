@@ -19,7 +19,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   priorityOptions,
-  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   type OrderUrgency,
   useOrderBasket,
@@ -31,17 +30,16 @@ import {
   useConfig,
   ExtensionSlot,
   OpenmrsDatePicker,
-  launchWorkspace,
   Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
 import styles from './general-order-form.scss';
 
-export interface OrderFormProps extends Pick<Workspace2DefinitionProps, 'closeWorkspace'> {
+export interface OrderFormProps {
   initialOrder: OrderBasketItem;
   orderTypeUuid: string;
-  orderableConceptSets: Array<string>;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
@@ -50,9 +48,9 @@ export interface OrderFormProps extends Pick<Workspace2DefinitionProps, 'closeWo
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
 export function OrderForm({
   initialOrder,
+  orderTypeUuid,
   closeWorkspace,
   setHasUnsavedChanges,
-  orderTypeUuid,
 }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -134,7 +132,7 @@ export function OrderForm({
       // TODO: Do not prompt
       closeWorkspace();
     },
-    [orders, setOrders, session?.currentProvider?.uuid, initialOrder],
+    [orders, setOrders, session?.currentProvider?.uuid, initialOrder, closeWorkspace],
   );
 
   const cancelOrder = useCallback(() => {

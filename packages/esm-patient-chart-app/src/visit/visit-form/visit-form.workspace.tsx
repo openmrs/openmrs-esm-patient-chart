@@ -41,7 +41,7 @@ import {
   createOfflineVisitForPatient,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
-  type DefaultPatientWorkspaceProps,
+  type PatientWorkspace2DefinitionProps,
 } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../config-schema';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
@@ -68,7 +68,7 @@ import styles from './visit-form.scss';
 
 dayjs.extend(isSameOrBefore);
 
-interface VisitFormProps extends DefaultPatientWorkspaceProps {
+interface VisitFormProps {
   /**
    * A unique string identifying where the visit form is opened from.
    * This string is passed into various extensions within the form to
@@ -79,18 +79,23 @@ interface VisitFormProps extends DefaultPatientWorkspaceProps {
   showPatientHeader?: boolean;
   visitToEdit?: Visit;
 }
+
 /**
  * This form is used for starting a new visit and for editing
  * an existing visit
  */
-const VisitForm: React.FC<VisitFormProps> = ({
+const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> = ({
   closeWorkspace,
-  handleReturnToSearchList,
+  workspaceProps: {handleReturnToSearchList,
   openedFrom,
-  patient,
-  patientUuid,
   showPatientHeader = false,
   visitToEdit,
+  },
+  groupProps: {
+    patient,
+    patientUuid,
+  }
+  
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -333,7 +338,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
             return Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
           })
           .then(() => {
-            closeWorkspace({ ignoreChanges: true });
+            closeWorkspace({ discardUnsavedChanges: true });
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
@@ -351,7 +356,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
-            closeWorkspace({ ignoreChanges: true });
+            closeWorkspace({ discardUnsavedChanges: true });
             showSnackbar({
               isLowContrast: true,
               kind: 'success',

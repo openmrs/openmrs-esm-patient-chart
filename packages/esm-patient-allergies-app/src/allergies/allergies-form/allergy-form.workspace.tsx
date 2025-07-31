@@ -22,8 +22,7 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper, Workspace2 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, showSnackbar, useConfig, useLayoutType, ResponsiveWrapper, Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import {
   type Allergen,
   type NewAllergy,
@@ -46,7 +45,7 @@ interface AllergyFormData {
   severityOfWorstReaction: string;
 }
 
-interface AllergyFormProps extends DefaultPatientWorkspaceProps {
+interface AllergyFormProps extends Workspace2DefinitionProps {
   allergy?: Allergy;
   formContext: 'creating' | 'editing';
 }
@@ -282,8 +281,6 @@ function AllergyForm({
       formValuesLoadedRef.current = true;
     }
   }, [allergy, formContext, getAllergyFormDefaultValues, inEditMode, isLoadingReactions, setValue]);
-
-
 
   const selectedAllergen = useWatch({
     control,
@@ -586,9 +583,9 @@ function AllergyForm({
               <span>{t('saveAndClose', 'Save and close')}</span>
             )}
           </Button>
-        </ButtonSet>
-      </div>
-    </Form>
+          </ButtonSet>
+        </div>
+      </Form>
     </Workspace2>
   );
 }

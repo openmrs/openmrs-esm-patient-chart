@@ -20,7 +20,7 @@ import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
-import { EmptyState, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps, EmptyState } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
   useLayoutType,
@@ -34,7 +34,7 @@ import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import { type ChartConfig } from '../config-schema';
 import styles from './mark-patient-deceased-form.scss';
 
-const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ closeWorkspace, groupProps: { patientUuid } }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);

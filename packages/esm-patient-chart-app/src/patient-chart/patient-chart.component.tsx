@@ -19,6 +19,8 @@ import SideMenuPanel from '../side-nav/side-menu.component';
 import { type LayoutMode } from './chart-review/dashboard-view.component';
 import styles from './patient-chart.scss';
 
+console.log("paging Major Tom")
+
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
@@ -31,13 +33,14 @@ const PatientChart: React.FC = () => {
   // patient search) must be updated in the callback, which is called when the patient
   // chart unmounts.
   useEffect(() => {
-    launchWorkspaceGroup2('patient-chart', { patientUuid });
+    console.log("launching patient-chart workspace group with props", state?.patientUuid, state?.patient?.id);
+    launchWorkspaceGroup2('patient-chart', state);
     setCurrentVisit(patientUuid, null);
     return () => {
       closeWorkspaceGroup2();
       setCurrentVisit(null, null);
     };
-  }, [patientUuid]);
+  }, [patientUuid, state]);
 
   useEffect(() => {
     getPatientChartStore().setState({ ...state });
@@ -45,6 +48,10 @@ const PatientChart: React.FC = () => {
       getPatientChartStore().setState({});
     };
   }, [state]);
+
+  useEffect(() => {
+    console.log('patientUuid', patientUuid);
+  }, [patientUuid]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
@@ -87,11 +94,6 @@ const PatientChart: React.FC = () => {
           </div>
         </>
       </main>
-      <WorkspaceContainer
-        showSiderailAndBottomNav
-        contextKey={`patient/${patientUuid}`}
-        additionalWorkspaceProps={state}
-      />
     </>
   );
 };

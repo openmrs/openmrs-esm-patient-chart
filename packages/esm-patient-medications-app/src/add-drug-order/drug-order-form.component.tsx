@@ -55,7 +55,7 @@ export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
-  promptBeforeClosing: (testFcn: () => boolean) => void;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 function useCreateMedicationOrderFormSchema() {
@@ -224,7 +224,7 @@ function InputWrapper({ children }) {
   );
 }
 
-export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
+export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, setHasUnsavedChanges }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
@@ -269,8 +269,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   });
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {

@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ComponentProps, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
@@ -8,17 +8,15 @@ import {
   ArrowLeftIcon,
   getPatientName,
   formatDate,
-  launchWorkspace,
   parseDate,
   useLayoutType,
   useConfig,
   Workspace2,
 } from '@openmrs/esm-framework';
 import {
-  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
+  PatientWorkspace2DefinitionProps,
   useOrderType,
-  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
@@ -31,33 +29,28 @@ export interface AddLabOrderWorkspaceAdditionalProps {
   orderTypeUuid: string;
 }
 
-export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
-
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddLabOrderWorkspace({
-  order: initialOrder,
-  orderTypeUuid,
+  groupProps: { patient },
+  workspaceProps: {order: initialOrder, orderTypeUuid, },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  setTitle,
-}: AddLabOrderWorkspace) {
+}: PatientWorkspace2DefinitionProps<AddLabOrderWorkspaceAdditionalProps, {}>) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { patientUuid, patient } = usePatientChartStore();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  useEffect(() => {
+  const title = useMemo(() => {
     if (orderType) {
-      setTitle(
-        t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
-          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
-        }),
-      );
+      t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
+        orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+      });
+    } else {
+      return "";
     }
-  }, [orderType, t, setTitle]);
+  }, [orderType, t]);
 
   const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
@@ -73,16 +66,8 @@ export default function AddLabOrderWorkspace({
 
   const patientName = patient ? getPatientName(patient) : '';
 
-  const cancelOrder = useCallback(() => {
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
-  }, [closeWorkspace]);
-
   return (
-    <Workspace2 title={t('addLabOrderWorkspaceTitle', 'Add lab order')} hasUnsavedChanges={false}>
+    <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
       <div className={styles.container}>
       {isTablet && (
         <div className={styles.patientHeader}>
@@ -100,7 +85,7 @@ export default function AddLabOrderWorkspace({
             renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription="Return to order basket"
             size="sm"
-            onClick={cancelOrder}
+            onClick={() => closeWorkspace()}
           >
             <span>{t('backToOrderBasket', 'Back to order basket')}</span>
           </Button>
@@ -109,12 +94,8 @@ export default function AddLabOrderWorkspace({
       {currentLabOrder ? (
         <LabOrderForm
           initialOrder={currentLabOrder}
-          patientUuid={patientUuid}
-          patient={patient}
           closeWorkspace={closeWorkspace}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          promptBeforeClosing={promptBeforeClosing}
-          setTitle={() => {}}
+          setHasUnsavedChanges={setHasUnsavedChanges}
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
         />

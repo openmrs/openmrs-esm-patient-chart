@@ -1,8 +1,8 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, launchWorkspace, useLayoutType, useSession, Workspace2 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { ArrowLeftIcon, useLayoutType, useSession, Workspace2 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import type { DrugOrderBasketItem } from '../types';
@@ -14,26 +14,17 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
 }
 
-export interface AddDrugOrderWorkspace extends DefaultPatientWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
-
 export default function AddDrugOrderWorkspace({
-  order: initialOrder,
+  workspaceProps: { order: initialOrder },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-}: AddDrugOrderWorkspace) {
+}: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, {}>) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
-
-  const cancelDrugOrder = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
-  }, [closeWorkspace]);
-
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
       const existingOrder = orders.find((order) => ordersEqual(order, searchResult));
@@ -62,22 +53,21 @@ export default function AddDrugOrderWorkspace({
         newOrders.push(finalizedOrder);
       }
       setOrders(newOrders);
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-      });
+      closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
   );
 
-  if (!currentOrder) {
-    return (
-      <Workspace2 title={t('addDrugOrderWorkspaceTitle', 'Add drug order')} hasUnsavedChanges={false}>
+  return (
+    <Workspace2 title={t('addDrugOrderWorkspaceTitle', 'Add drug order')} hasUnsavedChanges={hasUnsavedChanges}>
+      {!currentOrder ? (
+        <>
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
               iconDescription="Return to order basket"
               kind="ghost"
-              onClick={cancelDrugOrder}
+              onClick={() => closeWorkspace()}
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
               size="sm"
             >
@@ -85,16 +75,15 @@ export default function AddDrugOrderWorkspace({
             </Button>
           </div>
         )}
-        <DrugSearch openOrderForm={openOrderForm} />
-      </Workspace2>
-    );
-  } else {
-    return (
-      <DrugOrderForm
-        initialOrderBasketItem={currentOrder}
-        onSave={saveDrugOrder}
-        onCancel={cancelDrugOrder}
-      />
-    );
-  }
+        <DrugSearch closeWorkspace={closeWorkspace} openOrderForm={openOrderForm} />
+        </> ): (
+          <DrugOrderForm
+            initialOrderBasketItem={currentOrder}
+            onSave={saveDrugOrder}
+            onCancel={() => closeWorkspace()}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+          />
+        )}
+    </Workspace2>
+  );
 }

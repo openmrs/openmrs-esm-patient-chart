@@ -5,20 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextArea, ButtonSet, Column, Form, InlineNotification, Stack, InlineLoading } from '@carbon/react';
-import { OpenmrsDatePicker, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsDatePicker, showSnackbar, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { type Order, type PatientWorkspace2DefinitionProps, usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { cancelOrder } from './cancel-order.resource';
 import styles from './cancel-order-form.scss';
 
-interface OrderCancellationFormProps extends DefaultPatientWorkspaceProps {
+interface OrderCancellationFormProps {
   order: Order;
 }
 
-const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
-  order,
-  patientUuid,
+const OrderCancellationForm: React.FC<PatientWorkspace2DefinitionProps<OrderCancellationFormProps, {}>> = ({
+  workspaceProps: {order },
+  groupProps: {patientUuid},
   closeWorkspace,
-  promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -57,10 +56,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
     }
   }
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
-
   const cancelOrderRequest = useCallback(
     (data: CancelOrderFormData) => {
       const formData = data;
@@ -98,6 +93,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
   );
 
   return (
+    <Workspace2 title={t('orderCancellation','Order cancellation')} hasUnsavedChanges={isDirty}>
     <Form className={styles.form}>
       <div className={styles.grid}>
         <Stack>
@@ -174,6 +170,7 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
         </Button>
       </ButtonSet>
     </Form>
+    </Workspace2>
   );
 };
 

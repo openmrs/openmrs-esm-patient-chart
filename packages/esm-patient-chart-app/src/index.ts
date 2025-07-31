@@ -118,13 +118,11 @@ export const visitAttributeTags = getSyncLifecycle(visitAttributeTagsComponent, 
   moduleName,
 });
 
-// t('startVisitWorkspaceTitle', 'Start a visit')
 export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit-form/visit-form.workspace'), {
   featureName: 'start-visit-form',
   moduleName,
 });
 
-// t('markPatientDeceased', 'Mark patient deceased')
 export const markPatientDeceasedForm = getAsyncLifecycle(
   () => import('./mark-patient-deceased/mark-patient-deceased-form.workspace'),
   {

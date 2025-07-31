@@ -17,16 +17,13 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-// t('orderBasketWorkspaceTitle', 'Order Basket')
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
-// t('orderCancellation','Order cancellation')
 export const patientOrdersFormWorkspace = getAsyncLifecycle(
   () => import('./order-cancellation-form/cancel-order-form.component'),
   options,
 );
 
-// t('enterTestResults', 'Enter test results')
 export const testResultsFormWorkspace = getAsyncLifecycle(
   () => import('./lab-results/lab-results-form.component'),
   options,
@@ -38,6 +35,11 @@ export const orderPriceDetailsExtension = getAsyncLifecycle(
 );
 export const orderStockDetailsExtension = getAsyncLifecycle(
   () => import('./components/order-stock-details.component'),
+  options,
+);
+
+export const ShoppingCartIcon = getAsyncLifecycle(
+  () => import('./order-basket-action-button/order-basket-action-button.extension'),
   options,
 );
 

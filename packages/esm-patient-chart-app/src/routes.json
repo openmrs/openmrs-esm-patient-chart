@@ -231,5 +231,14 @@
       "component": "startVisitWorkspace",
       "window": "start-visit"
     }
-  ]
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "start-visit",
+      "group": "patient-chart"
+    }
+  ],
+  "workspaceGroups2": [{
+    "name":"patient-chart"
+  }]
 }

@@ -83,7 +83,7 @@
   "workspaceWindows2": [
     {
       "name": "order",
-      "icon": "shopping-cart",
+      "icon": "ShoppingCartIcon",
       "canHide": true,
       "group": "patient-chart",
       "order": 1

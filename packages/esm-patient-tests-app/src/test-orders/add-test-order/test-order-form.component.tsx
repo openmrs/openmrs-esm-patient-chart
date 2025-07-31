@@ -20,7 +20,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
-  type DefaultPatientWorkspaceProps,
   type OrderUrgency,
   priorityOptions,
   useOrderBasket,
@@ -28,11 +27,11 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
-  launchWorkspace,
   OpenmrsDatePicker,
   useConfig,
   useLayoutType,
   useSession,
+  Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import { ordersEqual } from './test-order';
@@ -40,10 +39,12 @@ import { type ConfigObject } from '../../config-schema';
 import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
+export interface LabOrderFormProps {
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   initialOrder: TestOrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 // Designs:
@@ -52,10 +53,8 @@ export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
 export function LabOrderForm({
   initialOrder,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
   orderTypeUuid,
-  orderableConceptSets,
+  setHasUnsavedChanges,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -156,20 +155,14 @@ export function LabOrderForm({
 
       setOrders(newOrders);
 
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-        closeWorkspaceGroup: false,
-      });
+      closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspace, initialOrder],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace();
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
   const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
@@ -189,8 +182,8 @@ export function LabOrderForm({
   };
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
 

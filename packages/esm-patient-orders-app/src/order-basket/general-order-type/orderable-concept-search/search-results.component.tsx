@@ -4,8 +4,8 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { Tile, Button, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
+  type Workspace2DefinitionProps,
   ArrowRightIcon,
-  type DefaultWorkspaceProps,
   ShoppingCartArrowDownIcon,
   useLayoutType,
   useSession,
@@ -27,6 +27,7 @@ interface OrderableConceptSearchResultsProps {
   cancelOrder: () => void;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
 const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps> = ({
@@ -36,6 +37,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   cancelOrder,
   orderableConceptSets,
   orderTypeUuid,
+  closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -86,6 +88,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
                 openOrderForm={openOrderForm}
                 concept={concept}
                 orderTypeUuid={orderTypeUuid}
+                closeWorkspace={closeWorkspace}
               />
             ))}
           </div>
@@ -150,7 +153,7 @@ interface TestTypeSearchResultItemProps {
   concept: OrderableConcept;
   openOrderForm: (searchResult: OrderBasketItem) => void;
   orderTypeUuid: string;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
@@ -180,11 +183,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     const orderBasketItem = createOrderBasketItem(concept);
     orderBasketItem.isOrderIncomplete = true;
     setOrders([...orders, orderBasketItem]);
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace({ discardUnsavedChanges: true });
   }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace]);
 
   const removeFromBasket = useCallback(() => {
