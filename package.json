@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "serve": "node tools/serve.js",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag next",
     "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@latest",
@@ -84,7 +85,13 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "@openmrs/esm-styleguide": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-styleguide",
+    "@openmrs/esm-dynamic-loading": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-dynamic-loading",
+    "@openmrs/esm-extensions": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-extensions",
+    "@openmrs/esm-react-utils": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-react-utils",
+    "@openmrs/esm-routes": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-routes",
+    "@openmrs/esm-globals": "portal:/home/brandon/Code/openmrs/mf/openmrs-esm-core/packages/framework/esm-globals"
   },
   "packageManager": "yarn@4.9.1"
 }
