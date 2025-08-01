@@ -4,6 +4,7 @@ import { type TFunction, useTranslation } from 'react-i18next';
 import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
 import {
   ExtensionSlot,
+  parseDate,
   showModal,
   showSnackbar,
   useConfig,
@@ -12,6 +13,8 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import {
+  type amPm,
+  convertTime12to24,
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   postOrders,
@@ -22,6 +25,7 @@ import {
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import GeneralOrderType from './general-order-type/general-order-type.component';
+import { format, isWithinInterval, parse, set } from 'date-fns';
 import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
@@ -35,6 +39,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const config = useConfig<ConfigObject>();
   const session = useSession();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const currentVisitIsRetrospective = Boolean(currentVisit?.stopDatetime);
+
   const { orders, clearOrders } = useOrderBasket();
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -46,6 +52,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   } = useOrderEncounter(patientUuid, config.orderEncounterType);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
+  const [hasRdeDateBoundsError, setHasRdeDateBoundsError] = useState(false);
+  const [rdeDate, setRdeDate] = useState<Date>();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
 
@@ -60,13 +68,69 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     });
   }, [patientUuid]);
 
+  const handleRdeDateTimeChange = useCallback(
+    (dateTime: { retrospectiveDate: Date; retrospectiveTime: string; retrospectiveTimeFormat: amPm }) => {
+      if (!dateTime.retrospectiveDate || !dateTime.retrospectiveTime || !dateTime.retrospectiveTimeFormat) {
+        setRdeDate(undefined);
+        return;
+      }
+
+      let [hour, minute] = convertTime12to24(dateTime.retrospectiveTime, dateTime.retrospectiveTimeFormat);
+
+      const completeDate = set(dateTime.retrospectiveDate, {
+        hours: hour,
+        minutes: minute,
+        seconds: 0,
+        milliseconds: 0,
+      });
+
+      setRdeDate(completeDate);
+
+      if (!currentVisit) {
+        return;
+      }
+
+      // check if the date is within the bounds of the current visit
+      const isWithinBounds = isWithinInterval(completeDate, {
+        // setting seconds to 0 for consistency to avoid issues like 2023-10-01T00:00:00.000Z vs 2023-10-01T00:00:09.000Z
+        start: set(new Date(currentVisit.startDatetime), { seconds: 0 }),
+        end: currentVisit.stopDatetime ? new Date(currentVisit.stopDatetime) : new Date(),
+      });
+
+      if (!isWithinBounds) {
+        setHasRdeDateBoundsError(true);
+        return;
+      }
+
+      if (isWithinBounds && hasRdeDateBoundsError) {
+        setHasRdeDateBoundsError(false);
+      }
+    },
+    [currentVisit, hasRdeDateBoundsError],
+  );
+
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
     setCreatingEncounterError('');
     let orderEncounterUuid = encounterUuid;
+    if (hasRdeDateBoundsError && currentVisit) {
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: t('orderDateOutOfBounds', 'Order date is out of bounds'),
+        subtitle: t('orderDateOutOfBoundsMessage', `The order date must be within {{startDate}} and {{endDate}}.`, {
+          startDate: format(currentVisit.startDatetime, 'PPP hh:mm a'),
+          endDate: currentVisit.stopDatetime
+            ? format(currentVisit.stopDatetime, 'PPP hh:mm a')
+            : t('currentDate', 'current date'),
+        }),
+      });
+      return;
+    }
     setIsSavingOrders(true);
-    // If there's no encounter present, create an encounter along with the orders.
-    if (!orderEncounterUuid) {
+
+    // If there's no encounter present or we are adding retrospective data, create an encounter along with the orders.
+    if (!orderEncounterUuid || rdeDate) {
       try {
         await postOrdersOnNewEncounter(
           patientUuid,
@@ -74,6 +138,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           visitRequired ? currentVisit : null,
           session?.sessionLocation?.uuid,
           abortController,
+          rdeDate,
         );
         mutateEncounterUuid();
         // Only revalidate current visit since orders create new encounters
@@ -105,19 +170,21 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
-    currentVisit,
-    visitRequired,
-    clearOrders,
-    closeWorkspaceWithSavedChanges,
-    config,
     encounterUuid,
+    patientUuid,
+    config?.orderEncounterType,
+    visitRequired,
+    currentVisit,
+    session?.sessionLocation?.uuid,
+    rdeDate,
     mutateEncounterUuid,
+    clearOrders,
     mutateOrders,
     mutateCurrentVisit,
     orders,
-    patientUuid,
-    session,
     t,
+    closeWorkspaceWithSavedChanges,
+    hasRdeDateBoundsError,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -128,6 +195,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     <>
       <div className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
@@ -147,6 +215,10 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 />
               </div>
             ))}
+          <ExtensionSlot
+            name="restrospective-date-time-picker-slot"
+            state={{ patientUuid, onChange: handleRdeDateTimeChange }}
+          />
         </div>
 
         <div>
@@ -155,6 +227,24 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
               kind="error"
               title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
               subtitle={creatingEncounterError}
+              lowContrast={true}
+              className={styles.inlineNotification}
+            />
+          )}
+          {hasRdeDateBoundsError && currentVisit && (
+            <InlineNotification
+              kind="error"
+              title={t('orderDateOutOfBounds', 'Order date is out of bounds')}
+              subtitle={t(
+                'orderDateOutOfBoundsMessage',
+                `The order date must be within {{startDate}} and {{endDate}}.`,
+                {
+                  startDate: format(currentVisit!.startDatetime, 'PPP hh:mm a'),
+                  endDate: currentVisit!.stopDatetime
+                    ? format(currentVisit!.stopDatetime, 'PPP hh:mm a')
+                    : t('currentDate', 'current date'),
+                },
+              )}
               lowContrast={true}
               className={styles.inlineNotification}
             />
@@ -181,7 +271,8 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (visitRequired && !currentVisit) ||
-                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
+                (currentVisitIsRetrospective && !rdeDate)
               }
             >
               {isSavingOrders ? (
