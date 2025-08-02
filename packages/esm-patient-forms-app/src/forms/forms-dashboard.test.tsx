@@ -12,11 +12,23 @@ const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
 jest.mock('../hooks/use-forms', () => ({
-  useForms: jest.fn().mockReturnValueOnce({
+  useForms: jest.fn().mockReturnValue({
     data: [],
     error: null,
     isValidating: false,
     allForms: [],
+  }),
+  useInfiniteForms: jest.fn().mockReturnValue({
+    data: [],
+    error: null,
+    isValidating: false,
+    isLoading: false,
+    loadMore: jest.fn(),
+    canLoadMore: false,
+    hasMore: false,
+    allForms: [],
+    mutateForms: jest.fn(),
+    totalLoaded: 0,
   }),
 }));
 
@@ -29,10 +41,40 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), htmlFormEntryForms: [] });
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  htmlFormEntryForms: [],
+  enableInfiniteScrolling: false,
+});
 
 describe('FormsDashboard', () => {
   test('renders an empty state if there are no forms persisted on the server', async () => {
+    mockUseVisitOrOfflineVisit.mockReturnValue({
+      currentVisit: mockCurrentVisit,
+      error: null,
+    });
+
+    render(
+      <FormsDashboard
+        promptBeforeClosing={jest.fn()}
+        closeWorkspace={jest.fn()}
+        closeWorkspaceWithSavedChanges={jest.fn()}
+        patientUuid={mockPatient.id}
+        patient={mockPatient}
+        setTitle={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
+  });
+
+  test('renders an empty state when infinite scrolling is enabled', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      htmlFormEntryForms: [],
+      enableInfiniteScrolling: true,
+    });
+
     mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
       error: null,
