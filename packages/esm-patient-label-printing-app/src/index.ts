@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  messageOmrsServiceWorker,
-  registerFeatureFlag,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 const moduleName = '@openmrs/esm-patient-label-printing-app';
@@ -12,11 +6,6 @@ const moduleName = '@openmrs/esm-patient-label-printing-app';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/relationship.+`,
-  });
-
   registerFeatureFlag(
     'print-patient-identifier-sticker',
     'Print patient identifier sticker',
