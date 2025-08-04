@@ -14,7 +14,7 @@
       "component": "immunizationHistorySummary",
       "slot": "patient-chart-immunizations-dashboard-slot",
       "meta": {
-         "fullWidth": true
+        "fullWidth": true
       }
     },
     {
