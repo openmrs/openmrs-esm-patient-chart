@@ -1,4 +1,4 @@
-:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNTQxNWFkNmVlZDk5NDFhMGJlOTE1ZjAzM2NkY2U0YTEiLCJwIjoiYyJ9) :teacher:	
+:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/x/IABBHg) :teacher:
 
 ![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
 
@@ -8,17 +8,18 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 
 - [Allergies](packages/esm-patient-allergies-app/README.md)
 - [Attachments](packages/esm-patient-attachments-app/README.md)
-- [Biometrics](packages/esm-patient-biometrics-app/README.md)
 - [Conditions](packages/esm-patient-conditions-app/README.md)
+- [Flags](packages/esm-patient-flags-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
+- [Lists](packages/esm-patient-lists-app/README.md)
 - [Medications](packages/esm-patient-medications-app/README.md)
 - [Notes](packages/esm-patient-notes-app/README.md)
+- [Orders](packages/esm-patient-orders-app/README.md)
 - [Patient banner](packages/esm-patient-banner-app/README.md)
-- [Patient chart](packages/esm-patient-chart-app/README.md)
 - [Programs](packages/esm-patient-programs-app/README.md)
 - [Tests](packages/esm-patient-tests-app/README.md)
-- [Vitals](packages/esm-patient-vitals-app/README.md)
+- [Vitals and Biometrics](packages/esm-patient-vitals-app/README.md)
 
 In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
 
@@ -27,7 +28,7 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 ## Setup
 
-Check out the developer documentation [here](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNTQxNWFkNmVlZDk5NDFhMGJlOTE1ZjAzM2NkY2U0YTEiLCJwIjoiYyJ9).
+Check out the developer documentation [in the Wiki](https://openmrs.atlassian.net/wiki/x/IABBHg).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
@@ -53,7 +54,7 @@ You could run `yarn start` with as many `sources` arguments as you require. For 
 yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/esm-patient-vitals-app'
 ```
 
-Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiMWM1ZTQ2NzcxNTIyNGQxODljZDQyMTUzMTZkMzdkNjEiLCJwIjoiYyJ9).
+Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962685/Develop+Frontend+Modules#Using-import-map-overrides).
 
 ## Running tests
 
@@ -109,7 +110,7 @@ To run end-to-end tests, run:
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962731/Testing+Frontend+Modules+O3#End-to-end-testing-with-Playwright) to learn more about End-to-End tests in this project.
+Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 
@@ -162,4 +163,4 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 
 ## Deployment
 
-See [Creating a Distribution](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNjJmYTBhZDY2ZjBkNDdlZGE2ZDBkNzIxNDlkYjg0ZjIiLCJwIjoiYyJ9) for information about adding microfrontends to a distribution.
+See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.
