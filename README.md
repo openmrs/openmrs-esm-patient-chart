@@ -1,4 +1,4 @@
-:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
+:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNTQxNWFkNmVlZDk5NDFhMGJlOTE1ZjAzM2NkY2U0YTEiLCJwIjoiYyJ9) :teacher:	
 
 ![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
 
@@ -27,7 +27,7 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 ## Setup
 
-Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
+Check out the developer documentation [here](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNTQxNWFkNmVlZDk5NDFhMGJlOTE1ZjAzM2NkY2U0YTEiLCJwIjoiYyJ9).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
@@ -53,7 +53,7 @@ You could run `yarn start` with as many `sources` arguments as you require. For 
 yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/esm-patient-vitals-app'
 ```
 
-Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
+Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiMWM1ZTQ2NzcxNTIyNGQxODljZDQyMTUzMTZkMzdkNjEiLCJwIjoiYyJ9).
 
 ## Running tests
 
@@ -109,7 +109,7 @@ To run end-to-end tests, run:
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) to learn more about End-to-End tests in this project.
+Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962731/Testing+Frontend+Modules+O3#End-to-end-testing-with-Playwright) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 
@@ -162,4 +162,4 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 
 ## Deployment
 
-See [Creating a Distribution](http://o3-dev.docs.openmrs.org/#/main/distribution?id=creating-a-distribution) for information about adding microfrontends to a distribution.
+See [Creating a Distribution](https://openmrs.atlassian.net/wiki/spaces/docs/pages/507576352/O3+Developer+Docs?atlOrigin=eyJpIjoiNjJmYTBhZDY2ZjBkNDdlZGE2ZDBkNzIxNDlkYjg0ZjIiLCJwIjoiYyJ9) for information about adding microfrontends to a distribution.
