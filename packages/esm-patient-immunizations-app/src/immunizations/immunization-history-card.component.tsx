@@ -3,16 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Table, TableBody, TableCell, TableRow } from '@carbon/react';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useImmunizations } from '../hooks/useImmunizations';
+import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
 
 interface ImmunizationHistoryCardProps {
-  patientUuid: string;
+  error?: Error | null;
+  immunizations?: Immunization[];
+  isLoading?: boolean;
 }
 
-const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patientUuid }) => {
+const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error, immunizations, isLoading }) => {
   const { t } = useTranslation();
-  const { data: immunizations, error, isLoading } = useImmunizations(patientUuid);
+
   const headerTitle = t('immunizations', 'Immunizations');
   const pageSize = 5;
 
@@ -34,11 +36,9 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ patie
     return (sortedImmunizations || []).map((immunization) => ({
       id: immunization.vaccineUuid,
       vaccine: immunization.vaccineName,
-      doses: immunization.existingDoses.map((dose, index) => (
+      doses: immunization.existingDoses.map((dose) => (
         <div key={dose.immunizationObsUuid} className={styles.doseCell}>
-          <div className={styles.doseLabel}>
-            {t('dose', 'Dose')} {`${dose.doseNumber}`}
-          </div>
+          <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
           {dose.occurrenceDateTime && (
             <div className={styles.doseDate}>
               {formatDate(parseDate(dose.occurrenceDateTime), {
