@@ -41,7 +41,10 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
   );
 }
 
-export function useOrderEncounter(patientUuid: string): {
+export function useOrderEncounter(
+  patientUuid: string,
+  encounterTypeUuid: string,
+): {
   visitRequired: boolean;
   isLoading: boolean;
   error: Error;
@@ -54,7 +57,7 @@ export function useOrderEncounter(patientUuid: string): {
   const nowDateString = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
   const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
     !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
-      ? `${restBaseUrl}/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${encounterTypeUuid}&fromdate=${nowDateString}&limit=1`
       : null,
     openmrsFetch,
   );
@@ -74,7 +77,9 @@ export function useOrderEncounter(patientUuid: string): {
       ? {
           visitRequired: true,
           isLoading: visit?.isLoading,
-          encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
+          encounterUuid: visit?.currentVisit?.encounters?.find(
+            (encounter) => encounter.encounterType?.uuid === encounterTypeUuid,
+          )?.uuid,
           error: visit?.error,
           mutate: visit?.mutate,
         }
@@ -85,6 +90,13 @@ export function useOrderEncounter(patientUuid: string): {
           error: todayEncounter?.error,
           mutate: todayEncounter?.mutate,
         };
-  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
+  }, [
+    isLoadingSystemVisitSetting,
+    errorFetchingSystemVisitSetting,
+    visit,
+    todayEncounter,
+    systemVisitEnabled,
+    encounterTypeUuid,
+  ]);
   return results;
 }
