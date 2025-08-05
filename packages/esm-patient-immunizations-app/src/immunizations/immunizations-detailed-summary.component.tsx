@@ -185,7 +185,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             getExpandHeaderProps,
           }) => (
             <TableContainer>
-              <Table aria-label="immunizations summary" size={isTablet ? 'lg' : 'sm'} {...getTableProps()}>
+              <Table aria-label="immunizations summary" size={isTablet ? 'md' : 'sm'} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
