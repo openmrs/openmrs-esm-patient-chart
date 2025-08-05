@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Table, TableBody, TableCell, TableRow } from '@carbon/react';
-import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
@@ -17,6 +17,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
 
   const headerTitle = t('immunizations', 'Immunizations');
   const pageSize = 5;
+  const isTablet = useLayoutType() === 'tablet';
 
   const sortedImmunizations = useMemo(() => {
     return (immunizations || []).map((immunization) => ({
@@ -77,11 +78,16 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
         ))}
       </div>
 
-      <div>
-        <Table size="xl" useZebraStyles={false} aria-label={t('immunizationHistory', 'Immunization history')}>
-          <TableBody className={styles.tableBody}>
+      <div className={styles.content}>
+        <Table
+          size={isTablet ? 'md' : 'sm'}
+          useZebraStyles={false}
+          aria-label={t('immunizationHistory', 'Immunization history')}
+          isSortable={false}
+        >
+          <TableBody>
             {paginatedRows?.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className={styles.tableRow}>
                 <TableCell className={styles.vaccineNameCell}>
                   <div className={styles.vaccineNameContent}>
                     <strong>{row.vaccine}</strong>

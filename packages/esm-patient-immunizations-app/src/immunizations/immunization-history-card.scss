@@ -4,6 +4,14 @@
 
 .widgetCard {
   border: 1px solid $ui-03;
+  @media (min-width: 1025px) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    max-width: 875px;
+    margin: 0 auto;
+  }
 }
 
 .content {
@@ -40,7 +48,7 @@
   display: inline-block;
   text-align: center;
   font-weight: bold;
-  position: sticky;
+  position: static;
   left: 0;
   background-color: $ui-01;
 }
