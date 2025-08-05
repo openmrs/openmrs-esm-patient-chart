@@ -135,7 +135,7 @@
   "selectLocation": "Seleccione una ubicación",
   "selectProgramType": "Seleccione el tipo de programa",
   "selectVisitType": "Por favor, seleccione el tipo de consulta",
-  "showVisitOnOrPriorTo": "Mostrar consultas en o antes de:",
+  "showVisitWithStartDateOnOrPriorTo": "Show visit with start date on or prior to:",
   "startDate": "Fecha de inicio",
   "startingVisit": "Iniciando consulta",
   "startNewVisit": "Iniciar nueva consulta",
