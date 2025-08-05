@@ -78,7 +78,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
         ))}
       </div>
 
-      <div className={styles.content}>
+      <div>
         <Table
           size={isTablet ? 'md' : 'sm'}
           useZebraStyles={false}
