@@ -87,7 +87,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
         >
           <TableBody>
             {paginatedRows?.map((row) => (
-              <TableRow key={row.id} className={styles.tableRow}>
+              <TableRow key={row.id}>
                 <TableCell className={styles.vaccineNameCell}>
                   <div className={styles.vaccineNameContent}>
                     <strong>{row.vaccine}</strong>
