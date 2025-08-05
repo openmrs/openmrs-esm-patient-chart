@@ -135,7 +135,7 @@
   "selectLocation": "选择地点",
   "selectProgramType": "选择项目类型",
   "selectVisitType": "请选择就诊类型",
-  "showVisitOnOrPriorTo": "Show visit on or prior to:",
+  "showVisitWithStartDateOnOrPriorTo": "Show visit with start date on or prior to:",
   "startDate": "Start date",
   "startingVisit": "开始就诊中",
   "startNewVisit": "开始新的就诊",

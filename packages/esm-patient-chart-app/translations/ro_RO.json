@@ -135,7 +135,7 @@
   "selectLocation": "Selecteaza o locatie",
   "selectProgramType": "Selecteaza tip program",
   "selectVisitType": "Selecteaza tip vizita",
-  "showVisitOnOrPriorTo": "Afiseaza vizitele pana la:",
+  "showVisitWithStartDateOnOrPriorTo": "Show visit with start date on or prior to:",
   "startDate": "Data inceput",
   "startingVisit": "Pornire vizita",
   "startNewVisit": "Porneste vizita noua",
