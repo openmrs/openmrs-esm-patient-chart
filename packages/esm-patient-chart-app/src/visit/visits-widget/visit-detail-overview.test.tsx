@@ -12,12 +12,6 @@ import {
   usePaginatedEncounters,
 } from './past-visits-components/encounters-table/encounters-table.resource';
 
-jest.mock('@openmrs/esm-form-engine-lib', () => ({
-  FormEngine: jest
-    .fn()
-    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
-}));
-
 const mockGetConfig = getConfig as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 

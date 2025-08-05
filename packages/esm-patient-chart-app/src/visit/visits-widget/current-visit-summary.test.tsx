@@ -4,12 +4,6 @@ import { useVisit, getConfig } from '@openmrs/esm-framework';
 import { waitForLoadingToFinish } from 'tools';
 import CurrentVisitSummary from './current-visit-summary.component';
 
-jest.mock('@openmrs/esm-form-engine-lib', () => ({
-  FormEngine: jest
-    .fn()
-    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
-}));
-
 const mockGetConfig = jest.mocked(getConfig);
 const mockUseVisits = jest.mocked(useVisit);
 

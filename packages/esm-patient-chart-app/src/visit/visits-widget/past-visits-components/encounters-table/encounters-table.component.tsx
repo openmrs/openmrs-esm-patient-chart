@@ -38,13 +38,13 @@ import {
   useSession,
   useVisit,
   type EncounterType,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import {
   type HtmlFormEntryForm,
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
-import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import {
   deleteEncounter,
   mapEncounter,
@@ -288,11 +288,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
                               {isFormAttached && !disableInlineSummary ? (
-                                <FormEngine
-                                  mode="embedded-view"
-                                  patientUUID={patientUuid}
-                                  formUUID={encounter?.form?.uuid}
-                                  encounterUUID={encounter?.id}
+                                <ExtensionSlot
+                                  name="form-summary-slot"
+                                  state={{
+                                    mode: 'embedded-view',
+                                    patientUUID: patientUuid,
+                                    formUUID: encounter?.form?.uuid,
+                                    encounterUUID: encounter?.id,
+                                  }}
                                 />
                               ) : (
                                 <EncounterObservations observations={encounter.obs} />

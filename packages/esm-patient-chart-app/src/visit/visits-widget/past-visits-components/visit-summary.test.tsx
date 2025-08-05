@@ -12,12 +12,6 @@ const mockGetConfig = jest.mocked(getConfig);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
-jest.mock('@openmrs/esm-form-engine-lib', () => ({
-  FormEngine: jest
-    .fn()
-    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
-}));
-
 describe('VisitSummary', () => {
   beforeEach(() => {
     mockExtensionSlot.mockImplementation((ext) => ext.name);

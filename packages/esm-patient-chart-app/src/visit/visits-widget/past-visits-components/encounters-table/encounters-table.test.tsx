@@ -20,12 +20,6 @@ const testProps: EncountersTableProps = {
   setPageSize: jest.fn(),
 };
 
-jest.mock('@openmrs/esm-form-engine-lib', () => ({
-  FormEngine: jest
-    .fn()
-    .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
-}));
-
 const mockShowModal = jest.mocked(showModal);
 const mockGetConfig = jest.mocked(getConfig);
 const mockUserHasAccess = jest.mocked(userHasAccess);
