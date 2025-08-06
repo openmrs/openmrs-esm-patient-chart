@@ -152,6 +152,11 @@ export const esmPatientChartSchema = {
     _description: 'Whether to require an active visit for the encounter tile',
     _default: true,
   },
+  enableEmbeddedEncounterView: {
+    _type: Type.Boolean,
+    _description: "When enabled, the encounter summary will be displayed using the Form Engine's embedded view mode",
+    _default: true,
+  },
 };
 
 export interface ChartConfig {
@@ -180,6 +185,7 @@ export interface ChartConfig {
   }>;
   visitDiagnosisConceptUuid: string;
   requireActiveVisitForEncounterTile: boolean;
+  enableEmbeddedEncounterView: boolean;
   trueConceptUuid: string;
   falseConceptUuid: string;
   otherConceptUuid: string;

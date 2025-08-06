@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  defineExtensionConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  registerFeatureFlag,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
@@ -34,13 +28,6 @@ export function startupApp() {
   setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
-
-  registerFeatureFlag(
-    'disable-inline-o3-form-summary',
-    'Disable Inline O3 Form Summary',
-    'When enabled, encounters with O3 Forms will render the old key-value observations list' +
-      ' instead of the O3 Form in `embedded view` mode.',
-  );
 }
 
 export const root = getSyncLifecycle(patientChartPageComponent, { featureName: 'patient-chart', moduleName });

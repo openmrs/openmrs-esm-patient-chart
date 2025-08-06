@@ -32,7 +32,6 @@ import {
   showSnackbar,
   TrashCanIcon,
   useConfig,
-  useFeatureFlag,
   useLayoutType,
   userHasAccess,
   useSession,
@@ -45,6 +44,8 @@ import {
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../../../../config-schema';
+import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
   mapEncounter,
@@ -83,7 +84,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
-  const disableInlineSummary = useFeatureFlag('disable-inline-o3-form-summary');
+  const { enableEmbeddedEncounterView } = useConfig() as ChartConfig;
 
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
@@ -229,7 +230,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
-                    const isFormAttached = encounter.form?.uuid;
+                    const isRfeCompatible = (encounter: MappedEncounter) =>
+                      encounter.form?.uuid &&
+                      encounter.form.resources.some((resource) => resource.name === jsonSchemaResourceName);
 
                     return (
                       <React.Fragment key={encounter.id}>
@@ -245,7 +248,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 size={responsiveSize}
                               >
                                 {userHasAccess(encounter.editPrivilege, session?.user) &&
-                                  (isFormAttached || isVisitNoteEncounter(encounter)) && (
+                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
@@ -287,7 +290,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              {isFormAttached && !disableInlineSummary ? (
+                              {enableEmbeddedEncounterView && isRfeCompatible(encounter) ? (
                                 <ExtensionSlot
                                   name="form-widget-slot"
                                   state={{
@@ -303,7 +306,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                               )}
                               {userHasAccess(encounter.editPrivilege, session?.user) && (
                                 <>
-                                  {(isFormAttached || isVisitNoteEncounter(encounter)) && (
+                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <Button
                                       kind="ghost"
                                       onClick={() => {
