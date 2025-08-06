@@ -11,6 +11,7 @@
   "never": "Never",
   "noFormsToDisplay": "There are no forms to display.",
   "off": "Off",
+  "noSearchResults": "No forms match your search \"{{searchTerm}}\".",
   "offlineForms": "Offline forms",
   "offlineForms__lower": "offline forms",
   "offlineFormsOverviewCardAvailableOffline": "Available offline",
@@ -23,5 +24,7 @@
   "on": "On",
   "previousPage": "Previous page",
   "scrollToLoadMore": "Scroll to load more forms...",
+  "searchForms": "Search forms",
+  "searchingForms": "Searching forms...",
   "searchThisList": "Search this list"
 }

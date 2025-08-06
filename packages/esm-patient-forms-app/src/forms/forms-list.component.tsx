@@ -21,6 +21,7 @@ export type FormsListProps = {
   isLoading?: boolean;
   totalLoaded?: number;
   enableInfiniteScrolling?: boolean;
+  isSearching?: boolean;
 };
 
 /*
@@ -39,7 +40,7 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
       debounce((searchTerm: string) => {
         setSearchTerm(searchTerm);
         onSearch?.(searchTerm);
-      }, 1000),
+      }, 500), // Match the debounce time with FormsDashboard
     [onSearch],
   );
 
@@ -91,13 +92,18 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
   }, []);
 
   const filteredForms = useMemo(() => {
-    // If using infinite scrolling with server-side search, don't filter client-side
-    if (enableInfiniteScrolling && onSearch) {
+    // If search is handled server-side through onSearch function, just use the results directly
+    if (onSearch && searchTerm) {
       return completedForms;
     }
 
     if (!searchTerm) {
       return forms;
+    }
+
+    // Ensure we have forms to filter
+    if (!completedForms || completedForms.length === 0) {
+      return [];
     }
 
     return fuzzy
