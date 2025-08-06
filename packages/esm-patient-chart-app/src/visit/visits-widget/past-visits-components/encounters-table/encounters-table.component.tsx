@@ -84,7 +84,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
-  const { enableEmbeddedEncounterView } = useConfig() as ChartConfig;
+  const { enableEmbeddedEncounterView } = useConfig<ChartConfig>();
 
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
@@ -230,7 +230,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
-                    const isRfeCompatible = (encounter: MappedEncounter) =>
+                    const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
                       encounter.form?.uuid &&
                       encounter.form.resources.some((resource) => resource.name === jsonSchemaResourceName);
 
@@ -290,7 +290,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              {enableEmbeddedEncounterView && isRfeCompatible(encounter) ? (
+                              {enableEmbeddedEncounterView && supportsEmbeddedFormView(encounter) ? (
                                 <ExtensionSlot
                                   name="form-widget-slot"
                                   state={{

@@ -155,7 +155,7 @@ export const esmPatientChartSchema = {
   enableEmbeddedEncounterView: {
     _type: Type.Boolean,
     _description: "When enabled, the encounter summary will be displayed using the Form Engine's embedded view mode",
-    _default: true,
+    _default: false,
   },
 };
 
