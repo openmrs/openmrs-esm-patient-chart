@@ -83,7 +83,6 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
           size={isTablet ? 'md' : 'sm'}
           useZebraStyles={false}
           aria-label={t('immunizationHistory', 'Immunization history')}
-          isSortable={false}
         >
           <TableBody>
             {paginatedRows?.map((row) => (
