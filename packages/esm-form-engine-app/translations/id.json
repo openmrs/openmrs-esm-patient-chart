@@ -40,6 +40,7 @@
   "fieldErrorDescriptionTitle": "Kesalahan Validasi",
   "fileUploadDescription": "",
   "fileUploadDescriptionAny": "Unggah file jenis apa pun",
+  "formActionFailed": "Form action failed",
   "invalidWorkspaceName": "Nama workspace tidak valid.",
   "invalidWorkspaceNameSubtitle": "Harap berikan nama workspace yang valid.",
   "launchWorkspace": "Buka Workspace",

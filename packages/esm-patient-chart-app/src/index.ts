@@ -1,5 +1,10 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import * as PatientCommonLib from '@openmrs/esm-patient-common-lib';
+import {
+  defineConfigSchema,
+  defineExtensionConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+} from '@openmrs/esm-framework';
+import * as Framework from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName } from './constants';
@@ -17,9 +22,9 @@ import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.co
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
 
-// This allows @openmrs/esm-patient-common-lib to be accessed by modules that are not
+// This allows @openmrs/esm-framework to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
-window['_openmrs_esm_patient_common_lib'] = PatientCommonLib;
+window['_openmrs_esm_framework'] = Framework;
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 

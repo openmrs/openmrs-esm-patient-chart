@@ -135,7 +135,7 @@
   "selectLocation": "Select a location",
   "selectProgramType": "Select program type",
   "selectVisitType": "Please select a visit type",
-  "showVisitOnOrPriorTo": "Show visit on or prior to:",
+  "showVisitWithStartDateOnOrPriorTo": "Show visit with start date on or prior to:",
   "startDate": "Start date",
   "startingVisit": "Starting visit",
   "startNewVisit": "Start new visit",

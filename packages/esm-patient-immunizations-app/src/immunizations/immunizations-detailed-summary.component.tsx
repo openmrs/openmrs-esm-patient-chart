@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -60,7 +60,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     return linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
   }, [existingImmunizations, sequenceDefinitions]);
 
-  const launchImmunizationsForm = React.useCallback(() => {
+  const launchImmunizationsForm = useCallback(() => {
     if (!currentVisit) {
       launchStartVisitPrompt();
       return;
@@ -109,10 +109,13 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           : null;
 
         const occurrenceDate = hasDoses
-          ? `${t('lastDoseOn', 'Last dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
-              time: false,
-              noToday: true,
-            })}, ${sequenceLabel ?? `${t('dose', 'Dose')} ${latestDose.doseNumber}`}`
+          ? `${t('lastDoseOnDate', 'Last dose on {{date}}', {
+              date: formatDate(parseDate(latestDose.occurrenceDateTime), {
+                mode: 'standard',
+                noToday: true,
+                time: false,
+              }),
+            })}, ${sequenceLabel ?? t('doseNumber', 'Dose {{number}}', { number: latestDose.doseNumber })}`
           : '';
 
         return {
@@ -130,6 +133,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   immunizationId: null,
                   vaccinationDate: null,
                   doseNumber: 0,
+                  note: null,
                   expirationDate: null,
                   lotNumber: null,
                   manufacturer: null,
@@ -138,7 +142,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
               }}
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               size="sm"
-            ></Button>
+            />
           ),
         };
       }),

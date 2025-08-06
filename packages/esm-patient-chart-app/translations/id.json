@@ -135,7 +135,7 @@
   "selectLocation": "Pilih lokasi",
   "selectProgramType": "Pilih jenis program",
   "selectVisitType": "Silakan pilih jenis kunjungan",
-  "showVisitOnOrPriorTo": "Tampilkan kunjungan pada atau sebelum:",
+  "showVisitWithStartDateOnOrPriorTo": "Show visit with start date on or prior to:",
   "startDate": "Tanggal mulai",
   "startingVisit": "Memulai kunjungan",
   "startNewVisit": "Mulai kunjungan baru",
