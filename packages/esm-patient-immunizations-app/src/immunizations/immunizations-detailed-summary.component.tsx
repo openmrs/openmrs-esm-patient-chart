@@ -48,8 +48,6 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const { immunizationsConfig } = useConfig();
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
-  const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
-  const urlLabel = t('goToSummary', 'Go to Summary');
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
@@ -227,8 +225,6 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             onPageNumberChange={({ page }) => goTo(page)}
             pageNumber={currentPage}
             currentItems={paginatedImmunizations?.length}
-            dashboardLinkUrl={pageUrl}
-            dashboardLinkLabel={urlLabel}
           />
         </div>
       </div>

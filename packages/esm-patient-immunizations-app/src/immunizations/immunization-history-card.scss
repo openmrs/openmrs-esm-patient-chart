@@ -40,6 +40,7 @@
   left: 0;
   background-color: $ui-01;
 }
+
 .widgetCard {
   border: 1px solid $ui-03;
 
@@ -73,6 +74,7 @@
     max-width: 100%;
   }
 }
+
 .vaccineNameContent {
   width: 13rem;
 }
@@ -81,4 +83,10 @@
   overflow-x: auto;
   white-space: nowrap;
   padding: layout.$spacing-03 0;
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
 }

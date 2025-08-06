@@ -69,7 +69,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
   }
 
   return (
-    <div className={styles.widgetCard}>
+    <div>
       <div className={styles.headerRow}>
         {headers.map((header, index) => (
           <div key={index} className={styles.headerCell}>
@@ -100,16 +100,17 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
           </TableBody>
         </Table>
       </div>
-
-      <PatientChartPagination
-        totalItems={tableRows?.length || 0}
-        pageSize={pageSize}
-        pageNumber={currentPage}
-        currentItems={paginatedRows?.length || 0}
-        onPageNumberChange={({ page }) => {
-          goTo(page);
-        }}
-      />
+      <div className={styles.paginationContainer}>
+        <PatientChartPagination
+          totalItems={tableRows?.length || 0}
+          pageSize={pageSize}
+          pageNumber={currentPage}
+          currentItems={paginatedRows?.length || 0}
+          onPageNumberChange={({ page }) => {
+            goTo(page);
+          }}
+        />
+      </div>
     </div>
   );
 };
