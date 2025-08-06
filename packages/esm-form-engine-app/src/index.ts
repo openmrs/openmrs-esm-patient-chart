@@ -24,11 +24,6 @@ export const formCollapseToggle = getAsyncLifecycle(
   },
 );
 
-export const formEngineWrapper = getAsyncLifecycle(
-  () => import('./form-engine/form-engine-wrapper.component'),
-  options,
-);
-
 export const deleteQuestionModal = getAsyncLifecycle(
   () => import('./form-renderer/repeat/delete-question.modal'),
   options,

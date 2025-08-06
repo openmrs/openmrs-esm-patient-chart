@@ -289,12 +289,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                             <>
                               {isFormAttached && !disableInlineSummary ? (
                                 <ExtensionSlot
-                                  name="form-summary-slot"
+                                  name="form-widget-slot"
                                   state={{
-                                    mode: 'embedded-view',
-                                    patientUUID: patientUuid,
-                                    formUUID: encounter?.form?.uuid,
-                                    encounterUUID: encounter?.id,
+                                    additionalProps: { mode: 'embedded-view' },
+                                    patientUuid: patientUuid,
+                                    formUuid: encounter.form.uuid,
+                                    encounterUuid: encounter.id,
+                                    promptBeforeClosing: () => {},
                                   }}
                                 />
                               ) : (
