@@ -78,3 +78,19 @@ html[dir='rtl'] {
   margin-top: layout.$spacing-03;
   @include type.type-style('body-compact-01');
 }
+
+.noSearchResults {
+  text-align: center;
+  padding: layout.$spacing-05;
+  color: $text-02;
+  @include type.type-style('body-compact-01');
+  margin: layout.$spacing-05 0;
+  font-style: italic;
+}
+
+.searchingMessage {
+  display: flex;
+  justify-content: center;
+  padding: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}

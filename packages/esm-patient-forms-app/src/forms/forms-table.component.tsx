@@ -59,9 +59,13 @@ const FormsTable = ({
                     <TableToolbarSearch
                       className={styles.search}
                       expanded
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleSearch?.(event.target.value)}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        // Call the debounced handler from parent component
+                        handleSearch?.(event.target.value);
+                      }}
                       placeholder={t('searchThisList', 'Search this list')}
                       size="sm"
+                      labelText={t('searchForms', 'Search forms')}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
