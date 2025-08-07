@@ -33,6 +33,12 @@ export function startupApp() {
   setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
+
+  Framework.registerFeatureFlag(
+    'enable-embedded-form-view',
+    'Enable Embedded Form View',
+    'When enabled, encounter summaries will display the full form layout instead of a simple observation list.',
+  );
 }
 
 export const root = getSyncLifecycle(patientChartPageComponent, { featureName: 'patient-chart', moduleName });

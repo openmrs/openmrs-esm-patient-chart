@@ -38,13 +38,13 @@ import {
   useVisit,
   type EncounterType,
   ExtensionSlot,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   type HtmlFormEntryForm,
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
@@ -84,7 +84,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
-  const { enableEmbeddedEncounterView } = useConfig<ChartConfig>();
+  const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
 
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
@@ -232,7 +232,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
 
                     const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
                       encounter.form?.uuid &&
-                      encounter.form.resources.some((resource) => resource.name === jsonSchemaResourceName);
+                      encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
                     return (
                       <React.Fragment key={encounter.id}>
@@ -290,7 +290,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              {enableEmbeddedEncounterView && supportsEmbeddedFormView(encounter) ? (
+                              {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
                                 <ExtensionSlot
                                   name="form-widget-slot"
                                   state={{
