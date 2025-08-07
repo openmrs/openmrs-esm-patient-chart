@@ -81,45 +81,52 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
     ];
   }, [t]);
 
-  const tableRows = useMemo(
-    () =>
-      subRows?.entries.length &&
-      subRows.entries.map((row, i) => {
-        const { units = '', range = '' } = row;
-        const isString = isNaN(parseFloat(row.value));
+  const tableRows = useMemo(() => {
+    if (!subRows?.entries?.length) return [];
 
-        return {
-          ...row,
-          id: `${i}-${index}`,
-          testName: (
-            <span className={styles['trendline-link']}>
-              {!isString ? (
-                <span
-                  className={styles['trendline-link-view']}
-                  onClick={() => launchResultsDialog(row.display, row.conceptUuid)}
-                >
-                  {row.display}
-                </span>
-              ) : (
-                <span className={styles.trendlineLink}>{row.display}</span>
-              )}
-            </span>
-          ),
-          value: {
-            value: `${row.value} ${row.units ?? ''}`,
-            interpretation: row?.interpretation,
-          },
-          referenceRange: `${range || '--'} ${units || '--'}`,
-        };
-      }),
-    [index, subRows, launchResultsDialog],
-  );
+    const seen = new Set();
+    const uniqueEntries = subRows.entries.filter((row) => {
+      const key = `${row.conceptUuid}-${row.obsDatetime}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return uniqueEntries.map((row, i) => {
+      const { units = '', range = '' } = row;
+      const isString = isNaN(parseFloat(row.value));
+
+      return {
+        ...row,
+        id: `${row.conceptUuid}-${row.obsDatetime}`,
+        testName: (
+          <span className={styles['trendline-link']}>
+            {!isString ? (
+              <span
+                className={styles['trendline-link-view']}
+                onClick={() => launchResultsDialog(row.display, row.conceptUuid)}
+              >
+                {row.display}
+              </span>
+            ) : (
+              <span className={styles.trendlineLink}>{row.display}</span>
+            )}
+          </span>
+        ),
+        value: {
+          value: `${row.value} ${row.units ?? ''}`,
+          interpretation: row?.interpretation,
+        },
+        referenceRange: `${range || '--'} ${units || '--'}`,
+      };
+    });
+  }, [subRows, launchResultsDialog]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   }
 
-  if (subRows.entries?.length) {
+  if (tableRows.length) {
     return (
       <DataTable rows={tableRows} headers={tableHeaders} data-floating-menu-container useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -141,23 +148,21 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => {
-                  return (
-                    <TableRow key={row.id}>
-                      {row.cells.map((cell) =>
-                        cell?.value?.interpretation ? (
-                          <TableCell className={classNames(getClasses(cell?.value?.interpretation))} key={cell.id}>
-                            <p>{cell?.value?.value ?? cell?.value}</p>
-                          </TableCell>
-                        ) : (
-                          <TableCell key={cell.id}>
-                            <p>{cell?.value}</p>
-                          </TableCell>
-                        ),
-                      )}
-                    </TableRow>
-                  );
-                })}
+                {rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.cells.map((cell) =>
+                      cell?.value?.interpretation ? (
+                        <TableCell className={classNames(getClasses(cell?.value?.interpretation))} key={cell.id}>
+                          <p>{cell?.value?.value ?? cell?.value}</p>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={cell.id}>
+                          <p>{cell?.value}</p>
+                        </TableCell>
+                      ),
+                    )}
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -165,6 +170,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
       </DataTable>
     );
   }
+  return null;
 };
 
 export default IndividualResultsTable;
