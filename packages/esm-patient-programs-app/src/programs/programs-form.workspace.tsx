@@ -207,7 +207,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           {...field}
           id="enrollmentDate"
           data-testid="enrollmentDate"
-          maxDate={new Date()}
+          maxDate={(() => {
+            const completionDate = watch('completionDate');
+            if (completionDate) {
+              const d = new Date(completionDate);
+              d.setDate(d.getDate() - 1);
+              return d;
+            }
+            return new Date();
+          })()}
           labelText={t('dateEnrolled', 'Date enrolled')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}
