@@ -4,9 +4,10 @@ import { ImmunizationsPage } from '../pages';
 
 test('Add and edit an immunization', async ({ page, patient }) => {
   const immunizationsPage = new ImmunizationsPage(page);
-  const headerRow = immunizationsPage.immunizationsTable().locator('thead > tr');
-  const immunizationType = immunizationsPage.immunizationsTable().locator('tbody td:nth-child(2)');
-  const vaccinationDate = immunizationsPage.immunizationsTable().locator('tbody td:nth-child(3)');
+  const immunizationsSummaryTable = page.getByRole('table', { name: /immunizations summary/i });
+  const headerRow = immunizationsSummaryTable.locator('thead > tr');
+  const immunizationType = immunizationsSummaryTable.locator('tbody td:nth-child(2)');
+  const vaccinationDate = immunizationsSummaryTable.locator('tbody td:nth-child(3)');
 
   await test.step('When I navigate to the Immunizations page', async () => {
     await immunizationsPage.goTo(patient.uuid);
@@ -43,6 +44,10 @@ test('Add and edit an immunization', async ({ page, patient }) => {
     await expect(page.getByText(/vaccination saved successfully/i)).toBeVisible();
   });
 
+  await test.step('Then I should see the immunizations summary table', async () => {
+    await expect(immunizationsSummaryTable).toBeVisible();
+  });
+
   await test.step('And I should see the immunization table with the correct headers', async () => {
     await expect(headerRow).toContainText(/vaccine/i);
     await expect(headerRow).toContainText(/recent vaccination/i);
@@ -54,16 +59,16 @@ test('Add and edit an immunization', async ({ page, patient }) => {
   });
 
   await test.step('When I click the Expand all rows button', async () => {
-    await page.getByRole('button', { name: /expand all rows/i }).click();
+    await immunizationsSummaryTable.getByRole('button', { name: /expand all rows/i }).click();
   });
 
   await test.step('Then I should see the expanded immunization details section', async () => {
-    await expect(page.getByText(/dose number within series/i)).toBeVisible();
-    await expect(page.getByText(/vaccination date/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/dose number within series/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/vaccination date/i)).toBeVisible();
   });
 
   await test.step('And I click the Edit button for the immunization', async () => {
-    await page.getByRole('button', { name: /edit/i }).click();
+    await immunizationsSummaryTable.getByRole('button', { name: /edit/i }).click();
   });
 
   await test.step('Then I should see the immunization form in edit mode with the current values', async () => {
@@ -101,14 +106,16 @@ test('Add and edit an immunization', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the newly updated immunization details reflected in the table', async () => {
-    await expect(page.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
-    await expect(page.getByRole('cell', { name: /last dose on 02-Jan-2025, dose 2/i })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: /hepatitis b vaccination/i })).toBeVisible();
+    await expect(
+      immunizationsSummaryTable.getByRole('cell', { name: /last dose on 02-Jan-2025, dose 2/i }),
+    ).toBeVisible();
   });
 
   await test.step('Then expanding the immunization details section should reveal the correct details', async () => {
-    await expect(page.getByText(/dose number within series/i)).toBeVisible();
-    await expect(page.getByText(/vaccination date/i)).toBeVisible();
-    await expect(page.getByRole('cell', { name: '2', exact: true })).toBeVisible();
-    await expect(page.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/dose number within series/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/vaccination date/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '2', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
   });
 });

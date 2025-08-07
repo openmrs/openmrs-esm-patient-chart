@@ -1,13 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
-import { AddIcon, navigate, showModal, showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { AddIcon, navigate, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { EncounterListDataTable } from './table.component';
-import { launchEncounterForm } from '../utils/helpers';
+import { type LaunchAction, launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../utils/encounter-list.resource';
 import { useEncounterRows, useFormsJson } from '../hooks';
-import type { TableRow, Encounter, Mode, FormattedColumn } from '../types';
+import type { TableRow, Encounter, FormattedColumn, Action } from '../types';
+import type { ChartConfig } from '../../config-schema';
 import styles from './encounter-list.scss';
 
 export interface EncounterListProps {
@@ -31,7 +33,7 @@ export interface EncounterListProps {
   filter?: (encounter: Encounter) => boolean;
   afterFormSaveAction?: () => void;
   deathStatus?: boolean;
-  currentVisit: Visit;
+  visit: Visit;
 }
 
 export const EncounterList: React.FC<EncounterListProps> = ({
@@ -44,10 +46,11 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   filter,
   launchOptions,
   afterFormSaveAction,
-  currentVisit,
+  visit,
   deathStatus,
 }) => {
   const { t } = useTranslation();
+  const { requireActiveVisitForEncounterTile } = useConfig<Pick<ChartConfig, 'requireActiveVisitForEncounterTile'>>();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -65,40 +68,50 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   const { displayText, hideFormLauncher } = launchOptions;
 
   const defaultActions = useMemo(
-    () => [
-      {
-        label: t('viewEncounter', 'View'),
-        form: {
-          name: formsJson?.name,
+    () =>
+      [
+        {
+          label: t('viewEncounter', 'View'),
+          form: {
+            name: formsJson?.name,
+          },
+          mode: 'view',
+          intent: '*',
         },
-        mode: 'view',
-        intent: '*',
-      },
-      {
-        label: t('editEncounter', 'Edit'),
-        form: {
-          name: formsJson?.name,
+        {
+          label: t('editEncounter', 'Edit'),
+          form: {
+            name: formsJson?.name,
+          },
+          mode: 'edit',
+          intent: '*',
         },
-        mode: 'edit',
-        intent: '*',
-      },
-      {
-        label: t('deleteEncounter', 'Delete'),
-        form: {
-          name: formsJson?.name,
+        {
+          label: t('deleteEncounter', 'Delete'),
+          form: {
+            name: formsJson?.name,
+          },
+          mode: 'delete',
+          intent: '*',
         },
-        mode: 'delete',
-        intent: '*',
-      },
-    ],
+      ] as Array<Action>,
     [formsJson, t],
   );
 
   const createLaunchFormAction = useCallback(
-    (encounter: Encounter, mode: Mode) => () => {
-      launchEncounterForm(formsJson, currentVisit, mode, onFormSave, encounter.uuid, null, patientUuid);
+    (encounter: Encounter, mode: LaunchAction) => () => {
+      launchEncounterForm(
+        formsJson,
+        visit,
+        mode,
+        onFormSave,
+        encounter.uuid,
+        null,
+        patientUuid,
+        requireActiveVisitForEncounterTile,
+      );
     },
-    [formsJson, onFormSave, patientUuid, currentVisit],
+    [formsJson, visit, onFormSave, patientUuid, requireActiveVisitForEncounterTile],
   );
 
   const handleDeleteEncounter = useCallback(
@@ -141,7 +154,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
   const tableRows = useMemo(() => {
     return encounters.map((encounter: Encounter) => {
-      const tableRow: TableRow = { id: encounter.uuid, actions: null };
+      const tableRow: TableRow = { id: encounter.uuid };
 
       encounter['launchFormActions'] = {
         editEncounter: createLaunchFormAction(encounter, 'edit'),
@@ -174,7 +187,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 
       tableRow['actions'] = (
         <OverflowMenu flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
-          {actions.map((actionItem, index) => {
+          {actions.map((actionItem: Action, index: number) => {
             const form = formsJson && actionItem?.form?.name ? formsJson.name === actionItem.form.name : null;
 
             return (
@@ -189,12 +202,13 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                       ? handleDeleteEncounter(encounter.uuid, encounter.encounterType.name)
                       : launchEncounterForm(
                           formsJson,
-                          currentVisit,
-                          actionItem.mode === 'enter' ? 'add' : actionItem.mode,
+                          visit,
+                          actionItem.mode,
                           onFormSave,
                           encounter.uuid,
                           actionItem.intent,
                           patientUuid,
+                          requireActiveVisitForEncounterTile,
                         );
                   }}
                 />
@@ -216,7 +230,8 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     handleDeleteEncounter,
     onFormSave,
     patientUuid,
-    currentVisit,
+    visit,
+    requireActiveVisitForEncounterTile,
   ]);
 
   const headers = useMemo(() => {
@@ -233,11 +248,20 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       return (
         <Button
           kind="ghost"
-          renderIcon={AddIcon}
+          renderIcon={() => <AddIcon className={styles.headerIcon} />}
           iconDescription="Add"
           onClick={(e) => {
             e.preventDefault();
-            launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid);
+            launchEncounterForm(
+              formsJson,
+              visit,
+              'add',
+              onFormSave,
+              '',
+              '*',
+              patientUuid,
+              requireActiveVisitForEncounterTile,
+            );
           }}
         >
           {t(displayText)}
@@ -245,7 +269,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
       );
     }
     return null;
-  }, [formsJson, displayText, onFormSave, patientUuid, t, currentVisit]);
+  }, [formsJson, displayText, onFormSave, patientUuid, t, visit, requireActiveVisitForEncounterTile]);
 
   if (isLoading === true || isLoadingFormsJson === true) {
     return <DataTableSkeleton rowCount={10} />;
@@ -257,7 +281,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t(headerTitle)}</h4>
+              <h4 className={classNames(styles.productiveHeading03)}>{t(headerTitle)}</h4>
               {!(hideFormLauncher ?? deathStatus) && <div className={styles.toggleButtons}>{formLauncher}</div>}
             </div>
             <EncounterListDataTable tableHeaders={headers} tableRows={tableRows} />
@@ -280,7 +304,17 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           launchForm={
             hideFormLauncher || deathStatus
               ? null
-              : () => launchEncounterForm(formsJson, currentVisit, 'add', onFormSave, '', '*', patientUuid)
+              : () =>
+                  launchEncounterForm(
+                    formsJson,
+                    visit,
+                    'add',
+                    onFormSave,
+                    '',
+                    '*',
+                    patientUuid,
+                    requireActiveVisitForEncounterTile,
+                  )
           }
         />
       )}

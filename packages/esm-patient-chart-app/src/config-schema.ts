@@ -147,6 +147,11 @@ export const esmPatientChartSchema = {
     _description: 'Default concept uuid for other in forms',
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  requireActiveVisitForEncounterTile: {
+    _type: Type.Boolean,
+    _description: 'Whether to require an active visit for the encounter tile',
+    _default: true,
+  },
 };
 
 export interface ChartConfig {
@@ -174,6 +179,7 @@ export interface ChartConfig {
     uuid: string;
   }>;
   visitDiagnosisConceptUuid: string;
+  requireActiveVisitForEncounterTile: boolean;
   trueConceptUuid: string;
   falseConceptUuid: string;
   otherConceptUuid: string;
