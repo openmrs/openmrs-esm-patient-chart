@@ -220,7 +220,7 @@
   "pages": [
     {
       "component": "root",
-      "routeRegex": "^patient/.+/chart",
+      "routeRegex": "^patient\/.+\/chart",
       "online": true,
       "offline": true
     }
