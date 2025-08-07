@@ -180,6 +180,11 @@
       "description": "Features to enter data for past visits. Includes the 'Edit Past Visit' button in the start visit dialog, and the 'Add Past Visit' button in the patient header",
       "flagName": "rde",
       "label": "Retrospective Data Entry"
+    },
+    {
+      "description": "When enabled, encounter summaries will display the full form layout instead of a simple observation list.",
+      "flagName": "enable-embedded-form-view",
+      "label": "Enable Embedded Form View"
     }
   ],
   "modals": [
@@ -215,7 +220,7 @@
   "pages": [
     {
       "component": "root",
-      "routeRegex": "^patient\/.+\/chart",
+      "routeRegex": "^patient/.+/chart",
       "online": true,
       "offline": true
     }
