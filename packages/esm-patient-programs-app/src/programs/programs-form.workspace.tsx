@@ -225,8 +225,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           {...field}
           id="completionDate"
           data-testid="completionDate"
-          minDate={new Date(watch('enrollmentDate'))}
+          minDate={(() => {
+            const date = new Date(watch('enrollmentDate'));
+            date.setDate(date.getDate() + 1);
+            return date;
+          })()}
           maxDate={new Date()}
+          isDisabled={(() => {
+            const d = new Date(watch('enrollmentDate'));
+            const today = new Date();
+            return d.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
+          })()}
           labelText={t('dateCompleted', 'Date completed')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}
