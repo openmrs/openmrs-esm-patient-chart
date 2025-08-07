@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton, Table, TableBody, TableCell, TableRow } from '@carbon/react';
+import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from '@carbon/react';
 import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { Immunization } from '../types';
@@ -8,13 +8,11 @@ import styles from './immunization-history-card.scss';
 
 interface ImmunizationHistoryCardProps {
   error?: Error | null;
-  immunizations?: Immunization[];
-  isLoading?: boolean;
+  immunizations?: Array<Immunization>;
 }
 
-const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error, immunizations, isLoading }) => {
+const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error, immunizations }) => {
   const { t } = useTranslation();
-
   const headerTitle = t('immunizations', 'Immunizations');
   const pageSize = 5;
   const isTablet = useLayoutType() === 'tablet';
@@ -55,14 +53,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
   }, [sortedImmunizations, t]);
 
   const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
-
-  if (isLoading) {
-    return (
-      <div className={styles.widgetCard}>
-        <DataTableSkeleton role="progressbar" />
-      </div>
-    );
-  }
+  const showPagination = (tableRows?.length || 0) > pageSize;
 
   if (error) {
     return <ErrorState error={error} headerTitle={headerTitle} />;
@@ -70,47 +61,47 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
 
   return (
     <div>
-      <div className={styles.headerRow}>
-        {headers.map((header, index) => (
-          <div key={index} className={styles.headerCell}>
-            {header.header}
-          </div>
-        ))}
-      </div>
-
-      <div>
-        <Table
-          size={isTablet ? 'md' : 'sm'}
-          useZebraStyles={false}
-          aria-label={t('immunizationHistory', 'Immunization history')}
-        >
-          <TableBody>
-            {paginatedRows?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell className={styles.vaccineNameCell}>
-                  <div className={styles.vaccineNameContent}>
-                    <strong>{row.vaccine}</strong>
-                  </div>
-                </TableCell>
-                <TableCell className={styles.dosesCell}>
-                  <div className={styles.vaccineDose}>{row.doses}</div>
-                </TableCell>
-              </TableRow>
+      <Table
+        aria-label={t('immunizationHistory', 'Immunization history')}
+        className={styles.table}
+        size={isTablet ? 'md' : 'sm'}
+        useZebraStyles
+      >
+        <TableHead>
+          <TableRow>
+            {headers.map((header, index) => (
+              <TableHeader key={header.key} className={index === 0 ? styles.vaccineNameCell : undefined}>
+                {header.header}
+              </TableHeader>
             ))}
-          </TableBody>
-        </Table>
-      </div>
-      <div className={styles.paginationContainer}>
-        <PatientChartPagination
-          totalItems={tableRows?.length || 0}
-          pageSize={pageSize}
-          pageNumber={currentPage}
-          currentItems={paginatedRows?.length || 0}
-          onPageNumberChange={({ page }) => {
-            goTo(page);
-          }}
-        />
-      </div>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {paginatedRows?.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell className={styles.vaccineNameCell}>
+                <div className={styles.vaccineNameContent}>
+                  <strong>{row.vaccine}</strong>
+                </div>
+              </TableCell>
+              <TableCell className={styles.dosesCell}>
+                <div className={styles.vaccineDose}>{row.doses}</div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {showPagination ? (
+        <div className={styles.paginationContainer}>
+          <PatientChartPagination
+            currentItems={paginatedRows?.length || 0}
+            onPageNumberChange={({ page }) => goTo(page)}
+            pageNumber={currentPage}
+            pageSize={pageSize}
+            totalItems={tableRows?.length || 0}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

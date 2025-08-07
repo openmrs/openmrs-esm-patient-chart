@@ -22,23 +22,9 @@
   color: $text-02;
 }
 
-.headerRow {
-  position: sticky;
-  top: 0;
-  background-color: $ui-01;
-  z-index: 1;
-  border-bottom: 1px solid $ui-01;
-}
-
-.headerCell {
-  min-width: 13rem;
-  padding: layout.$spacing-03;
-  display: inline-block;
-  text-align: center;
-  font-weight: bold;
-  position: static;
-  left: 0;
-  background-color: $ui-01;
+.table {
+  width: 100%;
+  table-layout: fixed;
 }
 
 .widgetCard {
@@ -46,25 +32,37 @@
 
   :global(.cds--data-table) {
     .vaccineNameCell {
-      width: 12rem;
+      width: 13rem;
       position: sticky;
-      left: 0;
+      inset-inline-start: 0;
       z-index: 1;
       vertical-align: top;
-      background-color: white !important;
+      background-color: inherit;
+      box-sizing: border-box;
+      background-clip: padding-box;
     }
 
     .dosesCell {
-      background-color: white !important;
+      background-color: inherit;
       padding: 0;
-      width: 100%;
+      width: auto;
+      max-width: calc(100% - 13rem);
+      box-sizing: border-box;
+    }
+
+    td {
+      border-bottom: none !important;
     }
   }
 }
 
+:global(.cds--data-table) thead .vaccineNameCell {
+  z-index: 2;
+}
+
 :global(.omrs-breakpoint-gt-phone):global(.omrs-breakpoint-lt-desktop) {
   .widgetCard {
-    max-width: 875px;
+    max-width: 60rem;
     margin: 0 auto;
   }
 }
@@ -83,6 +81,19 @@
   overflow-x: auto;
   white-space: nowrap;
   padding: layout.$spacing-03 0;
+
+  background:
+    linear-gradient(to left, $ui-background, rgba($ui-background, 0)) 100% 0 / 1.25rem 100% no-repeat,
+    linear-gradient(to left, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) 100% 0 / 0.5rem 100% no-repeat;
+  background-attachment: local, scroll;
+}
+
+/* RTL: flip right-edge hint to left edge */
+[dir='rtl'] .vaccineDose {
+  background:
+    linear-gradient(to right, $ui-background, rgba($ui-background, 0)) 0 0 / 1.25rem 100% no-repeat,
+    linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) 0 0 / 0.5rem 100% no-repeat;
+  background-attachment: local, scroll;
 }
 
 .paginationContainer {
