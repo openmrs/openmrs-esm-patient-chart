@@ -41,7 +41,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
   let tableRowLabels = config.data.map(({ concept, label }) => ({
     key: concept,
-    header: label ?? obss.find((o) => o.conceptUuid === concept)?.code?.text,
+    header: label || obss.find((o) => o.conceptUuid === concept)?.code?.text,
   }));
 
   if (config.showEncounterType) {
@@ -123,7 +123,7 @@ const HorizontalTable = ({ tableRowLabels, tableColumns }: { tableRowLabels: any
           <TableRow>
             <TableHeader>{t('dateAndTime', 'Date and time')}</TableHeader>
             {tableColumns.map((column) => (
-              <TableHeader key={`obs-horizontal-date-${column.id}-${column.date}`}>
+              <TableHeader key={`obs-hz-date-${column.id}-${column.date}`}>
                 <div className={styles.headerYear}>{column.date.getFullYear()}</div>
                 <div className={styles.headerDate}>{formatDate(column.date, { mode: 'wide', year: false })}</div>
                 <div className={styles.headerTime}>{formatTime(column.date)}</div>
@@ -133,10 +133,10 @@ const HorizontalTable = ({ tableRowLabels, tableColumns }: { tableRowLabels: any
         </TableHead>
         <TableBody>
           {tableRowLabels.map((label) => (
-            <TableRow key={`obs-horizontal-row-${label.header}`}>
+            <TableRow key={`obs-hz-row-${label.key}`}>
               <TableCell>{label.header}</TableCell>
               {tableColumns.map((column) => (
-                <TableCell key={`obs-horizontal-value-${column.id}-${label.key}`}>{column[label.key].value}</TableCell>
+                <TableCell key={`obs-hz-value-${column.id}-${label.key}`}>{column[label.key]?.value ?? '--'}</TableCell>
               ))}
             </TableRow>
           ))}
