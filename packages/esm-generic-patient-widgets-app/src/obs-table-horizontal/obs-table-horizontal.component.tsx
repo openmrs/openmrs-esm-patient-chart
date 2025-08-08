@@ -1,8 +1,6 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import classNames from 'classnames';
-import { showModal , usePagination, useConfig, formatDatetime, formatDate, formatTime } from '@openmrs/esm-framework';
+import React from 'react';
+import { usePagination, useConfig, formatDate, formatTime } from '@openmrs/esm-framework';
 import {
-  DataTable,
   Table,
   TableCell,
   TableContainer,
@@ -10,7 +8,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
   InlineLoading,
 } from '@carbon/react';
 import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -28,7 +25,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
   const config = useConfig<ConfigObjectHorizontal>();
   const { data: obss, isValidating } = useObs(patientUuid, config.showEncounterType);
   const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
-  const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
+  let obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
     obss.filter((o) => o.encounter.reference === reference),
   );
 
@@ -57,13 +54,15 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
         const rowData = {
           id: `${index}`,
           date: new Date(obss[0].effectiveDateTime),
-          encounter: obss[0].encounter.name,
+          encounter: { value: obss[0].encounter.name },
         };
 
         for (const obs of obss) {
           switch (obs.dataType) {
             case 'Text':
-              rowData[obs.conceptUuid] = obs.valueString;
+              rowData[obs.conceptUuid] = {
+                value: obs.valueString,
+              };
               break;
 
             case 'Number': {
@@ -71,16 +70,20 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
                 (ele: any) => ele.concept === obs.conceptUuid,
               )?.decimalPlaces;
 
+              let value;
               if (obs.valueQuantity?.value % 1 !== 0) {
-                rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(decimalPlaces);
+                value = obs.valueQuantity?.value.toFixed(decimalPlaces);
               } else {
-                rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+                value = obs.valueQuantity?.value;
               }
+              rowData[obs.conceptUuid] = {
+                value: value,
+              };
               break;
             }
 
             case 'Coded':
-              rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
+              rowData[obs.conceptUuid] = { value: obs.valueCodeableConcept?.coding[0]?.display };
               break;
           }
         }
@@ -114,30 +117,32 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 const HorizontalTable = ({ tableRowLabels, tableColumns }: { tableRowLabels: any; tableColumns: any }) => {
   const { t } = useTranslation();
   return (
-    <table className="cds--data-table cds--data-table--sm cds--data-table--zebra">
-      <thead>
-        <tr>
-          <th>{t('dateAndTime', 'Date and time')}</th>
-          {tableColumns.map((column) => (
-            <th className="cds--table-header-label" key={`obs-horizontal-date-${column.id}-${column.date}`}>
-              <div className={styles.headerYear}>{column.date.getFullYear()}</div>
-              <div className={styles.headerDate}>{formatDate(column.date, { mode: 'wide', year: false })}</div>
-              <div className={styles.headerTime}>{formatTime(column.date)}</div>
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {tableRowLabels.map((label) => (
-          <tr key={`obs-horizontal-row-${label.header}`}>
-            <td>{label.header}</td>
+    <TableContainer>
+      <Table experimentalAutoAlign={true} size="sm" useZebraStyles>
+        <TableHead>
+          <TableRow>
+            <TableHeader>{t('dateAndTime', 'Date and time')}</TableHeader>
             {tableColumns.map((column) => (
-              <td key={`obs-horizontal-value-${column.id}-${label.key}`}>{column[label.key]}</td>
+              <TableHeader key={`obs-horizontal-date-${column.id}-${column.date}`}>
+                <div className={styles.headerYear}>{column.date.getFullYear()}</div>
+                <div className={styles.headerDate}>{formatDate(column.date, { mode: 'wide', year: false })}</div>
+                <div className={styles.headerTime}>{formatTime(column.date)}</div>
+              </TableHeader>
             ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {tableRowLabels.map((label) => (
+            <TableRow key={`obs-horizontal-row-${label.header}`}>
+              <TableCell>{label.header}</TableCell>
+              {tableColumns.map((column) => (
+                <TableCell key={`obs-horizontal-value-${column.id}-${label.key}`}>{column[label.key].value}</TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

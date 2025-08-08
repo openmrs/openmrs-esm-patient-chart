@@ -1,6 +1,9 @@
 import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema-obs-switchable';
+import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
+import { type ConfigObjectHorizontal } from '../config-schema-obs-horizontal';
+
+type CommonConfig = ConfigObjectSwitchable | ConfigObjectHorizontal;
 
 export interface UseObsResult {
   data: Array<ObsResult>;
@@ -25,20 +28,20 @@ type ObsResult = fhir.Observation & {
 export const pageSize = 100;
 
 export function useObs(patientUuid: string, includeEncounters: boolean = false): UseObsResult {
-  const { encounterTypes, data } = useConfig<ConfigObject>();
+  const { encounterTypes, data, showEncounterType } = useConfig<CommonConfig>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
     .join(',')}&_summary=data&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
 
-  if (includeEncounters) {
+  if (showEncounterType) {
     url += '&_include=Observation:encounter';
   }
 
   const { data: result, error, isLoading, isValidating } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
 
-  const encounters = includeEncounters ? getEncountersByResources(result?.data?.entry) : [];
+  const encounters = showEncounterType ? getEncountersByResources(result?.data?.entry) : [];
   const observations = filterAndMapObservations(result?.data?.entry, encounters);
 
   return {

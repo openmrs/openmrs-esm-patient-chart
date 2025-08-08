@@ -6,14 +6,9 @@ export const configSchemaHorizontal = {
     _description: 'Displayed at the top of the widget.',
     _default: 'Vitals',
   },
-  resultsName: {
-    _type: Type.String,
-    _description: 'Displayed in messages about this data.',
-    _default: 'results',
-  },
   oldestFirst: {
     _type: Type.Boolean,
-    _description: 'Show graph values from most oldest to recent',
+    _description: 'Sort columns from oldest to newest',
     _default: false,
   },
   data: {

@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export const configSchemaSwitchable = {
   title: {
