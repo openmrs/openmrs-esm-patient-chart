@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical, Tabs } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
 
@@ -19,7 +19,7 @@ interface ObsGraphProps {
 
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const config = useConfig<ConfigObjectSwitchable>();
   const { data: observations } = useObs(patientUuid);
 
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({

@@ -12,6 +12,15 @@
       "meta": {
         "fullWidth": false
       }
+    },
+    {
+      "name": "obs-table-horizontal-widget",
+      "component": "obsTableHorizontal",
+      "online": true,
+      "offline": true,
+      "meta": {
+        "fullWidth": false
+      }
     }
   ]
 }
