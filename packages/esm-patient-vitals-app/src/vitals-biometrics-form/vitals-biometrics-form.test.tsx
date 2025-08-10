@@ -6,7 +6,7 @@ import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } fr
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
+import VitalsAndBiometricsForm, { type VitalsAndBiometricsFormProps } from './vitals-biometrics-form.workspace';
 
 const heightValue = 180;
 const muacValue = 23;
@@ -17,7 +17,7 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const testProps = {
+const testProps: VitalsAndBiometricsFormProps = {
   closeWorkspace: () => {},
   closeWorkspaceWithSavedChanges: jest.fn(),
   patientUuid: mockPatient.id,
@@ -25,6 +25,8 @@ const testProps = {
   promptBeforeClosing: () => {},
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: jest.fn(),
 };
 
 const mockShowSnackbar = jest.mocked(showSnackbar);

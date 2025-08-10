@@ -10,10 +10,11 @@ import {
   useWorkspaces,
   type WorkspacesInfo,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
+import { mockVisit } from '__mocks__';
 
 const MockActionMenuButton = jest.mocked(ActionMenuButton);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);
@@ -36,15 +37,6 @@ mockUseWorkspaces.mockReturnValue({
 // I think it is related to this: https://github.com/swc-project/jest/issues/14#issuecomment-1238621942
 
 const mockLaunchStartVisitPrompt = jest.fn();
-const mockUseVisitOrOfflineVisit = jest.fn(() => ({
-  activeVisit: {
-    uuid: '8ef90c91-14be-42dd-a1c0-e67fbf904470',
-  },
-  currentVisit: {
-    uuid: '8ef90c91-14be-42dd-a1c0-e67fbf904470',
-  },
-}));
-const mockGetPatientUuidFromUrl = jest.fn(() => mockPatient.id);
 const mockUseSystemVisitSetting = jest.fn();
 
 jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => {
@@ -59,14 +51,14 @@ jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
 
 jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => {
   return {
-    getPatientUuidFromStore: () => mockGetPatientUuidFromUrl(),
     usePatientChartStore: () => ({ patientUuid: mockPatient.id }),
   };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/offline/visit', () => {
-  return { useVisitOrOfflineVisit: () => mockUseVisitOrOfflineVisit() };
-});
+const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
+  usePatientChartStore: jest.fn(),
+}));
 
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
@@ -86,6 +78,14 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display tablet view action button', async () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('tablet');
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
@@ -97,6 +97,14 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display desktop view action button', async () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: mockVisit,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
@@ -110,10 +118,14 @@ describe('<OrderBasketActionButton/>', () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
-    mockUseVisitOrOfflineVisit.mockImplementation(() => ({
-      activeVisit: null,
-      currentVisit: null,
-    }));
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
 
     render(<OrderBasketActionButton />);
 
@@ -126,7 +138,15 @@ describe('<OrderBasketActionButton/>', () => {
 
   it('should display a count tag when orders are present on the desktop view', () => {
     mockUseLayoutType.mockReturnValue('small-desktop');
-    const { result } = renderHook(useOrderBasket);
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
+    const { result } = renderHook(() => useOrderBasket(mockPatient));
     expect(result.current.orders).toHaveLength(1); // sanity check
     render(<OrderBasketActionButton />);
 

@@ -1,12 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 import VisitTag from './visit-tag.extension';
 
-const mockUseVisitOrOfflineVisit = jest.mocked(useVisitOrOfflineVisit);
+const mockUseVisit = jest.mocked(useVisit);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -15,7 +14,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 
 describe('VisitBannerTag', () => {
   it('renders an active visit tag when an active visit is ongoing', () => {
-    mockUseVisitOrOfflineVisit.mockReturnValue({
+    mockUseVisit.mockReturnValue({
       activeVisit: mockCurrentVisit,
       currentVisit: mockCurrentVisit,
       currentVisitIsRetrospective: false,
@@ -43,7 +42,7 @@ describe('VisitBannerTag', () => {
   });
 
   it('should not render active visit tag for deceased patients', () => {
-    mockUseVisitOrOfflineVisit.mockReturnValue({
+    mockUseVisit.mockReturnValue({
       activeVisit: mockCurrentVisit,
       currentVisit: mockCurrentVisit,
       currentVisitIsRetrospective: false,

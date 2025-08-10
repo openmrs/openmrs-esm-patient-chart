@@ -1,11 +1,19 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenuButton, ShoppingCartIcon } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 
+/**
+ * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ */
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
-  const { orders } = useOrderBasket();
+  const { patient } = usePatientChartStore();
+  const { orders } = useOrderBasket(patient);
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
 
   return (

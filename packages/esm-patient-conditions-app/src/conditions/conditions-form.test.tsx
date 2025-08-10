@@ -20,6 +20,8 @@ const defaultProps = {
   promptBeforeClosing: jest.fn(),
   formContext: 'creating' as 'creating' | 'editing',
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 function renderConditionsForm(props = {}) {

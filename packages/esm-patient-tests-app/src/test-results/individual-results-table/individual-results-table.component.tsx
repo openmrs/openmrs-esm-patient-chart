@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-framework';
-import { getPatientUuidFromStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
 
@@ -54,7 +54,7 @@ const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
 const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, subRows, index, title }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const patientUuid = getPatientUuidFromStore();
+  const { patientUuid } = usePatientChartStore();
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const headerTitle = t(title);

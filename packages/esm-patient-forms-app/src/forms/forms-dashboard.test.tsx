@@ -46,6 +46,8 @@ describe('FormsDashboard', () => {
         patientUuid={mockPatient.id}
         patient={mockPatient}
         setTitle={jest.fn()}
+        visitContext={null}
+        mutateVisitContext={null}
       />,
     );
 

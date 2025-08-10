@@ -78,6 +78,8 @@ interface OrderBasketItemActionsProps {
   openOrderBasket: () => void;
   launchOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
+  responsiveSize: 'lg' | 'md' | 'sm';
+  patient: fhir.Patient;
 }
 
 interface OrderHeaderProps {
@@ -523,6 +525,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                             launchOrderForm={() => launchOrderForm(matchingOrder)}
                                             openOrderBasket={launchOrderBasket}
                                             orderItem={matchingOrder}
+                                            responsiveSize={responsiveSize}
+                                            patient={patient}
                                           />
                                         ) : (
                                           <ExtensionSlot
@@ -605,7 +609,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   );
 };
 
-function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm }: OrderBasketItemActionsProps) {
+function OrderBasketItemActions({
+  orderItem,
+  openOrderBasket,
+  launchOrderForm,
+  responsiveSize,
+  patient,
+}: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
 
   // Use the appropriate grouping key and postDataPrepFunction based on order type
@@ -629,7 +639,7 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm }:
   }, [orderItem.type, orderItem.orderType.uuid]);
 
   const { grouping, postDataPrepFn } = getOrderBasketConfig();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(grouping, postDataPrepFn);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
   const handleAddOrEditTestResults = useCallback(() => {

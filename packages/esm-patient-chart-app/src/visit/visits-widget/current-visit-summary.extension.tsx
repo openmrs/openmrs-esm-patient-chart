@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
-import { ErrorState, launchWorkspace, useVisit } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
 
@@ -10,25 +9,17 @@ interface CurrentVisitSummaryProps {
   patientUuid: string;
 }
 
+/**
+ * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ */
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { isLoading, currentVisit, error, isValidating } = useVisit(patientUuid);
+  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore();
 
-  if (isLoading) {
-    return (
-      <InlineLoading
-        status="active"
-        iconDescription={t('loading', 'Loading')}
-        description={t('loadingVisit', 'Loading current visit...')}
-      />
-    );
+  if (patientUuid !== storePatientUuid) {
+    return null;
   }
-
-  if (!!error) {
-    return <ErrorState headerTitle={t('failedToLoadCurrentVisit', 'Failed loading current visit')} error={error} />;
-  }
-
-  if (!currentVisit) {
+  if (!visitContext) {
     return (
       <EmptyState
         headerTitle={t('currentVisit', 'Current visit')}
@@ -43,10 +34,10 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
   return (
     <div className={styles.container}>
       <CardHeader title={t('currentVisit', 'Current visit')}>
-        <span>{isValidating ? <InlineLoading /> : null}</span>
+        <span />
       </CardHeader>
       <div className={styles.visitSummaryCard}>
-        <VisitSummary visit={currentVisit} patientUuid={patientUuid} />
+        <VisitSummary visit={visitContext} patientUuid={patientUuid} />
       </div>
     </div>
   );

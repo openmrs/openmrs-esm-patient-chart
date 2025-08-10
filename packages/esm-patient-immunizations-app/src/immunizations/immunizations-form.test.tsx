@@ -74,6 +74,8 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: mockSetTitle,
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 mockUseConfig.mockReturnValue({

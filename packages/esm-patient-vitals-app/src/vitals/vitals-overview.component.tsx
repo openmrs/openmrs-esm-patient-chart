@@ -243,6 +243,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     tableHeaders={tableHeaders}
                     tableRows={tableRows}
                     urlLabel={urlLabel}
+                    patient={patient}
                   />
                 </div>
               )}

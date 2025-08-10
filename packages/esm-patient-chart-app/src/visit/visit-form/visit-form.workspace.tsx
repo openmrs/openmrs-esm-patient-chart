@@ -29,7 +29,6 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
-  useVisit,
   type AssignedExtension,
   type NewVisitPayload,
   type Visit,
@@ -109,6 +108,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
   promptBeforeClosing,
   showPatientHeader = false,
   visitToEdit,
+  mutateVisitContext,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -120,7 +120,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
 
@@ -327,8 +326,8 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // 1. Current visit data (for critical components like visit summary, action buttons)
             // 2. Visit history table (for the paginated visit list)
 
-            // Update current visit data for critical components (useVisit hook)
-            mutateCurrentVisit();
+            // Update patient's visit context data for critical components
+            mutateVisitContext?.();
 
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
@@ -373,7 +372,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
         ).then(
           () => {
             // Use same targeted approach for offline visits for consistency
-            mutateCurrentVisit();
+            mutateVisitContext();
 
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
@@ -407,7 +406,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
       globalMutate,
       handleVisitAttributes,
       isOnline,
-      mutateCurrentVisit,
+      mutateVisitContext,
       patientUuid,
       t,
       visitFormCallbacks,

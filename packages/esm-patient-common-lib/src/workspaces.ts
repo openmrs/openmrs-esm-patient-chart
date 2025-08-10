@@ -5,6 +5,7 @@ import {
   navigateAndLaunchWorkspace,
   showModal,
   useFeatureFlag,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { usePatientChartStore } from './store/patient-chart-store';
@@ -14,6 +15,8 @@ import { useVisitOrOfflineVisit } from './offline/visit';
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
   patientUuid: string;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
 }
 
 export function launchPatientChartWithWorkspaceOpen({
@@ -35,16 +38,20 @@ export function launchPatientChartWithWorkspaceOpen({
   });
 }
 
+/**
+ * This hook MUST only be used in components mounted in the patient chart.
+ * @param workspaceName
+ * @returns
+ */
 export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid } = usePatientChartStore();
+  const { patientUuid, patient, visitContext, mutateVisitContext } = usePatientChartStore();
   const { systemVisitEnabled } = useSystemVisitSetting();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isRdeEnabled = useFeatureFlag('rde');
 
   const launchPatientWorkspaceCb = useCallback(
     (additionalProps?: T) => {
-      if (!systemVisitEnabled || currentVisit) {
-        launchWorkspace(workspaceName, additionalProps);
+      if (!systemVisitEnabled || visitContext) {
+        launchWorkspace(workspaceName, { patientUuid, patient, visitContext, mutateVisitContext, ...additionalProps });
       } else {
         if (isRdeEnabled) {
           const dispose = showModal('visit-context-switcher', {
@@ -58,7 +65,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
         }
       }
     },
-    [currentVisit, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
+    [visitContext, mutateVisitContext, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid, patient],
   );
   return launchPatientWorkspaceCb;
 }

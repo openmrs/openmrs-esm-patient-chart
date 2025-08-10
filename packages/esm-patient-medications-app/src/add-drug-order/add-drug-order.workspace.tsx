@@ -35,7 +35,11 @@ export default function AddDrugOrderWorkspace({
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
+    patient,
+    'medications',
+    prepMedicationOrderPostData,
+  );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
 
   const cancelDrugOrder = useCallback(() => {
@@ -94,7 +98,7 @@ export default function AddDrugOrderWorkspace({
             </Button>
           </div>
         )}
-        <DrugSearch openOrderForm={openOrderForm} />
+        <DrugSearch patient={patient} openOrderForm={openOrderForm} />
       </>
     );
   } else {

@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import styles from './vitals-biometrics-action-menu.scss';
 
 interface VitalsAndBiometricsActionMenuProps {
+  patient: fhir.Patient;
   encounterUuid: string;
 }
 
-export const VitalsAndBiometricsActionMenu = ({ encounterUuid }: VitalsAndBiometricsActionMenuProps) => {
+export const VitalsAndBiometricsActionMenu = ({ encounterUuid, patient }: VitalsAndBiometricsActionMenuProps) => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromStore();
+  const patientUuid = patient.id;
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchVitalsAndBiometricsForm = useCallback(() => {
