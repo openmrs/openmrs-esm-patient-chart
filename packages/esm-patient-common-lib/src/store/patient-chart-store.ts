@@ -1,40 +1,38 @@
-import { createGlobalStore, useStore } from '@openmrs/esm-framework';
+import { type Actions, createGlobalStore, useStoreWithActions, type Visit } from '@openmrs/esm-framework';
 
 export interface PatientChartStore {
-  patientUuid?: string;
-  patient?: fhir.Patient;
+  patientUuid: string;
+  patient: fhir.Patient;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
 
-const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {});
+const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {
+  patientUuid: null,
+  patient: null,
+  visitContext: null,
+  mutateVisitContext: null,
+});
+
+const patientCharStoreActions = {
+  setPatient(_, patient: fhir.Patient) {
+    return { patient, patientUuid: patient?.id ?? null, visitContext: null, mutateVisitContext: null };
+  },
+  setVisitContext(_, visitContext: Visit, mutateVisitContext: () => void) {
+    return { visitContext, mutateVisitContext };
+  },
+} satisfies Actions<PatientChartStore>;
 
 /**
- * This function returns the patient chart store.
- *
- * The patient chart store is used to store all global variables used in the patient chart.
- * In the recent requirements, patient chart is now not only bound with `/patient/{patientUuid}/` path.
+ * Hook to access the values and sets of the patient chart store.
+ * Note: This hooks MUST only be used by components inside the patient chart app.
+ * Workspaces / extensions that can be mounted by other apps (ex: the start visit form in the queue's app,
+ * the clinical forms workspace in the ward app), where the app display information of multiple patients,
+ * should have the patient / visitContext explicitly passed in as props.
+ * @returns
  */
-export function getPatientChartStore() {
-  return patientChartStore;
-}
-
 export function usePatientChartStore() {
-  return useStore(patientChartStore);
-}
-
-/**
- * This function will get the patient UUID from either URL, or will look into the patient chart store.
- * @returns {string} patientUuid
- */
-export function getPatientUuidFromStore(): string | undefined {
-  return patientChartStore.getState().patientUuid;
-}
-
-/**
- * This function will get the current patient from the store
- * @returns {string} patientUuid
- */
-export function getPatientFromStore(): fhir.Patient | undefined {
-  return patientChartStore.getState().patient;
+  return useStoreWithActions(patientChartStore, patientCharStoreActions);
 }

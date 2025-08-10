@@ -8,6 +8,10 @@ interface DeleteVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
+/**
+ * This button shows up in the patient banner action menu, but only when the patient has an active visit.
+ * On click, it opens the modal in delete-visit-dialog.component.tsx to DELETE the visit
+ */
 const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { activeVisit } = useVisit(patientUuid);

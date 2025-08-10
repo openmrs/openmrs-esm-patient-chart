@@ -76,7 +76,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(patient, 'medications');
   const { results, goTo, currentPage } = usePagination(medications, pageSize);
 
   const tableHeaders = [

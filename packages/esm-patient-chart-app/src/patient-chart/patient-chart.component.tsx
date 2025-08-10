@@ -1,12 +1,5 @@
-import {
-  ExtensionSlot,
-  WorkspaceContainer,
-  setCurrentVisit,
-  usePatient,
-  useWorkspaces,
-  useLeftNav,
-} from '@openmrs/esm-framework';
-import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, WorkspaceContainer, usePatient, useWorkspaces, useLeftNav } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -21,26 +14,26 @@ const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
-  const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
+  const extensionState = useMemo(
+    () => ({
+      patientUuid,
+      patient,
+    }),
+    [patient, patientUuid],
+  );
   const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
-  // Keep state updated with the current patient. Anything used outside the patient
-  // chart (e.g., the current visit is used by the Active Visit Tag used in the
-  // patient search) must be updated in the callback, which is called when the patient
-  // chart unmounts.
-  useEffect(() => {
-    setCurrentVisit(patientUuid, null);
-    return () => {
-      setCurrentVisit(null, null);
-    };
-  }, [patientUuid]);
+  const { setPatient } = usePatientChartStore();
 
   useEffect(() => {
-    getPatientChartStore().setState({ ...state });
+    if (!isLoadingPatient) {
+      setPatient(patient);
+    }
+
     return () => {
-      getPatientChartStore().setState({});
+      setPatient(null);
     };
-  }, [state]);
+  }, [patient, setPatient, isLoadingPatient]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
@@ -62,17 +55,17 @@ const PatientChart: React.FC = () => {
             ) : (
               <>
                 <aside>
-                  <ExtensionSlot name="patient-header-slot" state={state} />
-                  <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
-                  <ExtensionSlot name="patient-info-slot" state={state} />
+                  <ExtensionSlot name="patient-header-slot" state={extensionState} />
+                  <ExtensionSlot name="patient-highlights-bar-slot" state={extensionState} />
+                  <ExtensionSlot name="patient-info-slot" state={extensionState} />
                 </aside>
                 <div className={styles.grid}>
                   <div
                     className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
                   >
                     <ChartReview
-                      patient={state.patient}
-                      patientUuid={state.patientUuid}
+                      patient={extensionState.patient}
+                      patientUuid={extensionState.patientUuid}
                       view={view}
                       setDashboardLayoutMode={setLayoutMode}
                     />
@@ -86,7 +79,7 @@ const PatientChart: React.FC = () => {
       <WorkspaceContainer
         showSiderailAndBottomNav
         contextKey={`patient/${patientUuid}`}
-        additionalWorkspaceProps={state}
+        additionalWorkspaceProps={extensionState}
       />
     </>
   );

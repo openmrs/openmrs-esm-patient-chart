@@ -31,6 +31,8 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       patient={mockPatient}
       promptBeforeClosing={jest.fn()}
       setTitle={jest.fn()}
+      visitContext={null}
+      mutateVisitContext={null}
     />,
   );
 

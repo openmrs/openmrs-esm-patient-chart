@@ -7,16 +7,21 @@ import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-bui
 import styles from './encounter-list-tabs.scss';
 import { filter } from '../utils/helpers';
 import { type Encounter } from '../types';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface EncounterListTabsComponentProps {
   patientUuid: string;
   patient: fhir.Patient;
 }
 
-const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({ patientUuid, patient }) => {
+/**
+ * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ */
+const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { activeVisit, currentVisit } = useVisit(patientUuid);
-  const visit = currentVisit ?? activeVisit;
+  const { activeVisit } = useVisit(patientUuid);
+  const { visitContext } = usePatientChartStore();
+  const visit = visitContext ?? activeVisit;
 
   const config = useConfig();
   const { tabDefinitions = [] } = config;
@@ -71,4 +76,4 @@ const EncounterListTabsComponent: React.FC<EncounterListTabsComponentProps> = ({
   );
 };
 
-export default EncounterListTabsComponent;
+export default EncounterListTabsExtension;

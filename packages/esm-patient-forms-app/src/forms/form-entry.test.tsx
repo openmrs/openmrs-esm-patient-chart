@@ -15,6 +15,8 @@ const testProps = {
   formInfo: { formUuid: 'some-form-uuid' },
   mutateForm: jest.fn(),
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 const mockFormEntrySub = jest.fn();

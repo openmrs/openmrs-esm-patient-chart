@@ -24,6 +24,7 @@ interface PaginatedVitalsProps {
   tableHeaders: Array<VitalsTableHeader>;
   tableRows: Array<VitalsTableRow>;
   urlLabel: string;
+  patient: fhir.Patient;
 }
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
@@ -33,6 +34,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   tableHeaders,
   tableRows,
   urlLabel,
+  patient,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -132,7 +134,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       );
                     })}
                     <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} />
+                      <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
                     </TableCell>
                   </TableRow>
                 ))}

@@ -32,6 +32,8 @@ describe('MarkPatientDeceasedForm', () => {
     closeWorkspaceWithSavedChanges: jest.fn(),
     promptBeforeClosing: jest.fn(),
     setTitle: jest.fn(),
+    visitContext: null,
+    mutateVisitContext: null,
   };
 
   const codedCausesOfDeath = [

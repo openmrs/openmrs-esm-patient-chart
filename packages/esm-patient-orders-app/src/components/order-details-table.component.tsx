@@ -83,6 +83,7 @@ interface OrderBasketItemActionsProps {
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
   responsiveSize: 'lg' | 'md' | 'sm';
+  patient: fhir.Patient;
 }
 
 interface OrderHeaderProps {
@@ -90,16 +91,6 @@ interface OrderHeaderProps {
   header: string;
   isSortable: boolean;
   isVisible?: boolean;
-}
-
-interface DataTableRow {
-  id: string;
-  cells: Array<{
-    id: number;
-    info: { header: string };
-    value: ReactNode | { props: { orderItem: Order }; content: string };
-  }>;
-  isExpanded: boolean;
 }
 
 type MutableOrderBasketItem = OrderBasketItem;
@@ -529,6 +520,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                                 openOrderForm={() => openOrderForm(matchingOrder)}
                                                 orderItem={matchingOrder}
                                                 responsiveSize={responsiveSize}
+                                                patient={patient}
                                               />
                                             ) : (
                                               <ExtensionSlot
@@ -618,9 +610,10 @@ function OrderBasketItemActions({
   openOrderBasket,
   openOrderForm,
   responsiveSize,
+  patient,
 }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, orderItem.orderType.uuid);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
   const handleModifyClick = useCallback(() => {
