@@ -113,8 +113,9 @@ const VisitForm: React.FC<VisitFormProps> = ({
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
+  const isDeceased = Boolean(patient?.deceasedDateTime);
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
-    useVisitFormSchemaAndDefaultValues(visitToEdit);
+    useVisitFormSchemaAndDefaultValues(visitToEdit, { isDeceased });
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -451,8 +452,18 @@ const VisitForm: React.FC<VisitFormProps> = ({
                       </ContentSwitcher>
                     ) : (
                       <ContentSwitcher selectedIndex={selectedIndex} onChange={({ name }) => onChange(name)} size="md">
-                        <Switch name="new" text={t('new', 'New')} />
-                        <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
+                        <Switch
+                          name="new"
+                          text={t('new', 'New')}
+                          disabled={isDeceased}
+                          title={isDeceased ? t('deceasedPatient', 'This patient is deceased') : ''}
+                        />
+                        <Switch
+                          name="ongoing"
+                          text={t('ongoing', 'Ongoing')}
+                          disabled={isDeceased}
+                          title={isDeceased ? t('deceasedPatient', 'This patient is deceased') : ''}
+                        />
                         <Switch name="past" text={t('inThePast', 'In the past')} />
                       </ContentSwitcher>
                     );
