@@ -10,7 +10,6 @@
   "error": "Eroare",
   "errorSaving": "Eroare la salvarea vaccinarii",
   "expirationDate": "Data expirarii",
-  "goToSummary": "Mergi la sumar",
   "immunization": "Vaccinare",
   "immunizationDeleteConfirm": "Esti sigur ca vrei sa stergi doza {{doseNumber}} din {{vaccineName}}?",
   "immunizationDeleted": "Vaccinare stearsa",

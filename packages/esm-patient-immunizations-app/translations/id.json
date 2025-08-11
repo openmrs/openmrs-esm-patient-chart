@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "Kesalahan menyimpan vaksinasi",
   "expirationDate": "Tanggal Kedaluwarsa",
-  "goToSummary": "Lihat Ringkasan",
   "immunization": "Imunisasi",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",

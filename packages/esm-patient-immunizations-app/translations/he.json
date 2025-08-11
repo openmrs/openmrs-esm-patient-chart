@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "שגיאה בשמירת החיסון",
   "expirationDate": "תאריך תפוגה",
-  "goToSummary": "עבור לסיכום",
   "immunization": "Immunization",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",
