@@ -149,8 +149,6 @@ export function useLabEncounter(encounterUuid: string) {
 
 export function useObservation(obsUuid: string) {
   const url = `${restBaseUrl}/obs/${obsUuid}?v=${conceptObsRepresentation}`;
-  // const url = `${restBaseUrl}/obs/${obsUuid}?v=full`;
-
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Observation }, Error>(
     obsUuid ? url : null,
     openmrsFetch,

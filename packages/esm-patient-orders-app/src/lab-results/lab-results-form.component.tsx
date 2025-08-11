@@ -94,7 +94,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ['retrospectiveTime'],
-                message: t('timeIsRequired', 'time is required'),
+                message: t('timeIsRequired', 'Time is required'),
               });
             }
 
@@ -174,7 +174,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     }
 
     if (completeLabResult && order?.fulfillerStatus === 'COMPLETED' && isRdeEnabled) {
-      // "2025-07-25T15:12:00.000+0000"
       const retrospectiveDate = new Date(completeLabResult.obsDatetime);
       setValue('retrospectiveDate', retrospectiveDate);
       const retrospectiveTime = format(retrospectiveDate, 'hh:mm');
