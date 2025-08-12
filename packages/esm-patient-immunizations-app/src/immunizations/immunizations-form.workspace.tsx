@@ -70,6 +70,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
+      nextDoseDate: z.date().nullable().optional(),
       expirationDate: z.date().nullable().optional(),
       lotNumber: z.string().nullable().optional(),
       manufacturer: z.string().nullable().optional(),
@@ -84,6 +85,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccineUuid: '',
       vaccinationDate: dayjs().startOf('day').toDate(),
       doseNumber: 1,
+      nextDoseDate: null,
       note: '',
       expirationDate: null,
       lotNumber: '',
@@ -131,7 +133,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
       try {
-        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer, note } = data;
+        const {
+          vaccineUuid,
+          vaccinationDate,
+          doseNumber,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+          note,
+          nextDoseDate,
+        } = data;
         const abortController = new AbortController();
 
         const immunization: ImmunizationFormData = {
@@ -141,6 +152,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
+          nextDoseDate,
           note,
           expirationDate,
           lotNumber,
@@ -233,6 +245,23 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <DoseInput vaccine={vaccineUuid} sequences={config.sequenceDefinitions} control={control} />
             </ResponsiveWrapper>
           )}
+          <ResponsiveWrapper>
+            <Controller
+              name="nextDoseDate"
+              control={control}
+              render={({ field, fieldState }) => (
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="nextDoseDate"
+                  id="nextDoseDate"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('nextDoseDate', 'Next dose date')}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
           <ResponsiveWrapper>
             <Controller
               name="note"

@@ -53,6 +53,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
         header: sequences.length ? t('sequence', 'Sequence') : t('doseNumberWithinSeries', 'Dose number within series'),
       },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
+      { key: 'nextDoseDate', header: t('nextDoseDate', 'Next dose date') },
       { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
       { key: 'note', header: t('note', 'Note') },
       { key: 'actions', header: t('actions', 'Actions') },
@@ -82,6 +83,14 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
         noToday: true,
         time: false,
       }),
+    nextDoseDate:
+      (dose?.nextDoseDate &&
+        formatDate(new Date(dose.nextDoseDate), {
+          mode: 'standard',
+          noToday: true,
+          time: false,
+        })) ||
+      '--',
     expirationDate:
       (dose?.expirationDate &&
         formatDate(new Date(dose.expirationDate), {
@@ -102,6 +111,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               immunizationId: dose.immunizationObsUuid,
               vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               doseNumber: dose.doseNumber,
+              nextDoseDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               note: dose.note[0]?.text,
               expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
               lotNumber: dose.lotNumber,
