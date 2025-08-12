@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export const configSchemaHorizontal = {
   title: {
@@ -60,7 +60,6 @@ export const configSchemaHorizontal = {
 
 export interface ConfigObjectHorizontal {
   title: string;
-  resultsName: string;
   oldestFirst: boolean;
   data: Array<{
     concept: string;
