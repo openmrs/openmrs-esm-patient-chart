@@ -25,6 +25,10 @@ export type FHIRImmunizationResource = {
   encounter: Reference;
   occurrenceDateTime: Date;
   expirationDate: Date;
+  extension?: Array<{
+    url: string;
+    valueDateTime: string;
+  }>;
   note?: Array<{
     text: string;
   }>;
@@ -39,6 +43,7 @@ export type FHIRImmunizationResource = {
     },
   ];
 };
+
 export type FHIRImmunizationBundleEntry = {
   fullUrl: string;
   resource: FHIRImmunizationResource;

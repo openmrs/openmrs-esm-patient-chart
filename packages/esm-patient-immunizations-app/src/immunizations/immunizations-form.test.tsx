@@ -241,6 +241,7 @@ describe('Immunizations Form', () => {
       vaccinationDate: new Date('2024-01-03'),
       doseNumber: 2,
       expirationDate: new Date('2024-05-19'),
+      nextDoseDate: new Date('2024-05-19'),
       note: 'Given as part of routine schedule.',
       lotNumber: 'A123456',
       manufacturer: 'Merck & Co., Inc.',

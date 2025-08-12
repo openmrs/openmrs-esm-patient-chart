@@ -5,6 +5,7 @@ export interface Immunization {
   vaccineUuid: string;
   immunizationObsUuid?: string;
   manufacturer?: string;
+  nextDoseDate?: string;
   expirationDate?: string;
   occurrenceDateTime?: string;
   lotNumber?: string;
@@ -27,6 +28,7 @@ export interface ImmunizationFormState {
   note: string;
   expirationDate: Date;
   lotNumber: string;
+  nextDoseDate: Date;
   manufacturer: string;
   visitId?: string;
   locationId?: string;
@@ -50,6 +52,7 @@ export interface ExistingDoses {
     text: string;
   }>;
   visitUuid?: string;
+  nextDoseDate: string;
   lotNumber: string;
   manufacturer: string;
   occurrenceDateTime: string;

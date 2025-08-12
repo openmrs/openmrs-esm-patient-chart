@@ -17,12 +17,15 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
+  const nextDoseDate =
+    immunizationResource?.extension?.length > 0 && immunizationResource?.extension[0]?.valueDateTime.toString();
   const expirationDate = immunizationResource?.expirationDate?.toString();
   const note = immunizationResource?.note?.length > 0 && immunizationResource?.note[0]?.text;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
+    nextDoseDate,
     doseNumber,
     note: note ? [{ text: note }] : [],
     occurrenceDateTime,
@@ -120,9 +123,17 @@ export const mapToFHIRImmunizationResource = (
       ],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
-    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
+    encounter: toReferenceOfType('Encounter', visitUuid),
     occurrenceDateTime: immunizationFormData.vaccinationDate,
     expirationDate: immunizationFormData.expirationDate,
+    extension: immunizationFormData.nextDoseDate
+      ? [
+          {
+            url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
+            valueDateTime: immunizationFormData.nextDoseDate.toISOString(),
+          },
+        ]
+      : [],
     note: immunizationFormData.note?.trim() ? [{ text: immunizationFormData.note.trim() }] : [],
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
@@ -131,7 +142,7 @@ export const mapToFHIRImmunizationResource = (
     protocolApplied: [
       {
         doseNumberPositiveInt: immunizationFormData.doseNumber,
-        series: null, // the backend currently does not support "series"
+        series: null,
       },
     ],
   };
