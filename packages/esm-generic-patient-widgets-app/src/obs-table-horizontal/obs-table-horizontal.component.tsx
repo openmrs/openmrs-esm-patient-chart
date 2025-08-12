@@ -125,7 +125,7 @@ const HorizontalTable = ({ tableRowLabels, tableColumns }: { tableRowLabels: any
             {tableColumns.map((column) => (
               <TableHeader key={`obs-hz-date-${column.id}-${column.date}`}>
                 <div className={styles.headerYear}>{column.date.getFullYear()}</div>
-                <div className={styles.headerDate}>{formatDate(column.date, { mode: 'wide', year: false })}</div>
+                <div className={styles.headerDate}>{formatDate(column.date, { year: false, time: false })}</div>
                 <div className={styles.headerTime}>{formatTime(column.date)}</div>
               </TableHeader>
             ))}
