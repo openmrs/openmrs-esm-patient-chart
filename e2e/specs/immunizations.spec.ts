@@ -23,14 +23,14 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(page.getByText(/immunization form/i)).toBeVisible();
   });
 
-  await test.step('And I enter 08/03/2024 as the vaccination date', async () => {
+  await test.step('And I set the vaccination date to 08/03/2024', async () => {
     const vaccinationDateInput = page.getByTestId('vaccinationDate');
     await vaccinationDateInput.getByRole('spinbutton', { name: /day/i }).fill('08');
     await vaccinationDateInput.getByRole('spinbutton', { name: /month/i }).fill('03');
     await vaccinationDateInput.getByRole('spinbutton', { name: /year/i }).fill('2024');
   });
 
-  await test.step('And I select Hepatitis B vaccination from the immunization dropdown', async () => {
+  await test.step('And I choose "Hepatitis B vaccination" from the immunization dropdown', async () => {
     await page.getByRole('combobox', { name: /immunization/i }).click();
     await page.getByText(/hepatitis b vaccination/i).click();
   });
@@ -86,14 +86,14 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(dropdown).toHaveText(/hepatitis b vaccination/i);
   });
 
-  await test.step('And I enter the vaccination date as 02/01/2025', async () => {
+  await test.step('And I set the vaccination date to 02/01/2025', async () => {
     const vaccinationDateInput = page.getByTestId('vaccinationDate');
     await vaccinationDateInput.getByRole('spinbutton', { name: /day/i }).fill('02');
     await vaccinationDateInput.getByRole('spinbutton', { name: /month/i }).fill('01');
     await vaccinationDateInput.getByRole('spinbutton', { name: /year/i }).fill('2025');
   });
 
-  await test.step('And I enter the dose number as 2', async () => {
+  await test.step('And I set the dose number to 2', async () => {
     const doseNumberInput = page.getByRole('spinbutton', { name: /dose number within series/i });
     await doseNumberInput.clear();
     await doseNumberInput.fill('2');
@@ -124,7 +124,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
   });
 
-  await test.step('And I click the Delete button', async () => {
+  await test.step('And I delete the immunization dose', async () => {
     await immunizationsSummaryTable.getByRole('button', { name: /delete/i }).click();
   });
 
@@ -132,15 +132,15 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(page.getByRole('dialog')).toContainText(/are you sure you want to delete/i);
   });
 
-  await test.step('And I click delete', async () => {
+  await test.step('And when I confirm deletion', async () => {
     await page.getByRole('button', { name: 'danger Delete' }).click();
   });
 
-  await test.step('Then I should see a success notification for the deleted vaccination', async () => {
+  await test.step('Then I should see a success notification confirming deletion', async () => {
     await expect(page.getByText(/Immunization dose deleted/i)).toBeVisible();
   });
 
-  await test.step('And I should see There are no immunizations to display for this patient', async () => {
+  await test.step('And I should see an empty state tile', async () => {
     await expect(page.getByText(/there are no immunizations to display for this patient/i)).toBeVisible();
   });
 });
