@@ -41,7 +41,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
   let tableRowLabels = config.data.map(({ concept, label }) => ({
     key: concept,
-    header: label || obss.find((o) => o.conceptUuid === concept)?.code?.text,
+    header: t(label, label) || obss.find((o) => o.conceptUuid === concept)?.code?.text,
   }));
 
   if (config.showEncounterType) {
