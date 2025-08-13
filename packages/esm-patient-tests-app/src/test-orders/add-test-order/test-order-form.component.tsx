@@ -21,6 +21,7 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
   type DefaultPatientWorkspaceProps,
+  type Order,
   type OrderUrgency,
   priorityOptions,
   useOrderBasket,
@@ -39,11 +40,15 @@ import { ordersEqual } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
+import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  prevWorkSpace: string;
+  isWorkSpaceType: (value: string) => boolean;
+  prevOrder: Order;
 }
 
 // Designs:
@@ -56,6 +61,9 @@ export function LabOrderForm({
   promptBeforeClosing,
   orderTypeUuid,
   orderableConceptSets,
+  prevWorkSpace,
+  isWorkSpaceType,
+  prevOrder,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -157,20 +165,39 @@ export function LabOrderForm({
       setOrders(newOrders);
 
       closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
+        onWorkspaceClose: () =>
+          typeof isWorkSpaceType === 'function' &&
+          isWorkSpaceType(prevWorkSpace) &&
+          prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+            ? launchWorkspace(prevWorkSpace, { order: prevOrder })
+            : launchWorkspace(WORKSPACES.ORDER_BASKET),
         closeWorkspaceGroup: false,
       });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [
+      orders,
+      setOrders,
+      session?.currentProvider?.uuid,
+      closeWorkspaceWithSavedChanges,
+      initialOrder,
+      isWorkSpaceType,
+      prevOrder,
+      prevWorkSpace,
+    ],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
     closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () =>
+        typeof isWorkSpaceType === 'function' &&
+        isWorkSpaceType(prevWorkSpace) &&
+        prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+          ? launchWorkspace(prevWorkSpace, { order: prevOrder })
+          : launchWorkspace(WORKSPACES.ORDER_BASKET),
       closeWorkspaceGroup: false,
     });
-  }, [closeWorkspace, orders, setOrders, defaultValues]);
+  }, [closeWorkspace, orders, setOrders, defaultValues, isWorkSpaceType, prevOrder, prevWorkSpace]);
 
   const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
     if (errors) {

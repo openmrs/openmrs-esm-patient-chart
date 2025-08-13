@@ -13,7 +13,9 @@ import { type Control, Controller } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
+import orderStyles from '../order-basket/order-basket.scss';
+import classNames from 'classnames';
+import { useLayoutType, ExtensionSlot } from '@openmrs/esm-framework';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
@@ -148,6 +150,14 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             </AccordionItem>
           </Accordion>
         ) : null}
+        <div className={orderStyles.orderBasketContainer}>
+          <ExtensionSlot
+            className={classNames(orderStyles.orderBasketSlot, {
+              [orderStyles.orderBasketSlotTablet]: isTablet,
+            })}
+            name="result-order-basket-slot"
+          />
+        </div>
       </div>
     );
   }

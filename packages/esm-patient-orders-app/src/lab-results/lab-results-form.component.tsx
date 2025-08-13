@@ -2,12 +2,29 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
 import { type Control, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { type TFunction, useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  restBaseUrl,
+  showSnackbar,
+  useAbortController,
+  useLayoutType,
+  useConfig,
+  useVisit,
+  useSession,
+} from '@openmrs/esm-framework';
+import {
+  type DefaultPatientWorkspaceProps,
+  type Order,
+  type OrderBasketItem,
+  postOrders,
+  postOrdersOnNewEncounter,
+  useOrderBasket,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
+import { type ConfigObject } from '../config-schema';
 import {
   createObservationPayload,
   isCoded,
@@ -20,9 +37,10 @@ import {
   useOrderConceptByUuid,
 } from './lab-results.resource';
 import { createLabResultsFormSchema } from './lab-results-schema.resource';
-
+import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import orderStyles from '../order-basket/order-basket.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
@@ -39,6 +57,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
    */
   invalidateLabOrders,
+  patientUuid = order.patient.uuid,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -48,7 +67,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
   const { mutate } = useSWRConfig();
-
+  const config = useConfig<ConfigObject>();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { orders, clearOrders } = useOrderBasket();
+  const [isSavingOrders, setIsSavingOrders] = useState(false);
+  const [creatingEncounterError, setCreatingEncounterError] = useState('');
+  const session = useSession();
+  const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const mutateOrderData = useCallback(() => {
     mutate(
       (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${order.patient.uuid}`),
@@ -56,6 +83,99 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       { revalidate: true },
     );
   }, [mutate, order.patient.uuid]);
+  const {
+    visitRequired,
+    isLoading: isLoadingEncounterUuid,
+    encounterUuid,
+    error: errorFetchingEncounterUuid,
+    mutate: mutateEncounterUuid,
+  } = useOrderEncounter(patientUuid, config.orderEncounterType);
+
+  function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[]) {
+    const orderedString = patientOrderItems
+      .filter((item) => ['NEW', 'RENEW'].includes(item.action))
+      .map((item) => item.display)
+      .join(', ');
+    const updatedString = patientOrderItems
+      .filter((item) => item.action === 'REVISE')
+      .map((item) => item.display)
+      .join(', ');
+    const discontinuedString = patientOrderItems
+      .filter((item) => item.action === 'DISCONTINUE')
+      .map((item) => item.display)
+      .join(', ');
+
+    showSnackbar({
+      isLowContrast: true,
+      kind: 'success',
+      title: t('orderCompleted', 'Placed orders'),
+      subtitle:
+        (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
+        (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
+        (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
+    });
+  }
+
+  const handleCancel = useCallback(() => {
+    clearOrders();
+  }, [clearOrders]);
+  const handleSave = useCallback(async () => {
+    const abortController = new AbortController();
+    setCreatingEncounterError('');
+    let orderEncounterUuid = encounterUuid ? encounterUuid : order.encounter.uuid;
+    setIsSavingOrders(true);
+    // If there's no encounter present, create an encounter along with the orders.
+    if (!orderEncounterUuid) {
+      try {
+        await postOrdersOnNewEncounter(
+          patientUuid,
+          config?.orderEncounterType,
+          visitRequired ? currentVisit : null,
+          session?.sessionLocation?.uuid,
+          abortController,
+        );
+        mutateEncounterUuid();
+        // Only revalidate current visit since orders create new encounters
+        mutateCurrentVisit();
+        clearOrders();
+        await mutateOrders();
+        showOrderSuccessToast(t, orders);
+      } catch (e) {
+        console.error(e);
+        setCreatingEncounterError(
+          e.responseBody?.error?.message ||
+            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+        );
+      }
+    } else {
+      const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
+      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+      // Only revalidate current visit since orders create new encounters
+      mutateCurrentVisit();
+      await mutateOrders();
+      if (erroredItems.length == 0) {
+        showOrderSuccessToast(t, orders);
+      } else {
+        setOrdersWithErrors(erroredItems);
+      }
+    }
+    setIsSavingOrders(false);
+    return () => abortController.abort();
+  }, [
+    currentVisit,
+    visitRequired,
+    clearOrders,
+    config,
+    encounterUuid,
+    mutateEncounterUuid,
+    mutateOrders,
+    mutateCurrentVisit,
+    orders,
+    patientUuid,
+    session,
+    t,
+    order.encounter.uuid,
+  ]);
 
   const {
     control,
@@ -220,6 +340,53 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 />
               ) : (
                 <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+              )}
+
+              {orders?.length > 0 && (
+                <div className={orderStyles.orderBasketContainer}>
+                  {(creatingEncounterError || errorFetchingEncounterUuid) && (
+                    <InlineNotification
+                      kind="error"
+                      title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+                      subtitle={creatingEncounterError}
+                      lowContrast={true}
+                      className={styles.inlineNotification}
+                    />
+                  )}
+                  {ordersWithErrors.map((order) => (
+                    <InlineNotification
+                      lowContrast
+                      kind="error"
+                      title={t('saveDrugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
+                      subtitle={order.extractedOrderError?.fieldErrors?.join(', ')}
+                      className={styles.inlineNotification}
+                    />
+                  ))}
+                  <ButtonSet className={styles.buttonSet}>
+                    <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
+                      {t('cancelOrder', 'Cancel order')}
+                    </Button>
+                    <Button
+                      className={styles.actionButton}
+                      kind="primary"
+                      onClick={handleSave}
+                      size="sm"
+                      disabled={
+                        isSavingOrders ||
+                        !orders?.length ||
+                        // isLoadingEncounterUuid ||
+                        //  (visitRequired && !currentVisit) ||
+                        orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                      }
+                    >
+                      {isSavingOrders ? (
+                        <InlineLoading description={t('saving', 'Saving') + '...'} />
+                      ) : (
+                        <span>{t('saveOrder', 'Save order')}</span>
+                      )}
+                    </Button>
+                  </ButtonSet>
+                </div>
               )}
             </Stack>
           )}
