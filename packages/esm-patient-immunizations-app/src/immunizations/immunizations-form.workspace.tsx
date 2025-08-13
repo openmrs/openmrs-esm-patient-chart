@@ -46,6 +46,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     immunizationObsUuid: string;
     visitUuid?: string;
   }>();
+  const now = useMemo(() => new Date(), []);
 
   const immunizationFormSchema = useMemo(() => {
     return z.object({
@@ -59,7 +60,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           (date) => {
             // Normalize both dates to start of day in local timezone
             const inputDate = dayjs(date).startOf('day');
-            const today = dayjs().startOf('day');
+            const today = dayjs(now).startOf('day');
             return inputDate.isSame(today) || inputDate.isBefore(today);
           },
           {
@@ -74,7 +75,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       lotNumber: z.string().nullable().optional(),
       manufacturer: z.string().nullable().optional(),
     });
-  }, [patient.birthDate, t]);
+  }, [patient.birthDate, t, now]);
 
   type ImmunizationFormInputData = z.infer<typeof immunizationFormSchema>;
   const formProps = useForm<ImmunizationFormInputData>({
@@ -82,7 +83,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: zodResolver(immunizationFormSchema),
     defaultValues: {
       vaccineUuid: '',
-      vaccinationDate: dayjs().startOf('day').toDate(),
+      vaccinationDate: dayjs(now).startOf('day').toDate(),
       doseNumber: 1,
       nextDoseDate: null,
       note: '',
@@ -110,7 +111,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
       if (props) {
-        const vaccinationDateOrNow = props.vaccinationDate ? parseDate(props.vaccinationDate) : new Date();
+        const vaccinationDateOrNow = props.vaccinationDate ? parseDate(props.vaccinationDate) : now;
         reset({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
@@ -129,7 +130,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       sub.unsubscribe();
       immunizationFormSub.next(null);
     };
-  }, [reset]);
+  }, [reset, now]);
 
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
@@ -214,7 +215,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('vaccinationDate', 'Vaccination date')}
-                  maxDate={new Date()}
+                  maxDate={now}
                 />
               )}
             />
