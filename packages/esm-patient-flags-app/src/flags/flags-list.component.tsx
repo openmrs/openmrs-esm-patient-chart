@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { debounce, isEmpty, orderBy } from 'lodash-es';
+import React, { useMemo, useState } from 'react';
+import { orderBy } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -8,7 +8,7 @@ import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/
 import { getFlagType } from './utils';
 import styles from './flags-list.scss';
 
-type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
+type SortKey = 'alpha' | 'active' | 'retired';
 
 const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -18,81 +18,104 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
-
-  const searchRef = useRef(null);
   const [isEnabling, setIsEnabling] = useState(false);
   const [isDisabling, setIsDisabling] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<dropdownFilter>('A - Z');
+  const [sortBy, setSortBy] = useState<SortKey>('alpha');
+
+  const sortItems = useMemo(
+    () => [
+      { id: 'alpha' as const, label: t('alphabetically', 'A - Z') },
+      { id: 'active' as const, label: t('activeFirst', 'Active first') },
+      { id: 'retired' as const, label: t('retiredFirst', 'Retired first') },
+    ],
+    [t],
+  );
 
   const sortedRows = useMemo(() => {
     if (!sortBy) {
       return flags;
     }
-    if (sortBy === 'Active first') {
-      return orderBy(flags, [(item) => Number(item.voided)], 'asc');
+    if (sortBy === 'active') {
+      return orderBy(flags, [(item) => Number(item.voided)], ['asc']);
     }
-    if (sortBy === 'Retired first') {
-      return orderBy(flags, [(item) => Number(item.voided)], 'desc');
+    if (sortBy === 'retired') {
+      return orderBy(flags, [(item) => Number(item.voided)], ['desc']);
     }
-    return orderBy(flags, (f) => f.flag.display, 'asc');
+    return orderBy(flags, [(f) => f.flag.display], ['asc']);
   }, [sortBy, flags]);
 
   const searchResults = useMemo(() => {
-    if (!isEmpty(searchTerm)) {
-      return sortedRows.filter((f) => f.flag.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1);
-    } else {
-      return sortedRows;
+    const query = searchTerm.trim().toLowerCase();
+    if (query) {
+      return sortedRows.filter((f) => f.flag.display.toLowerCase().includes(query));
     }
+    return sortedRows;
   }, [searchTerm, sortedRows]);
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), [setSearchTerm]);
-
-  const handleSortByChange = ({ selectedItem }) => setSortBy(selectedItem);
+  const handleSortByChange = ({ selectedItem }) => setSortBy(selectedItem?.id as SortKey);
 
   const handleEnableFlag = async (flagUuid) => {
     setIsEnabling(true);
-    const res = await enablePatientFlag(flagUuid);
-
-    if (res.status === 200) {
-      mutate();
-      setIsEnabling(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'success',
-        subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
-        title: t('enabledFlag', 'Enabled flag'),
-      });
-    } else {
+    try {
+      const res = await enablePatientFlag(flagUuid);
+      if (res.ok) {
+        mutate();
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
+          title: t('enabledFlag', 'Enabled flag'),
+        });
+      } else {
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          subtitle: t('flagEnableError', 'Error enabling flag'),
+          title: t('enableFlagError', 'Enable flag error'),
+        });
+      }
+    } catch (e) {
       showSnackbar({
         isLowContrast: false,
         kind: 'error',
         subtitle: t('flagEnableError', 'Error enabling flag'),
-        title: t('flagEnabled', 'flag enabled'),
+        title: t('enableFlagError', 'Enable flag error'),
       });
+    } finally {
+      setIsEnabling(false);
     }
   };
 
   const handleDisableFlag = async (flagUuid) => {
     setIsDisabling(true);
-    const res = await disablePatientFlag(flagUuid);
-
-    if (res.status === 204) {
-      mutate();
-      setIsDisabling(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'success',
-        subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
-        title: t('flagDisabled', 'Flag disabled'),
-      });
-    } else {
+    try {
+      const res = await disablePatientFlag(flagUuid);
+      if (res.ok) {
+        mutate();
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
+          title: t('flagDisabled', 'Flag disabled'),
+        });
+      } else {
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          subtitle: t('flagDisableError', 'Error disabling the flag'),
+          title: t('disableFlagError', 'Disable flag error'),
+        });
+      }
+    } catch (e) {
       showSnackbar({
         isLowContrast: false,
         kind: 'error',
         subtitle: t('flagDisableError', 'Error disabling the flag'),
         title: t('disableFlagError', 'Disable flag error'),
       });
+    } finally {
+      setIsDisabling(false);
     }
   };
 
@@ -112,9 +135,9 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
           <Search
             labelText={t('searchForAFlag', 'Search for a flag')}
             placeholder={t('searchForAFlag', 'Search for a flag')}
-            ref={searchRef}
+            value={searchTerm}
             size={isTablet ? 'lg' : 'md'}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </ResponsiveWrapper>
         <Stack gap={4}>
@@ -130,16 +153,14 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                   <Dropdown
                     className={styles.sortDropdown}
                     id="sortBy"
-                    initialSelectedItem={'A - Z'}
+                    initialSelectedItem={sortItems[0]}
                     label=""
                     type="inline"
-                    items={[
-                      t('alphabetically', 'A - Z'),
-                      t('activeFirst', 'Active first'),
-                      t('retiredFirst', 'Retired first'),
-                    ]}
+                    items={sortItems}
+                    itemToString={(item) => item?.label ?? ''}
+                    selectedItem={sortItems.find((item) => item.id === sortBy)}
                     onChange={handleSortByChange}
-                    titleText="Sort by"
+                    titleText={t('sortBy', 'Sort by')}
                   />
                 </>
               ) : null}
@@ -150,7 +171,12 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                     <div className={styles.flagHeader}>
                       <div className={styles.titleAndType}>
                         <div className={styles.flagTitle}>{result.flag.display}</div>&middot;
-                        <span className={styles.type}>{t(getFlagType(result.tags)) || t('clinical', 'Clinical')}</span>
+                        <span className={styles.type}>
+                          {(() => {
+                            const typeLabel = getFlagType(result.tags);
+                            return typeLabel ? t(typeLabel, typeLabel) : t('clinical', 'Clinical');
+                          })()}
+                        </span>
                       </div>
                       <Toggle
                         className={styles.flagToggle}
@@ -186,8 +212,6 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                       size="sm"
                       onClick={() => {
                         setSearchTerm('');
-                        searchRef.current.value = '';
-                        searchRef.current.focus();
                       }}
                     >
                       {t('clearSearch', 'Clear search')}
