@@ -1,5 +1,5 @@
-import { Button, Loading } from '@carbon/react';
-import { showModal, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
+import { Button } from '@carbon/react';
+import { showModal, useFeatureFlag } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +24,10 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore();
+  const { visitContext } = usePatientChartStore(patientUuid);
   const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
 
-  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && storePatientUuid === patientUuid;
+  const showVisitContextHeader = systemVisitEnabled && isRdeEnabled && visitContext;
 
   const openVisitSwitcherModal = () => {
     const dispose = showModal('visit-context-switcher', {

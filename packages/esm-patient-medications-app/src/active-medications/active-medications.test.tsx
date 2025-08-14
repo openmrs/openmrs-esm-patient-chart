@@ -23,11 +23,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useWorkspaces: jest.fn(() => {
       return { workspaces: [{ name: 'order-basket' }] };
     }),
-    useVisitOrOfflineVisit: jest.fn(() => ({
-      currentVisit: {
-        uuid: '8ef90c91-14be-42dd-a1c0-e67fbf904470',
-      },
-    })),
   };
 });
 

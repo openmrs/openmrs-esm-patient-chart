@@ -19,9 +19,10 @@ interface TreeViewProps {
   error?: string;
 }
 
-const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boolean }> = ({
+const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; loadingPanelData: boolean }> = ({
   className,
   loadingPanelData,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
@@ -70,6 +71,19 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
             })}
           >
             <IndividualResultsTable
+              className={classNames({
+                [styles.border]: filteredSubRows?.entries.length,
+              })}
+            >
+              <IndividualResultsTable
+                isLoading={loadingPanelData}
+                subRows={filteredSubRows}
+                index={index}
+                title={filteredSubRows.key}
+              />
+            </div>
+          ) : null;
+        })}
               isLoading={loadingPanelData}
               subRows={filteredSubRows}
               index={index}
@@ -88,7 +102,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, error } = useGetManyObstreeData(patientUuid, conceptUuids);
 
   const { timelineData, tableData, totalResultsCount, filteredResultsCount, resetTree, isLoading } =
     useContext(FilterContext);
@@ -160,7 +174,11 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>
-            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={isLoading} />
+            <GroupedPanelsTables
+              patientUuid={patientUuid}
+              className={styles.groupPanelsTables}
+              loadingPanelData={isLoading}
+            />
           </div>
         ) : view === 'over-time' ? (
           <GroupedTimeline patientUuid={patientUuid} />

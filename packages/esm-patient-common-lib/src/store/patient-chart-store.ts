@@ -18,7 +18,7 @@ const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStore
 
 const patientCharStoreActions = {
   setPatient(_, patient: fhir.Patient) {
-    return { patient, patientUuid: patient?.id ?? null, visitContext: null, mutateVisitContext: null };
+    return { patient, patientUuid: patient?.id ?? null };
   },
   setVisitContext(_, visitContext: Visit, mutateVisitContext: () => void) {
     return { visitContext, mutateVisitContext };
@@ -27,12 +27,28 @@ const patientCharStoreActions = {
 
 /**
  * Hook to access the values and sets of the patient chart store.
- * Note: This hooks MUST only be used by components inside the patient chart app.
+ * Note: This hooks SHOULD only be used by components inside the patient chart app.
+ *
  * Workspaces / extensions that can be mounted by other apps (ex: the start visit form in the queue's app,
- * the clinical forms workspace in the ward app), where the app display information of multiple patients,
+ * the clinical forms workspace in the ward app)
  * should have the patient / visitContext explicitly passed in as props.
- * @returns
+ *
+ * As a safety feature, this hook requires the the patientUuid as the input, and only
+ * returns the actual store values if input patientUuid matches that in the store.
  */
-export function usePatientChartStore() {
-  return useStoreWithActions(patientChartStore, patientCharStoreActions);
+export function usePatientChartStore(patientUuid: string) {
+  const store = useStoreWithActions(patientChartStore, patientCharStoreActions);
+  if (store.patientUuid === patientUuid) {
+    return store;
+  } else {
+    const fakeStore: typeof store = {
+      ...store,
+      mutateVisitContext: null,
+      setVisitContext: () => {},
+      patient: null,
+      patientUuid: null,
+      visitContext: null,
+    };
+    return fakeStore;
+  }
 }

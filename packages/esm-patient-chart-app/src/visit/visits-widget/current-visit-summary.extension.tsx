@@ -10,11 +10,12 @@ interface CurrentVisitSummaryProps {
 }
 
 /**
- * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ * This extension is not used in the refapp.
+ * This extension uses the patient chart store and SHOULD only be mounted within the patient chart
  */
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore();
+  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore(patientUuid);
 
   if (patientUuid !== storePatientUuid) {
     return null;

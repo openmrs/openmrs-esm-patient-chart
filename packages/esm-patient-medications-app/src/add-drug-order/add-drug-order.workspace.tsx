@@ -128,6 +128,12 @@ export default function AddDrugOrderWorkspace({
           allowSelectingDrug={false} // In this workspace, the drug is selected in <DrugSearch>, not in <DrugOrderForm>
         />
       </div>
+      <DrugOrderForm
+        initialOrderBasketItem={currentOrder}
+        onSave={saveDrugOrder}
+        onCancel={cancelDrugOrder}
+        promptBeforeClosing={promptBeforeClosing}
+      />
     );
   }
 }

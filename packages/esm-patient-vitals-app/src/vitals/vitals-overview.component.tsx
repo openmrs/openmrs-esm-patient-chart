@@ -40,7 +40,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const isTablet = useLayoutType() === 'tablet';
   const [isPrinting, setIsPrinting] = useState(false);
   const contentToPrintRef = useRef(null);
-  const launchVitalsBiometricsForm = useLaunchVitalsAndBiometricsForm();
+  const launchVitalsBiometricsForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { data: vitals, error, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid);

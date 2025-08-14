@@ -7,11 +7,6 @@ import VisitTag from './visit-tag.extension';
 
 const mockUseVisit = jest.mocked(useVisit);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useVisitOrOfflineVisit: jest.fn(),
-}));
-
 describe('VisitBannerTag', () => {
   it('renders an active visit tag when an active visit is ongoing', () => {
     mockUseVisit.mockReturnValue({

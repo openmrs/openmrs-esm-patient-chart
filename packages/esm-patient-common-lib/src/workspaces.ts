@@ -10,7 +10,6 @@ import {
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
-import { useVisitOrOfflineVisit } from './offline/visit';
 
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
@@ -38,20 +37,15 @@ export function launchPatientChartWithWorkspaceOpen({
   });
 }
 
-/**
- * This hook MUST only be used in components mounted in the patient chart.
- * @param workspaceName
- * @returns
- */
-export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid, patient, visitContext, mutateVisitContext } = usePatientChartStore();
+export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: string, workspaceName: string) {
+  const { visitContext } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
 
   const launchPatientWorkspaceCb = useCallback(
     (additionalProps?: T) => {
       if (!systemVisitEnabled || visitContext) {
-        launchWorkspace(workspaceName, { patientUuid, patient, visitContext, mutateVisitContext, ...additionalProps });
+        launchWorkspace(workspaceName, additionalProps);
       } else {
         if (isRdeEnabled) {
           const dispose = showModal('visit-context-switcher', {
@@ -65,7 +59,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
         }
       }
     },
-    [visitContext, mutateVisitContext, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid, patient],
+    [visitContext, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
   );
   return launchPatientWorkspaceCb;
 }

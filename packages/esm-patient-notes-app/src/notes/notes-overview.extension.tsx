@@ -28,7 +28,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Forms & Notes`;
   const urlLabel = t('seeAll', 'See all');
 
-  const { visitContext } = usePatientChartStore();
+  const { visitContext } = usePatientChartStore(patientUuid);
   const displayText = t('visitNotes', 'Visit notes');
   const headerTitle = t('visitNotes', 'Visit notes');
   const { visitNotes, error, isLoading, isValidating } = useVisitNotes(patientUuid);

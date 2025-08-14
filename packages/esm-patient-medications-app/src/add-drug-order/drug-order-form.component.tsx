@@ -59,6 +59,7 @@ import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
+  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   patient: fhir.Patient;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
@@ -130,6 +131,7 @@ export function DrugOrderForm({
   promptBeforeClosing,
   allowSelectingPrescribingClinician,
   allowSelectingDrug,
+export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
@@ -277,6 +279,7 @@ export function DrugOrderForm({
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
+  const { patient } = usePatientChartStore();
   const patientName = patient ? getPatientName(patient) : '';
 
   const observer = useRef(null);

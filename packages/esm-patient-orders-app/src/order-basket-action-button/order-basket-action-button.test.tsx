@@ -49,17 +49,6 @@ jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
   return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => {
-  return {
-    usePatientChartStore: () => ({ patientUuid: mockPatient.id }),
-  };
-});
-
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
-  usePatientChartStore: jest.fn(),
-}));
-
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
 const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
@@ -78,15 +67,7 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display tablet view action button', async () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('tablet');
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatient.id,
-      patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
-    });
-    render(<OrderBasketActionButton />);
+    render(<OrderBasketActionButton patient={mockPatient} patientUuid={mockPatient.id} />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
@@ -97,15 +78,7 @@ describe('<OrderBasketActionButton/>', () => {
   it('should display desktop view action button', async () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatient.id,
-      patient: mockPatient,
-      visitContext: mockVisit,
-      mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
-    });
-    render(<OrderBasketActionButton />);
+    render(<OrderBasketActionButton patient={mockPatient} patientUuid={mockPatient.id} />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
@@ -118,16 +91,8 @@ describe('<OrderBasketActionButton/>', () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: true });
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatient.id,
-      patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
-    });
 
-    render(<OrderBasketActionButton />);
+    render(<OrderBasketActionButton patient={mockPatient} patientUuid={mockPatient.id} />);
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
@@ -138,17 +103,9 @@ describe('<OrderBasketActionButton/>', () => {
 
   it('should display a count tag when orders are present on the desktop view', () => {
     mockUseLayoutType.mockReturnValue('small-desktop');
-    mockUsePatientChartStore.mockReturnValue({
-      patientUuid: mockPatient.id,
-      patient: mockPatient,
-      visitContext: null,
-      mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
-    });
     const { result } = renderHook(() => useOrderBasket(mockPatient));
     expect(result.current.orders).toHaveLength(1); // sanity check
-    render(<OrderBasketActionButton />);
+    render(<OrderBasketActionButton patient={mockPatient} patientUuid={mockPatient.id} />);
 
     expect(screen.getByText(/order basket/i)).toBeInTheDocument();
     expect(screen.getByText(/1/i)).toBeInTheDocument();
@@ -156,7 +113,7 @@ describe('<OrderBasketActionButton/>', () => {
 
   it('should display the count tag when orders are present on the tablet view', () => {
     mockUseLayoutType.mockReturnValue('tablet');
-    render(<OrderBasketActionButton />);
+    render(<OrderBasketActionButton patient={mockPatient} patientUuid={mockPatient.id} />);
 
     expect(screen.getByRole('button', { name: /1 order basket/i })).toBeInTheDocument();
   });

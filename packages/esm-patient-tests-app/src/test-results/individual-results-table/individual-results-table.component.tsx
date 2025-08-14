@@ -14,11 +14,12 @@ import {
   TableRow,
 } from '@carbon/react';
 import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-framework';
-import { usePatientChartStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
 
 interface IndividualResultsTableProps {
+  patientUuid;
   isLoading: boolean;
   subRows: GroupedObservation;
   index: number;
@@ -51,10 +52,15 @@ const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
   }
 };
 
-const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, subRows, index, title }) => {
+const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
+  patientUuid,
+  isLoading,
+  subRows,
+  index,
+  title,
+}) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { patientUuid } = usePatientChartStore();
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const headerTitle = t(title);

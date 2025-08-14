@@ -100,3 +100,12 @@ export function invalidateVisitAndEncounterData(mutate: KeyedMutator<unknown>, p
   invalidateVisitHistory(mutate, patientUuid);
   invalidatePatientEncounters(mutate, patientUuid);
 }
+
+/**
+ * Invalides a visit fetched by URL /visit/<uuid>
+ * @param mutate - SWR mutate function from useSWRConfig()
+ * @param visitUuid
+ */
+export function invalidateVisitByUuid(mutate: KeyedMutator<unknown>, visitUuid: string) {
+  mutate(new RegExp(`${restBaseUrl}/visit${visitUuid}`));
+}
