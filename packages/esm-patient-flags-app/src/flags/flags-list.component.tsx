@@ -150,7 +150,7 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                     <div className={styles.flagHeader}>
                       <div className={styles.titleAndType}>
                         <div className={styles.flagTitle}>{result.flag.display}</div>&middot;
-                        <span className={styles.type}>{getFlagType(result.tags)}</span>
+                        <span className={styles.type}>{t(getFlagType(result.tags)) || t('clinical', 'Clinical')}</span>
                       </div>
                       <Toggle
                         className={styles.flagToggle}
@@ -165,7 +165,7 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                     {result.voided ? null : (
                       <div className={styles.secondRow}>
                         <div className={styles.metadata}>
-                          <span className={styles.label}>Assigned</span>
+                          <span className={styles.label}>{t('assigned', 'Assigned')}</span>
                           <span className={styles.value}>
                             {formatDate(parseDate(result.auditInfo?.dateCreated), { time: false })}
                           </span>

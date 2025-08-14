@@ -13,21 +13,21 @@
           "default": "Edit patient flags"
         }
       },
-      "featureFlag": "patientFlags"
+      "featureFlag": "patient-flags"
     },
     {
       "name": "patient-flag-tags",
       "slot": "patient-highlights-bar-slot",
       "component": "flagTags",
       "order": 0,
-      "featureFlag": "patientFlags"
+      "featureFlag": "patient-flags"
     },
     {
       "name": "patient-flags-overview",
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "flagsOverview",
       "order": 0,
-      "featureFlag": "patientFlags",
+      "featureFlag": "patient-flags",
       "meta": {
         "fullWidth": false
       }
