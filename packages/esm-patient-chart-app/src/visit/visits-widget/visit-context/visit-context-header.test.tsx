@@ -1,4 +1,3 @@
-import { useVisit, useVisitContextStore } from '@openmrs/esm-framework';
 import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
@@ -10,16 +9,6 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
   systemVisitEnabled: true,
   errorFetchingSystemVisitSetting: null,
   isLoadingSystemVisitSetting: false,
-});
-
-jest.mocked(useVisit).mockReturnValue({
-  currentVisit: mockCurrentVisit,
-  error: null,
-  mutate: jest.fn(),
-  isValidating: false,
-  activeVisit: null,
-  currentVisitIsRetrospective: false,
-  isLoading: false,
 });
 
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);

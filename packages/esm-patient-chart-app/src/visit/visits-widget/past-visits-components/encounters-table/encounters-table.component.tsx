@@ -44,6 +44,7 @@ import {
   type HtmlFormEntryForm,
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
+  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
@@ -79,7 +80,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutateVisitContext } = usePatientChartStore(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
@@ -132,7 +133,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
               // Update current visit data for critical components
-              mutateCurrentVisit();
+              mutateVisitContext?.();
 
               // Also invalidate visit history and encounter tables since the encounter was deleted
               invalidateVisitAndEncounterData(mutate, patientUuid);
@@ -159,7 +160,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         },
       });
     },
-    [mutate, mutateCurrentVisit, patientUuid, t],
+    [mutate, mutateVisitContext, patientUuid, t],
   );
 
   if (isLoadingEncounterTypes || isLoading) {

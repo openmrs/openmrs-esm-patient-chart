@@ -13,12 +13,7 @@ import {
   useLayoutType,
   useConfig,
 } from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  type OrderBasketItem,
-  useOrderType,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type OrderBasketItem, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';

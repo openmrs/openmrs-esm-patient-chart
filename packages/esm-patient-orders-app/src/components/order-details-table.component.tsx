@@ -107,10 +107,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'md';
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
-  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-drug-order');
+  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-lab-order');
+  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'orderable-concept-workspace');
   const contentToPrintRef = useRef(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);

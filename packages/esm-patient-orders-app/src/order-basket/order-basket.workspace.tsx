@@ -51,7 +51,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid, config.orderEncounterType);
+  } = useOrderEncounter(patientUuid, visitContext, mutateVisitContext, config.orderEncounterType);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
@@ -84,7 +84,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         );
         mutateEncounterUuid();
         // Only revalidate current visit since orders create new encounters
-        mutateVisitContext();
+        mutateVisitContext?.();
         clearOrders();
         await mutateOrders();
         closeWorkspaceWithSavedChanges();
@@ -100,7 +100,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
       // Only revalidate current visit since orders create new encounters
-      mutateVisitContext();
+      mutateVisitContext?.();
       await mutateOrders();
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();

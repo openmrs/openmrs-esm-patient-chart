@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
-import { useConfig, useVisit } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { EncounterList } from './encounter-list.component';
 import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
 import styles from './encounter-list-tabs.scss';
@@ -15,13 +15,12 @@ interface EncounterListTabsComponentProps {
 }
 
 /**
- * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ * This extension is not used in the refapp.
+ * This extension uses the patient chart store and SHOULD only be mounted within the patient chart
  */
 const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
-  const { visitContext } = usePatientChartStore();
-  const visit = visitContext ?? activeVisit;
+  const { visitContext } = usePatientChartStore(patientUuid);
 
   const config = useConfig();
   const { tabDefinitions = [] } = config;
@@ -65,7 +64,7 @@ const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({
                 launchOptions={tab.launchOptions}
                 headerTitle={tab.headerTitle}
                 description={tab.description}
-                visit={visit}
+                visit={visitContext}
                 deathStatus={isDead}
               />
             </TabPanel>

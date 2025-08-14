@@ -16,7 +16,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
 
   const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 
-  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit(patient.id, 'add-drug-order');
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
 

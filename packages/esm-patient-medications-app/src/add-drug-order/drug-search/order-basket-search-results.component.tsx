@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
-import { useOrderBasket, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
   closeWorkspace,
@@ -123,7 +123,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, dr
     'medications',
     prepMedicationOrderPostData,
   );
-  const { patientUuid } = usePatientChartStore();
+  const patientUuid = patient.id;
   const { data: activeOrders, isLoading: isLoadingActiveOrders } = useActivePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),

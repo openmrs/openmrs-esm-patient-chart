@@ -32,7 +32,7 @@ const getAttributeValue = (attributeType, value) => {
  * relies on the patient chart store
  */
 const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) => {
-  const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore();
+  const { visitContext, patientUuid: storePatientUuid } = usePatientChartStore(patientUuid);
   const { visitAttributeTypes } = useConfig<ChartConfig>();
 
   if (patientUuid !== storePatientUuid) {

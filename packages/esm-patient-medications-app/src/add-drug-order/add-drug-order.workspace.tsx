@@ -97,6 +97,7 @@ export default function AddDrugOrderWorkspace({
   } else {
     return (
       <DrugOrderForm
+        patientUuid={patient.id}
         initialOrderBasketItem={currentOrder}
         onSave={saveDrugOrder}
         onCancel={cancelDrugOrder}

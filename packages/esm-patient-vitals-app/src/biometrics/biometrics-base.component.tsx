@@ -31,7 +31,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { conceptUnits } = useConceptUnits();
-  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm();
+  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const tableHeaders: Array<BiometricsTableHeader> = [
     {

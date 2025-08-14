@@ -44,7 +44,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   const { workspaces } = useWorkspaces();
 
   const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
-  const launchForm = useLaunchVitalsAndBiometricsForm();
+  const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
