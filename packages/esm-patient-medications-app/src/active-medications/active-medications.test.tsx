@@ -9,7 +9,7 @@ import ActiveMedications from './active-medications.component';
 const mockUseSession = jest.mocked(useSession);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
-const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((patientId, name) => {
   return () => mockLaunchWorkspace(name);
 });
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
