@@ -115,7 +115,7 @@ export function deleteVisitAttribute(visitUuid: string, visitAttributeUuid: stri
   });
 }
 
-export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, config: { isDeceased: boolean }) {
+export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, options: { isDeceased: boolean }) {
   const { t } = useTranslation();
   const { visitAttributeTypes, restrictByVisitLocationTag } = useConfig<ChartConfig>();
   const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
@@ -140,7 +140,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, config: {
     const startDateTime = convertToDateTimeFields(visitToEdit?.startDatetime ?? now);
     const stopDateTime = convertToDateTimeFields(visitToEdit?.stopDatetime ?? now);
 
-    const visitStatus: VisitStatus = config.isDeceased
+    const visitStatus: VisitStatus = options.isDeceased
       ? 'past'
       : visitToEdit == null
         ? 'new'
@@ -280,7 +280,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, config: {
       });
 
     return { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime };
-  }, [t, visitAttributeTypes, visitToEdit, defaultVisitLocation, emrConfiguration, config.isDeceased]);
+  }, [t, visitAttributeTypes, visitToEdit, defaultVisitLocation, emrConfiguration, options.isDeceased]);
 }
 
 // Returns a Date object based on date, time and am/pm inputs from user.
