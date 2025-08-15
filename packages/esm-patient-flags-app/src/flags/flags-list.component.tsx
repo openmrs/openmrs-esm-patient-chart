@@ -59,22 +59,16 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsEnabling(true);
     try {
       const res = await enablePatientFlag(flagUuid);
-      if (res.ok) {
-        mutate();
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
-          title: t('enabledFlag', 'Enabled flag'),
-        });
-      } else {
-        showSnackbar({
-          isLowContrast: false,
-          kind: 'error',
-          subtitle: t('flagEnableError', 'Error enabling flag'),
-          title: t('enableFlagError', 'Enable flag error'),
-        });
+      if (!res.ok) {
+        throw new Error('Enable flag failed');
       }
+      mutate();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
+        title: t('enabledFlag', 'Enabled flag'),
+      });
     } catch (e) {
       showSnackbar({
         isLowContrast: false,
@@ -91,22 +85,16 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsDisabling(true);
     try {
       const res = await disablePatientFlag(flagUuid);
-      if (res.ok) {
-        mutate();
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
-          title: t('flagDisabled', 'Flag disabled'),
-        });
-      } else {
-        showSnackbar({
-          isLowContrast: false,
-          kind: 'error',
-          subtitle: t('flagDisableError', 'Error disabling the flag'),
-          title: t('disableFlagError', 'Disable flag error'),
-        });
+      if (!res.ok) {
+        throw new Error('Disable flag failed');
       }
+      mutate();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
+        title: t('flagDisabled', 'Flag disabled'),
+      });
     } catch (e) {
       showSnackbar({
         isLowContrast: false,
@@ -153,7 +141,6 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
                   <Dropdown
                     className={styles.sortDropdown}
                     id="sortBy"
-                    initialSelectedItem={sortItems[0]}
                     label=""
                     type="inline"
                     items={sortItems}

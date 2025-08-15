@@ -27,9 +27,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
         {infoFlags.map((infoFlag) => (
           <Toggletip key={infoFlag.uuid} align="bottom-start">
             <ToggletipButton label={t('infoFlag', 'Info flag')}>
-              <Tag key={infoFlag.uuid} className={styles.infoFlagTag}>
-                {infoFlag.flag.display}
-              </Tag>
+              <Tag className={styles.infoFlagTag}>{infoFlag.flag.display}</Tag>
             </ToggletipButton>
             <ToggletipContent>
               <div className={styles.content}>
@@ -44,7 +42,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
   };
 
   const RiskFlags = () => {
-    const hasRiskFlag = (tags) => tags?.filter((t) => t.display.includes('risk')).length;
+    const hasRiskFlag = (tags) => tags?.some((t) => t.display.toLowerCase().includes('risk'));
     const riskFlags = filteredFlags.filter((f) => hasRiskFlag(f.tags));
 
     return (
@@ -52,7 +50,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
         {riskFlags.map((riskFlag) => (
           <Toggletip key={riskFlag.uuid} align="bottom-start">
             <ToggletipButton label={t('riskFlag', 'Risk flag')}>
-              <Tag key={riskFlag.uuid} type="high-contrast" className={styles.flagTag}>
+              <Tag type="high-contrast" className={styles.flagTag}>
                 <span className={styles.flagIcon}>&#128681;</span> {riskFlag.flag.display}
               </Tag>
             </ToggletipButton>
