@@ -70,6 +70,15 @@ export interface ListResponse<T> {
   results: Array<T>;
 }
 
+export interface PaginatedListResponse<T> {
+  results: Array<T>;
+  totalCount?: number;
+  links?: {
+    next?: string;
+    prev?: string;
+  };
+}
+
 export interface CompletedFormInfo {
   form: Form;
   associatedEncounters: Array<EncounterWithFormRef>;
