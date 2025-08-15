@@ -277,7 +277,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
               OpenmrsFetchError && error instanceof OpenmrsFetchError
                 ? typeof error.responseBody === 'string'
                   ? error.responseBody
-                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
                 : error?.message;
 
             showSnackbar({

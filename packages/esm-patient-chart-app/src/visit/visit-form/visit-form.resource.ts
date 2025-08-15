@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, type TFunction } from 'react-i18next';
 import dayjs from 'dayjs';
 import { z } from 'zod';
 import {
@@ -57,7 +57,7 @@ export type ErrorObject = {
   };
 };
 
-export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TFunction) {
   const {
     error: { fieldErrors, globalErrors, message, code },
   } = errorObject ?? {};
@@ -74,7 +74,7 @@ export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
       .join('\n');
   }
 
-  return message ?? code ?? 'Unknown error';
+  return message ?? code ?? t('unknownError', 'Unknown error');
 }
 // *****************
 

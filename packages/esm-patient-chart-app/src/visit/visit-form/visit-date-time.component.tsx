@@ -14,6 +14,7 @@ const minOf = (...values: Array<number | undefined | null>) => {
   const nums = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
   return nums.length ? Math.min(...nums) : undefined;
 };
+
 const maxOf = (...values: Array<number | undefined | null>) => {
   const nums = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
   return nums.length ? Math.max(...nums) : undefined;
