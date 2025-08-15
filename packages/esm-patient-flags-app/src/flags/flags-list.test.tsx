@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
-import FlagsList from './flags-list.component';
+import FlagsList from './patient-flags.workspace';
 
 const mockUsePatientFlags = usePatientFlags as jest.Mock;
 

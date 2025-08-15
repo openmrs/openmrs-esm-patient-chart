@@ -50,7 +50,7 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 
   await user.click(editButton);
 
-  expect(mockLaunchWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 
   const closeButton = screen.getByRole('button', { name: /close flags bar/i });
 

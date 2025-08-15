@@ -16,7 +16,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((flag) => !flag.voided);
 
-  const handleClickEditFlags = useCallback(() => launchWorkspace('edit-flags-side-panel-form'), []);
+  const handleClickEditFlags = useCallback(() => launchWorkspace('patient-flags-workspace'), []);
 
   const InfoFlags = () => {
     const hasInfoFlag = (tags) => tags?.some((t) => t.display.toLowerCase().includes('info'));
