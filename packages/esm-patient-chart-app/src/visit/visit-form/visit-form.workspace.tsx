@@ -111,7 +111,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
   promptBeforeClosing,
   showPatientHeader = false,
   visitToEdit,
-  mutateVisitContext,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -339,7 +338,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
-            // (current visit is already updated with mutateCurrentVisit)
+            // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
