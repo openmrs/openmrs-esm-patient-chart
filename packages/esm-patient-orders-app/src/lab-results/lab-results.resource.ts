@@ -130,6 +130,29 @@ export function useOrderConceptByUuid(uuid: string) {
   return results;
 }
 
+export function useOrderConceptsByUuids(uuids: string[]) {
+  const { data, error, isLoading, isValidating, mutate } = useSWR<LabOrderConcept[], Error>(
+    uuids.length ? ['concepts', ...uuids] : null,
+    async () => {
+      const results = await Promise.all(uuids.map((uuid) => fetchAllSetMembers(uuid)));
+      return results;
+    },
+  );
+
+  const results = useMemo(
+    () => ({
+      concepts: data ?? [],
+      isLoading,
+      error,
+      isValidating,
+      mutate,
+    }),
+    [data, error, isLoading, isValidating, mutate],
+  );
+
+  return results;
+}
+
 export function useLabEncounter(encounterUuid: string) {
   const apiUrl = `${restBaseUrl}/encounter/${encounterUuid}?v=${labEncounterRepresentation}`;
 
@@ -163,6 +186,35 @@ export function useObservation(obsUuid: string) {
   };
 }
 
+export function useObservations(obsUuids: string[]) {
+  const fetchMultipleObservations = async () => {
+    if (!obsUuids || obsUuids.length === 0) return [];
+
+    const results = await Promise.all(
+      obsUuids.map(async (uuid) => {
+        const url = `${restBaseUrl}/obs/${uuid}?v=${conceptObsRepresentation}`;
+        const res = await openmrsFetch(url);
+        return res.data;
+      }),
+    );
+
+    return results;
+  };
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    obsUuids && obsUuids.length > 0 ? ['observations', ...obsUuids] : null,
+    fetchMultipleObservations,
+  );
+
+  return {
+    data: data || [],
+    isLoading,
+    error,
+    isValidating,
+    mutate,
+  };
+}
+
 export function useCompletedLabResults(order: Order) {
   const {
     encounter,
@@ -185,6 +237,31 @@ export function useCompletedLabResults(order: Order) {
       mutateObs();
     },
     error: isErrorObs ?? encounterError,
+  };
+}
+
+export function useCompletedLabResultsForOrders(orders: Order[]) {
+  const {
+    encounter,
+    isLoading: isLoadingEncounter,
+    mutate: mutateLabOrders,
+    error: encounterError,
+  } = useLabEncounter(orders[0]?.encounter.uuid);
+
+  const obsUuids = orders
+    .map((order) => encounter?.obs.find((obs) => obs?.concept?.uuid === order?.concept?.uuid)?.uuid)
+    .filter(Boolean) as string[];
+
+  const { data: observations, isLoading: isLoadingObs, error: errorObs, mutate: mutateObs } = useObservations(obsUuids);
+
+  return {
+    isLoading: isLoadingEncounter || isLoadingObs,
+    completeLabResults: observations,
+    mutate: () => {
+      mutateLabOrders();
+      mutateObs();
+    },
+    error: errorObs ?? encounterError,
   };
 }
 

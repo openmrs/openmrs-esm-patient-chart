@@ -11,6 +11,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  useWorkspaces,
 } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
@@ -18,6 +19,7 @@ import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddLabOrderWorkspace from './add-test-order.workspace';
+import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -25,6 +27,7 @@ const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockUseWorkSpaces = jest.mocked(useWorkspaces);
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
@@ -87,6 +90,9 @@ function renderAddLabOrderWorkspace() {
       patient={mockPatient}
       setTitle={jest.fn()}
       orderTypeUuid="test-lab-order-type-uuid"
+      prevWorkSpace={WORKSPACES.ORDER_BASKET}
+      isWorkSpaceType={jest.fn()}
+      prevOrder={null}
     />,
   );
   return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
