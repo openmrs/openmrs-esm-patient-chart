@@ -1,12 +1,12 @@
 import {
   ExtensionSlot,
   WorkspaceContainer,
-  setCurrentVisit,
   usePatient,
   useWorkspaces,
   useLeftNav,
+  useVisit,
 } from '@openmrs/esm-framework';
-import { getPatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -16,31 +16,85 @@ import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import SideMenuPanel from '../side-nav/side-menu.component';
 import { type LayoutMode } from './chart-review/dashboard-view.component';
 import styles from './patient-chart.scss';
+import { useVisitByUuId } from './patient-chart.resources';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
-  const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
-  // Keep state updated with the current patient. Anything used outside the patient
-  // chart (e.g., the current visit is used by the Active Visit Tag used in the
-  // patient search) must be updated in the callback, which is called when the patient
-  // chart unmounts.
-  useEffect(() => {
-    setCurrentVisit(patientUuid, null);
-    return () => {
-      setCurrentVisit(null, null);
-    };
-  }, [patientUuid]);
+  const {
+    patientUuid: storePatientUuid,
+    setPatient,
+    visitContext,
+    mutateVisitContext,
+    setVisitContext,
+  } = usePatientChartStore(patientUuid);
+
+  // The patient chart store sets the patient when we enter the patient chart
+  // and unsets the patient when we leave. (This gives extensions and workspaces a way
+  // to check whether they are rendered within the patient chart app.)
+  // Note, however, that the visitContext is NOT unset when we leave the chart, as
+  // we want to persist it across refreshes.
+  // When we enter the chart, we want to update the visit context as follows:
+  // does the the stored visitContext exist and belong to the patient?
+  // 1. If so, the visitContext should be valid but possibly stale; fetch the visit again
+  //    and update the context
+  // 2. If not, fetch the active visit of the patient, If it exists, set it as the
+  //    visitContext; otherwise, clear it.
+  const isVisitContextValid = visitContext && visitContext.patient.uuid === patientUuid;
+  const {
+    data: newVisitContext,
+    mutate: newMutateVisitContext,
+    isLoading: isLoadingVisitContext,
+  } = useVisitByUuId(isVisitContextValid ? visitContext.uuid : null);
+  const {
+    activeVisit,
+    isLoading: isLoadingActiveVisit,
+    mutate: mutateActiveVisit,
+  } = useVisit(isVisitContextValid ? null : patientUuid);
+
+  const state = useMemo(
+    () => ({
+      patientUuid,
+      patient: patient ?? {},
+      visitContext,
+      mutateVisitContext,
+    }),
+    [patient, patientUuid, visitContext, mutateVisitContext],
+  );
 
   useEffect(() => {
-    getPatientChartStore().setState({ ...state });
+    if (!isLoadingVisitContext && !isLoadingActiveVisit && storePatientUuid) {
+      if (activeVisit) {
+        setVisitContext(activeVisit, mutateActiveVisit);
+      } else if (newVisitContext) {
+        setVisitContext(newVisitContext.data, newMutateVisitContext);
+      } else {
+        setVisitContext(null, null);
+      }
+    }
+  }, [
+    newVisitContext,
+    isLoadingVisitContext,
+    newMutateVisitContext,
+    setVisitContext,
+    activeVisit,
+    isLoadingActiveVisit,
+    storePatientUuid,
+    mutateActiveVisit,
+  ]);
+
+  useEffect(() => {
+    if (!isLoadingPatient) {
+      setPatient(patient);
+    }
+
     return () => {
-      getPatientChartStore().setState({});
+      setPatient(null);
     };
-  }, [state]);
+  }, [patient, setPatient, isLoadingPatient]);
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
@@ -87,6 +141,7 @@ const PatientChart: React.FC = () => {
         showSiderailAndBottomNav
         contextKey={`patient/${patientUuid}`}
         additionalWorkspaceProps={state}
+        actionMenuProps={state}
       />
     </>
   );

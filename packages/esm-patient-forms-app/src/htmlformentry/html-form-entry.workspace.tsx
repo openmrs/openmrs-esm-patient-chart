@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  type DefaultPatientWorkspaceProps,
-  type FormEntryProps,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type FormEntryProps } from '@openmrs/esm-patient-common-lib';
 import HtmlFormEntryWrapper from './html-form-entry-wrapper.component';
 
 interface HtmlFormEntryComponentProps extends DefaultPatientWorkspaceProps {
@@ -12,12 +8,11 @@ interface HtmlFormEntryComponentProps extends DefaultPatientWorkspaceProps {
 
 const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   patientUuid,
-  patient,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   formInfo,
+  visitContext,
 }) => {
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { encounterUuid, visitUuid, htmlForm } = formInfo || {};
 
   // we always want to prompt the user before closing/hiding the workspace because we can't guarantee maintaining the state of the form
@@ -30,8 +25,8 @@ const HtmlFormEntry: React.FC<HtmlFormEntryComponentProps> = ({
   const url = `${window.openmrsBase}/htmlformentryui/htmlform/${uiPage}.page?`;
   const searchParams = new URLSearchParams();
   searchParams.append('patientId', patientUuid);
-  if (visitUuid || currentVisit?.uuid) {
-    searchParams.append('visitId', visitUuid ?? currentVisit?.uuid);
+  if (visitUuid || visitContext?.uuid) {
+    searchParams.append('visitId', visitUuid ?? visitContext?.uuid);
   }
   if (encounterUuid) {
     searchParams.append('encounterId', encounterUuid);

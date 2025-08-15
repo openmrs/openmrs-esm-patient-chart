@@ -27,9 +27,14 @@ import {
   useVisit,
   launchWorkspace,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  PatientChartPagination,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
-import { type ExistingDoses, type Sequence } from '../types';
 import { useImmunizations } from '../hooks/useImmunizations';
 import SequenceTable from './components/immunizations-sequence-table.component';
 import styles from './immunizations-detailed-summary.scss';
@@ -48,7 +53,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const { immunizationsConfig } = useConfig();
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
-  const { currentVisit } = useVisit(patientUuid);
+  const { visitContext } = usePatientChartStore(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
 
@@ -59,12 +64,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   }, [existingImmunizations, sequenceDefinitions]);
 
   const launchImmunizationsForm = useCallback(() => {
-    if (!currentVisit) {
+    if (!visitContext) {
       launchStartVisitPrompt();
       return;
     }
     launchWorkspace('immunization-form-workspace');
-  }, [currentVisit, launchStartVisitPrompt]);
+  }, [visitContext, launchStartVisitPrompt]);
 
   const sortedImmunizations = useMemo(() => {
     return orderBy(

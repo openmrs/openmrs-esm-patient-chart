@@ -16,10 +16,11 @@ interface BiometricsBaseProps {
   pageSize: number;
   pageUrl: string;
   patientUuid: string;
+  patient: fhir.Patient;
   urlLabel: string;
 }
 
-const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
+const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
@@ -30,7 +31,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { conceptUnits } = useConceptUnits();
-  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm();
+  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const tableHeaders: Array<BiometricsTableHeader> = [
     {
@@ -130,6 +131,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
             urlLabel={urlLabel}
             pageUrl={pageUrl}
             tableHeaders={tableHeaders}
+            patient={patient}
           />
         )}
       </div>

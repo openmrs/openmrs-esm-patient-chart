@@ -83,6 +83,7 @@ interface OrderBasketItemActionsProps {
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
   responsiveSize: 'lg' | 'md' | 'sm';
+  patient: fhir.Patient;
 }
 
 interface OrderHeaderProps {
@@ -90,16 +91,6 @@ interface OrderHeaderProps {
   header: string;
   isSortable: boolean;
   isVisible?: boolean;
-}
-
-interface DataTableRow {
-  id: string;
-  cells: Array<{
-    id: number;
-    info: { header: string };
-    value: ReactNode | { props: { orderItem: Order }; content: string };
-  }>;
-  isExpanded: boolean;
 }
 
 type MutableOrderBasketItem = OrderBasketItem;
@@ -116,10 +107,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'md';
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
-  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-drug-order');
+  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-lab-order');
+  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'orderable-concept-workspace');
   const contentToPrintRef = useRef(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
@@ -529,6 +520,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                                 openOrderForm={() => openOrderForm(matchingOrder)}
                                                 orderItem={matchingOrder}
                                                 responsiveSize={responsiveSize}
+                                                patient={patient}
                                               />
                                             ) : (
                                               <ExtensionSlot
@@ -618,9 +610,10 @@ function OrderBasketItemActions({
   openOrderBasket,
   openOrderForm,
   responsiveSize,
+  patient,
 }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, orderItem.orderType.uuid);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
   const handleModifyClick = useCallback(() => {

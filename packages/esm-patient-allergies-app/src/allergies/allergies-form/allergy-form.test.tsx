@@ -207,6 +207,8 @@ function renderAllergyForm(props = {}) {
     patientUuid: mockPatient.id,
     promptBeforeClosing: () => {},
     setTitle: jest.fn(),
+    visitContext: null,
+    mutateVisitContext: null,
   };
 
   render(<AllergyForm {...defaultProps} {...props} />);

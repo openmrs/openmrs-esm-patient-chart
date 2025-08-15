@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
   invalidateVisitAndEncounterData,
-  useVisitOrOfflineVisit,
   type DefaultPatientWorkspaceProps,
   type FormEntryProps,
 } from '@openmrs/esm-patient-common-lib';
@@ -24,23 +23,23 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   promptBeforeClosing,
   mutateForm,
   formInfo,
+  visitContext,
+  mutateVisitContext,
 }) => {
   const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid, additionalProps } =
     formInfo || {};
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
   const isOnline = useConnectivity();
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
 
   const state = useMemo(
     () => ({
       view: 'form',
       formUuid: formUuid ?? null,
-      visitUuid: visitUuid ?? currentVisit?.uuid ?? null,
-      visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
-      visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? null,
-      visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
+      visitUuid: visitUuid ?? visitContext?.uuid ?? null,
+      visitTypeUuid: visitTypeUuid ?? visitContext?.visitType?.uuid ?? null,
+      visitStartDatetime: visitStartDatetime ?? visitContext?.startDatetime ?? null,
+      visitStopDatetime: visitStopDatetime ?? visitContext?.stopDatetime ?? null,
       isOffline: !isOnline,
       patientUuid: patientUuid ?? null,
       patient,
@@ -52,7 +51,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       closeWorkspaceWithSavedChanges: () => {
         typeof mutateForm === 'function' && mutateForm();
         // Update current visit data for critical components
-        mutateCurrentVisit();
+        mutateVisitContext?.();
 
         // Also invalidate visit history and encounter tables since form submission may create/update encounters
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
@@ -68,15 +67,15 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       clinicalFormsWorkspaceName,
       closeWorkspace,
       closeWorkspaceWithSavedChanges,
-      currentVisit?.startDatetime,
-      currentVisit?.stopDatetime,
-      currentVisit?.uuid,
-      currentVisit?.visitType?.uuid,
+      visitContext?.startDatetime,
+      visitContext?.stopDatetime,
+      visitContext?.uuid,
+      visitContext?.visitType?.uuid,
       encounterUuid,
       formUuid,
       globalMutate,
       isOnline,
-      mutateCurrentVisit,
+      mutateVisitContext,
       mutateForm,
       patient,
       patientUuid,

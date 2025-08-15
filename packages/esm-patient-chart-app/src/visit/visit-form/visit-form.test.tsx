@@ -7,7 +7,6 @@ import {
   useConfig,
   useEmrConfiguration,
   useLocations,
-  useVisitContextStore,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -56,6 +55,7 @@ const visitAttributes = {
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSetTitle = jest.fn();
+const mockMutateVisitContext = jest.fn();
 
 const testProps = {
   openedFrom: 'test',
@@ -65,6 +65,8 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: mockSetTitle,
+  visitContext: null,
+  mutateVisitContext: mockMutateVisitContext,
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);
@@ -177,14 +179,6 @@ mockSaveVisit.mockResolvedValue({
     },
   },
 } as unknown as FetchResponse<Visit>);
-
-jest.mocked(useVisitContextStore).mockReturnValue({
-  manuallySetVisitUuid: null,
-  patientUuid: null,
-  setVisitContext: jest.fn(),
-  mutateVisitCallbacks: {},
-  mutateVisit: jest.fn(),
-});
 
 describe('Visit form', () => {
   beforeEach(() => {

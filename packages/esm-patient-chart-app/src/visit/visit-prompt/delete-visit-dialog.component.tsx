@@ -8,12 +8,18 @@ import styles from './start-visit-dialog.scss';
 interface DeleteVisitDialogProps {
   closeModal: () => void;
   patientUuid: string;
-  visit: Visit;
+  activeVisit: Visit;
+  mutateActiveVisit: () => void;
 }
 
-const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patientUuid, visit }) => {
+const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({
+  closeModal,
+  mutateActiveVisit,
+  patientUuid,
+  activeVisit,
+}) => {
   const { t } = useTranslation();
-  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, closeModal);
+  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(activeVisit, mutateActiveVisit, closeModal);
 
   return (
     <div>
@@ -24,7 +30,7 @@ const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patie
       <ModalBody>
         <p className={styles.body}>
           {t('confirmDeleteVisitText', 'Deleting this {{visit}} will delete its associated encounters.', {
-            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            visit: activeVisit?.visitType?.display ?? t('visit', 'Visit'),
           })}
         </p>
       </ModalBody>

@@ -37,6 +37,8 @@ const testProps = {
   patient: mockPatient,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 jest.mock('./programs.resource', () => ({

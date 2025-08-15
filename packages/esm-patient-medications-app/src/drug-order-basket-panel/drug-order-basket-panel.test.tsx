@@ -3,7 +3,7 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from 'tools';
 import { type DrugOrderBasketItem } from '../types';
-import { mockDrugSearchResultApiData, mockPatientDrugOrdersApiData } from '__mocks__';
+import { mockDrugSearchResultApiData, mockFhirPatient, mockPatientDrugOrdersApiData } from '__mocks__';
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
 
@@ -14,10 +14,17 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useOrderBasket: () => mockUseOrderBasket(),
 }));
 
+const testProps = {
+  patient: mockFhirPatient,
+  patientUuid: mockFhirPatient.id,
+  visitContext: null,
+  mutateVisitContext: null,
+};
+
 describe('OrderBasketPanel', () => {
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
-    render(<DrugOrderBasketPanel />);
+    render(<DrugOrderBasketPanel {...testProps} />);
     expect(screen.getByRole('heading', { name: /Drug orders \(0\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
   });
@@ -39,7 +46,7 @@ describe('OrderBasketPanel', () => {
       orders: orders,
       setOrders: mockSetOrders,
     }));
-    const { rerender } = render(<DrugOrderBasketPanel />);
+    const { rerender } = render(<DrugOrderBasketPanel {...testProps} />);
     expect(screen.getByText(/Drug orders \(4\)/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/New\s*Aspirin 81mg — 81mg — Tablet/i)).toBeVisible();
     expect(getByTextWithMarkup(/DOSE\s*Tablet.*— REFILLS 0 QUANTITY 0/i)).toBeVisible();
@@ -49,7 +56,7 @@ describe('OrderBasketPanel', () => {
     const removeAspirin81Button = screen.getAllByRole('button', { name: /remove from basket/i })[0];
     expect(removeAspirin81Button).toBeVisible();
     await user.click(removeAspirin81Button);
-    rerender(<DrugOrderBasketPanel />); // re-render because the mocked hook does not trigger a render
+    rerender(<DrugOrderBasketPanel {...testProps} />); // re-render because the mocked hook does not trigger a render
     await expect(screen.getByText(/Drug Orders \(3\)/i)).toBeInTheDocument();
   });
 });

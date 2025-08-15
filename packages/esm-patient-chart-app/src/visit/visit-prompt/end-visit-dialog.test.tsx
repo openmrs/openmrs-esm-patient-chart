@@ -4,6 +4,7 @@ import { screen, render } from '@testing-library/react';
 import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.component';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 const endVisitPayload = {
   stopDatetime: expect.any(Date),
@@ -14,6 +15,22 @@ const mockMutate = jest.fn();
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseVisit = jest.mocked(useVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
+
+const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+const mockSetVisitContext = jest.fn();
+
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  usePatientChartStore: jest.fn(),
+}));
+
+mockUsePatientChartStore.mockReturnValue({
+  patientUuid: 'patient-123',
+  patient: null,
+  visitContext: mockCurrentVisit,
+  mutateVisitContext: jest.fn(),
+  setPatient: jest.fn(),
+  setVisitContext: mockSetVisitContext,
+});
 
 describe('End visit dialog', () => {
   beforeEach(() => {
@@ -66,6 +83,8 @@ describe('End visit dialog', () => {
       kind: 'success',
       title: 'Visit ended',
     });
+
+    expect(mockSetVisitContext).toHaveBeenCalledTimes(1);
   });
 
   test('displays an error snackbar if there was a problem ending a visit', async () => {
