@@ -608,7 +608,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       render={({ field, fieldState }) => (
                         <OpenmrsDatePicker
                           {...field}
-                          maxDate={new Date()}
                           id="startDatePicker"
                           labelText={t('startDate', 'Start date')}
                           size={isTablet ? 'lg' : 'sm'}
