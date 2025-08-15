@@ -3,12 +3,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   useOrderConceptByUuid,
+  useOrderConceptsByUuids,
   useLabEncounter,
   useObservation,
   type LabOrderConcept,
   updateOrderResult,
   type Datatype,
   useCompletedLabResults,
+  useCompletedLabResultsForOrders,
 } from './lab-results.resource';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
@@ -16,17 +18,21 @@ import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
 const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
+const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 const mockUseCompletedLabResults = jest.mocked(useCompletedLabResults);
+const mockUseCompletedLabResultsForOrders = jest.mocked(useCompletedLabResultsForOrders);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
   useOrderConceptByUuid: jest.fn(),
+  useOrderConceptsByUuids: jest.fn(),
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
   useCompletedLabResults: jest.fn(),
+  useCompletedLabResultsForOrders: jest.fn(),
 }));
 
 const mockOrder = {
@@ -71,6 +77,28 @@ describe('LabResultsForm', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          hiCritical: 80,
+          hiNormal: 70,
+          lowAbsolute: 0,
+          lowCritical: 40,
+          lowNormal: 50,
+          units: 'mg/dL',
+          allowDecimal: false,
+        },
+      ] as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
     mockUseLabEncounter.mockReturnValue({
       encounter: { obs: [] } as Encounter,
       isLoading: false,
@@ -87,6 +115,12 @@ describe('LabResultsForm', () => {
     });
     mockUseCompletedLabResults.mockReturnValue({
       completeLabResult: null,
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    });
+    mockUseCompletedLabResultsForOrders.mockReturnValue({
+      completeLabResults: [],
       isLoading: false,
       error: null,
       mutate: jest.fn(),
@@ -126,6 +160,28 @@ describe('LabResultsForm', () => {
         units: 'mg/dL',
         allowDecimal: true,
       } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          lowAbsolute: null,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+          allowDecimal: true,
+        },
+      ] as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
@@ -210,6 +266,27 @@ describe('LabResultsForm', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          lowAbsolute: null,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+        },
+      ] as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
     render(<LabResultsForm {...testProps} />);
 
     const input = screen.getByRole('spinbutton', {
@@ -241,6 +318,27 @@ describe('LabResultsForm', () => {
         hiAbsolute: null,
         units: 'mg/dL',
       } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          hiAbsolute: null,
+          units: 'mg/dL',
+        },
+      ] as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
@@ -333,6 +431,54 @@ describe('LabResultsForm', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          hiAbsolute: null,
+          units: 'mg/dL',
+          setMembers: [
+            {
+              uuid: 'set-member-uuid',
+              display: 'Set Member',
+              setMembers: [],
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              lowAbsolute: 50,
+              lowCritical: 70,
+              lowNormal: 80,
+              hiCritical: 140,
+              hiNormal: 120,
+              hiAbsolute: 150,
+              units: 'mg/dL',
+            },
+            {
+              uuid: 'set-member-uuid-2',
+              display: 'Set Member 2',
+              setMembers: [],
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              lowAbsolute: 5,
+              lowCritical: 10,
+              lowNormal: 15,
+              hiCritical: 20,
+              hiNormal: 25,
+              hiAbsolute: 30,
+              units: 'mg/dL',
+            },
+          ],
+        },
+      ] as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
     render(<LabResultsForm {...testProps} />);
 
     // Normal input range
@@ -375,6 +521,27 @@ describe('LabResultsForm', () => {
         hiNormal: null,
         units: 'mg/dL',
       } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Text', hl7Abbreviation: 'ST' } as Datatype,
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+        },
+      ] as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
@@ -450,6 +617,55 @@ describe('LabResultsForm', () => {
         hiNormal: null,
         units: 'mg/dL',
       } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          set: true,
+          setMembers: [
+            {
+              uuid: 'set-member-uuid-1',
+              display: 'Set Member 1',
+              concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
+              hiAbsolute: 100,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mg/dL',
+            },
+            {
+              uuid: 'set-member-uuid-2',
+              display: 'Set Member 2',
+              concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
+              hiAbsolute: 80,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mmol/L',
+            },
+          ],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+        },
+      ] as unknown as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
@@ -559,6 +775,55 @@ describe('LabResultsForm', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          set: true,
+          setMembers: [
+            {
+              uuid: 'set-member-uuid-1',
+              display: 'Set Member 1',
+              concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              hiAbsolute: 100,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mg/dL',
+            },
+            {
+              uuid: 'set-member-uuid-2',
+              display: 'Set Member 2',
+              concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              hiAbsolute: 80,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mmol/L',
+            },
+          ],
+          datatype: { display: 'Numeric' },
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+        },
+      ] as unknown as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
 
     render(<LabResultsForm {...testProps} />);
     const concept1Input = await screen.findByLabelText('Set Member 1 (0 - 100 mg/dL)');
@@ -635,6 +900,20 @@ describe('LabResultsForm', () => {
         setMembers: [],
         datatype: { display: 'N/A' },
       } as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'N/A' },
+        },
+      ] as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
@@ -725,6 +1004,85 @@ describe('LabResultsForm', () => {
         hiNormal: null,
         units: 'mg/dL',
       } as unknown as LabOrderConcept,
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          set: true,
+          setMembers: [
+            {
+              uuid: 'set-member-uuid-1',
+              display: 'Set Member 1',
+              concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              hiAbsolute: 100,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mg/dL',
+            },
+            {
+              uuid: 'set-member-uuid-2',
+              display: 'Set Member 2',
+              concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
+              datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+              hiAbsolute: 80,
+              lowAbsolute: 0,
+              lowCritical: null,
+              lowNormal: null,
+              hiCritical: null,
+              hiNormal: null,
+              units: 'mmol/L',
+            },
+            {
+              uuid: 'set-member-uuid-3',
+              display: 'Set Member 3',
+              concept: { uuid: 'concept-uuid-3', display: 'Concept 3' },
+              datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+              set: true,
+              setMembers: [
+                {
+                  uuid: 'set-member-uuid-3.1',
+                  display: 'Set Member 3.1',
+                  concept: { uuid: 'concept-uuid-3.1', display: 'Concept 3.1' },
+                  datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                  hiAbsolute: 80,
+                  lowAbsolute: 0,
+                  lowCritical: null,
+                  lowNormal: null,
+                  units: 'mg/dL',
+                },
+                {
+                  uuid: 'set-member-uuid-3.2',
+                  display: 'Set Member 3.2',
+                  concept: { uuid: 'concept-uuid-3.2', display: 'Concept 3.2' },
+                  datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                  hiAbsolute: 80,
+                  lowAbsolute: 0,
+                  lowCritical: null,
+                  units: 'mg/dL',
+                },
+              ],
+            },
+          ],
+          datatype: { display: 'Numeric' },
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+        },
+      ] as unknown as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,

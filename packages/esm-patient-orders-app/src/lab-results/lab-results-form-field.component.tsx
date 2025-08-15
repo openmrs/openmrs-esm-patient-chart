@@ -150,14 +150,6 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
             </AccordionItem>
           </Accordion>
         ) : null}
-        <div className={orderStyles.orderBasketContainer}>
-          <ExtensionSlot
-            className={classNames(orderStyles.orderBasketSlot, {
-              [orderStyles.orderBasketSlotTablet]: isTablet,
-            })}
-            name="result-order-basket-slot"
-          />
-        </div>
       </div>
     );
   }

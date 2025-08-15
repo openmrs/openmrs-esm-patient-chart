@@ -25,6 +25,15 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
   };
 }
 
+function createSchemaForConceptList(labOrderConcepts: Array<LabOrderConcept>): SchemaRecord {
+  return labOrderConcepts.reduce((acc, concept) => {
+    return {
+      ...acc,
+      ...createSchemaForConcept(concept), // reuses recursive logic
+    };
+  }, {});
+}
+
 /**
  * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
  * This function is used to generate the schema for the lab results form.
@@ -36,6 +45,21 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) =>
     return z.object({});
   }
   const schema = createSchemaForConcept(labOrderConcepts);
+
+  return z.object(schema);
+};
+
+/**
+ * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
+ * This function is used to generate the schema for the lab results form.
+ * @param labOrderConceptUuid - The UUID of the lab order concept.
+ * @returns A Zod schema object for the lab results form.
+ */
+export const createArrayLabResultsFormSchema = (labOrderConcepts: Array<LabOrderConcept>) => {
+  if (!labOrderConcepts) {
+    return z.object({});
+  }
+  const schema = createSchemaForConceptList(labOrderConcepts);
 
   return z.object(schema);
 };
