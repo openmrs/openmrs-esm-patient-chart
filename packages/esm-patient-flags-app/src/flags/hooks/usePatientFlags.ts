@@ -71,7 +71,7 @@ export function enablePatientFlag(flagUuid: string) {
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: { deleted: 'false' },
+    body: { voided: false },
     signal: controller.signal,
   });
 }

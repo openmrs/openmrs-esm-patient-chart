@@ -21,8 +21,8 @@ export const flagsOverview = getSyncLifecycle(flagsOverviewComponent, {
   moduleName,
 });
 
-export const editPatientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/flags-list.component'), {
-  featureName: 'edit-flags-side-panel-form',
+export const patientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/patient-flags.workspace'), {
+  featureName: 'patient-flags-workspace',
   moduleName,
 });
 

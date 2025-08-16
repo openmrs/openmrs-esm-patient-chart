@@ -15,7 +15,7 @@ const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) =>
   const { t } = useTranslation();
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
-  const riskFlags = filteredFlags.filter((f) => f.tags.some((t) => t.display.includes('risk')));
+  const riskFlags = filteredFlags.filter((f) => f.tags.some((t) => t.display.toLowerCase().includes('risk')));
 
   const [showHighlightBar, setShowHighlightBar] = useState(false);
 
@@ -27,12 +27,14 @@ const FlagsHighlightBar: React.FC<FlagsHighlightBarProps> = ({ patientUuid }) =>
     setShowHighlightBar(false);
   }, []);
 
-  if (decodeURI(path).includes('Patient Summary')) {
+  // Avoid relying on translated display text; check the last path segment
+  const lastSegment = decodeURI(path).split('/').filter(Boolean).pop();
+  if (lastSegment === 'Patient Summary') {
     return null;
   }
 
   if (isLoading) {
-    <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} />;
+    return <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} />;
   }
 
   if (error) {

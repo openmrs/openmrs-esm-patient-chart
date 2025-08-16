@@ -43,5 +43,5 @@ it('renders flags in the patient flags slot', async () => {
 
   await user.click(editButton);
 
-  expect(mockLaunchWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 });
