@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "Erro ao salvar a vacinação",
   "expirationDate": "Data de expiração",
-  "goToSummary": "Ir para o Resumo",
   "immunization": "Imunização",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",

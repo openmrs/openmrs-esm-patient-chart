@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -65,8 +63,6 @@ import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
 import styles from './visit-form.scss';
 
-dayjs.extend(isSameOrBefore);
-
 interface VisitFormProps extends DefaultPatientWorkspaceProps {
   /**
    * A unique string identifying where the visit form is opened from.
@@ -108,7 +104,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
-  }>(null);
+  } | null>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
@@ -282,7 +278,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
               OpenmrsFetchError && error instanceof OpenmrsFetchError
                 ? typeof error.responseBody === 'string'
                   ? error.responseBody
-                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
                 : error?.message;
 
             showSnackbar({
@@ -441,7 +437,8 @@ const VisitForm: React.FC<VisitFormProps> = ({
                   control={control}
                   render={({ field: { onChange, value } }) => {
                     const validVisitStatuses = visitToEdit ? ['ongoing', 'past'] : visitStatuses;
-                    const selectedIndex = validVisitStatuses.indexOf(value) ?? 0;
+                    const idx = validVisitStatuses.indexOf(value);
+                    const selectedIndex = idx >= 0 ? idx : 0;
 
                     // For some reason, Carbon throws NPE when trying to conditionally
                     // render a <Switch> component

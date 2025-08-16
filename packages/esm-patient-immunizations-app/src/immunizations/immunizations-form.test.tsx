@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -11,14 +11,11 @@ import {
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
-import { configSchema } from '../config-schema';
-import { type ImmunizationWidgetConfigObject } from '../types/fhir-immunization-domain';
+import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
-
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
-
 import ImmunizationsForm from './immunizations-form.workspace';
 
 const mockCloseWorkspace = jest.fn();
@@ -26,7 +23,7 @@ const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 const mockSetTitle = jest.fn();
-const mockUseConfig = jest.mocked<() => { immunizationsConfig: ImmunizationWidgetConfigObject }>(useConfig);
+const mockUseConfig = jest.mocked<() => ImmunizationConfigObject>(useConfig);
 const mockUseSession = jest.mocked(useSession);
 const mockUseVisit = jest.mocked(useVisit);
 const mockMutate = jest.fn();
@@ -80,22 +77,20 @@ const testProps = {
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  immunizationsConfig: {
-    immunizationConceptSet: '984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    sequenceDefinitions: [
-      {
-        vaccineConceptUuid: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        sequences: [
-          { sequenceLabel: 'Dose-1', sequenceNumber: 1 },
-          { sequenceLabel: 'Dose-2', sequenceNumber: 2 },
-          { sequenceLabel: 'Dose-3', sequenceNumber: 3 },
-          { sequenceLabel: 'Dose-4', sequenceNumber: 4 },
-          { sequenceLabel: 'Booster-1', sequenceNumber: 11 },
-          { sequenceLabel: 'Booster-2', sequenceNumber: 12 },
-        ],
-      },
-    ],
-  },
+  immunizationConceptSet: '984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  sequenceDefinitions: [
+    {
+      vaccineConceptUuid: '783AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      sequences: [
+        { sequenceLabel: 'Dose-1', sequenceNumber: 1 },
+        { sequenceLabel: 'Dose-2', sequenceNumber: 2 },
+        { sequenceLabel: 'Dose-3', sequenceNumber: 3 },
+        { sequenceLabel: 'Dose-4', sequenceNumber: 4 },
+        { sequenceLabel: 'Booster-1', sequenceNumber: 11 },
+        { sequenceLabel: 'Booster-2', sequenceNumber: 12 },
+      ],
+    },
+  ],
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -205,18 +200,16 @@ describe('Immunizations Form', () => {
     expect(mockSavePatientImmunization).toHaveBeenCalledWith(
       expect.objectContaining({
         encounter: { reference: 'Encounter/17f512b4-d264-4113-a6fe-160cb38cb46e', type: 'Encounter' },
-        expirationDate: null,
         note: [{ text: formValues.note }],
         id: undefined,
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
-        lotNumber: '',
         manufacturer: { display: 'Pfizer' },
         occurrenceDateTime: mockVaccinationDate,
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
         ],
-        protocolApplied: [{ doseNumberPositiveInt: 1, series: null }],
+        protocolApplied: [{ doseNumberPositiveInt: 1 }],
         resourceType: 'Immunization',
         status: 'completed',
         vaccineCode: { coding: [{ code: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Hepatitis B vaccination' }] },
@@ -296,7 +289,7 @@ describe('Immunizations Form', () => {
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
         ],
-        protocolApplied: [{ doseNumberPositiveInt: 2, series: null }],
+        protocolApplied: [{ doseNumberPositiveInt: 2 }],
         resourceType: 'Immunization',
         status: 'completed',
         vaccineCode: {

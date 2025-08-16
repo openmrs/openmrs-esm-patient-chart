@@ -77,7 +77,13 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
                   valueSelected={value}
                 >
                   {results.map(({ uuid, display, name }) => (
-                    <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+                    <RadioButton
+                      className={styles.radioButton}
+                      id={`visit-type-${uuid}`}
+                      key={uuid}
+                      labelText={display}
+                      value={uuid}
+                    />
                   ))}
                 </RadioButtonGroup>
               )}
