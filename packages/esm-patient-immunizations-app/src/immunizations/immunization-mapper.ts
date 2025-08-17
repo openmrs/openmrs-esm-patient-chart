@@ -74,7 +74,7 @@ export const mapFromFHIRImmunizationBundle = (
 
   const validGroups = Object.entries(groupByImmunization).filter(([key]) => key);
 
-  return validGroups.map(([key, immunizationsForOneVaccine]) => {
+  const groups = validGroups.map(([key, immunizationsForOneVaccine]) => {
     const existingDoses: Array<ExistingDoses> = immunizationsForOneVaccine
       .map(mapToImmunizationDoseFromResource)
       .filter((dose) => dose !== null);
@@ -87,6 +87,9 @@ export const mapFromFHIRImmunizationBundle = (
       existingDoses: orderBy(existingDoses, [(dose) => dose.occurrenceDateTime], ['desc']),
     };
   });
+
+  // Sort vaccine groups by most recent dose date (descending)
+  return orderBy(groups, [(g) => g.existingDoses?.[0]?.occurrenceDateTime ?? ''], ['desc']);
 };
 
 function toReferenceOfType(type: string, referenceValue: string): Reference {
@@ -110,17 +113,12 @@ export const mapToFHIRImmunizationResource = (
   locationUuid: string,
   providerUuid: string,
 ): FHIRImmunizationResource => {
-  return {
+  const resource: FHIRImmunizationResource = {
     resourceType: 'Immunization',
     status: 'completed',
     id: immunizationFormData.immunizationId,
     vaccineCode: {
-      coding: [
-        {
-          code: immunizationFormData.vaccineUuid,
-          display: immunizationFormData.vaccineName,
-        },
-      ],
+      coding: [{ code: immunizationFormData.vaccineUuid, display: immunizationFormData.vaccineName }],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid),
@@ -146,4 +144,30 @@ export const mapToFHIRImmunizationResource = (
       },
     ],
   };
+
+  // performer: only when provider is present
+  if (providerUuid) {
+    resource.performer = [{ actor: toReferenceOfType('Practitioner', providerUuid) }];
+  }
+
+  // manufacturer: only when non-empty
+  const manufacturer = immunizationFormData.manufacturer?.trim();
+  if (manufacturer) {
+    resource.manufacturer = { display: manufacturer };
+  }
+
+  // lotNumber: only when non-empty
+  const lotNumber = immunizationFormData.lotNumber?.trim();
+  if (lotNumber) {
+    resource.lotNumber = lotNumber;
+  }
+
+  // protocolApplied: only when dose is a number >= 1
+  const dose = immunizationFormData.doseNumber;
+  if (typeof dose === 'number' && dose >= 1) {
+    resource.protocolApplied = [{ doseNumberPositiveInt: dose }];
+  }
+  // if dose is null/undefined, omit protocolApplied entirely to clear backend dose
+
+  return resource;
 };

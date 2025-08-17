@@ -14,6 +14,7 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
 import { useTranslation } from 'react-i18next';
+import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -21,11 +22,11 @@ interface ObsTableProps {
 
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
+  const config = useConfig<ConfigObjectSwitchable>();
   const { data: obss } = useObs(patientUuid, config.showEncounterType);
-  const uniqueEncounterUuids = [...new Set(obss.map((o) => o.encounter.reference))].sort();
-  const obssGroupedByEncounters = uniqueEncounterUuids.map((date) =>
-    obss.filter((o) => o.encounter.reference === date),
+  const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
+    obss.filter((o) => o.encounter.reference === reference),
   );
 
   const tableHeaders = [

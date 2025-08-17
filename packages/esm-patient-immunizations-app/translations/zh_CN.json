@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "保存疫苗接种时出现错误",
   "expirationDate": "过期日期",
-  "goToSummary": "前往摘要",
   "immunization": "免疫接种",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",

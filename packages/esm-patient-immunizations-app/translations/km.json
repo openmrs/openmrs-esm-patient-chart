@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "Error saving vaccination",
   "expirationDate": "Expiration Date",
-  "goToSummary": "ចូលទៅកាន់តារាងសង្ខេប",
   "immunization": "Immunization",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",

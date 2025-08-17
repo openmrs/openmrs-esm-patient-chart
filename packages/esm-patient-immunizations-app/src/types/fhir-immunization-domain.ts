@@ -19,7 +19,7 @@ export type Reference = {
 export type FHIRImmunizationResource = {
   resourceType: 'Immunization';
   status: 'completed';
-  id: string;
+  id?: string;
   vaccineCode: { coding: Array<Code> };
   patient: Reference;
   encounter: Reference;

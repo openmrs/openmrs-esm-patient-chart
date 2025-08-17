@@ -10,7 +10,6 @@
   "error": "Error",
   "errorSaving": "خطأ في حفظ التطعيم",
   "expirationDate": "تاريخ الانتهاء",
-  "goToSummary": "الانتقال إلى الملخص",
   "immunization": "Immunization",
   "immunizationDeleteConfirm": "Are you sure you want to delete dose {{doseNumber}} of {{vaccineName}}?",
   "immunizationDeleted": "Immunization deleted",
