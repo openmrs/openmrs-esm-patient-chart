@@ -130,7 +130,7 @@ export const mapToFHIRImmunizationResource = (
       ? [
           {
             url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
-            valueDateTime: immunizationFormData.nextDoseDate.toISOString(),
+            valueDateTime: immunizationFormData.nextDoseDate,
           },
         ]
       : [],
