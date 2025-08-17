@@ -27,7 +27,7 @@ export type FHIRImmunizationResource = {
   expirationDate?: Date;
   extension?: Array<{
     url: string;
-    valueDateTime: string;
+    valueDateTime: Date;
   }>;
   note?: Array<{ text: string }>;
   location?: Reference;
