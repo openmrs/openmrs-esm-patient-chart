@@ -17,15 +17,15 @@ import {
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
+  getPatientChartStore,
   type Order,
   type OrderBasketItem,
   postOrders,
-  postOrdersOnNewEncounter,
   useOrderBasket,
   usePatientOrders,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
-import { type Observation, type ObservationValue } from '../types/encounter';
+import { type ObservationValue } from '../types/encounter';
 import { type ConfigObject } from '../config-schema';
 import {
   createObservationPayload,
@@ -94,6 +94,9 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', null, null, null);
   const [savedOrderConceptList, setSavedOrderConceptList] = useState([]);
+  const [existingOrderNumbers, setExistingOrderNumbers] = useState([]);
+  const patientStore = getPatientChartStore();
+  const [isOutSitePatientChart, setIsOutSitePatientChart] = useState(false);
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -104,11 +107,24 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   }, [mutate, order.patient.uuid]);
 
   useEffect(() => {
-    if (savedOrderConceptList.length > 0 && newOrders?.length > 0) {
-      const filteredNewOders = newOrders.filter((o) => savedOrderConceptList.some((c) => o.concept.uuid === c));
-      setOrderList((prevOrders) => [...prevOrders, ...filteredNewOders]);
+    const storeUuid = patientStore.getState().patientUuid;
+    if (!storeUuid) {
+      patientStore.setState({ patientUuid: patientUuid });
+      setIsOutSitePatientChart(true);
     }
-  }, [savedOrderConceptList, newOrders]);
+  }, [patientUuid, patientStore]);
+
+  useEffect(() => {
+    if (savedOrderConceptList.length === 0 || !newOrders?.length) return;
+    const filteredNewOrders = newOrders.filter(
+      (o) => savedOrderConceptList.includes(o.concept.uuid) && !existingOrderNumbers.includes(o.orderNumber),
+    );
+    const updatedNewOrders = savedOrderConceptList.includes(order.concept.uuid)
+      ? filteredNewOrders
+      : [order, ...filteredNewOrders];
+
+    setOrderList(updatedNewOrders);
+  }, [newOrders, savedOrderConceptList, existingOrderNumbers, order]);
 
   const {
     visitRequired,
@@ -146,64 +162,47 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const handleCancel = useCallback(() => {
     clearOrders();
   }, [clearOrders]);
+
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
+    const orderNumbers = newOrders.filter((o) => o.orderNumber != order.orderNumber).map((o) => o.orderNumber);
+    setExistingOrderNumbers(orderNumbers);
     setCreatingEncounterError('');
     let orderEncounterUuid = encounterUuid ? encounterUuid : order.encounter.uuid;
+
     setIsSavingOrders(true);
-    // If there's no encounter present, create an encounter along with the orders.
-    if (!orderEncounterUuid) {
-      try {
-        await postOrdersOnNewEncounter(
-          patientUuid,
-          config?.orderEncounterType,
-          visitRequired ? currentVisit : null,
-          session?.sessionLocation?.uuid,
-          abortController,
-        );
-        mutateEncounterUuid();
-        // Only revalidate current visit since orders create new encounters
-        mutateCurrentVisit();
-        clearOrders();
-        await mutateOrders();
-        showOrderSuccessToast(t, orders);
-      } catch (e) {
-        console.error(e);
-        setCreatingEncounterError(
-          e.responseBody?.error?.message ||
-            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
-        );
-      }
+
+    const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
+    const conceptUuids = orders.map((order) => order['testType']['conceptUuid']);
+    setSavedOrderConceptList(conceptUuids);
+    clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+    // Only revalidate current visit since orders create new encounters
+    mutateCurrentVisit();
+    await mutateOrders();
+    if (erroredItems.length == 0) {
+      showOrderSuccessToast(t, orders);
     } else {
-      const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
-      const conceptUuids = orders.map((order) => order['testType']['conceptUuid']);
-      setSavedOrderConceptList(conceptUuids);
-      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      // Only revalidate current visit since orders create new encounters
-      mutateCurrentVisit();
-      await mutateOrders();
-      if (erroredItems.length == 0) {
-        showOrderSuccessToast(t, orders);
-      } else {
-        setOrdersWithErrors(erroredItems);
-      }
+      setOrdersWithErrors(erroredItems);
     }
     setIsSavingOrders(false);
+    if (isOutSitePatientChart) {
+      patientStore.setState({});
+      setIsOutSitePatientChart(false);
+    }
     return () => abortController.abort();
   }, [
-    currentVisit,
-    visitRequired,
     clearOrders,
-    config,
     encounterUuid,
-    mutateEncounterUuid,
     mutateOrders,
     mutateCurrentVisit,
     orders,
     patientUuid,
-    session,
     t,
     order.encounter.uuid,
+    isOutSitePatientChart,
+    newOrders,
+    order.orderNumber,
+    patientStore,
   ]);
 
   const {
@@ -422,11 +421,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                       onClick={handleSave}
                       size="sm"
                       disabled={
-                        isSavingOrders ||
-                        !orders?.length ||
-                        // isLoadingEncounterUuid ||
-                        //  (visitRequired && !currentVisit) ||
-                        orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                        isSavingOrders || !orders?.length || orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
                       }
                     >
                       {isSavingOrders ? (
