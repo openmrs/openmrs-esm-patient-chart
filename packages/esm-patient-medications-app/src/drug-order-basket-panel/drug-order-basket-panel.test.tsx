@@ -42,7 +42,7 @@ describe('OrderBasketPanel', () => {
     const { rerender } = render(<DrugOrderBasketPanel />);
     expect(screen.getByText(/Drug orders \(4\)/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/New\s*Aspirin 81mg — 81mg — Tablet/i)).toBeVisible();
-    expect(getByTextWithMarkup(/DOSE\s*Tablet.*— REFILLS 0 QUANTITY 0/i)).toBeVisible();
+    expect(getByTextWithMarkup(/DOSE\s*Tablet/i)).toBeVisible();
     expect(getByTextWithMarkup(/Renew\s*Sulfacetamide 0.1 — 10%/i)).toBeVisible();
     expect(getByTextWithMarkup(/Modify\s*Aspirin 162.5mg — 162.5mg — tablet/i)).toBeVisible();
     expect(getByTextWithMarkup(/Discontinue\s*Acetaminophen 325 mg — 325mg — tablet/i)).toBeVisible();

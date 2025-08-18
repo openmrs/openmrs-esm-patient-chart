@@ -14,8 +14,8 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   startDate: Date | string;
   durationUnit: DurationUnit;
   duration: number | null;
-  pillsDispensed: number;
-  numRefills: number;
+  pillsDispensed: number | null;
+  numRefills: number | null;
   indication: string;
   isFreeTextDosage: boolean;
   freeTextDosage: string;
