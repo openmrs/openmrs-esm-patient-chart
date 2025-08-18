@@ -1,5 +1,5 @@
-import { useOrderableConceptSets } from '@openmrs/esm-patient-common-lib';
 import { useMemo } from 'react';
+import { useOrderableConceptSets } from '@openmrs/esm-patient-common-lib';
 
 export interface TestType {
   label: string;
@@ -12,24 +12,26 @@ export function useTestTypes(
   orderableConceptSets: Array<string>,
 ): {
   testTypes: Array<TestType>;
-  isLoading: Boolean;
+  isLoading: boolean;
   error: Error;
 } {
   const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, orderableConceptSets);
 
+  const mappedTestTypes = useMemo(() => {
+    return concepts.map(({ display, uuid, synonyms }) => ({
+      label: display,
+      conceptUuid: uuid,
+      synonyms,
+    }));
+  }, [concepts]);
+
   const results = useMemo(
     () => ({
-      testTypes: concepts
-        ? concepts.map(({ display, uuid, synonyms }) => ({
-            label: display,
-            conceptUuid: uuid,
-            synonyms,
-          }))
-        : [],
+      testTypes: mappedTestTypes,
       isLoading,
       error,
     }),
-    [isLoading, concepts, error],
+    [isLoading, mappedTestTypes, error],
   );
   return results;
 }

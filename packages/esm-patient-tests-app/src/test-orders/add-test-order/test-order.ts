@@ -14,6 +14,6 @@ export function createEmptyLabOrder(testType: TestType, orderer: string): TestOr
   };
 }
 
-export function ordersEqual(order1: LabOrderRequest, order2: LabOrderRequest) {
+export function ordersEqual(order1: LabOrderRequest, order2: LabOrderRequest): boolean {
   return order1.testType.conceptUuid === order2.testType.conceptUuid && order1.action === order2.action;
 }

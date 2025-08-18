@@ -1,6 +1,5 @@
 import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-
 import {
   Button,
   ButtonSet,
@@ -65,9 +64,13 @@ export function LabOrderForm({
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const orderReasonRequired = (
-    config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
-  ).required;
+
+  const orderReasonRequired = useMemo(
+    () =>
+      (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})
+        .required,
+    [config.labTestsWithOrderReasons, initialOrder?.testType?.conceptUuid],
+  );
 
   const labOrderFormSchema = useMemo(
     () =>
@@ -178,15 +181,18 @@ export function LabOrderForm({
     }
   };
 
-  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
-    return (e: ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value as OrderUrgency;
-      if (value !== 'ON_SCHEDULED_DATE') {
-        setValue('scheduledDate', null);
-      }
-      fieldOnChange(e);
-    };
-  };
+  const handleUpdateUrgency = useCallback(
+    (fieldOnChange: ControllerRenderProps['onChange']) => {
+      return (e: ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value as OrderUrgency;
+        if (value !== 'ON_SCHEDULED_DATE') {
+          setValue('scheduledDate', null);
+        }
+        fieldOnChange(e);
+      };
+    },
+    [setValue],
+  );
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
