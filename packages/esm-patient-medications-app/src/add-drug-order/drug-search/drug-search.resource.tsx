@@ -114,8 +114,8 @@ export function getTemplateOrderBasketItem(
               valueCoded: configDefaultDurationConcept?.uuid,
             }
           : null,
-        pillsDispensed: 0,
-        numRefills: 0,
+        pillsDispensed: null,
+        numRefills: null,
         freeTextDosage: '',
         indication: '',
         template: template.template,
@@ -155,8 +155,8 @@ export function getTemplateOrderBasketItem(
               valueCoded: configDefaultDurationConcept?.uuid,
             }
           : null,
-        pillsDispensed: 0,
-        numRefills: 0,
+        pillsDispensed: null,
+        numRefills: null,
         freeTextDosage: '',
         indication: '',
         orderer: null,
