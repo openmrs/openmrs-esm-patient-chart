@@ -55,7 +55,7 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
-import { ChartConfig } from '../../../../config-schema';
+import { type ChartConfig } from '../../../../config-schema';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -83,10 +83,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
-  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
 
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
   });
@@ -235,12 +235,18 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
-                    const encounterAgeInMinutes = (new Date().getTime() - new Date(encounter.datetime).getTime()) / (1000 * 60);
+                    const encounterAgeInMinutes = (Date.now() - new Date(encounter.datetime).getTime()) / (1000 * 60);
 
-                    const canEditEncounter = userHasAccess(encounter.editPrivilege, session?.user) && 
+                    const canDeleteEncounter =
+                      userHasAccess(encounter.editPrivilege, session?.user) &&
                       (encounterEditableDuration === 0 ||
-                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
-                      encounterEditableDurationOverridePrivileges.some((privilege) => userHasAccess(privilege, session?.user)))
+                        (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                        encounterEditableDurationOverridePrivileges.some((privilege) =>
+                          userHasAccess(privilege, session?.user),
+                        ));
+
+                    const canEditEncounter =
+                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
 
                     return (
                       <React.Fragment key={encounter.id}>
@@ -250,13 +256,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
-                              <OverflowMenu
-                                aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
-                                flipped
-                                size={responsiveSize}
-                              >
-                                {canEditEncounter &&
-                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
+                              {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
+                                <OverflowMenu
+                                  aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+                                  flipped
+                                  size={responsiveSize}
+                                  align="left"
+                                >
+                                  {canEditEncounter && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
@@ -282,16 +289,17 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       }}
                                     />
                                   )}
-                                {canEditEncounter && (
-                                  <OverflowMenuItem
-                                    className={styles.menuItem}
-                                    hasDivider
-                                    isDelete
-                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                    onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                  />
-                                )}
-                              </OverflowMenu>
+                                  {canDeleteEncounter && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      hasDivider
+                                      isDelete
+                                      itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                      onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
+                                    />
+                                  )}
+                                </OverflowMenu>
+                              )}
                             </Layer>
                           </TableCell>
                         </TableExpandRow>
@@ -312,38 +320,38 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                               ) : (
                                 <EncounterObservations observations={encounter.obs} />
                               )}
-                              {canEditEncounter && (
-                                <>
-                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
-                                    <Button
-                                      kind="ghost"
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchFormEntryOrHtmlForms(
-                                            htmlFormEntryForms,
-                                            patientUuid,
-                                            encounter.form,
-                                            encounter.visitUuid,
-                                            encounter.id,
-                                            encounter.visitTypeUuid,
-                                            encounter.visitStartDatetime,
-                                            encounter.visitStopDatetime,
-                                          );
-                                        }
-                                      }}
-                                      renderIcon={(props: ComponentProps<typeof EditIcon>) => (
-                                        <EditIcon size={16} {...props} />
-                                      )}
-                                    >
-                                      {t('editThisEncounter', 'Edit this encounter')}
-                                    </Button>
-                                  )}
+                              <>
+                                {canEditEncounter && (
+                                  <Button
+                                    kind="ghost"
+                                    onClick={() => {
+                                      if (isVisitNoteEncounter(encounter)) {
+                                        launchWorkspace('visit-notes-form-workspace', {
+                                          encounter,
+                                          formContext: 'editing',
+                                          patientUuid,
+                                        });
+                                      } else {
+                                        launchFormEntryOrHtmlForms(
+                                          htmlFormEntryForms,
+                                          patientUuid,
+                                          encounter.form,
+                                          encounter.visitUuid,
+                                          encounter.id,
+                                          encounter.visitTypeUuid,
+                                          encounter.visitStartDatetime,
+                                          encounter.visitStopDatetime,
+                                        );
+                                      }
+                                    }}
+                                    renderIcon={(props: ComponentProps<typeof EditIcon>) => (
+                                      <EditIcon size={16} {...props} />
+                                    )}
+                                  >
+                                    {t('editThisEncounter', 'Edit this encounter')}
+                                  </Button>
+                                )}
+                                {canDeleteEncounter && (
                                   <Button
                                     kind="danger--ghost"
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
@@ -353,8 +361,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                   >
                                     {t('deleteThisEncounter', 'Delete this encounter')}
                                   </Button>
-                                </>
-                              )}
+                                )}
+                              </>
                             </>
                           </TableExpandedRow>
                         ) : (
