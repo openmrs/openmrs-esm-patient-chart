@@ -50,11 +50,36 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 
   await user.click(editButton);
 
-  expect(mockLaunchWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 
   const closeButton = screen.getByRole('button', { name: /close flags bar/i });
 
   await user.click(closeButton);
 
   expect(screen.getAllByRole('button', { name: /flag/i })).not.toEqual(5);
+});
+
+it('suppresses the highlight bar on Patient Summary route', () => {
+  // Simulate route where last segment is 'Patient Summary'
+  Object.defineProperty(window, 'location', {
+    value: {
+      ...window.location,
+      pathname: '/patient/123/Patient Summary',
+    },
+    writable: true,
+  });
+
+  mockUsePatientFlags.mockReturnValue({
+    flags: [],
+    error: null,
+    isLoading: false,
+    isValidating: false,
+    mutate: jest.fn(),
+  } as unknown as ReturnType<typeof usePatientFlags>);
+
+  const { rerender } = render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
+  expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
+
+  // No highlight bar should be shown on the patient summary route
+  expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
 });

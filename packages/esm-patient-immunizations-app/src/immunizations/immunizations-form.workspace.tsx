@@ -46,7 +46,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     immunizationObsUuid: string;
     visitUuid?: string;
   }>();
-  const now = useMemo(() => new Date(), []);
 
   const immunizationFormSchema = useMemo(() => {
     return z.object({
@@ -56,9 +55,17 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         .min(new Date(patient.birthDate), {
           message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
         })
-        .max(now, {
-          message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
-        }),
+        .refine(
+          (date) => {
+            // Normalize both dates to start of day in local timezone
+            const inputDate = dayjs(date).startOf('day');
+            const today = dayjs().startOf('day');
+            return inputDate.isSame(today) || inputDate.isBefore(today);
+          },
+          {
+            message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
+          },
+        ),
       // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
@@ -66,7 +73,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       lotNumber: z.string().nullable().optional(),
       manufacturer: z.string().nullable().optional(),
     });
-  }, [patient.birthDate, t, now]);
+  }, [patient.birthDate, t]);
 
   type ImmunizationFormInputData = z.infer<typeof immunizationFormSchema>;
   const formProps = useForm<ImmunizationFormInputData>({
@@ -74,7 +81,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: zodResolver(immunizationFormSchema),
     defaultValues: {
       vaccineUuid: '',
-      vaccinationDate: now,
+      vaccinationDate: dayjs().startOf('day').toDate(),
       doseNumber: 1,
       note: '',
       expirationDate: null,
@@ -100,7 +107,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
       if (props) {
-        const vaccinationDateOrNow = props.vaccinationDate || now;
+        const vaccinationDateOrNow = props.vaccinationDate || new Date();
         reset({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
@@ -118,7 +125,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       sub.unsubscribe();
       immunizationFormSub.next(null);
     };
-  }, [reset, now]);
+  }, [reset]);
 
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
@@ -194,7 +201,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('vaccinationDate', 'Vaccination date')}
-                  maxDate={now}
+                  maxDate={new Date()}
                 />
               )}
             />
@@ -288,7 +295,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
-                  minDate={immunizationToEditMeta ? null : now}
+                  minDate={immunizationToEditMeta ? null : new Date()}
                 />
               )}
             />
