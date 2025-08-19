@@ -7,6 +7,8 @@ import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import Flags from './flags.component';
 
+type FlagWithPriority = ReturnType<typeof usePatientFlags>['flags'][0];
+
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
@@ -24,7 +26,7 @@ it('renders flags in the patient flags slot', async () => {
 
   mockUsePatientFlags.mockReturnValue({
     error: null,
-    flags: mockPatientFlags,
+    flags: mockPatientFlags as FlagWithPriority[],
     isLoading: false,
     isValidating: false,
     mutate: jest.fn(),
