@@ -47,11 +47,11 @@ const PatientChart: React.FC = () => {
   const {
     data: newVisitContext,
     mutate: newMutateVisitContext,
-    isLoading: isLoadingVisitContext,
+    isValidating: isValidatingVisitContext,
   } = useVisitByUuId(isVisitContextValid ? visitContext.uuid : null);
   const {
     activeVisit,
-    isLoading: isLoadingActiveVisit,
+    isValidating: isValidatingActiveVisit,
     mutate: mutateActiveVisit,
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
@@ -66,7 +66,7 @@ const PatientChart: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!isLoadingVisitContext && !isLoadingActiveVisit && storePatientUuid) {
+    if (!isValidatingVisitContext && !isValidatingActiveVisit && storePatientUuid) {
       if (activeVisit) {
         setVisitContext(activeVisit, mutateActiveVisit);
       } else if (newVisitContext) {
@@ -77,11 +77,11 @@ const PatientChart: React.FC = () => {
     }
   }, [
     newVisitContext,
-    isLoadingVisitContext,
+    isValidatingVisitContext,
     newMutateVisitContext,
     setVisitContext,
     activeVisit,
-    isLoadingActiveVisit,
+    isValidatingActiveVisit,
     storePatientUuid,
     mutateActiveVisit,
   ]);
