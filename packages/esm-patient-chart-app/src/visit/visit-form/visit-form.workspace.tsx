@@ -109,7 +109,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState(null);
 
-  const isDeceased = Boolean(patient?.deceasedDateTime);
+  const isDeceased = patient?.deceasedBoolean === true || !!patient?.deceasedDateTime;
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit, { isDeceased });
 
