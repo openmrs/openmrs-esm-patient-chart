@@ -18,11 +18,13 @@ export function useTestTypes(
   const { concepts, isLoading, error } = useOrderableConceptSets(searchTerm, orderableConceptSets);
 
   const mappedTestTypes = useMemo(() => {
-    return concepts.map(({ display, uuid, synonyms }) => ({
-      label: display,
-      conceptUuid: uuid,
-      synonyms,
-    }));
+    return (
+      concepts?.map(({ display, uuid, synonyms }) => ({
+        label: display,
+        conceptUuid: uuid,
+        synonyms,
+      })) || []
+    );
   }, [concepts]);
 
   const results = useMemo(
