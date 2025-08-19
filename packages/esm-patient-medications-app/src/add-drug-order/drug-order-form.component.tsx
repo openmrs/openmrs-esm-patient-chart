@@ -188,7 +188,7 @@ function MedicationInfoHeader({
   orderBasketItem: DrugOrderBasketItem;
   routeValue: string;
   unitValue: string;
-  dosage: number;
+  dosage: number | null;
 }) {
   const { t } = useTranslation();
 
@@ -258,7 +258,7 @@ export function DrugOrderForm({
     defaultValues: {
       isFreeTextDosage: initialOrderBasketItem?.isFreeTextDosage,
       freeTextDosage: initialOrderBasketItem?.freeTextDosage,
-      dosage: initialOrderBasketItem?.dosage,
+      dosage: initialOrderBasketItem?.dosage ?? null,
       unit: initialOrderBasketItem?.unit,
       route: initialOrderBasketItem?.route,
       patientInstructions: initialOrderBasketItem?.patientInstructions,
@@ -266,9 +266,9 @@ export function DrugOrderForm({
       asNeededCondition: initialOrderBasketItem?.asNeededCondition,
       duration: initialOrderBasketItem?.duration,
       durationUnit: initialOrderBasketItem?.durationUnit,
-      pillsDispensed: initialOrderBasketItem?.pillsDispensed,
+      pillsDispensed: initialOrderBasketItem?.pillsDispensed ?? null,
       quantityUnits: initialOrderBasketItem?.quantityUnits,
-      numRefills: initialOrderBasketItem?.numRefills,
+      numRefills: initialOrderBasketItem?.numRefills ?? null,
       indication: initialOrderBasketItem?.indication,
       frequency: initialOrderBasketItem?.frequency,
       startDate: defaultStartDate,
@@ -639,7 +639,7 @@ export function DrugOrderForm({
                       min={0}
                       step={1}
                       max={maxDispenseDurationInDays}
-                      allowEmpty={true}
+                      allowEmpty
                     />
                   ) : (
                     <CustomNumberInput
@@ -904,6 +904,7 @@ const ControlledFieldInput = ({
       const numberInputProps = restProps as ComponentProps<typeof NumberInput>;
       return (
         <NumberInput
+          allowEmpty
           className={fieldErrorStyles}
           disableWheel
           onBlur={onBlur}
@@ -913,7 +914,7 @@ const ControlledFieldInput = ({
           }}
           ref={ref}
           size={isTablet ? 'md' : 'sm'}
-          value={typeof value === 'number' ? value : undefined}
+          value={typeof value === 'number' ? value : ''}
           {...numberInputProps}
         />
       );
