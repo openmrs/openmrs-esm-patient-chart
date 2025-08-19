@@ -55,6 +55,7 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
+import { ChartConfig } from '../../../../config-schema';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -82,7 +83,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
-
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
 
@@ -234,6 +235,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
+                    const encounterAgeInMinutes = (new Date().getTime() - new Date(encounter.datetime).getTime()) / (1000 * 60);
+
+                    const canEditEncounter = userHasAccess(encounter.editPrivilege, session?.user) && 
+                      (encounterEditableDuration === 0 ||
+                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                      encounterEditableDurationOverridePrivileges.some((privilege) => userHasAccess(privilege, session?.user)))
+
                     return (
                       <React.Fragment key={encounter.id}>
                         <TableExpandRow {...getRowProps({ row })}>
@@ -247,7 +255,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 flipped
                                 size={responsiveSize}
                               >
-                                {userHasAccess(encounter.editPrivilege, session?.user) &&
+                                {canEditEncounter &&
                                   (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
@@ -274,7 +282,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       }}
                                     />
                                   )}
-                                {userHasAccess(encounter.editPrivilege, session?.user) && (
+                                {canEditEncounter && (
                                   <OverflowMenuItem
                                     className={styles.menuItem}
                                     hasDivider
@@ -304,7 +312,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                               ) : (
                                 <EncounterObservations observations={encounter.obs} />
                               )}
-                              {userHasAccess(encounter.editPrivilege, session?.user) && (
+                              {canEditEncounter && (
                                 <>
                                   {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
                                     <Button

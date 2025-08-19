@@ -1,11 +1,12 @@
 import React from 'react';
-import { getConfig, showModal, userHasAccess } from '@openmrs/esm-framework';
+import { getConfig, getDefaultsFromConfigSchema, showModal, useConfig, userHasAccess } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import EncountersTable from './encounters-table.component';
 import { type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
+import { ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
 
 const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
@@ -35,6 +36,8 @@ const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
   isLoading: false,
   nextUri: '',
 });
+
+const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 
 jest.mock('./encounters-table.resource', () => ({
   ...jest.requireActual('./encounters-table.resource'),
@@ -69,6 +72,57 @@ describe('EncountersTable', () => {
     });
   });
 });
+
+describe('Encounter editability', () => {
+
+  beforeEach(() => {
+    jest.spyOn(Date, 'now').mockImplementation(() => 
+      new Date('2022-01-18T20:00:00.000Z').getTime()
+    );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('displays an edit encounter button by default', async () => {
+    const user = userEvent.setup();
+
+    renderEncountersTable();
+
+    const row = screen.getByRole('row', {
+      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
+
+    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+    expect(within(row).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
+  });
+
+  it('displays an edit encounter button only if the encounter is within editable duration', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      encounterEditableDuration: 1440,
+      encounterEditableDurationOverridePrivileges: [],
+    });
+
+    const user = userEvent.setup();
+
+    renderEncountersTable();
+
+    const todayRow = screen.getByRole('row', {
+      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
+    await user.click(within(todayRow).getByRole('button', { name: /expand current row/i }));
+    expect(within(todayRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
+
+    const oldRow = screen.getByRole('row', {
+      name: /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i,
+    });
+    await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
+    expect(within(oldRow).queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
+  });
+});
+
 
 describe('Delete Encounter', () => {
   it('Clicking the `Delete` button deletes an encounter', async () => {
