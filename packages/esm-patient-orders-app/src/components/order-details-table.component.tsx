@@ -10,8 +10,6 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -58,6 +56,7 @@ import {
   useConfig,
   useLayoutType,
   usePagination,
+  OpenmrsDateRangePicker,
 } from '@openmrs/esm-framework';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import GeneralOrderTable from './general-order-table.component';
@@ -127,6 +126,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
+  const dateRange: [Date | null, Date | null] = useMemo(
+    () => [selectedFromDate, selectedToDate],
+    [selectedFromDate, selectedToDate],
+  );
+
   const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
   const {
     data: allOrders,
@@ -374,27 +378,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
           />
         </div>
         <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
-        <DatePicker
-          datePickerType="range"
-          dateFormat={'d/m/Y'}
-          value={''}
+        <OpenmrsDateRangePicker
+          value={dateRange}
           onChange={([startDate, endDate]) => {
             handleDateFilterChange([startDate, endDate]);
           }}
-        >
-          <DatePickerInput
-            id="startDatePickerInput"
-            data-testid="startDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-          <DatePickerInput
-            id="endDatePickerInput"
-            data-testid="endDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-        </DatePicker>
+        />
       </div>
 
       {(() => {
