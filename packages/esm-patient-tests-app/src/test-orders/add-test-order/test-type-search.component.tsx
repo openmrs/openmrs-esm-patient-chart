@@ -44,10 +44,10 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
 
-  const focusAndClearSearchInput = () => {
+  const focusAndClearSearchInput = useCallback(() => {
     setSearchTerm('');
     searchInputRef.current?.focus();
-  };
+  }, [setSearchTerm]);
 
   const cancelOrder = useCallback(() => {
     closeWorkspace('add-lab-order', {
@@ -56,9 +56,12 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
     });
   }, []);
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value ?? '');
-  };
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value ?? '');
+    },
+    [setSearchTerm],
+  );
 
   return (
     <>
@@ -66,7 +69,7 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
         <Search
           autoFocus
           labelText={t('searchFieldPlaceholder', 'Search for a test type')}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           ref={searchInputRef}
           size="lg"

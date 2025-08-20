@@ -1,10 +1,4 @@
-import {
-  type FetchResponse,
-  openmrsFetch,
-  type OpenmrsResource,
-  restBaseUrl,
-  toOmrsIsoString,
-} from '@openmrs/esm-framework';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
   priorityOptions,
