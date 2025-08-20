@@ -20,6 +20,8 @@ it('renders an empty state if patient list data is unavailable', async () => {
     isLoading: false,
     error: null,
     patientLists: [],
+    mutate: jest.fn(),
+    isValidating: false,
   });
 
   render(<PatientListsWorkspace />);
@@ -46,6 +48,8 @@ it('renders a tabular overview of the available patient lists', async () => {
         type: 'My List',
       },
     ],
+    mutate: jest.fn(),
+    isValidating: false,
   });
 
   render(<PatientListsWorkspace />);
