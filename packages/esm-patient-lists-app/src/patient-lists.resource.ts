@@ -100,7 +100,7 @@ export function usePatientLists() {
     name: cohort.name,
     size: cohort.size,
     startDate: cohort.startDate,
-    type: cohort.cohortType?.display,
+    type: cohort.cohortType?.display ?? '',
   });
 
   const patientLists = data?.data?.results ? data.data.results.map(mapProperties) : [];
