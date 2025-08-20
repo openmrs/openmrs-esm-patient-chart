@@ -31,6 +31,11 @@ export const configSchema = {
         conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         defaultOpen: false,
       },
+      {
+        // All orderable tests
+        conceptUuid: 'd46dfc42-c29a-48d3-bec9-25963481b64f',
+        defaultOpen: false,
+      },
     ],
   },
   orders: {
