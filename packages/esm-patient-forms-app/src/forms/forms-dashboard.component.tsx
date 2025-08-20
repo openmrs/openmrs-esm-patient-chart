@@ -8,7 +8,6 @@ import {
   type Form,
   launchFormEntryOrHtmlForms,
   mapFormsToHtmlFormEntryForms,
-  useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
@@ -26,17 +25,17 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   clinicalFormsWorkspaceName,
   formEntryWorkspaceName,
   htmlFormEntryWorkspaceName,
+  visitContext,
 }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isOnline = useConnectivity();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const {
     data: forms,
     allForms,
     error,
     mutateForms,
-  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
+  } = useForms(patientUuid, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const htmlFormEntryForms = useMemo(() => {
     return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
@@ -48,11 +47,11 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
         htmlFormEntryForms,
         patientUuid,
         form,
-        currentVisit?.uuid,
+        visitContext?.uuid,
         encounterUuid,
-        currentVisit?.visitType.uuid,
-        currentVisit?.startDatetime,
-        currentVisit?.stopDatetime,
+        visitContext?.visitType.uuid,
+        visitContext?.startDatetime,
+        visitContext?.stopDatetime,
         mutateForms,
         clinicalFormsWorkspaceName,
         formEntryWorkspaceName,
@@ -60,7 +59,7 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
       );
     },
     [
-      currentVisit,
+      visitContext,
       htmlFormEntryForms,
       mutateForms,
       patientUuid,

@@ -52,6 +52,7 @@ import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
+  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
@@ -224,7 +225,13 @@ function InputWrapper({ children }) {
   );
 }
 
-export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
+export function DrugOrderForm({
+  patientUuid,
+  initialOrderBasketItem,
+  onSave,
+  onCancel,
+  promptBeforeClosing,
+}: DrugOrderFormProps) {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
@@ -359,7 +366,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patient } = usePatientChartStore();
+  const { patient } = usePatientChartStore(patientUuid);
   const patientName = patient ? getPatientName(patient) : '';
   const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 

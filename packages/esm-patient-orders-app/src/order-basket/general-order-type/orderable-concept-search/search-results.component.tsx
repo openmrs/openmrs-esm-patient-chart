@@ -28,6 +28,7 @@ interface OrderableConceptSearchResultsProps {
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  patient: fhir.Patient;
 }
 
 const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps> = ({
@@ -38,6 +39,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
+  patient,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -89,6 +91,7 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
                 concept={concept}
                 orderTypeUuid={orderTypeUuid}
                 closeWorkspace={closeWorkspace}
+                patient={patient}
               />
             ))}
           </div>
@@ -154,6 +157,7 @@ interface TestTypeSearchResultItemProps {
   openOrderForm: (searchResult: OrderBasketItem) => void;
   orderTypeUuid: string;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  patient: fhir.Patient;
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
@@ -161,11 +165,12 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   openOrderForm,
   orderTypeUuid,
   closeWorkspace,
+  patient,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
 
   const orderAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.concept.uuid === concept.uuid),

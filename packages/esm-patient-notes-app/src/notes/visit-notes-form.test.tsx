@@ -22,6 +22,8 @@ const defaultProps = {
   patientUuid: mockPatient.id,
   promptBeforeClosing: jest.fn(),
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 function renderVisitNotesForm(props = {}) {

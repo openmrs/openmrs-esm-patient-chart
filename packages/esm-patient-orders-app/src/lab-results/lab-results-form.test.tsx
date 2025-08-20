@@ -47,6 +47,8 @@ const testProps = {
   setTitle: jest.fn(),
   patientUuid: mockPatient.id,
   patient: mockPatient,
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 describe('LabResultsForm', () => {

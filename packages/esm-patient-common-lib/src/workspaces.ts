@@ -5,15 +5,17 @@ import {
   navigateAndLaunchWorkspace,
   showModal,
   useFeatureFlag,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
-import { useVisitOrOfflineVisit } from './offline/visit';
 
 export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
   patientUuid: string;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
 }
 
 export function launchPatientChartWithWorkspaceOpen({
@@ -35,15 +37,14 @@ export function launchPatientChartWithWorkspaceOpen({
   });
 }
 
-export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName: string) {
-  const { patientUuid } = usePatientChartStore();
+export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: string, workspaceName: string) {
+  const { visitContext } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const isRdeEnabled = useFeatureFlag('rde');
 
   const launchPatientWorkspaceCb = useCallback(
     (additionalProps?: T) => {
-      if (!systemVisitEnabled || currentVisit) {
+      if (!systemVisitEnabled || visitContext) {
         launchWorkspace(workspaceName, additionalProps);
       } else {
         if (isRdeEnabled) {
@@ -58,7 +59,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(workspaceName
         }
       }
     },
-    [currentVisit, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
+    [visitContext, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
   );
   return launchPatientWorkspaceCb;
 }

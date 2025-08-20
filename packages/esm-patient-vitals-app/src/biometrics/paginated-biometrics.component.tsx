@@ -23,6 +23,7 @@ interface PaginatedBiometricsProps {
   pageUrl: string;
   urlLabel: string;
   tableHeaders: Array<BiometricsTableHeader>;
+  patient: fhir.Patient;
 }
 
 const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
@@ -31,6 +32,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   pageUrl,
   urlLabel,
   tableHeaders,
+  patient,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
@@ -110,7 +112,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu encounterUuid={row.id} />
+                      <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
                     </TableCell>
                   </TableRow>
                 ))}

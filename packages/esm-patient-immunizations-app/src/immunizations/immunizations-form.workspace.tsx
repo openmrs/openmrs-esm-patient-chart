@@ -15,7 +15,6 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisit,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { DoseInput } from './components/dose-input.component';
@@ -34,12 +33,12 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  visitContext,
 }) => {
   const config = useConfig<ImmunizationConfigObject>();
   const currentUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
   const { immunizationsConceptSet } = useImmunizationsConceptSet(config);
   const { mutate } = useImmunizations(patientUuid);
 
@@ -150,7 +149,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         await savePatientImmunization(
           mapToFHIRImmunizationResource(
             immunization,
-            immunizationToEditMeta?.visitUuid || currentVisit?.uuid,
+            immunizationToEditMeta?.visitUuid || visitContext?.uuid,
             currentUser?.sessionLocation?.uuid,
             currentUser?.currentProvider?.uuid,
           ),
@@ -177,7 +176,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       currentUser?.sessionLocation?.uuid,
       patientUuid,
       currentUser?.currentProvider?.uuid,
-      currentVisit?.uuid,
+      visitContext?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
       closeWorkspaceWithSavedChanges,
@@ -296,7 +295,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
-                  minDate={immunizationToEditMeta ? null : dayjs().startOf('day').toDate()}
+                  minDate={immunizationToEditMeta ? null : new Date()}
                 />
               )}
             />

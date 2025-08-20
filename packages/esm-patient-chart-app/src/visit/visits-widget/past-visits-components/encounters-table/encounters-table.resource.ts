@@ -8,7 +8,6 @@ import {
   type Encounter,
   type EncounterType,
   type Obs,
-  type OpenmrsResource,
   useOpenmrsFetchAll,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
