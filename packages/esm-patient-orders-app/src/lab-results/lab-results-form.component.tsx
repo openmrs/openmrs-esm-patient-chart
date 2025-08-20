@@ -67,12 +67,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const [orderList, setOrderList] = useState<Order[]>([order]);
-  const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const { isLoading: isAnyConceptLoading, concepts: conceptList } = useOrderConceptsByUuids(
     orderList.map((o) => o.concept.uuid),
   );
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const mergedSchema = useMemo(() => createArrayLabResultsFormSchema(conceptList), [conceptList]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
   const { mutate } = useSWRConfig();
@@ -108,23 +106,19 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
   useEffect(() => {
     const storeUuid = patientStore.getState().patientUuid;
-    if (!storeUuid) {
+    if (!storeUuid || storeUuid !== patientUuid) {
       patientStore.setState({ patientUuid: patientUuid });
       setIsOutSitePatientChart(true);
     }
   }, [patientUuid, patientStore]);
 
   useEffect(() => {
-    if (savedOrderConceptList.length === 0 || !newOrders?.length) return;
-    const filteredNewOrders = newOrders.filter(
-      (o) => savedOrderConceptList.includes(o.concept.uuid) && !existingOrderNumbers.includes(o.orderNumber),
-    );
-    const updatedNewOrders = savedOrderConceptList.includes(order.concept.uuid)
-      ? filteredNewOrders
-      : [order, ...filteredNewOrders];
-
-    setOrderList(updatedNewOrders);
-  }, [newOrders, savedOrderConceptList, existingOrderNumbers, order]);
+    if (savedOrderConceptList.length === 0 || !newOrders?.length) {
+      return;
+    }
+    const filteredNewOrders = newOrders.filter((o) => !existingOrderNumbers.includes(o.orderNumber));
+    setOrderList(filteredNewOrders);
+  }, [newOrders, existingOrderNumbers, savedOrderConceptList]);
 
   const {
     visitRequired,
@@ -249,7 +243,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  if (isLoadingConcepts) {
+  if (isAnyConceptLoading) {
     return (
       <div className={styles.loaderContainer}>
         <InlineLoading
