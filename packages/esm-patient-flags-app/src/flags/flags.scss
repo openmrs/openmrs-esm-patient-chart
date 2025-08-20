@@ -4,7 +4,10 @@
 
 .container {
   display: flex;
-  justify-content: space-between;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: layout.$spacing-03;
 }
 
 .flagsContainer {
@@ -13,11 +16,14 @@
   column-gap: layout.$spacing-02;
   row-gap: layout.$spacing-03;
   align-items: center;
-  width: 100%;
+  flex: 1;
+  margin-right: auto;
 }
 
 .actionButton {
   max-height: layout.$spacing-08;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .flagIcon {
