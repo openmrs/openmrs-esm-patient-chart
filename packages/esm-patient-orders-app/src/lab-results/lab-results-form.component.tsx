@@ -377,14 +377,17 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               ) : (
                 <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
               )}
-              <div className={orderStyles.orderBasketContainer}>
-                <ExtensionSlot
-                  className={classNames(orderStyles.orderBasketSlot, {
-                    [orderStyles.orderBasketSlotTablet]: isTablet,
-                  })}
-                  name="result-order-basket-slot"
-                />
-              </div>
+              {savedOrderConceptList.length === 0 && (
+                <div className={orderStyles.orderBasketContainer}>
+                  <ExtensionSlot
+                    className={classNames(orderStyles.orderBasketSlot, {
+                      [orderStyles.orderBasketSlotTablet]: isTablet,
+                    })}
+                    name="result-order-basket-slot"
+                  />
+                </div>
+              )}
+
               {orders?.length > 0 && (
                 <div className={orderStyles.orderBasketContainer}>
                   {(creatingEncounterError || errorFetchingEncounterUuid) && (
