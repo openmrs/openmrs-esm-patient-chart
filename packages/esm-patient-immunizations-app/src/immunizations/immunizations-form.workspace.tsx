@@ -56,9 +56,17 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         .min(new Date(patient.birthDate), {
           message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
         })
-        .max(new Date(), {
-          message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
-        }),
+        .refine(
+          (date) => {
+            // Normalize both dates to start of day in local timezone
+            const inputDate = dayjs(date).startOf('day');
+            const today = dayjs().startOf('day');
+            return inputDate.isSame(today) || inputDate.isBefore(today);
+          },
+          {
+            message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
+          },
+        ),
       // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
@@ -74,7 +82,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: zodResolver(immunizationFormSchema),
     defaultValues: {
       vaccineUuid: '',
-      vaccinationDate: new Date(),
+      vaccinationDate: dayjs().startOf('day').toDate(),
       doseNumber: 1,
       note: '',
       expirationDate: null,
@@ -288,7 +296,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
-                  minDate={immunizationToEditMeta ? null : new Date()}
+                  minDate={immunizationToEditMeta ? null : dayjs().startOf('day').toDate()}
                 />
               )}
             />
