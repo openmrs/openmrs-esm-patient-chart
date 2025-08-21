@@ -44,7 +44,6 @@ async function getLatestObsUuid(patientUuid: string): Promise<string> {
     _sort: '-_date',
     _summary: 'data',
     _format: 'json',
-    _count: '1',
   });
   const result = await request.next().value;
   return result?.entry?.[0]?.resource?.id;
