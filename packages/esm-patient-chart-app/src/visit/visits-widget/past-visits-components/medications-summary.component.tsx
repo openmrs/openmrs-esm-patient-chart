@@ -2,7 +2,7 @@ import React from 'react';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
 import type { OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
@@ -13,7 +13,29 @@ interface MedicationSummaryProps {
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
 
-  const drugOrders = medications?.filter((medication) => medication?.order?.orderType?.display === 'Drug Order');
+  const drugOrders = medications?.filter((medication) => {
+    // First, check if it's a drug order
+    if (medication?.order?.orderType?.display !== 'Drug Order') {
+      return false;
+    }
+
+    // Then filter out discontinued orders
+    if (medication?.order?.action === 'DISCONTINUE') {
+      return false;
+    }
+
+    // Filter out orders that have been stopped (only if stopped in the past)
+    if (medication?.order?.dateStopped && new Date(medication.order.dateStopped) <= new Date()) {
+      return false;
+    }
+
+    // Filter out expired orders (only if expired in the past)
+    if (medication?.order?.autoExpireDate && new Date(medication.order.autoExpireDate) <= new Date()) {
+      return false;
+    }
+
+    return true;
+  });
 
   if (drugOrders.length === 0) {
     return (
@@ -91,9 +113,10 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
               </div>
 
               <p className={styles.metadata}>
-                {formatTime(parseDate(medication?.order?.dateActivated))}
-                {medication?.provider?.name && <> &middot; {medication?.provider?.name}</>}
-                {medication?.provider?.role && <>, {medication?.provider?.role}</>}
+                <div className={styles.startDateColumn}>
+                  <span>{formatDate(new Date(medication.order.dateActivated))}</span> &middot;{' '}
+                  <span>{medication.order.orderer?.display ?? '--'}</span>
+                </div>
               </p>
             </React.Fragment>
           ),

@@ -18,9 +18,13 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
 
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
 
   if (activePatientOrders?.length) {
     return (
