@@ -12,6 +12,7 @@ import {
   useLayoutType,
   useSession,
   useWorkspaces,
+  type WorkspacesInfo,
 } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
@@ -28,6 +29,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseWorkSpaces = jest.mocked(useWorkspaces);
+const mockWorkSpacesInfo = {} as unknown as WorkspacesInfo;
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();
@@ -127,6 +129,7 @@ mockUseOrderType.mockReturnValue({
 describe('AddLabOrder', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
+    mockUseWorkSpaces.mockReturnValue(mockWorkSpacesInfo);
   });
 
   test('happy path fill and submit form', async () => {

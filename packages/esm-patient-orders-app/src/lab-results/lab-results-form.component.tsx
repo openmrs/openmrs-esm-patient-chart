@@ -35,12 +35,10 @@ import {
   isText,
   updateObservation,
   updateOrderResult,
-  useCompletedLabResults,
-  useCompletedLabResultsForOrders,
+  useCompletedLabResultsArray,
   useOrderConceptsByUuids,
-  useOrderConceptByUuid,
 } from './lab-results.resource';
-import { createArrayLabResultsFormSchema, createLabResultsFormSchema } from './lab-results-schema.resource';
+import { createLabResultsFormCompositeSchema } from './lab-results-schema.resource';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
@@ -71,20 +69,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     orderList.map((o) => o.concept.uuid),
   );
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const mergedSchema = useMemo(() => createArrayLabResultsFormSchema(conceptList), [conceptList]);
-  const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptList), [conceptList]);
   const { mutate } = useSWRConfig();
   const config = useConfig<ConfigObject>();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { orders, clearOrders } = useOrderBasket();
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
-  const session = useSession();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
   const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
-  const { isLoading: isAnyResultLoading, completeLabResults: completeLabResultList } =
-    useCompletedLabResultsForOrders(orderList);
+  const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(orderList);
   const {
     data: newOrders,
     error: error,
@@ -206,13 +200,13 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     handleSubmit,
   } = useForm<Record<string, ObservationValue>>({
     defaultValues: {} as Record<string, ObservationValue>,
-    resolver: zodResolver(mergedSchema),
+    resolver: zodResolver(compositeSchema),
     mode: 'all',
   });
 
   useEffect(() => {
     orderList.forEach((order, index) => {
-      const completeLabResult = completeLabResultList.find((r) => r.concept.uuid === order.concept.uuid);
+      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === order.concept.uuid);
       const concept = conceptList.find((c) => c.uuid === order.concept.uuid);
       if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
@@ -237,7 +231,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         }
       }
     });
-  }, [conceptList, completeLabResultList, orderList, setValue]);
+  }, [conceptList, completeLabResults, orderList, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -278,7 +272,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
     // Handle update operation for completed lab order results
     orderList.forEach(async (order, index) => {
-      const completeLabResult = completeLabResultList.find((r) => r.concept.uuid === order.concept.uuid);
+      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === order.concept.uuid);
       if (order.fulfillerStatus === 'COMPLETED') {
         const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
           const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
@@ -366,10 +360,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         <div className={styles.grid}>
           {conceptList?.length > 0 && (
             <Stack gap={5}>
-              {!isAnyResultLoading ? (
+              {!isLoading ? (
                 conceptList.map((c) => (
                   <ResultFormField
-                    defaultValue={completeLabResultList.find((r) => r.concept.uuid === c.uuid)}
+                    defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
                     concept={c}
                     control={control as unknown as Control<Record<string, unknown>>}
                   />

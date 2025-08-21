@@ -240,7 +240,7 @@ export function useCompletedLabResults(order: Order) {
   };
 }
 
-export function useCompletedLabResultsForOrders(orders: Order[]) {
+export function useCompletedLabResultsArray(orders: Order[]) {
   const {
     encounter,
     isLoading: isLoadingEncounter,

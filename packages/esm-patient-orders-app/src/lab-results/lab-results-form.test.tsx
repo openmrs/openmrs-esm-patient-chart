@@ -2,27 +2,23 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
-  useOrderConceptByUuid,
   useOrderConceptsByUuids,
   useLabEncounter,
   useObservation,
   type LabOrderConcept,
   updateOrderResult,
   type Datatype,
-  useCompletedLabResults,
-  useCompletedLabResultsForOrders,
+  useCompletedLabResultsArray,
 } from './lab-results.resource';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
-const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
 const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
-const mockUseCompletedLabResults = jest.mocked(useCompletedLabResults);
-const mockUseCompletedLabResultsForOrders = jest.mocked(useCompletedLabResultsForOrders);
+const mockUseCompletedLabResultsArray = jest.mocked(useCompletedLabResultsArray);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
@@ -31,8 +27,7 @@ jest.mock('./lab-results.resource', () => ({
   useLabEncounter: jest.fn(),
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
-  useCompletedLabResults: jest.fn(),
-  useCompletedLabResultsForOrders: jest.fn(),
+  useCompletedLabResultsArray: jest.fn(),
 }));
 
 const mockOrder = {
@@ -57,26 +52,6 @@ const testProps = {
 
 describe('LabResultsForm', () => {
   beforeEach(() => {
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        hiAbsolute: 100,
-        hiCritical: 80,
-        hiNormal: 70,
-        lowAbsolute: 0,
-        lowCritical: 40,
-        lowNormal: 50,
-        units: 'mg/dL',
-        allowDecimal: false,
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -113,13 +88,7 @@ describe('LabResultsForm', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
-    mockUseCompletedLabResults.mockReturnValue({
-      completeLabResult: null,
-      isLoading: false,
-      error: null,
-      mutate: jest.fn(),
-    });
-    mockUseCompletedLabResultsForOrders.mockReturnValue({
+    mockUseCompletedLabResultsArray.mockReturnValue({
       completeLabResults: [],
       isLoading: false,
       error: null,
@@ -145,26 +114,6 @@ describe('LabResultsForm', () => {
   test('validate when we have a concept with allowDecimal set to true', async () => {
     const user = userEvent.setup();
     // if allowDecimal is true, we should allow decimal values
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        hiAbsolute: 100,
-        lowAbsolute: null,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-        allowDecimal: true,
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -247,25 +196,6 @@ describe('LabResultsForm', () => {
 
   test('validate numeric input with concept having only hiAbsolute', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        hiAbsolute: 100,
-        lowAbsolute: null,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -304,25 +234,6 @@ describe('LabResultsForm', () => {
 
   test('validate numeric input with concept having only lowAbsolute', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        hiAbsolute: null,
-        units: 'mg/dL',
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -359,6 +270,63 @@ describe('LabResultsForm', () => {
     });
   });
 
+  test('validate numeric input for multiple fields', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 60,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+          allowDecimal: true,
+        },
+        {
+          uuid: 'concept-uuid2',
+          display: 'Test Concept Percentage',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: '%',
+          allowDecimal: true,
+        },
+      ] as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 60 mg/dL)`);
+    await user.type(input, '80');
+
+    const input2 = await screen.findByLabelText(`Test Concept Percentage (0 - 100 %)`);
+    await user.type(input2, '120');
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Concept must be between 0 and 60')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Test Concept Percentage must be between 0 and 100')).toBeInTheDocument();
+    });
+  });
+
   test('submits form with valid data', async () => {
     const user = userEvent.setup();
     const mockCloseWorkspace = jest.fn();
@@ -383,54 +351,71 @@ describe('LabResultsForm', () => {
     });
   });
 
-  test('validate numeric input where concept is a set', async () => {
+  test('submits form with valid data for multiple Results', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        hiAbsolute: null,
-        units: 'mg/dL',
-        setMembers: [
-          {
-            uuid: 'set-member-uuid',
-            display: 'Set Member',
-            setMembers: [],
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            lowAbsolute: 50,
-            lowCritical: 70,
-            lowNormal: 80,
-            hiCritical: 140,
-            hiNormal: 120,
-            hiAbsolute: 150,
-            units: 'mg/dL',
-          },
-          {
-            uuid: 'set-member-uuid-2',
-            display: 'Set Member 2',
-            setMembers: [],
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            lowAbsolute: 5,
-            lowCritical: 10,
-            lowNormal: 15,
-            hiCritical: 20,
-            hiNormal: 25,
-            hiAbsolute: 30,
-            units: 'mg/dL',
-          },
-        ],
-      } as LabOrderConcept,
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Concept',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 60,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: 'mg/dL',
+          allowDecimal: true,
+        },
+        {
+          uuid: 'concept-uuid2',
+          display: 'Test Concept Percentage',
+          setMembers: [],
+          datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+          hiAbsolute: 100,
+          lowAbsolute: 0,
+          lowCritical: null,
+          lowNormal: null,
+          hiCritical: null,
+          hiNormal: null,
+          units: '%',
+          allowDecimal: true,
+        },
+      ] as LabOrderConcept[],
       isLoading: false,
       error: null,
       isValidating: false,
       mutate: jest.fn(),
     });
+    const mockCloseWorkspace = jest.fn();
+    const mockCloseWorkspaceWithSavedChanges = jest.fn();
+
+    render(
+      <LabResultsForm
+        {...testProps}
+        closeWorkspace={mockCloseWorkspace}
+        closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
+      />,
+    );
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 60 mg/dL)`);
+    await user.type(input, '50');
+
+    const input2 = await screen.findByLabelText(`Test Concept Percentage (0 - 100 %)`);
+    await user.type(input2, '90');
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
+    });
+  });
+
+  test('validate numeric input where concept is a set', async () => {
+    const user = userEvent.setup();
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -507,25 +492,6 @@ describe('LabResultsForm', () => {
 
   test('lab results form submits the correct lab result payload when the concept is not a set', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'Text', hl7Abbreviation: 'ST' } as Datatype,
-        hiAbsolute: 100,
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -575,53 +541,6 @@ describe('LabResultsForm', () => {
 
   test('lab results forms submits correct payload when the concept is a set and one set member is keyed', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        set: true,
-        setMembers: [
-          {
-            uuid: 'set-member-uuid-1',
-            display: 'Set Member 1',
-            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
-            hiAbsolute: 100,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mg/dL',
-          },
-          {
-            uuid: 'set-member-uuid-2',
-            display: 'Set Member 2',
-            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' } as Datatype,
-            hiAbsolute: 80,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mmol/L',
-          },
-        ],
-        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-        hiAbsolute: 100,
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-      } as unknown as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -728,53 +647,6 @@ describe('LabResultsForm', () => {
 
   test('lab results form submits correct payload when the concept is a set and both set members are keyed', async () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        set: true,
-        setMembers: [
-          {
-            uuid: 'set-member-uuid-1',
-            display: 'Set Member 1',
-            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            hiAbsolute: 100,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mg/dL',
-          },
-          {
-            uuid: 'set-member-uuid-2',
-            display: 'Set Member 2',
-            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            hiAbsolute: 80,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mmol/L',
-          },
-        ],
-        datatype: { display: 'Numeric' },
-        hiAbsolute: 100,
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-      } as unknown as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -893,18 +765,6 @@ describe('LabResultsForm', () => {
   });
 
   test('display error notification when the concept datatype is N/A', async () => {
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        setMembers: [],
-        datatype: { display: 'N/A' },
-      } as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -932,83 +792,6 @@ describe('LabResultsForm', () => {
 
   test('should display second level of set members for a given concept, if present', () => {
     const user = userEvent.setup();
-    mockUseOrderConceptByUuid.mockReturnValue({
-      concept: {
-        uuid: 'concept-uuid',
-        display: 'Test Concept',
-        set: true,
-        setMembers: [
-          {
-            uuid: 'set-member-uuid-1',
-            display: 'Set Member 1',
-            concept: { uuid: 'concept-uuid-1', display: 'Concept 1' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            hiAbsolute: 100,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mg/dL',
-          },
-          {
-            uuid: 'set-member-uuid-2',
-            display: 'Set Member 2',
-            concept: { uuid: 'concept-uuid-2', display: 'Concept 2' },
-            datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-            hiAbsolute: 80,
-            lowAbsolute: 0,
-            lowCritical: null,
-            lowNormal: null,
-            hiCritical: null,
-            hiNormal: null,
-            units: 'mmol/L',
-          },
-          {
-            uuid: 'set-member-uuid-3',
-            display: 'Set Member 3',
-            concept: { uuid: 'concept-uuid-3', display: 'Concept 3' },
-            datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
-            set: true,
-            setMembers: [
-              {
-                uuid: 'set-member-uuid-3.1',
-                display: 'Set Member 3.1',
-                concept: { uuid: 'concept-uuid-3.1', display: 'Concept 3.1' },
-                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-                hiAbsolute: 80,
-                lowAbsolute: 0,
-                lowCritical: null,
-                lowNormal: null,
-                units: 'mg/dL',
-              },
-              {
-                uuid: 'set-member-uuid-3.2',
-                display: 'Set Member 3.2',
-                concept: { uuid: 'concept-uuid-3.2', display: 'Concept 3.2' },
-                datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
-                hiAbsolute: 80,
-                lowAbsolute: 0,
-                lowCritical: null,
-                units: 'mg/dL',
-              },
-            ],
-          },
-        ],
-        datatype: { display: 'Numeric' },
-        hiAbsolute: 100,
-        lowAbsolute: 0,
-        lowCritical: null,
-        lowNormal: null,
-        hiCritical: null,
-        hiNormal: null,
-        units: 'mg/dL',
-      } as unknown as LabOrderConcept,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {

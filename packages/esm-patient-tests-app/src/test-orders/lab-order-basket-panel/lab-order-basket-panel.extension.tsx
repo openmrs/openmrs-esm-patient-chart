@@ -59,7 +59,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
   type WorkSpaceType = (typeof WORKSPACES)[keyof typeof WORKSPACES];
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const { workspaces = [{ name: WORKSPACES.ORDER_BASKET, additionalProps: {} }] } = useWorkspaces() || {};
+  const { workspaces = [{ name: WORKSPACES.ORDER_BASKET, additionalProps: {} }] } = useWorkspaces();
   const [prevWorkSpace, setPrevWorkSpace] = useState(workspaces[0]?.name);
   const [prevOrder, setPrevOrder] = useState(
     workspaces[0]?.name === WORKSPACES.TEST_RESULTS_FORM ? workspaces[0].additionalProps['order'] : null,

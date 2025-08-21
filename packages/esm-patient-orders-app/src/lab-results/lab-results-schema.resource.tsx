@@ -25,7 +25,7 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
   };
 }
 
-function createSchemaForConceptList(labOrderConcepts: Array<LabOrderConcept>): SchemaRecord {
+function createSchemaForConceptArray(labOrderConcepts: Array<LabOrderConcept>): SchemaRecord {
   return labOrderConcepts.reduce((acc, concept) => {
     return {
       ...acc,
@@ -50,16 +50,16 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) =>
 };
 
 /**
- * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
+ * Custom hook to generate a Zod schema for lab results form based on multiple lab order concepts.
  * This function is used to generate the schema for the lab results form.
- * @param labOrderConceptUuid - The UUID of the lab order concept.
+ * @param {Array<string>} labOrderConceptUuid - The List of UUID of the lab order concepts.
  * @returns A Zod schema object for the lab results form.
  */
-export const createArrayLabResultsFormSchema = (labOrderConcepts: Array<LabOrderConcept>) => {
+export const createLabResultsFormCompositeSchema = (labOrderConcepts: Array<LabOrderConcept>) => {
   if (!labOrderConcepts) {
     return z.object({});
   }
-  const schema = createSchemaForConceptList(labOrderConcepts);
+  const schema = createSchemaForConceptArray(labOrderConcepts);
 
   return z.object(schema);
 };

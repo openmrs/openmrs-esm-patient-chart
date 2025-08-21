@@ -13,9 +13,7 @@ import { type Control, Controller } from 'react-hook-form';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
-import orderStyles from '../order-basket/order-basket.scss';
-import classNames from 'classnames';
-import { useLayoutType, ExtensionSlot } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
