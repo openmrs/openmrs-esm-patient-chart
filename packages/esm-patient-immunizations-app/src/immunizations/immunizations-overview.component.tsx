@@ -14,14 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { AddIcon, formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
-import {
-  launchPatientWorkspace,
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  PatientChartPagination,
-} from '@openmrs/esm-patient-common-lib';
+import { AddIcon, formatDate, launchWorkspace, parseDate, usePagination } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useImmunizations } from '../hooks/useImmunizations';
 import styles from './immunizations-overview.scss';
 
@@ -42,7 +36,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   const { data: immunizations, error, isLoading, isValidating } = useImmunizations(patientUuid);
   const { results: paginatedImmunizations, goTo, currentPage } = usePagination(immunizations ?? [], immunizationsCount);
 
-  const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
+  const launchImmunizationsForm = React.useCallback(() => launchWorkspace('immunization-form-workspace'), []);
 
   const tableHeaders = [
     {

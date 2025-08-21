@@ -1,20 +1,20 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading, Tile } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import {
   ErrorState,
+  launchWorkspace,
   OpenmrsDatePicker,
   useDebounce,
   useOnVisible,
   useVisitContextStore,
   type Visit,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
-import dayjs from 'dayjs';
 
 interface VisitContextSwitcherProps {
   patientUuid: string;
@@ -51,7 +51,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
 
   const openStartVisitWorkspace = () => {
     closeModal();
-    launchPatientWorkspace('start-visit-workspace-form', {
+    launchWorkspace('start-visit-workspace-form', {
       openedFrom: 'visit-context-switcher',
     });
   };
@@ -60,9 +60,9 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
     <>
       <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')}>
         <OpenmrsDatePicker
-          id={'visit-context-swticher-date-picker'}
+          id="visit-context-switcher-date-picker"
           className={styles.datepicker}
-          labelText={t('showVisitOnOrPriorTo', 'Show visit on or prior to:')}
+          labelText={t('showVisitWithStartDateOnOrPriorTo', 'Show visit with start date on or prior to:')}
           maxDate={Date.now()}
           value={maxStartDate}
           onChange={setMaxStartDate}

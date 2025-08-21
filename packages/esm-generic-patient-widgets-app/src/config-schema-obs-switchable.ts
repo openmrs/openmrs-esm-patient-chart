@@ -1,6 +1,6 @@
 import { Type, validators } from '@openmrs/esm-framework';
 
-export const configSchema = {
+export const configSchemaSwitchable = {
   title: {
     _type: Type.String,
     _description: 'Displayed at the top of the widget.',
@@ -24,12 +24,13 @@ export const configSchema = {
   data: {
     _type: Type.Array,
     _elements: {
+      _type: Type.Object,
       concept: {
         _type: Type.ConceptUuid,
       },
       label: {
         _type: Type.String,
-        _default: null,
+        _default: '',
         _description: 'The text to display. Defaults to the concept display name.',
       },
       color: {
@@ -68,16 +69,17 @@ export const configSchema = {
   },
   encounterTypes: {
     _type: Type.Array,
-    _description: 'Encounter types used to filter the requests',
     _elements: {
       _type: Type.String,
     },
+    _description: 'Only show obs from these encounter types',
     _default: [],
   },
   dateFormat: {
     _type: Type.String,
-    _description: 'Type of display for data',
+    _description: 'Format the date as a "date", "time", or "dateTime"',
     _default: 'dateTime',
+    _validators: [validators.oneOf(['date', 'time', 'dateTime'])],
   },
   showEncounterType: {
     _type: Type.Boolean,
@@ -86,7 +88,7 @@ export const configSchema = {
   },
 };
 
-export interface ConfigObject {
+export interface ConfigObjectSwitchable {
   title: string;
   resultsName: string;
   graphOldestFirst: boolean;
@@ -95,6 +97,7 @@ export interface ConfigObject {
     concept: string;
     label: string;
     color: string;
+    decimalPlaces: number;
   }>;
   table: {
     pageSize: number;
@@ -102,4 +105,5 @@ export interface ConfigObject {
   showGraphByDefault: boolean;
   encounterTypes: Array<string>;
   dateFormat: 'date' | 'time' | 'dateTime';
+  showEncounterType: boolean;
 }

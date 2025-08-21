@@ -16,15 +16,15 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { AddIcon, formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { AddIcon, formatDate, launchWorkspace, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
   const { t } = useTranslation();
-  const displayText = t('conditions', 'Conditions');
+  const displayText = t('conditions_lower', 'conditions');
   const headerTitle = t('conditions', 'Conditions');
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const layout = useLayoutType();
@@ -91,13 +91,13 @@ function ConditionsDetailedSummary({ patient }) {
 
   const launchConditionsForm = useCallback(
     () =>
-      launchPatientWorkspace('conditions-form-workspace', {
+      launchWorkspace('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],
   );
 
-  const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
+  const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem.id);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
@@ -110,11 +110,16 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem="Active"
+                initialSelectedItem={{ id: 'Active', label: t('active', 'Active') }}
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"
-                items={['All', 'Active', 'Inactive']}
+                items={[
+                  { id: 'All', label: t('all', 'All') },
+                  { id: 'Active', label: t('active', 'Active') },
+                  { id: 'Inactive', label: t('inactive', 'Inactive') },
+                ]}
+                itemToString={(item) => (item ? item.label : '')}
                 onChange={handleConditionStatusChange}
                 size={isTablet ? 'lg' : 'sm'}
               />
@@ -164,7 +169,11 @@ function ConditionsDetailedSummary({ patient }) {
                       return (
                         <TableRow key={row.id} {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                            <TableCell key={cell.id}>
+                              {cell.value?.content ?? cell.info.header === 'status'
+                                ? t(cell.value.toLowerCase(), cell.value)
+                                : cell.value}
+                            </TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <ConditionsActionMenu patientUuid={patient.id} condition={matchingCondition} />

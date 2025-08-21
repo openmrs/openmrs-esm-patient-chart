@@ -1,61 +1,48 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import {
-  Button,
-  ButtonSet,
-  Dropdown,
-  Form,
-  InlineNotification,
-  SelectItem,
-  Stack,
-  TextInput,
-  TimePicker,
-  TimePickerSelect,
-} from '@carbon/react';
-import {
-  useSession,
-  useVisit,
-  useLayoutType,
-  useConfig,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  ResponsiveWrapper,
-  OpenmrsDatePicker,
-} from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { type DefaultPatientWorkspaceProps, type amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { savePatientImmunization } from './immunizations.resource';
-import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
-import { mapToFHIRImmunizationResource } from './immunization-mapper';
-import { type ConfigObject } from '../config-schema';
-import { type ImmunizationFormData } from '../types';
-import { immunizationFormSub } from './utils';
+import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextArea, TextInput } from '@carbon/react';
+import {
+  getCoreTranslation,
+  OpenmrsDatePicker,
+  ResponsiveWrapper,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  useLayoutType,
+  useSession,
+  useVisit,
+} from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { DoseInput } from './components/dose-input.component';
+import { immunizationFormSub } from './utils';
+import { mapToFHIRImmunizationResource } from './immunization-mapper';
+import { savePatientImmunization } from './immunizations.resource';
+import { type ImmunizationConfigObject } from '../config-schema';
+import { type ImmunizationFormData } from '../types';
 import { useImmunizations } from '../hooks/useImmunizations';
+import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import styles from './immunizations-form.scss';
 
-interface ResponsiveWrapperProps {
-  children: React.ReactNode;
-  isTablet: boolean;
-}
-
 const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
+  patient,
   patientUuid,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
-  const { t } = useTranslation();
-  const { immunizationsConfig } = useConfig<ConfigObject>();
+  const config = useConfig<ImmunizationConfigObject>();
   const currentUser = useSession();
-  const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
-  const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
+  const { t } = useTranslation();
+  const { currentVisit } = useVisit(patientUuid);
+  const { immunizationsConceptSet } = useImmunizationsConceptSet(config);
   const { mutate } = useImmunizations(patientUuid);
+
   const [immunizationToEditMeta, setImmunizationToEditMeta] = useState<{
     immunizationObsUuid: string;
     visitUuid?: string;
@@ -63,21 +50,31 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
 
   const immunizationFormSchema = useMemo(() => {
     return z.object({
-      vaccineUuid: z.string().refine((value) => !!value, t('vaccineRequired', 'Vaccine required')),
-      vaccinationDate: z.date().refine((value) => !!value, t('vaccinationDateRequired', 'Vaccination date required')),
-      vaccinationTime: z.string(),
-      timeFormat: z.enum(['PM', 'AM']),
-      doseNumber: z
-        .number()
-        .nullable()
-        // The backend will attempt to convert the dose number to a positive integer
-        // so we need to set it to null if the value is less than 1
-        .transform((value) => (value < 1 ? null : value)),
-      expirationDate: z.date().nullable(),
-      lotNumber: z.string().nullable(),
-      manufacturer: z.string().nullable(),
+      vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine is required')),
+      vaccinationDate: z
+        .date()
+        .min(new Date(patient.birthDate), {
+          message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
+        })
+        .refine(
+          (date) => {
+            // Normalize both dates to start of day in local timezone
+            const inputDate = dayjs(date).startOf('day');
+            const today = dayjs().startOf('day');
+            return inputDate.isSame(today) || inputDate.isBefore(today);
+          },
+          {
+            message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
+          },
+        ),
+      // null means unset; when provided, must be an integer ≥ 1
+      doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
+      note: z.string().trim().max(255).optional(),
+      expirationDate: z.date().nullable().optional(),
+      lotNumber: z.string().nullable().optional(),
+      manufacturer: z.string().nullable().optional(),
     });
-  }, [t]);
+  }, [patient.birthDate, t]);
 
   type ImmunizationFormInputData = z.infer<typeof immunizationFormSchema>;
   const formProps = useForm<ImmunizationFormInputData>({
@@ -85,10 +82,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     resolver: zodResolver(immunizationFormSchema),
     defaultValues: {
       vaccineUuid: '',
-      vaccinationDate: new Date(),
-      vaccinationTime: dayjs(new Date()).format('hh:mm'),
-      timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
+      vaccinationDate: dayjs().startOf('day').toDate(),
       doseNumber: 1,
+      note: '',
       expirationDate: null,
       lotNumber: '',
       manufacturer: '',
@@ -116,9 +112,8 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
         reset({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
-          vaccinationTime: dayjs(vaccinationDateOrNow).format('hh:mm'),
-          timeFormat: vaccinationDateOrNow.getHours() >= 12 ? 'PM' : 'AM',
           doseNumber: props.doseNumber,
+          note: props.note,
           expirationDate: props.expirationDate,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
@@ -128,79 +123,55 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     });
 
     return () => {
-      // cleanup
       sub.unsubscribe();
       immunizationFormSub.next(null);
     };
   }, [reset]);
 
   const onSubmit = useCallback(
-    (data: ImmunizationFormInputData) => {
-      const {
-        vaccineUuid,
-        vaccinationDate,
-        doseNumber,
-        expirationDate,
-        lotNumber,
-        manufacturer,
-        timeFormat,
-        vaccinationTime,
-      } = data;
-      const abortController = new AbortController();
+    async (data: ImmunizationFormInputData) => {
+      try {
+        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer, note } = data;
+        const abortController = new AbortController();
 
-      const [hours, minutes] = convertTime12to24(vaccinationTime, timeFormat);
+        const immunization: ImmunizationFormData = {
+          patientUuid,
+          immunizationId: immunizationToEditMeta?.immunizationObsUuid,
+          vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
+          vaccineUuid: vaccineUuid,
+          vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
+          doseNumber,
+          note,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+        };
 
-      const immunization: ImmunizationFormData = {
-        patientUuid,
-        immunizationId: immunizationToEditMeta?.immunizationObsUuid,
-        vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
-        vaccineUuid: vaccineUuid,
-        vaccinationDate: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(
-              dayjs(vaccinationDate).year(),
-              dayjs(vaccinationDate).month(),
-              dayjs(vaccinationDate).date(),
-              hours,
-              minutes,
-            ),
+        await savePatientImmunization(
+          mapToFHIRImmunizationResource(
+            immunization,
+            immunizationToEditMeta?.visitUuid || currentVisit?.uuid,
+            currentUser?.sessionLocation?.uuid,
+            currentUser?.currentProvider?.uuid,
           ),
-        ),
-        doseNumber,
-        expirationDate,
-        lotNumber,
-        manufacturer,
-      };
-
-      savePatientImmunization(
-        mapToFHIRImmunizationResource(
-          immunization,
-          immunizationToEditMeta?.visitUuid || currentVisit?.uuid,
-          currentUser?.sessionLocation?.uuid,
-          currentUser?.currentProvider?.uuid,
-        ),
-        immunizationToEditMeta?.immunizationObsUuid,
-        abortController,
-      ).then(
-        () => {
-          closeWorkspaceWithSavedChanges();
-          mutate();
-          showSnackbar({
-            kind: 'success',
-            title: t('vaccinationSaved', 'Vaccination saved successfully'),
-            isLowContrast: true,
-          });
-        },
-        (err) => {
-          showSnackbar({
-            title: t('errorSaving', 'Error saving vaccination'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: err?.message,
-          });
-        },
-      );
-      return () => abortController.abort();
+          immunizationToEditMeta?.immunizationObsUuid,
+          abortController,
+        );
+        closeWorkspaceWithSavedChanges();
+        mutate();
+        showSnackbar({
+          kind: 'success',
+          title: t('vaccinationSaved', 'Vaccination saved successfully'),
+          isLowContrast: true,
+        });
+      } catch (err) {
+        showSnackbar({
+          title: t('errorSaving', 'Error saving vaccination'),
+          kind: 'error',
+          isLowContrast: false,
+          subtitle: err?.message,
+        });
+      }
     },
     [
       currentUser?.sessionLocation?.uuid,
@@ -214,183 +185,133 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       mutate,
     ],
   );
-
   return (
     <FormProvider {...formProps}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
-        <Stack gap={1} className={styles.container}>
-          <section className={` ${styles.row}`}>
-            <div className={styles.dateTimeSection}>
-              <ResponsiveWrapper>
-                <Controller
-                  name="vaccinationDate"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <OpenmrsDatePicker
-                      {...field}
-                      id="vaccinationDate"
-                      data-testid="vaccinationDate"
-                      className={styles.datePicker}
-                      maxDate={new Date()}
-                      labelText={t('vaccinationDate', 'Vaccination date')}
-                      invalid={Boolean(fieldState?.error?.message)}
-                      invalidText={fieldState?.error?.message}
-                    />
-                  )}
+        <Stack gap={5} className={styles.container}>
+          <ResponsiveWrapper>
+            <Controller
+              name="vaccinationDate"
+              control={control}
+              render={({ field, fieldState }) => (
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="vaccinationDate"
+                  id="vaccinationDate"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('vaccinationDate', 'Vaccination date')}
+                  maxDate={new Date()}
                 />
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Controller
-                  name="vaccinationTime"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value } }) => (
-                    <div className={styles.timePickerContainer}>
-                      <TimePicker
-                        id="vaccinationTime"
-                        labelText={t('time', 'Time')}
-                        onChange={(event) => onChange(event.target.value as amPm)}
-                        pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                        value={value}
-                        onBlur={onBlur}
-                      >
-                        <Controller
-                          name="timeFormat"
-                          control={control}
-                          render={({ field: { onChange, value } }) => (
-                            <TimePickerSelect
-                              id="timeFormatSelect"
-                              onChange={(event) => onChange(event.target.value as amPm)}
-                              value={value}
-                              aria-label={t('timeFormat ', 'Time Format')}
-                            >
-                              <SelectItem value="AM" text={t('AM', 'AM')} />
-                              <SelectItem value="PM" text={t('PM', 'PM')} />
-                            </TimePickerSelect>
-                          )}
-                        />
-                      </TimePicker>
-                    </div>
-                  )}
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="vaccineUuid"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Dropdown
+                  disabled={!!immunizationToEditMeta}
+                  id="immunization"
+                  invalid={!!errors?.vaccineUuid}
+                  invalidText={errors?.vaccineUuid?.message}
+                  itemToString={(item) =>
+                    immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
+                  }
+                  items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
+                  label={t('selectImmunization', 'Select immunization')}
+                  onChange={(val) => onChange(val.selectedItem)}
+                  selectedItem={value}
+                  titleText={t('immunization', 'Immunization')}
                 />
-              </ResponsiveWrapper>
-            </div>
-          </section>
-          <section>
-            <ResponsiveWrapper>
-              <Controller
-                name="vaccineUuid"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <div className={styles.row}>
-                    <Dropdown
-                      id="immunization"
-                      label={t('pleaseSelect', 'Please select')}
-                      titleText={t('immunization', 'Immunization')}
-                      items={immunizationsConceptSet?.answers?.map((item) => item.uuid) || []}
-                      itemToString={(item) =>
-                        immunizationsConceptSet?.answers.find((candidate) => candidate.uuid == item)?.display
-                      }
-                      onChange={(val) => onChange(val.selectedItem)}
-                      selectedItem={value}
-                      invalid={!!errors?.vaccineUuid}
-                    />
-                  </div>
-                )}
-              />
-            </ResponsiveWrapper>
-          </section>
-          {errors?.vaccineUuid && (
-            <section>
-              <div className={styles.row}>
-                <InlineNotification
-                  role="alert"
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast
-                  title={t('error', 'Error')}
-                  subtitle={errors.vaccineUuid.message}
-                />
-              </div>
-            </section>
-          )}
+              )}
+            />
+          </ResponsiveWrapper>
           {vaccineUuid && (
-            <section>
-              <ResponsiveWrapper>
-                <DoseInput
-                  vaccine={vaccineUuid}
-                  sequences={immunizationsConfig.sequenceDefinitions}
-                  control={control}
-                />
-              </ResponsiveWrapper>
-            </section>
+            <ResponsiveWrapper>
+              <DoseInput vaccine={vaccineUuid} sequences={config.sequenceDefinitions} control={control} />
+            </ResponsiveWrapper>
           )}
-          <section>
-            <ResponsiveWrapper>
-              <Controller
-                name="manufacturer"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <div className={styles.row}>
-                    <TextInput
-                      type="text"
-                      id="manufacturer"
-                      labelText={t('manufacturer', 'Manufacturer')}
-                      value={value}
-                      onChange={(evt) => onChange(evt.target.value)}
-                    />
-                  </div>
-                )}
-              />
-            </ResponsiveWrapper>
-          </section>
-          <section>
-            <ResponsiveWrapper>
-              <Controller
-                name="lotNumber"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <div className={styles.row}>
-                    <TextInput
-                      type="text"
-                      id="lotNumber"
-                      labelText={t('lotNumber', 'Lot Number')}
-                      value={value}
-                      onChange={(evt) => onChange(evt.target.value)}
-                    />
-                  </div>
-                )}
-              />
-            </ResponsiveWrapper>
-          </section>
-          <section>
-            <ResponsiveWrapper>
-              <Controller
-                name="expirationDate"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div className={styles.row}>
-                    <OpenmrsDatePicker
-                      {...field}
-                      id="vaccinationExpiration"
-                      data-testid="vaccinationExpiration"
-                      className={styles.datePicker}
-                      minDate={immunizationToEditMeta ? null : new Date()}
-                      labelText={t('expirationDate', 'Expiration date')}
-                      invalid={Boolean(fieldState?.error?.message)}
-                      invalidText={fieldState?.error?.message}
-                    />
-                  </div>
-                )}
-              />
-            </ResponsiveWrapper>
-          </section>
+          <ResponsiveWrapper>
+            <Controller
+              name="note"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextArea
+                  enableCounter
+                  id="note"
+                  invalidText={errors?.note?.message}
+                  labelText={t('note', 'Note')}
+                  maxCount={255}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
+                  value={value}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <div className={styles.vaccineBatchHeading}>{t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
+          <ResponsiveWrapper>
+            <Controller
+              name="manufacturer"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  id="manufacturer"
+                  labelText={t('manufacturer', 'Manufacturer')}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  type="text"
+                  value={value}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="lotNumber"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  id="lotNumber"
+                  labelText={t('lotNumber', 'Lot Number')}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  type="text"
+                  value={value}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="expirationDate"
+              control={control}
+              render={({ field, fieldState }) => (
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="vaccinationExpiration"
+                  id="vaccinationExpiration"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('expirationDate', 'Expiration date')}
+                  minDate={immunizationToEditMeta ? null : dayjs().startOf('day').toDate()}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
         </Stack>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-            {t('cancel', 'Cancel')}
+            {getCoreTranslation('cancel')}
           </Button>
           <Button className={styles.button} kind="primary" disabled={isSubmitting} type="submit">
-            {t('save', 'Save')}
+            {isSubmitting ? (
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{getCoreTranslation('save')}</span>
+            )}
           </Button>
         </ButtonSet>
       </Form>

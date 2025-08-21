@@ -3,6 +3,7 @@ import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeftIcon,
+  launchWorkspace,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
@@ -10,7 +11,6 @@ import {
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
 import {
-  launchPatientWorkspace,
   type OrderBasketItem,
   useOrderBasket,
   useOrderType,
@@ -70,7 +70,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
       closeWorkspaceGroup: false,
     });
   }, [closeWorkspace]);
@@ -143,7 +143,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
-      onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
+      onWorkspaceClose: () => launchWorkspace('order-basket'),
     });
   }, [closeWorkspace]);
 
@@ -152,8 +152,10 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
     searchInputRef.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(event.target.value ?? '');
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value ?? ''),
+    [setSearchTerm],
+  );
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -167,7 +169,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
           labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
             orderType: orderType?.display ?? '',
           })}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}
         />

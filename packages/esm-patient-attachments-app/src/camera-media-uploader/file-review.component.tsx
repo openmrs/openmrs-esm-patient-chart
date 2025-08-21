@@ -222,7 +222,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
         </div>
       </ModalBody>
       <ModalFooter>
-        <UserHasAccess privilege="Create Attachment">
+        <UserHasAccess privilege="Create Attachments">
           <Button kind="secondary" onClick={handleCancelUpload} size="lg">
             {getCoreTranslation('cancel')}
           </Button>

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-attachments-app",
-  "version": "10.2.0",
+  "version": "11.1.0",
   "license": "MPL-2.0",
   "description": "Patient attachments microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-attachments-app.js",
@@ -40,13 +40,13 @@
     "@carbon/react": "^1.83.0",
     "@openmrs/esm-patient-common-lib": "next",
     "linkify-react": "^4.2.0",
-    "linkifyjs": "^4.2.0",
+    "linkifyjs": "^4.3.2",
     "lodash-es": "^4.17.21",
     "react-grid-gallery": "^0.5.6",
     "react-html5-camera-photo": "^1.5.11"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "6.x",
+    "@openmrs/esm-framework": "7.x",
     "@openmrs/esm-patient-common-lib": "10.x",
     "dayjs": "1.x",
     "react": "^18.2.0",

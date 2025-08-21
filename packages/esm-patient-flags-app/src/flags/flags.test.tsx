@@ -1,22 +1,16 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { screen, render } from '@testing-library/react';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import Flags from './flags.component';
 
+type FlagWithPriority = ReturnType<typeof usePatientFlags>['flags'][0];
+
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-  };
-});
+const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');
@@ -32,7 +26,7 @@ it('renders flags in the patient flags slot', async () => {
 
   mockUsePatientFlags.mockReturnValue({
     error: null,
-    flags: mockPatientFlags,
+    flags: mockPatientFlags as FlagWithPriority[],
     isLoading: false,
     isValidating: false,
     mutate: jest.fn(),
@@ -51,5 +45,5 @@ it('renders flags in the patient flags slot', async () => {
 
   await user.click(editButton);
 
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('edit-flags-side-panel-form');
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 });

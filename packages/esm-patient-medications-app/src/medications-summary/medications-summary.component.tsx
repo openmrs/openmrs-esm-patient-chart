@@ -33,8 +33,8 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
     <div>
       <div style={{ marginBottom: '1.5rem' }}>
         {(() => {
-          const displayText = t('activeMedicationsDisplayText', 'Active medications');
-          const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
+          const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
+          const displayText = t('activeMedicationsDisplayText', 'active medications');
 
           if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
 
@@ -59,8 +59,8 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
       </div>
       <div>
         {(() => {
-          const displayText = t('pastMedicationsDisplayText', 'Past medications');
-          const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
+          const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
+          const displayText = t('pastMedicationsDisplayText', 'past medications');
 
           if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
 

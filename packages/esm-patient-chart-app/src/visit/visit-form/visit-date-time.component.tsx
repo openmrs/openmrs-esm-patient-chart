@@ -9,6 +9,17 @@ import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { convertToDate, type VisitFormData } from './visit-form.resource';
 import styles from './visit-form.scss';
 
+// Helpers to safely compute min/max across optional values
+const minOf = (...values: Array<number | undefined | null>) => {
+  const nums = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+  return nums.length ? Math.min(...nums) : undefined;
+};
+
+const maxOf = (...values: Array<number | undefined | null>) => {
+  const nums = values.filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+  return nums.length ? Math.max(...nums) : undefined;
+};
+
 interface VisitDateTimeSectionProps {
   control: Control<VisitFormData, any>;
   firstEncounterDateTime: number;
@@ -51,7 +62,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
   const selectedVisitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
   if (visitStatus === 'new') {
-    return <></>;
+    return null;
   }
 
   return (
@@ -65,14 +76,14 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
         dateField={{ name: 'visitStartDate', label: t('startDate', 'Start date') }}
         timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
         timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
-        maxDate={Math.min(firstEncounterDateTime, selectedVisitStopDateTime?.getTime(), Date.now())}
+        maxDate={minOf(Date.now(), firstEncounterDateTime, selectedVisitStopDateTime?.getTime())}
       />
       {hasStopTime && (
         <VisitDateTimeField
           dateField={{ name: 'visitStopDate', label: t('endDate', 'End date') }}
           timeField={{ name: 'visitStopTime', label: t('endTime', 'End time') }}
           timeFormatField={{ name: 'visitStopTimeFormat', label: t('endTimeFormat', 'End time format') }}
-          minDate={Math.max(lastEncounterDateTime, selectedVisitStartDateTime?.getTime())}
+          minDate={maxOf(lastEncounterDateTime, selectedVisitStartDateTime?.getTime())}
           maxDate={Date.now()}
         />
       )}
@@ -148,15 +159,15 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
             <div className={styles.timePickerContainer}>
               <TimePicker
                 className={styles.timePicker}
+                disabled={disabled}
                 id={timeField.name}
                 invalid={Boolean(errors[timeField.name])}
                 invalidText={errors[timeField.name]?.message}
                 labelText={timeField.label}
                 onBlur={onBlur}
-                onChange={(event) => onChange(event.target.value as amPm)}
+                onChange={(event) => onChange(event.target.value)}
                 pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
-                value={value as amPm}
-                disabled={disabled}
+                value={value as string}
               >
                 <Controller
                   name={timeFormatField.name}
@@ -167,10 +178,10 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
                       className={classNames({
                         [styles.timePickerSelectError]: errors[timeFormatField.name],
                       })}
+                      disabled={disabled}
                       id={`${timeFormatField.name}Input`}
                       onChange={(event) => onChange(event.target.value as amPm)}
                       value={value as amPm}
-                      disabled={disabled}
                     >
                       <SelectItem value="AM" text={t('AM', 'AM')} />
                       <SelectItem value="PM" text={t('PM', 'PM')} />

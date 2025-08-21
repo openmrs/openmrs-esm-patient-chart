@@ -3,7 +3,7 @@ import type { Encounter, ColumnDefinition, ConfigConcepts, EncounterTileColumn, 
 import dayjs from 'dayjs';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
-  return `${dayjs().diff(dayjs(givenDate), 'days')} days`;
+  return `${Math.abs(dayjs().diff(dayjs(givenDate), 'days'))} days`;
 };
 
 export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: ConfigConcepts) => {
@@ -35,7 +35,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
           config: config,
         });
       }
-      return typeof obsValue === 'string' ? obsValue : obsValue?.name?.name ?? '--';
+      return typeof obsValue === 'string' || (typeof obsValue === 'number' && !isNaN(obsValue)) ? obsValue : obsValue?.name?.name ?? '--';
     },
     getSummaryObsValue: column.hasSummary
       ? (encounter: Encounter) => {
@@ -61,7 +61,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
             const primaryDate = getObsFromEncounter({
               encounter: encounter,
               obsConcept: column.summaryConcept.primaryConcept,
-              isDate: column.summaryConcept.isDate,
+              isDate: false,
               config,
             });
 
@@ -76,6 +76,7 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
               obsConcept: column.summaryConcept?.primaryConcept,
               isDate: column.summaryConcept?.isDate,
               config: config,
+              type: column.summaryConcept?.type,
             });
           }
           return typeof summaryValue === 'string' ? summaryValue : summaryValue?.name?.name || '--';

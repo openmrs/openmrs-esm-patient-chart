@@ -33,6 +33,8 @@
   "goToSummary": "Ir para o Resumo",
   "heartRate": "Frequência cardíaca",
   "height": "Altura",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "Carregando",
   "male": "Masculino",
   "muac": "CMB",
@@ -73,6 +75,6 @@
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Histórico de sinais vitais",
   "vitalSignDisplayed": "Sinal vital exibido",
-  "vitalSigns": "Sinais vitais",
+  "vitalSigns": "vital signs",
   "weight": "Peso"
 }

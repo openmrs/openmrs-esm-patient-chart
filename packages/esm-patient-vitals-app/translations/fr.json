@@ -33,6 +33,8 @@
   "goToSummary": "Accéder au résumé patient",
   "heartRate": "Fréquence cardiaque",
   "height": "Taille",
+  "hoursOldVitals_one": "<0>Ces signes vitaux ont <1> {{count}} heure</0> ",
+  "hoursOldVitals_other": "<0>Ces constantes datent de <1>{{count}} heures</1></0>",
   "loading": "En cours de chargement",
   "male": "Homme",
   "muac": "Périmètre brachial",
@@ -73,6 +75,6 @@
   "vitalsAndBiometricsUpdateError": "Erreur lors de la mise à jour des signes vitaux et données biométriques",
   "vitalsHistory": "Historique des signes vitaux",
   "vitalSignDisplayed": "Signe vital affiché",
-  "vitalSigns": "Signes vitaux",
+  "vitalSigns": "constantes",
   "weight": "Poids"
 }

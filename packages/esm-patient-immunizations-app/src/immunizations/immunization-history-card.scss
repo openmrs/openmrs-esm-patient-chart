@@ -1,0 +1,103 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.content {
+  background-color: $ui-background;
+}
+
+.doseCell {
+  min-width: layout.$spacing-13;
+  padding: layout.$spacing-03;
+  display: inline-block;
+  text-align: center;
+}
+
+.doseLabel {
+  margin-bottom: layout.$spacing-03;
+}
+
+.doseDate {
+  @include type.type-style('label-02');
+  color: $text-02;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.widgetCard {
+  border: 1px solid $ui-03;
+
+  :global(.cds--data-table) {
+    .vaccineNameCell {
+      width: 13rem;
+      position: sticky;
+      inset-inline-start: 0;
+      z-index: 1;
+      vertical-align: top;
+      background-color: inherit;
+      box-sizing: border-box;
+      background-clip: padding-box;
+    }
+
+    .dosesCell {
+      background-color: inherit;
+      padding: 0;
+      width: auto;
+      max-width: calc(100% - 13rem);
+      box-sizing: border-box;
+    }
+
+    td {
+      border-bottom: none !important;
+    }
+  }
+}
+
+:global(.cds--data-table) thead .vaccineNameCell {
+  z-index: 2;
+}
+
+:global(.omrs-breakpoint-gt-phone):global(.omrs-breakpoint-lt-desktop) {
+  .widgetCard {
+    max-width: 60rem;
+    margin: 0 auto;
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .widgetCard {
+    max-width: 100%;
+  }
+}
+
+.vaccineNameContent {
+  width: 13rem;
+}
+
+.vaccineDose {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: layout.$spacing-03 0;
+
+  background:
+    linear-gradient(to left, $ui-background, rgba($ui-background, 0)) 100% 0 / 1.25rem 100% no-repeat,
+    linear-gradient(to left, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) 100% 0 / 0.5rem 100% no-repeat;
+  background-attachment: local, scroll;
+}
+
+/* RTL: flip right-edge hint to left edge */
+[dir='rtl'] .vaccineDose {
+  background:
+    linear-gradient(to right, $ui-background, rgba($ui-background, 0)) 0 0 / 1.25rem 100% no-repeat,
+    linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) 0 0 / 0.5rem 100% no-repeat;
+  background-attachment: local, scroll;
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}

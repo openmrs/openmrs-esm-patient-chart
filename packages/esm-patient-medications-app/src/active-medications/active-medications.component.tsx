@@ -11,16 +11,20 @@ interface ActiveMedicationsProps {
 
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('activeMedicationsDisplayText', 'Active medications');
-  const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
+  const displayText = t('activeMedicationsDisplayText', 'active medications');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit('add-drug-order');
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
 
   if (activePatientOrders?.length) {
     return (

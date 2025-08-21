@@ -18,9 +18,9 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { EmptyDataIllustration, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import { usePatientLists } from '../patient-lists.resource';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { usePatientLists, type MappedList } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
 function PatientListsWorkspace() {
@@ -28,11 +28,10 @@ function PatientListsWorkspace() {
   const layout = useLayoutType();
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm);
   const { patientLists, isLoading } = usePatientLists();
 
-  const launchListDetailsWorkspace = useCallback((list) => {
-    launchPatientWorkspace('patient-list-details', { list, workspaceTitle: list.name });
+  const launchListDetailsWorkspace = useCallback((list: MappedList) => {
+    launchWorkspace('patient-list-details', { list, workspaceTitle: list.name });
   }, []);
 
   const tableHeaders = [
@@ -51,28 +50,17 @@ function PatientListsWorkspace() {
   ];
 
   const filteredLists = useMemo(() => {
-    if (!debouncedSearchTerm) {
+    if (!searchTerm) {
       return patientLists;
     }
 
-    return debouncedSearchTerm
-      ? fuzzy
-          .filter(debouncedSearchTerm, patientLists, {
-            extract: (list) => `${list.name} ${list.type}`,
-          })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : patientLists;
-  }, [debouncedSearchTerm, patientLists]);
-
-  const tableRows = useMemo(
-    () =>
-      filteredLists?.map((list) => ({
-        ...list,
-        numberOfPatients: list.size,
-      })) ?? [],
-    [filteredLists],
-  );
+    return fuzzy
+      .filter(searchTerm, patientLists, {
+        extract: (list) => `${list.name} ${list.type}`,
+      })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
+  }, [searchTerm, patientLists]);
 
   const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
@@ -86,7 +74,7 @@ function PatientListsWorkspace() {
   if (patientLists?.length > 0) {
     return (
       <section className={styles.container}>
-        <DataTable headers={tableHeaders} rows={tableRows} size={responsiveSize} useZebraStyles>
+        <DataTable headers={tableHeaders} rows={filteredLists || []} size={responsiveSize} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <>
               <TableContainer className={styles.tableContainer}>
@@ -98,7 +86,7 @@ function PatientListsWorkspace() {
                         expanded
                         onChange={handleSearchTermChange}
                         placeholder={t('searchThisList', 'Search this list')}
-                        size={responsiveSize}
+                        size="sm"
                       />
                     </TableToolbarContent>
                   </TableToolbar>
@@ -108,7 +96,9 @@ function PatientListsWorkspace() {
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
-                          <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                          <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                            {header.header}
+                          </TableHeader>
                         ))}
                       </TableRow>
                     </TableHead>

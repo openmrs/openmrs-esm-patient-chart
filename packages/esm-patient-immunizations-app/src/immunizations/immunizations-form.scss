@@ -1,12 +1,9 @@
 @use '@carbon/layout';
+@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   margin: layout.$spacing-05;
-
-  & section {
-    margin: layout.$spacing-05 0;
-  }
 }
 
 .form {
@@ -39,16 +36,12 @@
   }
 }
 
-.dateTimeSection {
-  display: flex;
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
 }
 
-.timePickerContainer {
-  display: flex;
-  flex-direction: column;
-}
-@media screen and (max-width: 600px) {
-  .dateTimeSection {
-    flex-direction: column;
-  }
+.vaccineBatchHeading {
+  @include type.type-style('heading-compact-02');
 }

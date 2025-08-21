@@ -3,8 +3,13 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   orderEncounterType: {
     _type: Type.UUID,
-    _description: 'The encounter type of the encounter encapsulating orders',
+    _description: 'The encounter type of the encounter encapsulating orders. Defaults to the "Order" encounter type.',
     _default: '39da3525-afe4-45ff-8977-c53b7b359158',
+  },
+  careSettingUuid: {
+    _type: Type.UUID,
+    _description: 'The UUID of the care setting for orders. Defaults to the "Outpatient" care setting.',
+    _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   showPrintButton: {
     _type: Type.Boolean,
@@ -14,20 +19,19 @@ export const configSchema = {
   },
   orderTypes: {
     _type: Type.Array,
-    _default: [],
-    _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
     _elements: {
+      _type: Type.Object,
       orderTypeUuid: {
         _type: Type.UUID,
         _description: 'The UUID of the order type listed in the order basket',
       },
       orderableConceptSets: {
         _type: Type.Array,
-        _description:
-          "UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the `orderableConcepts`. If the orderableConcepts are not given, then it'll search concepts by concept class.",
         _elements: {
           _type: Type.UUID,
         },
+        _description:
+          "UUIDs of concepts that represent orderable concepts. Either the `conceptClass` should be given, or the `orderableConcepts`. If the orderableConcepts are not given, then it'll search concepts by concept class.",
       },
       label: {
         _type: Type.String,
@@ -40,12 +44,14 @@ export const configSchema = {
         _default: '',
       },
     },
+    _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
+    _default: [],
   },
   showReferenceNumberField: {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'Whether to display the Reference number field in the Order form. This field maps to the accesion_number property in the Order data model',
+      'Whether to display the "Reference number" field in the Order form. This field maps to the accession_number property in the Order data model',
   },
 };
 
@@ -58,6 +64,7 @@ export interface OrderTypeDefinition {
 
 export interface ConfigObject {
   orderEncounterType: string;
+  careSettingUuid: string;
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
