@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type LabOrderConcept, useOrderConceptByUuid } from './lab-results.resource';
+import { type LabOrderConcept } from './lab-results.resource';
 
 type SchemaRecord = Record<string, z.ZodType>;
 
@@ -153,4 +153,6 @@ const createNumericSchema = (
       message: `${display} must be less than or equal to ${upperLimit}`,
     });
   }
+
+  return baseSchema;
 };
