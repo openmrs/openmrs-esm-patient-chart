@@ -5,30 +5,11 @@ import { type Control, useForm } from 'react-hook-form';
 import { type TFunction, useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  restBaseUrl,
-  showSnackbar,
-  useAbortController,
-  useLayoutType,
-  useConfig,
-  useVisit,
-  useSession,
-  ExtensionSlot,
-} from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  getPatientChartStore,
-  type Order,
-  type OrderBasketItem,
-  postOrders,
-  useOrderBasket,
-  usePatientOrders,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { restBaseUrl, showSnackbar, useAbortController, useLayoutType, ExtensionSlot } from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
-import { type ConfigObject } from '../config-schema';
 import {
-  createObservationPayload,
+  createCompositeObservationPayload,
   isCoded,
   isNumeric,
   isPanel,
@@ -39,7 +20,6 @@ import {
   useOrderConceptsByUuids,
 } from './lab-results.resource';
 import { createLabResultsFormCompositeSchema } from './lab-results-schema.resource';
-import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 import orderStyles from '../order-basket/order-basket.scss';
@@ -59,36 +39,18 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
    */
   invalidateLabOrders,
-  patientUuid = order.patient.uuid,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
-  const [orderList, setOrderList] = useState<Order[]>([order]);
-  const { isLoading: isAnyConceptLoading, concepts: conceptList } = useOrderConceptsByUuids(
-    orderList.map((o) => o.concept.uuid),
-  );
+  const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
+  const { isLoading: isAnyConceptLoading, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptList), [conceptList]);
+  const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
-  const config = useConfig<ConfigObject>();
   const { orders, clearOrders } = useOrderBasket();
   const [isSavingOrders, setIsSavingOrders] = useState(false);
-  const [creatingEncounterError, setCreatingEncounterError] = useState('');
-  const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
-  const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
-  const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(orderList);
-  const {
-    data: newOrders,
-    error: error,
-    isLoading: ordersLoading,
-    isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', null, null, null);
-  const [savedOrderConceptList, setSavedOrderConceptList] = useState([]);
-  const [existingOrderNumbers, setExistingOrderNumbers] = useState([]);
-  const patientStore = getPatientChartStore();
-  const [isOutSitePatientChart, setIsOutSitePatientChart] = useState(false);
+  const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -98,100 +60,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }, [mutate, order.patient.uuid]);
 
-  useEffect(() => {
-    const storeUuid = patientStore.getState().patientUuid;
-    if (!storeUuid || storeUuid !== patientUuid) {
-      patientStore.setState({ patientUuid: patientUuid });
-      setIsOutSitePatientChart(true);
-    }
-  }, [patientUuid, patientStore]);
-
-  useEffect(() => {
-    if (savedOrderConceptList.length === 0 || !newOrders?.length) {
-      return;
-    }
-    const filteredNewOrders = newOrders.filter((o) => !existingOrderNumbers.includes(o.orderNumber));
-    setOrderList(filteredNewOrders);
-  }, [newOrders, existingOrderNumbers, savedOrderConceptList]);
-
-  const {
-    visitRequired,
-    isLoading: isLoadingEncounterUuid,
-    encounterUuid,
-    error: errorFetchingEncounterUuid,
-    mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid, config.orderEncounterType);
-
-  function showOrderSuccessToast(t: TFunction, patientOrderItems: OrderBasketItem[]) {
-    const orderedString = patientOrderItems
-      .filter((item) => ['NEW', 'RENEW'].includes(item.action))
-      .map((item) => item.display)
-      .join(', ');
-    const updatedString = patientOrderItems
-      .filter((item) => item.action === 'REVISE')
-      .map((item) => item.display)
-      .join(', ');
-    const discontinuedString = patientOrderItems
-      .filter((item) => item.action === 'DISCONTINUE')
-      .map((item) => item.display)
-      .join(', ');
-
-    showSnackbar({
-      isLowContrast: true,
-      kind: 'success',
-      title: t('orderCompleted', 'Placed orders'),
-      subtitle:
-        (orderedString && `${t('ordered', 'Placed order for')} ${orderedString}. `) +
-        (updatedString && `${t('updated', 'Updated')} ${updatedString}. `) +
-        (discontinuedString && `${t('discontinued', 'Discontinued')} ${discontinuedString}.`),
-    });
-  }
-
   const handleCancel = useCallback(() => {
     clearOrders();
   }, [clearOrders]);
 
-  const handleSave = useCallback(async () => {
-    const abortController = new AbortController();
-    const orderNumbers = newOrders.filter((o) => o.orderNumber != order.orderNumber).map((o) => o.orderNumber);
-    setExistingOrderNumbers(orderNumbers);
-    setCreatingEncounterError('');
-    let orderEncounterUuid = encounterUuid ? encounterUuid : order.encounter.uuid;
-
-    setIsSavingOrders(true);
-
-    const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
-    const conceptUuids = orders.map((order) => order['testType']['conceptUuid']);
-    setSavedOrderConceptList(conceptUuids);
-    clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-    // Only revalidate current visit since orders create new encounters
-    mutateCurrentVisit();
-    await mutateOrders();
-    if (erroredItems.length == 0) {
-      showOrderSuccessToast(t, orders);
-    } else {
-      setOrdersWithErrors(erroredItems);
-    }
-    setIsSavingOrders(false);
-    if (isOutSitePatientChart) {
-      patientStore.setState({});
-      setIsOutSitePatientChart(false);
-    }
-    return () => abortController.abort();
-  }, [
-    clearOrders,
-    encounterUuid,
-    mutateOrders,
-    mutateCurrentVisit,
-    orders,
-    patientUuid,
-    t,
-    order.encounter.uuid,
-    isOutSitePatientChart,
-    newOrders,
-    order.orderNumber,
-    patientStore,
-  ]);
+  const handleSave = useCallback(() => {
+    const newConceptUuids = orders.map((order) => order['testType']['conceptUuid']);
+    setOrderConceptUuids([order.concept.uuid, ...newConceptUuids]);
+    clearOrders();
+  }, [clearOrders, orders, order.concept.uuid]);
 
   const {
     control,
@@ -203,11 +80,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     resolver: zodResolver(compositeSchema),
     mode: 'all',
   });
+  useEffect(() => {
+    if (Array.isArray(completeLabResults) && completeLabResults.length > 1) {
+      const conceptUuids = completeLabResults.map((r) => r.concept.uuid);
+      setOrderConceptUuids(conceptUuids);
+    }
+  }, [completeLabResults]);
 
   useEffect(() => {
-    orderList.forEach((order, index) => {
-      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === order.concept.uuid);
-      const concept = conceptList.find((c) => c.uuid === order.concept.uuid);
+    conceptArray.forEach((concept, index) => {
+      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
       if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
           setValue(concept.uuid, completeLabResult.value.uuid);
@@ -231,7 +113,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         }
       }
     });
-  }, [conceptList, completeLabResults, orderList, setValue]);
+  }, [conceptArray, completeLabResults, order?.fulfillerStatus, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -271,97 +153,91 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     };
 
     // Handle update operation for completed lab order results
-    orderList.forEach(async (order, index) => {
-      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === order.concept.uuid);
-      if (order.fulfillerStatus === 'COMPLETED') {
-        const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-          const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-          return updateObservation(obs?.uuid, { value });
-        });
-        const updateResults = await Promise.allSettled(updateTasks);
-        const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-          if (curr.status === 'rejected') {
-            return [...prev, Object.keys(formValues).at(index)];
-          }
-          return prev;
-        }, []);
-
-        if (failedObsconceptUuids.length) {
-          showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
-        } else {
-          closeWorkspaceWithSavedChanges();
-          showNotification(
-            'success',
-            t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-              orderNumber: order?.orderNumber,
-            }),
-          );
+    //const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
+    if (order.fulfillerStatus === 'COMPLETED') {
+      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+        const completeLabResult = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
+        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+        return updateObservation(obs?.uuid, { value });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+        if (curr.status === 'rejected') {
+          return [...prev, Object.keys(formValues).at(index)];
         }
-        mutateResults();
-        return setShowEmptyFormErrorNotification(false);
-      }
+        return prev;
+      }, []);
 
-      // Handle Creation logic
-
-      // Set the observation status to 'FINAL' as we're not capturing it in the form
-      const obsPayload = createObservationPayload(
-        conceptList.find((c) => c.uuid === order.concept.uuid),
-        order,
-        formValues,
-        'FINAL',
-      );
-      const orderDiscontinuationPayload = {
-        previousOrder: order.uuid,
-        type: 'testorder',
-        action: 'DISCONTINUE',
-        careSetting: order.careSetting.uuid,
-        encounter: order.encounter.uuid,
-        patient: order.patient.uuid,
-        concept: order.concept.uuid,
-        orderer: order.orderer,
-      };
-      const resultsStatusPayload = {
-        fulfillerStatus: 'COMPLETED',
-        fulfillerComment: 'Test Results Entered',
-      };
-
-      try {
-        await updateOrderResult(
-          order.uuid,
-          order.encounter.uuid,
-          obsPayload,
-          resultsStatusPayload,
-          orderDiscontinuationPayload,
-          abortController,
-        );
-
+      if (failedObsconceptUuids.length) {
+        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+      } else {
         closeWorkspaceWithSavedChanges();
-        mutateOrderData();
-        mutateResults();
-        invalidateLabOrders?.();
-
         showNotification(
           'success',
           t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
             orderNumber: order?.orderNumber,
           }),
         );
-      } catch (err) {
-        showNotification('error', err?.message);
-      } finally {
-        setShowEmptyFormErrorNotification(false);
       }
-    });
+      mutateResults();
+      return setShowEmptyFormErrorNotification(false);
+    }
+
+    // Handle Creation logic
+
+    // Set the observation status to 'FINAL' as we're not capturing it in the form
+    const obsPayload = createCompositeObservationPayload(conceptArray, order, formValues, 'FINAL');
+    const orderDiscontinuationPayload = {
+      previousOrder: order.uuid,
+      type: 'testorder',
+      action: 'DISCONTINUE',
+      careSetting: order.careSetting.uuid,
+      encounter: order.encounter.uuid,
+      patient: order.patient.uuid,
+      concept: order.concept.uuid,
+      orderer: order.orderer,
+    };
+    const resultsStatusPayload = {
+      fulfillerStatus: 'COMPLETED',
+      fulfillerComment: 'Test Results Entered',
+    };
+
+    try {
+      await updateOrderResult(
+        order.uuid,
+        order.encounter.uuid,
+        obsPayload,
+        resultsStatusPayload,
+        orderDiscontinuationPayload,
+        abortController,
+      );
+
+      closeWorkspaceWithSavedChanges();
+      mutateOrderData();
+      mutateResults();
+      invalidateLabOrders?.();
+
+      showNotification(
+        'success',
+        t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+          orderNumber: order?.orderNumber,
+        }),
+      );
+    } catch (err) {
+      showNotification('error', err?.message);
+    } finally {
+      setShowEmptyFormErrorNotification(false);
+    }
   };
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
       <Layer level={isTablet ? 1 : 0}>
         <div className={styles.grid}>
-          {conceptList?.length > 0 && (
+          {conceptArray?.length > 0 && (
             <Stack gap={5}>
               {!isLoading ? (
-                conceptList.map((c) => (
+                conceptArray.map((c) => (
                   <ResultFormField
                     defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
                     concept={c}
@@ -371,7 +247,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               ) : (
                 <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
               )}
-              {savedOrderConceptList.length === 0 && (
+              {order.fulfillerStatus !== 'COMPLETED' && (
                 <div className={orderStyles.orderBasketContainer}>
                   <ExtensionSlot
                     className={classNames(orderStyles.orderBasketSlot, {
@@ -384,24 +260,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
               {orders?.length > 0 && (
                 <div className={orderStyles.orderBasketContainer}>
-                  {(creatingEncounterError || errorFetchingEncounterUuid) && (
-                    <InlineNotification
-                      kind="error"
-                      title={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
-                      subtitle={creatingEncounterError}
-                      lowContrast={true}
-                      className={styles.inlineNotification}
-                    />
-                  )}
-                  {ordersWithErrors.map((order) => (
-                    <InlineNotification
-                      lowContrast
-                      kind="error"
-                      title={t('saveDrugOrderFailed', 'Error ordering {{orderName}}', { orderName: order.display })}
-                      subtitle={order.extractedOrderError?.fieldErrors?.join(', ')}
-                      className={styles.inlineNotification}
-                    />
-                  ))}
                   <ButtonSet className={styles.buttonSet}>
                     <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
                       {t('cancelOrder', 'Cancel order')}
