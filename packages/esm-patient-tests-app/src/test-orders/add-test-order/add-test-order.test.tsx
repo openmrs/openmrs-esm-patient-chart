@@ -29,7 +29,7 @@ const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseWorkSpaces = jest.mocked(useWorkspaces);
-const mockWorkSpacesInfo = {} as unknown as WorkspacesInfo;
+const mockWorkSpacesInfo = {} as WorkspacesInfo;
 
 mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
   onWorkspaceClose?.();

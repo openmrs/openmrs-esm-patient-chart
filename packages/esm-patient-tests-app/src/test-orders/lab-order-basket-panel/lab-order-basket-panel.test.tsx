@@ -11,7 +11,7 @@ const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
 const mockUseWorkSpaces = jest.mocked(useWorkspaces);
-const mockWorkSpacesInfo = {} as unknown as WorkspacesInfo;
+const mockWorkSpacesInfo = {} as WorkspacesInfo;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
