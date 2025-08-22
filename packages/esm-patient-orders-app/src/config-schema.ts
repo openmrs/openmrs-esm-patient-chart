@@ -3,8 +3,13 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   orderEncounterType: {
     _type: Type.UUID,
-    _description: 'The encounter type of the encounter encapsulating orders',
+    _description: 'The encounter type of the encounter encapsulating orders. Defaults to the "Order" encounter type.',
     _default: '39da3525-afe4-45ff-8977-c53b7b359158',
+  },
+  careSettingUuid: {
+    _type: Type.UUID,
+    _description: 'The UUID of the care setting for orders. Defaults to the "Outpatient" care setting.',
+    _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   showPrintButton: {
     _type: Type.Boolean,
@@ -46,7 +51,7 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description:
-      'Whether to display the Reference number field in the Order form. This field maps to the accesion_number property in the Order data model',
+      'Whether to display the "Reference number" field in the Order form. This field maps to the accession_number property in the Order data model',
   },
 };
 
@@ -59,6 +64,7 @@ export interface OrderTypeDefinition {
 
 export interface ConfigObject {
   orderEncounterType: string;
+  careSettingUuid: string;
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;

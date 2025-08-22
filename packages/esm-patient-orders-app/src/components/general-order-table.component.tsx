@@ -67,7 +67,7 @@ const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
         normalRange:
           memberConcept.hiNormal && memberConcept.lowNormal
             ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
-            : 'N/A',
+            : t('notApplicable', 'Not applicable'),
         referenceNumber: order?.accessionNumber,
       }));
     } else if (concept && concept.setMembers.length === 0) {
@@ -77,14 +77,17 @@ const GeneralOrderTable: React.FC<GeneralOrderProps> = ({ order }) => {
           orderName: <div className={styles.type}>{concept.display}</div>,
           instructions: order?.instructions ?? '--',
           result: isLoadingResult ? <SkeletonText /> : getObservationDisplayValue(obs?.value) ?? '--',
-          normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+          normalRange:
+            concept.hiNormal && concept.lowNormal
+              ? `${concept.lowNormal} - ${concept.hiNormal}`
+              : t('notApplicable', 'Not applicable'),
           referenceNumber: order?.accessionNumber,
         },
       ];
     } else {
       return [];
     }
-  }, [concept, isLoadingResult, obs?.groupMembers, obs?.value, order?.accessionNumber, order?.instructions]);
+  }, [concept, isLoadingResult, obs?.groupMembers, obs?.value, order?.accessionNumber, order?.instructions, t]);
 
   return (
     <div className={styles.order}>

@@ -42,7 +42,7 @@ export function launchEncounterForm(
     });
 }
 
-export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
+export function getEncounterValues(encounter: Encounter, param: string, isDate?: boolean) {
   if (isDate) return formatDate(encounter[param]);
   else return encounter[param] ?? '--';
 }

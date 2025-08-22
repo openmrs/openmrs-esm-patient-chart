@@ -43,7 +43,9 @@ export function usePatientOrders(
   const orders = useMemo(
     () =>
       data?.data?.results
-        ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
+        ? [...data.data.results]?.sort(
+            (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+          )
         : null,
     [data],
   );

@@ -22,7 +22,6 @@
   padding: 0;
 
   :global(.cds--data-table-content) {
-    border: 1px solid colors.$gray-20;
     border-bottom: none;
     overflow: visible;
   }
@@ -54,6 +53,7 @@
 
 .search {
   input {
+    background-color: colors.$gray-10 !important;
     padding: 0 layout.$spacing-10 !important;
   }
 

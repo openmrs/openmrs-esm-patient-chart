@@ -76,7 +76,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
           normalRange:
             memberConcept?.hiNormal && memberConcept?.lowNormal
               ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
-              : 'N/A',
+              : t('notApplicable', 'Not applicable'),
         };
       });
     }
@@ -88,10 +88,13 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
         result: isLoadingResult ? <SkeletonText /> : mainResultValue,
-        normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+        normalRange:
+          concept.hiNormal && concept.lowNormal
+            ? `${concept.lowNormal} - ${concept.hiNormal}`
+            : t('notApplicable', 'Not applicable'),
       },
     ];
-  }, [concept, encounter, isLoadingResult, testResultObs]);
+  }, [concept, encounter, isLoadingResult, testResultObs, t]);
 
   if (isLoadingTestConcepts || isLoadingResult) {
     return <DataTableSkeleton role="progressbar" zebra />;
