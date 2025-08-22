@@ -8,6 +8,7 @@ import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextArea, Text
 import {
   getCoreTranslation,
   OpenmrsDatePicker,
+  parseDate,
   ResponsiveWrapper,
   showSnackbar,
   toDateObjectStrict,
@@ -100,6 +101,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
+  const vaccinationDate = watch('vaccinationDate');
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -115,8 +117,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
           doseNumber: props.doseNumber,
+          nextDoseDate: props.nextDoseDate,
           note: props.note,
-          expirationDate: props.expirationDate,
+          expirationDate: props.expirationDate ? parseDate(props.expirationDate.toISOString()) : null,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
         });
@@ -152,7 +155,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
-          nextDoseDate,
+          nextDoseDate: toDateObjectStrict(toOmrsIsoString(dayjs(nextDoseDate).startOf('day').toDate())),
           note,
           expirationDate,
           lotNumber,
@@ -258,6 +261,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('nextDoseDate', 'Next dose date')}
+                  minDate={vaccinationDate}
                 />
               )}
             />
@@ -323,7 +327,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
-                  minDate={immunizationToEditMeta ? null : dayjs().startOf('day').toDate()}
+                  minDate={vaccinationDate}
                 />
               )}
             />
