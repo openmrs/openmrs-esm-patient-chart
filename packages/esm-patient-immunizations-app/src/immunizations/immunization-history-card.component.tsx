@@ -30,26 +30,36 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
     { key: 'vaccine', header: t('vaccine', 'Vaccine') },
     { key: 'doses', header: t('doses', 'Doses') },
   ];
+  const getNextDoseStatus = (nextDoseDate: string) => {
+    if (!nextDoseDate) return 'NOT_DUE';
+    const nextDate = new Date(nextDoseDate);
+    const todayDate = new Date();
 
+    return todayDate >= nextDate ? 'DUE' : 'NOT_DUE';
+  };
   const tableRows = useMemo(() => {
-    return (sortedImmunizations || []).map((immunization) => ({
-      id: immunization.vaccineUuid,
-      vaccine: immunization.vaccineName,
-      doses: immunization.existingDoses.map((dose) => (
-        <div key={dose.immunizationObsUuid} className={styles.doseCell}>
-          <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
-          {dose.occurrenceDateTime && (
-            <div className={styles.doseDate}>
-              {formatDate(parseDate(dose.occurrenceDateTime), {
-                mode: 'standard',
-                time: false,
-                noToday: true,
-              })}
-            </div>
-          )}
-        </div>
-      )),
-    }));
+    return (sortedImmunizations || []).map((immunization) => {
+      const latestDose = immunization.existingDoses?.[immunization.existingDoses.length - 1];
+      return {
+        id: immunization.vaccineUuid,
+        vaccine: immunization.vaccineName,
+        nextDoseDate: latestDose?.nextDoseDate,
+        doses: immunization.existingDoses.map((dose) => (
+          <div key={dose.immunizationObsUuid} className={styles.doseCell}>
+            <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
+            {dose.occurrenceDateTime && (
+              <div className={styles.doseDate}>
+                {formatDate(parseDate(dose.occurrenceDateTime), {
+                  mode: 'standard',
+                  time: false,
+                  noToday: true,
+                })}
+              </div>
+            )}
+          </div>
+        )),
+      };
+    });
   }, [sortedImmunizations, t]);
 
   const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
@@ -82,6 +92,16 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
               <TableCell className={styles.vaccineNameCell}>
                 <div className={styles.vaccineNameContent}>
                   <strong>{row.vaccine}</strong>
+                  {row.nextDoseDate && (
+                    <div className={styles.nextDoseDateLabel} data-status={getNextDoseStatus(row.nextDoseDate)}>
+                      {t('nextDoseDate', 'Next dose date')}:{' '}
+                      {formatDate(parseDate(row.nextDoseDate), {
+                        mode: 'standard',
+                        time: false,
+                        noToday: true,
+                      })}
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell className={styles.dosesCell}>

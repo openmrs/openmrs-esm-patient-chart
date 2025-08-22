@@ -1,4 +1,5 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
@@ -99,5 +100,20 @@
 .paginationContainer {
   > div {
     border-top: none !important;
+  }
+}
+.nextDoseDateLabel {
+  @include type.type-style('label-01');
+  display: inline-block;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-02;
+  text-align: center;
+
+  &[data-status='DUE'] {
+    background-color: colors.$red-20;
+  }
+
+  &[data-status='NOT_DUE'] {
+    background-color: colors.$green-20;
   }
 }
