@@ -16,6 +16,11 @@ export const esmPatientChartSchema = {
     _default: false,
     _description: 'Disable notes/tests/medications/encounters tabs when empty',
   },
+  drugOrderTypeConceptUuid: {
+    _type: Type.UUID,
+    _description: "Concept UUID for the 'Drug' order type used to fetch medications",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
   freeTextFieldConceptUuid: {
     _type: Type.ConceptUuid,
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -157,6 +162,7 @@ export const esmPatientChartSchema = {
 export interface ChartConfig {
   defaultFacilityUrl: string;
   disableChangingVisitLocation: boolean;
+  drugOrderTypeConceptUuid: string;
   freeTextFieldConceptUuid: string;
   logo: {
     alt: string;
