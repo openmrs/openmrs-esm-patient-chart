@@ -15,15 +15,18 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
+import VisitLocationCell from './visit-location-cell.component';
+import VisitProviderCell from './visit-provider-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
 import styles from './visit-history-table.scss';
+import type { ChartConfig } from '../../config-schema';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -40,14 +43,23 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
+  const { visitHistoryColumns } = useConfig<ChartConfig>();
 
-  // TODO: make this configurable
-  const columns = [
+  const allColumns = [
     { key: 'visitDate', header: t('date', 'Date'), CellComponent: VisitDateCell },
     { key: 'visitType', header: t('visitType', 'Visit type'), CellComponent: VisitTypeCell },
     { key: 'diagnoses', header: t('diagnoses', 'Diagnoses'), CellComponent: VisitDiagnosisCell },
+    { key: 'location', header: t('location', 'Location'), CellComponent: VisitLocationCell },
+    { key: 'provider', header: t('provider', 'Provider'), CellComponent: VisitProviderCell },
     { key: 'actions', header: '', CellComponent: VisitActionsCell },
-  ];
+  ] as const;
+
+  const configuredColumns = (visitHistoryColumns ?? [])
+    .filter((c) => c.visible)
+    .map((cfg) => allColumns.find((c) => c.key === cfg.key))
+    .filter((c): c is (typeof allColumns)[number] => Boolean(c));
+
+  const columns = configuredColumns.length > 0 ? configuredColumns : [...allColumns];
 
   const layout = useLayoutType();
 

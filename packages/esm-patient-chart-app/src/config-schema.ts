@@ -69,6 +69,30 @@ export const esmPatientChartSchema = {
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
     _default: true,
   },
+  visitHistoryColumns: {
+    _type: Type.Array,
+    _description:
+      'Configurable columns for the visit history table. The array order determines the display order; set visible to false to hide a column.',
+    _elements: {
+      _type: Type.Object,
+      key: {
+        _type: Type.String,
+        _description: 'One of visitDate, visitType, diagnoses, location, provider,actions',
+      },
+      visible: {
+        _type: Type.Boolean,
+        _default: true,
+      },
+    },
+    _default: [
+      { key: 'visitDate', visible: true },
+      { key: 'visitType', visible: true },
+      { key: 'diagnoses', visible: true },
+      { key: 'location', visible: false },
+      { key: 'provider', visible: false },
+      { key: 'actions', visible: true },
+    ],
+   },
   showExtraVisitAttributesSlot: {
     _type: Type.Boolean,
     _description:
@@ -167,6 +191,10 @@ export interface ChartConfig {
   offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
+  visitHistoryColumns: Array<{
+    key: 'visitDate' | 'visitType' | 'diagnoses'  | 'location'  | 'provider'| 'actions';
+    visible: boolean;
+  }>;
   showExtraVisitAttributesSlot: boolean;
   showRecommendedVisitTypeTab: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
