@@ -25,13 +25,13 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
 
   // Build flatName with hierarchy but ensure we don't lose any tests
   if (prefix && prefix !== 'Bloodwork') {
-    outData.flatName = `${prefix}-${node.display}`;
+    outData.flatName = `${prefix.trim()}-${node.display.trim()}`;
   } else if (prefix === 'Bloodwork') {
     // For Bloodwork, use the simplified name to avoid duplicates
     // but ensure the test is still accessible
-    outData.flatName = node.display;
+    outData.flatName = node.display.trim();
   } else {
-    outData.flatName = node.display;
+    outData.flatName = node.display.trim();
   }
 
   outData.hasData = false;

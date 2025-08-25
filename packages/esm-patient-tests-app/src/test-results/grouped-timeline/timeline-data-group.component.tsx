@@ -39,7 +39,7 @@ const PanelHeader: React.FC<{
       ),
     ];
 
-    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+    allTimes.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
     const yearColumns: Array<{ year: string; size: number }> = [];
     const dayColumns: Array<{ year: string; day: string; size: number }> = [];

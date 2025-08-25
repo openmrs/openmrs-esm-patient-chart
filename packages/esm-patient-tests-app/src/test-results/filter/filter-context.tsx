@@ -110,7 +110,8 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       ),
     ];
 
-    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+    allTimes.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
     const rows = [];
     Object.values(tests).forEach((testData) => {
       if (testData?.obs && Array.isArray(testData.obs)) {
@@ -162,10 +163,10 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       if (flatNameParts.length >= 2) {
         // For names like "Hematology-Lipid panel-Total cholesterol" or "Chemistry-Basic metabolic panel-Serum sodium"
         // Take the second part (index 1) which is the actual panel name
-        groupKey = flatNameParts[1].trim();
+        groupKey = flatNameParts[1];
       } else {
         // Fallback to first part if only one part exists
-        groupKey = flatNameParts[0].trim();
+        groupKey = flatNameParts[0];
       }
 
       const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
