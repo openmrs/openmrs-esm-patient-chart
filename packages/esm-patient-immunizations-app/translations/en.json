@@ -25,6 +25,7 @@
   "lastDoseOnDate": "Last dose on {{date}}",
   "lotNumber": "Lot number",
   "manufacturer": "Manufacturer",
+  "nextDoseDate": "Next dose date",
   "note": "Note",
   "pleaseSelect": "Please select",
   "recentVaccination": "Recent vaccination",

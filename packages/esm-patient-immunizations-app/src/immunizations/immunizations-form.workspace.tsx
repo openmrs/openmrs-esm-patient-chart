@@ -8,6 +8,7 @@ import { Button, ButtonSet, Dropdown, Form, InlineLoading, Stack, TextArea, Text
 import {
   getCoreTranslation,
   OpenmrsDatePicker,
+  parseDate,
   ResponsiveWrapper,
   showSnackbar,
   toDateObjectStrict,
@@ -70,9 +71,10 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
-      expirationDate: z.date().nullable().optional(),
-      lotNumber: z.string().nullable().optional(),
-      manufacturer: z.string().nullable().optional(),
+      nextDoseDate: z.date().nullable(),
+      expirationDate: z.date().nullable(),
+      lotNumber: z.string().nullable(),
+      manufacturer: z.string().nullable(),
     });
   }, [patient.birthDate, t]);
 
@@ -84,6 +86,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
       vaccineUuid: '',
       vaccinationDate: dayjs().startOf('day').toDate(),
       doseNumber: 1,
+      nextDoseDate: null,
       note: '',
       expirationDate: null,
       lotNumber: '',
@@ -98,6 +101,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
+  const vaccinationDate = watch('vaccinationDate');
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -113,8 +117,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
           doseNumber: props.doseNumber,
+          nextDoseDate: props.nextDoseDate,
           note: props.note,
-          expirationDate: props.expirationDate,
+          expirationDate: props.expirationDate ? parseDate(props.expirationDate.toISOString()) : null,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
         });
@@ -131,7 +136,16 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
       try {
-        const { vaccineUuid, vaccinationDate, doseNumber, expirationDate, lotNumber, manufacturer, note } = data;
+        const {
+          vaccineUuid,
+          vaccinationDate,
+          doseNumber,
+          expirationDate,
+          lotNumber,
+          manufacturer,
+          note,
+          nextDoseDate,
+        } = data;
         const abortController = new AbortController();
 
         const immunization: ImmunizationFormData = {
@@ -141,6 +155,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
+          nextDoseDate: toDateObjectStrict(toOmrsIsoString(dayjs(nextDoseDate).startOf('day').toDate())),
           note,
           expirationDate,
           lotNumber,
@@ -236,6 +251,24 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           )}
           <ResponsiveWrapper>
             <Controller
+              name="nextDoseDate"
+              control={control}
+              render={({ field, fieldState }) => (
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  data-testid="nextDoseDate"
+                  id="nextDoseDate"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('nextDoseDate', 'Next dose date')}
+                  minDate={vaccinationDate}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
               name="note"
               control={control}
               render={({ field: { onChange, value } }) => (
@@ -296,7 +329,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
-                  minDate={immunizationToEditMeta ? null : dayjs().startOf('day').toDate()}
+                  minDate={vaccinationDate}
                 />
               )}
             />

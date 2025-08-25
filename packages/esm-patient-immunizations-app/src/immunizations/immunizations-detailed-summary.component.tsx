@@ -131,6 +131,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   immunizationId: null,
                   vaccinationDate: null,
                   doseNumber: 0,
+                  nextDoseDate: null,
                   note: null,
                   expirationDate: null,
                   lotNumber: null,
