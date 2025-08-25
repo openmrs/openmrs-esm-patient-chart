@@ -6,7 +6,7 @@ export function useImmunizationsConceptSet(config: ImmunizationWidgetConfigObjec
   const conceptRepresentation =
     'custom:(uuid,display,answers:(uuid,display),conceptMappings:(conceptReferenceTerm:(conceptSource:(name),code)))';
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
+  const { data, isLoading } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
     `${restBaseUrl}/concept?references=${config.immunizationConceptSet}&v=${conceptRepresentation}`,
     openmrsFetch,
   );
