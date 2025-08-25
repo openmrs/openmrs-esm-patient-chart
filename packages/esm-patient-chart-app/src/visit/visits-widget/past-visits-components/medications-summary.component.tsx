@@ -3,17 +3,19 @@ import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Tag, Tooltip } from '@carbon/react';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
 import type { OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
 interface MedicationSummaryProps {
-  drugOrderTypeConceptUuid: string;
   medications: Array<OrderItem>;
 }
 
-const MedicationSummary: React.FC<MedicationSummaryProps> = ({ drugOrderTypeConceptUuid, medications }) => {
+const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
+  const { drugOrderTypeUUID } = useConfig({
+    externalModuleName: '@openmrs/esm-patient-medications-app',
+  });
 
   const isPastMedication = (order: OrderItem['order']) => {
     if (!order) {
@@ -28,7 +30,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ drugOrderTypeConc
   };
 
   const drugOrders = medications?.filter((medication) => {
-    return medication?.order?.orderType?.uuid === drugOrderTypeConceptUuid;
+    return medication?.order?.orderType?.uuid === drugOrderTypeUUID;
   });
 
   if (drugOrders.length === 0) {
