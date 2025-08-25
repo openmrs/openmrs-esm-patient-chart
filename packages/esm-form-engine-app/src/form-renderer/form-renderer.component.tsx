@@ -29,6 +29,7 @@ interface FormRendererProps
   closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
   setTitle?: DefaultPatientWorkspaceProps['setTitle'];
   hideControls?: boolean;
+  hidePatientBanner?: boolean;
   handlePostResponse?: (encounter: Encounter) => void;
   preFilledQuestions?: Record<string, string>;
 }
@@ -45,6 +46,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   visitUuid,
   clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   hideControls,
+  hidePatientBanner,
   handlePostResponse,
   preFilledQuestions,
 }) => {
@@ -127,6 +129,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           patientUUID={patientUuid}
           visit={visit}
           hideControls={hideControls}
+          hidePatientBanner={hidePatientBanner}
           preFilledQuestions={preFilledQuestions}
         />
       )}
