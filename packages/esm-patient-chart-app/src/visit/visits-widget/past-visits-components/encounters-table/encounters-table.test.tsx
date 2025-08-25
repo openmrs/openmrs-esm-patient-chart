@@ -115,7 +115,7 @@ describe('Encounter editability', () => {
     expect(within(expandedRow).getByRole('button', { name: /danger Delete this encounter/i })).toBeInTheDocument();
   });
 
-  it('displays an edit and delete encounter buttons only if the encounter is within editable duration', async () => {
+  it('displays edit and delete encounter buttons only if the encounter is within the editable duration', async () => {
     mockUseConfig.mockImplementation((options) => {
       if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
         return { htmlFormEntryForms: [] };
