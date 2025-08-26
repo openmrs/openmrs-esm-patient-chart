@@ -1,4 +1,4 @@
-import React, { type ComponentProps } from 'react';
+import React, { useMemo, type ComponentProps } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -49,7 +49,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       header: t('vaccinationDate', 'Vaccination date'),
     },
   ];
-  const tableRows = React.useMemo(() => {
+
+  const tableRows = useMemo(() => {
     return paginatedImmunizations?.map((immunization, index) => ({
       ...immunization,
       id: `${index}`,
