@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableExpandedRow,
 } from '@carbon/react';
-import { orderBy, get, first } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 import {
   AddIcon,
   formatDate,
@@ -29,7 +29,6 @@ import {
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
-import { type ExistingDoses, type Sequence } from '../types';
 import { useImmunizations } from '../hooks/useImmunizations';
 import SequenceTable from './components/immunizations-sequence-table.component';
 import styles from './immunizations-detailed-summary.scss';

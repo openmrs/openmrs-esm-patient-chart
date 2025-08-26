@@ -58,11 +58,10 @@ export interface ReducerState {
 }
 
 export enum ReducerActionType {
-  INITIALIZE = 'initialize',
-  TOGGLEVAL = 'toggleVal',
-  UDPATEPARENT = 'updateParent',
-  UPDATEBASEPATH = 'updateBasePath',
-  RESET_TREE = 'resetTree',
+  INITIALIZE = 'INITIALIZE',
+  TOGGLE_CHECKBOX = 'TOGGLE_CHECKBOX',
+  TOGGLE_PARENT = 'TOGGLE_PARENT',
+  RESET_TREE = 'RESET_TREE',
 }
 
 export interface ReducerAction {
@@ -107,6 +106,7 @@ export interface FilterContextProps extends ReducerState {
   activeTests: string[];
   someChecked: boolean;
   totalResultsCount: number;
+  filteredResultsCount: number;
   isLoading: boolean;
   initialize: (trees: Array<TreeNode>) => void;
   toggleVal: (name: string) => void;
