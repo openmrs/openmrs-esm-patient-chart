@@ -25,7 +25,7 @@ const mockProps = {
 
 const renderTreeViewWithMockContext = () => {
   render(
-    <FilterProvider roots={mockResults as Roots} isLoading={false}>
+    <FilterProvider roots={mockResults as Roots} filteredRoots={mockResults as Roots} isLoading={false}>
       <TreeView {...mockProps} />
     </FilterProvider>,
   );
@@ -63,6 +63,7 @@ describe('TreeView', () => {
   it('renders an empty state view when there is no data', () => {
     mockUseGetManyObstreeData.mockReturnValue({
       roots: [],
+      filteredRoots: [],
       isLoading: false,
       error: null,
     });
@@ -77,6 +78,7 @@ describe('TreeView', () => {
     const mockError = new Error('Test error');
     mockUseGetManyObstreeData.mockReturnValue({
       roots: [],
+      filteredRoots: [],
       isLoading: false,
       error: mockError,
     });
@@ -94,6 +96,7 @@ describe('TreeView', () => {
   it('renders the tree view when test data is successfully fetched', async () => {
     mockUseGetManyObstreeData.mockReturnValue({
       roots: mockResults,
+      filteredRoots: mockResults,
       isLoading: false,
       error: null,
     });

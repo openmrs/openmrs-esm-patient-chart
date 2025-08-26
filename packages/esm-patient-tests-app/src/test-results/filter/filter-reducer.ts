@@ -11,6 +11,10 @@ export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
+export const getDisplayFromFlatName = (flatName: string) => {
+  return flatName.split('-').pop();
+};
+
 const computeParents = (
   prefix: string,
   node: TreeNode,
@@ -68,16 +72,15 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         lowestParents: Array<LowestNode> = [];
       action.trees?.forEach((tree) => {
         // if anyone knows a shorthand for this i'm stoked to learn it :)
-        const {
-          parents: newParents,
-          leaves: newLeaves,
-          tests: newTests,
-          lowestParents: newLP,
-        } = computeParents('', tree);
+        const { parents: newParents, leaves: newLeaves, lowestParents: newLP } = computeParents('', tree);
         parents = { ...parents, ...newParents };
         leaves = [...leaves, ...newLeaves];
-        tests = [...tests, ...newTests];
         lowestParents = [...lowestParents, ...newLP];
+      });
+
+      action.filteredTrees?.forEach((tree) => {
+        const { tests: newTests } = computeParents('', tree);
+        tests = [...tests, ...newTests];
       });
 
       const flatTests = Object.fromEntries(tests);
@@ -91,17 +94,32 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     }
     case ReducerActionType.TOGGLEVAL: {
+      const suffix = getDisplayFromFlatName(action.name);
+      const affectedLeaves = Object.keys(state.checkboxes).filter((key) => key.endsWith(suffix));
+      const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
+      const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
+      affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
       return {
         ...state,
-        checkboxes: {
-          ...state.checkboxes,
-          [action.name]: !state.checkboxes[action.name],
-        },
+        checkboxes: checkboxes,
       };
     }
 
     case ReducerActionType.UDPATEPARENT: {
-      const affectedLeaves = state.parents[action.name];
+      const checkedLeaves = state.parents[action.name];
+      const suffixes = checkedLeaves.map((target) => getDisplayFromFlatName(target));
+      const affectedLeaves = [];
+
+      for (const key in state.parents) {
+        const values = state.parents[key];
+        for (const item of values) {
+          for (const suffix of suffixes) {
+            if (item.endsWith(suffix)) {
+              affectedLeaves.push(item);
+            }
+          }
+        }
+      }
       const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
       affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));

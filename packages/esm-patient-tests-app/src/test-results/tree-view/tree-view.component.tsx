@@ -8,6 +8,7 @@ import { type ConfigObject } from '../../config-schema';
 import { type GroupedObservation, type viewOpts } from '../../types';
 import FilterSet, { FilterContext } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
+import { getDisplayFromFlatName } from '../filter/filter-reducer';
 import IndividualResultsTable from '../individual-results-table/individual-results-table.component';
 import TabletOverlay from '../tablet-overlay';
 import styles from '../results-viewer/results-viewer.scss';
@@ -33,7 +34,12 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
         ?.filter(
           (row) =>
             !someChecked ||
-            row.entries?.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey)),
+            row.entries?.some((entry) =>
+              selectedCheckboxes.some(
+                (selectedKey) =>
+                  entry.flatName === selectedKey || entry.display === getDisplayFromFlatName(selectedKey),
+              ),
+            ),
         )
         .map((subRows: GroupedObservation, index) => {
           return {
@@ -41,7 +47,12 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
             entries: subRows.entries?.filter(
               (entry) =>
                 !someChecked ||
-                selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey),
+                selectedCheckboxes.some(
+                  (selectedKey) =>
+                    entry.flatName === selectedKey ||
+                    entry.key === selectedKey ||
+                    entry.display === getDisplayFromFlatName(selectedKey),
+                ),
             ),
           };
         }),
@@ -58,19 +69,19 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
         return filteredSubRows.entries?.length > 0 ? (
           <div
             key={index}
-              className={classNames({
-                [styles.border]: filteredSubRows?.entries.length,
-              })}
-            >
-              <IndividualResultsTable
-                isLoading={loadingPanelData}
-                subRows={filteredSubRows}
-                index={index}
-                title={filteredSubRows.key}
-              />
-            </div>
-          ) : null;
-        })}
+            className={classNames({
+              [styles.border]: filteredSubRows?.entries.length,
+            })}
+          >
+            <IndividualResultsTable
+              isLoading={loadingPanelData}
+              subRows={filteredSubRows}
+              index={index}
+              title={filteredSubRows.key}
+            />
+          </div>
+        ) : null;
+      })}
     </Layer>
   );
 };
@@ -81,7 +92,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, error } = useGetManyObstreeData(conceptUuids);
+  const { filteredRoots, roots, error } = useGetManyObstreeData(conceptUuids);
 
   const { timelineData, resetTree, isLoading } = useContext(FilterContext);
 
