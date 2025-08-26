@@ -116,8 +116,6 @@ describe('Immunizations Form', () => {
   it('should render ImmunizationsForm component', () => {
     render(<ImmunizationsForm {...testProps} />);
 
-    // TODO: use better selector
-    // expect(screen.getByTestId('vaccinationDate')).toBeInTheDocument();
     expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Immunization/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /note/i })).toBeInTheDocument();
@@ -125,8 +123,6 @@ describe('Immunizations Form', () => {
     expect(screen.getByRole('textbox', { name: /Manufacturer/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Lot Number/i })).toBeInTheDocument();
 
-    // TODO: use better selector
-    // expect(screen.getByTestId('vaccinationExpiration')).toBeInTheDocument();
     expect(screen.getByLabelText(/expiration date/i)).toBeInTheDocument();
   });
 
