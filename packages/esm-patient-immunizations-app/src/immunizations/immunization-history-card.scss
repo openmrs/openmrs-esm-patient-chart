@@ -102,12 +102,15 @@
     border-top: none !important;
   }
 }
+
 .nextDoseDateLabel {
   @include type.type-style('label-01');
   display: inline-block;
   border-radius: layout.$spacing-05;
   padding: layout.$spacing-02;
   text-align: center;
+  font-weight: bold;
+  padding: layout.$spacing-02;
 
   &[data-status='DUE'] {
     background-color: colors.$red-20;

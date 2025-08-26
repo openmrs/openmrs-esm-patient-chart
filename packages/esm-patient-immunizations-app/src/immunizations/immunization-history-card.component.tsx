@@ -5,6 +5,10 @@ import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/es
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
+dayjs.extend(isSameOrAfter);
 
 interface ImmunizationHistoryCardProps {
   error?: Error | null;
@@ -30,12 +34,15 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
     { key: 'vaccine', header: t('vaccine', 'Vaccine') },
     { key: 'doses', header: t('doses', 'Doses') },
   ];
-  const getNextDoseStatus = (nextDoseDate: string) => {
-    if (!nextDoseDate) return 'NOT_DUE';
-    const nextDate = new Date(nextDoseDate);
-    const todayDate = new Date();
+  const getNextDoseStatus = (nextDoseDate: string): 'DUE' | 'NOT_DUE' => {
+    const today = dayjs().startOf('day');
+    const nextDate = dayjs(nextDoseDate).startOf('day');
 
-    return todayDate >= nextDate ? 'DUE' : 'NOT_DUE';
+    return today.isSameOrAfter(nextDate) ? 'DUE' : 'NOT_DUE';
+  };
+
+  const getNextDoseStatusLabel = (status: 'DUE' | 'NOT_DUE') => {
+    return status === 'DUE' ? t('due', 'Due') : t('notDue', 'Not due');
   };
   const tableRows = useMemo(() => {
     return (sortedImmunizations || []).map((immunization) => {
@@ -99,7 +106,8 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
                         mode: 'standard',
                         time: false,
                         noToday: true,
-                      })}
+                      })}{' '}
+                      <div>({getNextDoseStatusLabel(getNextDoseStatus(row.nextDoseDate))})</div>
                     </div>
                   )}
                 </div>

@@ -155,7 +155,9 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccineUuid: vaccineUuid,
           vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
           doseNumber,
-          nextDoseDate: toDateObjectStrict(toOmrsIsoString(dayjs(nextDoseDate).startOf('day').toDate())),
+          nextDoseDate: nextDoseDate
+            ? toDateObjectStrict(toOmrsIsoString(dayjs(nextDoseDate).startOf('day').toDate()))
+            : null,
           note,
           expirationDate,
           lotNumber,
