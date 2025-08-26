@@ -154,8 +154,7 @@ const Trendline: React.FC<TrendlineProps> = ({
           includeZero: false,
         },
       },
-      height: '20.125rem',
-
+      height: '400px',
       color: {
         scale: {
           [chartTitle]: '#6929c4',
@@ -171,7 +170,36 @@ const Trendline: React.FC<TrendlineProps> = ({
       tooltip: {
         customHTML: ([{ date, value }]) =>
           `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
-          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
+          <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${formatDate(date)}</span></div>`,
+      },
+      toolbar: {
+        enabled: true,
+        numberOfIcons: 4,
+        controls: [
+          {
+            type: 'Zoom in',
+          },
+          {
+            type: 'Zoom out',
+          },
+          {
+            type: 'Reset zoom',
+          },
+          {
+            type: 'Export as CSV',
+          },
+          {
+            type: 'Export as PNG',
+          },
+          {
+            type: 'Make fullscreen',
+          },
+        ],
+      },
+      zoomBar: {
+        top: {
+          enabled: true,
+        },
       },
     }),
     [bottomAxisTitle, leftAxisTitle, range, chartTitle],
@@ -192,11 +220,19 @@ const Trendline: React.FC<TrendlineProps> = ({
   );
 
   if (isLoading) {
-    return <SkeletonText />;
+    return (
+      <div className={styles.container}>
+        <SkeletonText paragraph={true} lineCount={8} />
+      </div>
+    );
   }
 
   if (obs.length === 0) {
-    return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
+    return (
+      <div className={styles.container}>
+        <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />
+      </div>
+    );
   }
 
   return (
@@ -215,18 +251,20 @@ const Trendline: React.FC<TrendlineProps> = ({
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
 
-      {showResultsTable ? (
-        <>
-          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
-            {t('hideResultsTable', 'Hide results table')}
+      <div className={styles.tableControls}>
+        {showResultsTable ? (
+          <>
+            <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
+              {t('hideResultsTable', 'Hide results table')}
+            </Button>
+            <DrawTable {...{ tableData, tableHeaderData }} />
+          </>
+        ) : (
+          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
+            {t('showResultsTable', 'Show results table')}
           </Button>
-          <DrawTable {...{ tableData, tableHeaderData }} />
-        </>
-      ) : (
-        <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
-          {t('showResultsTable', 'Show results table')}
-        </Button>
-      )}
+        )}
+      </div>
     </div>
   );
 };

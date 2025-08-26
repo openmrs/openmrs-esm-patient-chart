@@ -19,7 +19,7 @@
   }
 
   :global(.cds--data-table--md td) {
-    padding-top: 0.1rem;
+    padding-top: layout.$spacing-01;
   }
 }
 
@@ -70,7 +70,7 @@
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 0.625rem;
+  gap: layout.$spacing-04;
 }
 
 .viewOptionsText {
@@ -108,7 +108,7 @@
   display: flex;
   min-width: layout.$spacing-08;
   align-items: center;
-  gap: 0.625rem;
+  gap: layout.$spacing-04;
 }
 
 .leftHeaderActions > :global(.cds--content-switcher),
@@ -161,9 +161,12 @@
   position: fixed;
   bottom: layout.$spacing-11;
   right: layout.$spacing-05;
-  z-index: 99;
+  z-index: 10000;
 
   button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: $brand-01 !important;
     padding: layout.$spacing-05;
     border-radius: 50%;
@@ -176,6 +179,7 @@
 
 .panelViewTimeline {
   margin-bottom: layout.$spacing-07;
+  margin-top: layout.$spacing-03;
 }
 
 .border {
