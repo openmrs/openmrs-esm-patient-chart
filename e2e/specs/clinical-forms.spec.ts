@@ -110,7 +110,8 @@ test('Fill a clinical form', async ({ page, patient }) => {
 
 test('Fill a form with a browser slightly ahead of time', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
-  const visitsPage = new VisitsPage(page);
+
+  await page.clock.setSystemTime(new Date());
   await page.clock.fastForward('01:00'); // Advances the time by 1 minute in the testing environment.
 
   await test.step('When I visit the chart summary page', async () => {

@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableExpandedRow,
 } from '@carbon/react';
-import { orderBy, get, first } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 import {
   AddIcon,
   formatDate,
@@ -29,7 +29,6 @@ import {
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { immunizationFormSub, latestFirst, linkConfiguredSequences } from './utils';
-import { type ExistingDoses, type Sequence } from '../types';
 import { useImmunizations } from '../hooks/useImmunizations';
 import SequenceTable from './components/immunizations-sequence-table.component';
 import styles from './immunizations-detailed-summary.scss';
@@ -48,8 +47,6 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const { immunizationsConfig } = useConfig();
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
-  const pageUrl = window.getOpenmrsSpaBase() + `patient/${patientUuid}/chart`;
-  const urlLabel = t('goToSummary', 'Go to Summary');
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
@@ -60,7 +57,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     return linkConfiguredSequences(existingImmunizations, sequenceDefinitions);
   }, [existingImmunizations, sequenceDefinitions]);
 
-  const launchImmunizationsForm = React.useCallback(() => {
+  const launchImmunizationsForm = useCallback(() => {
     if (!currentVisit) {
       launchStartVisitPrompt();
       return;
@@ -109,10 +106,13 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           : null;
 
         const occurrenceDate = hasDoses
-          ? `${t('lastDoseOn', 'Last dose on')} ${formatDate(parseDate(latestDose.occurrenceDateTime), {
-              time: false,
-              noToday: true,
-            })}, ${sequenceLabel ?? `${t('dose', 'Dose')} ${latestDose.doseNumber}`}`
+          ? `${t('lastDoseOnDate', 'Last dose on {{date}}', {
+              date: formatDate(parseDate(latestDose.occurrenceDateTime), {
+                mode: 'standard',
+                noToday: true,
+                time: false,
+              }),
+            })}, ${sequenceLabel ?? t('doseNumber', 'Dose {{number}}', { number: latestDose.doseNumber })}`
           : '';
 
         return {
@@ -130,6 +130,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   immunizationId: null,
                   vaccinationDate: null,
                   doseNumber: 0,
+                  note: null,
                   expirationDate: null,
                   lotNumber: null,
                   manufacturer: null,
@@ -138,7 +139,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
               }}
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               size="sm"
-            ></Button>
+            />
           ),
         };
       }),
@@ -181,7 +182,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             getExpandHeaderProps,
           }) => (
             <TableContainer>
-              <Table aria-label="immunizations summary" {...getTableProps()}>
+              <Table aria-label="immunizations summary" size={isTablet ? 'md' : 'sm'} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
@@ -223,8 +224,6 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             onPageNumberChange={({ page }) => goTo(page)}
             pageNumber={currentPage}
             currentItems={paginatedImmunizations?.length}
-            dashboardLinkUrl={pageUrl}
-            dashboardLinkLabel={urlLabel}
           />
         </div>
       </div>

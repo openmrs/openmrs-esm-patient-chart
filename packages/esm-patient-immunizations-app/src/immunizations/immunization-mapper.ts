@@ -1,64 +1,106 @@
-import { find, get, groupBy, isUndefined, map, orderBy } from 'lodash-es';
+import { find, groupBy, isUndefined, orderBy } from 'lodash-es';
 import {
   type Code,
   type FHIRImmunizationBundle,
-  type FHIRImmunizationBundleEntry,
   type FHIRImmunizationResource,
   type Reference,
 } from '../types/fhir-immunization-domain';
 import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
-const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEntry): ExistingDoses => {
-  const immunizationResource = immunizationBundleEntry?.resource;
+const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses | null => {
+  if (!immunizationResource) {
+    return null;
+  }
   const immunizationObsUuid = immunizationResource?.id;
   const manufacturer = immunizationResource?.manufacturer?.display;
   const lotNumber = immunizationResource?.lotNumber;
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
-  const occurrenceDateTime = immunizationResource?.occurrenceDateTime as any as string;
-  const expirationDate = immunizationResource?.expirationDate as any as string;
+  const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
+  const expirationDate = immunizationResource?.expirationDate?.toString();
+  const note = immunizationResource?.note?.length > 0 && immunizationResource?.note[0]?.text;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
     doseNumber,
+    note: note ? [{ text: note }] : [],
     occurrenceDateTime,
     expirationDate,
     visitUuid: fromReference(immunizationResource?.encounter),
   };
 };
 
-const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationResource) {
-  //Code without system represents internal code using uuid
-  return find(immunizationResource?.vaccineCode?.coding, function (code: Code) {
-    return isUndefined(code.system);
-  });
+const findCodeWithoutSystem = function (immunizationResource: FHIRImmunizationResource): Code | null {
+  if (!immunizationResource?.vaccineCode?.coding) {
+    return null;
+  }
+  return (
+    find(immunizationResource.vaccineCode.coding, function (code: Code) {
+      return isUndefined(code.system);
+    }) || null
+  );
 };
 
 export const mapFromFHIRImmunizationBundle = (
-  immunizationBundle: FHIRImmunizationBundle,
+  immunizationData: FHIRImmunizationBundle | FHIRImmunizationResource[],
 ): Array<ImmunizationGrouped> => {
-  const groupByImmunization = groupBy(immunizationBundle.entry, (immunizationResourceEntry) => {
-    return findCodeWithoutSystem(immunizationResourceEntry.resource)?.code;
+  if (!immunizationData) {
+    return [];
+  }
+
+  let immunizations: FHIRImmunizationResource[] = [];
+
+  if (Array.isArray(immunizationData)) {
+    immunizations = immunizationData.filter(
+      (item) => item && typeof item === 'object' && item.resourceType === 'Immunization',
+    );
+  } else if (immunizationData?.entry) {
+    immunizations = immunizationData.entry
+      .filter((entry) => entry?.resource?.resourceType === 'Immunization')
+      .map((entry) => entry.resource);
+  }
+
+  if (!immunizations.length) {
+    return [];
+  }
+
+  const groupByImmunization = groupBy(immunizations, (immunizationResource) => {
+    return findCodeWithoutSystem(immunizationResource)?.code;
   });
-  return map(groupByImmunization, (immunizationsForOneVaccine: Array<FHIRImmunizationBundleEntry>) => {
-    const existingDoses: Array<ExistingDoses> = map(immunizationsForOneVaccine, mapToImmunizationDose);
-    const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]?.resource);
+
+  const validGroups = Object.entries(groupByImmunization).filter(([key]) => key);
+
+  const groups = validGroups.map(([key, immunizationsForOneVaccine]) => {
+    const existingDoses: Array<ExistingDoses> = immunizationsForOneVaccine
+      .map(mapToImmunizationDoseFromResource)
+      .filter((dose) => dose !== null);
+
+    const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]);
 
     return {
       vaccineName: codeWithoutSystem?.display,
       vaccineUuid: codeWithoutSystem?.code,
-      existingDoses: orderBy(existingDoses, [(dose) => get(dose, 'occurrenceDateTime')], ['desc']),
+      existingDoses: orderBy(existingDoses, [(dose) => dose.occurrenceDateTime], ['desc']),
     };
   });
+
+  // Sort vaccine groups by most recent dose date (descending)
+  return orderBy(groups, [(g) => g.existingDoses?.[0]?.occurrenceDateTime ?? ''], ['desc']);
 };
 
 function toReferenceOfType(type: string, referenceValue: string): Reference {
+  if (!referenceValue) {
+    return null;
+  }
   const reference = `${type}/${referenceValue}`;
   return { type, reference };
 }
 
-function fromReference(reference: Reference): string {
+function fromReference(reference: Reference): string | null {
+  if (!reference || !reference.reference) {
+    return null;
+  }
   return reference.reference.split('/')[1];
 }
 
@@ -68,31 +110,44 @@ export const mapToFHIRImmunizationResource = (
   locationUuid: string,
   providerUuid: string,
 ): FHIRImmunizationResource => {
-  return {
+  const resource: FHIRImmunizationResource = {
     resourceType: 'Immunization',
     status: 'completed',
     id: immunizationFormData.immunizationId,
     vaccineCode: {
-      coding: [
-        {
-          code: immunizationFormData.vaccineUuid,
-          display: immunizationFormData.vaccineName,
-        },
-      ],
+      coding: [{ code: immunizationFormData.vaccineUuid, display: immunizationFormData.vaccineName }],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
-    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
+    encounter: toReferenceOfType('Encounter', visitUuid),
     occurrenceDateTime: immunizationFormData.vaccinationDate,
-    expirationDate: immunizationFormData.expirationDate,
+    expirationDate: immunizationFormData.expirationDate || undefined,
+    note: immunizationFormData.note?.trim() ? [{ text: immunizationFormData.note.trim() }] : [],
     location: toReferenceOfType('Location', locationUuid),
-    performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
-    manufacturer: { display: immunizationFormData.manufacturer },
-    lotNumber: immunizationFormData.lotNumber,
-    protocolApplied: [
-      {
-        doseNumberPositiveInt: immunizationFormData.doseNumber,
-        series: null, // the backend currently does not support "series"
-      },
-    ],
   };
+
+  // performer: only when provider is present
+  if (providerUuid) {
+    resource.performer = [{ actor: toReferenceOfType('Practitioner', providerUuid) }];
+  }
+
+  // manufacturer: only when non-empty
+  const manufacturer = immunizationFormData.manufacturer?.trim();
+  if (manufacturer) {
+    resource.manufacturer = { display: manufacturer };
+  }
+
+  // lotNumber: only when non-empty
+  const lotNumber = immunizationFormData.lotNumber?.trim();
+  if (lotNumber) {
+    resource.lotNumber = lotNumber;
+  }
+
+  // protocolApplied: only when dose is a number >= 1
+  const dose = immunizationFormData.doseNumber;
+  if (typeof dose === 'number' && dose >= 1) {
+    resource.protocolApplied = [{ doseNumberPositiveInt: dose }];
+  }
+  // if dose is null/undefined, omit protocolApplied entirely to clear backend dose
+
+  return resource;
 };

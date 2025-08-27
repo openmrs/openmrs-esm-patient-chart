@@ -37,12 +37,15 @@ import {
   useSession,
   useVisit,
   type EncounterType,
+  ExtensionSlot,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import {
   type HtmlFormEntryForm,
   launchFormEntryOrHtmlForms,
   invalidateVisitAndEncounterData,
 } from '@openmrs/esm-patient-common-lib';
+import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
   mapEncounter,
@@ -81,6 +84,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
 
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
+  const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
 
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
@@ -226,6 +230,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
+                    const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
+                      encounter.form?.uuid &&
+                      encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
+
                     return (
                       <React.Fragment key={encounter.id}>
                         <TableExpandRow {...getRowProps({ row })}>
@@ -282,7 +290,20 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              <EncounterObservations observations={encounter.obs} />
+                              {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
+                                <ExtensionSlot
+                                  name="form-widget-slot"
+                                  state={{
+                                    additionalProps: { mode: 'embedded-view' },
+                                    patientUuid: patientUuid,
+                                    formUuid: encounter.form.uuid,
+                                    encounterUuid: encounter.id,
+                                    promptBeforeClosing: () => {},
+                                  }}
+                                />
+                              ) : (
+                                <EncounterObservations observations={encounter.obs} />
+                              )}
                               {userHasAccess(encounter.editPrivilege, session?.user) && (
                                 <>
                                   {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (

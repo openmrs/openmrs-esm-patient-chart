@@ -15,7 +15,7 @@ const RecommendedVisitType: React.FC<RecommendedVisitTypeProp> = ({
   patientProgramEnrollment,
   locationUuid,
 }) => {
-  const { recommendedVisitTypes, error, isLoading } = useRecommendedVisitTypes(
+  const { recommendedVisitTypes, isLoading } = useRecommendedVisitTypes(
     patientUuid,
     patientProgramEnrollment?.uuid,
     patientProgramEnrollment?.program?.uuid,

@@ -7,7 +7,7 @@ export type TableHeaderType = {
 };
 
 export interface Encounter extends OpenmrsResource {
-  encounterDatetime: Date;
+  encounterDatetime: string;
   encounterType: { uuid: string; name: string };
   patient: {
     uuid: string;
@@ -189,7 +189,7 @@ export interface TabSchema {
   launchOptions: LaunchOptions;
 }
 
-export type Mode = 'edit' | 'view';
+export type Mode = 'edit' | 'view' | 'delete';
 
 export interface Action {
   label: string;
@@ -200,7 +200,7 @@ export interface Action {
 
 export interface TableRow {
   id: string;
-  actions: Action[] | ReactElement | null;
+  actions?: ReactElement;
 }
 
 export interface FormColumn {
@@ -244,7 +244,7 @@ export interface EncounterTileColumn {
   getObsValue: (encounter: Encounter) => string;
   getSummaryObsValue?: (encounter: Encounter) => string;
   encounter?: Encounter;
-  hasSummary?: Boolean;
+  hasSummary?: boolean;
 }
 export interface EncounterTileProps {
   patientUuid: string;
@@ -262,6 +262,7 @@ interface SummaryConcept {
   secondaryConcept?: string;
   isDate?: boolean;
   hasCalculatedDate?: boolean;
+  type?: EncounterPropertyType;
 }
 
 export interface FormattedCardColumn {
@@ -288,6 +289,7 @@ export enum EncounterPropertyType {
   visitType = 'visitType',
   ageAtEncounter = 'ageAtEncounter',
   visitDate = 'visitDate',
+  encounterDatetime = 'encounterDatetime',
 }
 
 export interface GetObsFromEncounterParams {

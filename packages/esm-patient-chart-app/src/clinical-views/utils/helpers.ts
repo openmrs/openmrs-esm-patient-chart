@@ -10,7 +10,7 @@ import type {
   Observation,
 } from '../types';
 
-type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
+export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
   form: Form,
@@ -26,7 +26,7 @@ export function launchEncounterForm(
     launchStartVisitPrompt();
   } else
     launchWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: form?.name,
+      workspaceTitle: form?.display ?? form?.name,
       mutateForm: onFormSave,
       formInfo: {
         encounterUuid,
@@ -42,7 +42,7 @@ export function launchEncounterForm(
     });
 }
 
-export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
+export function getEncounterValues(encounter: Encounter, param: string, isDate?: boolean) {
   if (isDate) return formatDate(encounter[param]);
   else return encounter[param] ?? '--';
 }
@@ -221,6 +221,10 @@ export const getEncounterProperty = (encounter: Encounter, type: EncounterProper
 
   if (type === 'visitType') {
     return encounter.visit?.visitType?.display ?? '--';
+  }
+
+  if (type === 'encounterDatetime') {
+    return formatDate(parseDate(encounter.encounterDatetime), { mode: 'wide' });
   }
 };
 

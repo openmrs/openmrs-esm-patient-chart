@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import useSWR from 'swr';
-import { formatDate, openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
+import useSWRInfinite from 'swr/infinite';
+import { type FetchResponse, formatDate, openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
 
 /**
  * Represents a cohort object returned by the OpenMRS Cohort resource https://github.com/openmrs/openmrs-module-cohort#readme.
@@ -25,6 +27,12 @@ export interface Cohort {
   uuid: string;
   voided: boolean;
   voidReason: string | null;
+}
+
+export interface CohortResponse<T> {
+  results: Array<T>;
+  error: any;
+  totalCount: number;
 }
 
 export interface CohortMember {
@@ -53,6 +61,11 @@ export interface CohortMember {
   voided: boolean;
 }
 
+export interface CohortType {
+  display: string;
+  uuid: string;
+}
+
 export interface MappedList {
   attributes: Array<unknown>;
   description: string;
@@ -72,43 +85,94 @@ export interface MappedListMembers {
   patientUuid: string;
 }
 
+export interface OpenmrsCohort {
+  uuid: string;
+  resourceVersion: string;
+  name: string;
+  description: string;
+  attributes: Array<any>;
+  links: Array<any>;
+  location: Location | null;
+  groupCohort: boolean | null;
+  startDate: string | null;
+  endDate: string | null;
+  voidReason: string | null;
+  voided: boolean;
+  isStarred?: boolean;
+  type?: string;
+  size: number;
+  cohortType?: CohortType;
+}
+
+interface PatientListResponse {
+  results: CohortResponse<OpenmrsCohort>;
+  links: Array<{ rel: 'prev' | 'next' }>;
+  totalCount: number;
+}
+
 /**
  * Fetches patient lists from the OpenMRS Cohort resource.
  * @returns An object containing the patient lists, loading state, and error state.
  */
+
 export function usePatientLists() {
-  // Custom representation of the cohort object to fetch only the required properties.
-  const customRepresentation = `custom:(uuid,name,description,display,size,attributes,cohortType,startDate,endDate)`;
+  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType,startDate,endDate)';
+  const query: Array<[string, string]> = [
+    ['v', custom],
+    ['totalCount', 'true'],
+  ];
 
-  const listsUrl = `${restBaseUrl}/cohortm/cohort?`;
+  const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-  const urlSearchParams = new URLSearchParams({
-    v: customRepresentation,
-    totalCount: 'true',
-  });
+  const getUrl = (pageIndex, previousPageData: FetchResponse<PatientListResponse>) => {
+    if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
+      return null;
+    }
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<Cohort> } }, Error>(
-    listsUrl + urlSearchParams,
-    openmrsFetch,
-  );
+    let url = `${restBaseUrl}/cohortm/cohort?${params}`;
 
-  // Map the properties of the fetched patient lists to a simpler object.
-  const mapProperties = (cohort: Cohort): MappedList => ({
+    if (pageIndex) {
+      url += `&startIndex=${pageIndex * 50}`;
+    }
+
+    return url;
+  };
+
+  const {
+    data,
+    error,
+    mutate,
+    isValidating,
+    isLoading,
+    size: pageNumber,
+    setSize,
+  } = useSWRInfinite<FetchResponse<PatientListResponse>, Error>(getUrl, openmrsFetch);
+
+  useEffect(() => {
+    if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
+      setSize((currentSize) => currentSize + 1);
+    }
+  }, [data, pageNumber, setSize]);
+
+  // Map the properties to match the MappedList interface
+  const mapProperties = (cohort: OpenmrsCohort) => ({
     attributes: cohort.attributes,
     description: cohort.description,
     id: cohort.uuid,
     name: cohort.name,
     size: cohort.size,
-    startDate: cohort.startDate,
-    type: cohort.cohortType.display,
+    startDate: cohort.startDate || '',
+    type: cohort.cohortType?.display || '',
   });
 
-  const patientLists = data?.data?.results ? data.data.results.map(mapProperties) : [];
+  const patientLists = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map(mapProperties);
 
   return {
     patientLists,
     isLoading,
     error,
+    mutate,
+    isValidating,
   };
 }
 

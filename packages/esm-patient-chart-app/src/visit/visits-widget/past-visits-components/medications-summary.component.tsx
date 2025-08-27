@@ -2,7 +2,8 @@ import React from 'react';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { Tag, Tooltip } from '@carbon/react';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
 import type { OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
@@ -12,8 +13,25 @@ interface MedicationSummaryProps {
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
+  const { drugOrderTypeUUID } = useConfig({
+    externalModuleName: '@openmrs/esm-patient-medications-app',
+  });
 
-  const drugOrders = medications?.filter((medication) => medication?.order?.orderType?.display === 'Drug Order');
+  const isPastMedication = (order: OrderItem['order']) => {
+    if (!order) {
+      return false;
+    }
+
+    return (
+      order.action === 'DISCONTINUE' ||
+      (order.dateStopped && new Date(order.dateStopped) <= new Date()) ||
+      (order.autoExpireDate && new Date(order.autoExpireDate) <= new Date())
+    );
+  };
+
+  const drugOrders = medications?.filter((medication) => {
+    return medication?.order?.orderType?.uuid === drugOrderTypeUUID;
+  });
 
   if (drugOrders.length === 0) {
     return (
@@ -37,6 +55,13 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     {medication?.order?.doseUnits?.display && (
                       <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
                     )}{' '}
+                    {isPastMedication(medication.order) && (
+                      <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
+                        <Tag type="gray" className={styles.tag}>
+                          {t('discontinued', 'Discontinued')}
+                        </Tag>
+                      </Tooltip>
+                    )}
                   </p>
                   <p className={styles.bodyLong01}>
                     <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
@@ -91,9 +116,10 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
               </div>
 
               <p className={styles.metadata}>
-                {formatTime(parseDate(medication?.order?.dateActivated))}
-                {medication?.provider?.name && <> &middot; {medication?.provider?.name}</>}
-                {medication?.provider?.role && <>, {medication?.provider?.role}</>}
+                <div className={styles.startDateColumn}>
+                  <span>{formatDate(new Date(medication.order.dateActivated))}</span> &middot;{' '}
+                  <span>{medication.order.orderer?.display ?? '--'}</span>
+                </div>
               </p>
             </React.Fragment>
           ),
