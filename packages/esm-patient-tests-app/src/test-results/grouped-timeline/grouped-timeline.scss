@@ -3,37 +3,25 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.timelineHeader {
-  position: sticky;
-  top: 6.5rem;
-  z-index: 1;
-}
-
-.nestedTimelineHeader {
-  border: 0.5px solid colors.$gray-50;
-}
-
 .timelineDataContainer {
-  > div + div {
-    margin: 1rem 0;
+  > div {
     border: 0.5px solid colors.$gray-50;
+    border-right: none;
+    border-top: none;
+  }
+
+  > div:first-child {
+    border-top: none;
+  }
+
+  > div + div {
+    margin: layout.$spacing-05 0;
   }
 }
 
-.dateHeaderContainer {
-  padding: 0;
-  box-sizing: border-box;
-  display: grid;
-  grid-auto-flow: row;
-  column-gap: 1px;
-  row-gap: 0px;
-  background-color: $color-gray-30;
-  grid-template: auto auto / 9em auto;
-  border-collapse: collapse;
-}
-
 .grid {
-  width: fit-content;
+  width: 100%;
+  min-width: 100%;
   background-color: $color-gray-30;
   display: grid;
   grid-auto-rows: auto;
@@ -45,7 +33,7 @@
 .dayColumn,
 .yearColumn {
   @include type.type-style('heading-compact-01');
-  color: $text-02;
+  color: colors.$gray-70;
 }
 
 .timeColumn {
@@ -93,7 +81,6 @@
   column-gap: 1px;
   row-gap: 0px;
   background-color: $color-gray-30;
-  grid-template: auto auto / 9em auto;
   border-collapse: collapse;
   overflow-x: auto;
   width: 100%;
@@ -103,12 +90,6 @@
     // needed for Chrome, Edge, Opera, Safari
     display: none;
   }
-}
-
-.rowHeader {
-  overflow: hidden;
-  background-color: $ui-03;
-  padding: 0.5rem layout.$spacing-05;
 }
 
 .rowStartCell {
@@ -158,31 +139,59 @@
 }
 
 .cornerGridElement {
-  grid-row: span 1;
-  position: sticky;
-  left: 0px;
-  top: 0px;
-  z-index: 3;
-  padding: 0 layout.$spacing-05;
+  grid-row: 1 / span 3;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 layout.$spacing-03;
 
   div {
-    @include type.type-style('heading-compact-01');
-
-    left: 0;
-    width: 100%;
-    word-wrap: normal;
+    font-weight: 600;
   }
+}
+
+.panelHeader {
+  position: sticky;
+  top: layout.$spacing-12;
+  z-index: 1;
+  background: white;
+  border-bottom: 1px solid $ui-03;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panelHeader + div .grid > div:first-child {
+  border-top: none;
+}
+
+.panelHeader + div .grid {
+  border-left: 1px solid $ui-03 !important;
+}
+
+.panelNameText {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-70;
 }
 
 .shadow {
   box-shadow: layout.$spacing-03 0 20px 0 rgba(0, 0, 0, 0.15);
+  border-right: 1px solid colors.$gray-50;
 }
 
 .trendlineLink {
   @include type.type-style('body-compact-01');
+  color: $text-02;
+  cursor: default;
+}
+
+.trendline-link-view {
+  @include type.type-style('body-compact-01');
   color: $interactive-01;
   cursor: pointer;
   text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .rangeUnits {
