@@ -4,7 +4,7 @@ export const configSchema = {
   hideUnansweredQuestionsInReadonlyForms: {
     _type: Type.Boolean,
     _description:
-      'When enabled, unanswered questions will be hidden in read-only O3 forms (in embedded view) unless an explicit hide expression is defined.',
+      'Controls whether empty fields are hidden in embedded readonly forms. When true, empty non-transient fields are hidden when forms are displayed in embedded-view mode (e.g., in the Visit dashboard Encounters widget).',
     _default: false,
   },
 };
