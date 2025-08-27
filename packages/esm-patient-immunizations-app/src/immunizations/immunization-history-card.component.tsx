@@ -101,13 +101,13 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
                   <strong>{row.vaccine}</strong>
                   {row.nextDoseDate && (
                     <div className={styles.nextDoseDateLabel} data-status={getNextDoseStatus(row.nextDoseDate)}>
-                      {t('nextDoseDate', 'Next dose date')}:{' '}
+                      {t('nextDose', 'Next dose')}:{' '}
                       {formatDate(parseDate(row.nextDoseDate), {
                         mode: 'standard',
                         time: false,
                         noToday: true,
                       })}{' '}
-                      <div>({getNextDoseStatusLabel(getNextDoseStatus(row.nextDoseDate))})</div>
+                      ({getNextDoseStatusLabel(getNextDoseStatus(row.nextDoseDate))})
                     </div>
                   )}
                 </div>
