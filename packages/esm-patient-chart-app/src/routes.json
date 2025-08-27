@@ -157,6 +157,14 @@
       "order": 1
     },
     {
+      "name": "visit-details-link-action-button",
+      "slot": "visit-detail-overview-actions",
+      "component": "visitDetailsLinkButton",
+      "online": true,
+      "offline": true,
+      "order": 2
+    },
+    {
       "name": "active-visit-action-button",
       "slot": "active-visit-actions",
       "component": "activeVisitActionsComponent",
