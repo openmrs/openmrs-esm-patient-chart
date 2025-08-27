@@ -7,7 +7,9 @@ import {
   type TreeParents,
 } from './filter-types';
 
-export const getName = (prefix, name) => {
+const ROOT_PREFIX = '';
+
+export const getName = (prefix: string | undefined, name: string): string => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
@@ -24,73 +26,100 @@ const computeParents = (
   const leaves: Array<string> = [];
   const tests: Array<[string, TreeNode]> = [];
   const lowestParents: Array<LowestNode> = [];
-  if (node?.subSets?.length && node.subSets[0].obs) {
-    // lowest parent
-    const activeLeaves: Array<string> = [];
-    node.subSets.forEach((leaf) => {
-      if (leaf.hasData) {
-        activeLeaves.push(leaf.flatName);
+
+  if (node?.obs && Array.isArray(node.obs) && node.obs.length > 0) {
+    // This is a leaf test (Test concept) - has obs data
+    leaves.push(node.flatName);
+    tests.push([node.flatName, node]);
+  } else if (node?.subSets && Array.isArray(node.subSets) && node.subSets.length > 0) {
+    // parent category - recursively process children
+
+    const childResults = node.subSets
+      .map((subNode) => {
+        if (subNode) {
+          // Don't add the current node's display name as a prefix
+          // This prevents creating "Bloodwork-Hematology-..." names
+          return computeParents(prefix, subNode);
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    // Merge results from children
+    childResults.forEach((result) => {
+      if (result) {
+        parents = { ...parents, ...result.parents };
+        leaves.push(...result.leaves);
+        tests.push(...result.tests);
+        lowestParents.push(...result.lowestParents);
       }
     });
-    const activeTests: Array<[string, TreeNode]> = [];
-    node.subSets.forEach((leaf) => {
-      if (Array.isArray(leaf?.obs) && leaf.obs.length > 0) {
-        activeTests.push([leaf.flatName, leaf]);
-      }
-    });
-    leaves.push(...activeLeaves);
-    tests.push(...activeTests);
-    lowestParents.push({ flatName: node.flatName, display: node.display });
-  } else if (node?.subSets?.length) {
-    node.subSets.forEach((subNode) => {
-      const {
-        parents: newParents,
-        leaves: newLeaves,
-        tests: newTests,
-        lowestParents: newLowestParents,
-      } = computeParents(getName(prefix, node.display), subNode);
-      parents = { ...parents, ...newParents };
-      leaves.push(...newLeaves);
-      tests.push(...newTests);
-      lowestParents.push(...newLowestParents);
-    });
+
+    // Check if this parent should be added to lowestParents
+    // A parent should be in lowestParents if it has children with actual data
+    const hasChildrenWithData = node.subSets.some((subNode) => subNode?.hasData);
+    if (hasChildrenWithData) {
+      lowestParents.push(node as LowestNode);
+    }
+  } else {
+    // This is a leaf test (Test concept) - no subSets, should be treated as individual test
+    leaves.push(node.flatName);
+    tests.push([node.flatName, node]);
   }
-  parents[node.flatName] = leaves;
+
+  // Use the node's flatName for parent mapping to match the data augmentation
+  parents[node.flatName || node.display] = leaves;
+
   return { parents, leaves, tests, lowestParents };
 };
 
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
     case ReducerActionType.INITIALIZE: {
-      let parents: TreeParents = {},
-        leaves: Array<string> = [],
-        tests: Array<[string, TreeNode]> = [],
-        lowestParents: Array<LowestNode> = [];
-      action.trees?.forEach((tree) => {
-        // if anyone knows a shorthand for this i'm stoked to learn it :)
+      let parents: TreeParents = {};
+      let leaves: Array<string> = [];
+      let tests: Array<[string, TreeNode]> = [];
+      let lowestParents: Array<LowestNode> = [];
+
+      action.trees.forEach((tree) => {
+        // Process each tree node to build the filter structure
         const {
           parents: newParents,
           leaves: newLeaves,
           tests: newTests,
-          lowestParents: newLP,
-        } = computeParents('', tree);
+          lowestParents: newLowestParents,
+        } = computeParents(ROOT_PREFIX, tree);
         parents = { ...parents, ...newParents };
         leaves = [...leaves, ...newLeaves];
         tests = [...tests, ...newTests];
-        lowestParents = [...lowestParents, ...newLP];
+        lowestParents = [...lowestParents, ...newLowestParents];
       });
 
-      const flatTests = Object.fromEntries(tests);
+      // Handle duplicate keys by merging tests with the same flatName
+      const flatTests: Record<string, TreeNode> = {};
+      tests.forEach(([key, test]) => {
+        if (flatTests[key]) {
+          // If we already have this test, merge the obs data
+          if (test.obs && Array.isArray(test.obs)) {
+            if (!flatTests[key].obs) {
+              flatTests[key].obs = [];
+            }
+            flatTests[key].obs.push(...test.obs);
+          }
+        } else {
+          flatTests[key] = test;
+        }
+      });
 
       return {
-        checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, false])) || {},
+        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, false])),
         parents: parents,
         roots: action.trees,
         tests: flatTests,
         lowestParents: lowestParents,
       };
     }
-    case ReducerActionType.TOGGLEVAL: {
+    case ReducerActionType.TOGGLE_CHECKBOX: {
       return {
         ...state,
         checkboxes: {
@@ -100,11 +129,15 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     }
 
-    case ReducerActionType.UDPATEPARENT: {
+    case ReducerActionType.TOGGLE_PARENT: {
       const affectedLeaves = state.parents[action.name];
       const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
-      const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
-      affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
+
+      if (affectedLeaves && Array.isArray(affectedLeaves)) {
+        const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
+        affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
+      }
+
       return {
         ...state,
         checkboxes: checkboxes,
@@ -114,7 +147,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
     case ReducerActionType.RESET_TREE:
       return {
         ...state,
-        checkboxes: Object.fromEntries(Object.keys(state?.checkboxes)?.map((leaf) => [leaf, false])),
+        checkboxes: Object.fromEntries(Object.keys(state.checkboxes).map((leaf) => [leaf, false])),
       };
 
     default:

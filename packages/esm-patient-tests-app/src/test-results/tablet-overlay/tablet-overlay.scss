@@ -43,13 +43,17 @@
 .buttonsGroup {
   width: 100%;
   align-self: end;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-05;
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  margin-bottom: layout.$spacing-10;
 }
 
 .buttonsGroup {
   button {
-    max-width: unset;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
   }
 }

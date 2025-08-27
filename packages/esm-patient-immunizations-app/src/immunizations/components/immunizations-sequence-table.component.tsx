@@ -54,7 +54,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
       },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
       { key: 'nextDoseDate', header: t('nextDoseDate', 'Next dose date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
+      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
       { key: 'note', header: t('note', 'Note') },
       { key: 'actions', header: t('actions', 'Actions') },
     ],
