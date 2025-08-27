@@ -111,7 +111,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
               immunizationId: dose.immunizationObsUuid,
               vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
               doseNumber: dose.doseNumber,
-              nextDoseDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
+              nextDoseDate: dose.nextDoseDate && parseDate(dose.nextDoseDate),
               note: dose.note[0]?.text,
               expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
               lotNumber: dose.lotNumber,
