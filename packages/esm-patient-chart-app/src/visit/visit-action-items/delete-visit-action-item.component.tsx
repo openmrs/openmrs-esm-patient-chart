@@ -40,7 +40,13 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
   return (
     <UserHasAccess privilege="Delete Visits">
       {compact ? (
-        <IconButton onClick={deleteVisit} label={getCoreTranslation('delete')} kind="ghost" size={responsiveSize}>
+        <IconButton
+          onClick={deleteVisit}
+          label={getCoreTranslation('delete')}
+          kind="ghost"
+          size={responsiveSize}
+          align="top-end"
+        >
           <TrashCanIcon size={16} />
         </IconButton>
       ) : (
