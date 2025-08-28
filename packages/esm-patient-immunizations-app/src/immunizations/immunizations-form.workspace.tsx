@@ -187,7 +187,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   );
   return (
     <FormProvider {...formProps}>
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-testid="immunization-form">
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <Stack gap={5} className={styles.container}>
           <ResponsiveWrapper>
             <Controller
@@ -197,7 +197,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 <OpenmrsDatePicker
                   {...field}
                   className={styles.datePicker}
-                  data-testid="vaccinationDate"
                   id="vaccinationDate"
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
@@ -291,7 +290,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                 <OpenmrsDatePicker
                   {...field}
                   className={styles.datePicker}
-                  data-testid="vaccinationExpiration"
                   id="vaccinationExpiration"
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}

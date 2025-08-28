@@ -5,6 +5,8 @@
 @import '~@carbon/charts/styles.css';
 
 .container {
+  width: 100%;
+
   :global(.cds--cc--area path.area) {
     stroke: none;
     fill: colors.$green-20;
@@ -17,7 +19,7 @@
   background-color: colors.$teal-70;
   color: white;
   padding-top: layout.$spacing-05;
-  padding-left: 0.938rem;
+  padding-left: layout.$spacing-05;
   display: flex;
 }
 
@@ -45,6 +47,7 @@
   align-items: center;
   background: white;
   border-bottom: 1px solid $ui-03;
+  padding: layout.$spacing-04 0;
 }
 
 .backButton {
@@ -81,6 +84,8 @@
   width: 100%;
   padding: layout.$spacing-05 layout.$spacing-03;
   background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   :global(
       .cds--chart-holder
@@ -90,6 +95,10 @@
         .cds--overflow-menu-options__btn
     ) {
     max-width: none !important;
+  }
+
+  :global(.cds--cc--chart-holder) {
+    min-height: 400px;
   }
 }
 
@@ -101,4 +110,18 @@
   :global(.cds--tab--list) {
     width: 100%;
   }
+}
+
+.show-hide-table {
+  margin-top: layout.$spacing-04;
+  margin-bottom: layout.$spacing-04;
+  width: 100%;
+  justify-content: center;
+}
+
+.tableControls {
+  margin-top: layout.$spacing-05;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

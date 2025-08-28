@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import { type ImmunizationSequenceDefinition } from '../../types/fhir-immunization-domain';
-import { useController, type Control } from 'react-hook-form';
 import { Dropdown, NumberInput } from '@carbon/react';
-import styles from './../immunizations-form.scss';
+import { useController, type Control } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { type ImmunizationSequenceDefinition } from '../../types/fhir-immunization-domain';
+import styles from './../immunizations-form.scss';
 
 export const DoseInput: React.FC<{
   vaccine: string;
@@ -32,24 +32,24 @@ export const DoseInput: React.FC<{
       {vaccineSequences.length ? (
         <Dropdown
           id="sequence"
-          label={t('pleaseSelect', 'Please select')}
-          titleText={t('sequence', 'Sequence')}
           items={vaccineSequences?.map((sequence) => sequence.sequenceNumber) || []}
           itemToString={(item) => vaccineSequences.find((s) => s.sequenceNumber === item)?.sequenceLabel}
+          label={t('pleaseSelect', 'Please select')}
           onChange={(val) => field.onChange(parseInt(val.selectedItem || 0))}
           selectedItem={field.value}
+          titleText={t('sequence', 'Sequence')}
         />
       ) : (
         <NumberInput
+          allowEmpty
+          disableWheel
+          hideSteppers
           id="doseNumber"
           label={t('doseNumberWithinSeries', 'Dose number within series')}
           min={1}
           onChange={handleChange}
+          required
           value={field.value}
-          hideSteppers={true}
-          allowEmpty={true}
-          disableWheel={true}
-          required={true}
         />
       )}
     </div>

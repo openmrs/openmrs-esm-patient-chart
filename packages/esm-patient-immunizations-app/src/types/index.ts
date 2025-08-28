@@ -9,7 +9,6 @@ export interface Immunization {
   occurrenceDateTime?: string;
   lotNumber?: string;
   doseNumber?: number;
-  formChanged?: any;
 }
 
 export interface ImmunizationGrouped {

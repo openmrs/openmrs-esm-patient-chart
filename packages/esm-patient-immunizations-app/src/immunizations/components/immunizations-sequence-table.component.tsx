@@ -53,7 +53,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
         header: sequences.length ? t('sequence', 'Sequence') : t('doseNumberWithinSeries', 'Dose number within series'),
       },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
-      { key: 'expirationDate', header: t('expirationDate', 'Expiration Date') },
+      { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
       { key: 'note', header: t('note', 'Note') },
       { key: 'actions', header: t('actions', 'Actions') },
     ],

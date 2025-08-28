@@ -66,6 +66,7 @@ const mockFilterContext: FilterContextProps = {
   resetTree: jest.fn(),
   roots: mockResults,
   tests: {},
+  filteredResultsCount: 0,
 };
 
 global.IntersectionObserver = jest.fn(function (callback, options) {
@@ -156,10 +157,16 @@ describe('ResultsViewer', () => {
       });
     });
 
-    const panelButton = screen.getByRole('button', { name: /Comprehensive metabolic panel/i });
+    // Look for a panel that actually has children with data and is rendered as an accordion
+    // "Complete blood count" has children with data (like Platelets), so it should be rendered as an accordion
+    const panelButtons = screen.getAllByRole('button', { name: /Complete blood count/i });
+    expect(panelButtons).toHaveLength(2); // There should be 2 buttons with this name
+    const panelButton = panelButtons[0]; // Use the first one
     expect(panelButton).toBeInTheDocument();
 
     await userEvent.click(panelButton);
-    expect(screen.getByText(/Comprehensive metabolic panel/i)).toBeVisible();
+    const completeBloodCountTexts = screen.getAllByText(/Complete blood count/i);
+    expect(completeBloodCountTexts.length).toBeGreaterThan(0);
+    expect(completeBloodCountTexts[0]).toBeVisible();
   });
 });

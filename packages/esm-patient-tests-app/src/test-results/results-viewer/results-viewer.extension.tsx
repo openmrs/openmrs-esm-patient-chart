@@ -56,7 +56,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount, resetTree, isLoading } = useContext(FilterContext);
+  const { totalResultsCount, filteredResultsCount, resetTree, isLoading } = useContext(FilterContext);
   const isExpanded = view === 'full';
   const responsiveSize = isTablet ? 'lg' : 'md';
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -94,7 +94,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
         <div ref={headerRef} className={styles.headerSentinel} />
         <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-            totalResultsCount ? `(${totalResultsCount})` : ''
+            filteredResultsCount ? `(${filteredResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
             <RefreshDataButton isTablet={isTablet} t={t} />
@@ -131,7 +131,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
             <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
-              totalResultsCount ? `(${totalResultsCount})` : ''
+              filteredResultsCount ? `(${filteredResultsCount})` : ''
             }`}</h4>
             <div className={styles.buttonsContainer}>
               <RefreshDataButton isTablet={isTablet} t={t} />
