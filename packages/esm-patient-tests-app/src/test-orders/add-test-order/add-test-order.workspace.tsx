@@ -16,6 +16,7 @@ import {
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
+  type Order,
   useOrderType,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
@@ -24,10 +25,14 @@ import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
 import styles from './add-test-order.scss';
+import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
   orderTypeUuid: string;
+  prevWorkSpace: string;
+  isWorkSpaceType: (value: string) => boolean;
+  prevOrder: Order | null;
 }
 
 export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
@@ -40,6 +45,9 @@ export default function AddLabOrderWorkspace({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   setTitle,
+  prevWorkSpace,
+  isWorkSpaceType,
+  prevOrder,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -75,10 +83,16 @@ export default function AddLabOrderWorkspace({
   const cancelOrder = useCallback(() => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () =>
+        typeof isWorkSpaceType === 'function' &&
+        isWorkSpaceType(prevWorkSpace) &&
+        prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+          ? launchWorkspace(prevWorkSpace, { order: prevOrder })
+          : launchWorkspace(WORKSPACES.ORDER_BASKET),
+
       closeWorkspaceGroup: false,
     });
-  }, [closeWorkspace]);
+  }, [closeWorkspace, isWorkSpaceType, prevOrder, prevWorkSpace]);
 
   return (
     <div className={styles.container}>
@@ -100,7 +114,13 @@ export default function AddLabOrderWorkspace({
             size="sm"
             onClick={cancelOrder}
           >
-            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            <span>
+              {typeof isWorkSpaceType === 'function' &&
+              isWorkSpaceType(prevWorkSpace) &&
+              prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+                ? t('backToTestResults', 'Back to test Results')
+                : t('backToOrderBasket', 'Back to order basket')}
+            </span>
           </Button>
         </div>
       )}
@@ -115,12 +135,18 @@ export default function AddLabOrderWorkspace({
           setTitle={() => {}}
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
+          prevWorkSpace={prevWorkSpace}
+          isWorkSpaceType={isWorkSpaceType}
+          prevOrder={prevOrder}
         />
       ) : (
         <TestTypeSearch
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
           openLabForm={setCurrentLabOrder}
+          prevWorkSpace={prevWorkSpace}
+          isWorkSpaceType={isWorkSpaceType}
+          prevOrder={prevOrder}
         />
       )}
     </div>
