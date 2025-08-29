@@ -35,7 +35,6 @@ import styles from './immunizations-detailed-summary.scss';
 
 interface ImmunizationsDetailedSummaryProps {
   patientUuid: string;
-  basePath: string;
   launchStartVisitPrompt: () => void;
 }
 
@@ -164,6 +163,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           <Button
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
+            data-testid="addImmunizationsButton"
             iconDescription={t('addImmunizations', 'Add immunizations')}
             onClick={launchImmunizationsForm}
           >
