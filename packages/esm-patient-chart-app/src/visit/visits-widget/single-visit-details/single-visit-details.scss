@@ -1,0 +1,41 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.editButton,
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0;
+  padding-right: 0;
+  @include type.type-style('body-compact-01');
+
+  &:not([disabled]) svg {
+    fill: $color-blue-60-2;
+  }
+}
+
+.visitDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  @include type.type-style('body-compact-01');
+}
+
+.visitType {
+  @include type.type-style('heading-03');
+}
