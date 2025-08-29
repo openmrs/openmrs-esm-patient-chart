@@ -24,13 +24,24 @@ export type FHIRImmunizationResource = {
   patient: Reference;
   encounter: Reference;
   occurrenceDateTime: Date;
-  expirationDate?: Date;
-  note?: Array<{ text: string }>;
-  location?: Reference;
-  performer?: Array<{ actor: Reference }>;
-  manufacturer?: { display: string };
-  lotNumber?: string;
-  protocolApplied?: Array<{ doseNumberPositiveInt: number; series?: string }>;
+  expirationDate: Date;
+  extension?: Array<{
+    url: string;
+    valueDateTime: Date;
+  }>;
+  note?: Array<{
+    text: string;
+  }>;
+  location: Reference;
+  performer: Array<{ actor: Reference }>;
+  manufacturer: { display: string };
+  lotNumber: string;
+  protocolApplied: [
+    {
+      doseNumberPositiveInt: number;
+      series?: string;
+    },
+  ];
 };
 
 export type FHIRImmunizationBundleEntry = {
