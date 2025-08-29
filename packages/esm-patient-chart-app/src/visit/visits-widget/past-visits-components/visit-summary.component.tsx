@@ -20,7 +20,7 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import styles from './visit-summary.scss';
-import { ChartConfig } from '../../../config-schema';
+import { type ChartConfig } from '../../../config-schema';
 
 interface VisitSummaryProps {
   visit: Visit;
