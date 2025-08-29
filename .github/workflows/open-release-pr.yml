@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  release:
+  open-release-pr:
     runs-on: ubuntu-latest
 
     steps:
