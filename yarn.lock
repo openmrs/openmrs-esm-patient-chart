@@ -4389,8 +4389,8 @@ __metadata:
     react-error-boundary: "npm:^4.0.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4400,8 +4400,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 3.1.5-pre.2095
-  resolution: "@openmrs/esm-form-engine-lib@npm:3.1.5-pre.2095"
+  version: 3.3.1-pre.2102
+  resolution: "@openmrs/esm-form-engine-lib@npm:3.3.1-pre.2102"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     classnames: "npm:^2.5.1"
@@ -4412,13 +4412,13 @@ __metadata:
     react-waypoint: "npm:^10.3.0"
     react-webcam: "npm:^7.2.0"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     dayjs: 1.x
     i18next: 23.x
     react: 18.x
     react-i18next: 11.x
     swr: 2.x
-  checksum: 10/64a997a2a794fc1bd44f8214e034976bf9b5416930125b335309298aa8ccb93be77446d5ee45417c6e1c33ad1d27618b605e544e7ea6f42ba80ec1f60a88d495
+  checksum: 10/7bd192f62793dcc0634a5823e67ed568a610ff2c3e78c70dc2c68bb244a0486e4889ac571f2d822a288c2fd8a7e9c8a2d9749b90f9d96ad204d47e40a73a56df
   languageName: node
   linkType: hard
 
@@ -4487,7 +4487,7 @@ __metadata:
     webpack: "npm:~5.94.0"
     zone.js: "npm:~0.14.8"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     single-spa: 6.x
   languageName: unknown
   linkType: soft
@@ -4537,8 +4537,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4596,8 +4596,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4620,8 +4620,8 @@ __metadata:
     react-html5-camera-photo: "npm:^1.5.11"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4640,8 +4640,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4662,7 +4662,7 @@ __metadata:
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     "@openmrs/esm-patient-common-lib": "*"
     dayjs: 1.x
     lodash-es: 4.x
@@ -4751,7 +4751,7 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     uuid: "npm:^8.3.2"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: 18.x
     single-spa: 6.x
   languageName: unknown
@@ -4766,8 +4766,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4785,8 +4785,8 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4806,8 +4806,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4829,8 +4829,8 @@ __metadata:
     webpack: "npm:^5.99.9"
     zod: "npm:^3.23.8"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4848,8 +4848,8 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4868,8 +4868,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4887,8 +4887,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4907,8 +4907,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4927,8 +4927,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -4949,8 +4949,8 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     webpack: "npm:^5.99.9"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -4968,8 +4968,8 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
-    "@openmrs/esm-patient-common-lib": 10.x
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
