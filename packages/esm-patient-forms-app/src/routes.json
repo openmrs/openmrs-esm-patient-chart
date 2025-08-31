@@ -52,7 +52,7 @@
       "type": "clinical-form",
       "canMaximize": true,
       "canHide": true,
-      "width": "extra-wide"
+      "width": "wider"
     },
     {
       "name": "ward-patient-form-entry-workspace",
