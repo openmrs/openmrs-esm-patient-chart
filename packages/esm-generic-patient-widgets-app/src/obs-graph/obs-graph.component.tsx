@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
@@ -8,9 +8,9 @@ import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
 
-interface ConceptDescriptor {
-  label: string;
-  uuid: string;
+interface ConceptGroupDescriptor {
+  groupLabel: string;
+  concepts: ConfigObjectSwitchable['data'];
 }
 
 interface ObsGraphProps {
@@ -22,28 +22,49 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
   const { data: observations } = useObs(patientUuid);
 
-  const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
-    label: config.data[0]?.label,
-    uuid: config.data[0]?.concept,
-  });
+  const groupedConfigData = useMemo(
+    () =>
+      config.data.reduce((acc, curr) => {
+        if (!curr.graphGroup) {
+          acc.push({
+            groupLabel: curr.label || observations.find((o) => o.conceptUuid == curr.concept)?.conceptUuid,
+            concepts: [curr],
+          });
+        } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
+          acc.find((a) => a.groupLabel == curr.graphGroup).concepts.push(curr);
+        } else {
+          acc.push({
+            groupLabel: curr.graphGroup,
+            concepts: [curr],
+          });
+        }
+        return acc;
+      }, [] as ConceptGroupDescriptor[]),
+    [config.data, observations],
+  );
 
-  const chartData = useMemo(() => {
-    const chartRecords = observations
-      .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
-      .map((obs) => ({
-        group: selectedConcept.label,
-        key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
-        value: obs.valueQuantity.value,
-      }));
+  const [selectedMenuItem, setSelectedMenuItem] = React.useState<ConceptGroupDescriptor>(groupedConfigData[0]);
 
-    if (config.graphOldestFirst) {
-      chartRecords.reverse();
-    }
+  const chartDataForConcepts = useCallback(
+    (concepts: ConfigObjectSwitchable['data']) => {
+      const chartRecords = observations
+        .filter((obs) => concepts.some((c) => c.concept == obs.conceptUuid) && obs.dataType === 'Number')
+        .map((obs) => ({
+          group: obs.conceptUuid,
+          key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
+          value: obs.valueQuantity.value,
+        }));
 
-    return chartRecords;
-  }, [observations, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
+      if (config.graphOldestFirst) {
+        chartRecords.reverse();
+      }
 
-  const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
+      return chartRecords;
+    },
+    [observations, config.graphOldestFirst],
+  );
+
+  const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
 
   const chartOptions = {
     axes: {
@@ -54,7 +75,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       },
       left: {
         mapsTo: 'value',
-        title: selectedConcept.label,
+        title: selectedMenuItem.groupLabel,
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
       },
@@ -72,37 +93,29 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     <>
       <div className={styles.graphContainer}>
         <div className={styles.conceptPickerTabs}>
-          <label className={styles.conceptLabel} htmlFor="concept-tab-group">
-            {t('displaying', 'Displaying')}
-          </label>
           <div className={styles.verticalTabs}>
             <TabsVertical>
               <TabListVertical aria-label="Obs tabs">
-                {config.data.map(({ concept, label }, index) => {
+                {groupedConfigData.map(({ groupLabel }, index) => {
                   const tabClasses = classNames(styles.tab, styles.bodyLong01, {
-                    [styles.selectedTab]: selectedConcept.label === label,
+                    [styles.selectedTab]: selectedMenuItem.groupLabel === groupLabel,
                   });
 
                   return (
                     <Tab
                       className={tabClasses}
-                      key={concept}
-                      onClick={() =>
-                        setSelectedConcept({
-                          label,
-                          uuid: concept,
-                        })
-                      }
+                      key={groupLabel}
+                      onClick={() => setSelectedMenuItem(groupedConfigData[index])}
                     >
-                      {label}
+                      {groupLabel}
                     </Tab>
                   );
                 })}
               </TabListVertical>
               <TabPanels>
-                {config.data.map(({ concept, label }) => (
-                  <TabPanel key={concept}>
-                    <LineChart data={chartData.flat()} options={chartOptions} />
+                {groupedConfigData.map(({ groupLabel, concepts }) => (
+                  <TabPanel key={groupLabel}>
+                    <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
                   </TabPanel>
                 ))}
               </TabPanels>
