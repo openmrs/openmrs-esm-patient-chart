@@ -18,7 +18,6 @@ interface ObsGraphProps {
 }
 
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
   const { data: observations } = useObs(patientUuid);
 
@@ -27,7 +26,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       config.data.reduce((acc, curr) => {
         if (!curr.graphGroup) {
           acc.push({
-            groupLabel: curr.label || observations.find((o) => o.conceptUuid == curr.concept)?.conceptUuid,
+            groupLabel: curr.label || observations.find((o) => o.conceptUuid == curr.concept)?.code.text,
             concepts: [curr],
           });
         } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
@@ -50,7 +49,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       const chartRecords = observations
         .filter((obs) => concepts.some((c) => c.concept == obs.conceptUuid) && obs.dataType === 'Number')
         .map((obs) => ({
-          group: obs.conceptUuid,
+          group: obs.code.text,
           key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
           value: obs.valueQuantity.value,
         }));

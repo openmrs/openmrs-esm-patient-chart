@@ -30,7 +30,8 @@ export const configSchemaSwitchable = {
       },
       label: {
         _type: Type.String,
-        _description: 'Label to display for the concept.',
+        _default: '',
+        _description: 'Label to display for the concept. If not provided, the concept display name will be used.',
       },
       color: {
         _type: Type.String,
