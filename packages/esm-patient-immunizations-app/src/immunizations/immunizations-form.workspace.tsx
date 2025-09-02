@@ -250,42 +250,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <DoseInput vaccine={vaccineUuid} sequences={config.sequenceDefinitions} control={control} />
             </ResponsiveWrapper>
           )}
-          <ResponsiveWrapper>
-            <Controller
-              name="nextDoseDate"
-              control={control}
-              render={({ field, fieldState }) => (
-                <OpenmrsDatePicker
-                  {...field}
-                  className={styles.datePicker}
-                  data-testid="nextDoseDate"
-                  id="nextDoseDate"
-                  invalid={Boolean(fieldState?.error?.message)}
-                  invalidText={fieldState?.error?.message}
-                  labelText={t('nextDoseDate', 'Next dose date')}
-                  minDate={vaccinationDate}
-                />
-              )}
-            />
-          </ResponsiveWrapper>
-          <ResponsiveWrapper>
-            <Controller
-              name="note"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <TextArea
-                  enableCounter
-                  id="note"
-                  invalidText={errors?.note?.message}
-                  labelText={t('note', 'Note')}
-                  maxCount={255}
-                  onChange={(evt) => onChange(evt.target.value)}
-                  placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
-                  value={value}
-                />
-              )}
-            />
-          </ResponsiveWrapper>
+
           <div className={styles.vaccineBatchHeading}>{t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <ResponsiveWrapper>
             <Controller
@@ -329,6 +294,41 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
                   invalid={Boolean(fieldState?.error?.message)}
                   invalidText={fieldState?.error?.message}
                   labelText={t('expirationDate', 'Expiration date')}
+                  minDate={vaccinationDate}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="note"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextArea
+                  enableCounter
+                  id="note"
+                  invalidText={errors?.note?.message}
+                  labelText={t('note', 'Note')}
+                  maxCount={255}
+                  onChange={(evt) => onChange(evt.target.value)}
+                  placeholder={t('immunizationNotePlaceholder', 'For example: mild redness at injection site')}
+                  value={value}
+                />
+              )}
+            />
+          </ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="nextDoseDate"
+              control={control}
+              render={({ field, fieldState }) => (
+                <OpenmrsDatePicker
+                  {...field}
+                  className={styles.datePicker}
+                  id="nextDoseDate"
+                  invalid={Boolean(fieldState?.error?.message)}
+                  invalidText={fieldState?.error?.message}
+                  labelText={t('nextDoseDate', 'Next dose date')}
                   minDate={vaccinationDate}
                 />
               )}

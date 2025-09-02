@@ -106,7 +106,6 @@
 .nextDoseDateLabel {
   @include type.type-style('label-01');
   border-radius: layout.$spacing-05;
-  padding: layout.$spacing-03;
   text-align: center;
   padding: layout.$spacing-02;
   margin-top: layout.$spacing-02;

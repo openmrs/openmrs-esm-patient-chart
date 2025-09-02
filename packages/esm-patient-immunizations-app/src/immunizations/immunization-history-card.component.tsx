@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from '@carbon/react';
 import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
-import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 dayjs.extend(isSameOrAfter);
 
@@ -44,6 +44,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
   const getNextDoseStatusLabel = (status: 'DUE' | 'NOT_DUE') => {
     return status === 'DUE' ? t('due', 'Due') : t('notDue', 'Not due');
   };
+
   const tableRows = useMemo(() => {
     return (sortedImmunizations || []).map((immunization) => {
       const latestDose = immunization.existingDoses?.[immunization.existingDoses.length - 1];
