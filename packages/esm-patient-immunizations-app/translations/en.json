@@ -26,6 +26,7 @@
   "lastDoseOnDate": "Last dose on {{date}}",
   "lotNumber": "Lot number",
   "manufacturer": "Manufacturer",
+  "nextDose": "Next dose",
   "nextDoseDate": "Next dose date",
   "notDue": "Not due",
   "note": "Note",

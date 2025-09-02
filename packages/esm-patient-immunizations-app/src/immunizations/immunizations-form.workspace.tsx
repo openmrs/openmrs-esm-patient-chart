@@ -250,7 +250,6 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
               <DoseInput vaccine={vaccineUuid} sequences={config.sequenceDefinitions} control={control} />
             </ResponsiveWrapper>
           )}
-
           <div className={styles.vaccineBatchHeading}>{t('vaccineBatchInformation', 'Vaccine Batch Information')}</div>
           <ResponsiveWrapper>
             <Controller
