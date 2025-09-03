@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
@@ -21,35 +20,55 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
   const { data: observations } = useObs(patientUuid);
 
+  const obsForConcepts = useMemo(() => {
+    return Object.fromEntries(
+      config.data
+        .map((c) => c.concept)
+        .map((conceptUuid) => [conceptUuid, observations.filter((o) => o.conceptUuid == conceptUuid)]),
+    );
+  }, [config.data, observations]);
+
+  const conceptForObs = useMemo(() => {
+    return Object.fromEntries(
+      observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept == o.conceptUuid)]),
+    );
+  }, [observations, config.data]);
+
   const groupedConfigData = useMemo(
     () =>
-      config.data.reduce((acc, curr) => {
-        if (!curr.graphGroup) {
-          acc.push({
-            groupLabel: curr.label || observations.find((o) => o.conceptUuid == curr.concept)?.code.text,
-            concepts: [curr],
-          });
-        } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
-          acc.find((a) => a.groupLabel == curr.graphGroup).concepts.push(curr);
-        } else {
-          acc.push({
-            groupLabel: curr.graphGroup,
-            concepts: [curr],
-          });
-        }
-        return acc;
-      }, [] as ConceptGroupDescriptor[]),
-    [config.data, observations],
+      config.data
+        .filter((c) => {
+          const obs = obsForConcepts[c.concept][0];
+          return obs && obs.dataType === 'Number';
+        })
+        .reduce((acc, curr) => {
+          if (!curr.graphGroup) {
+            acc.push({
+              groupLabel: curr.label || obsForConcepts[curr.concept][0]?.code.text,
+              concepts: [curr],
+            });
+          } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
+            acc.find((a) => a.groupLabel == curr.graphGroup).concepts.push(curr);
+          } else {
+            acc.push({
+              groupLabel: curr.graphGroup,
+              concepts: [curr],
+            });
+          }
+          return acc;
+        }, [] as ConceptGroupDescriptor[]),
+    [config.data, obsForConcepts],
   );
 
   const [selectedMenuItem, setSelectedMenuItem] = React.useState<ConceptGroupDescriptor>(groupedConfigData[0]);
 
   const chartDataForConcepts = useCallback(
     (concepts: ConfigObjectSwitchable['data']) => {
-      const chartRecords = observations
-        .filter((obs) => concepts.some((c) => c.concept == obs.conceptUuid) && obs.dataType === 'Number')
+      const chartRecords = concepts
+        .map((c) => obsForConcepts[c.concept])
+        .flat()
         .map((obs) => ({
-          group: obs.code.text,
+          group: conceptForObs[obs.conceptUuid].label || obs.code.text,
           key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
           value: obs.valueQuantity.value,
         }));
@@ -60,7 +79,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
       return chartRecords;
     },
-    [observations, config.graphOldestFirst],
+    [obsForConcepts, conceptForObs, config.graphOldestFirst],
   );
 
   const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
