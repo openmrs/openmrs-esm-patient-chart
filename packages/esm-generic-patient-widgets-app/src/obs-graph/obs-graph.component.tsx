@@ -6,6 +6,7 @@ import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
+import { useTranslation } from 'react-i18next';
 
 interface ConceptGroupDescriptor {
   groupLabel: string;
@@ -18,6 +19,7 @@ interface ObsGraphProps {
 
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
+  const { t } = useTranslation();
   const { data: observations } = useObs(patientUuid);
 
   const obsForConcepts = useMemo(() => {
@@ -68,7 +70,9 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .map((c) => obsForConcepts[c.concept])
         .flat()
         .map((obs) => ({
-          group: conceptForObs[obs.conceptUuid].label || obs.code.text,
+          group: conceptForObs[obs.conceptUuid].label
+            ? t(conceptForObs[obs.conceptUuid].label, conceptForObs[obs.conceptUuid].label)
+            : obs.code.text,
           key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
           value: obs.valueQuantity.value,
         }));
@@ -79,7 +83,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
       return chartRecords;
     },
-    [obsForConcepts, conceptForObs, config.graphOldestFirst],
+    [obsForConcepts, conceptForObs, config.graphOldestFirst, t],
   );
 
   const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
@@ -109,37 +113,45 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
   return (
     <>
-      <div className={styles.graphContainer}>
-        <div className={styles.conceptPickerTabs}>
-          <div className={styles.verticalTabs}>
-            <TabsVertical>
-              <TabListVertical aria-label="Obs tabs">
-                {groupedConfigData.map(({ groupLabel }, index) => {
-                  const tabClasses = classNames(styles.tab, styles.bodyLong01, {
-                    [styles.selectedTab]: selectedMenuItem.groupLabel === groupLabel,
-                  });
+      <div className={styles.graphWidgetContainer}>
+        {groupedConfigData.length > 1 ? (
+          <div className={styles.conceptPickerTabs}>
+            <div className={styles.verticalTabs}>
+              <TabsVertical>
+                <TabListVertical aria-label="Obs tabs">
+                  {groupedConfigData.map(({ groupLabel }, index) => {
+                    const tabClasses = classNames(styles.tab, styles.bodyLong01, {
+                      [styles.selectedTab]: selectedMenuItem.groupLabel === groupLabel,
+                    });
 
-                  return (
-                    <Tab
-                      className={tabClasses}
-                      key={groupLabel}
-                      onClick={() => setSelectedMenuItem(groupedConfigData[index])}
-                    >
-                      {groupLabel}
-                    </Tab>
-                  );
-                })}
-              </TabListVertical>
-              <TabPanels>
-                {groupedConfigData.map(({ groupLabel, concepts }) => (
-                  <TabPanel key={groupLabel}>
-                    <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
-                  </TabPanel>
-                ))}
-              </TabPanels>
-            </TabsVertical>
+                    return (
+                      <Tab
+                        className={tabClasses}
+                        key={groupLabel}
+                        onClick={() => setSelectedMenuItem(groupedConfigData[index])}
+                      >
+                        {t(groupLabel, groupLabel)}
+                      </Tab>
+                    );
+                  })}
+                </TabListVertical>
+                <TabPanels>
+                  {groupedConfigData.map(({ groupLabel, concepts }) => (
+                    <TabPanel key={groupLabel}>
+                      <div className={styles.lineChartContainer}>
+                        <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
+                      </div>
+                    </TabPanel>
+                  ))}
+                </TabPanels>
+              </TabsVertical>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className={styles.lineChartContainer}>
+            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts).flat()} options={chartOptions} />
+          </div>
+        )}
       </div>
       {config.interpretationSlot ? (
         <div>

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { LineChart } from '@carbon/charts-react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import ObsSwitchable from './obs-switchable.component';
-import { useObs , type ObsResult } from '../resources/useObs';
+import { useObs, type ObsResult } from '../resources/useObs';
 import { configSchemaSwitchable } from '../config-schema-obs-switchable';
 
 jest.mock('../resources/useObs', () => ({
@@ -175,7 +175,7 @@ describe('ObsSwitchable', () => {
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
       title: 'My Stats',
-      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
       showGraphByDefault: true,
     });
 
@@ -183,8 +183,10 @@ describe('ObsSwitchable', () => {
 
     const tabs = screen.getByLabelText('Obs tabs');
     expect(tabs).toHaveTextContent('Height');
+    expect(tabs).toHaveTextContent('Weight');
 
-    expect(mockLineChart).toHaveBeenCalledWith(
+    expect(mockLineChart).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         data: [
           { group: 'Height', key: '01-Jan-2021', value: 180 },
@@ -238,6 +240,33 @@ describe('ObsSwitchable', () => {
           { group: 'Weight', key: '01-Jan-2021', value: 70 },
           { group: 'Weight', key: '01-Feb-2021', value: 72 },
         ],
+        options: expect.any(Object),
+      }),
+      {},
+    );
+  });
+
+  it('should hide the graph tab selection if there is only one graph', async () => {
+    mockUseObs.mockReturnValue({
+      data: mockObsData.filter((o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') as Array<ObsResult>,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      title: 'My Stats',
+      showGraphByDefault: true,
+      data: [{ concept: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    expect(screen.queryByLabelText('Obs tabs')).not.toBeInTheDocument();
+
+    expect(mockLineChart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
         options: expect.any(Object),
       }),
       {},
