@@ -83,14 +83,9 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
         noToday: true,
         time: false,
       }),
-    nextDoseDate:
-      (dose?.nextDoseDate &&
-        formatDate(new Date(dose.nextDoseDate), {
-          mode: 'standard',
-          noToday: true,
-          time: false,
-        })) ||
-      '--',
+    nextDoseDate: dose?.nextDoseDate
+      ? formatDate(new Date(dose.nextDoseDate), { mode: 'standard', noToday: true, time: false })
+      : '--',
     expirationDate:
       (dose?.expirationDate &&
         formatDate(new Date(dose.expirationDate), {
@@ -109,11 +104,11 @@ const SequenceTable: React.FC<SequenceTableProps> = ({
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,
               immunizationId: dose.immunizationObsUuid,
-              vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
+              vaccinationDate: dose.occurrenceDateTime,
               doseNumber: dose.doseNumber,
-              nextDoseDate: dose.nextDoseDate && parseDate(dose.nextDoseDate),
+              nextDoseDate: dose.nextDoseDate,
               note: dose.note[0]?.text,
-              expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
+              expirationDate: dose.expirationDate,
               lotNumber: dose.lotNumber,
               manufacturer: dose.manufacturer,
               visitId: dose.visitUuid,

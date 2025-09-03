@@ -16,6 +16,7 @@ import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
+import { FHIR_NEXT_DOSE_DATE_EXTENSION_URL } from './immunization-mapper';
 import ImmunizationsForm from './immunizations-form.workspace';
 
 const mockCloseWorkspace = jest.fn();
@@ -202,7 +203,7 @@ describe('Immunizations Form', () => {
         id: undefined,
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         manufacturer: { display: 'Pfizer' },
-        occurrenceDateTime: mockVaccinationDate.toString(),
+        occurrenceDateTime: dayjs(new Date()).startOf('day').toDate().toISOString(),
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
@@ -229,10 +230,10 @@ describe('Immunizations Form', () => {
     const immunizationToEdit = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       immunizationId: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-      vaccinationDate: new Date('2024-01-03'),
+      vaccinationDate: new Date('2024-01-03').toString(),
       doseNumber: 2,
-      expirationDate: new Date('2024-05-19'),
-      nextDoseDate: new Date('2024-05-19'),
+      expirationDate: new Date('2024-05-19').toString(),
+      nextDoseDate: new Date('2024-01-03').toString(),
       note: 'Given as part of routine schedule.',
       lotNumber: 'A123456',
       manufacturer: 'Merck & Co., Inc.',
@@ -268,6 +269,10 @@ describe('Immunizations Form', () => {
     expect(manufacturerField).toHaveValue('Merck & Co., Inc.');
     expect(expirationDateField).toHaveValue('19/05/2024');
 
+    // Check next dose date field
+    const nextDoseDateField = screen.getByRole('textbox', { name: /Next dose date/i });
+    expect(nextDoseDateField).toHaveValue('03/01/2024');
+
     // edit the form
     await user.clear(doseField);
     await user.type(doseField, '2');
@@ -278,18 +283,18 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-        expirationDate: dayjs(new Date('2024-05-19'), isoFormat).toDate().toString(),
+        expirationDate: dayjs(new Date('2024-05-19')).startOf('day').toDate().toISOString(),
         extension: [
           {
-            url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
-            valueDateTime: dayjs(mockVaccinationDate, isoFormat).toDate().toString(),
+            url: FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
+            valueDateTime: dayjs(new Date('2024-01-03')).startOf('day').toDate().toISOString(),
           },
         ],
         note: [{ text: immunizationToEdit.note }],
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: 'A123456',
         manufacturer: { display: 'Merck & Co., Inc.' },
-        occurrenceDateTime: dayjs(mockVaccinationDate, isoFormat).toDate().toString(),
+        occurrenceDateTime: dayjs(new Date('2024-01-03')).startOf('day').toDate().toISOString(),
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },

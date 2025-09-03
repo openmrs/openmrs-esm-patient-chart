@@ -7,6 +7,8 @@ import {
 } from '../types/fhir-immunization-domain';
 import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
+export const FHIR_NEXT_DOSE_DATE_EXTENSION_URL = 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate';
+
 const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses | null => {
   if (!immunizationResource) {
     return null;
@@ -19,7 +21,7 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
 
   const nextDoseDateExtension = immunizationResource?.extension?.find(
-    (ext) => ext.url === 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
+    (ext) => ext.url === FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
   );
   const nextDoseDate = nextDoseDateExtension?.valueDateTime?.toString();
 
@@ -126,13 +128,13 @@ export const mapToFHIRImmunizationResource = (
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid),
-    occurrenceDateTime: immunizationFormData.vaccinationDate.toString(),
-    expirationDate: immunizationFormData.expirationDate?.toString() || undefined,
+    occurrenceDateTime: immunizationFormData.vaccinationDate,
+    expirationDate: immunizationFormData.expirationDate || undefined,
     extension: immunizationFormData.nextDoseDate
       ? [
           {
-            url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
-            valueDateTime: immunizationFormData.nextDoseDate.toString(),
+            url: FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
+            valueDateTime: immunizationFormData.nextDoseDate,
           },
         ]
       : [],

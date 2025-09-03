@@ -11,8 +11,6 @@ import {
   parseDate,
   ResponsiveWrapper,
   showSnackbar,
-  toDateObjectStrict,
-  toOmrsIsoString,
   useConfig,
   useLayoutType,
   useSession,
@@ -112,14 +110,14 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
       if (props) {
-        const vaccinationDateOrNow = props.vaccinationDate || new Date();
+        const vaccinationDateOrNow = props.vaccinationDate ? parseDate(props.vaccinationDate) : new Date();
         reset({
           vaccineUuid: props.vaccineUuid,
           vaccinationDate: vaccinationDateOrNow,
           doseNumber: props.doseNumber,
-          nextDoseDate: props.nextDoseDate ? parseDate(props.nextDoseDate.toISOString()) : null,
+          nextDoseDate: props.nextDoseDate ? parseDate(props.nextDoseDate) : null,
           note: props.note,
-          expirationDate: props.expirationDate ? parseDate(props.expirationDate.toISOString()) : null,
+          expirationDate: props.expirationDate ? parseDate(props.expirationDate) : null,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
         });
@@ -153,13 +151,11 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           immunizationId: immunizationToEditMeta?.immunizationObsUuid,
           vaccineName: immunizationsConceptSet.answers.find((answer) => answer.uuid === vaccineUuid).display,
           vaccineUuid: vaccineUuid,
-          vaccinationDate: toDateObjectStrict(toOmrsIsoString(dayjs(vaccinationDate).startOf('day').toDate())),
+          vaccinationDate: dayjs(vaccinationDate).startOf('day').toDate().toISOString(),
           doseNumber,
-          nextDoseDate: nextDoseDate
-            ? toDateObjectStrict(toOmrsIsoString(dayjs(nextDoseDate).startOf('day').toDate()))
-            : null,
+          nextDoseDate: nextDoseDate ? dayjs(nextDoseDate).startOf('day').toDate().toISOString() : null,
           note,
-          expirationDate,
+          expirationDate: expirationDate ? dayjs(expirationDate).startOf('day').toDate().toISOString() : null,
           lotNumber,
           manufacturer,
         };

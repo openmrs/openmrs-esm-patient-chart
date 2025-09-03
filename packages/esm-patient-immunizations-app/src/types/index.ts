@@ -22,12 +22,12 @@ export interface ImmunizationGrouped {
 export interface ImmunizationFormState {
   vaccineUuid: string;
   immunizationId?: string;
-  vaccinationDate: Date;
+  vaccinationDate: string;
   doseNumber: number;
   note: string;
-  expirationDate: Date;
+  expirationDate: string;
   lotNumber: string;
-  nextDoseDate: Date;
+  nextDoseDate: string;
   manufacturer: string;
   visitId?: string;
   locationId?: string;

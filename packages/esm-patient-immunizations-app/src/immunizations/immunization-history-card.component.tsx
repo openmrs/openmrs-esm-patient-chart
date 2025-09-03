@@ -15,6 +15,13 @@ interface ImmunizationHistoryCardProps {
   immunizations?: Array<Immunization>;
 }
 
+const getNextDoseStatus = (nextDoseDate: string): 'DUE' | 'NOT_DUE' => {
+  const today = dayjs().startOf('day');
+  const nextDate = dayjs(nextDoseDate).startOf('day');
+
+  return today.isSameOrAfter(nextDate) ? 'DUE' : 'NOT_DUE';
+};
+
 const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error, immunizations }) => {
   const { t } = useTranslation();
   const headerTitle = t('immunizations', 'Immunizations');
@@ -34,13 +41,6 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
     { key: 'vaccine', header: t('vaccine', 'Vaccine') },
     { key: 'doses', header: t('doses', 'Doses') },
   ];
-
-  const getNextDoseStatus = (nextDoseDate: string): 'DUE' | 'NOT_DUE' => {
-    const today = dayjs().startOf('day');
-    const nextDate = dayjs(nextDoseDate).startOf('day');
-
-    return today.isSameOrAfter(nextDate) ? 'DUE' : 'NOT_DUE';
-  };
 
   const getNextDoseStatusLabel = (status: 'DUE' | 'NOT_DUE') => {
     return status === 'DUE' ? t('due', 'Due') : t('notDue', 'Not due');
