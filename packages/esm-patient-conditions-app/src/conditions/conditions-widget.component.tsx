@@ -195,7 +195,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     if (isSubmittingForm) {
       if (Object.keys(errors).length > 0) {
         setIsSubmittingForm(false);
-        Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
+        Object.entries(errors).map((key, err) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(`${key}: ${err} `);
+          }
+        });
         return;
       }
       isEditing ? handleUpdate() : handleCreate();
