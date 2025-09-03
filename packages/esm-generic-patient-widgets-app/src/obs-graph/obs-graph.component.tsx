@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
@@ -8,9 +7,9 @@ import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
 
-interface ConceptDescriptor {
-  label: string;
-  uuid: string;
+interface ConceptGroupDescriptor {
+  groupLabel: string;
+  concepts: ConfigObjectSwitchable['data'];
 }
 
 interface ObsGraphProps {
@@ -18,32 +17,72 @@ interface ObsGraphProps {
 }
 
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
   const { data: observations } = useObs(patientUuid);
 
-  const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
-    label: config.data[0]?.label,
-    uuid: config.data[0]?.concept,
-  });
+  const obsForConcepts = useMemo(() => {
+    return Object.fromEntries(
+      config.data
+        .map((c) => c.concept)
+        .map((conceptUuid) => [conceptUuid, observations.filter((o) => o.conceptUuid == conceptUuid)]),
+    );
+  }, [config.data, observations]);
 
-  const chartData = useMemo(() => {
-    const chartRecords = observations
-      .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
-      .map((obs) => ({
-        group: selectedConcept.label,
-        key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
-        value: obs.valueQuantity.value,
-      }));
+  const conceptForObs = useMemo(() => {
+    return Object.fromEntries(
+      observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept == o.conceptUuid)]),
+    );
+  }, [observations, config.data]);
 
-    if (config.graphOldestFirst) {
-      chartRecords.reverse();
-    }
+  const groupedConfigData = useMemo(
+    () =>
+      config.data
+        .filter((c) => {
+          const obs = obsForConcepts[c.concept][0];
+          return obs && obs.dataType === 'Number';
+        })
+        .reduce((acc, curr) => {
+          if (!curr.graphGroup) {
+            acc.push({
+              groupLabel: curr.label || obsForConcepts[curr.concept][0]?.code.text,
+              concepts: [curr],
+            });
+          } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
+            acc.find((a) => a.groupLabel == curr.graphGroup).concepts.push(curr);
+          } else {
+            acc.push({
+              groupLabel: curr.graphGroup,
+              concepts: [curr],
+            });
+          }
+          return acc;
+        }, [] as ConceptGroupDescriptor[]),
+    [config.data, obsForConcepts],
+  );
 
-    return chartRecords;
-  }, [observations, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
+  const [selectedMenuItem, setSelectedMenuItem] = React.useState<ConceptGroupDescriptor>(groupedConfigData[0]);
 
-  const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
+  const chartDataForConcepts = useCallback(
+    (concepts: ConfigObjectSwitchable['data']) => {
+      const chartRecords = concepts
+        .map((c) => obsForConcepts[c.concept])
+        .flat()
+        .map((obs) => ({
+          group: conceptForObs[obs.conceptUuid].label || obs.code.text,
+          key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
+          value: obs.valueQuantity.value,
+        }));
+
+      if (config.graphOldestFirst) {
+        chartRecords.reverse();
+      }
+
+      return chartRecords;
+    },
+    [obsForConcepts, conceptForObs, config.graphOldestFirst],
+  );
+
+  const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
 
   const chartOptions = {
     axes: {
@@ -54,7 +93,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       },
       left: {
         mapsTo: 'value',
-        title: selectedConcept.label,
+        title: selectedMenuItem.groupLabel,
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
       },
@@ -72,37 +111,29 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     <>
       <div className={styles.graphContainer}>
         <div className={styles.conceptPickerTabs}>
-          <label className={styles.conceptLabel} htmlFor="concept-tab-group">
-            {t('displaying', 'Displaying')}
-          </label>
           <div className={styles.verticalTabs}>
             <TabsVertical>
               <TabListVertical aria-label="Obs tabs">
-                {config.data.map(({ concept, label }, index) => {
+                {groupedConfigData.map(({ groupLabel }, index) => {
                   const tabClasses = classNames(styles.tab, styles.bodyLong01, {
-                    [styles.selectedTab]: selectedConcept.label === label,
+                    [styles.selectedTab]: selectedMenuItem.groupLabel === groupLabel,
                   });
 
                   return (
                     <Tab
                       className={tabClasses}
-                      key={concept}
-                      onClick={() =>
-                        setSelectedConcept({
-                          label,
-                          uuid: concept,
-                        })
-                      }
+                      key={groupLabel}
+                      onClick={() => setSelectedMenuItem(groupedConfigData[index])}
                     >
-                      {label}
+                      {groupLabel}
                     </Tab>
                   );
                 })}
               </TabListVertical>
               <TabPanels>
-                {config.data.map(({ concept, label }) => (
-                  <TabPanel key={concept}>
-                    <LineChart data={chartData.flat()} options={chartOptions} />
+                {groupedConfigData.map(({ groupLabel, concepts }) => (
+                  <TabPanel key={groupLabel}>
+                    <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
                   </TabPanel>
                 ))}
               </TabPanels>

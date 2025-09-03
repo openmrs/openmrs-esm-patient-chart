@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { ChartLineSmooth, Table } from '@carbon/react/icons';
+import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
+import { Analytics, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useConfig } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import ObsGraph from '../obs-graph/obs-graph.component';
@@ -18,6 +18,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
   const [chartView, setChartView] = React.useState<boolean>(config.showGraphByDefault);
+  const isTablet = !isDesktop(useLayoutType());
 
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 
@@ -37,26 +38,20 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                 </div>
                 {hasNumberType ? (
                   <div className={styles.headerActionItems}>
-                    <div className={styles.toggleButtons}>
-                      <Button
-                        className={styles.toggle}
-                        size="md"
-                        kind={chartView ? 'ghost' : 'tertiary'}
-                        hasIconOnly
-                        renderIcon={(props) => <Table size={16} {...props} />}
-                        iconDescription={t('tableView', 'Table View')}
-                        onClick={() => setChartView(false)}
-                      />
-                      <Button
-                        className={styles.toggle}
-                        size="md"
-                        kind={chartView ? 'tertiary' : 'ghost'}
-                        hasIconOnly
-                        renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
-                        iconDescription={t('chartView', 'Chart View')}
-                        onClick={() => setChartView(true)}
-                      />
-                    </div>
+                    <ContentSwitcher
+                      onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
+                        setChartView(evt.name === 'chartView')
+                      }
+                      size={isTablet ? 'md' : 'sm'}
+                      selectedIndex={chartView ? 1 : 0}
+                    >
+                      <IconSwitch name="tableView" text="Table view">
+                        <Table size={16} />
+                      </IconSwitch>
+                      <IconSwitch name="chartView" text="Chart view">
+                        <Analytics size={16} />
+                      </IconSwitch>
+                    </ContentSwitcher>
                   </div>
                 ) : null}
               </CardHeader>
