@@ -196,11 +196,13 @@ describe('Immunizations Form', () => {
     expect(mockSavePatientImmunization).toHaveBeenCalledWith(
       expect.objectContaining({
         encounter: { reference: 'Encounter/17f512b4-d264-4113-a6fe-160cb38cb46e', type: 'Encounter' },
+        expirationDate: undefined,
+        extension: [],
         note: [{ text: formValues.note }],
         id: undefined,
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         manufacturer: { display: 'Pfizer' },
-        occurrenceDateTime: mockVaccinationDate,
+        occurrenceDateTime: mockVaccinationDate.toString(),
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },
@@ -276,12 +278,18 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-        expirationDate: dayjs(new Date('2024-05-19'), isoFormat).toDate(),
+        expirationDate: dayjs(new Date('2024-05-19'), isoFormat).toDate().toString(),
+        extension: [
+          {
+            url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
+            valueDateTime: dayjs(mockVaccinationDate, isoFormat).toDate().toString(),
+          },
+        ],
         note: [{ text: immunizationToEdit.note }],
         location: { reference: 'Location/b1a8b05e-3542-4037-bbd3-998ee9c40574', type: 'Location' },
         lotNumber: 'A123456',
         manufacturer: { display: 'Merck & Co., Inc.' },
-        occurrenceDateTime: dayjs(mockVaccinationDate, isoFormat).toDate(),
+        occurrenceDateTime: dayjs(mockVaccinationDate, isoFormat).toDate().toString(),
         patient: { reference: 'Patient/8673ee4f-e2ab-4077-ba55-4980f408773e', type: 'Patient' },
         performer: [
           { actor: { reference: 'Practitioner/b1a8b05e-3542-4037-bbd3-998ee9c4057z', type: 'Practitioner' } },

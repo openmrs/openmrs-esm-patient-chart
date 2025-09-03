@@ -34,6 +34,7 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
     { key: 'vaccine', header: t('vaccine', 'Vaccine') },
     { key: 'doses', header: t('doses', 'Doses') },
   ];
+
   const getNextDoseStatus = (nextDoseDate: string): 'DUE' | 'NOT_DUE' => {
     const today = dayjs().startOf('day');
     const nextDate = dayjs(nextDoseDate).startOf('day');

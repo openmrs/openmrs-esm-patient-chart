@@ -16,18 +16,18 @@ export type Reference = {
   reference: string;
 };
 
-export type FHIRImmunizationResource = {
+export interface FHIRImmunizationResource {
   resourceType: 'Immunization';
   status: 'completed';
   id?: string;
   vaccineCode: { coding: Array<Code> };
   patient: Reference;
   encounter: Reference;
-  occurrenceDateTime: Date;
-  expirationDate?: Date;
+  occurrenceDateTime: string;
+  expirationDate?: string;
   extension?: Array<{
     url: string;
-    valueDateTime: Date;
+    valueDateTime: string;
   }>;
   note?: Array<{ text: string }>;
   location?: Reference;
@@ -35,7 +35,7 @@ export type FHIRImmunizationResource = {
   manufacturer?: { display: string };
   lotNumber?: string;
   protocolApplied?: Array<{ doseNumberPositiveInt: number; series?: string }>;
-};
+}
 
 export type FHIRImmunizationBundleEntry = {
   fullUrl: string;

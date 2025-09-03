@@ -17,8 +17,12 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
-  const nextDoseDate =
-    immunizationResource?.extension?.length > 0 && immunizationResource?.extension[0]?.valueDateTime.toString();
+
+  const nextDoseDateExtension = immunizationResource?.extension?.find(
+    (ext) => ext.url === 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
+  );
+  const nextDoseDate = nextDoseDateExtension?.valueDateTime?.toString();
+
   const expirationDate = immunizationResource?.expirationDate?.toString();
   const note = immunizationResource?.note?.length > 0 && immunizationResource?.note[0]?.text;
   return {
@@ -122,13 +126,13 @@ export const mapToFHIRImmunizationResource = (
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid),
-    occurrenceDateTime: immunizationFormData.vaccinationDate,
-    expirationDate: immunizationFormData.expirationDate || undefined,
+    occurrenceDateTime: immunizationFormData.vaccinationDate.toString(),
+    expirationDate: immunizationFormData.expirationDate?.toString() || undefined,
     extension: immunizationFormData.nextDoseDate
       ? [
           {
             url: 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate',
-            valueDateTime: immunizationFormData.nextDoseDate,
+            valueDateTime: immunizationFormData.nextDoseDate.toString(),
           },
         ]
       : [],
@@ -144,7 +148,9 @@ export const mapToFHIRImmunizationResource = (
   // manufacturer: only when non-empty
   const manufacturer = immunizationFormData.manufacturer?.trim();
   if (manufacturer) {
-    resource.manufacturer = { display: manufacturer };
+    resource.manufacturer = {
+      display: manufacturer,
+    };
   }
 
   // lotNumber: only when non-empty
