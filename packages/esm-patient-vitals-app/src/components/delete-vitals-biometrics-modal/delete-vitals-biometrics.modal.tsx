@@ -40,7 +40,9 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
         });
       })
       .catch((error) => {
-        console.error('Error deleting encounter: ', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error deleting encounter: ', error);
+        }
         showSnackbar({
           isLowContrast: false,
           kind: 'error',
