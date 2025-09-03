@@ -98,5 +98,9 @@ moduleName/
 /playwright/.cache/
 e2e/storageState.json
 
+# Documentation files (generated during development)
+STRUCTURAL_DIAGRAM.md
+ISSUES_FIXED.md
+
 # misc
 .angular
