@@ -36,7 +36,9 @@ const OrderPriceDetailsComponent: React.FC<OrderPriceDetailsComponentProps> = ({
         maximumFractionDigits: 2,
       }).format(amount.value);
     } catch (error) {
-      console.error(`Invalid currency code: ${amount.currency}. Error: ${error.message}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`Invalid currency code: ${amount.currency}. Error: ${error.message}`);
+      }
       return `${new Intl.NumberFormat(locale, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
