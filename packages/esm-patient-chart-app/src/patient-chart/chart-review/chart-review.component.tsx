@@ -38,7 +38,9 @@ function getDashboardDefinition(meta: object, config: ConfigObject, moduleName: 
   } else {
     const msg = `Could not find a valid dashboard definition for the dashboard ${name} located in ${moduleName}`;
     if (!seenMessages.has(msg)) {
-      console.error(msg);
+      if (process.env.NODE_ENV === 'development') {
+        console.error(msg);
+      }
       seenMessages.add(msg);
     }
     return null;
