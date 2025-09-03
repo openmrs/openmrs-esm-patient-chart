@@ -140,7 +140,6 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                             <NumberInput
                               allowEmpty
                               className={numberInputClasses}
-                              defaultValue={''}
                               disableWheel
                               hideSteppers
                               id={`${fieldId}-${fieldProperty.id}`}
@@ -156,7 +155,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               style={{ ...fieldStyles }}
                               title={fieldProperty.name}
                               type="number"
-                              value={value}
+                              value={value ?? ''}
                             />
                           );
                         }}
