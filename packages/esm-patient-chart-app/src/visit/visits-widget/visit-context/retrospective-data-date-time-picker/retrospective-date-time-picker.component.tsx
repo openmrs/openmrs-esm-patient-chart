@@ -1,13 +1,13 @@
 import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import { OpenmrsDatePicker, ResponsiveWrapper, showSnackbar, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
+import React, { useCallback, useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { format } from 'date-fns';
 
 type FormValues = {
-  retrospectiveDate: Date;
+  retrospectiveDate: string;
   retrospectiveTime: string;
   retrospectiveTimeFormat: string;
 };
@@ -28,7 +28,7 @@ const RetrospectiveDateTimePicker = ({
 
   const { currentVisit } = useVisit(patientUuid);
   const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
-  const maxDate = currentVisit?.stopDatetime;
+  const maxDate = currentVisit?.stopDatetime ?? new Date();
   const minDate = currentVisit?.startDatetime;
 
   const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
@@ -55,7 +55,35 @@ const RetrospectiveDateTimePicker = ({
         retrospectiveTimeFormat: retrospectiveTimeFormat,
       });
     }
-  }, [onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+  }, [form, onChange, retrospectiveDate, retrospectiveTime, retrospectiveTimeFormat]);
+
+  const resetFormForRetrospectiveVisit = useCallback(() => {
+    const timeFormat = new Date(currentVisit.startDatetime).getHours() >= 12 ? 'PM' : 'AM';
+    form.reset({
+      retrospectiveDate: currentVisit.startDatetime,
+      retrospectiveTime: format(new Date(currentVisit.startDatetime), 'hh:mm'),
+      retrospectiveTimeFormat: timeFormat,
+    });
+  }, [currentVisit, form]);
+
+  // each time the current visit changes, reset the form values
+  useEffect(() => {
+    if (currentVisit) {
+      const currentVisitIsRetrospective = Boolean(currentVisit.stopDatetime);
+
+      if (currentVisitIsRetrospective) {
+        resetFormForRetrospectiveVisit();
+        return;
+      }
+
+      form.reset({
+        retrospectiveDate: '',
+        retrospectiveTime: '',
+        retrospectiveTimeFormat: '',
+      });
+      setManuallyEnableDateTimePicker(false);
+    }
+  }, [currentVisit, form, resetFormForRetrospectiveVisit]);
 
   if (!isRdeEnabled) {
     return null;
@@ -63,15 +91,25 @@ const RetrospectiveDateTimePicker = ({
 
   return (
     <section className={styles.wrapper}>
-      <h4 className={styles.heading}>Encounter time</h4>
+      <h4 className={styles.heading}>Order time</h4>
       {isActiveVisit && (
         <Checkbox
           checked={manuallyEnableDateTimePicker}
           className={styles.checkbox}
           id={'enable-date-time-picker'}
-          labelText={t('enable', 'Enable')}
+          labelText={t('inThePast', 'In the past')}
           onChange={(_, { checked, id }) => {
             setManuallyEnableDateTimePicker(checked);
+            if (checked) {
+              resetFormForRetrospectiveVisit();
+            }
+            if (!checked) {
+              form.reset({
+                retrospectiveDate: '',
+                retrospectiveTime: '',
+                retrospectiveTimeFormat: '',
+              });
+            }
           }}
         />
       )}
@@ -104,12 +142,30 @@ const RetrospectiveDateTimePicker = ({
                 <TimePicker
                   id={'retrospective-time-picker-input'}
                   labelText={t('time', 'Time')}
-                  onBlur={onBlur}
+                  onBlur={(event) => {
+                    const timeValue = event.target.value;
+                    if (timeValue) {
+                      const pattern = /^(0[1-9]|1[0-2]):([0-5][0-9])$/;
+                      if (!pattern.test(timeValue)) {
+                        form.setError('retrospectiveTime', {
+                          type: 'manual',
+                          message: t(
+                            'invalidTimeFormatMessage',
+                            'Please enter a valid time in 12 HR format HH:MM (e.g., 02:30).',
+                          ),
+                        });
+                        form.setValue('retrospectiveTime', '');
+                      }
+                    }
+                  }}
                   onChange={(event) => onChange(event.target.value)}
                   pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
                   value={value}
                   disabled={disableInputs}
                   className={styles.timePicker}
+                  invalid={Boolean(form.formState.errors.retrospectiveTime)}
+                  invalidText={form.formState.errors.retrospectiveTime?.message}
+                  onFocus={() => form.clearErrors('retrospectiveTime')}
                 >
                   <Controller
                     name={'retrospectiveTimeFormat'}
