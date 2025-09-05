@@ -74,7 +74,7 @@ describe('ImmunizationOverview', () => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
-    const expectedTableRows = [/rotavirus sept 2018/, /polio nov 2018/, /influenza may 2018/];
+    const expectedTableRows = [/rotavirus \d{1,2}-sept-2018/, /polio \d{1,2}-nov-2018/, /influenza \d{1,2}-may-2018/];
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
