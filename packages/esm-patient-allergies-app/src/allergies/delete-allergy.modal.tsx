@@ -31,7 +31,9 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
         }
       })
       .catch((error) => {
-        console.error('Error deleting allergy: ', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error deleting allergy: ', error);
+        }
 
         showSnackbar({
           isLowContrast: false,
