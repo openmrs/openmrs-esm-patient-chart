@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from '@carbon/react';
 import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
@@ -6,10 +8,19 @@ import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-
 import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';
 
+dayjs.extend(isSameOrAfter);
+
 interface ImmunizationHistoryCardProps {
   error?: Error | null;
   immunizations?: Array<Immunization>;
 }
+
+const getNextDoseStatus = (nextDoseDate: string): 'DUE' | 'NOT_DUE' => {
+  const today = dayjs().startOf('day');
+  const nextDate = dayjs(nextDoseDate).startOf('day');
+
+  return today.isSameOrAfter(nextDate) ? 'DUE' : 'NOT_DUE';
+};
 
 const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error, immunizations }) => {
   const { t } = useTranslation();
@@ -31,25 +42,33 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
     { key: 'doses', header: t('doses', 'Doses') },
   ];
 
+  const getNextDoseStatusLabel = (status: 'DUE' | 'NOT_DUE') => {
+    return status === 'DUE' ? t('due', 'Due') : t('notDue', 'Not due');
+  };
+
   const tableRows = useMemo(() => {
-    return (sortedImmunizations || []).map((immunization) => ({
-      id: immunization.vaccineUuid,
-      vaccine: immunization.vaccineName,
-      doses: immunization.existingDoses.map((dose) => (
-        <div key={dose.immunizationObsUuid} className={styles.doseCell}>
-          <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
-          {dose.occurrenceDateTime && (
-            <div className={styles.doseDate}>
-              {formatDate(parseDate(dose.occurrenceDateTime), {
-                mode: 'standard',
-                time: false,
-                noToday: true,
-              })}
-            </div>
-          )}
-        </div>
-      )),
-    }));
+    return (sortedImmunizations || []).map((immunization) => {
+      const latestDose = immunization.existingDoses?.[immunization.existingDoses.length - 1];
+      return {
+        id: immunization.vaccineUuid,
+        vaccine: immunization.vaccineName,
+        nextDoseDate: latestDose?.nextDoseDate,
+        doses: immunization.existingDoses.map((dose) => (
+          <div key={dose.immunizationObsUuid} className={styles.doseCell}>
+            <div className={styles.doseLabel}>{t('doseNumber', 'Dose {{number}}', { number: dose.doseNumber })}</div>
+            {dose.occurrenceDateTime && (
+              <div className={styles.doseDate}>
+                {formatDate(parseDate(dose.occurrenceDateTime), {
+                  mode: 'standard',
+                  time: false,
+                  noToday: true,
+                })}
+              </div>
+            )}
+          </div>
+        )),
+      };
+    });
   }, [sortedImmunizations, t]);
 
   const { results: paginatedRows, currentPage, goTo } = usePagination(tableRows || [], pageSize);
@@ -82,6 +101,17 @@ const ImmunizationHistoryCard: React.FC<ImmunizationHistoryCardProps> = ({ error
               <TableCell className={styles.vaccineNameCell}>
                 <div className={styles.vaccineNameContent}>
                   <strong>{row.vaccine}</strong>
+                  {row.nextDoseDate && (
+                    <div className={styles.nextDoseDateLabel} data-status={getNextDoseStatus(row.nextDoseDate)}>
+                      {t('nextDose', 'Next dose')}:{' '}
+                      {formatDate(parseDate(row.nextDoseDate), {
+                        mode: 'standard',
+                        time: false,
+                        noToday: true,
+                      })}{' '}
+                      ({getNextDoseStatusLabel(getNextDoseStatus(row.nextDoseDate))})
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell className={styles.dosesCell}>
