@@ -20,6 +20,7 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import styles from './visit-summary.scss';
+import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -111,6 +112,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       </div>
       <Tabs>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
+            {t('timeline', 'Timeline')}
+          </Tab>
           <Tab
             className={classNames(styles.tab, styles.bodyLong01)}
             id="notes-tab"
@@ -145,6 +149,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           ))}
         </TabList>
         <TabPanels>
+          <TabPanel>
+            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+          </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
           </TabPanel>

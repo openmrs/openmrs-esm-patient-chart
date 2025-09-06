@@ -24,7 +24,6 @@ import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
 import styles from './visit-history-table.scss';
-import SingleVisitDetailsOverview from '../visits-widget/single-visit-details/single-visit-details.component';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -111,8 +110,6 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
                             <VisitSummary visit={visit} patientUuid={patientUuid} />
-                            {/* TODO remember to remove the below component */}
-                            <SingleVisitDetailsOverview patientUuid={patientUuid} visit={visit} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
