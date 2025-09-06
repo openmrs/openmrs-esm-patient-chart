@@ -20,6 +20,7 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import styles from './visit-summary.scss';
+import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
 import { type ChartConfig } from '../../../config-schema';
 
 interface VisitSummaryProps {
@@ -119,6 +120,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('notes', 'Notes')}
           </Tab>
+          <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
+            {t('timeline', 'Timeline')}
+          </Tab>
           <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
             {t('tests', 'Tests')}
           </Tab>
@@ -146,6 +150,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           ))}
         </TabList>
         <TabPanels>
+          <TabPanel>
+            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+          </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
           </TabPanel>
