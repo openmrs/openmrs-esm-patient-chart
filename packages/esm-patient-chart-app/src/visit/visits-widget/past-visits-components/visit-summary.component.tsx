@@ -21,6 +21,7 @@ import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import styles from './visit-summary.scss';
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
+import { type ChartConfig } from '../../../config-schema';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -30,7 +31,7 @@ interface VisitSummaryProps {
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
-  const config = useConfig();
+  const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
