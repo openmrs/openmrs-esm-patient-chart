@@ -1,14 +1,42 @@
 import React from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type Encounter } from '../types';
+
+interface EncounterProvider {
+  provider: {
+    display: string;
+  };
+}
+
+interface EncounterType {
+  name: string;
+}
+
+interface Visit {
+  uuid: string;
+}
+
+interface AuditInfo {
+  dateCreated: string;
+}
+
+export interface Encounter {
+  uuid: string;
+  encounterType: EncounterType;
+  encounterProviders: EncounterProvider[];
+  encounterDatetime: string;
+  auditInfo: AuditInfo;
+  visit: Visit;
+}
 
 interface EncounterResponse {
-  results: Encounter[]; // TODO: make sure this matches the actual API response
+  results: Encounter[];
 }
 
 export function useEncountersByVisit(patientUuid: string, visitUuid: string) {
-  const url = `${restBaseUrl}/encounter?patient=${patientUuid}&v=full`; // TODO: remove v=full and specify needed fields
+  const customRepresentation =
+    'custom:(uuid,encounterType:(name),encounterProviders:(provider:(display)),encounterDatetime,auditInfo:(dateCreated),visit:(uuid))';
+  const url = `${restBaseUrl}/encounter?patient=${patientUuid}&v=${customRepresentation}`;
   const { data: response, error, isLoading } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
   return {

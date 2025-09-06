@@ -5,6 +5,7 @@ import styles from './visit-timeline.scss';
 import { useEncountersByVisit } from '../../../../clinical-views/hooks/useEncountersByVisit';
 import { formatDate } from '@openmrs/esm-framework';
 import { SkeletonText } from '@carbon/react';
+import { format, isToday } from 'date-fns';
 
 interface VisitTimelineProps {
   patientUuid: string;
@@ -77,15 +78,17 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
             {encounter.encounterProviders.length === 0 ? (
               <span>{t('noProvider', 'No Provider')}</span>
             ) : (
-              <span>
-                {/* @ts-ignore temporarily */}
-                {encounter.encounterProviders.map((provider) => provider.provider.display).join(', ')}
-              </span>
+              <span>{encounter.encounterProviders.map((provider) => provider.provider.display).join(', ')}</span>
             )}
             <span>&middot;</span>{' '}
             <span>
-              {formatDate(new Date(encounter.auditInfo?.dateCreated))} <span>&mdash;</span>{' '}
-              {formatDate(new Date(encounter.encounterDatetime))}
+              {isToday(encounter.auditInfo?.dateCreated)
+                ? format(new Date(encounter.auditInfo?.dateCreated), 'h:mm a')
+                : format(new Date(encounter.auditInfo?.dateCreated), 'MMM dd, yyyy h:mm a')}{' '}
+              <span>&mdash;</span>{' '}
+              {isToday(encounter.encounterDatetime)
+                ? format(new Date(encounter.encounterDatetime), 'h:mm a')
+                : format(encounter.encounterDatetime, 'MMM dd, yyyy h:mm a')}
             </span>
           </p>
         ))}
