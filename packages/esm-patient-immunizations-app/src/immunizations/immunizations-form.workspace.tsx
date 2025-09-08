@@ -116,7 +116,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           vaccinationDate: vaccinationDateOrNow,
           doseNumber: props.doseNumber,
           nextDoseDate: props.nextDoseDate ? parseDate(props.nextDoseDate) : null,
-          note: props.note ?? '',
+          note: props.note,
           expirationDate: props.expirationDate ? parseDate(props.expirationDate) : null,
           lotNumber: props.lotNumber,
           manufacturer: props.manufacturer,
