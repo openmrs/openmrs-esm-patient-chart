@@ -382,7 +382,11 @@ export function LabOrderForm({
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} kind="primary" size="xl" type="submit">
-            {t('saveOrder', 'Save order')}
+            {typeof isWorkSpaceType === 'function' &&
+            isWorkSpaceType(prevWorkSpace) &&
+            prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+              ? t('saveTest', 'Save test')
+              : t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
       </div>

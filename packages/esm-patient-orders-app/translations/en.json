@@ -98,6 +98,7 @@
   "saveDrugOrderFailed": "Error ordering {{orderName}}",
   "saveLabResults": "Save lab results",
   "saveOrder": "Save order",
+  "saveTests": "Save tests",
   "saving": "Saving",
   "scheduledDate": "Scheduled date",
   "scheduledDateRequired": "Scheduled date is required",

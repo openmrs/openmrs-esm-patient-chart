@@ -276,7 +276,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                       {isSavingOrders ? (
                         <InlineLoading description={t('saving', 'Saving') + '...'} />
                       ) : (
-                        <span>{t('saveOrder', 'Save order')}</span>
+                        <span>{t('saveTests', 'Save Tests')}</span>
                       )}
                     </Button>
                   </ButtonSet>
