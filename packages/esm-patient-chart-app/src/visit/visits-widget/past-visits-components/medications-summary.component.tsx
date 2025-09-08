@@ -2,7 +2,8 @@ import React from 'react';
 import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { formatDate } from '@openmrs/esm-framework';
+import { Tag, Tooltip } from '@carbon/react';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
 import type { OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
@@ -12,29 +13,24 @@ interface MedicationSummaryProps {
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
+  const { drugOrderTypeUUID } = useConfig({
+    externalModuleName: '@openmrs/esm-patient-medications-app',
+  });
+
+  const isPastMedication = (order: OrderItem['order']) => {
+    if (!order) {
+      return false;
+    }
+
+    return (
+      order.action === 'DISCONTINUE' ||
+      (order.dateStopped && new Date(order.dateStopped) <= new Date()) ||
+      (order.autoExpireDate && new Date(order.autoExpireDate) <= new Date())
+    );
+  };
 
   const drugOrders = medications?.filter((medication) => {
-    // First, check if it's a drug order
-    if (medication?.order?.orderType?.display !== 'Drug Order') {
-      return false;
-    }
-
-    // Then filter out discontinued orders
-    if (medication?.order?.action === 'DISCONTINUE') {
-      return false;
-    }
-
-    // Filter out orders that have been stopped (only if stopped in the past)
-    if (medication?.order?.dateStopped && new Date(medication.order.dateStopped) <= new Date()) {
-      return false;
-    }
-
-    // Filter out expired orders (only if expired in the past)
-    if (medication?.order?.autoExpireDate && new Date(medication.order.autoExpireDate) <= new Date()) {
-      return false;
-    }
-
-    return true;
+    return medication?.order?.orderType?.uuid === drugOrderTypeUUID;
   });
 
   if (drugOrders.length === 0) {
@@ -47,7 +43,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
     <div className={styles.medicationRecord}>
       {drugOrders.map(
         (medication, index) =>
-          medication?.order?.dose && (
+          (medication?.order?.dose || medication?.order?.dosingInstructions) && (
             <React.Fragment key={index}>
               <div className={styles.medicationContainer}>
                 <div>
@@ -59,31 +55,65 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     {medication?.order?.doseUnits?.display && (
                       <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
                     )}{' '}
+                    {isPastMedication(medication.order) && (
+                      <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
+                        <Tag type="gray" className={styles.tag}>
+                          {t('discontinued', 'Discontinued')}
+                        </Tag>
+                      </Tooltip>
+                    )}
                   </p>
                   <p className={styles.bodyLong01}>
-                    <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
-                    <span className={styles.dosage}>
-                      {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
-                    </span>{' '}
-                    {medication.order?.route?.display && (
-                      <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
-                    )}
-                    {medication?.order?.frequency?.display?.toLowerCase()} &mdash;{' '}
-                    {!medication?.order?.duration
-                      ? t('orderIndefiniteDuration', 'Indefinite duration')
-                      : t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
-                          duration: medication?.order?.duration,
-                          durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
-                        })}
-                    {medication?.order?.numRefills !== 0 && (
-                      <span>
-                        <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-                        {medication?.order?.numRefills}
-                        {''}
-                      </span>
-                    )}
-                    {medication?.order?.dosingInstructions && (
-                      <span> &mdash; {medication?.order?.dosingInstructions?.toLocaleLowerCase()}</span>
+                    {medication?.order?.dose ? (
+                      <>
+                        <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
+                        <span className={styles.dosage}>
+                          {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
+                        </span>{' '}
+                        {medication.order?.route?.display && (
+                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
+                        )}
+                        {medication?.order?.frequency?.display?.toLowerCase()} &mdash;{' '}
+                        {!medication?.order?.duration
+                          ? t('orderIndefiniteDuration', 'Indefinite duration')
+                          : t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                              duration: medication?.order?.duration,
+                              durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
+                            })}
+                        {medication?.order?.numRefills !== 0 && (
+                          <span>
+                            <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                            {medication?.order?.numRefills}
+                            {''}
+                          </span>
+                        )}
+                        {medication?.order?.dosingInstructions && (
+                          <span> &mdash; {medication?.order?.dosingInstructions?.toLocaleLowerCase()}</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span className={styles.label01}>
+                          {t('dosingInstructions', 'Dosing Instructions').toUpperCase()}{' '}
+                        </span>
+                        <span className={styles.dosage}>{medication?.order?.dosingInstructions}</span>
+                        {medication?.order?.duration && (
+                          <span>
+                            {' '}
+                            &mdash;{' '}
+                            {t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                              duration: medication?.order?.duration,
+                              durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
+                            })}
+                          </span>
+                        )}
+                        {medication?.order?.numRefills !== 0 && (
+                          <span>
+                            <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                            {medication?.order?.numRefills}
+                          </span>
+                        )}
+                      </>
                     )}
                   </p>
                   <p className={styles.bodyLong01}>

@@ -24,10 +24,18 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('And I set the vaccination date to 08/03/2024', async () => {
-    const vaccinationDateInput = page.getByTestId('vaccinationDate');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /day/i }).fill('08');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /month/i }).fill('03');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /year/i }).fill('2024');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /day/i })
+      .fill('08');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /month/i })
+      .fill('03');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /year/i })
+      .fill('2024');
   });
 
   await test.step('And I choose "Hepatitis B vaccination"', async () => {
@@ -87,10 +95,18 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('And I set the vaccination date to 02/01/2025', async () => {
-    const vaccinationDateInput = page.getByTestId('vaccinationDate');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /day/i }).fill('02');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /month/i }).fill('01');
-    await vaccinationDateInput.getByRole('spinbutton', { name: /year/i }).fill('2025');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /day/i })
+      .fill('02');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /month/i })
+      .fill('01');
+    await page
+      .getByLabel(/vaccination date/i)
+      .getByRole('spinbutton', { name: /year/i })
+      .fill('2025');
   });
 
   await test.step('And I set the dose number to 2', async () => {
