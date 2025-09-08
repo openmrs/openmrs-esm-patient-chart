@@ -163,7 +163,13 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
-          <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
+          <h4 className={styles.heading}>{`${
+            isWorkSpaceType(prevWorkSpace) && prevWorkSpace === WORKSPACES.ORDER_BASKET
+              ? label
+                ? t(label)
+                : orderType?.display
+              : t('tests', 'Tests')
+          } (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

@@ -60,11 +60,16 @@ export default function AddLabOrderWorkspace({
     if (orderType) {
       setTitle(
         t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
-          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+          orderTypeDisplay:
+            typeof isWorkSpaceType === 'function' &&
+            isWorkSpaceType(prevWorkSpace) &&
+            prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+              ? 'tests'
+              : orderType.display.toLocaleLowerCase(),
         }),
       );
     }
-  }, [orderType, t, setTitle]);
+  }, [orderType, t, setTitle, isWorkSpaceType, prevWorkSpace]);
 
   const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
