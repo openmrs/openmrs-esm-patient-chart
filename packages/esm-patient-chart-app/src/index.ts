@@ -176,11 +176,6 @@ export const deleteVisitActionButton = getAsyncLifecycle(
   { featureName: 'delete-visit', moduleName },
 );
 
-export const visitDetailsLinkButton = getAsyncLifecycle(
-  () => import('./visit/visit-action-items/visit-details-link.component'),
-  { featureName: 'visit-details-button', moduleName },
-);
-
 export const activeVisitActionsComponent = getAsyncLifecycle(
   () => import('./visit/visits-widget/active-visit-buttons/active-visit-buttons'),
   { featureName: 'active-visit-actions', moduleName },
