@@ -113,15 +113,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       </div>
       <Tabs>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
+            {t('timeline', 'Timeline')}
+          </Tab>
           <Tab
             className={classNames(styles.tab, styles.bodyLong01)}
             id="notes-tab"
             disabled={notes.length <= 0 && config.disableEmptyTabs}
           >
             {t('notes', 'Notes')}
-          </Tab>
-          <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
-            {t('timeline', 'Timeline')}
           </Tab>
           <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
             {t('tests', 'Tests')}
@@ -151,10 +151,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <NotesSummary notes={notes} />
+            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
             <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
