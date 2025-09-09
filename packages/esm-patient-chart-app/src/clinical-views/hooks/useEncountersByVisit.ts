@@ -16,16 +16,11 @@ interface Visit {
   uuid: string;
 }
 
-interface AuditInfo {
-  dateCreated: string;
-}
-
 export interface Encounter {
   uuid: string;
   encounterType: EncounterType;
   encounterProviders: EncounterProvider[];
   encounterDatetime: string;
-  auditInfo: AuditInfo;
   visit: Visit;
 }
 
@@ -35,7 +30,7 @@ interface EncounterResponse {
 
 export function useEncountersByVisit(patientUuid: string, visitUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounterType:(name),encounterProviders:(provider:(display)),encounterDatetime,auditInfo:(dateCreated),visit:(uuid))';
+    'custom:(uuid,encounterType:(name),encounterProviders:(provider:(display)),encounterDatetime,visit:(uuid))';
   const url = `${restBaseUrl}/encounter?patient=${patientUuid}&v=${customRepresentation}`;
   const { data: response, error, isLoading } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
