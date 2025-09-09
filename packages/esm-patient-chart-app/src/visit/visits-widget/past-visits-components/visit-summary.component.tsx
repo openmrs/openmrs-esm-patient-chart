@@ -151,10 +151,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <NotesSummary notes={notes} />
+            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
             <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />

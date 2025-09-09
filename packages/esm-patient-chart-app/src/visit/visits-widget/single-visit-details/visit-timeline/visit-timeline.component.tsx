@@ -64,10 +64,7 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
       </CardHeader>
       <p className={styles.timelineHeader}>
         <span>{t('encounter', 'Encounter')}</span> <span>&middot;</span>
-        <span>{t('provider', 'Provider')}</span> <span>&middot;</span>{' '}
-        <span>
-          {t('timeStarted', 'Time Started')} <span>&mdash;</span> {t('timeCompleted', 'Time Completed')}{' '}
-        </span>
+        <span>{t('provider', 'Provider')}</span> <span>&middot;</span> <span>{t('time', 'Time')}</span>
       </p>
       <div className={styles.timelineEntries}>
         {encounters?.map((encounter) => (
@@ -82,10 +79,6 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
             )}
             <span>&middot;</span>{' '}
             <span>
-              {isToday(encounter.auditInfo?.dateCreated)
-                ? format(new Date(encounter.auditInfo?.dateCreated), 'h:mm a')
-                : format(new Date(encounter.auditInfo?.dateCreated), 'MMM dd, yyyy h:mm a')}{' '}
-              <span>&mdash;</span>{' '}
               {isToday(encounter.encounterDatetime)
                 ? format(new Date(encounter.encounterDatetime), 'h:mm a')
                 : format(encounter.encounterDatetime, 'MMM dd, yyyy h:mm a')}
