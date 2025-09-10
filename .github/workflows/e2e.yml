@@ -28,33 +28,14 @@ jobs:
       - name: 🛠️ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: 💾 Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '20.x'
+          cache: 'yarn'
 
       - name: 📦 Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: 🎭 Get installed Playwright version
-        id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(grep '@playwright/test@' yarn.lock | sed -n 's/.*npm:\([^":]*\).*/\1/p' | head -n 1)" >> $GITHUB_ENV
-
-      - name: 💾 Cache Playwright binaries
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-
       - name: 🎭 Install Playwright Browsers
-        run: npx playwright install --with-deps --no-shell
+        run: npx playwright install --with-deps chromium
 
       - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
@@ -63,7 +44,11 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: 🏗️ Build apps
-        run: yarn turbo run build --color
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 2
+          command: yarn turbo run build --color
 
       - name: 🚀 Run dev server
         run: bash e2e/support/github/run-e2e-docker-env.sh
