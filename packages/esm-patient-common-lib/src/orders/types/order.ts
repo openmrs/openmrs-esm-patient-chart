@@ -208,6 +208,7 @@ export interface OrderType {
 }
 
 export type FulfillerStatus =
+  | 'NEW'
   | 'RECEIVED'
   | 'IN_PROGRESS'
   | 'EXCEPTION'
