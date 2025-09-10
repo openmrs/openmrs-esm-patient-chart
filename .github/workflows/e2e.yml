@@ -35,7 +35,7 @@ jobs:
         run: yarn install --immutable
 
       - name: 🎭 Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: 🚀 Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
