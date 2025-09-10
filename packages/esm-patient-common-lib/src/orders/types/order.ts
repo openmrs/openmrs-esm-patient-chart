@@ -186,7 +186,7 @@ export interface Order {
     changedBy: string;
     dateChanged: string;
   };
-  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONINTUED';
+  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONTINUED';
   fulfillerComment: string;
   specimenSource: string;
   laterality: string;
