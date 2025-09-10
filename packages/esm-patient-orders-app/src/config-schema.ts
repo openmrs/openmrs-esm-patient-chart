@@ -17,6 +17,12 @@ export const configSchema = {
       'Determines whether or not to display a Print button in the Orders details table. If set to true, a Print button gets shown in both the orders table headers. When clicked, this button enables the user to print out the contents of the table',
     _default: false,
   },
+  enableReviewingLabResultsBeforeApproval: {
+    _type: Type.Boolean,
+    _default: false,
+    _description:
+      'Enable reviewing lab results before final approval. When enabled, lab results will be submitted for review before being approved and finalized.',
+  },
   orderTypes: {
     _type: Type.Array,
     _elements: {
@@ -68,4 +74,5 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
+  enableReviewingLabResultsBeforeApproval: boolean;
 }
