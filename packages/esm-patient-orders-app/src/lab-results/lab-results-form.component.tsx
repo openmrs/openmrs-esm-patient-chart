@@ -249,6 +249,9 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               )}
               {order.fulfillerStatus !== 'COMPLETED' && (
                 <div className={orderStyles.orderBasketContainer}>
+                  <div className={styles.heading}>
+                    <span>{t('addOrderTests', 'Add Tests to this order')}</span>
+                  </div>
                   <ExtensionSlot
                     className={classNames(orderStyles.orderBasketSlot, {
                       [orderStyles.orderBasketSlotTablet]: isTablet,

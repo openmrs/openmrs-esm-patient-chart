@@ -4,6 +4,7 @@
   "additionalInstructions": "Additional instructions",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "addResults": "Add results",
+  "addOrderTests" : "Add Tests to this order",
   "allOrders": "All orders",
   "backToOrderBasket": "Back to order basket",
   "cancel": "Cancel",
