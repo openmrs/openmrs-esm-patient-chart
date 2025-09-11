@@ -208,14 +208,12 @@ export interface OrderType {
 }
 
 export type FulfillerStatus =
-  | 'NEW'
   | 'RECEIVED'
   | 'IN_PROGRESS'
   | 'EXCEPTION'
   | 'ON_HOLD'
   | 'DECLINED'
-  | 'COMPLETED'
-  | 'DISCONTINUED';
+  | 'COMPLETED';
 
 export type PostDataPrepFunction = (
   order: OrderBasketItem,
