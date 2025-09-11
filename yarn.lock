@@ -4613,7 +4613,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    linkify-react: "npm:^4.2.0"
+    linkify-react: "npm:^4.3.2"
     linkifyjs: "npm:^4.3.2"
     lodash-es: "npm:^4.17.21"
     react-grid-gallery: "npm:^0.5.6"
@@ -18031,13 +18031,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-react@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "linkify-react@npm:4.2.0"
+"linkify-react@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "linkify-react@npm:4.3.2"
   peerDependencies:
     linkifyjs: ^4.0.0
     react: ">= 15.0.0"
-  checksum: 10/d2e73abaf9ac2eff84f1dfd1bd0546748fa22225d80a40e76610ecfbe49097cc473118bf012c7b20df4966ed2f30c3eccfeb360c396f1c6b1e27906f92f00fbd
+  checksum: 10/cdf3942af0d291db6dc67adccbce381bbe7ce2eb5c2a06b9ee92a19323f540284e1768ef1df369b7aabc5d6894310addddafb8e53226f50d376b36cd4ddbd598
   languageName: node
   linkType: hard
 
