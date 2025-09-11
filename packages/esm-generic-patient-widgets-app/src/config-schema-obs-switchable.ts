@@ -31,12 +31,18 @@ export const configSchemaSwitchable = {
       label: {
         _type: Type.String,
         _default: '',
-        _description: 'The text to display. Defaults to the concept display name.',
+        _description: 'Label to display for the concept. If not provided, the concept display name will be used.',
       },
       color: {
         _type: Type.String,
         _default: 'blue',
         _description: 'The color of the line to display in the line graph.',
+      },
+      graphGroup: {
+        _type: Type.String,
+        _default: '',
+        _description:
+          'For showing multiple lines on the same graph. If multiple obs should be shown together, give them the same `graphGroup`. The value of `graphGroup` will be used as the label (or translation key) in the graph view menu panel.',
       },
       decimalPlaces: {
         _type: Type.Number,
@@ -97,6 +103,7 @@ export interface ConfigObjectSwitchable {
     concept: string;
     label: string;
     color: string;
+    graphGroup: string;
     decimalPlaces: number;
   }>;
   table: {
