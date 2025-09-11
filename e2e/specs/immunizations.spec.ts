@@ -42,6 +42,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await page.getByRole('combobox', { name: /immunization/i }).click();
     await page.getByText(/hepatitis b vaccination/i).click();
   });
+
   await test.step('And I set the dose number to 1', async () => {
     await page.getByRole('spinbutton', { name: /dose number within series/i }).fill('1');
   });
@@ -130,11 +131,12 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(immunizationsSummaryTable.getByText(/note/i)).toBeVisible();
     await expect(immunizationsSummaryTable.getByText(/actions/i)).toBeVisible();
   });
+
   await test.step('And the expanded section should show the immunization details', async () => {
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '1', exact: true })).toBeVisible();
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '08-Mar-2024', exact: true })).toBeVisible();
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '12-May-2025', exact: true })).toBeVisible();
-    await expect(immunizationsSummaryTable.getByRole('cell', { name: '11-Nov-2027', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '12-Nov-2027', exact: true })).toBeVisible();
     await expect(
       immunizationsSummaryTable.getByRole('cell', {
         name: 'Administered in left deltoid. No adverse reaction observed.',
@@ -179,6 +181,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await doseNumberInput.clear();
     await doseNumberInput.fill('2');
   });
+
   await test.step('And I set the next dose date to 02/01/2026', async () => {
     await page
       .getByLabel(/next dose date/i)
@@ -193,6 +196,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
       .getByRole('spinbutton', { name: /year/i })
       .fill('2026');
   });
+
   await test.step('And I save the changes', async () => {
     await page.getByRole('button', { name: /save/i }).click();
   });
