@@ -4400,8 +4400,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 3.3.1-pre.2106
-  resolution: "@openmrs/esm-form-engine-lib@npm:3.3.1-pre.2106"
+  version: 3.3.1-pre.2108
+  resolution: "@openmrs/esm-form-engine-lib@npm:3.3.1-pre.2108"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     classnames: "npm:^2.5.1"
@@ -4418,7 +4418,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     swr: 2.x
-  checksum: 10/f611fb64fe6f39a15f162ad10a50e0363865c6d559fa97e75f515f310b6347d7e2fbb11ab2a52ea0e1c689072718413654f88c15fc581e00fc2e8d73a4124e15
+  checksum: 10/f02c8c32b6a89287a7cb048870ef0528f5a9b067da0bf5b86baff61c3311a577793c9acd5867c8c283320df76780677b3b9fe8f277d89be05cc05e2ac087013c
   languageName: node
   linkType: hard
 
@@ -4613,7 +4613,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    linkify-react: "npm:^4.2.0"
+    linkify-react: "npm:^4.3.2"
     linkifyjs: "npm:^4.3.2"
     lodash-es: "npm:^4.17.21"
     react-grid-gallery: "npm:^0.5.6"
@@ -18031,13 +18031,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-react@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "linkify-react@npm:4.2.0"
+"linkify-react@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "linkify-react@npm:4.3.2"
   peerDependencies:
     linkifyjs: ^4.0.0
     react: ">= 15.0.0"
-  checksum: 10/d2e73abaf9ac2eff84f1dfd1bd0546748fa22225d80a40e76610ecfbe49097cc473118bf012c7b20df4966ed2f30c3eccfeb360c396f1c6b1e27906f92f00fbd
+  checksum: 10/cdf3942af0d291db6dc67adccbce381bbe7ce2eb5c2a06b9ee92a19323f540284e1768ef1df369b7aabc5d6894310addddafb8e53226f50d376b36cd4ddbd598
   languageName: node
   linkType: hard
 
