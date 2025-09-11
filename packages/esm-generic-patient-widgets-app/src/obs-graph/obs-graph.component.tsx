@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
@@ -62,7 +62,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     [config.data, obsForConcepts],
   );
 
-  const [selectedMenuItem, setSelectedMenuItem] = React.useState<ConceptGroupDescriptor>(groupedConfigData[0]);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<ConceptGroupDescriptor>(groupedConfigData[0]);
 
   const chartDataForConcepts = useCallback(
     (concepts: ConfigObjectSwitchable['data']) => {
