@@ -5,7 +5,14 @@ import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
+import {
+  restBaseUrl,
+  showSnackbar,
+  useAbortController,
+  useConfig,
+  useLayoutType,
+  showModal,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
@@ -23,6 +30,7 @@ import { createLabResultsFormSchema } from './lab-results-schema.resource';
 
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import { type ConfigObject } from '../config-schema';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
@@ -41,6 +49,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   invalidateLabOrders,
 }) => {
   const { t } = useTranslation();
+  const { enableReviewingLabResultsBeforeApproval } = useConfig<ConfigObject>();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
@@ -57,6 +66,13 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }, [mutate, order.patient.uuid]);
 
+  const launchApprovalModal = useCallback(() => {
+    const dispose = showModal('approval-lab-results-modal', {
+      closeModal: () => dispose(),
+      order,
+    });
+  }, [order]);
+
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
@@ -69,7 +85,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   });
 
   useEffect(() => {
-    if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+    // Determine which statuses to check based on the config
+    const validStatuses = enableReviewingLabResultsBeforeApproval ? ['COMPLETED', 'ON_HOLD'] : ['COMPLETED'];
+
+    if (concept && completeLabResult && validStatuses.includes(order?.fulfillerStatus)) {
       if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
         setValue(concept.uuid, completeLabResult.value.uuid);
       } else if (isNumeric(concept) && completeLabResult?.value) {
@@ -91,7 +110,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         });
       }
     }
-  }, [concept, completeLabResult, order, setValue]);
+  }, [concept, completeLabResult, order, setValue, enableReviewingLabResultsBeforeApproval]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
@@ -131,78 +150,178 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     };
 
     // Handle update operation for completed lab order results
-    if (order.fulfillerStatus === 'COMPLETED') {
-      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-        return updateObservation(obs?.uuid, { value });
-      });
-      const updateResults = await Promise.allSettled(updateTasks);
-      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-        if (curr.status === 'rejected') {
-          return [...prev, Object.keys(formValues).at(index)];
-        }
-        return prev;
-      }, []);
+    if (enableReviewingLabResultsBeforeApproval) {
+      // New workflow with approval process
+      if (order.fulfillerStatus === 'COMPLETED' || order.fulfillerStatus === 'ON_HOLD') {
+        try {
+          const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+            const obs =
+              completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+            return updateObservation(obs?.uuid, { value });
+          });
 
-      if (failedObsconceptUuids.length) {
-        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
-      } else {
+          const updateResults = await Promise.allSettled(updateTasks);
+
+          const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+            if (curr.status === 'rejected') {
+              return [...prev, Object.keys(formValues).at(index)];
+            }
+            return prev;
+          }, []);
+
+          if (failedObsconceptUuids.length) {
+            const errorMessage = 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', ');
+            showNotification('error', errorMessage);
+            return;
+          }
+
+          const resultsStatusPayload = {
+            fulfillerStatus: 'COMPLETED',
+            fulfillerComment: 'Test Results Entered',
+          };
+
+          await updateOrderResult(order.uuid, order.encounter.uuid, null, resultsStatusPayload, null, abortController);
+
+          await Promise.all([mutateResults(), mutateOrderData()]);
+
+          if (invalidateLabOrders) {
+            invalidateLabOrders();
+          }
+          launchApprovalModal();
+
+          closeWorkspaceWithSavedChanges();
+          showNotification(
+            'success',
+            t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+              orderNumber: order?.orderNumber,
+            }),
+          );
+        } catch (err) {
+          showNotification('error', err?.message || 'An error occurred while updating lab results');
+        } finally {
+          setShowEmptyFormErrorNotification(false);
+        }
+        return;
+      }
+
+      try {
+        const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+        const orderDiscontinuationPayload = {
+          previousOrder: order.uuid,
+          type: 'testorder',
+          action: 'DISCONTINUE',
+          careSetting: order.careSetting.uuid,
+          encounter: order.encounter.uuid,
+          patient: order.patient.uuid,
+          concept: order.concept.uuid,
+          orderer: order.orderer,
+        };
+        const resultsStatusPayload = {
+          fulfillerStatus: 'ON_HOLD',
+          fulfillerComment: 'Test Results Modified, pending approval',
+        };
+
+        await updateOrderResult(
+          order.uuid,
+          order.encounter.uuid,
+          obsPayload,
+          resultsStatusPayload,
+          orderDiscontinuationPayload,
+          abortController,
+        );
+
+        await Promise.all([mutateOrderData(), mutateResults()]);
+
+        if (invalidateLabOrders) {
+          invalidateLabOrders();
+        }
+
         closeWorkspaceWithSavedChanges();
+
         showNotification(
           'success',
           t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
             orderNumber: order?.orderNumber,
           }),
         );
+      } catch (err) {
+        showNotification('error', err?.message || 'An error occurred while saving lab results');
+      } finally {
+        setShowEmptyFormErrorNotification(false);
       }
-      mutateResults();
-      return setShowEmptyFormErrorNotification(false);
-    }
+    } else {
+      // Original workflow without approval process
+      if (order.fulfillerStatus === 'COMPLETED') {
+        const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+          const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+          return updateObservation(obs?.uuid, { value });
+        });
+        const updateResults = await Promise.allSettled(updateTasks);
+        const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+          if (curr.status === 'rejected') {
+            return [...prev, Object.keys(formValues).at(index)];
+          }
+          return prev;
+        }, []);
 
-    // Handle Creation logic
+        if (failedObsconceptUuids.length) {
+          showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+        } else {
+          closeWorkspaceWithSavedChanges();
+          showNotification(
+            'success',
+            t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+              orderNumber: order?.orderNumber,
+            }),
+          );
+        }
+        mutateResults();
+        return setShowEmptyFormErrorNotification(false);
+      }
 
-    // Set the observation status to 'FINAL' as we're not capturing it in the form
-    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
-    const orderDiscontinuationPayload = {
-      previousOrder: order.uuid,
-      type: 'testorder',
-      action: 'DISCONTINUE',
-      careSetting: order.careSetting.uuid,
-      encounter: order.encounter.uuid,
-      patient: order.patient.uuid,
-      concept: order.concept.uuid,
-      orderer: order.orderer,
-    };
-    const resultsStatusPayload = {
-      fulfillerStatus: 'COMPLETED',
-      fulfillerComment: 'Test Results Entered',
-    };
+      // Handle Creation logic (original workflow - directly to COMPLETED)
+      const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+      const orderDiscontinuationPayload = {
+        previousOrder: order.uuid,
+        type: 'testorder',
+        action: 'DISCONTINUE',
+        careSetting: order.careSetting.uuid,
+        encounter: order.encounter.uuid,
+        patient: order.patient.uuid,
+        concept: order.concept.uuid,
+        orderer: order.orderer,
+      };
+      const resultsStatusPayload = {
+        fulfillerStatus: 'COMPLETED',
+        fulfillerComment: 'Test Results Entered',
+      };
 
-    try {
-      await updateOrderResult(
-        order.uuid,
-        order.encounter.uuid,
-        obsPayload,
-        resultsStatusPayload,
-        orderDiscontinuationPayload,
-        abortController,
-      );
+      try {
+        await updateOrderResult(
+          order.uuid,
+          order.encounter.uuid,
+          obsPayload,
+          resultsStatusPayload,
+          orderDiscontinuationPayload,
+          abortController,
+        );
 
-      closeWorkspaceWithSavedChanges();
-      mutateOrderData();
-      mutateResults();
-      invalidateLabOrders?.();
+        closeWorkspaceWithSavedChanges();
+        mutateOrderData();
+        mutateResults();
+        invalidateLabOrders?.();
 
-      showNotification(
-        'success',
-        t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-          orderNumber: order?.orderNumber,
-        }),
-      );
-    } catch (err) {
-      showNotification('error', err?.message);
-    } finally {
-      setShowEmptyFormErrorNotification(false);
+        showNotification(
+          'success',
+          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+            orderNumber: order?.orderNumber,
+          }),
+        );
+      } catch (err) {
+        showNotification('error', err?.message);
+      } finally {
+        setShowEmptyFormErrorNotification(false);
+      }
     }
   };
 
