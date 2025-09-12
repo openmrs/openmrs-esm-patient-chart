@@ -79,9 +79,9 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
             )}
             <span>&middot;</span>{' '}
             <span>
-              {isToday(encounter.encounterDatetime)
-                ? format(new Date(encounter.encounterDatetime), 'h:mm a')
-                : format(encounter.encounterDatetime, 'MMM dd, yyyy h:mm a')}
+              {formatDate(new Date(encounter.encounterDatetime), {
+                time: isToday(encounter.encounterDatetime) ? 'for today' : true,
+              })}
             </span>
           </p>
         ))}
