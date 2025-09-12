@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
@@ -34,9 +34,17 @@ export function useEncountersByVisit(patientUuid: string, visitUuid: string) {
   const url = `${restBaseUrl}/encounter?patient=${patientUuid}&v=${customRepresentation}`;
   const { data: response, error, isLoading } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
+  const sortedEncounters = useMemo(() => {
+    if (!response?.data.results) return [];
+
+    return response.data.results
+      .filter((encounter) => encounter.visit?.uuid === visitUuid)
+      .sort((a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime());
+  }, [response?.data.results, visitUuid]);
+
   return {
     isLoading,
     error,
-    encounters: response?.data.results.filter((encounter) => encounter.visit?.uuid === visitUuid),
+    encounters: sortedEncounters,
   };
 }
