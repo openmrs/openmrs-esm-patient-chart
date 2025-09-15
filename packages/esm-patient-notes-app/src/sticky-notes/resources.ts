@@ -13,20 +13,25 @@ export function useStickyNotes(patientUuid: string) {
   const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
   const params = new URLSearchParams();
   params.set('subject:Patient', patientUuid);
-  params.set('patient', patientUuid);
   params.set('code', stickyNoteConceptUuid);
   const url = stickyNoteConceptUuid ? `${fhirBaseUrl}/Observation?${params.toString()}` : null;
-  const { data, isLoading, error, isValidating } = useOpenmrsSWR<fhir.Observation>(url);
+  const {
+    data,
+    isLoading: isLoadingStickyNotes,
+    error: errorFetchingStickyNotes,
+    isValidating: isValidatingStickyNotes,
+    mutate: mutateStickyNotes,
+  } = useOpenmrsSWR<fhir.Observation>(url);
 
   useEffect(() => {
-    if (!isLoading && error) {
+    if (!isLoadingStickyNotes && errorFetchingStickyNotes) {
       showToast({
         title: t('stickyNoteError', 'Error fetching sticky notes'),
-        description: error?.message,
+        description: errorFetchingStickyNotes?.message,
         kind: 'error',
       });
     }
-  }, [isLoading, error, t]);
+  }, [isLoadingStickyNotes, errorFetchingStickyNotes, t]);
 
   useEffect(() => {
     if (!stickyNoteConceptUuid) {
@@ -41,11 +46,12 @@ export function useStickyNotes(patientUuid: string) {
   const results = useMemo(
     () => ({
       data: data?.data,
-      isLoading,
-      error,
-      isValidating,
+      isLoadingStickyNotes,
+      errorFetchingStickyNotes,
+      isValidatingStickyNotes,
+      mutateStickyNotes,
     }),
-    [data, isLoading, error, isValidating],
+    [data, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes],
   );
 
   return results;

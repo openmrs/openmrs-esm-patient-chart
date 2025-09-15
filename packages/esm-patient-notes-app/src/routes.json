@@ -28,5 +28,11 @@
       "type": "visit-note",
       "canHide": true
     }
+  ],
+  "modals": [
+    {
+      "name": "delete-sticky-note-confirmation-modal",
+      "component": "deleteStickyNoteConfirmationModal"
+    }
   ]
 }
