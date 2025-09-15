@@ -51,8 +51,9 @@
 }
 
 .overflowMenu {
+  background-color: $ui-04;
   &:hover {
-    background-color: hsla(0, 0%, 55%, 0.12) !important;
+    background-color: $ui-03 !important;
   }
 
   svg {
