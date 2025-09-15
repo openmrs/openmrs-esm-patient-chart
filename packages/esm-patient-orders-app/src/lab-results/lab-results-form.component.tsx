@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack, TextArea } from '@carbon/react';
 import classNames from 'classnames';
-import { type Control, useForm } from 'react-hook-form';
+import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,6 +35,10 @@ import { type ConfigObject } from '../config-schema';
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
   invalidateLabOrders?: () => void;
+}
+
+interface FormData extends Record<string, ObservationValue> {
+  fulfillerComment?: string;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
@@ -78,14 +82,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     formState: { errors, isDirty, isSubmitting },
     setValue,
     handleSubmit,
-  } = useForm<Record<string, ObservationValue>>({
-    defaultValues: {} as Record<string, ObservationValue>,
+    watch,
+  } = useForm<FormData>({
+    defaultValues: {} as FormData,
     resolver: zodResolver(schema),
     mode: 'all',
   });
 
+  const commentValue = watch('fulfillerComment') || '';
+
   useEffect(() => {
-    // Determine which statuses to check based on the config
     const validStatuses = enableReviewingLabResultsBeforeApproval ? ['COMPLETED', 'ON_HOLD'] : ['COMPLETED'];
 
     if (concept && completeLabResult && validStatuses.includes(order?.fulfillerStatus)) {
@@ -110,6 +116,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         });
       }
     }
+
+    if (order?.fulfillerComment) {
+      setValue('fulfillerComment', order.fulfillerComment);
+    }
   }, [concept, completeLabResult, order, setValue, enableReviewingLabResultsBeforeApproval]);
 
   useEffect(() => {
@@ -129,11 +139,14 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }
 
-  const saveLabResults = async (formValues: Record<string, unknown>) => {
-    const isEmptyForm = Object.values(formValues).every(
+  const saveLabResults = async (formValues: FormData) => {
+    const { fulfillerComment, ...labValues } = formValues;
+
+    const isEmptyLabForm = Object.values(labValues).every(
       (value) => value === '' || value === null || value === undefined,
     );
-    if (isEmptyForm) {
+
+    if (isEmptyLabForm) {
       setShowEmptyFormErrorNotification(true);
       return;
     }
@@ -149,12 +162,12 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       });
     };
 
-    // Handle update operation for completed lab order results
+    const commentText = fulfillerComment?.trim() || '';
+
     if (enableReviewingLabResultsBeforeApproval) {
-      // New workflow with approval process
       if (order.fulfillerStatus === 'COMPLETED' || order.fulfillerStatus === 'ON_HOLD') {
         try {
-          const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+          const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
             const obs =
               completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
             return updateObservation(obs?.uuid, { value });
@@ -164,7 +177,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
           const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
             if (curr.status === 'rejected') {
-              return [...prev, Object.keys(formValues).at(index)];
+              return [...prev, Object.keys(labValues).at(index)];
             }
             return prev;
           }, []);
@@ -177,7 +190,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
           const resultsStatusPayload = {
             fulfillerStatus: 'COMPLETED',
-            fulfillerComment: 'Test Results Entered',
+            fulfillerComment: commentText || 'Test Results Entered',
           };
 
           await updateOrderResult(order.uuid, order.encounter.uuid, null, resultsStatusPayload, null, abortController);
@@ -205,7 +218,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       }
 
       try {
-        const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+        const obsPayload = createObservationPayload(concept, order, labValues, 'FINAL');
         const orderDiscontinuationPayload = {
           previousOrder: order.uuid,
           type: 'testorder',
@@ -218,7 +231,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         };
         const resultsStatusPayload = {
           fulfillerStatus: 'ON_HOLD',
-          fulfillerComment: 'Test Results Modified, pending approval',
+          fulfillerComment: commentText || 'Test Results Modified, pending approval',
         };
 
         await updateOrderResult(
@@ -250,23 +263,40 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         setShowEmptyFormErrorNotification(false);
       }
     } else {
-      // Original workflow without approval process
       if (order.fulfillerStatus === 'COMPLETED') {
-        const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-          const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-          return updateObservation(obs?.uuid, { value });
-        });
-        const updateResults = await Promise.allSettled(updateTasks);
-        const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-          if (curr.status === 'rejected') {
-            return [...prev, Object.keys(formValues).at(index)];
-          }
-          return prev;
-        }, []);
+        try {
+          const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
+            const obs =
+              completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+            return updateObservation(obs?.uuid, { value });
+          });
 
-        if (failedObsconceptUuids.length) {
-          showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
-        } else {
+          const updateResults = await Promise.allSettled(updateTasks);
+          const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+            if (curr.status === 'rejected') {
+              return [...prev, Object.keys(labValues).at(index)];
+            }
+            return prev;
+          }, []);
+
+          if (failedObsconceptUuids.length) {
+            showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+            return;
+          }
+
+          const resultsStatusPayload = {
+            fulfillerStatus: 'COMPLETED',
+            fulfillerComment: commentText,
+          };
+
+          await updateOrderResult(order.uuid, order.encounter.uuid, null, resultsStatusPayload, null, abortController);
+
+          await Promise.all([mutateResults(), mutateOrderData()]);
+
+          if (invalidateLabOrders) {
+            invalidateLabOrders();
+          }
+
           closeWorkspaceWithSavedChanges();
           showNotification(
             'success',
@@ -274,29 +304,31 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               orderNumber: order?.orderNumber,
             }),
           );
+        } catch (err) {
+          showNotification('error', err?.message || 'An error occurred while updating lab results');
+        } finally {
+          setShowEmptyFormErrorNotification(false);
         }
-        mutateResults();
-        return setShowEmptyFormErrorNotification(false);
+        return;
       }
 
-      // Handle Creation logic (original workflow - directly to COMPLETED)
-      const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
-      const orderDiscontinuationPayload = {
-        previousOrder: order.uuid,
-        type: 'testorder',
-        action: 'DISCONTINUE',
-        careSetting: order.careSetting.uuid,
-        encounter: order.encounter.uuid,
-        patient: order.patient.uuid,
-        concept: order.concept.uuid,
-        orderer: order.orderer,
-      };
-      const resultsStatusPayload = {
-        fulfillerStatus: 'COMPLETED',
-        fulfillerComment: 'Test Results Entered',
-      };
-
       try {
+        const obsPayload = createObservationPayload(concept, order, labValues, 'FINAL');
+        const orderDiscontinuationPayload = {
+          previousOrder: order.uuid,
+          type: 'testorder',
+          action: 'DISCONTINUE',
+          careSetting: order.careSetting.uuid,
+          encounter: order.encounter.uuid,
+          patient: order.patient.uuid,
+          concept: order.concept.uuid,
+          orderer: order.orderer,
+        };
+        const resultsStatusPayload = {
+          fulfillerStatus: 'COMPLETED',
+          fulfillerComment: commentText || 'Test Results Entered',
+        };
+
         await updateOrderResult(
           order.uuid,
           order.encounter.uuid,
@@ -306,10 +338,13 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           abortController,
         );
 
+        await Promise.all([mutateOrderData(), mutateResults()]);
+
+        if (invalidateLabOrders) {
+          invalidateLabOrders();
+        }
+
         closeWorkspaceWithSavedChanges();
-        mutateOrderData();
-        mutateResults();
-        invalidateLabOrders?.();
 
         showNotification(
           'success',
@@ -318,7 +353,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }),
         );
       } catch (err) {
-        showNotification('error', err?.message);
+        showNotification('error', err?.message || 'An error occurred while saving lab results');
       } finally {
         setShowEmptyFormErrorNotification(false);
       }
@@ -340,6 +375,27 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
               ) : (
                 <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
               )}
+              <div className={styles.commentsSection}>
+                <Controller
+                  control={control}
+                  name="fulfillerComment"
+                  render={({ field, fieldState: { error } }) => (
+                    <TextArea
+                      {...field}
+                      id="fulfillerComment"
+                      labelText={t('comments', 'Comments')}
+                      placeholder={t('addCommentsOptional', 'Add comments (optional)...')}
+                      helperText={`${t(
+                        'commentsHelperText',
+                        'Enter any additional notes or observations about the test results',
+                      )} (${commentValue.length}/500)`}
+                      invalid={Boolean(error?.message)}
+                      invalidText={error?.message}
+                      rows={3}
+                    />
+                  )}
+                />
+              </div>
             </Stack>
           )}
           {showEmptyFormErrorNotification && (
