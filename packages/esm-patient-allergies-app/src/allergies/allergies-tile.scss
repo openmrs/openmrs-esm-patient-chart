@@ -1,4 +1,5 @@
 @use '@carbon/type';
+@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label {
@@ -14,4 +15,8 @@
 
 .value {
   @include type.type-style('body-compact-01');
+}
+
+.allergiesTag {
+  background-color: colors.$orange-20;
 }
