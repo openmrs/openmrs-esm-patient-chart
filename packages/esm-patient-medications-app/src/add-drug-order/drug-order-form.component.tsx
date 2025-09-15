@@ -432,6 +432,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             </div>
           )}
 
+          {/* <h1>{t('allergies', 'Allergies')}</h1> */}
+          <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+
           <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
           <div ref={medicationInfoHeaderRef}>
             <MedicationInfoHeader

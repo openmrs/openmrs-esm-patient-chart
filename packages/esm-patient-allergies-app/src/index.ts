@@ -12,6 +12,7 @@ import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import allergiesDetailedSummaryComponent from './allergies/allergies-detailed-summary.component';
 import allergyTileComponent from './allergies/allergies-tile.component';
+import allergyListComponent from './allergies/allergies-list.component';
 
 const moduleName = '@openmrs/esm-patient-allergies-app';
 
@@ -58,6 +59,8 @@ export const allergyFormWorkspace = getAsyncLifecycle(
 );
 
 export const allergyTile = getSyncLifecycle(allergyTileComponent, options);
+
+export const allergyList = getSyncLifecycle(allergyListComponent, options);
 
 export const allergyDeleteConfirmationDialog = getAsyncLifecycle(
   () => import('./allergies/delete-allergy.modal'),
