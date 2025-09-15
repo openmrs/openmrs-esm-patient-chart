@@ -8,9 +8,15 @@ export const configSchema = {
     _description: 'The concept class to use for the diagnoses',
   },
   visitNoteConfig: notesConfigSchema,
+  stickyNoteConceptUuid: {
+    _type: Type.ConceptUuid,
+    _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _description: 'The concept UUID being used to map sticky notes data',
+  },
 };
 
 export interface ConfigObject {
   diagnosisConceptClass: string;
   visitNoteConfig: VisitNoteConfigObject;
+  stickyNoteConceptUuid: string;
 }
