@@ -35,5 +35,20 @@
   "visitNotes": "Notas de visita",
   "visitNoteSaved": "Nota de visita guardada",
   "visitNoteSaveError": "Error al guardar la nota de visita",
-  "visitNoteWorkspaceTitle": "Nota de la Visita"
+  "visitNoteWorkspaceTitle": "Nota de la Visita",
+  "stickyNotes": "Notas adhesivas",
+  "editStickyNote": "Editar Nota Adhesiva",
+  "newStickyNote": "Nueva Nota Adhesiva",
+  "noteContent": "Contenido de la Nota",
+  "enterNotePlaceholder": "Ingresa tu nota adhesiva aquí...",
+  "characters": "caracteres",
+  "stickyNoteRequired": "Por favor ingresa una nota antes de guardar",
+  "stickyNoteSaved": "Nota adhesiva guardada",
+  "stickyNoteSavedSuccess": "Tu nota adhesiva ha sido guardada exitosamente",
+  "stickyNoteSaveError": "Error al guardar nota adhesiva",
+  "unexpectedError": "Ocurrió un error inesperado",
+  "createdBy": "Creado por",
+  "createdOn": "Creado el",
+  "lastUpdatedBy": "Última actualización por",
+  "lastUpdatedOn": "Última actualización el"
 }

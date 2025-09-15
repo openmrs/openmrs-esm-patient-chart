@@ -8,6 +8,7 @@ import {
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
 } from '@openmrs/esm-framework';
+import { NoteIcon } from '../../../esm-patient-notes-app/src/sticky-note';
 import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
@@ -70,6 +71,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
                 patientUuid={patientUuid}
               />
             ) : null}
+          </div>
+          <div className={styles.bannerInformationSlot}>
+            <NoteIcon patient={patient} patientUuid={patientUuid} />
           </div>
           {!showDetailsButtonBelowHeader ? (
             <PatientBannerToggleContactDetailsButton

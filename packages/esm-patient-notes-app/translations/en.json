@@ -35,5 +35,20 @@
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved",
   "visitNoteSaveError": "Error saving visit note",
-  "visitNoteWorkspaceTitle": "Visit Note"
+  "visitNoteWorkspaceTitle": "Visit Note",
+  "stickyNotes": "Sticky notes",
+  "editStickyNote": "Edit Sticky Note",
+  "newStickyNote": "New Sticky Note",
+  "noteContent": "Note Content",
+  "enterNotePlaceholder": "Enter your sticky note here...",
+  "characters": "characters",
+  "stickyNoteRequired": "Please enter a note before saving",
+  "stickyNoteSaved": "Sticky note saved",
+  "stickyNoteSavedSuccess": "Your sticky note has been saved successfully",
+  "stickyNoteSaveError": "Error saving sticky note",
+  "unexpectedError": "An unexpected error occurred",
+  "createdBy": "Created by",
+  "createdOn": "Created on",
+  "lastUpdatedBy": "Last updated by",
+  "lastUpdatedOn": "Last updated on"
 }

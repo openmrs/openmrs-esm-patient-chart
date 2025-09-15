@@ -35,5 +35,20 @@
   "visitNotes": "Notes visite",
   "visitNoteSaved": "Note de la visite enregistrée",
   "visitNoteSaveError": "Erreur en enregistrant la note de visite",
-  "visitNoteWorkspaceTitle": "Note de visite"
+  "visitNoteWorkspaceTitle": "Note de visite",
+  "stickyNotes": "Notes autocollantes",
+  "editStickyNote": "Modifier la Note Autocollante",
+  "newStickyNote": "Nouvelle Note Autocollante",
+  "noteContent": "Contenu de la Note",
+  "enterNotePlaceholder": "Entrez votre note autocollante ici...",
+  "characters": "caractères",
+  "stickyNoteRequired": "Veuillez entrer une note avant de sauvegarder",
+  "stickyNoteSaved": "Note autocollante sauvegardée",
+  "stickyNoteSavedSuccess": "Votre note autocollante a été sauvegardée avec succès",
+  "stickyNoteSaveError": "Erreur lors de la sauvegarde de la note autocollante",
+  "unexpectedError": "Une erreur inattendue s'est produite",
+  "createdBy": "Créé par",
+  "createdOn": "Créé le",
+  "lastUpdatedBy": "Dernière mise à jour par",
+  "lastUpdatedOn": "Dernière mise à jour le"
 }
