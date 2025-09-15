@@ -405,6 +405,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
+          <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         </div>
       )}
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
@@ -419,20 +420,21 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             />
           )}
           {!isTablet && (
-            <div className={styles.backButton}>
-              <Button
-                kind="ghost"
-                renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-                iconDescription="Return to order basket"
-                size="sm"
-                onClick={onCancel}
-              >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-              </Button>
+            <div>
+              <div className={styles.backButton}>
+                <Button
+                  kind="ghost"
+                  renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+                  iconDescription="Return to order basket"
+                  size="sm"
+                  onClick={onCancel}
+                >
+                  <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+                </Button>
+              </div>
+              <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
             </div>
           )}
-
-          <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
 
           <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
           <div ref={medicationInfoHeaderRef}>
