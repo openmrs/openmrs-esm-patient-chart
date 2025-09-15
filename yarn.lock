@@ -4918,6 +4918,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-patient-procedures-app@workspace:packages/esm-patient-procedures-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-procedures-app@workspace:packages/esm-patient-procedures-app"
+  dependencies:
+    "@carbon/react": "npm:^1.83.0"
+    "@hookform/resolvers": "npm:^3.3.1"
+    "@openmrs/esm-patient-common-lib": "workspace:*"
+    lodash-es: "npm:^4.17.21"
+    react-hook-form: "npm:^7.46.2"
+    webpack: "npm:^5.99.9"
+    zod: "npm:^3.23.8"
+  peerDependencies:
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-patient-programs-app@workspace:packages/esm-patient-programs-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-programs-app@workspace:packages/esm-patient-programs-app"
