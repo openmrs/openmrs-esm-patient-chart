@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Document } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { useStickyNotes } from './use-sticky-notes';
+import { DocumentIcon, useConfig, showSnackbar } from '@openmrs/esm-framework';
+import { useStickyNotes, createStickyNote, updateStickyNote } from './use-sticky-notes';
+import { type ConfigObject } from '../config-schema';
 import StickyNoteModal from './sticky-note-modal.component';
 import styles from './note-icon.scss';
 
@@ -15,25 +16,39 @@ const NoteIcon: React.FC<NoteIconProps> = ({ patient, patientUuid }) => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { stickyNote, isLoading, fetchStickyNote, saveStickyNote, updateStickyNote } = useStickyNotes(patientUuid);
+  const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
+  const { stickyNote, isLoadingStickyNotes, mutateStickyNotes } = useStickyNotes(patientUuid);
 
-  useEffect(() => {
-    fetchStickyNote();
-  }, [fetchStickyNote]);
-
-  const handleNoteClick = async () => {
-    // Fetch the latest sticky note data before opening modal
-    await fetchStickyNote();
+  const handleNoteClick = () => {
     setIsModalOpen(true);
   };
 
   const handleSave = async (note: string) => {
-    if (stickyNote) {
-      // Update existing note
-      await updateStickyNote(note);
-    } else {
-      // Create new note
-      await saveStickyNote(note);
+    try {
+      if (stickyNote?.uuid) {
+        // Update existing note
+        await updateStickyNote(stickyNote.uuid, note);
+      } else {
+        // Create new note
+        await createStickyNote(patientUuid, note, stickyNoteConceptUuid);
+      }
+
+      // Refresh the data
+      mutateStickyNotes();
+
+      showSnackbar({
+        kind: 'success',
+        title: t('stickyNoteSaved', 'Sticky note saved'),
+        subtitle: t('stickyNoteSavedSuccess', 'Your sticky note has been saved successfully'),
+        isLowContrast: true,
+      });
+    } catch (error) {
+      showSnackbar({
+        kind: 'error',
+        title: t('stickyNoteSaveError', 'Error saving sticky note'),
+        subtitle: error.message || t('unexpectedError', 'An unexpected error occurred'),
+        isLowContrast: false,
+      });
     }
   };
 
@@ -48,14 +63,14 @@ const NoteIcon: React.FC<NoteIconProps> = ({ patient, patientUuid }) => {
           <Button
             kind="ghost"
             size="sm"
-            renderIcon={Document}
+            renderIcon={DocumentIcon}
             onClick={handleNoteClick}
             className={styles.noteButton}
-            disabled={isLoading}
+            disabled={isLoadingStickyNotes}
           >
             {t('stickyNotes', 'Sticky notes')}
           </Button>
-          {stickyNote?.note && !isLoading && <div className={styles.notificationBadge}>1</div>}
+          {stickyNote?.note && !isLoadingStickyNotes && <div className={styles.notificationBadge}>1</div>}
         </div>
       </div>
 

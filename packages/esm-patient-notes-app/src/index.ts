@@ -41,3 +41,5 @@ export const deleteStickyNoteConfirmationModal = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const noteIconComponent = getAsyncLifecycle(() => import('./sticky-note/note-icon.component'), options);

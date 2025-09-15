@@ -1,24 +1,7 @@
-import { useState, useCallback } from 'react';
-import { openmrsFetch, useSession } from '@openmrs/esm-framework';
-
-interface OpenMRSObsData {
-  uuid: string;
-  display: string;
-  value: string;
-  obsDatetime: string;
-  auditInfo: {
-    creator: {
-      uuid: string;
-      display: string;
-    };
-    dateCreated: string;
-    changedBy?: {
-      uuid: string;
-      display: string;
-    } | null;
-    dateChanged?: string | null;
-  };
-}
+import { useCallback, useMemo } from 'react';
+import { fhirBaseUrl, openmrsFetch, showToast, useConfig, useOpenmrsSWR } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
+import { useTranslation } from 'react-i18next';
 
 interface StickyNoteData {
   uuid?: string;
@@ -36,167 +19,128 @@ interface StickyNoteData {
   };
 }
 
-const STICKY_NOTE_CONCEPT_UUID = '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
 export function useStickyNotes(patientUuid: string) {
-  const [stickyNote, setStickyNote] = useState<StickyNoteData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useSession();
+  const { t } = useTranslation();
+  const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
+  const params = new URLSearchParams();
+  params.set('subject:Patient', patientUuid);
+  params.set('code', stickyNoteConceptUuid);
+  const url = stickyNoteConceptUuid ? `${fhirBaseUrl}/Observation?${params.toString()}` : null;
 
-  const fetchStickyNote = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await openmrsFetch(
-        `/ws/rest/v1/obs?concept=${STICKY_NOTE_CONCEPT_UUID}&patient=${patientUuid}&v=full`,
-      );
+  const {
+    data,
+    isLoading: isLoadingStickyNotes,
+    error: errorFetchingStickyNotes,
+    isValidating: isValidatingStickyNotes,
+    mutate: mutateStickyNotes,
+  } = useOpenmrsSWR<fhir.Bundle>(url);
 
-      if (response.data?.results?.length > 0) {
-        const obsData: OpenMRSObsData = response.data.results[0];
+  // Show error toast if there's an error fetching sticky notes
+  if (!isLoadingStickyNotes && errorFetchingStickyNotes) {
+    showToast({
+      title: t('stickyNoteError', 'Error fetching sticky notes'),
+      description: errorFetchingStickyNotes?.message,
+      kind: 'error',
+    });
+  }
 
-        const noteData: StickyNoteData = {
-          uuid: obsData.uuid,
-          patientUuid,
-          note: obsData.value,
-          createdAt: obsData.auditInfo.dateCreated,
-          updatedAt: obsData.auditInfo.dateChanged || obsData.auditInfo.dateCreated,
-          createdBy: obsData.auditInfo.creator,
-          updatedBy: obsData.auditInfo.changedBy || obsData.auditInfo.creator,
-        };
+  // Show error toast if concept UUID is not set
+  if (!stickyNoteConceptUuid) {
+    showToast({
+      title: t('stickyNoteError', 'Error fetching sticky notes'),
+      description: t('stickyNoteConceptUuidNotSet', 'Sticky note concept UUID not set'),
+      kind: 'error',
+    });
+  }
 
-        setStickyNote(noteData);
-        return noteData;
-      } else {
-        setStickyNote(null);
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching sticky note:', error);
+  // Transform FHIR data to our internal format
+  const stickyNote = useMemo(() => {
+    if (!data?.data?.entry?.length) {
       return null;
-    } finally {
-      setIsLoading(false);
     }
-  }, [patientUuid]);
 
-  const saveStickyNote = useCallback(
-    async (note: string) => {
-      try {
-        const payload = {
-          person: patientUuid,
-          concept: STICKY_NOTE_CONCEPT_UUID,
-          value: note,
-          obsDatetime: new Date().toISOString(),
-        };
+    const observation = data.data.entry[0].resource as fhir.Observation;
 
-        const response = await openmrsFetch('/ws/rest/v1/obs', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: payload,
-        });
+    return {
+      uuid: observation.id,
+      patientUuid,
+      note: observation.valueString || '',
+      createdAt: observation.meta?.lastUpdated,
+      updatedAt: observation.meta?.lastUpdated,
+      createdBy: {
+        uuid: 'unknown',
+        display: 'Unknown',
+      },
+      updatedBy: {
+        uuid: 'unknown',
+        display: 'Unknown',
+      },
+    } as StickyNoteData;
+  }, [data, patientUuid]);
 
-        if (response.data?.uuid) {
-          // Fetch the created obs to get full data including audit info
-          const createdObs = await openmrsFetch(`/ws/rest/v1/obs/${response.data.uuid}?v=full`);
-
-          const obsData: OpenMRSObsData = createdObs.data;
-          const noteData: StickyNoteData = {
-            uuid: obsData.uuid,
-            patientUuid,
-            note: obsData.value,
-            createdAt: obsData.auditInfo.dateCreated,
-            updatedAt: obsData.auditInfo.dateChanged || obsData.auditInfo.dateCreated,
-            createdBy: obsData.auditInfo.creator,
-            updatedBy: obsData.auditInfo.changedBy || obsData.auditInfo.creator,
-          };
-
-          setStickyNote(noteData);
-          return noteData;
-        }
-
-        throw new Error('Failed to create sticky note');
-      } catch (error) {
-        console.error('Error saving sticky note:', error);
-        throw error;
-      }
-    },
-    [patientUuid],
+  const results = useMemo(
+    () => ({
+      stickyNote,
+      isLoadingStickyNotes,
+      errorFetchingStickyNotes,
+      isValidatingStickyNotes,
+      mutateStickyNotes,
+    }),
+    [stickyNote, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes],
   );
 
-  const updateStickyNote = useCallback(
-    async (note: string) => {
-      try {
-        if (!stickyNote?.uuid) {
-          throw new Error('No sticky note to update');
-        }
+  return results;
+}
 
-        const payload = {
-          person: patientUuid,
-          concept: STICKY_NOTE_CONCEPT_UUID,
-          value: note,
-          uuid: stickyNote.uuid,
-          obsDatetime: new Date().toISOString(),
-        };
-
-        const response = await openmrsFetch(`/ws/rest/v1/obs/${stickyNote.uuid}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: payload,
-        });
-
-        if (response.data?.uuid) {
-          // Fetch the updated obs to get full data including audit info
-          const updatedObs = await openmrsFetch(`/ws/rest/v1/obs/${response.data.uuid}?v=full`);
-
-          const obsData: OpenMRSObsData = updatedObs.data;
-          const noteData: StickyNoteData = {
-            uuid: obsData.uuid,
-            patientUuid,
-            note: obsData.value,
-            createdAt: obsData.auditInfo.dateCreated,
-            updatedAt: obsData.auditInfo.dateChanged || obsData.auditInfo.dateCreated,
-            createdBy: obsData.auditInfo.creator,
-            updatedBy: obsData.auditInfo.changedBy || obsData.auditInfo.creator,
-          };
-
-          setStickyNote(noteData);
-          return noteData;
-        }
-
-        throw new Error('Failed to update sticky note');
-      } catch (error) {
-        console.error('Error updating sticky note:', error);
-        throw error;
-      }
+// CRUD functions for sticky notes using FHIR API
+export function createStickyNote(patientUuid: string, note: string, stickyNoteConceptUuid: string) {
+  const payload = {
+    resourceType: 'Observation',
+    status: 'final',
+    code: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: stickyNoteConceptUuid,
+        },
+      ],
     },
-    [patientUuid, stickyNote],
-  );
-
-  const deleteStickyNote = useCallback(async () => {
-    try {
-      if (!stickyNote?.uuid) {
-        throw new Error('No sticky note to delete');
-      }
-
-      await openmrsFetch(`/ws/rest/v1/obs/${stickyNote.uuid}?purge=true`, {
-        method: 'DELETE',
-      });
-
-      setStickyNote(null);
-    } catch (error) {
-      console.error('Error deleting sticky note:', error);
-      throw error;
-    }
-  }, [stickyNote]);
-
-  return {
-    stickyNote,
-    isLoading,
-    fetchStickyNote,
-    saveStickyNote,
-    updateStickyNote,
-    deleteStickyNote,
+    subject: {
+      reference: `Patient/${patientUuid}`,
+    },
+    valueString: note,
+    issued: new Date().toISOString(),
   };
+
+  return openmrsFetch(`${fhirBaseUrl}/Observation`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/fhir+json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateStickyNote(observationUuid: string, note: string) {
+  const payload = {
+    resourceType: 'Observation',
+    id: observationUuid,
+    status: 'final',
+    valueString: note,
+    issued: new Date().toISOString(),
+  };
+
+  return openmrsFetch(`${fhirBaseUrl}/Observation/${observationUuid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/fhir+json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteStickyNote(observationUuid: string) {
+  return openmrsFetch(`${fhirBaseUrl}/Observation/${observationUuid}`, {
+    method: 'DELETE',
+  });
 }

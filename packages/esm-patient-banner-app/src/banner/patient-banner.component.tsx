@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
+  ExtensionSlot,
   getPatientName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
@@ -8,7 +9,6 @@ import {
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
 } from '@openmrs/esm-framework';
-import { NoteIcon } from '../../../esm-patient-notes-app/src/sticky-note';
 import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
@@ -72,9 +72,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               />
             ) : null}
           </div>
-          <div className={styles.bannerInformationSlot}>
-            <NoteIcon patient={patient} patientUuid={patientUuid} />
-          </div>
+          <ExtensionSlot name="patient-information-slot" state={{ patientUuid }} />
           {!showDetailsButtonBelowHeader ? (
             <PatientBannerToggleContactDetailsButton
               className={styles.toggleContactDetailsButton}

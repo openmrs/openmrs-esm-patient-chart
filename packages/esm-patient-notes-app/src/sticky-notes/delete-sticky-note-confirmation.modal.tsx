@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { deleteStickyNote, useStickyNotes } from './resources';
-import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework/src';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 
 interface DeleteStickyNoteConfirmationModalProps {
   closeModal: () => void;

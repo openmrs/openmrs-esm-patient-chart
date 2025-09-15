@@ -1,3 +1,5 @@
+@use '@carbon/layout';
+
 .noteIconContainer {
   display: flex;
   align-items: center;
@@ -11,25 +13,25 @@
 
 .noteButton {
   min-width: auto;
-  height: 2rem;
-  padding: 0 0.5rem;
+  height: layout.$spacing-08;
+  padding: 0 layout.$spacing-04;
 
   :global(.cds--btn__icon) {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.25rem;
+    width: layout.$spacing-05;
+    height: layout.$spacing-05;
+    margin-right: layout.$spacing-02;
   }
 }
 
 .notificationBadge {
   position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
+  top: calc(layout.$spacing-02 * -1);
+  right: calc(layout.$spacing-02 * -1);
   background-color: #da1e28;
   color: white;
   border-radius: 50%;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: layout.$spacing-06;
+  height: layout.$spacing-06;
   display: flex;
   align-items: center;
   justify-content: center;
