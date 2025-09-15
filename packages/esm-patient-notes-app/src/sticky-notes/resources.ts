@@ -1,12 +1,9 @@
 import { fhirBaseUrl, openmrsFetch, showToast, useConfig, useOpenmrsSWR } from '@openmrs/esm-framework';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, createContext } from 'react';
 import { type ConfigObject } from '../config-schema';
 import { useTranslation } from 'react-i18next';
 
-interface StickyNoteObservation {
-  display: string;
-  uuid: string;
-}
+export const StickyNoteContext = createContext<{}>({});
 
 export function useStickyNotes(patientUuid: string) {
   const { t } = useTranslation();
@@ -45,7 +42,7 @@ export function useStickyNotes(patientUuid: string) {
 
   const results = useMemo(
     () => ({
-      data: data?.data,
+      stickyNotes: data?.data,
       isLoadingStickyNotes,
       errorFetchingStickyNotes,
       isValidatingStickyNotes,

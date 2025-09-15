@@ -15,7 +15,7 @@ const DeleteStickyNote: React.FC<DeleteStickyNoteProps> = ({ patientUuid, observ
 
   const handleDelete = useCallback(async () => {
     setIsDeleting(true);
-    const dispose = showModal('delete-sticky-note-modal', {
+    const dispose = showModal('delete-sticky-note-confirmation-modal', {
       closeModal: () => {
         setIsDeleting(false);
         dispose();
