@@ -1,6 +1,7 @@
 import {
   fhirBaseUrl,
   openmrsFetch,
+  restBaseUrl,
   showToast,
   toOmrsIsoString,
   useConfig,
@@ -28,16 +29,6 @@ export function useStickyNotes(patientUuid: string) {
   } = useOpenmrsSWR<fhir.Bundle>(url);
 
   useEffect(() => {
-    if (!isLoadingStickyNotes && errorFetchingStickyNotes) {
-      showToast({
-        title: t('stickyNoteError', 'Error fetching sticky notes'),
-        description: errorFetchingStickyNotes?.message,
-        kind: 'error',
-      });
-    }
-  }, [isLoadingStickyNotes, errorFetchingStickyNotes, t]);
-
-  useEffect(() => {
     if (!stickyNoteConceptUuid) {
       showToast({
         title: t('stickyNoteError', 'Error fetching sticky notes'),
@@ -49,7 +40,7 @@ export function useStickyNotes(patientUuid: string) {
 
   const results = useMemo(() => {
     return {
-      stickyNotes: data?.data?.entry,
+      stickyNotes: data?.data?.entry?.map((entry) => entry.resource as fhir.Observation),
       isLoadingStickyNotes,
       errorFetchingStickyNotes,
       isValidatingStickyNotes,
@@ -67,7 +58,7 @@ export function createStickyNote(patientUuid: string, note: string, stickyNoteCo
     value: note,
     obsDatetime: toOmrsIsoString(new Date()),
   };
-  return openmrsFetch(`${fhirBaseUrl}/Observation`, {
+  return openmrsFetch(`${restBaseUrl}/obs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -76,8 +67,12 @@ export function createStickyNote(patientUuid: string, note: string, stickyNoteCo
   });
 }
 
-export function updateStickyNote(observationUuid: string, payload: Record<string, any>) {
-  return openmrsFetch(`${fhirBaseUrl}/Observation/${observationUuid}`, {
+export function updateStickyNote(observationUuid: string, noteText: string) {
+  const payload = {
+    value: noteText,
+    obsDatetime: toOmrsIsoString(new Date()),
+  };
+  return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
