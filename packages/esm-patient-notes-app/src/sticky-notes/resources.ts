@@ -1,4 +1,11 @@
-import { fhirBaseUrl, openmrsFetch, showToast, useConfig, useOpenmrsSWR } from '@openmrs/esm-framework';
+import {
+  fhirBaseUrl,
+  openmrsFetch,
+  showToast,
+  toOmrsIsoString,
+  useConfig,
+  useOpenmrsSWR,
+} from '@openmrs/esm-framework';
 import { useEffect, useMemo, createContext } from 'react';
 import { type ConfigObject } from '../config-schema';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +25,7 @@ export function useStickyNotes(patientUuid: string) {
     error: errorFetchingStickyNotes,
     isValidating: isValidatingStickyNotes,
     mutate: mutateStickyNotes,
-  } = useOpenmrsSWR<fhir.Observation>(url);
+  } = useOpenmrsSWR<fhir.Bundle>(url);
 
   useEffect(() => {
     if (!isLoadingStickyNotes && errorFetchingStickyNotes) {
@@ -40,18 +47,33 @@ export function useStickyNotes(patientUuid: string) {
     }
   }, [stickyNoteConceptUuid, t]);
 
-  const results = useMemo(
-    () => ({
-      stickyNotes: data?.data,
+  const results = useMemo(() => {
+    return {
+      stickyNotes: data?.data?.entry,
       isLoadingStickyNotes,
       errorFetchingStickyNotes,
       isValidatingStickyNotes,
       mutateStickyNotes,
-    }),
-    [data, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes],
-  );
+    };
+  }, [data, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes]);
 
   return results;
+}
+
+export function createStickyNote(patientUuid: string, note: string, stickyNoteConceptUuid: string) {
+  const payload = {
+    person: patientUuid,
+    concept: stickyNoteConceptUuid,
+    value: note,
+    obsDatetime: toOmrsIsoString(new Date()),
+  };
+  return openmrsFetch(`${fhirBaseUrl}/Observation`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: payload,
+  });
 }
 
 export function updateStickyNote(observationUuid: string, payload: Record<string, any>) {

@@ -53,41 +53,18 @@ export function useStickyNotes(patientUuid: string) {
     });
   }
 
-  // Transform FHIR data to our internal format
-  const stickyNote = useMemo(() => {
-    if (!data?.data?.entry?.length) {
-      return null;
-    }
-
-    const observation = data.data.entry[0].resource as fhir.Observation;
+  const results = useMemo(() => {
+    const stickyNote = data?.data?.entry[0].resource as fhir.Observation;
 
     return {
-      uuid: observation.id,
-      patientUuid,
-      note: observation.valueString || '',
-      createdAt: observation.meta?.lastUpdated,
-      updatedAt: observation.meta?.lastUpdated,
-      createdBy: {
-        uuid: 'unknown',
-        display: 'Unknown',
-      },
-      updatedBy: {
-        uuid: 'unknown',
-        display: 'Unknown',
-      },
-    } as StickyNoteData;
-  }, [data, patientUuid]);
-
-  const results = useMemo(
-    () => ({
       stickyNote,
+      isStickyNotePresent: Boolean(stickyNote),
       isLoadingStickyNotes,
       errorFetchingStickyNotes,
       isValidatingStickyNotes,
       mutateStickyNotes,
-    }),
-    [stickyNote, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes],
-  );
+    };
+  }, [data, isLoadingStickyNotes, errorFetchingStickyNotes, isValidatingStickyNotes, mutateStickyNotes]);
 
   return results;
 }
