@@ -4,11 +4,11 @@ import { InlineLoading } from '@carbon/react';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-tile.scss';
 
-interface AllergyTileInterface {
+interface AllergyTileProps {
   patientUuid: string;
 }
 
-const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
+const AllergyTile: React.FC<AllergyTileProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 

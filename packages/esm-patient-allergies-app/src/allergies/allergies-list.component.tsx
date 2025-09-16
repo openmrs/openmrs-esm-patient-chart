@@ -4,11 +4,11 @@ import { InlineLoading, Tag } from '@carbon/react';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-tile.scss';
 
-interface AllergyListInterface {
+interface AllergyListProps {
   patientUuid: string;
 }
 
-const AllergyList: React.FC<AllergyListInterface> = ({ patientUuid }) => {
+const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 
@@ -21,13 +21,19 @@ const AllergyList: React.FC<AllergyListInterface> = ({ patientUuid }) => {
         <div className={styles.label}>
           {t('allergies', 'Allergies')}:
           {allergies.map((allergy) => (
-            <Tag className={styles.allergiesTag}>{allergy.reactionToSubstance}</Tag>
+            <Tag className={styles.allergiesTag} key={allergy.id}>
+              {allergy.reactionToSubstance}
+            </Tag>
           ))}
         </div>
       </div>
     );
   } else {
-    return <div className={styles.label}>{t('allergies', 'Allergies')}: Unknown</div>;
+    return (
+      <div className={styles.label}>
+        {t('allergies', 'Allergies')}: {t('unknown', 'Unknown')}
+      </div>
+    );
   }
 };
 
