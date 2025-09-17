@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.content {
+  background-color: $ui-background;
+}
+
+s .table {
+  width: 100%;
+  table-layout: fixed;
+}

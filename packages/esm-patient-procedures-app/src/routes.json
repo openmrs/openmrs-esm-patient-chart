@@ -5,19 +5,6 @@
   },
   "extensions": [
     {
-      "name": "procedure-overview-widget",
-      "component": "proceduresOverview",
-      "order": 5
-    },
-    {
-      "name": "procedure-detailed-history-card",
-      "component": "procedureHistorySummary",
-      "slot": "patient-chart-procedures-dashboard-slot",
-      "meta": {
-        "fullWidth": true
-      }
-    },
-    {
       "name": "procedure-details-widget",
       "component": "proceduresDetailedSummary",
       "slot": "patient-chart-procedures-dashboard-slot",
@@ -37,7 +24,8 @@
     }
   ],
   "pages": [],
-  "workspaces": [],
+  "workspaces": [
+  ],
   "modals": []
 }
 
