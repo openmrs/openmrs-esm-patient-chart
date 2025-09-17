@@ -1,20 +1,9 @@
 import { type FetchResponse, OpenmrsResource, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { type Results } from './types';
-import { object } from 'zod';
 
 interface EncounterResponse {
   results: Array<Results>;
-}
-
-export async function deletePatientProcedure(procedureUuid: string) {
-  const controller = new AbortController();
-  const url = ``;
-
-  await openmrsFetch(url, {
-    method: 'DELETE',
-    signal: controller.signal,
-  });
 }
 
 export function useProcedures(patientUuid: string, encounterTypeUuid: string) {
