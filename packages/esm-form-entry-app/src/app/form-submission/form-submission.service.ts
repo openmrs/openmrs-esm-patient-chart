@@ -26,7 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
  */
 interface FormSubmissionResult {
-  encounter: Encounter;
+  encounters: Array<Encounter>;
   identifiers?: Array<Identifier>;
   person?: Person;
 }
@@ -59,13 +59,14 @@ export class FormSubmissionService {
           this.deepClearInitialNodeValues(form.rootNode);
         }
 
-        const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
+        const encountersPayload = this.buildEncounterPayload(form);
+        const encountersCreate = encountersPayload ? this.onEncounterCreate(encountersPayload) : [];
         const personUpdate = this.buildPersonUpdatePayload(form);
         const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
 
         return isOfflineSubmission
-          ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
-          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload);
+          ? this.submitPayloadOffline(form, encountersCreate, personUpdate, syncItem?.content._id)
+          : this.submitPayloadOnline(encountersCreate, personUpdate, identifierPayload);
       }),
     );
   }
@@ -87,26 +88,30 @@ export class FormSubmissionService {
     }
   }
 
-  private onEncounterCreate(encounterCreate: EncounterCreate): EncounterCreate {
+  private onEncounterCreate(encountersCreate: Array<EncounterCreate>): Array<EncounterCreate> {
     const handleEncounterCreate = this.singleSpaPropsService.getProp('handleEncounterCreate');
-    if (handleEncounterCreate && typeof handleEncounterCreate === 'function') handleEncounterCreate(encounterCreate);
-    return encounterCreate;
+    if (handleEncounterCreate && typeof handleEncounterCreate === 'function') {
+      encountersCreate.forEach((encounterCreate) => handleEncounterCreate(encounterCreate));
+    }
+    return encountersCreate;
   }
 
   private submitPayloadOffline(
     form: Form,
-    encounterCreate: EncounterCreate,
+    encountersCreate: Array<EncounterCreate>,
     personUpdate: PersonUpdate,
     syncItemIdToEdit: string | undefined,
   ): Observable<FormSubmissionResult> {
-    const encounter = mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreate));
-    const result: FormSubmissionResult = { encounter: encounter as any };
+    const encounters = encountersCreate.map((encounterCreate) =>
+      mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreate)),
+    );
+    const result: FormSubmissionResult = { encounters: encounters as any };
     const syncItem: PatientFormSyncItemContent = {
       _id: syncItemIdToEdit ?? v4(),
       formSchemaUuid: form.schema.uuid,
-      encounter,
+      encounter: encounters[0], // Keep first encounter for backward compatibility
       _payloads: {
-        encounterCreate,
+        encounterCreate: encountersCreate[0], // Keep first encounter for backward compatibility
         personUpdate,
       },
     };
@@ -115,12 +120,12 @@ export class FormSubmissionService {
   }
 
   private submitPayloadOnline(
-    encounterCreate: EncounterCreate,
+    encountersCreate: Array<EncounterCreate>,
     personUpdate: PersonUpdate,
     identifierPayload: IdentifierPayload,
   ): Observable<FormSubmissionResult> {
     return forkJoin({
-      encounter: this.submitEncounter(encounterCreate),
+      encounters: this.submitEncounters(encountersCreate),
       person: this.submitPersonUpdate(personUpdate),
       identifiers: this.submitPatientIdentifier(identifierPayload),
     });
@@ -142,6 +147,16 @@ export class FormSubmissionService {
     // TODO: Add translations once ngx-translate is in place
     return confirm(
       'The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?',
+    );
+  }
+
+  private submitEncounters(encountersCreate: Array<EncounterCreate>): Observable<Array<Encounter>> {
+    if (!encountersCreate || encountersCreate.length === 0) {
+      return of([]);
+    }
+
+    return forkJoin(encountersCreate.map((encounterCreate) => this.submitEncounter(encounterCreate))).pipe(
+      map((encounters) => encounters.filter((encounter) => encounter !== undefined) as Array<Encounter>),
     );
   }
 
@@ -190,7 +205,7 @@ export class FormSubmissionService {
       .pipe(catchError((res) => this.throwUserFriendlyError(res)));
   }
 
-  public buildEncounterPayload(form: Form): EncounterCreate | undefined {
+  public buildEncounterPayload(form: Form): Array<EncounterCreate> | undefined {
     const providers = this.formDataSourceService.getCachedProviderSearchResults();
 
     if (providers?.length && !form.valueProcessingInfo.providerUuid) {
@@ -198,13 +213,17 @@ export class FormSubmissionService {
       form.valueProcessingInfo.providerUuid = providerUuid;
     }
 
-    const encounterPayload = this.encounterAdapter.generateFormPayload(form) as unknown as EncounterCreate;
+    const encountersPayload = this.encounterAdapter.generateFormPayloadWithSubforms(
+      form,
+    ) as unknown as Array<EncounterCreate>;
 
-    //Assign location to encounter payload if no location field is present on the form
-    if (!encounterPayload.hasOwnProperty('location') && form.dataSourcesContainer.dataSources?.userLocation?.uuid)
-      encounterPayload.location = form.dataSourcesContainer.dataSources.userLocation.uuid;
+    encountersPayload.forEach((encounter) => {
+      //Assign location to encounter payload if no location field is present on the form
+      if (!encounter.hasOwnProperty('location') && form.dataSourcesContainer.dataSources?.userLocation?.uuid)
+        encounter.location = form.dataSourcesContainer.dataSources.userLocation.uuid;
+    });
 
-    return isEmpty(encounterPayload) ? undefined : encounterPayload;
+    return isEmpty(encountersPayload) ? undefined : encountersPayload;
   }
 
   private findProviderUuidFormForm(providers: Array<any>, form: Form): string | undefined {
