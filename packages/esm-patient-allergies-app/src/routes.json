@@ -14,6 +14,11 @@
       "order": 3
     },
     {
+      "name": "allergy-list",
+      "component": "allergyList",
+      "slot": "allergy-list-pills-slot"
+    },
+    {
       "name": "allergies-details-widget",
       "component": "allergiesDetailedSummary",
       "slot": "patient-chart-allergies-dashboard-slot",
