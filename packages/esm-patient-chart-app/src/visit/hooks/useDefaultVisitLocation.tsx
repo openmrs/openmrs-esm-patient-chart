@@ -15,7 +15,7 @@ export function useDefaultVisitLocation(location: Location, restrictByVisitLocat
   const { data, error } = useSWR<FetchResponse>(restrictByVisitLocationTag ? url : null, openmrsFetch);
 
   useEffect(() => {
-    if (error) {
+    if (error && process.env.NODE_ENV === 'development') {
       console.error(error);
     }
   }, [error]);
