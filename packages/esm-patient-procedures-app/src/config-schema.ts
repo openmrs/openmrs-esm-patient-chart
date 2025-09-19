@@ -12,9 +12,21 @@ export const configSchema = {
     _description: 'This is the uuid of the procedures form',
     _default: '74d8d0e7-1c81-4c6c-bc5f-6d50eeb2a851',
   },
+  dayProcedurePerformedUuid: {
+    _type: Type.UUID,
+    _description: 'UUID of the backing concept for Date when procedure was performed',
+    _default: '160715AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  nameOfProcedurePerformedUuid: {
+    _type: Type.UUID,
+    _description: 'UUID of the backing concept for Name of procedure or test performed',
+    _default: '1651AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
 };
 
 export interface ConfigObject {
   procedureEncounterType: string;
   procedureFormUuid: string;
+  dayProcedurePerformedUuid: string;
+  nameOfProcedurePerformedUuid: string;
 }

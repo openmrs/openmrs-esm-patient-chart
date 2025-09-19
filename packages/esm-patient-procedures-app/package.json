@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-procedures-app",
-  "version": "1.0.0",
+  "version": "11.3.0",
   "license": "MPL-2.0",
   "description": "Patient procedures microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-procedures-app.js",
