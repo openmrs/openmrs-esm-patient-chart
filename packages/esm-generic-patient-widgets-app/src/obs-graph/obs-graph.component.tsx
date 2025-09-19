@@ -102,7 +102,16 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
               <TabPanels>
                 {config.data.map(({ concept, label }) => (
                   <TabPanel key={concept}>
-                    <LineChart data={chartData.flat()} options={chartOptions} />
+                    <LineChart
+                      data={chartData
+                        .flat()
+                        .filter((data) =>
+                          concept === '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+                            ? data.group === 'Goal Weight' || data.group === 'Weight'
+                            : data.group === label,
+                        )}
+                      options={chartOptions}
+                    />
                   </TabPanel>
                 ))}
               </TabPanels>
