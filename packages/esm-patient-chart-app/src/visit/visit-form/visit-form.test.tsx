@@ -780,7 +780,11 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       result: {
         current: { visitFormSchema, defaultValues },
       },
-    } = renderHook(() => useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters));
+    } = renderHook(() =>
+      useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters, {
+        isDeceased: false,
+      }),
+    );
 
     // verify start time set to past end time
     const stopDateTime = dayjs(mockPastVisitWithEncounters.stopDatetime);
