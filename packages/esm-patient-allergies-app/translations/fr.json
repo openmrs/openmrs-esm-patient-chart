@@ -47,5 +47,6 @@
   "severityRequired": "Gravité est obligatoire",
   "typeAdditionalComments": "Ajouter ici tous commentaires additionnels",
   "typeAllergenName": "Veuillez saisir le nom de l'allergène",
-  "typeAllergicReactionName": "Veuillez saisir le nom de la réaction allergique"
+  "typeAllergicReactionName": "Veuillez saisir le nom de la réaction allergique",
+  "unknown": "Unknown"
 }

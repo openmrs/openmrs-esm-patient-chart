@@ -47,5 +47,6 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "Nhập bất kỳ bình luận bổ sung nào ở đây",
   "typeAllergenName": "Vui lòng nhập tên chất gây dị ứng",
-  "typeAllergicReactionName": "Vui lòng nhập tên phản ứng dị ứng"
+  "typeAllergicReactionName": "Vui lòng nhập tên phản ứng dị ứng",
+  "unknown": "Unknown"
 }
