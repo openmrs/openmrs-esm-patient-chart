@@ -5,14 +5,13 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
   restBaseUrl,
-  translateFrom,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import allergiesDetailedSummaryComponent from './allergies/allergies-detailed-summary.component';
-import allergyTileComponent from './allergies/allergies-tile.component';
-import allergyListComponent from './allergies/allergies-list.component';
+import allergiesTileExtension from './allergies/allergies-tile.extension';
+import allergiesListExtension from './allergies/allergies-list.extension';
 
 const moduleName = '@openmrs/esm-patient-allergies-app';
 
@@ -58,11 +57,8 @@ export const allergyFormWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const allergyTile = getSyncLifecycle(allergyTileComponent, options);
+export const allergiesTile = getSyncLifecycle(allergiesTileExtension, options);
 
-export const allergyList = getSyncLifecycle(allergyListComponent, options);
+export const allergiesList = getSyncLifecycle(allergiesListExtension, options);
 
-export const allergyDeleteConfirmationDialog = getAsyncLifecycle(
-  () => import('./allergies/delete-allergy.modal'),
-  options,
-);
+export const deleteAllergyModal = getAsyncLifecycle(() => import('./allergies/delete-allergy.modal'), options);

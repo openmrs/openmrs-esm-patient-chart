@@ -7,15 +7,15 @@
   "extensions": [
     {
       "name": "allergy-tile",
-      "component": "allergyTile",
+      "component": "allergiesTile",
       "slot": "patient-details-header-slot",
       "online": true,
       "offline": true,
       "order": 3
     },
     {
-      "name": "allergy-list",
-      "component": "allergyList",
+      "name": "allergies-list",
+      "component": "allergiesList",
       "slot": "allergy-list-pills-slot"
     },
     {
@@ -36,10 +36,12 @@
         "slot": "patient-chart-allergies-dashboard-slot",
         "path": "Allergies"
       }
-    },
+    }
+  ],
+  "modals": [
     {
-      "name": "allergy-delete-confirmation-dialog",
-      "component": "allergyDeleteConfirmationDialog"
+      "name": "delete-allergy-modal",
+      "component": "deleteAllergyModal"
     }
   ],
   "workspaces": [

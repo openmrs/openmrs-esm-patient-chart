@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
+import { TagSkeleton } from '@carbon/react';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-tile.scss';
 
@@ -13,8 +13,9 @@ const AllergyTile: React.FC<AllergyTileProps> = ({ patientUuid }) => {
   const { allergies, isLoading } = useAllergies(patientUuid);
 
   if (isLoading) {
-    return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
+    return <TagSkeleton />;
   }
+
   if (allergies?.length) {
     return (
       <div>
@@ -25,10 +26,11 @@ const AllergyTile: React.FC<AllergyTileProps> = ({ patientUuid }) => {
       </div>
     );
   }
+
   return (
     <div>
       <p className={styles.label}>{t('allergies', 'Allergies')}</p>
-      <p className={styles.content}>--</p>
+      <p className={styles.content}>{t('unknown', 'Unknown')}</p>
     </div>
   );
 };
