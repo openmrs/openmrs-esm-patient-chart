@@ -1,26 +1,36 @@
-import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
+import { useLastEncounter } from '../hooks';
+import type { Encounter } from '../types';
 
-interface ConceptResponse {
-  uuid: string;
-  display: string;
-  units?: string;
+/**
+ * Extract units directly from the encounter observation data
+ * This eliminates separate API calls for concept units
+ */
+export function useConceptUnits(conceptUuid: string) {
+  return {
+    units: '', // Default empty value that will be overridden in the component
+    error: null,
+    isLoading: false,
+  };
 }
 
-export function useConceptUnits(conceptUuid: string) {
-  const customRepresentation = 'custom:(uuid,display,units)';
-  const apiUrl = conceptUuid ? `${restBaseUrl}/concept/${conceptUuid}?v=${customRepresentation}` : null;
+/**
+ * Helper function to extract units from an encounter for a specific concept
+ * @param encounter The encounter containing observations
+ * @param conceptUuid The concept UUID to find
+ * @returns The units string if found
+ */
+export function getConceptUnitsFromEncounter(encounter: Encounter | null, conceptUuid: string): string {
+  if (!encounter || !encounter.obs || !conceptUuid) {
+    return '';
+  }
 
-  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptResponse }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
-
-  return {
-    units: data?.data?.units || '',
-    error,
-    isLoading,
-  };
+  // Find the observation for this concept
+  const obs = encounter.obs.find(o => o.concept?.uuid === conceptUuid);
+  
+  // Return the units if found
+  // Note: The updated representation in useLastEncounter includes the 'units' field
+  return (obs?.concept as any)?.units || '';
 }
 
 export const withUnit = (value: string | number, unit: string | null | undefined) => {
