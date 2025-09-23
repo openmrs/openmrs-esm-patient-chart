@@ -33,7 +33,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
     ...config.data.map(({ concept, label }) => ({
       key: concept,
-      header: label,
+      header: label || obss.find((o) => o.conceptUuid == concept)?.code.text,
     })),
   ];
 
