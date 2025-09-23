@@ -1,9 +1,10 @@
 {
   "add": "Add",
-  "addProcedures": "Add Procedures",
+  "addProcedures": "Add procedures",
   "date": "Date",
   "procedure": "Procedure",
   "procedures": "Procedures",
   "procedures__lower": "procedures",
-  "proceduresHistory": "Procedures history"
+  "proceduresHistory": "Procedures history",
+  "recordProcedure": "Record a procedure"
 }
