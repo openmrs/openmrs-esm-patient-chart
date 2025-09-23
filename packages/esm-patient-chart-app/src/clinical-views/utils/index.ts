@@ -1,6 +1,7 @@
 import { getConceptFromMappings, getObsFromEncounter } from './helpers';
 import type { Encounter, ColumnDefinition, ConfigConcepts, EncounterTileColumn, MenuCardProps } from '../types';
 import dayjs from 'dayjs';
+import { useConceptUnits, withUnit } from './concept-utils';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
   return `${Math.abs(dayjs().diff(dayjs(givenDate), 'days'))} days`;

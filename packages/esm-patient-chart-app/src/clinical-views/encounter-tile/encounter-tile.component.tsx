@@ -5,6 +5,7 @@ import { isNil } from 'lodash-es';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useLastEncounter } from '../hooks';
 import type { EncounterTileColumn, EncounterTileProps } from '../types';
+import { useConceptUnits, withUnit } from '../utils/concept-utils';
 import styles from './tile.scss';
 
 export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
@@ -41,6 +42,7 @@ const EncounterData: React.FC<{
 }> = ({ patientUuid, column }) => {
   const { t } = useTranslation();
   const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, column.encounterTypeUuid);
+  const { units } = useConceptUnits(column.concept);
   const obsValue = column.getObsValue(lastEncounter);
   const summaryValue =
     column.hasSummary === true && column.getSummaryObsValue && typeof column.getSummaryObsValue === 'function'
@@ -65,13 +67,13 @@ const EncounterData: React.FC<{
       <span className={styles.tileTitle}>{t(column.header)}</span>
       {!(obsValue === '--' && summaryValue !== '--' && !isNil(summaryValue)) && (
         <span className={styles.tileValue}>
-          <p>{obsValue}</p>
+          <p>{withUnit(obsValue, units)}</p>
         </span>
       )}
 
       {!isNil(summaryValue) && summaryValue !== '--' && (
         <span className={styles.tileValue}>
-          <p>{summaryValue}</p>
+          <p>{withUnit(summaryValue, units)}</p>
         </span>
       )}
     </>
