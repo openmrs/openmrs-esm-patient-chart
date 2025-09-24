@@ -1,7 +1,6 @@
 import { getConceptFromMappings, getObsFromEncounter } from './helpers';
 import type { Encounter, ColumnDefinition, ConfigConcepts, EncounterTileColumn, MenuCardProps } from '../types';
 import dayjs from 'dayjs';
-import { useConceptUnits, withUnit, getConceptUnitsFromEncounter } from './concept-utils';
 
 const calculateDateDifferenceInDate = (givenDate: string): string => {
   return `${Math.abs(dayjs().diff(dayjs(givenDate), 'days'))} days`;
@@ -36,7 +35,9 @@ export const getEncounterTileColumns = (tileDefinition: MenuCardProps, config: C
           config: config,
         });
       }
-      return typeof obsValue === 'string' || (typeof obsValue === 'number' && !isNaN(obsValue)) ? obsValue : obsValue?.name?.name ?? '--';
+      return typeof obsValue === 'string' || (typeof obsValue === 'number' && !isNaN(obsValue))
+        ? obsValue
+        : obsValue?.name?.name ?? '--';
     },
     getSummaryObsValue: column.hasSummary
       ? (encounter: Encounter) => {

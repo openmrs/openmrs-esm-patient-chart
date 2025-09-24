@@ -37,17 +37,6 @@
       "offline": true
     },
     {
-      "name": "clinical-views-summary",
-      "slot": "patient-chart-summary-dashboard-slot",
-      "component": "encounterTile",
-      "order": 2,
-      "meta": {
-        "columnSpan": 4
-      },
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "clinical-views-details",
       "component": "clinicalViewsSummary",
       "online": true,

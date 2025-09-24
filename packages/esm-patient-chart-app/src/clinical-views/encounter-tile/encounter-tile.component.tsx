@@ -5,7 +5,7 @@ import { isNil } from 'lodash-es';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { useLastEncounter } from '../hooks';
 import type { EncounterTileColumn, EncounterTileProps } from '../types';
-import { useConceptUnits, withUnit, getConceptUnitsFromEncounter } from '../utils/concept-utils';
+import { withUnit, getConceptUnitsFromEncounter } from '../utils/concept-utils';
 import styles from './tile.scss';
 
 export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: EncounterTileProps) => {
@@ -74,7 +74,7 @@ const EncounterData: React.FC<{
 
       {!isNil(summaryValue) && summaryValue !== '--' && (
         <span className={styles.tileValue}>
-          <p>{withUnit(summaryValue, units)}</p>
+          <p>{summaryValue}</p>
         </span>
       )}
     </>

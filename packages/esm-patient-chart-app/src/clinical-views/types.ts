@@ -38,7 +38,7 @@ export interface Encounter extends OpenmrsResource {
 
 export interface Observation {
   uuid: string;
-  concept: { uuid: string; name: string };
+  concept: { uuid: string; name: string; units?: string };
   value:
     | {
         uuid: string;
