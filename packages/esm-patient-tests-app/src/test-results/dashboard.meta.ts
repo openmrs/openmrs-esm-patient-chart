@@ -1,8 +1,8 @@
-export const dashboardMeta = {
+import { type DashboardConfig } from '@openmrs/esm-patient-common-lib';
+
+export const dashboardMeta: DashboardConfig = {
   slot: 'patient-chart-test-results-dashboard-slot',
-  columns: 1,
   path: 'Results',
   title: 'Results',
   icon: 'omrs-icon-chart-average',
-  hideDashboardTitle: true,
 };

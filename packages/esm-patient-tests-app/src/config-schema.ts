@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { type IconId, Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
   resultsViewerConcepts: {
@@ -140,7 +140,7 @@ export interface ConfigObject {
     label?: string;
     orderTypeUuid: string;
     orderableConceptSets: Array<string>;
-    icon?: string;
+    icon?: IconId;
   }>;
   resultsViewerConcepts: Array<ObsTreeEntry>;
 }

@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { type IconId, Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
   orderEncounterType: {
@@ -59,7 +59,7 @@ export interface OrderTypeDefinition {
   label?: string;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
-  icon?: string;
+  icon?: IconId;
 }
 
 export interface ConfigObject {
