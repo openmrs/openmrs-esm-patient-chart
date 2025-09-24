@@ -47,5 +47,6 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "在此处录入其他附加备注",
   "typeAllergenName": "请键入过敏原的名称",
-  "typeAllergicReactionName": "请键入过敏反应的名称"
+  "typeAllergicReactionName": "请键入过敏反应的名称",
+  "unknown": "Unknown"
 }

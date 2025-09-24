@@ -47,5 +47,6 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "اكتب أي تعليقات إضافية هنا",
   "typeAllergenName": "الرجاء كتابة اسم مسببات الحساسية",
-  "typeAllergicReactionName": "يرجى كتابة اسم رد الفعل الحساس"
+  "typeAllergicReactionName": "يرجى كتابة اسم رد الفعل الحساس",
+  "unknown": "Unknown"
 }

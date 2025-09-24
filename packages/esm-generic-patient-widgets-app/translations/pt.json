@@ -1,7 +1,4 @@
 {
-  "chartView": "Visualização de Gráfico",
   "dateAndTime": "Data e hora",
-  "displaying": "Visualizando",
-  "encounterType": "Tipo de consulta",
-  "tableView": "Visualização em Tabela"
+  "encounterType": "Tipo de consulta"
 }

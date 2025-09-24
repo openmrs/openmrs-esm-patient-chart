@@ -44,11 +44,7 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: 🏗️ Build apps
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 15
-          max_attempts: 2
-          command: yarn turbo run build --color
+        run: yarn turbo run build --color
 
       - name: 🚀 Run dev server
         run: bash e2e/support/github/run-e2e-docker-env.sh

@@ -43,7 +43,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
   }, [closeDeleteModal, allergyId, mutate, t, patientUuid]);
 
   return (
-    <div>
+    <>
       <ModalHeader closeModal={closeDeleteModal} title={t('deletePatientAllergy', 'Delete allergy')} />
       <ModalBody>
         <p>{t('deleteModalConfirmationText', 'Are you sure you want to delete this allergy?')}</p>
@@ -60,7 +60,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
           )}
         </Button>
       </ModalFooter>
-    </div>
+    </>
   );
 };
 

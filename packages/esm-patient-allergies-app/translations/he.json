@@ -47,5 +47,6 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "הקלד הערות נוספות כאן",
   "typeAllergenName": "נא הקלד את שם החומר האלרגני",
-  "typeAllergicReactionName": "נא הקלד את שם התגובה האלרגנית"
+  "typeAllergicReactionName": "נא הקלד את שם התגובה האלרגנית",
+  "unknown": "Unknown"
 }

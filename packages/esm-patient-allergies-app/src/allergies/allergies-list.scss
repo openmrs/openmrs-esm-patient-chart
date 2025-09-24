@@ -1,6 +1,5 @@
-@use '@carbon/type';
-@use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label {
@@ -9,14 +8,4 @@
   display: flex;
   gap: layout.$spacing-02;
   align-items: center;
-}
-
-.content {
-  @include type.type-style('body-compact-01');
-  color: $text-02;
-  margin-top: 5px;
-}
-
-.value {
-  @include type.type-style('body-compact-01');
 }

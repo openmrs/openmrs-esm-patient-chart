@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Allergy } from '../types';
-import styles from './allergies-action-menu.scss';
 import { patientAllergiesFormWorkspace } from '../constants';
+import styles from './allergies-action-menu.scss';
 
 interface allergiesActionMenuProps {
   allergy: Allergy;
@@ -24,7 +24,7 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
   }, [allergy, t]);
 
   const launchDeleteAllergyDialog = (allergyId: string) => {
-    const dispose = showModal('allergy-delete-confirmation-dialog', {
+    const dispose = showModal('delete-allergy-modal', {
       closeDeleteModal: () => dispose(),
       allergyId,
       patientUuid,
