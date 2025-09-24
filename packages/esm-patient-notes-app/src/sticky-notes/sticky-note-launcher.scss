@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.notificationBadge {
+  position: absolute;
+  top: calc(layout.$spacing-02 * -1);
+  right: layout.$spacing-03;
+  background-color: $danger;
+  color: white;
+  border-radius: 25%;
+  width: layout.$spacing-04;
+  height: layout.$spacing-04;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: layout.$spacing-03;
+  font-weight: 600;
+}
