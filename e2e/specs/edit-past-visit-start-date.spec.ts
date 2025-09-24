@@ -4,10 +4,11 @@ import { getVisit, endVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
 import { VisitsPage } from '../pages';
 
-test('Edit start date of a past visit', async ({ page, api, patient, visit }) => {
+test('Edit start date and time of a past visit', async ({ page, api, patient, visit }) => {
   const visitsPage = new VisitsPage(page);
   const targetStartDate = visitStartDatetime.subtract(1, 'day');
-  await test.step('Given the current visit is ended (past visit)', async () => {
+
+  await test.step('Given there is a past visit for the patient', async () => {
     await endVisit(api, visit);
   });
 
@@ -26,7 +27,7 @@ test('Edit start date of a past visit', async ({ page, api, patient, visit }) =>
     await expect(visitsPage.page.getByRole('tab', { name: /ended/i })).toBeVisible();
   });
 
-  await test.step('When I change the visit start date to two days ago', async () => {
+  await test.step('When I change the visit start date and time', async () => {
     await visitsPage.page.getByRole('tab', { name: /ongoing/i }).click();
     await expect(visitsPage.page.getByRole('button', { name: /update visit/i })).toBeVisible();
     await expect(visitsPage.page.getByTestId('visitStartDateInput')).toBeVisible();
@@ -51,16 +52,16 @@ test('Edit start date of a past visit', async ({ page, api, patient, visit }) =>
     expect(dayText).toBe(targetStartDate.format('DD'));
     expect(monthText).toBe(targetStartDate.format('MM'));
     expect(yearText).toBe(targetStartDate.format('YYYY'));
-    await visitsPage.page.keyboard.press('Enter');
 
+    await visitsPage.page.keyboard.press('Enter');
     await visitsPage.page.getByRole('button', { name: /update visit/i }).click();
   });
 
-  await test.step('Then I should see a success notification', async () => {
+  await test.step('Then I should see a success notification indicating that the visit details have been updated', async () => {
     await expect(visitsPage.page.getByText(/visit details updated/i)).toBeVisible();
   });
 
-  await test.step('And the visit start date should be updated in the backend', async () => {
+  await test.step('And the visit start date and time should be updated in the backend', async () => {
     const updated = await getVisit(api, visit.uuid);
     const updatedStart = dayjs(updated.startDatetime).format('YYYY-MM-DD');
     const expectedStart = targetStartDate.format('YYYY-MM-DD');
