@@ -37,7 +37,7 @@
       "offline": true
     },
     {
-      "name": "clinical-views-details",
+      "name": "clinical-views-summary",
       "component": "clinicalViewsSummary",
       "online": true,
       "offline": true
