@@ -49,7 +49,7 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
   if (encounters?.length === 0) {
     return (
       <EmptyState
-        displayText={t('noEncounters', 'encounters for specified visit')}
+        displayText={t('encountersForThisVisit', 'encounters for this visit')}
         headerTitle={t('timeline', 'Timeline')}
       />
     );
