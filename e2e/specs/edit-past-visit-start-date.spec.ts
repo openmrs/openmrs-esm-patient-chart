@@ -1,11 +1,10 @@
-import { expect } from '@playwright/test';
 import dayjs from 'dayjs';
+import { expect } from '@playwright/test';
 import { getVisit, endVisit, visitStartDatetime } from '../commands';
 import { test } from '../core';
-import { ChartPage, VisitsPage } from '../pages';
+import { VisitsPage } from '../pages';
 
 test('Edit start date of a past visit', async ({ page, api, patient, visit }) => {
-  const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
   const targetStartDate = visitStartDatetime.subtract(1, 'day');
   await test.step('Given the current visit is ended (past visit)', async () => {
@@ -28,46 +27,37 @@ test('Edit start date of a past visit', async ({ page, api, patient, visit }) =>
   });
 
   await test.step('When I change the visit start date to two days ago', async () => {
-    const newStartDate = targetStartDate;
     await visitsPage.page.getByRole('tab', { name: /ongoing/i }).click();
-    await expect(chartPage.page.getByRole('button', { name: /update visit/i })).toBeVisible();
-    await expect(chartPage.page.getByTestId('visitStartDateInput')).toBeVisible();
+    await expect(visitsPage.page.getByRole('button', { name: /update visit/i })).toBeVisible();
+    await expect(visitsPage.page.getByTestId('visitStartDateInput')).toBeVisible();
 
-    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    const startDateInput = visitsPage.page.getByTestId('visitStartDateInput');
     const startDateDayInput = startDateInput.getByRole('spinbutton', { name: /day/i });
     const startDateMonthInput = startDateInput.getByRole('spinbutton', { name: /month/i });
     const startDateYearInput = startDateInput.getByRole('spinbutton', { name: /year/i });
 
-    await startDateDayInput.click();
-    await startDateDayInput.press('Control+A');
-    await startDateDayInput.type(newStartDate.format('DD'));
+    await startDateDayInput.fill(targetStartDate.format('DD'));
+    await startDateMonthInput.fill(targetStartDate.format('MM'));
+    await startDateYearInput.fill(targetStartDate.format('YYYY'));
 
-    await startDateMonthInput.click();
-    await startDateMonthInput.press('Control+A');
-    await startDateMonthInput.type(newStartDate.format('MM'));
-
-    await startDateYearInput.click();
-    await startDateYearInput.press('Control+A');
-    await startDateYearInput.type(newStartDate.format('YYYY'));
-
-    const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
+    const startTimeInput = visitsPage.page.getByRole('textbox', { name: /start time/i });
     await expect(startTimeInput).toBeVisible();
-    await startTimeInput.click();
     await startTimeInput.fill('12:00');
-    await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
+    await visitsPage.page.getByLabel(/start time format/i).selectOption('AM');
 
     const dayText = await startDateDayInput.textContent();
     const monthText = await startDateMonthInput.textContent();
     const yearText = await startDateYearInput.textContent();
-    expect(dayText).toBe(newStartDate.format('DD'));
-    expect(monthText).toBe(newStartDate.format('MM'));
-    expect(yearText).toBe(newStartDate.format('YYYY'));
+    expect(dayText).toBe(targetStartDate.format('DD'));
+    expect(monthText).toBe(targetStartDate.format('MM'));
+    expect(yearText).toBe(targetStartDate.format('YYYY'));
+    await visitsPage.page.keyboard.press('Enter');
 
-    await chartPage.page.getByRole('button', { name: /update visit/i }).click();
+    await visitsPage.page.getByRole('button', { name: /update visit/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
-    await expect(chartPage.page.getByText(/visit details updated/i)).toBeVisible();
+    await expect(visitsPage.page.getByText(/visit details updated/i)).toBeVisible();
   });
 
   await test.step('And the visit start date should be updated in the backend', async () => {
