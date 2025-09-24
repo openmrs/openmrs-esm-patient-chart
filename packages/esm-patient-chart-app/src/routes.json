@@ -31,6 +31,9 @@
     },
     {
       "name": "start-visit-button",
+
+
+      
       "component": "startVisitActionButton",
       "slot": "patient-actions-slot",
       "online": true,
