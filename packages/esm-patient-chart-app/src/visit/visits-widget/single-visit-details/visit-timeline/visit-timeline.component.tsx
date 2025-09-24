@@ -1,11 +1,11 @@
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import styles from './visit-timeline.scss';
-import { useEncountersByVisit } from '../../../../clinical-views/hooks/useEncountersByVisit';
-import { formatDate } from '@openmrs/esm-framework';
 import { SkeletonText } from '@carbon/react';
-import { format, isToday } from 'date-fns';
+import { formatDate } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { useEncountersByVisit } from '../../../../clinical-views/hooks/useEncountersByVisit';
+import styles from './visit-timeline.scss';
 
 interface VisitTimelineProps {
   patientUuid: string;
@@ -19,14 +19,12 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
   if (isLoading) {
     return (
       <div className={styles.visitTimeline}>
-        <CardHeader title={t('timeline', 'Timeline')}>
-          <></>
-        </CardHeader>
+        <CardHeader title={t('timeline', 'Timeline')}>{null}</CardHeader>
         <p className={styles.timelineHeader}>
           <span>{t('encounter', 'Encounter')}</span> <span>&middot;</span>
           <span>{t('provider', 'Provider')}</span> <span>&middot;</span>{' '}
           <span>
-            {t('timeStarted', 'Time Started')} <span>&mdash;</span> {t('timeCompleted', 'Time Completed')}{' '}
+            {t('timeStarted', 'Time started')} <span>&mdash;</span> {t('timeCompleted', 'Time Completed')}{' '}
           </span>
         </p>
         <div className={styles.timelineEntries}>
@@ -59,12 +57,10 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
 
   return (
     <div className={styles.visitTimeline}>
-      <CardHeader title={t('timeline', 'Timeline')}>
-        <></>
-      </CardHeader>
       <p className={styles.timelineHeader}>
         <span>{t('encounter', 'Encounter')}</span> <span>&middot;</span>
-        <span>{t('provider', 'Provider')}</span> <span>&middot;</span> <span>{t('time', 'Time')}</span>
+        <span>{t('provider', 'Provider')}</span> <span>&middot;</span>
+        <span>{t('timeStarted', 'Time started')}</span>
       </p>
       <div className={styles.timelineEntries}>
         {encounters?.map((encounter) => (
@@ -73,14 +69,18 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
             <span className={styles.encounterType}>{encounter.encounterType.name}</span>
             <span>&middot;</span>
             {encounter.encounterProviders.length === 0 ? (
-              <span>{t('noProvider', 'No Provider')}</span>
+              <span>{t('noProvider', 'No provider')}</span>
             ) : (
-              <span>{encounter.encounterProviders.map((provider) => provider.provider.display).join(', ')}</span>
+              <span>
+                {encounter.encounterProviders
+                  .map((encounterProvider) => encounterProvider.provider.person.display)
+                  .join(', ')}
+              </span>
             )}
             <span>&middot;</span>{' '}
             <span>
               {formatDate(new Date(encounter.encounterDatetime), {
-                time: isToday(encounter.encounterDatetime) ? 'for today' : true,
+                time: dayjs(encounter.encounterDatetime).isSame(dayjs(), 'day') ? 'for today' : true,
               })}
             </span>
           </p>

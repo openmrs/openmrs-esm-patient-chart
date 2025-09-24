@@ -4,7 +4,9 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface EncounterProvider {
   provider: {
-    display: string;
+    person: {
+      display: string;
+    };
   };
 }
 
@@ -30,7 +32,7 @@ interface EncounterResponse {
 
 export function useEncountersByVisit(patientUuid: string, visitUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounterType:(name),encounterProviders:(provider:(display)),encounterDatetime,visit:(uuid))';
+    'custom:(uuid,encounterType:(name),encounterProviders:(provider:(person:(display))),encounterDatetime,visit:(uuid))';
   const url = `${restBaseUrl}/encounter?patient=${patientUuid}&v=${customRepresentation}`;
   const { data: response, error, isLoading } = useSWR<{ data: EncounterResponse }, Error>(url, openmrsFetch);
 
