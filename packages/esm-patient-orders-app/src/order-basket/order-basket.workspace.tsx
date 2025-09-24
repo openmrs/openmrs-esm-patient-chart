@@ -88,7 +88,9 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         closeWorkspaceWithSavedChanges();
         showOrderSuccessToast(t, orders);
       } catch (e) {
-        console.error(e);
+        if (process.env.NODE_ENV === 'development') {
+          console.error(e);
+        }
         setCreatingEncounterError(
           e.responseBody?.error?.message ||
             t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
