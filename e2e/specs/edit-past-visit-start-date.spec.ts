@@ -54,7 +54,10 @@ test('Edit start date and time of a past visit', async ({ page, api, patient, vi
     expect(yearText).toBe(targetStartDate.format('YYYY'));
 
     await visitsPage.page.keyboard.press('Enter');
-    await visitsPage.page.getByRole('button', { name: /update visit/i }).click();
+    await visitsPage.page
+      .locator('form')
+      .getByRole('button', { name: /update visit/i })
+      .click();
   });
 
   await test.step('Then I should see a success notification indicating that the visit details have been updated', async () => {
