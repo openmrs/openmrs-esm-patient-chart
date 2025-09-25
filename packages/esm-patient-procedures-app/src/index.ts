@@ -1,8 +1,7 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import proceduresDetailedSummaryComponent from './components/procedures-history/procedures-history.component';
 
 const moduleName = '@openmrs/esm-patient-procedures-app';
 
@@ -17,8 +16,12 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const proceduresDetailedSummary = getSyncLifecycle(proceduresDetailedSummaryComponent, options);
+export const proceduresDetailedSummary = getAsyncLifecycle(
+  () => import('./components/procedures-history/procedures-history.component'),
+  options,
+);
 
+// t('procedures', 'Procedures')
 export const proceduresDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...dashboardMeta,
