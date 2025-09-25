@@ -12,7 +12,7 @@ export interface UseObsResult {
   isValidating: boolean;
 }
 
-type ObsResult = fhir.Observation & {
+export type ObsResult = fhir.Observation & {
   conceptUuid: string;
   dataType?: string;
   valueDateTime?: string;
