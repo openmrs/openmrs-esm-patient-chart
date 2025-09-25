@@ -43,6 +43,9 @@ const EncounterData: React.FC<{
   const { t } = useTranslation();
   const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, column.encounterTypeUuid);
   const units = getConceptUnitsFromEncounter(lastEncounter, column.concept);
+  const summaryUnits = column.summaryConcept?.primaryConcept
+    ? getConceptUnitsFromEncounter(lastEncounter, column.summaryConcept.primaryConcept)
+    : null;
   const obsValue = column.getObsValue(lastEncounter);
   const summaryValue =
     column.hasSummary === true && column.getSummaryObsValue && typeof column.getSummaryObsValue === 'function'
@@ -69,7 +72,9 @@ const EncounterData: React.FC<{
         <div className={styles.tileValue}>{withUnit(obsValue, units)}</div>
       )}
 
-      {!isNil(summaryValue) && summaryValue !== '--' && <div className={styles.tileValue}>{summaryValue}</div>}
+      {!isNil(summaryValue) && summaryValue !== '--' && (
+        <div className={styles.tileValue}>{withUnit(summaryValue, summaryUnits)}</div>
+      )}
     </>
   );
 };

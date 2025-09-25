@@ -245,6 +245,7 @@ export interface EncounterTileColumn {
   getSummaryObsValue?: (encounter: Encounter) => string;
   encounter?: Encounter;
   hasSummary?: boolean;
+  summaryConcept?: SummaryConcept;
 }
 export interface EncounterTileProps {
   patientUuid: string;
