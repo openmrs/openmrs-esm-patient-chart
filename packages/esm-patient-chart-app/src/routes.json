@@ -31,16 +31,13 @@
     },
     {
       "name": "start-visit-button",
-
-
-      
       "component": "startVisitActionButton",
       "slot": "patient-actions-slot",
       "online": true,
       "offline": true
     },
     {
-      "name": "clinical-views-details",
+      "name": "clinical-views-summary",
       "component": "clinicalViewsSummary",
       "online": true,
       "offline": true

@@ -42,7 +42,6 @@ const EncounterData: React.FC<{
 }> = ({ patientUuid, column }) => {
   const { t } = useTranslation();
   const { lastEncounter, isLoading, error, isValidating } = useLastEncounter(patientUuid, column.encounterTypeUuid);
-  // Extract units directly from the encounter data instead of making a separate API call
   const units = getConceptUnitsFromEncounter(lastEncounter, column.concept);
   const obsValue = column.getObsValue(lastEncounter);
   const summaryValue =

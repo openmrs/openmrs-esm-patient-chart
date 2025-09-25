@@ -10,7 +10,7 @@
   @include type.type-style('body-compact-01');
 }
 
-.graphContainer {
+.graphWidgetContainer {
   display: flex;
   margin: 0 layout.$spacing-05;
   flex-direction: row;
@@ -34,12 +34,6 @@
   :global(.layout-child) {
     margin-top: layout.$spacing-03;
   }
-}
-
-.conceptLabel {
-  @extend .label01;
-  margin-bottom: layout.$spacing-05;
-  display: inline-block;
 }
 
 .tab {
