@@ -67,16 +67,10 @@ const EncounterData: React.FC<{
     <>
       <span className={styles.tileTitle}>{t(column.header)}</span>
       {!(obsValue === '--' && summaryValue !== '--' && !isNil(summaryValue)) && (
-        <span className={styles.tileValue}>
-          <p>{withUnit(obsValue, units)}</p>
-        </span>
+        <div className={styles.tileValue}>{withUnit(obsValue, units)}</div>
       )}
 
-      {!isNil(summaryValue) && summaryValue !== '--' && (
-        <span className={styles.tileValue}>
-          <p>{summaryValue}</p>
-        </span>
-      )}
+      {!isNil(summaryValue) && summaryValue !== '--' && <div className={styles.tileValue}>{summaryValue}</div>}
     </>
   );
 };
