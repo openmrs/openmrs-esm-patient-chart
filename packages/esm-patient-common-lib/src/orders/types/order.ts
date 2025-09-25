@@ -71,6 +71,7 @@ export interface OrderBasketItem {
   orderType?: string;
   orderNumber?: string;
   scheduledDate?: Date;
+  dateActivated?: string;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
