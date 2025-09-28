@@ -1,9 +1,9 @@
 {
   "activeFirst": "Attivi per primi",
   "alphabetically": "A - Z",
-  "assigned": "Assigned",
+  "assigned": "Assegnato",
   "clearSearch": "Cancella ricerca",
-  "clinical": "Clinical",
+  "clinical": "Clinico",
   "closeFlagsBar": "Chiudi barra segnalazioni",
   "disableFlagError": "Errore nella disattivazione della segnalazione",
   "disablingFlag": "Disattivazione della segnalazione in corso...",
@@ -12,7 +12,7 @@
   "editFlags": "Modifica segnalazioni",
   "editPatientFlags": "Modifica segnalazioni paziente",
   "enabledFlag": "Segnalazione attivata",
-  "enableFlagError": "Enable flag error",
+  "enableFlagError": "Errore nell'attivazione della segnalazione",
   "enablingFlag": "Attivazione della segnalazione in corso...",
   "flagCount_one": "{{count}} segnalazione di rischio",
   "flagCount_other": "{{count}} segnalazioni di rischio",
@@ -21,14 +21,14 @@
   "flagDisableError": "Errore nella disattivazione della segnalazione",
   "flagEnabledSuccessfully": "Segnalazione attivata con successo",
   "flagEnableError": "Errore nell'attivazione della segnalazione",
-  "infoFlag": "Info flag",
+  "infoFlag": "Segnalazione di informazione",
   "loading": "Caricamento in corso",
   "matchesForSearchTerm_one": "{{count}} segnalazione",
   "matchesForSearchTerm_other": "{{count}} segnalazioni",
   "noFlagsFound": "Spiacente, nessuna segnalazione trovata corrispondente alla ricerca",
   "retiredFirst": "Disattivati per primi",
-  "riskFlag": "Risk flag",
+  "riskFlag": "Segnalazione di rischio",
   "saveAndClose": "Salva e chiudi",
   "searchForAFlag": "Cerca una segnalazione",
-  "sortBy": "Sort by"
+  "sortBy": "Ordina per"
 }
