@@ -15,7 +15,6 @@ export function getConceptUnitsFromEncounter(encounter: Encounter | null, concep
   const obs = encounter.obs.find((o) => o.concept?.uuid === conceptUuid);
 
   // Return the units if found
-  // The updated representation in useLastEncounter includes the 'units' field
   return obs?.concept?.units || '';
 }
 
