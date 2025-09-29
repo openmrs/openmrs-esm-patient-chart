@@ -1,7 +1,4 @@
 {
-  "chartView": "Tampilan Grafik",
   "dateAndTime": "Tanggal dan waktu",
-  "displaying": "Menampilkan",
-  "encounterType": "Jenis pertemuan",
-  "tableView": "Tampilan Tabel"
+  "encounterType": "Jenis pertemuan"
 }
