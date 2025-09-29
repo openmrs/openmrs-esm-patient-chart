@@ -5,7 +5,7 @@ import useSWR from 'swr';
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
   'patient:(uuid,display,age,identifiers,person),encounterProviders:(uuid,provider:(uuid,name)),' +
-  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,display,name:(uuid,name)),value:(uuid,name:(uuid,name,display),' +
+  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,display,units,name:(uuid,name)),value:(uuid,name:(uuid,name,display),' +
   'names:(uuid,conceptNameType,name,display))),form:(uuid,name))';
 
 export function useLastEncounter(patientUuid: string, encounterType: string) {
