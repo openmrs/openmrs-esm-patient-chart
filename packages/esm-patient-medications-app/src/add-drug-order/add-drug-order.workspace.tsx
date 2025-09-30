@@ -49,6 +49,17 @@ export default function AddDrugOrderWorkspace({
 
   const saveDrugOrder = useCallback(
     (finalizedOrder: DrugOrderBasketItem) => {
+      // a prper error message instead of crushing
+      if (!session.currentProvider) {
+        // Show a proper error message instead of crashing
+        alert(
+          t(
+            'missingProviderError',
+            'Error: The current user is not a provider. A provider is needed in order to record clinical data.',
+          ),
+        );
+        return;
+      }
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
@@ -67,8 +78,12 @@ export default function AddDrugOrderWorkspace({
         onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider, t],
   );
+  //makes the current provider to hydrate first before the session continues
+  if (!session.currentProvider) {
+    return <div className={styles.loading}>{t('loadingProvider', 'Loading provider information...')}</div>;
+  }
 
   if (!currentOrder) {
     return (
