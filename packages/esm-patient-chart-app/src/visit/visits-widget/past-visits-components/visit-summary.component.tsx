@@ -20,6 +20,7 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import styles from './visit-summary.scss';
+import { type ChartConfig } from '../../../config-schema';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -29,7 +30,7 @@ interface VisitSummaryProps {
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
-  const config = useConfig();
+  const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
@@ -83,6 +84,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
 
     // Sort the diagnoses by rank, so that primary diagnoses come first
     diagnoses.sort((a, b) => a.rank - b.rank);
+
+    // Sort medications by dateActivated DESC (newest first) to align with backend ordering
+    medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
 
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);

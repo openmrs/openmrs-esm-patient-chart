@@ -1,6 +1,6 @@
 {
   "abnormalValue": "Valore anomalo",
-  "actions": "Actions",
+  "actions": "Azioni",
   "add": "Aggiungi",
   "additionalNoteText": "Scrivi qui eventuali note aggiuntive",
   "biometricDisplayed": "Dati biometrici visualizzati",
@@ -33,8 +33,8 @@
   "goToSummary": "Vai al riepilogo",
   "heartRate": "Frequenza cardiaca",
   "height": "Altezza",
-  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
-  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
+  "hoursOldVitals_one": "<0>Questi parametri vitali sono stati misurati <1>{{count}} ora fa</1></0>",
+  "hoursOldVitals_other": "<0>Questi parametri vitali sono stati misurati <1>{{count}} ore fa</1></0>",
   "loading": "Caricamento in corso",
   "male": "Maschio",
   "muac": "MUAC",
@@ -75,6 +75,6 @@
   "vitalsAndBiometricsUpdateError": "Errore aggiornando Parametri vitali e Dati biometrici",
   "vitalsHistory": "Storico parametri vitali",
   "vitalSignDisplayed": "Segno vitale visualizzato",
-  "vitalSigns": "Segni vitali",
+  "vitalSigns": "segni vitali",
   "weight": "Peso"
 }

@@ -17,7 +17,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     permissions:
       actions: read
 
@@ -26,17 +25,10 @@ jobs:
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: '20.x'
+          cache: 'yarn'
 
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: 🚀 Setup a local cache server for Turborepo
@@ -63,18 +55,11 @@ jobs:
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.x'
+          cache: 'yarn'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: 🚀 Setup local cache server for Turborepo
@@ -135,18 +120,11 @@ jobs:
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.x'
+          cache: 'yarn'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: 💾 Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
       - name: 📦 Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: 🚀 Setup local cache server for Turborepo

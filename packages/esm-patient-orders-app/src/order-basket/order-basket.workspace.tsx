@@ -9,20 +9,22 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisitContextStore,
+  useVisit,
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
+  invalidateVisitAndEncounterData,
   postOrders,
   postOrdersOnNewEncounter,
   useOrderBasket,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
+import { useSWRConfig } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
-import styles from './order-basket.scss';
 import GeneralOrderType from './general-order-type/general-order-type.component';
+import styles from './order-basket.scss';
 
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
@@ -43,11 +45,12 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid);
+  } = useOrderEncounter(patientUuid, config.orderEncounterType);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -76,9 +79,12 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           abortController,
         );
         mutateEncounterUuid();
-        mutateVisit();
+        // Only revalidate current visit since orders create new encounters
+        mutateCurrentVisit();
+        invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
+
         closeWorkspaceWithSavedChanges();
         showOrderSuccessToast(t, orders);
       } catch (e) {
@@ -91,8 +97,11 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      mutateVisit();
+      // Only revalidate current visit since orders create new encounters
+      mutateCurrentVisit();
       await mutateOrders();
+      invalidateVisitAndEncounterData(mutate, patientUuid);
+
       if (erroredItems.length == 0) {
         closeWorkspaceWithSavedChanges();
         showOrderSuccessToast(t, orders);
@@ -111,11 +120,12 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     mutateEncounterUuid,
     mutateOrders,
-    mutateVisit,
+    mutateCurrentVisit,
     orders,
     patientUuid,
     session,
     t,
+    mutate,
   ]);
 
   const handleCancel = useCallback(() => {

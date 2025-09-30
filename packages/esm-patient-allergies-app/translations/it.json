@@ -47,5 +47,6 @@
   "severityRequired": "La gravità è richiesta",
   "typeAdditionalComments": "Digita eventuali commenti aggiuntivi qui",
   "typeAllergenName": "Digita il nome dell'allergene",
-  "typeAllergicReactionName": "Digita il nome della reazione allergica"
+  "typeAllergicReactionName": "Digita il nome della reazione allergica",
+  "unknown": "Sconosciuto"
 }

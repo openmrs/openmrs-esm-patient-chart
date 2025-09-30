@@ -1,5 +1,6 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ComboBox,
@@ -26,18 +27,25 @@ import {
 import {
   EditIcon,
   isDesktop,
+  launchWorkspace,
   showModal,
   showSnackbar,
   TrashCanIcon,
-  useLayoutType,
-  useSession,
-  userHasAccess,
   useConfig,
+  useLayoutType,
+  userHasAccess,
+  useSession,
+  useVisit,
   type EncounterType,
-  launchWorkspace,
-  useVisitContextStore,
+  ExtensionSlot,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import {
+  type HtmlFormEntryForm,
+  launchFormEntryOrHtmlForms,
+  invalidateVisitAndEncounterData,
+} from '@openmrs/esm-patient-common-lib';
+import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
   mapEncounter,
@@ -47,6 +55,7 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
+import { type ChartConfig } from '../../../../config-schema';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -71,16 +80,21 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
-
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
+  const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
 
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
   const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
     externalModuleName: '@openmrs/esm-patient-forms-app',
   });
   const { htmlFormEntryForms } = formsConfig;
-  const paginatedMappedEncounters = useMemo(() => paginatedEncounters?.map(mapEncounter), [paginatedEncounters]);
+  const paginatedMappedEncounters = useMemo(
+    () => (paginatedEncounters ?? []).map(mapEncounter).filter(Boolean),
+    [paginatedEncounters],
+  );
 
   const tableHeaders = [
     {
@@ -118,7 +132,11 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              mutateVisit();
+              // Update current visit data for critical components
+              mutateCurrentVisit();
+
+              // Also invalidate visit history and encounter tables since the encounter was deleted
+              invalidateVisitAndEncounterData(mutate, patientUuid);
 
               showSnackbar({
                 isLowContrast: true,
@@ -142,7 +160,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         },
       });
     },
-    [mutateVisit, t],
+    [mutate, mutateCurrentVisit, patientUuid, t],
   );
 
   if (isLoadingEncounterTypes || isLoading) {
@@ -208,8 +226,27 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   {rows?.map((row, i) => {
                     const encounter = paginatedMappedEncounters[i];
 
+                    if (!encounter) return null;
+
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
+
+                    const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
+                      encounter.form?.uuid &&
+                      encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
+
+                    const encounterAgeInMinutes = (Date.now() - new Date(encounter.datetime).getTime()) / (1000 * 60);
+
+                    const canDeleteEncounter =
+                      userHasAccess(encounter.editPrivilege, session?.user) &&
+                      (encounterEditableDuration === 0 ||
+                        (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                        encounterEditableDurationOverridePrivileges.some((privilege) =>
+                          userHasAccess(privilege, session?.user),
+                        ));
+
+                    const canEditEncounter =
+                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
 
                     return (
                       <React.Fragment key={encounter.id}>
@@ -219,13 +256,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
-                              <OverflowMenu
-                                aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
-                                flipped
-                                size={responsiveSize}
-                              >
-                                {userHasAccess(encounter.editPrivilege, session?.user) &&
-                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
+                              {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
+                                <OverflowMenu
+                                  aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+                                  flipped
+                                  size={responsiveSize}
+                                  align="left"
+                                >
+                                  {canEditEncounter && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
@@ -251,55 +289,69 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       }}
                                     />
                                   )}
-                                {userHasAccess(encounter.editPrivilege, session?.user) && (
-                                  <OverflowMenuItem
-                                    className={styles.menuItem}
-                                    hasDivider
-                                    isDelete
-                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                    onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                  />
-                                )}
-                              </OverflowMenu>
+                                  {canDeleteEncounter && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      hasDivider
+                                      isDelete
+                                      itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                      onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
+                                    />
+                                  )}
+                                </OverflowMenu>
+                              )}
                             </Layer>
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                             <>
-                              <EncounterObservations observations={encounter.obs} />
-                              {userHasAccess(encounter.editPrivilege, session?.user) && (
-                                <>
-                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
-                                    <Button
-                                      kind="ghost"
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchFormEntryOrHtmlForms(
-                                            htmlFormEntryForms,
-                                            patientUuid,
-                                            encounter.form,
-                                            encounter.visitUuid,
-                                            encounter.id,
-                                            encounter.visitTypeUuid,
-                                            encounter.visitStartDatetime,
-                                            encounter.visitStopDatetime,
-                                          );
-                                        }
-                                      }}
-                                      renderIcon={(props: ComponentProps<typeof EditIcon>) => (
-                                        <EditIcon size={16} {...props} />
-                                      )}
-                                    >
-                                      {t('editThisEncounter', 'Edit this encounter')}
-                                    </Button>
-                                  )}
+                              {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
+                                <ExtensionSlot
+                                  name="form-widget-slot"
+                                  state={{
+                                    additionalProps: { mode: 'embedded-view' },
+                                    patientUuid: patientUuid,
+                                    formUuid: encounter.form.uuid,
+                                    encounterUuid: encounter.id,
+                                    promptBeforeClosing: () => {},
+                                  }}
+                                />
+                              ) : (
+                                <EncounterObservations observations={encounter.obs} />
+                              )}
+                              <>
+                                {canEditEncounter && (
+                                  <Button
+                                    kind="ghost"
+                                    onClick={() => {
+                                      if (isVisitNoteEncounter(encounter)) {
+                                        launchWorkspace('visit-notes-form-workspace', {
+                                          encounter,
+                                          formContext: 'editing',
+                                          patientUuid,
+                                        });
+                                      } else {
+                                        launchFormEntryOrHtmlForms(
+                                          htmlFormEntryForms,
+                                          patientUuid,
+                                          encounter.form,
+                                          encounter.visitUuid,
+                                          encounter.id,
+                                          encounter.visitTypeUuid,
+                                          encounter.visitStartDatetime,
+                                          encounter.visitStopDatetime,
+                                        );
+                                      }
+                                    }}
+                                    renderIcon={(props: ComponentProps<typeof EditIcon>) => (
+                                      <EditIcon size={16} {...props} />
+                                    )}
+                                  >
+                                    {t('editThisEncounter', 'Edit this encounter')}
+                                  </Button>
+                                )}
+                                {canDeleteEncounter && (
                                   <Button
                                     kind="danger--ghost"
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
@@ -309,8 +361,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                   >
                                     {t('deleteThisEncounter', 'Delete this encounter')}
                                   </Button>
-                                </>
-                              )}
+                                )}
+                              </>
                             </>
                           </TableExpandedRow>
                         ) : (

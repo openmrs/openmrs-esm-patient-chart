@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity, useFeatureFlag, useVisitContextStore } from '@openmrs/esm-framework';
+import { useSWRConfig } from 'swr';
+import { ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
 import {
   clinicalFormsWorkspace,
+  invalidateVisitAndEncounterData,
+  useVisitOrOfflineVisit,
   type DefaultPatientWorkspaceProps,
   type FormEntryProps,
-  useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
 interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
@@ -28,7 +30,8 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [showForm, setShowForm] = useState(true);
   const isOnline = useConnectivity();
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
 
   const state = useMemo(
     () => ({
@@ -48,7 +51,12 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       },
       closeWorkspaceWithSavedChanges: () => {
         typeof mutateForm === 'function' && mutateForm();
-        mutateVisit();
+        // Update current visit data for critical components
+        mutateCurrentVisit();
+
+        // Also invalidate visit history and encounter tables since form submission may create/update encounters
+        invalidateVisitAndEncounterData(globalMutate, patientUuid);
+
         closeWorkspaceWithSavedChanges();
       },
       promptBeforeClosing,
@@ -56,26 +64,27 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({
       clinicalFormsWorkspaceName,
     }),
     [
-      formUuid,
-      visitUuid,
-      visitTypeUuid,
-      encounterUuid,
-      visitStartDatetime,
-      visitStopDatetime,
-      currentVisit?.uuid,
-      currentVisit?.visitType?.uuid,
-      currentVisit?.startDatetime,
-      currentVisit?.stopDatetime,
-      patientUuid,
-      patient,
-      isOnline,
-      mutateForm,
-      mutateVisit,
-      closeWorkspace,
-      closeWorkspaceWithSavedChanges,
-      promptBeforeClosing,
       additionalProps,
       clinicalFormsWorkspaceName,
+      closeWorkspace,
+      closeWorkspaceWithSavedChanges,
+      currentVisit?.startDatetime,
+      currentVisit?.stopDatetime,
+      currentVisit?.uuid,
+      currentVisit?.visitType?.uuid,
+      encounterUuid,
+      formUuid,
+      globalMutate,
+      isOnline,
+      mutateCurrentVisit,
+      mutateForm,
+      patient,
+      patientUuid,
+      promptBeforeClosing,
+      visitStartDatetime,
+      visitStopDatetime,
+      visitTypeUuid,
+      visitUuid,
     ],
   );
 

@@ -3,12 +3,11 @@ import { type Order } from '@openmrs/esm-patient-common-lib';
 import { generateRandomDrugOrder, deleteDrugOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
 import { type Encounter, type Provider } from '../commands/types';
 import { test } from '../core';
-import { OrdersPage } from '../pages';
+import { MedicationsPage, OrdersPage } from '../pages';
 
 let drugOrder: Order;
 let encounter: Encounter;
 let orderer: Provider;
-const url = process.env.E2E_BASE_URL;
 
 test.beforeEach(async ({ api, patient, visit }) => {
   orderer = await getProvider(api);
@@ -19,9 +18,10 @@ test.beforeEach(async ({ api, patient, visit }) => {
 test.describe('Drug Order Tests', () => {
   test('Record a drug order', async ({ page, patient }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await medicationsPage.goTo(patient.uuid);
     });
 
     await test.step('And I click the Add button on the medications details table', async () => {
@@ -127,11 +127,12 @@ test.describe('Drug Order Tests', () => {
   });
 
   test('Edit a drug order', async ({ page, patient }) => {
+    const medicationsPage = new MedicationsPage(page);
     const form = page.locator('#drugOrderForm');
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await medicationsPage.goTo(patient.uuid);
     });
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
@@ -211,9 +212,10 @@ test.describe('Drug Order Tests', () => {
 
   test('Discontinue a drug order', async ({ page, patient }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
 
     await test.step('When I visit the medications page', async () => {
-      await page.goto(url + `/spa/patient/${patient.uuid}/chart/Medications`);
+      await medicationsPage.goTo(patient.uuid);
     });
 
     await test.step('And I click on the "Discontinue" button', async () => {

@@ -5,11 +5,11 @@ export interface Immunization {
   vaccineUuid: string;
   immunizationObsUuid?: string;
   manufacturer?: string;
+  nextDoseDate?: string;
   expirationDate?: string;
   occurrenceDateTime?: string;
   lotNumber?: string;
   doseNumber?: number;
-  formChanged?: any;
 }
 
 export interface ImmunizationGrouped {
@@ -22,10 +22,12 @@ export interface ImmunizationGrouped {
 export interface ImmunizationFormState {
   vaccineUuid: string;
   immunizationId?: string;
-  vaccinationDate: Date;
+  vaccinationDate: string;
   doseNumber: number;
-  expirationDate: Date;
+  note: string;
+  expirationDate: string;
   lotNumber: string;
+  nextDoseDate: string;
   manufacturer: string;
   visitId?: string;
   locationId?: string;
@@ -45,7 +47,11 @@ export interface Sequence {
 export interface ExistingDoses {
   expirationDate: string;
   immunizationObsUuid: string;
+  note: Array<{
+    text: string;
+  }>;
   visitUuid?: string;
+  nextDoseDate: string;
   lotNumber: string;
   manufacturer: string;
   occurrenceDateTime: string;

@@ -1,6 +1,6 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
-export const configSchema = {
+export const configSchemaSwitchable = {
   title: {
     _type: Type.String,
     _description: 'Displayed at the top of the widget.',
@@ -31,12 +31,18 @@ export const configSchema = {
       label: {
         _type: Type.String,
         _default: '',
-        _description: 'The text to display. Defaults to the concept display name.',
+        _description: 'Label to display for the concept. If not provided, the concept display name will be used.',
       },
       color: {
         _type: Type.String,
         _default: 'blue',
         _description: 'The color of the line to display in the line graph.',
+      },
+      graphGroup: {
+        _type: Type.String,
+        _default: '',
+        _description:
+          'For showing multiple lines on the same graph. If multiple obs should be shown together, give them the same `graphGroup`. The value of `graphGroup` will be used as the label (or translation key) in the graph view menu panel.',
       },
       decimalPlaces: {
         _type: Type.Number,
@@ -72,12 +78,12 @@ export const configSchema = {
     _elements: {
       _type: Type.String,
     },
-    _description: 'Encounter types used to filter the requests',
+    _description: 'Only show obs from these encounter types',
     _default: [],
   },
   dateFormat: {
     _type: Type.String,
-    _description: 'Type of display for data',
+    _description: 'Format the date as a "date", "time", or "dateTime"',
     _default: 'dateTime',
     _validators: [validators.oneOf(['date', 'time', 'dateTime'])],
   },
@@ -88,7 +94,7 @@ export const configSchema = {
   },
 };
 
-export interface ConfigObject {
+export interface ConfigObjectSwitchable {
   title: string;
   resultsName: string;
   graphOldestFirst: boolean;
@@ -97,6 +103,8 @@ export interface ConfigObject {
     concept: string;
     label: string;
     color: string;
+    graphGroup: string;
+    decimalPlaces: number;
   }>;
   table: {
     pageSize: number;
@@ -104,4 +112,5 @@ export interface ConfigObject {
   showGraphByDefault: boolean;
   encounterTypes: Array<string>;
   dateFormat: 'date' | 'time' | 'dateTime';
+  showEncounterType: boolean;
 }

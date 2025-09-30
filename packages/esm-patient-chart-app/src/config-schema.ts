@@ -16,6 +16,19 @@ export const esmPatientChartSchema = {
     _default: false,
     _description: 'Disable notes/tests/medications/encounters tabs when empty',
   },
+  encounterEditableDuration: {
+    _type: Type.Number,
+    _default: 0,
+    _description: 'The number of minutes an encounter is editable after it is created. 0 means the encounter is editable forever.',
+  },
+  encounterEditableDurationOverridePrivileges: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: [],
+    _description: 'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
+  },
   freeTextFieldConceptUuid: {
     _type: Type.ConceptUuid,
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -147,11 +160,42 @@ export const esmPatientChartSchema = {
     _description: 'Default concept uuid for other in forms',
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  tileDefinitions: {
+    _type: Type.Array,
+    _default: [
+      {
+        title: 'Weight and Height',
+        columns: [
+          {
+            title: 'Weight',
+            concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            encounterType: '67a71486-1a54-468f-ac3e-7091a9a79584',
+            hasSummary: true,
+          },
+          {
+            title: 'Height',
+            concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            encounterType: '67a71486-1a54-468f-ac3e-7091a9a79584',
+            hasSummary: true,
+          },
+        ],
+      },
+    ],
+    _description: 'Definitions for clinical summary tiles with their concepts and encounter types',
+  },
+  requireActiveVisitForEncounterTile: {
+    _type: Type.Boolean,
+    _description: 'Whether to require an active visit for the encounter tile',
+    _default: true,
+  },
 };
 
 export interface ChartConfig {
   defaultFacilityUrl: string;
   disableChangingVisitLocation: boolean;
+  disableEmptyTabs: boolean;
+  encounterEditableDuration: number;
+  encounterEditableDurationOverridePrivileges: Array<string>;
   freeTextFieldConceptUuid: string;
   logo: {
     alt: string;
@@ -174,7 +218,17 @@ export interface ChartConfig {
     uuid: string;
   }>;
   visitDiagnosisConceptUuid: string;
+  requireActiveVisitForEncounterTile: boolean;
   trueConceptUuid: string;
   falseConceptUuid: string;
+  tileDefinitions: Array<{
+    title: string;
+    columns: Array<{
+      title: string;
+      concept: string;
+      encounterType: string;
+      hasSummary?: boolean;
+    }>;
+  }>;
   otherConceptUuid: string;
 }

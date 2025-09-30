@@ -22,13 +22,22 @@ interface ObsTreeNode {
 
 const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   const outData: Partial<ObsTreeNode> = JSON.parse(JSON.stringify(node));
-  outData.flatName = getName(prefix, node.display);
+
+  // Build flatName with hierarchy but ensure we don't lose any tests
+  if (prefix && prefix !== 'Bloodwork') {
+    outData.flatName = `${prefix.trim()}-${node.display.trim()}`;
+  } else if (prefix === 'Bloodwork') {
+    // For Bloodwork, use the simplified name to avoid duplicates
+    // but ensure the test is still accessible
+    outData.flatName = node.display.trim();
+  } else {
+    outData.flatName = node.display.trim();
+  }
+
   outData.hasData = false;
 
   if (outData?.subSets?.length) {
-    outData.subSets = outData.subSets.map((subNode: ObsTreeNode) =>
-      augmentObstreeData(subNode, getName(prefix, node?.display)),
-    );
+    outData.subSets = outData.subSets.map((subNode: ObsTreeNode) => augmentObstreeData(subNode, outData.flatName));
     outData.hasData = outData.subSets.some((subNode: ObsTreeNode) => subNode.hasData);
   }
   if (exist(outData?.hiNormal, outData?.lowNormal)) {
