@@ -24,11 +24,6 @@ export const configSchema = {
     _description:
       'Determines whether or not to display the Print button in both the active and past medications datatable headers. If set to true, a Print button gets shown in both the active and past medications table headers. When clicked, this button enables the user to print out the contents of the table',
   },
-  maxDispenseDurationInDays: {
-    _type: Type.Number,
-    _default: 99,
-    _description: 'The maximum number of days for medication dispensing.',
-  },
   debounceDelayInMs: {
     _type: Type.Number,
     _description:
@@ -56,7 +51,6 @@ export interface ConfigObject {
   };
   drugOrderTypeUUID: string;
   showPrintButton: boolean;
-  maxDispenseDurationInDays: number;
   debounceDelayInMs: number;
   requireIndication: boolean;
   prescriberProviderRoles: Array<string>;
