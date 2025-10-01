@@ -361,7 +361,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient } = usePatientChartStore();
   const patientName = patient ? getPatientName(patient) : '';
-  const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -635,7 +634,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       label={t('duration', 'Duration')}
                       min={0}
                       step={1}
-                      max={maxDispenseDurationInDays}
                       allowEmpty
                     />
                   ) : (
@@ -773,7 +771,6 @@ interface CustomNumberInputProps {
 
 const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...inputProps }: CustomNumberInputProps) => {
   const { t } = useTranslation();
-  const { maxDispenseDurationInDays } = useConfig();
   const responsiveSize = isTablet ? 'md' : 'sm';
 
   const {
@@ -789,7 +786,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   );
 
   const increment = () => {
-    setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
+    setValue(name, Number(value) + 1);
   };
 
   const decrement = () => {
