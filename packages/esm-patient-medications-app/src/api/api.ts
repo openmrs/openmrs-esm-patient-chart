@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig, useOpenmrsFetchAll, type FetchResponse } from '@openmrs/esm-framework';
 import type { DrugOrderPost, PatientOrderFetchResponse, Order } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type DrugOrderBasketItem } from '../types';
@@ -228,4 +228,20 @@ export function useRequireOutpatientQuantity(): {
   );
 
   return results;
+}
+export interface Provider {
+  uuid: string;
+  person: {
+    display?: string;
+  };
+}
+
+export function useProviders(providerRoles: Array<string>) {
+  const rep = 'custom:(uuid,person:(display)';
+  const ret = useOpenmrsFetchAll<Provider>(
+    providerRoles?.length > 0 ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
+  );
+
+  ret.data?.sort((a, b) => a.person?.display.localeCompare(b.person?.display));
+  return ret;
 }

@@ -63,6 +63,7 @@
   "patientInstructions": "Patient instructions",
   "patientInstructionsPlaceholder": "Additional dosing instructions (e.g. \"Take after eating\")",
   "pillDispensedErrorMessage": "Quantity to dispense is required",
+  "prescribingClinician": "Prescribing Clinician",
   "prescriptionDuration": "2. Prescription duration",
   "prescriptionRefills": "Prescription refills",
   "print": "Print",

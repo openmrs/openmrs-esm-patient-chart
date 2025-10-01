@@ -3,6 +3,9 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies": {
+    "providermanagement": "^2.16.0"
+  },
   "extensions": [
     {
       "name": "medications-details-widget",
@@ -36,6 +39,10 @@
       "component": "drugOrderPanel",
       "slot": "order-basket-slot",
       "order": 1
+    },
+    {
+      "name": "drug-order-form",
+      "component": "drugOrderForm"
     }
   ],
   "workspaces": [
