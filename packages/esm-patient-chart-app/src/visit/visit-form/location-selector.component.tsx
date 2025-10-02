@@ -47,7 +47,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ control }) => {
 
   useEffect(() => {
     if (config.restrictByVisitLocationTag && !isEmrApiModuleInstalled) {
-      console.warn('EMR API module is not installed. Visit location will not be restricted by location tag.');
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('EMR API module is not installed. Visit location will not be restricted by location tag.');
+      }
     }
   }, [config.restrictByVisitLocationTag, isEmrApiModuleInstalled]);
 

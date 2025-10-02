@@ -498,7 +498,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     ],
   );
 
-  const onError = (errors) => console.error(errors);
+  const onError = (errors) => {
+    // Log errors for debugging purposes only
+    if (process.env.NODE_ENV === 'development') {
+      console.error(errors);
+    }
+  };
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
