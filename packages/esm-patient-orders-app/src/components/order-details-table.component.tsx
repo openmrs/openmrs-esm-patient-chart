@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dayjs from 'dayjs';
 import { capitalize, lowerCase } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import dayjs from 'dayjs';
 import {
   Button,
   DataTable,
@@ -113,25 +113,36 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   // UI-controlled date range
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   // Derived API filter dates (ISO strings)
-  const [fromUI, toUI] = dateRange;
-  const selectedFromDate = useMemo(() => (fromUI ? dayjs(fromUI).startOf('day').toISOString() : null), [fromUI]);
-  const selectedToDate = useMemo(() => (toUI ? dayjs(toUI).endOf('day').toISOString() : null), [toUI]);
+  const [startDate, endDate] = dateRange;
+  const selectedFromDate = useMemo(
+    () => (startDate ? dayjs(startDate).startOf('day').toISOString() : null),
+    [startDate],
+  );
+  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).endOf('day').toISOString() : null), [endDate]);
 
   const selectedOrderType = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid);
 
-  const emptyStateDisplayText = useMemo(() => {
-    if (!selectedOrderType) {
+  const getOrderTypeDisplayText = useCallback(
+    (orderType: OrderType | undefined) => {
+      if (!orderType) {
+        return t('ordersLower', 'orders');
+      }
+
+      const label = (orderType.display || orderType.name || '').toLowerCase();
+      if (label.includes('test')) {
+        return t('testOrders', 'test orders');
+      }
+      if (label.includes('drug')) {
+        return t('drugOrders', 'drug orders');
+      }
       return t('ordersLower', 'orders');
-    }
-    const label = (selectedOrderType.display || selectedOrderType.name || '').toLowerCase();
-    if (label.includes('test')) {
-      return t('testOrders', 'test orders');
-    }
-    if (label.includes('drug')) {
-      return t('drugOrders', 'drug orders');
-    }
-    return t('ordersLower', 'orders');
-  }, [selectedOrderType, t]);
+    },
+    [t],
+  );
+
+  const emptyStateDisplayText = useMemo(() => {
+    return getOrderTypeDisplayText(selectedOrderType);
+  }, [selectedOrderType, getOrderTypeDisplayText]);
 
   const getOrderTypeLabel = useCallback(
     (orderType: OrderType) => {
@@ -141,6 +152,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
       if (!orderType.uuid) {
         return t('allOrders', 'All orders');
       }
+
       const label = (orderType.display || orderType.name || '').toLowerCase();
       if (label.includes('drug')) {
         const value = t('drugOrders', 'Drug orders');
@@ -393,7 +405,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         <OpenmrsDateRangePicker
           className={styles.inlineDateRange}
           labelText={t('dateRange', 'Date range') + ':'}
-          data-testid="orderDateRangePicker"
           maxDate={new Date()}
           onChange={handleDateFilterChange}
           value={dateRange}
