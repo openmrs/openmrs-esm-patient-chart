@@ -24,7 +24,7 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
           <span>{t('encounter', 'Encounter')}</span> <span>&middot;</span>
           <span>{t('provider', 'Provider')}</span> <span>&middot;</span>{' '}
           <span>
-            {t('timeStarted', 'Time started')} <span>&mdash;</span> {t('timeCompleted', 'Time Completed')}{' '}
+            {t('timeStarted', 'Time started')} <span>&mdash;</span> {t('timeCompleted', 'Time completed')}{' '}
           </span>
         </p>
         <div className={styles.timelineEntries}>
