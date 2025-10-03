@@ -39,3 +39,5 @@ export const addDrugOrderWorkspace = getAsyncLifecycle(
   () => import('./add-drug-order/add-drug-order.workspace'),
   options,
 );
+
+export const drugOrderForm = getAsyncLifecycle(() => import('./add-drug-order/drug-order-form.component'), options);

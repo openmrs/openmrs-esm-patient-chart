@@ -32,6 +32,7 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
+  useSession,
 } from '@openmrs/esm-framework';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -48,7 +49,7 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { useRequireOutpatientQuantity } from '../api';
+import { type Provider, useProviders, useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
@@ -71,6 +72,9 @@ function useCreateMedicationOrderFormSchema() {
     };
 
     const baseSchemaFields = {
+      orderer: z.object({
+        uuid: z.string(),
+      }),
       freeTextDosage: z.string().refine((value) => !!value, {
         message: t('freeDosageErrorMessage', 'Add free dosage note'),
       }),
@@ -238,6 +242,22 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
+  const { currentProvider: _provider, user } = useSession();
+  const currentProvider: Provider = useMemo(
+    () => ({
+      ..._provider,
+      person: user.person,
+    }),
+    [_provider, user],
+  );
+  const { data: providers } = useProviders(config.prescriberProviderRoles);
+  const providersWithCurrentUser = useMemo(() => {
+    if (providers == null) {
+      return providers;
+    }
+    return providers.some((p) => p.uuid === currentProvider.uuid) ? providers : [currentProvider, ...providers];
+  }, [providers, currentProvider]);
+
   const {
     control,
     formState: { isDirty },
@@ -249,6 +269,9 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
     mode: 'all',
     resolver: zodResolver(medicationOrderFormSchema),
     defaultValues: {
+      orderer: initialOrderBasketItem?.orderer
+        ? providersWithCurrentUser?.find((p) => p.uuid == initialOrderBasketItem.orderer)
+        : currentProvider,
       isFreeTextDosage: initialOrderBasketItem?.isFreeTextDosage,
       freeTextDosage: initialOrderBasketItem?.freeTextDosage,
       dosage: initialOrderBasketItem?.dosage ?? null,
@@ -288,6 +311,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const handleFormSubmission = (data: MedicationOrderFormData) => {
     const newBasketItems = {
       ...initialOrderBasketItem,
+      orderer: data.orderer.uuid,
       isFreeTextDosage: data.isFreeTextDosage,
       freeTextDosage: data.freeTextDosage,
       dosage: data.dosage,
@@ -304,8 +328,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
       indication: data.indication,
       frequency: data.frequency,
       startDate: data.startDate,
-    };
-    onSave(newBasketItems as DrugOrderBasketItem);
+    } as DrugOrderBasketItem;
+    onSave(newBasketItems);
   };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(
@@ -349,6 +373,10 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
 
   const filterItemsByName = useCallback((menu) => {
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+  }, []);
+
+  const filterItemsByProviderName = useCallback((menu) => {
+    return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
 
   const filterItemsBySynonymNames = useCallback((menu) => {
@@ -444,6 +472,22 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               unitValue={unitValue}
             />
           </div>
+          <section className={styles.formSection}>
+            {providers?.length > 0 && (
+              <ControlledFieldInput
+                control={control}
+                name="orderer"
+                type="comboBox"
+                getValues={getValues}
+                id="orderer"
+                shouldFilterItem={filterItemsByProviderName}
+                placeholder={t('prescribingClinician', 'Prescribing Clinician')}
+                titleText={t('prescribingClinician', 'Prescribing Clinician')}
+                items={providersWithCurrentUser}
+                itemToString={(item: Provider) => item?.person?.display}
+              />
+            )}
+          </section>
           <section className={styles.formSection}>
             <Grid className={styles.gridRow}>
               <Column lg={12} md={6} sm={4}>
@@ -852,7 +896,6 @@ const ControlledFieldInput = ({
     fieldState: { error },
   } = useController<MedicationOrderFormData>({ name, control });
   const isTablet = useLayoutType() === 'tablet';
-  const responsiveSize = isTablet ? 'md' : 'sm';
 
   const fieldErrorStyles = classNames({
     [styles.fieldError]: error?.message,
@@ -953,6 +996,7 @@ const ControlledFieldInput = ({
           ref={ref}
           size={isTablet ? 'md' : 'sm'}
           selectedItem={value}
+          initialSelectedItem={value}
           {...comboBoxProps}
         />
       );
@@ -968,3 +1012,5 @@ const ControlledFieldInput = ({
     </>
   );
 };
+
+export default DrugOrderForm;
