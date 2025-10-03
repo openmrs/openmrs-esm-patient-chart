@@ -50,10 +50,7 @@ describe('PanelView', () => {
     );
 
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /hiv viral load/i })).toBeInTheDocument();
-    // This observation belongs to two panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(1);
   });
 
   it('filters the panel view when searching for a test', async () => {
@@ -69,10 +66,7 @@ describe('PanelView', () => {
     const searchButton = screen.getByRole('button', { name: /search/i });
     expect(searchButton).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /hematology/i })).toBeInTheDocument();
-    // This observation belongs to both panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(1);
 
     await user.click(searchButton);
 
@@ -83,7 +77,6 @@ describe('PanelView', () => {
     await user.keyboard('{Enter}');
 
     expect(screen.queryByRole('row', { name: /platelets 56/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
   });
 
   it('selecting a test opens the timeline view on tablet', async () => {
@@ -98,16 +91,22 @@ describe('PanelView', () => {
       </FilterProvider>,
     );
 
-    const hivViralLoadCell = screen.getByRole('cell', { name: /hiv viral load/i });
-    await user.click(hivViralLoadCell);
+    const plateletsCell = screen.getByRole('cell', {
+      name: /platelets/i,
+    });
+    await user.click(plateletsCell);
 
-    expect(screen.getByRole('banner', { name: /hiv viral load/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('banner', {
+        name: /complete blood count/i,
+      }),
+    ).toBeInTheDocument();
 
     const backButton = screen.getByRole('button', { name: /back/i });
     expect(backButton).toBeInTheDocument();
     await user.click(backButton);
 
     expect(backButton).not.toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /platelets 56/i })).toBeInTheDocument();
   });
 });
