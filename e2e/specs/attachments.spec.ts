@@ -87,6 +87,17 @@ test('Add and remove an attachment', async ({ page, patient }) => {
     await page.getByRole('tab', { name: 'Webcam' }).click();
   });
 
+  const video = page.locator('video');
+  await expect(video).toBeVisible({ timeout: 1000 });
+
+  await page.waitForFunction(
+    () => {
+      const video = document.querySelector('video');
+      return video && video.readyState === 4;
+    },
+    { timeout: 1000 },
+  );
+
   await test.step('And I capture a photo from webcam', async () => {
     await page.locator('#inner-circle').click();
   });
