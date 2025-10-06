@@ -104,6 +104,31 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
+### End-to-End Tests (E2E)
+
+Before running the E2E tests, you need to set up the test environment.
+
+1. Install Playwright browsers:
+   ```bash
+   npx playwright install
+   ```
+
+2. Set up environment variables:
+   
+   Copy the example environment file to a new .env file:
+   ```bash
+   cp example.env .env
+   ```
+   
+   The .env file is used to configure the E2E tests.
+   
+   - If you are running against a local OpenMRS backend instance, modify the variables in this .env file to match your local development environment.
+   
+   - If you are not running a local OpenMRS backend instance, you should still create the .env file and set the E2E_BASE_URL variable within it to point to a remote instance. For example:
+     ```
+     E2E_BASE_URL=https://dev3.openmrs.org/openmrs
+     ```
+
 To run end-to-end tests, run:
 
 ```bash
