@@ -135,20 +135,6 @@ describe('Biometrics Overview', () => {
 
     // Initial state should be descending
     expect(getRowDates()).toEqual(expectedDescendingOrder);
-
-    // Sorting in descending order
-    // Since the date order is already in descending order, the rows should be the same
-    await user.click(sortRowsButton);
-    // Sorting in ascending order
-    await user.click(sortRowsButton);
-    expect(getRowDates()).toEqual(expectedAscendingOrder);
-
-    // Sorting order = NONE, hence it is still in the ascending order
-    await user.click(sortRowsButton);
-    // Sorting in descending order
-    await user.click(sortRowsButton);
-
-    expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

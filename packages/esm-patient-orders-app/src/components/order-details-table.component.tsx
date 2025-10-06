@@ -518,7 +518,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                     ))}
                                     {!isPrinting && (
                                       <TableCell className="cds--table-column-menu">
-                                        {isOmrsOrder(matchingOrder) ? (
+                                        {matchingOrder && isOmrsOrder(matchingOrder) ? (
                                           <OrderBasketItemActions
                                             launchOrderForm={() => launchOrderForm(matchingOrder)}
                                             openOrderBasket={launchOrderBasket}
@@ -526,7 +526,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                           />
                                         ) : (
                                           <ExtensionSlot
-                                            name={`${matchingOrder.type}-action-menu-items-slot`}
+                                            name={`${matchingOrder?.type}-action-menu-items-slot`}
                                             state={{
                                               className: styles.menuItem,
                                               orderItem: matchingOrder,
