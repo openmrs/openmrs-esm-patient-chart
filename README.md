@@ -104,35 +104,57 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
-### End-to-End Tests (E2E)
+## Running unit and integration tests (E2E)
 
 Before running the E2E tests, you need to set up the test environment.
 
-1. Install Playwright browsers:
-   ```bash
-   npx playwright install
-   ```
+```bash
+npx playwright install
+cp example.env .env
+```
 
-2. Set up environment variables:
-   
-   Copy the example environment file to a new .env file:
-   ```bash
-   cp example.env .env
-   ```
-   
-   The .env file is used to configure the E2E tests.
-   
-   - If you are running against a local OpenMRS backend instance, modify the variables in this .env file to match your local development environment.
-   
-   - If you are not running a local OpenMRS backend instance, you should still create the .env file and set the E2E_BASE_URL variable within it to point to a remote instance. For example:
-     ```
-     E2E_BASE_URL=https://dev3.openmrs.org/openmrs
-     ```
+By default, tests run against a local backend at http://localhost:8080/openmrs. To test local changes, make sure your dev server is running before executing tests. For example, to test local changes to the Allergies app, run:
 
-To run end-to-end tests, run:
+```bash
+yarn start --sources packages/esm-patient-allergies-app
+```
+
+To test against a remote instance (such as the OpenMRS refapp hosted on dev3.openmrs.org, update the E2E_BASE_URL environment variable in your .env file:
+
+```
+E2E_BASE_URL=https://dev3.openmrs.org/openmrs
+```
+
+To run E2E tests:
 
 ```bash
 yarn test-e2e
+```
+
+This will run all the E2E tests (files in the e2e directory with the *.spec.ts extension) in headless mode. That means no browser UI will be visible.
+
+To run tests in headed mode (shows the browser while tests run) use:
+
+```bash
+yarn test-e2e --headed
+```
+
+To run tests in Playwright's UI mode (interactive debugger), use:
+
+```bash
+yarn test-e2e --ui
+```
+
+You'll most often want to run tests in both headed and UI mode:
+
+```bash
+yarn test-e2e --headed --ui
+```
+
+To run a specific test file:
+
+```bash
+yarn test-e2e <test-name>
 ```
 
 Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) to learn more about End-to-End tests in this project.
