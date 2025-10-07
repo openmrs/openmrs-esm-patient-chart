@@ -56,9 +56,9 @@ yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/e
 
 Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962685/Develop+Frontend+Modules#Using-import-map-overrides).
 
-## Running tests
+## Running unit and integration tests
 
-To run tests for all packages, run:
+To run unit and integration tests for all packages, run:
 
 ```bash
 yarn turbo run test
@@ -84,8 +84,7 @@ yarn turbo run test -- visit-notes-form
 
 The above command will only run tests in the file or files that match the provided string.
 
-You can also run the matching tests from above in watch mode. In order to interact with the
-test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
+You can also run the matching tests from above in watch mode. In order to interact with the test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
 and then press "enter" in the Turbo UI to activate interactive mode.
 
 ```bash
@@ -104,9 +103,9 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
-## Running End-to-End tests (E2E)
+## Running End-to-End (E2E) tests 
 
-Before running the E2E tests, you need to set up the test environment.
+Before running the E2E tests, you need to set up the test environment. Install Playwright browsers and setup the default test environment variables by running the following commands: 
 
 ```bash
 npx playwright install
