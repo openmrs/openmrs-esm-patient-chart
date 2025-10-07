@@ -10,7 +10,7 @@ export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-interface ObsTreeNode {
+export interface ObsTreeNode {
   flatName?: string;
   display: string;
   hasData: boolean;
@@ -173,7 +173,35 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
       ]
     );
   }, [data]);
-  const roots = result.map((item) => item.data);
+
+  const filterNodesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
+    // If this node has obs data, include it
+    if (node.obs && node.obs.length > 0) {
+      return node;
+    }
+
+    // If this node has subSets, recursively filter them
+    if (node.subSets && node.subSets.length > 0) {
+      const filteredSubSets = node.subSets
+        .map((subSet) => filterNodesWithData(subSet))
+        .filter((subSet): subSet is ObsTreeNode => subSet !== null);
+
+      // Only include this node if it has valid subSets after filtering
+      if (filteredSubSets.length > 0) {
+        return { ...node, subSets: filteredSubSets };
+      }
+    }
+
+    // No data found in this branch
+    return null;
+  };
+
+  const roots = result
+    .map((item) => item.data)
+    .filter((data): data is ObsTreeNode => 'display' in data)
+    .map((data) => filterNodesWithData(data))
+    .filter((data): data is ObsTreeNode => data !== null);
+
   const isLoading = result.some((item) => item.loading);
 
   return { roots, isLoading, error };

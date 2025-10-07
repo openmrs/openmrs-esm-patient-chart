@@ -7,6 +7,7 @@ import { type ConfigObject, configSchema } from '../../config-schema';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import TreeView from './tree-view.component';
 import { FilterProvider, type Roots } from '../filter/filter-context';
+import { type ObsTreeNode } from '../grouped-timeline/useObstreeData';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -93,7 +94,7 @@ describe('TreeView', () => {
 
   it('renders the tree view when test data is successfully fetched', async () => {
     mockUseGetManyObstreeData.mockReturnValue({
-      roots: mockResults,
+      roots: mockResults as unknown as Array<ObsTreeNode>,
       isLoading: false,
       error: null,
     });
