@@ -104,7 +104,7 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
-## Running unit and integration tests (E2E)
+## Running End-to-End tests (E2E)
 
 Before running the E2E tests, you need to set up the test environment.
 
