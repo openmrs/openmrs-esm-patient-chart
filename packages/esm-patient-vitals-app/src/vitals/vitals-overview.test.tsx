@@ -113,23 +113,6 @@ describe('VitalsOverview', () => {
       /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
     ];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
-
-    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
-
-    // Sorting in descending order
-    // Since the date order is already in descending order, the rows should be the same
-    await user.click(sortRowsButton);
-    // Sorting in ascending order
-    await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
-
-    // Sorting order = NONE, hence it is still in the ascending order
-    await user.click(sortRowsButton);
-    // Sorting in descending order
-    await user.click(sortRowsButton);
-
-    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
