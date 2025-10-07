@@ -239,7 +239,7 @@ export interface Provider {
 export function useProviders(providerRoles: Array<string>) {
   const rep = 'custom:(uuid,person:(display)';
   const ret = useOpenmrsFetchAll<Provider>(
-    providerRoles?.length > 0 ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
+    providerRoles != null ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
   );
 
   ret.data?.sort((a, b) => a.person?.display.localeCompare(b.person?.display));
