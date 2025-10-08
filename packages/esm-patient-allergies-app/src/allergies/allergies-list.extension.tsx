@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, TagSkeleton } from '@carbon/react';
+import { Tag, TagSkeleton, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-list.scss';
 
@@ -18,12 +18,22 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
 
   if (allergies?.length) {
     return (
-      <div className={styles.label}>
+      <div>
         {t('allergies', 'Allergies')}:
         {allergies.map((allergy) => (
-          <Tag key={allergy.id} type="red">
-            {allergy.reactionToSubstance}
-          </Tag>
+          <Toggletip align="bottom" key={allergy.id}>
+            <ToggletipButton label={t('allergies', 'Allergies')}>
+              <Tag className={styles.allergyLabel} data-severity={allergy.reactionSeverity?.toLowerCase()}>
+                {allergy.reactionToSubstance}
+              </Tag>
+            </ToggletipButton>
+            <ToggletipContent>
+              <div role="tooltip">
+                <span> {t('severity', 'Severity')}: </span>
+                <span>{allergy.reactionSeverity}</span>
+              </div>
+            </ToggletipContent>
+          </Toggletip>
         ))}
       </div>
     );

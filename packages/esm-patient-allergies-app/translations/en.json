@@ -42,6 +42,7 @@
   "selectAllergen": "Select the allergen",
   "selectReactions": "Select the reactions",
   "severe": "Severe",
+  "severity": "Severity",
   "severityandReaction": "Severity",
   "severityOfWorstReaction": "Severity of worst reaction",
   "severityRequired": "Severity is required",
