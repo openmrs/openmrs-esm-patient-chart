@@ -86,5 +86,5 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.10.3"
 }
