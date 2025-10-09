@@ -1,0 +1,21 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.stickyNoteContent {
+  @include type.type-style('body-01');
+  padding: layout.$spacing-04;
+  min-height: layout.$spacing-13;
+  border-bottom: 1px solid #33b1ff;
+}
+
+.noteFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.noteMetadata {
+  padding-left: layout.$spacing-04;
+  @include type.type-style('label-01');
+}
