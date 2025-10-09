@@ -2,13 +2,16 @@
 @use '@carbon/colors';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+
 .label {
   @include type.type-style('label-01');
   color: $text-02;
   display: flex;
+  flex-wrap: wrap;
   gap: layout.$spacing-02;
   align-items: center;
 }
+
 .allergyLabel {
   @include type.type-style('label-01');
   display: inline-block;
@@ -30,4 +33,3 @@
     background-color: colors.$red-20;
   }
 }
-//

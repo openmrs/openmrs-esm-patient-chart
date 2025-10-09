@@ -15,22 +15,20 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   if (isLoading) {
     return <TagSkeleton />;
   }
-
   if (allergies?.length) {
     return (
-      <div>
-        {t('allergies', 'Allergies')}:
+      <div className={styles.label}>
+        <span>{t('allergies', 'Allergies')}:</span>
         {allergies.map((allergy) => (
           <Toggletip align="bottom" key={allergy.id}>
-            <ToggletipButton label={t('allergies', 'Allergies')}>
+            <ToggletipButton label={`${allergy.reactionToSubstance} - ${t('allergies', 'Allergies')}`}>
               <Tag className={styles.allergyLabel} data-severity={allergy.reactionSeverity?.toLowerCase()}>
                 {allergy.reactionToSubstance}
               </Tag>
             </ToggletipButton>
             <ToggletipContent>
-              <div role="tooltip">
-                <span> {t('severity', 'Severity')}: </span>
-                <span>{allergy.reactionSeverity}</span>
+              <div>
+                <span>{allergy.reactionSeverity || t('unknown', 'Unknown')}</span>
               </div>
             </ToggletipContent>
           </Toggletip>
