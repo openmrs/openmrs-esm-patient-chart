@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -283,7 +283,7 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-        expirationDate: dayjs(new Date('2024-05-19')).startOf('day').toDate().toISOString(),
+        expirationDate: '2024-05-19',
         extension: [
           {
             url: FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
@@ -315,6 +315,52 @@ describe('Immunizations Form', () => {
       kind: 'success',
       title: 'Vaccination saved successfully',
     });
+  });
+
+  it('should format expiration date as date-only string without timezone (O3-4970)', async () => {
+    const user = userEvent.setup();
+
+    // Setup immunization with expiration date
+    const immunizationWithExpiration = {
+      vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      immunizationId: 'test-immunization-with-expiration',
+      vaccinationDate: new Date('2024-12-25').toString(),
+      doseNumber: 1,
+      expirationDate: new Date('2025-12-31').toString(),
+      manufacturer: 'Test Manufacturer',
+      lotNumber: 'LOT123',
+      note: 'Test note',
+      nextDoseDate: null,
+    };
+
+    immunizationFormSub.next(immunizationWithExpiration);
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: {
+        id: immunizationWithExpiration.immunizationId,
+      },
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    // Verify the expiration date is displayed correctly
+    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
+    expect(expirationDateField).toHaveValue('31/12/2025');
+
+    // Submit the form without changes to verify the date format is preserved
+    const saveButton = screen.getByRole('button', { name: /Save/i });
+    await user.click(saveButton);
+
+    // Verify that expirationDate is formatted as YYYY-MM-DD without timezone (not ISO string)
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expirationDate: '2025-12-31', // Date-only format, not ISO string with time/timezone
+      }),
+      immunizationWithExpiration.immunizationId,
+      expect.any(AbortController),
+    );
   });
 });
 
