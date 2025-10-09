@@ -317,7 +317,7 @@ describe('Immunizations Form', () => {
     });
   });
 
-  it('should format expiration date as date-only string without timezone (O3-4970)', async () => {
+  it('should format expiration date as date-only string without timezone', async () => {
     const user = userEvent.setup();
 
     // Setup immunization with expiration date
