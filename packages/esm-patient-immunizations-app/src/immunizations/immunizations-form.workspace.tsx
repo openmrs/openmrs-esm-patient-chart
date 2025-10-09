@@ -18,7 +18,7 @@ import {
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { DoseInput } from './components/dose-input.component';
-import { immunizationFormSub, toDateOnlyString } from './utils';
+import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { savePatientImmunization } from './immunizations.resource';
 import { type ImmunizationConfigObject } from '../config-schema';
@@ -155,7 +155,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           doseNumber,
           nextDoseDate: nextDoseDate ? dayjs(nextDoseDate).startOf('day').toDate().toISOString() : null,
           note,
-          expirationDate: expirationDate ? toDateOnlyString(expirationDate) : null,
+          expirationDate: expirationDate ? dayjs(expirationDate).format('YYYY-MM-DD') : null,
           lotNumber,
           manufacturer,
         };
