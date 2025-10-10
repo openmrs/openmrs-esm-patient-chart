@@ -194,42 +194,11 @@ export class FormDataSourceService {
 
     return openmrsFetch<{ entry: Array<FHIRResource> }>(
       `${fhirBaseUrl}/Observation/$lastn?${urlParams.toString()}`,
-      // TODO: Why do we need the duplicate type signature here?
     ).then((response: FetchResponse<{ entry: Array<FHIRResource> }>) =>
       response.ok
-        ? // The output of this reduce() call is intended to be an object similar to an OpenMRS REST Encounter
-          // This allows it to be consumed by the historical data source
-          response.data.entry?.reduce<{ obs: Array<Partial<Observation>> }>(
-            (acc, entry) => {
-              if (entry.resource && entry.resource.resourceType === 'Observation' && entry.resource.code) {
-                const code = entry.resource.code.coding.find((c) => !Boolean(c.system))?.code;
-                let value: string | number | { uuid: string };
-                if (typeof entry.resource.valueString !== 'undefined' && entry.resource.valueString !== null) {
-                  value = entry.resource.valueString;
-                } else if (
-                  typeof entry.resource.valueQuantity?.value !== 'undefined' &&
-                  entry.resource.valueQuantity?.value !== null
-                ) {
-                  value = entry.resource.valueQuantity.value;
-                } else {
-                  const coding = entry.resource.valueCodeableConcept?.coding?.find((c) => !Boolean(c.system))?.code;
-                  if (typeof coding !== 'undefined' && coding !== null) {
-                    value = { uuid: coding };
-                  }
-                }
-
-                if (typeof code !== 'undefined' && code !== null && typeof value !== 'undefined') {
-                  acc.obs.push({
-                    concept: { uuid: code, display: null, conceptClass: null },
-                    value,
-                  });
-                }
-              }
-
-              return acc;
-            },
-            { obs: [] },
-          )
+        ? // The extracted observations are formatted to match the OpenMRS REST Encounter format
+          // This allows them to be consumed by the historical data source
+          this.extractObservationValue(response)
         : { obs: [] },
     );
   }
@@ -381,5 +350,43 @@ export class FormDataSourceService {
       return locationReference?.substring(lastIndexOf + 1);
     }
     return '';
+  }
+
+  private extractObservationValue(resource: FetchResponse<{ entry: Array<FHIRResource> }>): {
+    obs: Array<Partial<Observation>>;
+  } {
+    const observations: Array<Partial<Observation>> = [];
+
+    if (!resource.data.entry) {
+      return { obs: [] };
+    }
+
+    for (const entry of resource.data.entry) {
+      if (entry.resource?.resourceType !== 'Observation' || !entry.resource.code) {
+        continue;
+      }
+
+      const code = entry.resource.code.coding.find((c) => !c.system)?.code;
+      if (!code) {
+        continue;
+      }
+
+      const valueString = entry.resource?.valueString;
+      const valueQuantity = entry.resource?.valueQuantity?.value;
+      const valueCoding = entry.resource?.valueCodeableConcept?.coding?.find((c: any) => !c.system)?.code;
+      const valueDateTime = entry.resource?.['valueDateTime']; // TODO: Add valueDateTime to FHIRResource type
+      const value = valueString ?? valueQuantity ?? valueCoding ?? valueDateTime;
+
+      if (!value) {
+        continue;
+      }
+
+      observations.push({
+        concept: { uuid: code, display: null, conceptClass: null },
+        value,
+      });
+    }
+
+    return { obs: observations };
   }
 }
