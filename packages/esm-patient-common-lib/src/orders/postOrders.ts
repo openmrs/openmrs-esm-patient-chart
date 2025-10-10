@@ -1,4 +1,11 @@
-import { openmrsFetch, type OpenmrsResource, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
+import {
+  type Concept,
+  openmrsFetch,
+  type OpenmrsResource,
+  parseDate,
+  restBaseUrl,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { type OrderBasketStore, orderBasketStore } from './store';
 import type {
   DrugOrderPost,
@@ -15,18 +22,25 @@ export async function postOrdersOnNewEncounter(
   currentVisit: Visit | null,
   sessionLocationUuid: string,
   abortController?: AbortController,
+
+  /**
+   * If not specified, the encounterDate will either be set to
+   * `now` if currentVisit is active, or the start of the visit
+   */
+  encounterDate?: Date,
 ) {
   const now = new Date();
   const visitStartDate = parseDate(currentVisit?.startDatetime);
   const visitEndDate = parseDate(currentVisit?.stopDatetime);
-  let encounterDate: Date;
-  if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
-    encounterDate = now;
-  } else {
-    console.warn(
-      'postOrdersOnNewEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
-    );
-    encounterDate = visitStartDate;
+  if (!encounterDate) {
+    if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
+      encounterDate = now;
+    } else {
+      console.warn(
+        'postOrdersOnNewEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
+      );
+      encounterDate = visitStartDate;
+    }
   }
 
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
@@ -40,7 +54,7 @@ export async function postOrdersOnNewEncounter(
     });
   });
 
-  const encounterPostData = {
+  const encounterPostData: EncounterPost = {
     patient: patientUuid,
     location: sessionLocationUuid,
     encounterType: orderEncounterType,
@@ -50,6 +64,24 @@ export async function postOrdersOnNewEncounter(
     orders,
   };
 
+  return postEncounter(encounterPostData, abortController);
+}
+interface ObsPayload {
+  concept: Concept | string;
+  value?: string | OpenmrsResource;
+  groupMembers?: Array<ObsPayload>;
+}
+export interface EncounterPost {
+  patient: string;
+  location: string;
+  encounterType: string;
+  encounterDatetime: Date;
+  visit?: string;
+  obs: ObsPayload[];
+  orders: OrderPost[];
+}
+
+export async function postEncounter(encounterPostData: EncounterPost, abortController?: AbortController) {
   return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',

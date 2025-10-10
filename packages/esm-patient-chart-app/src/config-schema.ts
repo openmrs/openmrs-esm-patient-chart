@@ -19,7 +19,8 @@ export const esmPatientChartSchema = {
   encounterEditableDuration: {
     _type: Type.Number,
     _default: 0,
-    _description: 'The number of minutes an encounter is editable after it is created. 0 means the encounter is editable forever.',
+    _description:
+      'The number of minutes an encounter is editable after it is created. 0 means the encounter is editable forever.',
   },
   encounterEditableDurationOverridePrivileges: {
     _type: Type.Array,
@@ -27,7 +28,8 @@ export const esmPatientChartSchema = {
       _type: Type.String,
     },
     _default: [],
-    _description: 'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
+    _description:
+      'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
   },
   freeTextFieldConceptUuid: {
     _type: Type.ConceptUuid,
@@ -188,6 +190,11 @@ export const esmPatientChartSchema = {
     _description: 'Whether to require an active visit for the encounter tile',
     _default: true,
   },
+  drugOrderTypeUUID: {
+    _type: Type.UUID,
+    _description: "UUID for the 'Drug' order type to fetch medications",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
 };
 
 export interface ChartConfig {
@@ -231,4 +238,5 @@ export interface ChartConfig {
     }>;
   }>;
   otherConceptUuid: string;
+  drugOrderTypeUUID: string;
 }

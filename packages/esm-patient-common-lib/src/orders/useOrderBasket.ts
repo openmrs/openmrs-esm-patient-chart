@@ -1,4 +1,4 @@
-import { useStoreWithActions } from '@openmrs/esm-framework';
+import { type Actions, useStoreWithActions } from '@openmrs/esm-framework';
 import type { OrderBasketItem, PostDataPrepFunction } from './types';
 import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { useEffect } from 'react';
@@ -32,7 +32,7 @@ const orderBasketStoreActions = {
       },
     };
   },
-};
+} satisfies Actions<OrderBasketStore>;
 
 function getOrderItems(items: OrderBasketStore['items'], grouping?: string | null): Array<OrderBasketItem> {
   const patientUuid = getPatientUuidFromStore();
