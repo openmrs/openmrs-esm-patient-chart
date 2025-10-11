@@ -145,7 +145,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           />
           {config?.orderTypes?.length > 0 &&
             config.orderTypes.map((orderType) => (
-              <div className={styles.orderPanel}>
+              <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
                 <GeneralOrderType key={orderType.orderTypeUuid} {...orderType} closeWorkspace={closeWorkspace} />
               </div>
             ))}
