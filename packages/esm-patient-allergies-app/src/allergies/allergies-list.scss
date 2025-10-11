@@ -8,7 +8,7 @@
   color: $text-02;
   display: flex;
   flex-wrap: wrap;
-  gap: layout.$spacing-02;
+  column-gap: layout.$spacing-02;
   align-items: center;
 }
 

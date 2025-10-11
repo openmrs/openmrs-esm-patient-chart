@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, TagSkeleton, Toggletip, ToggletipButton, ToggletipContent, Tooltip } from '@carbon/react';
+import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
+import { getCoreTranslation } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
-import styles from './allergies-list.scss';
 import { severityOrder } from '../utils';
+import styles from './allergies-list.scss';
 
 interface AllergyListProps {
   patientUuid: string;
@@ -13,13 +14,14 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 
-  const sortedAllergies = allergies?.sort((a, b) => {
-    return severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity];
-  });
+  const sortedAllergies = allergies?.sort(
+    (a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity],
+  );
 
   if (isLoading) {
     return <TagSkeleton />;
   }
+
   if (sortedAllergies?.length) {
     return (
       <div className={styles.label}>
@@ -28,9 +30,13 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
           <Tooltip
             align="bottom"
             key={allergy.id}
-            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity || t('unknown', 'Unknown')}`}
+            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity || getCoreTranslation('unknown')}`}
           >
-            <Tag className={styles.allergyLabel} data-severity={allergy.reactionSeverity?.toLowerCase()}>
+            <Tag
+              className={styles.allergyLabel}
+              data-severity={allergy.reactionSeverity?.toLowerCase()}
+              data-testid={`allergy-tag-${allergy.reactionSeverity?.toLowerCase()}`}
+            >
               {allergy.reactionToSubstance}
             </Tag>
           </Tooltip>
@@ -41,7 +47,7 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
 
   return (
     <div className={styles.label}>
-      {t('allergies', 'Allergies')}: {t('unknown', 'Unknown')}
+      {t('allergies', 'Allergies')}: {getCoreTranslation('unknown')}
     </div>
   );
 };
