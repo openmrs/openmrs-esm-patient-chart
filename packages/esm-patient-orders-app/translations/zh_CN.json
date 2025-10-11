@@ -2,6 +2,7 @@
   "actionsMenu": "动作菜单",
   "add": "添加",
   "additionalInstructions": "附加说明",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "添加{{orderTypeDisplay}}",
   "addResults": "添加结果",
   "allOrders": "所有医嘱",
@@ -122,5 +123,6 @@
   "tryTo": "尝试",
   "updated": "已更新",
   "usingADifferentTerm": "使用不同的术语",
+  "view": "View",
   "visitRequired": "必须有一次就诊才能下达医嘱"
 }
