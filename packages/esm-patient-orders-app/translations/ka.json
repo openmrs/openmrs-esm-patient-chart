@@ -2,6 +2,7 @@
   "actionsMenu": "ქმედებების მენიუ",
   "add": "დამატება",
   "additionalInstructions": "დამატებითი ინსტრუქციები",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "{{orderTypeDisplay}}-ის დამატება",
   "addResults": "შედეგების დამატება",
   "allOrders": "ყველა შეკვეთა",
@@ -122,5 +123,6 @@
   "tryTo": "სცადეთ",
   "updated": "განახლებულია",
   "usingADifferentTerm": " სხვა პირობის გამოყენებით",
+  "view": "View",
   "visitRequired": "A visit is required to make orders"
 }
