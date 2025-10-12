@@ -1,7 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, TagSkeleton } from '@carbon/react';
+import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
+import { getCoreTranslation } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
+import { severityOrder } from '../utils';
 import styles from './allergies-list.scss';
 
 interface AllergyListProps {
@@ -12,18 +14,32 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 
+  const sortedAllergies = allergies?.sort(
+    (a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity],
+  );
+
   if (isLoading) {
     return <TagSkeleton />;
   }
 
-  if (allergies?.length) {
+  if (sortedAllergies?.length) {
     return (
       <div className={styles.label}>
-        {t('allergies', 'Allergies')}:
-        {allergies.map((allergy) => (
-          <Tag key={allergy.id} type="red">
-            {allergy.reactionToSubstance}
-          </Tag>
+        <span>{t('allergies', 'Allergies')}:</span>
+        {sortedAllergies.map((allergy) => (
+          <Tooltip
+            align="bottom"
+            key={allergy.id}
+            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity || getCoreTranslation('unknown')}`}
+          >
+            <Tag
+              className={styles.allergyLabel}
+              data-severity={allergy.reactionSeverity?.toLowerCase()}
+              data-testid={`allergy-tag-${allergy.reactionSeverity?.toLowerCase()}`}
+            >
+              {allergy.reactionToSubstance}
+            </Tag>
+          </Tooltip>
         ))}
       </div>
     );
@@ -31,7 +47,7 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
 
   return (
     <div className={styles.label}>
-      {t('allergies', 'Allergies')}: {t('unknown', 'Unknown')}
+      {t('allergies', 'Allergies')}: {getCoreTranslation('unknown')}
     </div>
   );
 };

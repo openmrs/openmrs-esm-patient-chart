@@ -2,6 +2,7 @@
   "actionsMenu": "Actions",
   "add": "Ajouter",
   "additionalInstructions": "Instructions supplémentaires",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "{{orderTypeDisplay}}",
   "addResults": "Entrer des résultats",
   "allOrders": "Toutes les prescriptions",
@@ -122,5 +123,6 @@
   "tryTo": "Essayez de",
   "updated": "Modifié",
   "usingADifferentTerm": "en utilisant un terme différent",
+  "view": "View",
   "visitRequired": "Une visite est requise pour passer des prescriptions"
 }
