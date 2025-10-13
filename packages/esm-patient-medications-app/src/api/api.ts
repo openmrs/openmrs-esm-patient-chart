@@ -229,6 +229,7 @@ export function useRequireOutpatientQuantity(): {
 
   return results;
 }
+
 export interface Provider {
   uuid: string;
   person: {

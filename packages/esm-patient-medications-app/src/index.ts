@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta, moduleName } from './dashboard.meta';
@@ -40,4 +40,7 @@ export const addDrugOrderWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const drugOrderForm = getAsyncLifecycle(() => import('./add-drug-order/drug-order-form.component'), options);
+export const fillPrescriptionFormWorkspace = getAsyncLifecycle(
+  () => import('./add-drug-order/fill-prescription-form.workspace'),
+  options,
+);
