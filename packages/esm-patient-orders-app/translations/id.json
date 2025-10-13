@@ -2,6 +2,7 @@
   "actionsMenu": "Menu tindakan",
   "add": "Tambah",
   "additionalInstructions": "Instruksi tambahan",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "Tambahkan {{orderTypeDisplay}}",
   "addResults": "Tambahkan hasil",
   "allOrders": "Semua pesanan",
@@ -122,5 +123,6 @@
   "tryTo": "Coba",
   "updated": "Diperbarui",
   "usingADifferentTerm": "menggunakan istilah yang berbeda",
+  "view": "View",
   "visitRequired": "Kunjungan diperlukan untuk membuat pesanan"
 }
