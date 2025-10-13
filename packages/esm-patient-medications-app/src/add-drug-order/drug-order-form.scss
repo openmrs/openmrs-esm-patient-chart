@@ -2,12 +2,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .orderForm {
   flex-grow: 1;
   display: flex;
@@ -42,6 +36,16 @@
 
   :global(.cds--number__control-btn) {
     border: 0;
+  }
+
+  counter-reset: section;
+
+  h3 {
+    counter-increment: section;
+
+    &::before {
+      content: counter(section) '. ';
+    }
   }
 }
 

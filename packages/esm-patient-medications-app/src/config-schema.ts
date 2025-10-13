@@ -42,6 +42,17 @@ export const configSchema = {
       'Array of provider roles uuids. If specified, the drug order form shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit the drug order form may still do so with themselves as the prescriber.',
     _default: [],
   },
+  allowSelectingPrescribingClinician: {
+    _type: Type.Boolean,
+    _description:
+      'If true, allows user to select the prescribing provider when ordering medications from the order basket. (Otherwise, the prescribing provider always defaults to the current user.) The `prescriberProviderRoles` config must be set for this to work properly.',
+  },
+  drugOrderEncounterType: {
+    _type: Type.UUID,
+    _description:
+      'The encounter type of the encounter for the Fill Prescription form. Defaults to the "Order" encounter type.',
+    _default: '39da3525-afe4-45ff-8977-c53b7b359158',
+  },
 };
 
 export interface ConfigObject {
@@ -54,4 +65,6 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   prescriberProviderRoles: Array<string>;
+  allowSelectingPrescribingClinician: boolean;
+  drugOrderEncounterType: string;
 }
