@@ -1,16 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
-const moduleName = '@openmrs/esm-patient-label-printing-app';
+const moduleName = '@openmrs/esm-patient-printing-app';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  registerFeatureFlag(
-    'print-patient-identifier-sticker',
-    'Print patient identifier sticker',
-    'Features to support printing a patient identifier sticker',
-  );
   defineConfigSchema(moduleName, configSchema);
 }
 
