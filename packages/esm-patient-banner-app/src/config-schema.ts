@@ -1,6 +1,18 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
+  report: {
+    _type: Type.Object,
+    patientIdSticker: {
+      _type: Type.Object,
+      patientIdStickerReportDesignUuid: {
+        _type: Type.UUID,
+        _description:
+          'UUID of the report design used for Patient ID Sticker. Allows implementation-specific configuration.',
+        _default: '',
+      },
+    },
+  },
   contactAttributeTypes: {
     _type: Type.Array,
     _elements: {
@@ -87,4 +99,9 @@ export interface ConfigObject {
     identifiersToDisplay: Array<string>;
   };
   useRelationshipNameLink: boolean;
+  report: {
+    patientIdSticker: {
+      patientIdStickerReportDesignUuid: string;
+    };
+  };
 }

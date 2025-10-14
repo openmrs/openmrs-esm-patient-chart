@@ -15,6 +15,7 @@
       "es2022"
     ],
     "module": "esnext",
+    "ignoreDeprecations":"6.0",
     "moduleResolution": "node",
     "noEmit": true,
     "paths": {

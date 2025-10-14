@@ -3,7 +3,7 @@ import Barcode from 'react-barcode';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { getPatientName, showSnackbar, useConfig, getCoreTranslation } from '@openmrs/esm-framework';
+import { getPatientName, showSnackbar, useConfig, getCoreTranslation, getConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { defaultBarcodeParams, getPatientField } from './print-identifier-sticker.resource';
 import styles from './print-identifier-sticker.scss';
@@ -18,6 +18,56 @@ interface PrintComponentProps extends Partial<ConfigObject> {
 }
 
 const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeModal, patient }) => {
+  const fetchStickerReport = async () => {
+    const config = await getConfig('@openmrs/esm-patient-banner-app');
+    const reportDesignUuid =
+      config?.report?.patientIdSticker?.patientIdStickerReportDesignUuid || 'fallback-default-uuid';
+
+    if (!patient?.id) {
+      showSnackbar({
+        kind: 'error',
+        title: 'Missing patient ID',
+        subtitle: 'Cannot print sticker without a valid patient.',
+      });
+      return;
+    }
+
+    setIsPrinting(true);
+
+    try {
+      const response = await fetch(
+        `/openmrs/ws/rest/v1/reportingrest/reportdata/${reportDesignUuid}?patient=${patient.id}`,
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/pdf', //  application depends on backend
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate report. Status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const newWindow = window.open(url, '_blank');
+      if (!newWindow) {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      }
+
+      newWindow.focus();
+    } catch (error) {
+      showSnackbar({
+        kind: 'error',
+        title: 'Print error',
+        subtitle: `An error occurred while printing: ${error.message}`,
+      });
+    } finally {
+      setIsPrinting(false);
+      closeModal();
+    }
+  };
   const { t } = useTranslation();
   const { printPatientSticker } = useConfig<ConfigObject>();
   const { pageSize, printScale = '1' } = printPatientSticker ?? {};
@@ -112,7 +162,7 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         <Button kind="secondary" onClick={closeModal}>
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} disabled={isPrinting} onClick={handlePrint} kind="primary">
+        <Button className={styles.button} onClick={fetchStickerReport} kind="primary">
           {isPrinting ? (
             <InlineLoading className={styles.loader} description={getCoreTranslation('printing', 'Printing') + '...'} />
           ) : (
