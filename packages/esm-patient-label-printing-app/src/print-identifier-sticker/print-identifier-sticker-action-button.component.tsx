@@ -32,8 +32,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     if (isPrinting) return;
 
     try {
-      const pdfUrl = getPdfUrl();
-      await printPdf(pdfUrl);
+      await printPdf(getPdfUrl());
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       showSnackbar({
