@@ -2,6 +2,7 @@
   "actionsMenu": "Meniu acțiuni",
   "add": "Adaugă",
   "additionalInstructions": "Instrucțiuni suplimentare",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "Adaugă {{orderTypeDisplay}}",
   "addResults": "Adaugă rezultate",
   "allOrders": "Toate comenzile",
@@ -122,5 +123,6 @@
   "tryTo": "Încearcă să",
   "updated": "Actualizat",
   "usingADifferentTerm": "folosind un alt termen",
+  "view": "View",
   "visitRequired": "Este necesară o vizită pentru a crea comenzi"
 }

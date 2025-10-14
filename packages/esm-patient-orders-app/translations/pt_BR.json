@@ -2,6 +2,7 @@
   "actionsMenu": "Menu de ações",
   "add": "Adicionar",
   "additionalInstructions": "Instruções adicionais",
+  "addMedication": "Add medication",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "addResults": "Adicionar resultados",
   "allOrders": "Todos os pedidos",
@@ -122,5 +123,6 @@
   "tryTo": "Tente",
   "updated": "Atualizado",
   "usingADifferentTerm": "usando um termo diferente",
+  "view": "View",
   "visitRequired": "A visit is required to make orders"
 }
