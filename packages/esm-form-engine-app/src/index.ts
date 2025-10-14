@@ -14,7 +14,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
-  registerExpressionHelper('calcPHQ9Score', async (...responses: Array<string | null | undefined>) => {
+  registerExpressionHelper('calcPHQ9Score', async (...answers: Array<string | null | undefined>) => {
     const config = await getConfig<ConfigObject>(moduleName);
     const { phq9Concepts } = config;
 
@@ -25,7 +25,7 @@ export function startupApp() {
       [phq9Concepts.nearlyEveryDay]: 3,
     };
 
-    return responses.reduce((sum, answer) => {
+    return answers.reduce((sum, answer) => {
       if (!answer) {
         return sum;
       }
