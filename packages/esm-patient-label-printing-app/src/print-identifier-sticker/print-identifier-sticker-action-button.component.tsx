@@ -13,19 +13,18 @@ interface PrintIdentifierStickerOverflowMenuItemProps {
 const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({ patient }) => {
   const { t } = useTranslation();
   const { showPrintIdentifierStickerButton } = useConfig<ConfigObject>();
-  const enableStickerFeatureFlag = useFeatureFlag('print-patient-identifier-sticker');
   const { printPdf, isPrinting } = useStickerPdfPrinter();
 
   const isVisible = useMemo(() => {
     if (!patient?.id) return false;
-    return enableStickerFeatureFlag || showPrintIdentifierStickerButton;
-  }, [enableStickerFeatureFlag, showPrintIdentifierStickerButton, patient?.id]);
+    return showPrintIdentifierStickerButton;
+  }, [showPrintIdentifierStickerButton, patient?.id]);
 
   const getPdfUrl = useCallback(() => {
     if (!patient?.id) {
       throw new Error(t('patientIdNotFound', 'Patient ID not found'));
     }
-    return `${window.openmrsBase}/ws/module/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
+    return `${window.openmrsBase}/ws/rest/v1/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
   }, [patient?.id, t]);
 
   const handlePrint = useCallback(async () => {

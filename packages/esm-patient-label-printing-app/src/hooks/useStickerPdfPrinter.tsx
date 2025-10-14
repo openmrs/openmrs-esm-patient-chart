@@ -15,12 +15,12 @@ export const useStickerPdfPrinter = () => {
           const iframe = document.createElement('iframe');
           iframe.name = 'pdfPrinterFrame';
           Object.assign(iframe.style, {
-              position: 'fixed',
-              width: '0',
-              height: '0',
-              border: 'none',
-              visibility: 'hidden'
-           });
+            position: 'fixed',
+            width: '0',
+            height: '0',
+            border: 'none',
+            visibility: 'hidden',
+          });
           iframeRef.current = iframe;
           document.body.appendChild(iframe);
         }
@@ -43,7 +43,9 @@ export const useStickerPdfPrinter = () => {
             } else {
               // For cross-origin, we'll assume printing is immediate
               // and rely on the browser's print dialog behavior
-              handlePrintComplete();
+              setTimeout(() => {
+                handlePrintComplete();
+              }, 1000);
             }
           } catch (error) {
             handlePrintError(error);
@@ -95,6 +97,7 @@ export const useStickerPdfPrinter = () => {
     return () => {
       if (iframeRef.current) {
         document.body.removeChild(iframeRef.current);
+        iframeRef.current = null;
       }
     };
   }, []);
