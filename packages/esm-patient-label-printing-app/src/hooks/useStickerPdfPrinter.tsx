@@ -14,11 +14,13 @@ export const useStickerPdfPrinter = () => {
         if (!iframeRef.current) {
           const iframe = document.createElement('iframe');
           iframe.name = 'pdfPrinterFrame';
-          iframe.style.position = 'fixed';
-          iframe.style.width = '0';
-          iframe.style.height = '0';
-          iframe.style.border = 'none';
-          iframe.style.visibility = 'hidden';
+          Object.assign(iframe.style, {
+              position: 'fixed',
+              width: '0',
+              height: '0',
+              border: 'none',
+              visibility: 'hidden'
+           });
           iframeRef.current = iframe;
           document.body.appendChild(iframe);
         }
