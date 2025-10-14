@@ -14,9 +14,23 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
-  registerExpressionHelper('calcPHQ9Score', async (...answers: Array<string | null | undefined>) => {
-    const config = await getConfig<ConfigObject>(moduleName);
-    const { phq9Concepts } = config;
+  // PHQ-9 concepts - will be updated when config loads
+  let phq9Concepts: ConfigObject['phq9Concepts'] | null = null;
+
+  // Load config and set concepts when available
+  getConfig<ConfigObject>(moduleName)
+    .then((config) => {
+      phq9Concepts = config.phq9Concepts;
+    })
+    .catch((error) => {
+      console.error('Failed to load PHQ-9 config:', error);
+    });
+
+  registerExpressionHelper('calcPHQ9Score', (...answers: Array<string | null | undefined>) => {
+    if (!phq9Concepts) {
+      console.warn('PHQ-9 concepts not yet loaded, returning 0');
+      return 0;
+    }
 
     const scoreMap = {
       [phq9Concepts.notAtAll]: 0,
