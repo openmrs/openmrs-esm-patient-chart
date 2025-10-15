@@ -10,7 +10,6 @@ interface PrintIdentifierStickerOverflowMenuItemProps {
 
 const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const canPrintPatientIdentifierSticker = useFeatureFlag('print-patient-identifier-sticker');
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('print-identifier-sticker-modal', {
@@ -19,7 +18,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     });
   }, [patient]);
 
-  if (!patient || !canPrintPatientIdentifierSticker) {
+  if (!patient) {
     return null;
   }
 
