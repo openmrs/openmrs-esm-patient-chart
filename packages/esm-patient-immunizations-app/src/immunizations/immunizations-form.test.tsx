@@ -9,8 +9,8 @@ import {
   toOmrsIsoString,
   useConfig,
   useSession,
-  useVisit,
 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
@@ -26,8 +26,6 @@ const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 const mockSetTitle = jest.fn();
 const mockUseConfig = jest.mocked<() => ImmunizationConfigObject>(useConfig);
 const mockUseSession = jest.mocked(useSession);
-const mockUseVisit = jest.mocked(useVisit);
-const mockMutate = jest.fn();
 const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
 const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
 
@@ -67,13 +65,18 @@ jest.mock('./immunizations.resource', () => ({
   savePatientImmunization: jest.fn(),
 }));
 
-const testProps = {
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
+const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   closeWorkspace: mockCloseWorkspace,
-  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-  promptBeforeClosing: mockPromptBeforeClosing,
-  setTitle: mockSetTitle,
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: mockCurrentVisit,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {},
+  windowProps: {},
 };
 
 mockUseConfig.mockReturnValue({
@@ -95,15 +98,6 @@ mockUseConfig.mockReturnValue({
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-mockUseVisit.mockReturnValue({
-  activeVisit: mockCurrentVisit,
-  currentVisit: mockCurrentVisit,
-  currentVisitIsRetrospective: false,
-  error: null,
-  isLoading: false,
-  isValidating: false,
-  mutate: mockMutate,
-});
 
 describe('Immunizations Form', () => {
   const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';

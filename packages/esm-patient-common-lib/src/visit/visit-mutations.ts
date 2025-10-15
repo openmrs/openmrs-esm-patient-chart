@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
 import { useVisit, type Visit, restBaseUrl } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '../store/patient-chart-store';
 
 export interface VisitMutationOptions {
   encounters?: boolean;
@@ -19,7 +20,7 @@ export interface VisitMutationOptions {
  */
 export function useOptimisticVisitMutations(patientUuid: string) {
   const { mutate } = useSWRConfig();
-  const { currentVisit } = useVisit(patientUuid);
+  const { visitContext, mutateVisitContext } = usePatientChartStore(patientUuid);
 
   /**
    * Optimistically updates visit data in SWR caches without triggering network requests.
@@ -28,15 +29,8 @@ export function useOptimisticVisitMutations(patientUuid: string) {
   const updateVisitOptimistically = useCallback(
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
-      if (currentVisit?.uuid === visitUuid) {
-        mutate(
-          `${restBaseUrl}/visit?patient=${patientUuid}&v=custom`,
-          (current: any) => ({
-            ...current,
-            data: { ...current?.data, ...updates },
-          }),
-          false, // Don't revalidate
-        );
+      if (visitContext?.uuid === visitUuid) {
+        mutateVisitContext();
       }
 
       // Update visit lists across all hooks using regex pattern matching
@@ -59,7 +53,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
         false, // Don't revalidate
       );
     },
-    [currentVisit, mutate, patientUuid],
+    [visitContext, mutateVisitContext, mutate, patientUuid],
   );
 
   /**
@@ -87,11 +81,11 @@ export function useOptimisticVisitMutations(patientUuid: string) {
       );
 
       // If deleted visit was current, revalidate current visit to get new state
-      if (currentVisit?.uuid === visitUuid) {
-        mutate(`${restBaseUrl}/visit?patient=${patientUuid}&v=custom`);
+      if (visitContext?.uuid === visitUuid) {
+        mutateVisitContext();
       }
     },
-    [currentVisit, mutate, patientUuid],
+    [visitContext, mutateVisitContext, mutate, patientUuid],
   );
 
   /**

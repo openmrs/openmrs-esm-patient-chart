@@ -144,15 +144,6 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await page.getByRole('button', { name: /save order/i }).click();
     });
 
-    await test.step('Then the order status should be changed to `Modify`', async () => {
-      await expect(page.getByRole('status', { name: /new/i })).toBeHidden();
-      await expect(page.getByRole('status', { name: /modify/i }).nth(0)).toBeVisible();
-    });
-
-    await test.step('When I click on the `Sign and close` button', async () => {
-      await page.getByRole('button', { name: /sign and close/i }).click();
-    });
-
     await test.step('Then I should see a success notification', async () => {
       await expect(page.getByText(/updated serum glucose/i)).toBeVisible();
     });

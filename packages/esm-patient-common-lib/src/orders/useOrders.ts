@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl, translateFrom } from '@openmrs/esm-framework';
-import type { PatientOrderFetchResponse, PriorityOption } from './types';
+import type { Order, PatientOrderFetchResponse, PriorityOption } from './types';
 
 export type Status = 'ACTIVE' | 'any';
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
@@ -10,7 +10,7 @@ const patientChartAppModuleName = '@openmrs/esm-patient-chart-app';
 export const drugCustomRepresentation =
   'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
   'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
-  'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+  'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
@@ -60,7 +60,7 @@ export function usePatientOrders(
 }
 
 export function getDrugOrderByUuid(orderUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
+  return openmrsFetch<Order>(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
 }
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java

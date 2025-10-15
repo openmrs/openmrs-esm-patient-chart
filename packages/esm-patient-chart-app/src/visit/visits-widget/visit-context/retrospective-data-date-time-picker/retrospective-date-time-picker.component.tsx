@@ -1,10 +1,9 @@
 import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit, type Visit } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './restrospective-date-time-picker.scss';
-import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 type FormValues = {
   retrospectiveDate: Date;
@@ -14,22 +13,22 @@ type FormValues = {
 
 type RetrospectiveDateTimePickerProps = {
   patientUuid: string;
+  visitContext: Visit;
   control?: Control<FormValues>;
   onChange?: (data: FormValues) => void;
 };
 
 const RetrospectiveDateTimePicker = ({
-  patientUuid,
+  visitContext,
   control: propControl,
   onChange,
 }: RetrospectiveDateTimePickerProps) => {
   const { t } = useTranslation();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const { currentVisit } = useVisit(patientUuid);
-  const isActiveVisit = !Boolean(currentVisit && currentVisit.stopDatetime);
-  const maxDate = currentVisit?.stopDatetime;
-  const minDate = currentVisit?.startDatetime;
+  const isActiveVisit = !Boolean(visitContext && visitContext.stopDatetime);
+  const maxDate = visitContext?.stopDatetime;
+  const minDate = visitContext?.startDatetime;
 
   const [manuallyEnableDateTimePicker, setManuallyEnableDateTimePicker] = useState<boolean>(false);
 

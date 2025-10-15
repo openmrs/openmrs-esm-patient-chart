@@ -1,7 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
-import orderBasketActionMenuComponent from './order-basket-action-button/order-basket-action-button.extension';
 import { ordersDashboardMeta } from './dashboard.meta';
 import OrdersSummary from './orders-summary/orders-summary.component';
 
@@ -18,22 +17,17 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-// t('orderBasketWorkspaceTitle', 'Order Basket')
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
-// t('orderCancellation','Order cancellation')
 export const patientOrdersFormWorkspace = getAsyncLifecycle(
   () => import('./order-cancellation-form/cancel-order-form.component'),
   options,
 );
 
-// t('enterTestResults', 'Enter test results')
 export const testResultsFormWorkspace = getAsyncLifecycle(
-  () => import('./lab-results/lab-results-form.component'),
+  () => import('./lab-results/lab-results-form.workspace'),
   options,
 );
-
-export const orderBasketActionMenu = getSyncLifecycle(orderBasketActionMenuComponent, options);
 
 export const orderPriceDetailsExtension = getAsyncLifecycle(
   () => import('./components/order-price-details.component'),
@@ -41,6 +35,11 @@ export const orderPriceDetailsExtension = getAsyncLifecycle(
 );
 export const orderStockDetailsExtension = getAsyncLifecycle(
   () => import('./components/order-stock-details.component'),
+  options,
+);
+
+export const ShoppingCartIcon = getAsyncLifecycle(
+  () => import('./order-basket-action-button/order-basket-action-button.extension'),
   options,
 );
 

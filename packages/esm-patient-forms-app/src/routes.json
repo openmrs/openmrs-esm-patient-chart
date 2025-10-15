@@ -31,62 +31,32 @@
       "online": true
     },
     {
-      "name": "clinical-form-action-menu",
-      "component": "clinicalFormActionMenu",
-      "slot": "action-menu-patient-chart-items-slot",
-      "offline": true,
-      "online": true,
-      "order": 2
-    },
-    {
       "name": "clinical-forms-workspaceExtension",
       "component": "clinicalFormsWorkspaceExtension",
       "slot": "ward-patient-clinical-forms-workspace-slot"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-form-entry-workspace",
-      "title": "clinicalForm",
       "component": "patientFormEntryWorkspace",
-      "type": "clinical-form",
-      "canMaximize": true,
-      "canHide": true,
-      "width": "wider"
-    },
-    {
-      "name": "ward-patient-form-entry-workspace",
-      "title": "clinicalForm",
-      "component": "patientFormEntryWorkspace",
-      "type": "ward-patient-clinical-form",
-      "canMaximize": true,
-      "canHide": false,
-      "width": "wider"
-    },
-    {
-      "name": "patient-html-form-entry-workspace",
-      "title": "clinicalForm",
-      "component": "patientHtmlFormEntryWorkspace",
-      "type": "clinical-form",
-      "canMaximize": true,
-      "canHide": false,
-      "width": "extra-wide"
-    },
-    {
-      "name": "ward-patient-html-form-entry-workspace",
-      "title": "clinicalForm",
-      "component": "patientHtmlFormEntryWorkspace",
-      "type": "ward-patient-clinical-form",
-      "canMaximize": true,
-      "canHide": false,
-      "width": "extra-wide"
+      "window": "clinical-forms"
     },
     {
       "name": "clinical-forms-workspace",
-      "title": "clinicalForms",
       "component": "clinicalFormsWorkspace",
-      "type": "clinical-forms",
-      "width": "wider"
+      "window": "clinical-forms"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "clinical-forms",
+      "icon": "clinicalFormActionButton",
+      "order": 3,
+      "width": "extra-wide",
+      "group": "patient-chart",
+      "canMaximize": true,
+      "canHide": true
     }
   ]
 }

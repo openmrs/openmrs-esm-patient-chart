@@ -1,20 +1,21 @@
-import React, { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeftIcon,
-  launchWorkspace,
   ResponsiveWrapper,
   useConfig,
   useDebounce,
   useLayoutType,
-  type DefaultWorkspaceProps,
+  type Visit,
+  Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
+  type PatientWorkspace2DefinitionProps,
   useOrderBasket,
   useOrderType,
-  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
@@ -22,7 +23,7 @@ import { type ConfigObject } from '../../../config-schema';
 import OrderableConceptSearchResults from './search-results.component';
 import styles from './orderable-concept-search.scss';
 
-interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
+interface OrderableConceptSearchWorkspaceProps {
   order: OrderBasketItem;
   orderTypeUuid: string;
   orderableConceptClasses: Array<string>;
@@ -37,31 +38,36 @@ export function ordersEqual(order1: DrugsOrOrders, order2: DrugsOrOrders) {
   return order1.action === order2.action;
 }
 
-const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceProps> = ({
-  order: initialOrder,
-  orderTypeUuid,
+const OrderableConceptSearchWorkspace: React.FC<
+  PatientWorkspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, {}>
+> = ({
+  workspaceProps: { order: initialOrder, orderTypeUuid },
+  groupProps: { patient, patientUuid, visitContext, mutateVisitContext },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  setTitle,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
-  const { patientUuid, patient } = usePatientChartStore();
+  const { orders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { orderType } = useOrderType(orderTypeUuid);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  useEffect(() => {
+  const title = useMemo(() => {
     if (orderType) {
-      setTitle(
-        t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
+      if (initialOrder?.action == 'REVISE') {
+        return t(`editOrderableForOrderType`, 'Edit {{orderTypeDisplay}}', {
           orderTypeDisplay: orderType.display.toLocaleLowerCase(),
-        }),
-      );
+        });
+      } else {
+        return t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
+          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+        });
+      }
+    } else {
+      return '';
     }
-  }, [orderType, t, setTitle]);
+  }, [orderType, t, initialOrder?.action]);
 
   const orderableConceptSets = useMemo(
     () => orderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets,
@@ -69,10 +75,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   );
 
   const cancelDrugOrder = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace();
   }, [closeWorkspace]);
 
   const openOrderForm = useCallback(
@@ -88,52 +91,61 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   );
 
   return (
-    <div className={styles.workspaceWrapper}>
-      {!isTablet && (
-        <div className={styles.backButton}>
-          <Button
-            iconDescription="Return to order basket"
-            kind="ghost"
-            onClick={cancelDrugOrder}
-            renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-            size="sm"
-          >
-            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-          </Button>
-        </div>
-      )}
-      {currentOrder ? (
-        <OrderForm
-          initialOrder={currentOrder}
-          closeWorkspace={closeWorkspace}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          promptBeforeClosing={promptBeforeClosing}
-          orderTypeUuid={orderTypeUuid}
-          orderableConceptSets={orderableConceptSets}
-          patientUuid={patientUuid}
-          patient={patient}
-          setTitle={() => {}}
-        />
-      ) : (
-        <ConceptSearch
-          openOrderForm={openOrderForm}
-          closeWorkspace={closeWorkspace}
-          orderableConceptSets={orderableConceptSets}
-          orderTypeUuid={orderTypeUuid}
-        />
-      )}
-    </div>
+    <Workspace2 title={title} hasUnsavedChanges={hasUnsavedChanges}>
+      <div className={styles.workspaceWrapper}>
+        {!isTablet && (
+          <div className={styles.backButton}>
+            <Button
+              iconDescription="Return to order basket"
+              kind="ghost"
+              onClick={cancelDrugOrder}
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+              size="sm"
+            >
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            </Button>
+          </div>
+        )}
+        {currentOrder ? (
+          <OrderForm
+            initialOrder={currentOrder}
+            closeWorkspace={closeWorkspace}
+            setHasUnsavedChanges={setHasUnsavedChanges}
+            orderTypeUuid={orderTypeUuid}
+            patient={patient}
+          />
+        ) : (
+          <ConceptSearch
+            openOrderForm={openOrderForm}
+            closeWorkspace={closeWorkspace}
+            orderableConceptSets={orderableConceptSets}
+            orderTypeUuid={orderTypeUuid}
+            patient={patient}
+            visit={visitContext}
+          />
+        )}
+      </div>
+    </Workspace2>
   );
 };
 
 interface ConceptSearchProps {
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   openOrderForm: (search: OrderBasketItem) => void;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  patient: fhir.Patient;
+  visit: Visit;
 }
 
-function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderableConceptSets }: ConceptSearchProps) {
+function ConceptSearch({
+  closeWorkspace,
+  orderTypeUuid,
+  openOrderForm,
+  orderableConceptSets,
+  patient,
+  visit,
+}: ConceptSearchProps) {
   const { t } = useTranslation();
   const { orderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
@@ -142,9 +154,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
   const searchInputRef = useRef(null);
 
   const cancelDrugOrder = useCallback(() => {
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-    });
+    closeWorkspace();
   }, [closeWorkspace]);
 
   const focusAndClearSearchInput = () => {
@@ -178,10 +188,12 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
-        closeWorkspace={closeWorkspace}
         orderTypeUuid={orderTypeUuid}
         cancelOrder={() => {}}
         orderableConceptSets={orderableConceptSets}
+        closeWorkspace={closeWorkspace}
+        patient={patient}
+        visit={visit}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>

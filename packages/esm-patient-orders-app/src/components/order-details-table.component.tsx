@@ -50,7 +50,7 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
-  launchWorkspace,
+  launchWorkspace2,
   OpenmrsDateRangePicker,
   parseDate,
   PrinterIcon,
@@ -78,6 +78,7 @@ interface OrderBasketItemActionsProps {
   openOrderBasket: () => void;
   launchOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
+  patient: fhir.Patient;
 }
 
 interface OrderHeaderProps {
@@ -101,10 +102,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'md';
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
-  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-drug-order');
+  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-lab-order');
+  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'orderable-concept-workspace');
   const contentToPrintRef = useRef<HTMLDivElement | null>(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
@@ -523,6 +524,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                             launchOrderForm={() => launchOrderForm(matchingOrder)}
                                             openOrderBasket={launchOrderBasket}
                                             orderItem={matchingOrder}
+                                            patient={patient}
                                           />
                                         ) : (
                                           <ExtensionSlot
@@ -588,11 +590,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                 {!isPrinting && (
                   <div className={styles.paginationContainer}>
                     <PatientChartPagination
-                      currentItems={paginatedOrders.length}
-                      onPageNumberChange={({ page }) => goTo(page)}
                       pageNumber={currentPage}
-                      pageSize={defaultPageSize}
                       totalItems={tableRows.length}
+                      currentItems={paginatedOrders.length}
+                      pageSize={defaultPageSize}
+                      onPageNumberChange={({ page }) => goTo(page)}
                     />
                   </div>
                 )}
@@ -605,36 +607,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   );
 };
 
-function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm }: OrderBasketItemActionsProps) {
+function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-
-  // Use the appropriate grouping key and postDataPrepFunction based on order type
-  const getOrderBasketConfig = useCallback(() => {
-    if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
-      return {
-        grouping: getOrderGrouping(ORDER_TYPES.DRUG_ORDER),
-        postDataPrepFn: prepMedicationOrderPostData,
-      };
-    } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
-      return {
-        grouping: getOrderGrouping(ORDER_TYPES.TEST_ORDER, orderItem.orderType.uuid),
-        postDataPrepFn: prepTestOrderPostData,
-      };
-    } else {
-      return {
-        grouping: getOrderGrouping(ORDER_TYPES.GENERAL_ORDER, orderItem.orderType.uuid),
-        postDataPrepFn: prepOrderPostData,
-      };
-    }
-  }, [orderItem.type, orderItem.orderType.uuid]);
-
-  const { grouping, postDataPrepFn } = getOrderBasketConfig();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(grouping, postDataPrepFn);
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, orderItem.orderType.uuid);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
-
-  const handleAddOrEditTestResults = useCallback(() => {
-    launchWorkspace('test-results-form-workspace', { order: orderItem });
-  }, [orderItem]);
 
   const handleCancelOrder = useCallback(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
@@ -677,6 +653,28 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm }:
       launchOrderForm({ order });
     }
   }, [orderItem, launchOrderForm, orders, setOrders]);
+
+  const handleAddOrEditTestResults = useCallback(() => {
+    launchWorkspace2('test-results-form-workspace', { order: orderItem });
+  }, [orderItem]);
+
+  const handleCancelClick = useCallback(() => {
+    if (orderItem.type === 'drugorder') {
+      getDrugOrderByUuid(orderItem.uuid).then((res) => {
+        let medicationOrder = res.data;
+        setOrders([...orders, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
+        openOrderBasket();
+      });
+    } else if (orderItem.type === 'testorder') {
+      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
+      setOrders([...orders, labItem]);
+      openOrderBasket();
+    } else {
+      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
+      setOrders([...orders, order]);
+      openOrderBasket();
+    }
+  }, [orderItem, setOrders, orders, openOrderBasket]);
 
   return (
     <Layer className={styles.layer}>

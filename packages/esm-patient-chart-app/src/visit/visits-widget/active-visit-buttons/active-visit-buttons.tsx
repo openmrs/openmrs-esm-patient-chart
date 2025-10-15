@@ -20,13 +20,14 @@ const ActiveVisitActions: React.FC<ActiveVisitActionsInterface> = ({ visit, pati
   const isTablet = layout === 'tablet';
   const isMobile = layout === 'phone';
 
-  const launchAllergiesFormWorkspace = useLaunchWorkspaceRequiringVisit('patient-allergy-form-workspace');
-  const launchAppointmentsFormWorkspace = useLaunchWorkspaceRequiringVisit('appointments-form-workspace');
-  const launchClinicalFormsWorkspace = useLaunchWorkspaceRequiringVisit('clinical-forms-workspace');
-  const launchConditionsFormWorkspace = useLaunchWorkspaceRequiringVisit('conditions-form-workspace');
-  const launchOrderBasketFormWorkspace = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchVisitNotesFormWorkspace = useLaunchWorkspaceRequiringVisit('visit-notes-form-workspace');
+  const launchAllergiesFormWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'patient-allergy-form-workspace');
+  const launchAppointmentsFormWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'appointments-form-workspace');
+  const launchClinicalFormsWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'clinical-forms-workspace');
+  const launchConditionsFormWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'conditions-form-workspace');
+  const launchOrderBasketFormWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const launchVisitNotesFormWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'visit-notes-form-workspace');
   const launchVitalsAndBiometricsFormWorkspace = useLaunchWorkspaceRequiringVisit(
+    patientUuid,
     'patient-vitals-biometrics-form-workspace',
   );
 

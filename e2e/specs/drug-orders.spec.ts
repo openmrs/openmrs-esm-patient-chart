@@ -24,8 +24,12 @@ test.describe('Drug Order Tests', () => {
       await medicationsPage.goTo(patient.uuid);
     });
 
-    await test.step('And I click the Add button on the medications details table', async () => {
+    await test.step('And I click the Add button on the medications details table to launch the order basket', async () => {
       await page.getByRole('button', { name: 'Add', exact: true }).click();
+    });
+
+    await test.step('And I click the `Add +` button to order drugs', async () => {
+      await page.locator("[id='order-basket']").getByRole('button', { name: 'Add', exact: true }).first().click();
     });
 
     await test.step('Then the add drug order workspace should be visible in the order basket', async () => {
@@ -177,15 +181,6 @@ test.describe('Drug Order Tests', () => {
 
     await test.step('And I click on the "Save Order" button', async () => {
       await page.getByRole('button', { name: /save order/i }).click();
-    });
-
-    await test.step('Then the order status should be changed to "Modify"', async () => {
-      await expect(orderBasket.getByText(/new/i)).toBeHidden();
-      await expect(orderBasket.getByText(/modify/i)).toBeVisible();
-    });
-
-    await test.step('When I click on the "Sign and close" button', async () => {
-      await page.getByRole('button', { name: /sign and close/i }).click();
     });
 
     await test.step('Then I should see a success notification', async () => {

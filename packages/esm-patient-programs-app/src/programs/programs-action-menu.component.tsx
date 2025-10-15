@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import styles from './programs-action-menu.scss';
 
 interface ProgramActionsProps {
@@ -15,7 +15,7 @@ export const ProgramsActionMenu = ({ patientUuid, programEnrollmentId }: Program
 
   const launchEditProgramsForm = useCallback(
     () =>
-      launchWorkspace('programs-form-workspace', {
+      launchWorkspace2('programs-form-workspace', {
         workspaceTitle: t('editProgramEnrollment', 'Edit program enrollment'),
         programEnrollmentId,
       }),

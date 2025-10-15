@@ -4,12 +4,12 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { Tile, Button, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
+  type Workspace2DefinitionProps,
   ArrowRightIcon,
-  type DefaultWorkspaceProps,
   ShoppingCartArrowDownIcon,
   useLayoutType,
   useSession,
-  launchWorkspace,
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
   useOrderBasket,
@@ -27,7 +27,9 @@ interface OrderableConceptSearchResultsProps {
   cancelOrder: () => void;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  patient: fhir.Patient;
+  visit: Visit;
 }
 
 const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps> = ({
@@ -38,6 +40,8 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
+  patient,
+  visit,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -89,6 +93,8 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
                 concept={concept}
                 orderTypeUuid={orderTypeUuid}
                 closeWorkspace={closeWorkspace}
+                patient={patient}
+                visit={visit}
               />
             ))}
           </div>
@@ -153,7 +159,9 @@ interface TestTypeSearchResultItemProps {
   concept: OrderableConcept;
   openOrderForm: (searchResult: OrderBasketItem) => void;
   orderTypeUuid: string;
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  patient: fhir.Patient;
+  visit: Visit;
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
@@ -161,11 +169,13 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   openOrderForm,
   orderTypeUuid,
   closeWorkspace,
+  patient,
+  visit,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
 
   const orderAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.concept.uuid === concept.uuid),
@@ -173,22 +183,18 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   );
 
   const createOrderBasketItem = useCallback(
-    (testType: OrderableConcept) => {
-      return createEmptyOrder(testType, session.currentProvider?.uuid);
+    (testType: OrderableConcept, visit: Visit) => {
+      return createEmptyOrder(testType, session.currentProvider?.uuid, visit);
     },
     [session.currentProvider.uuid],
   );
 
   const addToBasket = useCallback(() => {
-    const orderBasketItem = createOrderBasketItem(concept);
+    const orderBasketItem = createOrderBasketItem(concept, visit);
     orderBasketItem.isOrderIncomplete = true;
     setOrders([...orders, orderBasketItem]);
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
-  }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace]);
+    closeWorkspace({ discardUnsavedChanges: true });
+  }, [orders, setOrders, createOrderBasketItem, concept, closeWorkspace, visit]);
 
   const removeFromBasket = useCallback(() => {
     setOrders(orders.filter((order) => order?.concept?.uuid !== concept?.uuid));
@@ -227,7 +233,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
         <Button
           kind="ghost"
           renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-          onClick={() => openOrderForm(createOrderBasketItem(concept))}
+          onClick={() => openOrderForm(createOrderBasketItem(concept, visit))}
         >
           {t('goToDrugOrderForm', 'Order form')}
         </Button>

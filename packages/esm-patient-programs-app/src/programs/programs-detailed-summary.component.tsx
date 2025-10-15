@@ -23,7 +23,7 @@ import {
   useConfig,
   useLayoutType,
   isDesktop as desktopLayout,
-  launchWorkspace,
+  launchWorkspace2,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { findLastState, usePrograms } from './programs.resource';
@@ -91,7 +91,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [enrollments, t],
   );
 
-  const launchProgramsForm = useCallback(() => launchWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = useCallback(() => launchWorkspace2('programs-form-workspace'), []);
 
   const isEnrolledInAllPrograms = useMemo(() => {
     if (!availablePrograms?.length || !enrollments?.length) {

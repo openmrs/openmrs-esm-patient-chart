@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
-import { launchWorkspace, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './edit-lab-results.scss';
 
@@ -26,7 +26,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
   const handleLaunchWorkspace = () => {
     if (selectedOrder) {
-      launchWorkspace('test-results-form-workspace', { order: selectedOrder });
+      launchWorkspace2('test-results-form-workspace', { order: selectedOrder });
       closeModal();
     }
   };

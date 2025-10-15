@@ -1,27 +1,34 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import PatientListDetailsWorkspace from './patient-list-details.workspace';
+import PatientListDetailsWorkspace, { type PatientListDetailsWorkspaceProps } from './patient-list-details.workspace';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-const defaultProps = {
-  patientUuid: '',
-  patient: undefined,
-  promptBeforeClosing: jest.fn(),
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  list: {
-    attributes: [],
-    description:
-      'Cardiovascular Outcomes in Type 2 Diabetes (COTD Study): A Longitudinal Assessment of a New Diabetes Medication',
-    id: '4dcb7061-fcad-4542-b219-4c197c117050',
-    name: 'COTD Study',
-    size: 2,
-    startDate: '2023-11-14T23:45:51.000+0000',
-    type: 'My List',
+const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, {}> = {
+  groupProps: {
+    patientUuid: '',
+    patient: undefined,
+    visitContext: null,
+    mutateVisitContext: null,
   },
-  setTitle: jest.fn(),
+  closeWorkspace: jest.fn(),
+  workspaceProps: {
+    list: {
+      attributes: [],
+      description:
+        'Cardiovascular Outcomes in Type 2 Diabetes (COTD Study): A Longitudinal Assessment of a New Diabetes Medication',
+      id: '4dcb7061-fcad-4542-b219-4c197c117050',
+      name: 'COTD Study',
+      size: 2,
+      startDate: '2023-11-14T23:45:51.000+0000',
+      type: 'My List',
+    },
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  windowProps: {},
 };
 
 const mockPatientListData = [
@@ -114,7 +121,7 @@ it('renders the patient list details workspace', async () => {
 
   render(<PatientListDetailsWorkspace {...defaultProps} />);
 
-  await screen.findByRole('heading', { name: defaultProps.list.description });
+  await screen.findByRole('heading', { name: defaultProps.workspaceProps.list.description });
 
   expect(screen.getByRole('button', { name: /back to patient lists/i })).toBeInTheDocument();
   expect(screen.getByText(/2 patients/i)).toBeInTheDocument();

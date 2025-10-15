@@ -3,71 +3,37 @@ import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-framework';
 import {
-  type DefaultPatientWorkspaceProps,
+  type ClinicalFormsWorkspaceWindowProps,
   EmptyDataIllustration,
   type Form,
-  launchFormEntryOrHtmlForms,
-  mapFormsToHtmlFormEntryForms,
-  useVisitOrOfflineVisit,
+  type PatientWorkspace2DefinitionProps,
 } from '@openmrs/esm-patient-common-lib';
-import type { ConfigObject } from '../config-schema';
+import type { FormEntryConfigSchema } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
-interface FormsDashboardProps extends DefaultPatientWorkspaceProps {
-  clinicalFormsWorkspaceName?: string;
-  formEntryWorkspaceName?: string;
-  htmlFormEntryWorkspaceName?: string;
-}
-
-const FormsDashboard: React.FC<FormsDashboardProps> = ({
-  patientUuid,
-  clinicalFormsWorkspaceName,
-  formEntryWorkspaceName,
-  htmlFormEntryWorkspaceName,
+const FormsDashboard: React.FC<PatientWorkspace2DefinitionProps<{}, ClinicalFormsWorkspaceWindowProps>> = ({
+  groupProps: { patientUuid, visitContext },
+  launchChildWorkspace,
 }) => {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const config = useConfig<FormEntryConfigSchema>();
   const isOnline = useConnectivity();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const {
     data: forms,
-    allForms,
     error,
     mutateForms,
-  } = useForms(patientUuid, currentVisit?.uuid, undefined, undefined, !isOnline, config.orderBy);
-
-  const htmlFormEntryForms = useMemo(() => {
-    return mapFormsToHtmlFormEntryForms(allForms, config.htmlFormEntryForms);
-  }, [config.htmlFormEntryForms, allForms]);
+  } = useForms(patientUuid, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const handleFormOpen = useCallback(
     (form: Form, encounterUuid: string) => {
-      launchFormEntryOrHtmlForms(
-        htmlFormEntryForms,
-        patientUuid,
+      launchChildWorkspace('patient-form-entry-workspace', {
         form,
-        currentVisit?.uuid,
         encounterUuid,
-        currentVisit?.visitType.uuid,
-        currentVisit?.startDatetime,
-        currentVisit?.stopDatetime,
-        mutateForms,
-        clinicalFormsWorkspaceName,
-        formEntryWorkspaceName,
-        htmlFormEntryWorkspaceName,
-      );
+      });
     },
-    [
-      currentVisit,
-      htmlFormEntryForms,
-      mutateForms,
-      patientUuid,
-      clinicalFormsWorkspaceName,
-      formEntryWorkspaceName,
-      htmlFormEntryWorkspaceName,
-    ],
+    [launchChildWorkspace],
   );
 
   const sections = useMemo(() => {
@@ -93,14 +59,14 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList completedForms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList forms={forms} error={error} handleFormOpen={handleFormOpen} />
       ) : (
         sections.map((section) => {
           return (
             <FormsList
               key={`form-section-${section.name}`}
               sectionName={section.name}
-              completedForms={section.availableForms}
+              forms={section.availableForms}
               error={error}
               handleFormOpen={handleFormOpen}
             />

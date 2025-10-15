@@ -5,20 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextArea, ButtonSet, Column, Form, InlineNotification, Stack, InlineLoading } from '@carbon/react';
-import { OpenmrsDatePicker, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, usePatientOrders, type Order } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsDatePicker, showSnackbar, useLayoutType, Workspace2 } from '@openmrs/esm-framework';
+import { type Order, type PatientWorkspace2DefinitionProps, usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { cancelOrder } from './cancel-order.resource';
 import styles from './cancel-order-form.scss';
 
-interface OrderCancellationFormProps extends DefaultPatientWorkspaceProps {
+interface OrderCancellationFormProps {
   order: Order;
 }
 
-const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
-  order,
-  patientUuid,
+const OrderCancellationForm: React.FC<PatientWorkspace2DefinitionProps<OrderCancellationFormProps, {}>> = ({
+  workspaceProps: { order },
+  groupProps: { patientUuid },
   closeWorkspace,
-  promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -57,10 +56,6 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
     }
   }
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
-
   const cancelOrderRequest = useCallback(
     (data: CancelOrderFormData) => {
       const formData = data;
@@ -98,82 +93,84 @@ const OrderCancellationForm: React.FC<OrderCancellationFormProps> = ({
   );
 
   return (
-    <Form className={styles.form}>
-      <div className={styles.grid}>
-        <Stack>
-          <section>
-            <h4 className={styles.orderDisplay}>{order?.display}</h4>
-          </section>
-          <section>
-            <Controller
-              name="cancellationDate"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div className={styles.row}>
-                  <OpenmrsDatePicker
-                    {...field}
-                    id="cancellationDate"
-                    minDate={dayjs().startOf('day')}
-                    labelText={t('cancellationDate', 'Cancellation date')}
-                    invalid={Boolean(fieldState?.error?.message)}
-                    invalidText={fieldState?.error?.message}
-                  />
-                </div>
-              )}
-            />
-          </section>
-          <section>
-            <Controller
-              name="reasonForCancellation"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <div className={styles.row}>
-                  <TextArea
-                    type="text"
-                    id="reasonForCancellation"
-                    labelText={t('reasonForCancellation', 'Reason for cancellation')}
-                    value={value}
-                    onChange={(evt) => onChange(evt.target.value)}
-                    invalid={!!errors['reasonForCancellation']}
-                    invalidText={!!errors['reasonForCancellation'] && errors['reasonForCancellation'].message}
-                  />
-                </div>
-              )}
-            />
-          </section>
-        </Stack>
-      </div>
+    <Workspace2 title={t('orderCancellation', 'Order cancellation')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form}>
+        <div className={styles.grid}>
+          <Stack>
+            <section>
+              <h4 className={styles.orderDisplay}>{order?.display}</h4>
+            </section>
+            <section>
+              <Controller
+                name="cancellationDate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div className={styles.row}>
+                    <OpenmrsDatePicker
+                      {...field}
+                      id="cancellationDate"
+                      minDate={dayjs().startOf('day')}
+                      labelText={t('cancellationDate', 'Cancellation date')}
+                      invalid={Boolean(fieldState?.error?.message)}
+                      invalidText={fieldState?.error?.message}
+                    />
+                  </div>
+                )}
+              />
+            </section>
+            <section>
+              <Controller
+                name="reasonForCancellation"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <div className={styles.row}>
+                    <TextArea
+                      type="text"
+                      id="reasonForCancellation"
+                      labelText={t('reasonForCancellation', 'Reason for cancellation')}
+                      value={value}
+                      onChange={(evt) => onChange(evt.target.value)}
+                      invalid={!!errors['reasonForCancellation']}
+                      invalidText={!!errors['reasonForCancellation'] && errors['reasonForCancellation'].message}
+                    />
+                  </div>
+                )}
+              />
+            </section>
+          </Stack>
+        </div>
 
-      {showErrorNotification && (
-        <Column className={styles.errorContainer}>
-          <InlineNotification
-            lowContrast
-            title={t('error', 'Error')}
-            subtitle={t('pleaseFillRequiredFields', 'Please fill all the required fields') + '.'}
-            onClose={() => setShowErrorNotification(false)}
-          />
-        </Column>
-      )}
+        {showErrorNotification && (
+          <Column className={styles.errorContainer}>
+            <InlineNotification
+              lowContrast
+              title={t('error', 'Error')}
+              subtitle={t('pleaseFillRequiredFields', 'Please fill all the required fields') + '.'}
+              onClose={() => setShowErrorNotification(false)}
+            />
+          </Column>
+        )}
 
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          onClick={handleSubmit(cancelOrderRequest, onError)}
-          disabled={isSubmitting}
-          type="submit"
-        >
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            t('saveAndClose', 'Save and close')
-          )}
-        </Button>
-      </ButtonSet>
-    </Form>
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            kind="primary"
+            onClick={handleSubmit(cancelOrderRequest, onError)}
+            disabled={isSubmitting}
+            type="submit"
+          >
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              t('saveAndClose', 'Save and close')
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 

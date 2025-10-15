@@ -16,8 +16,9 @@ import {
   useAvailablePrograms,
   useEnrollments,
 } from './programs.resource';
-import ProgramsForm from './programs-form.workspace';
+import ProgramsForm, { type ProgramsFormProps } from './programs-form.workspace';
 import { type ConfigObject, configSchema } from '../config-schema';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
 const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
 const mockUseEnrollments = jest.mocked(useEnrollments);
@@ -26,17 +27,20 @@ const mockUpdateProgramEnrollment = jest.mocked(updateProgramEnrollment);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseLocations = jest.mocked(useLocations);
 const mockCloseWorkspace = jest.fn();
-const mockCloseWorkspaceWithSavedChanges = jest.fn();
-const mockPromptBeforeClosing = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
-const testProps = {
+const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
-  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
-  promptBeforeClosing: mockPromptBeforeClosing,
-  setTitle: jest.fn(),
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {},
+  windowProps: {},
 };
 
 jest.mock('./programs.resource', () => ({
@@ -109,7 +113,7 @@ describe('ProgramsForm', () => {
       new AbortController(),
     );
 
-    expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalledTimes(1);
+    expect(mockCloseWorkspace).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       subtitle: 'It is now visible in the Programs table',
@@ -172,5 +176,9 @@ describe('ProgramsForm', () => {
 });
 
 function renderProgramsForm(programEnrollmentUuidToEdit?: string) {
-  render(<ProgramsForm {...testProps} programEnrollmentId={programEnrollmentUuidToEdit} />);
+  const props = {
+    ...testProps,
+    workspaceProps: { programEnrollmentId: programEnrollmentUuidToEdit },
+  };
+  render(<ProgramsForm {...props} />);
 }

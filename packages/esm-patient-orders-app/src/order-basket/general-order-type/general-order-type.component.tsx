@@ -2,13 +2,12 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
 import {
+  type Workspace2DefinitionProps,
   AddIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  type DefaultWorkspaceProps,
   MaybeIcon,
   useLayoutType,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
@@ -18,15 +17,24 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 import styles from './general-order-panel.scss';
 
 interface GeneralOrderTypeProps extends OrderTypeDefinition {
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  patient: fhir.Patient;
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, closeWorkspace, label, icon }) => {
+const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
+  patient,
+  orderTypeUuid,
+  closeWorkspace,
+  label,
+  icon,
+  launchChildWorkspace,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
 
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -66,24 +74,26 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ orderTypeUuid, clos
 
   const openConceptSearch = () => {
     closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
+      discardUnsavedChanges: true,
+    }).then((didClose) => {
+      if (didClose) {
+        launchChildWorkspace('orderable-concept-workspace', {
           orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
+        });
+      }
     });
   };
 
   const openOrderForm = (order: OrderBasketItem) => {
     closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
+      discardUnsavedChanges: true,
+    }).then((didClose) => {
+      if (didClose) {
+        launchChildWorkspace('orderable-concept-workspace', {
           order,
           orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
+        });
+      }
     });
   };
 
