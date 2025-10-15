@@ -97,7 +97,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       },
       left: {
         mapsTo: 'value',
-        title: selectedMenuItem.groupLabel,
+        title: t(selectedMenuItem.groupLabel),
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
       },
