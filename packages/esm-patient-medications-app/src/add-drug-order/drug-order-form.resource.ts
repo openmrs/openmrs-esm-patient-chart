@@ -87,8 +87,8 @@ function useCreateMedicationOrderFormSchema() {
                 uuid: z.string(),
               })
               .passthrough(),
-            strength: z.string(),
-            display: z.string(),
+            strength: z.string().nullable(),
+            display: z.string().nullable(),
           },
           {
             message: t('drugRequiredErrorMessage', 'Drug is required'),

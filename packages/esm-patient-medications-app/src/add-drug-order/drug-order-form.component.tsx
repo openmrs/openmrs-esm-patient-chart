@@ -35,7 +35,7 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, useController, UseFormReturn } from 'react-hook-form';
+import { type Control, Controller, useController } from 'react-hook-form';
 import { type Drug } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -144,7 +144,7 @@ export function DrugOrderForm({
   const defaultPrescribingProvider = allowAndSupportSelectingPrescribingClinician
     ? providers?.find((p) => p.uuid === currentProvider.uuid)
     : currentProvider;
-  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, defaultPrescribingProvider.uuid);
+  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, defaultPrescribingProvider?.uuid);
   const {
     control,
     formState: { isDirty },
