@@ -5252,9 +5252,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-patient-printing-app@workspace:packages/esm-patient-label-printing-app":
+"@openmrs/esm-patient-printing-app@workspace:packages/esm-patient-printing-app":
   version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-printing-app@workspace:packages/esm-patient-label-printing-app"
+  resolution: "@openmrs/esm-patient-printing-app@workspace:packages/esm-patient-printing-app"
   dependencies:
     "@carbon/react": "npm:^1.76.0"
     webpack: "npm:^5.94.0"
