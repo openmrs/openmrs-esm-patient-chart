@@ -4,7 +4,7 @@ export const configSchema = {
   showPrintIdentifierStickerButton: {
     _type: Type.Boolean,
     _description: "Whether to display the 'Print identifier sticker' button in the patient banner",
-    _default: false,
+    _default: true,
   },
 };
 
