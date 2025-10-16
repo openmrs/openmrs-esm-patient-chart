@@ -361,7 +361,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient } = usePatientChartStore();
   const patientName = patient ? getPatientName(patient) : '';
-  const { maxDispenseDurationInDays } = useConfig<ConfigObject>();
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -405,6 +404,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
+          <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         </div>
       )}
       <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
@@ -419,16 +419,19 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
             />
           )}
           {!isTablet && (
-            <div className={styles.backButton}>
-              <Button
-                kind="ghost"
-                renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-                iconDescription="Return to order basket"
-                size="sm"
-                onClick={onCancel}
-              >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-              </Button>
+            <div>
+              <div className={styles.backButton}>
+                <Button
+                  kind="ghost"
+                  renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+                  iconDescription="Return to order basket"
+                  size="sm"
+                  onClick={onCancel}
+                >
+                  <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+                </Button>
+              </div>
+              <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
             </div>
           )}
 
@@ -631,7 +634,6 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
                       label={t('duration', 'Duration')}
                       min={0}
                       step={1}
-                      max={maxDispenseDurationInDays}
                       allowEmpty
                     />
                   ) : (
@@ -769,7 +771,6 @@ interface CustomNumberInputProps {
 
 const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...inputProps }: CustomNumberInputProps) => {
   const { t } = useTranslation();
-  const { maxDispenseDurationInDays } = useConfig();
   const responsiveSize = isTablet ? 'md' : 'sm';
 
   const {
@@ -785,7 +786,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   );
 
   const increment = () => {
-    setValue(name, Math.min(Number(value) + 1, maxDispenseDurationInDays));
+    setValue(name, Number(value) + 1);
   };
 
   const decrement = () => {

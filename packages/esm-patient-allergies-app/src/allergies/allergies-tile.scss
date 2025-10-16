@@ -1,9 +1,14 @@
 @use '@carbon/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .label {
   @include type.type-style('label-01');
   color: $text-02;
+  display: flex;
+  gap: layout.$spacing-02;
+  align-items: center;
 }
 
 .content {

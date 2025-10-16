@@ -22,7 +22,6 @@
 }
 
 .tileValue {
-  @include type.type-style('label-01');
   margin: layout.$spacing-04 0 layout.$spacing-04;
   display: block;
 }
