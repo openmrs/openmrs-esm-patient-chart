@@ -230,7 +230,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           orderer: order.orderer,
         };
         const resultsStatusPayload = {
-          fulfillerStatus: 'ON_HOLD',
+          fulfillerStatus: 'DRAFT',
           fulfillerComment: commentText || 'Test Results Modified, pending approval',
         };
 
