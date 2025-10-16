@@ -11,6 +11,7 @@ import {
   useConfig,
   MaybeIcon,
   launchWorkspace,
+  useWorkspaces,
 } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../../config-schema';
@@ -44,15 +45,25 @@ export default function LabOrderBasketPanelExtension() {
   );
 }
 
+export const WORKSPACES = {
+  TEST_RESULTS_FORM: 'test-results-form-workspace',
+  ORDER_BASKET: 'order-basket',
+};
+
 type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {}
 
 function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
+  type WorkSpaceType = (typeof WORKSPACES)[keyof typeof WORKSPACES];
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-
+  const { workspaces = [{ name: WORKSPACES.ORDER_BASKET, additionalProps: {} }] } = useWorkspaces();
+  const [prevWorkSpace, setPrevWorkSpace] = useState(workspaces[0]?.name);
+  const [prevOrder, setPrevOrder] = useState(
+    workspaces[0]?.name === WORKSPACES.TEST_RESULTS_FORM ? workspaces[0].additionalProps['order'] : null,
+  );
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -90,31 +101,40 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
       discontinuedOrderBasketItems,
     };
   }, [orders]);
+  const isWorkSpaceType = useCallback((value: string): value is WorkSpaceType => {
+    return Object.values(WORKSPACES).includes(value as WorkSpaceType);
+  }, []);
 
   const openNewLabForm = useCallback(() => {
-    closeWorkspace('order-basket', {
+    closeWorkspace(isWorkSpaceType(prevWorkSpace) ? prevWorkSpace : WORKSPACES.ORDER_BASKET, {
       ignoreChanges: true,
       onWorkspaceClose: () =>
         launchWorkspace('add-lab-order', {
           orderTypeUuid: orderTypeUuid,
+          prevWorkSpace: prevWorkSpace,
+          isWorkSpaceType: isWorkSpaceType,
+          prevOrder: prevOrder,
         }),
       closeWorkspaceGroup: false,
     });
-  }, [orderTypeUuid]);
+  }, [orderTypeUuid, isWorkSpaceType, prevOrder, prevWorkSpace]);
 
   const openEditLabForm = useCallback(
     (order: OrderBasketItem) => {
-      closeWorkspace('order-basket', {
+      closeWorkspace(isWorkSpaceType(prevWorkSpace) ? prevWorkSpace : WORKSPACES.ORDER_BASKET, {
         ignoreChanges: true,
         onWorkspaceClose: () =>
           launchWorkspace('add-lab-order', {
             order,
             orderTypeUuid: orderTypeUuid,
+            prevWorkSpace: prevWorkSpace,
+            isWorkSpaceType: isWorkSpaceType,
+            prevOrder: prevOrder,
           }),
         closeWorkspaceGroup: false,
       });
     },
-    [orderTypeUuid],
+    [orderTypeUuid, isWorkSpaceType, prevOrder, prevWorkSpace],
   );
 
   const removeLabOrder = useCallback(
@@ -143,7 +163,13 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon }: LabOrderBasketPanel
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
-          <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
+          <h4 className={styles.heading}>{`${
+            isWorkSpaceType(prevWorkSpace) && prevWorkSpace === WORKSPACES.ORDER_BASKET
+              ? label
+                ? t(label)
+                : orderType?.display
+              : t('tests', 'Tests')
+          } (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button

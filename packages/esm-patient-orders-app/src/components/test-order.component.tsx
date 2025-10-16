@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';
+import { useLabEncounter, useOrderConceptByUuid, useOrderConceptsByUuids } from '../lab-results/lab-results.resource';
 import { getObservationDisplayValue } from '../utils';
 import styles from './test-order.scss';
 
@@ -47,51 +47,62 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   );
 
   const testResultObs = useMemo(() => {
-    if (!encounter || !concept) return null;
-    return encounter.obs?.find((obs) => obs.concept.uuid === concept.uuid);
-  }, [concept, encounter]);
+    if (!encounter) return null;
+    return encounter.obs?.filter((obs) => obs.order.uuid === testOrder.uuid);
+  }, [encounter, testOrder.uuid]);
+
+  const obsUuids = useMemo(
+    () =>
+      Array.isArray(testResultObs) && testResultObs.length > 0
+        ? testResultObs.map((o) => o.concept?.uuid).filter(Boolean)
+        : [],
+    [testResultObs],
+  );
+
+  const { isLoading: isAnyConceptLoading, concepts: conceptList } = useOrderConceptsByUuids(obsUuids);
 
   const testRows = useMemo(() => {
-    if (!concept) return [];
+    if (!Array.isArray(testResultObs) || testResultObs.length === 0) return [];
 
-    // For panel tests (with set members)
-    if (concept.setMembers && concept.setMembers.length > 0) {
-      return concept.setMembers.map((memberConcept) => {
-        const memberObs = testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid);
+    return testResultObs.flatMap((obs) => {
+      const concept = conceptList.find((c) => c.uuid === obs.concept.uuid);
+      if (!concept) return [];
 
-        let resultValue: React.ReactNode;
-        if (isLoadingResult) {
-          resultValue = <SkeletonText />;
-        } else if (memberObs) {
-          resultValue = getObservationDisplayValue(memberObs.value ?? memberObs);
-        } else {
-          resultValue = '--';
-        }
+      // Handle panel tests (with set members / groupMembers)
+      if (concept.setMembers && concept.setMembers.length > 0) {
+        return concept.setMembers.map((memberConcept) => {
+          const memberObs = obs.groupMembers?.find((gm) => gm.concept.uuid === memberConcept.uuid);
 
-        return {
-          id: memberConcept.uuid,
-          testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
-          result: resultValue,
-          normalRange:
-            memberConcept.lowNormal != null && memberConcept.hiNormal != null
-              ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
-              : t('notApplicable', 'Not applicable'),
-        };
-      });
-    }
+          let resultValue: React.ReactNode;
+          if (isLoadingResult) {
+            resultValue = <SkeletonText />;
+          } else if (memberObs) {
+            resultValue = getObservationDisplayValue(memberObs.value ?? memberObs);
+          } else {
+            resultValue = '--';
+          }
 
-    // For single tests (no set members)
-    let resultValue: React.ReactNode;
-    if (isLoadingResult) {
-      resultValue = <SkeletonText />;
-    } else if (testResultObs) {
-      resultValue = getObservationDisplayValue(testResultObs.value ?? testResultObs);
-    } else {
-      resultValue = '--';
-    }
+          return {
+            id: memberConcept.uuid,
+            testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
+            result: resultValue,
+            normalRange:
+              memberConcept.lowNormal != null && memberConcept.hiNormal != null
+                ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
+                : t('notApplicable', 'Not applicable'),
+          };
+        });
+      }
 
-    return [
-      {
+      // Handle single test (no set members)
+      let resultValue: React.ReactNode;
+      if (isLoadingResult) {
+        resultValue = <SkeletonText />;
+      } else {
+        resultValue = getObservationDisplayValue(obs.value ?? obs);
+      }
+
+      return {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
         result: resultValue,
@@ -99,11 +110,11 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
           concept.lowNormal != null && concept.hiNormal != null
             ? `${concept.lowNormal} - ${concept.hiNormal}`
             : t('notApplicable', 'Not applicable'),
-      },
-    ];
-  }, [concept, isLoadingResult, testResultObs, t]);
+      };
+    });
+  }, [isLoadingResult, testResultObs, conceptList, t]);
 
-  if (isLoadingTestConcepts || isLoadingResult) {
+  if (isAnyConceptLoading || isLoadingResult) {
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
