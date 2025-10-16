@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { useFeatureFlag, showSnackbar, getCoreTranslation, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, getCoreTranslation, useConfig } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
 import { useStickerPdfPrinter } from '../hooks/useStickerPdfPrinter';
 import type { ConfigObject } from '../config-schema';
