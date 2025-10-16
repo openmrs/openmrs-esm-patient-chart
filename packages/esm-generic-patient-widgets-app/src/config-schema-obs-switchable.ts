@@ -13,7 +13,12 @@ export const configSchemaSwitchable = {
   },
   graphOldestFirst: {
     _type: Type.Boolean,
-    _description: 'Show graph values from most oldest to recent',
+    _description: 'Plot values from oldest (left) to newest (right)',
+    _default: false,
+  },
+  tableSortOldestFirst: {
+    _type: Type.Boolean,
+    _description: 'Sort table by default from oldest to newest',
     _default: false,
   },
   interpretationSlot: {
@@ -98,6 +103,7 @@ export interface ConfigObjectSwitchable {
   title: string;
   resultsName: string;
   graphOldestFirst: boolean;
+  tableSortOldestFirst: boolean;
   interpretationSlot: string;
   data: Array<{
     concept: string;
