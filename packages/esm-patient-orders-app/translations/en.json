@@ -1,6 +1,7 @@
 {
   "actionsMenu": "Actions menu",
   "add": "Add",
+  "addCommentsOptional": "Add comments (optional)...",
   "additionalInstructions": "Additional instructions",
   "addOrderableForOrderType": "Add {{orderTypeDisplay}}",
   "addResults": "Add results",
@@ -13,6 +14,8 @@
   "checkFilters": "Check the filters above",
   "chooseAnOption": "Choose an option",
   "clearSearchResults": "Clear results",
+  "comments": "Comments",
+  "commentsHelperText": "Enter any additional notes or observations about the test results",
   "dateCannotBeBeforeToday": "Date cannot be before today",
   "dateOfOrder": "Date of order",
   "dateRange": "Date range",
