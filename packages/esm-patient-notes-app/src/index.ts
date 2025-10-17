@@ -28,7 +28,6 @@ export function startupApp() {
 }
 
 export const notesOverview = getSyncLifecycle(notesOverviewExtension, options);
-
 export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExtension, options);
 
 // t('visitNoteWorkspaceTitle', 'Visit Note')

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { useVisitContextStore } from '@openmrs/esm-framework';
+import userEvent from '@testing-library/user-event';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
 import { useInfiniteVisits } from '../visit.resource';
@@ -10,14 +10,6 @@ const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue
   errorFetchingSystemVisitSetting: null,
   isLoadingSystemVisitSetting: false,
   systemVisitEnabled: true,
-});
-
-jest.mocked(useVisitContextStore).mockReturnValue({
-  manuallySetVisitUuid: null,
-  mutateVisitCallbacks: {},
-  patientUuid: null,
-  setVisitContext: jest.fn(),
-  mutateVisit: jest.fn(),
 });
 
 const mockUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
@@ -40,7 +32,20 @@ jest.mock('../visit.resource', () => ({
   useInfiniteVisits: () => mockUseInfiniteVisits('some-uuid'),
 }));
 
+const mockSetVisitContext = jest.fn();
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  usePatientChartStore: jest.fn(() => ({
+    visitContext: null,
+    setVisitContext: mockSetVisitContext,
+  })),
+}));
+
 describe('VisitContextSwitcherModal', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should display a list of past visits', () => {
     mockUseSystemVisitSetting.mockReturnValueOnce({
       systemVisitEnabled: false,
@@ -52,6 +57,23 @@ describe('VisitContextSwitcherModal', () => {
     expect(screen.getAllByText('Registration Desk')).toHaveLength(3);
     // visit type - only check the visitType div elements
     expect(screen.getAllByText('Facility Visit', { selector: '.visitType' })).toHaveLength(3);
+  });
+
+  it('should call setVisitContext when continue button is clicked with selected visit', async () => {
+    const user = userEvent.setup();
+
+    renderVisitContextSwitcherModal();
+
+    // Select a visit by clicking on the first visit card
+    const firstVisitRadio = screen.getAllByRole('radio', { name: /Facility Visit/ })[0];
+    await user.click(firstVisitRadio);
+
+    // Click the continue button
+    const continueButton = screen.getByRole('button', { name: /continue/i });
+    await user.click(continueButton);
+
+    // Verify setVisitContext was called with the selected visit
+    expect(mockSetVisitContext).toHaveBeenCalledWith(mockCurrentVisit, expect.any(Function));
   });
 });
 

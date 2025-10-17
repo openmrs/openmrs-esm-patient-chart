@@ -27,11 +27,16 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   render(
     <FlagsList
       closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      promptBeforeClosing={jest.fn()}
-      setTitle={jest.fn()}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceProps={{}}
+      windowProps={{}}
+      workspaceName=""
+      launchChildWorkspace={null}
     />,
   );
 
@@ -59,11 +64,16 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
   render(
     <FlagsList
       closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      promptBeforeClosing={jest.fn()}
-      setTitle={jest.fn()}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceProps={{}}
+      windowProps={{}}
+      workspaceName=""
+      launchChildWorkspace={null}
     />,
   );
 

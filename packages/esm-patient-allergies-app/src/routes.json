@@ -44,12 +44,17 @@
       "component": "deleteAllergyModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "patient-allergy-form-workspace",
-      "title": "recordNewAllergy",
       "component": "allergyFormWorkspace",
-      "type": "form"
+      "window": "patient-allergy-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-allergy-form-window",
+      "group": "patient-chart"
     }
   ]
 }

@@ -4,7 +4,6 @@ import {
   subscribePrecacheStaticDependencies,
   syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
-import { ComponentType } from 'react';
 import { configSchema } from './config-schema';
 import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 
@@ -25,22 +24,15 @@ export function startupApp() {
   subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 }
 
-// t('clinicalForm', 'Clinical form')
 export const patientFormEntryWorkspace = getAsyncLifecycle(() => import('./forms/form-entry.workspace'), options);
 
-export const patientHtmlFormEntryWorkspace = getAsyncLifecycle(
-  () => import('./htmlformentry/html-form-entry.workspace'),
-  options,
-);
-
-// t('clinicalForms', 'Clinical forms')
 export const clinicalFormsWorkspace = getAsyncLifecycle(() => import('./forms/forms-dashboard.workspace'), options);
 export const clinicalFormsWorkspaceExtension = getAsyncLifecycle(
   () => import('./forms/forms-dashboard.workspace'),
   options,
 );
 
-export const clinicalFormActionMenu = getAsyncLifecycle(
+export const clinicalFormActionButton = getAsyncLifecycle(
   () => import('./clinical-form-action-button.component'),
   options,
 );

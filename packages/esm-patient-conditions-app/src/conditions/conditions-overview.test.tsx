@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
-  launchWorkspace,
+  launchWorkspace2,
   openmrsFetch,
   useConfig,
 } from '@openmrs/esm-framework';
@@ -15,11 +15,7 @@ import ConditionsOverview from './conditions-overview.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  launchWorkspace: jest.fn(),
-}));
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -107,7 +103,7 @@ describe('ConditionsOverview', () => {
 
     await user.click(recordConditionsLink);
 
-    expect(launchWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('conditions-form-workspace', { formContext: 'creating' });
   });
 });

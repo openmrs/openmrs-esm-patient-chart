@@ -35,27 +35,28 @@ import {
 } from '@openmrs/esm-framework';
 import { type Control, Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  usePatientChartStore,
+  type CommonMedicationValueCoded,
+  type DosingUnit,
+  type DrugOrderBasketItem,
+  type DurationUnit,
+  type MedicationFrequency,
+  type MedicationRoute,
+  type QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 import { z } from 'zod';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import type {
-  CommonMedicationValueCoded,
-  DosingUnit,
-  DrugOrderBasketItem,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  QuantityUnit,
-} from '../types';
 import { useRequireOutpatientQuantity } from '../api';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
+  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   onSave: (finalizedOrder: DrugOrderBasketItem) => void;
   onCancel: () => void;
-  promptBeforeClosing: (testFcn: () => boolean) => void;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 function useCreateMedicationOrderFormSchema() {
@@ -224,7 +225,13 @@ function InputWrapper({ children }) {
   );
 }
 
-export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, promptBeforeClosing }: DrugOrderFormProps) {
+export function DrugOrderForm({
+  patientUuid,
+  initialOrderBasketItem,
+  onSave,
+  onCancel,
+  setHasUnsavedChanges,
+}: DrugOrderFormProps) {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
@@ -269,8 +276,8 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   });
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -359,7 +366,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patient } = usePatientChartStore();
+  const { patient } = usePatientChartStore(patientUuid);
   const patientName = patient ? getPatientName(patient) : '';
 
   const observer = useRef(null);
@@ -418,7 +425,7 @@ export function DrugOrderForm({ initialOrderBasketItem, onSave, onCancel, prompt
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           )}
-          {!isTablet && (
+          {!isTablet && initialOrderBasketItem.action != 'REVISE' && (
             <div>
               <div className={styles.backButton}>
                 <Button

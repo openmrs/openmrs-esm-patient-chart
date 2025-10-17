@@ -1,11 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
+import { object } from 'zod';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 describe('StartVisitOverflowMenuItem', () => {
   it('should launch the start visit form', async () => {
@@ -18,9 +19,12 @@ describe('StartVisitOverflowMenuItem', () => {
 
     await user.click(startVisitButton);
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
-      openedFrom: 'patient-chart-start-visit',
-    });
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'start-visit-workspace-form',
+      { openedFrom: 'patient-chart-start-visit' },
+      {},
+      expect.objectContaining({ patient: mockPatient, patientUuid: mockPatient.id }),
+    );
   });
 
   it('should not show start visit button for a deceased patient', () => {

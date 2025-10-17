@@ -16,7 +16,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { AddIcon, formatDate, launchWorkspace, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
@@ -91,7 +91,7 @@ function ConditionsDetailedSummary({ patient }) {
 
   const launchConditionsForm = useCallback(
     () =>
-      launchWorkspace('conditions-form-workspace', {
+      launchWorkspace2('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],

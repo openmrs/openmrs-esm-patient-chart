@@ -12,6 +12,9 @@ import BiometricsOverview from './biometrics-overview.component';
 const testProps = {
   basePath: patientChartBasePath,
   patientUuid: mockPatient.id,
+  patient: mockPatient,
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);

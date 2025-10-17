@@ -10,8 +10,8 @@ import {
   type Datatype,
   useCompletedLabResults,
 } from './lab-results.resource';
-import LabResultsForm from './lab-results-form.component';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
+import { type PatientWorkspace2DefinitionProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
@@ -39,14 +39,22 @@ const mockOrder = {
   orderer: { uuid: 'orderer-uuid' },
 };
 
-const testProps = {
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  order: mockOrder as Order,
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
+const mockCloseWorkspace = jest.fn();
+
+const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
+  closeWorkspace: mockCloseWorkspace,
+  workspaceProps: {
+    order: mockOrder as Order,
+  },
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  launchChildWorkspace: jest.fn(),
+  windowProps: {},
+  workspaceName: '',
 };
 
 describe('LabResultsForm', () => {
@@ -263,16 +271,8 @@ describe('LabResultsForm', () => {
 
   test('submits form with valid data', async () => {
     const user = userEvent.setup();
-    const mockCloseWorkspace = jest.fn();
-    const mockCloseWorkspaceWithSavedChanges = jest.fn();
 
-    render(
-      <LabResultsForm
-        {...testProps}
-        closeWorkspace={mockCloseWorkspace}
-        closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
-      />,
-    );
+    render(<LabResultsForm {...testProps} />);
 
     const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '50');
@@ -281,7 +281,7 @@ describe('LabResultsForm', () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
+      expect(mockCloseWorkspace).toHaveBeenCalled();
     });
   });
 

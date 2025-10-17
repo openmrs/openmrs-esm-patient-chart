@@ -71,7 +71,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                         <Link
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            handleFormOpen(tableRows[i].form, '');
+                            handleFormOpen(tableRows[i].form, null);
                           }}
                           role="presentation"
                           className={styles.formName}

@@ -7,7 +7,7 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
-  launchWorkspace,
+  launchWorkspace2,
   useConfig,
   useLayoutType,
   useSession,
@@ -24,11 +24,6 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
-
-mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
-  onWorkspaceClose?.();
-});
 
 const mockTestTypes = [
   // {
@@ -62,34 +57,24 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useOrderType: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
-  getPatientUuidFromStore: jest.fn(() => mockPatient.id),
-  usePatientChartStore: jest.fn(() => ({
-    patientUuid: mockPatient.id,
-    patient: mockPatient,
-  })),
-}));
-
 function renderAddLabOrderWorkspace() {
-  const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
-    onWorkspaceClose();
-  });
-  const mockCloseWorkspaceWithSavedChanges = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
-    onWorkspaceClose();
-  });
-  const mockPromptBeforeClosing = jest.fn();
-  const view = render(
+  return render(
     <AddLabOrderWorkspace
       closeWorkspace={mockCloseWorkspace}
-      closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
-      promptBeforeClosing={mockPromptBeforeClosing}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      setTitle={jest.fn()}
-      orderTypeUuid="test-lab-order-type-uuid"
+      workspaceProps={{
+        orderTypeUuid: 'test-lab-order-type-uuid',
+      }}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceName={''}
+      launchChildWorkspace={jest.fn()}
+      windowProps={{}}
     />,
   );
-  return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
 }
 
 mockUseConfig.mockReturnValue({
@@ -126,9 +111,9 @@ describe('AddLabOrder', () => {
   test('happy path fill and submit form', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
     );
-    const { mockCloseWorkspaceWithSavedChanges } = renderAddLabOrderWorkspace();
+    renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
     await screen.findByText('CD4 COUNT');
 
@@ -171,14 +156,13 @@ describe('AddLabOrder', () => {
       ]);
     });
 
-    expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
   test('from lab search, click add directly to order basket', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepFunction),
     );
     renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
@@ -190,27 +174,22 @@ describe('AddLabOrder', () => {
     await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
         {
-          ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid),
+          ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid, null),
           isOrderIncomplete: true,
         },
       ]);
     });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mockCloseWorkspace).toHaveBeenCalledWith('add-lab-order', {
-      ignoreChanges: true,
-      onWorkspaceClose: expect.any(Function),
-    });
   });
 
   test('back to order basket', async () => {
     const user = userEvent.setup();
-    const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    renderAddLabOrderWorkspace();
     const back = screen.getByText('Back to order basket');
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('should display a patient header on tablet', () => {

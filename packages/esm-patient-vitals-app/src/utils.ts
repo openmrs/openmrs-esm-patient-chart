@@ -10,10 +10,11 @@ import { invalidateCachedVitalsAndBiometrics } from './common';
  * @param currentVisit - The current visit.
  * @param config - The configuration object.
  */
-export function useLaunchVitalsAndBiometricsForm() {
+export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
   const config = useConfig<ConfigObject>();
   const { useFormEngine, formName, formUuid } = config.vitals;
   const launchVitalsAndBiometricsForm = useLaunchWorkspaceRequiringVisit(
+    patientUuid,
     useFormEngine ? 'patient-form-entry-workspace' : patientVitalsBiometricsFormWorkspace,
   );
 

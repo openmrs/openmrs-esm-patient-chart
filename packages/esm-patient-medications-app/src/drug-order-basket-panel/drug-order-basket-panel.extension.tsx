@@ -2,28 +2,29 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import {
-  AddIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  closeWorkspace,
-  launchWorkspace,
-  useLayoutType,
-} from '@openmrs/esm-framework';
-import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
+  type OrderBasketExtensionProps,
+  useOrderBasket,
+  type DrugOrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
-import type { DrugOrderBasketItem } from '../types';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
 import styles from './drug-order-basket-panel.scss';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
+ * Slotted into order-basket-slot by default
  */
-export default function DrugOrderBasketPanelExtension() {
+function DrugOrderBasketPanelExtension({ patient, launchChildWorkspace }: OrderBasketExtensionProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
+    patient,
+    'medications',
+    prepMedicationOrderPostData,
+  );
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -62,19 +63,11 @@ export default function DrugOrderBasketPanelExtension() {
   }, [orders]);
 
   const openDrugSearch = () => {
-    closeWorkspace('order-basket', {
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('add-drug-order'),
-      closeWorkspaceGroup: false,
-    });
+    launchChildWorkspace('add-drug-order');
   };
 
   const openDrugForm = (order: DrugOrderBasketItem) => {
-    closeWorkspace('order-basket', {
-      ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('add-drug-order', { order }),
-      closeWorkspaceGroup: false,
-    });
+    launchChildWorkspace('add-drug-order', { order });
   };
 
   const removeMedication = useCallback(
@@ -195,3 +188,5 @@ export default function DrugOrderBasketPanelExtension() {
     </Tile>
   );
 }
+
+export default DrugOrderBasketPanelExtension;

@@ -37,7 +37,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(page.getByText(/soap note template/i)).toBeVisible();
+    await expect(page.getByText(/soap note template/i).filter({ visible: true })).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
@@ -57,15 +57,15 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
+    await page.getByRole('button', { name: /order basket/i }).click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
-    await page.getByRole('button', { name: /add/i }).nth(1).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).first().click();
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
-    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+    await page.getByRole('button', { name: /clinical forms/i }).click();
   });
 
   await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
@@ -188,11 +188,11 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
+    await page.getByRole('button', { name: /order basket/i }).click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
-    await page.getByRole('button', { name: /add/i }).nth(1).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).first().click();
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {

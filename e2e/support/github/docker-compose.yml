@@ -6,6 +6,9 @@ services:
     image: openmrs/openmrs-reference-application-3-gateway:${TAG:-nightly}
     ports:
       - '8080:80'
+    depends_on:
+      - backend
+      - frontend
 
   frontend:
     build:

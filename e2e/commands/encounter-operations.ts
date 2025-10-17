@@ -36,7 +36,7 @@ export const createEncounter = async (
   visit: Visit,
 ): Promise<Encounter> => {
   const encounterAfterVisit = dayjs(visit.startDatetime).add(1, 'minute');
-  const now = dayjs().subtract(1, 'second');
+  const now = dayjs().subtract(0, 'second');
   const encounterDatetime = encounterAfterVisit.isBefore(now) ? encounterAfterVisit.format() : now.format();
   const encounterRes = await api.post('encounter', {
     data: {

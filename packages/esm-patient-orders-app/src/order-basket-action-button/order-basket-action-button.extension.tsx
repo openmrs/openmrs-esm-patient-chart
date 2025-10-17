@@ -1,21 +1,33 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenuButton, ShoppingCartIcon } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { ActionMenuButton2, ShoppingCartIcon } from '@openmrs/esm-framework';
+import {
+  useStartVisitIfNeeded,
+  useOrderBasket,
+  type PatientChartWorkspaceActionButtonProps,
+} from '@openmrs/esm-patient-common-lib';
 
-const OrderBasketActionButton: React.FC = () => {
+/**
+ * This extension uses the patient chart store and MUST only be mounted within the patient chart
+ */
+const OrderBasketActionButton: React.FC<PatientChartWorkspaceActionButtonProps> = (props) => {
+  const {
+    groupProps: { patientUuid, patient },
+  } = props;
   const { t } = useTranslation();
-  const { orders } = useOrderBasket();
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
+  const { orders } = useOrderBasket(patient);
+  const startVisitIfNeeded = useStartVisitIfNeeded(patientUuid);
 
   return (
-    <ActionMenuButton
-      getIcon={(props: ComponentProps<typeof ShoppingCartIcon>) => <ShoppingCartIcon {...props} />}
+    <ActionMenuButton2
+      icon={(props: ComponentProps<typeof ShoppingCartIcon>) => <ShoppingCartIcon {...props} />}
       label={t('orderBasket', 'Order basket')}
-      iconDescription={t('medications', 'Medications')}
-      handler={launchOrderBasket}
-      type={'order'}
       tagContent={orders?.length > 0 ? orders?.length : null}
+      workspaceToLaunch={{
+        workspaceName: 'order-basket',
+        windowProps: { encounterUuid: '' },
+      }}
+      onBeforeWorkspaceLaunch={startVisitIfNeeded}
     />
   );
 };

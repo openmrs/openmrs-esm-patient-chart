@@ -4,14 +4,15 @@ import styles from './visit-actions-cell.scss';
 
 interface Props {
   visit: Visit;
+  patient: fhir.Patient;
 }
 
-const VisitActionsCell: React.FC<Props> = ({ visit }) => {
+const VisitActionsCell: React.FC<Props> = ({ visit, patient }) => {
   return (
     <ExtensionSlot
       name="visit-detail-overview-actions"
       className={styles.visitActions}
-      state={{ patientUuid: visit.patient.uuid, visit, compact: true }}
+      state={{ patientUuid: visit.patient.uuid, patient, visit, compact: true }}
     />
   );
 };

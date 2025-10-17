@@ -38,12 +38,11 @@
       "order": 1
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "add-drug-order",
-      "title": "addDrugOrderWorkspaceTitle",
       "component": "addDrugOrderWorkspace",
-      "type": "order"
+      "window": "order"
     }
   ]
 }
