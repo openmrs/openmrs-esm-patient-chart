@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   DataTable,
   Table,
@@ -8,6 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  type DataTableSortState,
 } from '@carbon/react';
 import { usePagination, useConfig, formatDatetime, formatDate, formatTime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -20,6 +21,20 @@ interface ObsTableProps {
   patientUuid: string;
 }
 
+interface Row {
+  id: string;
+  date: string;
+  encounter: string;
+  [conceptUuid: string]: string | number;
+}
+
+interface Header {
+  key: string;
+  header: string;
+  isSortable: boolean;
+  sortFunc: (rowA: Row, rowB: Row) => number;
+}
+
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
@@ -29,24 +44,41 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     obss.filter((o) => o.encounter.reference === reference),
   );
 
-  const tableHeaders = [
-    { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
-    ...config.data.map(({ concept, label }) => ({
-      key: concept,
-      header: label || obss.find((o) => o.conceptUuid == concept)?.code.text,
-    })),
-  ];
+  const tableHeaders: Array<Header> = useMemo(
+    () => [
+      {
+        key: 'date',
+        header: t('dateAndTime', 'Date and time'),
+        isSortable: true,
+        sortFunc: (rowA: Row, rowB: Row) =>
+          new Date(rowA.rawDate).getTime() < new Date(rowB.rawDate).getTime() ? 1 : -1,
+      },
+      ...config.data.map(({ concept, label }) => ({
+        key: concept,
+        header: label || obss.find((o) => o.conceptUuid == concept)?.code.text,
+        isSortable: true,
+        sortFunc: (rowA: Row, rowB: Row) => (rowA[concept] < rowB[concept] ? 1 : -1),
+      })),
+    ],
+    [t, config.data, obss],
+  );
 
   if (config.showEncounterType) {
-    tableHeaders.splice(1, 0, { key: 'encounter', header: t('encounterType', 'Encounter type'), isSortable: true });
+    tableHeaders.splice(1, 0, {
+      key: 'encounter',
+      header: t('encounterType', 'Encounter type'),
+      isSortable: true,
+      sortFunc: (rowA: Row, rowB: Row) => rowA.encounter.localeCompare(rowB.encounter),
+    });
   }
 
-  const tableRows = React.useMemo(
+  const tableRows: Array<Row> = React.useMemo(
     () =>
       obssGroupedByEncounters?.map((obss, index) => {
         const rowData = {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
+          rawDate: obss[0].effectiveDateTime,
           encounter: obss[0].encounter.name,
         };
 
@@ -98,11 +130,50 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     [config.data, config?.dateFormat, obssGroupedByEncounters],
   );
 
-  const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);
+  const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
+    key: 'date',
+    sortDirection: config.tableSortOldestFirst ? 'ASC' : 'DESC',
+  });
+
+  const handleSorting = useCallback(
+    (cellA: any, cellB: any, { key, sortDirection }: { key: string; sortDirection: DataTableSortState }) => {
+      // Use setTimeout to avoid setState during render
+      setTimeout(() => {
+        if (sortDirection === 'NONE') {
+          setSortParams({ key: '', sortDirection });
+        } else {
+          setSortParams({ key, sortDirection });
+        }
+      }, 0);
+      return 0;
+    },
+    [],
+  );
+
+  const sortedData: Array<any> = useMemo(() => {
+    if (sortParams.sortDirection === 'NONE') {
+      return tableRows;
+    }
+
+    const header = tableHeaders.find((header) => header.key === sortParams.key);
+
+    if (!header) {
+      return tableRows;
+    }
+
+    const sortedRows = tableRows.slice().sort((rowA, rowB) => {
+      const sortingNum = header.sortFunc(rowA, rowB);
+      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
+    });
+
+    return sortedRows;
+  }, [tableHeaders, tableRows, sortParams]);
+
+  const { results, goTo, currentPage } = usePagination(sortedData, config.table.pageSize);
 
   return (
     <div>
-      <DataTable rows={results} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable rows={results} headers={tableHeaders} isSortable sortRow={handleSorting} size="sm" useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()} className={styles.customRow}>
