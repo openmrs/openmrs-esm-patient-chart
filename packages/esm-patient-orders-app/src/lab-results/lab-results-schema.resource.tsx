@@ -33,11 +33,16 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
  */
 export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) => {
   if (!labOrderConcepts) {
-    return z.object({});
+    return z.object({
+      fulfillerComment: z.string().max(500, 'Comments cannot exceed 500 characters').optional(),
+    });
   }
-  const schema = createSchemaForConcept(labOrderConcepts);
 
-  return z.object(schema);
+  const conceptSchema = createSchemaForConcept(labOrderConcepts);
+
+  return z.object(conceptSchema).extend({
+    fulfillerComment: z.string().max(500, 'Comments cannot exceed 500 characters').optional(),
+  });
 };
 
 /**
