@@ -66,7 +66,7 @@ function VisitTimeline({ patientUuid, visitUuid }: VisitTimelineProps) {
         {encounters?.map((encounter) => (
           <p className={styles.timelineEntry} key={encounter.uuid}>
             <div className={styles.timelineDot} />
-            <span className={styles.encounterType}>{encounter.encounterType.name}</span>
+            <span className={styles.encounterType}>{encounter.encounterType.display}</span>
             <span>&middot;</span>
             {encounter.encounterProviders.length === 0 ? (
               <span>{t('noProvider', 'No provider')}</span>

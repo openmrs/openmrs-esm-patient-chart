@@ -3,7 +3,7 @@ import { Type, validators } from '@openmrs/esm-framework';
 export const configSchemaSwitchable = {
   title: {
     _type: Type.String,
-    _description: 'Displayed at the top of the widget.',
+    _description: 'Displayed at the top of the widget. Can also be a translation key.',
     _default: 'Vitals',
   },
   resultsName: {

@@ -2,7 +2,7 @@ name: OpenMRS CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'patch/*']
   pull_request:
     branches: [main]
   release:
@@ -52,6 +52,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -69,7 +71,7 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: 🏷️ Version
-        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")${{ github.ref_name == 'main' && '-pre' || '-patch' }}.${{ github.run_number }}"
 
       - name: 🏗️ Build
         run: yarn turbo run build --color --concurrency=5
@@ -80,7 +82,7 @@ jobs:
         run: git add . && git commit -m "Prerelease version" --no-verify
 
       - name: 📤 Pre-release
-        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish${{ github.ref_name == 'main' && '' || '-patch' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -97,7 +99,7 @@ jobs:
 
     needs: pre_release
 
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
 
     steps:
       - name: 🚀 Trigger RefApp Build

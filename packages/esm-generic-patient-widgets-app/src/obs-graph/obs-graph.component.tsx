@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
-import { LineChart, ScaleTypes } from '@carbon/charts-react';
+import { LineChart, type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
@@ -73,7 +73,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           group: conceptForObs[obs.conceptUuid].label
             ? t(conceptForObs[obs.conceptUuid].label, conceptForObs[obs.conceptUuid].label)
             : obs.code.text,
-          key: formatDate(new Date(obs.effectiveDateTime), { year: true, time: false }),
+          key: new Date(obs.effectiveDateTime),
           value: obs.valueQuantity.value,
         }));
 
@@ -88,16 +88,19 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
   const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
 
-  const chartOptions = {
+  const chartOptions: LineChartOptions = {
     axes: {
       bottom: {
-        title: 'Date',
+        title: t('date', 'Date'),
         mapsTo: 'key',
-        scaleType: ScaleTypes.LABELS,
+        scaleType: ScaleTypes.TIME,
+        ticks: {
+          formatter: (value: Date) => formatDate(value, { year: true, time: false }),
+        },
       },
       left: {
         mapsTo: 'value',
-        title: selectedMenuItem.groupLabel,
+        title: t(selectedMenuItem.groupLabel),
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
       },
@@ -107,6 +110,15 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     },
     color: {
       scale: chartColors,
+    },
+    tooltip: {
+      alwaysShowRulerTooltip: true,
+      showTotal: false,
+      valueFormatter: (value: any, label: string) =>
+        label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
+      truncation: {
+        numCharacter: 40,
+      },
     },
     height: '400px',
   };
