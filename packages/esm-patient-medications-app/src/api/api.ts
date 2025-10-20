@@ -243,6 +243,6 @@ export function useProviders(providerRoles: Array<string>) {
     providerRoles != null ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
   );
 
-  ret.data?.sort((a, b) => a.person?.display.localeCompare(b.person?.display));
+  ret.data?.sort((a, b) => (a.person?.display ?? '').localeCompare(b.person?.display ?? ''));
   return ret;
 }
