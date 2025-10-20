@@ -37,7 +37,6 @@ export default function AddDrugOrderWorkspace({
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { patient } = usePatientChartStore();
-  const { allowSelectingPrescribingClinician } = useConfig<ConfigObject>();
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
@@ -121,7 +120,7 @@ export default function AddDrugOrderWorkspace({
           saveButtonText={t('saveOrder', 'Save order')}
           onCancel={cancelDrugOrder}
           promptBeforeClosing={promptBeforeClosing}
-          allowSelectingPrescribingClinician={allowSelectingPrescribingClinician}
+          allowSelectingPrescribingClinician={false}
           allowSelectingDrug={false} // In this workspace, the drug is selected in <DrugSearch>, not in <DrugOrderForm>
         />
       </div>

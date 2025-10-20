@@ -65,8 +65,12 @@ export interface DrugOrderFormProps {
   onCancel: () => void;
   promptBeforeClosing: (testFcn: () => boolean) => void;
 
+  /**
+   * If true, allows user to select the prescribing provider when ordering medications from the order basket.
+   * (Otherwise, the prescribing provider always defaults to the current user.)
+   * The `prescriberProviderRoles` config must be set for this to work properly.
+   */
   allowSelectingPrescribingClinician: boolean;
-
   allowSelectingDrug: boolean;
 }
 

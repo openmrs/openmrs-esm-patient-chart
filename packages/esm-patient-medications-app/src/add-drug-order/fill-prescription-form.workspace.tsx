@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 
 export interface OrderBasketDrugOrderFormProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
-  allowSelectingPrescribingClinician: boolean;
 }
 
 /**
@@ -29,7 +28,6 @@ export interface OrderBasketDrugOrderFormProps extends DefaultWorkspaceProps {
  */
 const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
   patient,
-  allowSelectingPrescribingClinician,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
@@ -92,7 +90,7 @@ const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
       saveButtonText={t('fillPrescription', 'Fill prescription')}
       onCancel={closeWorkspace}
       promptBeforeClosing={promptBeforeClosing}
-      allowSelectingPrescribingClinician={allowSelectingPrescribingClinician}
+      allowSelectingPrescribingClinician={true}
       allowSelectingDrug={true}
     />
   );
