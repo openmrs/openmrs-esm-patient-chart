@@ -174,32 +174,31 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
     );
   }, [data]);
 
-  const filterNodesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
-    // If this node has obs data, include it
-    if (node.obs && node.obs.length > 0) {
-      return node;
+  const filterTreesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
+    // If this is a leaf node (has obs array), only keep it if it has data
+    if (node.obs !== undefined) {
+      return node.hasData ? node : null;
     }
 
-    // If this node has subSets, recursively filter them
+    // This is an intermediate/parent node - always keep it to preserve hierarchy
     if (node.subSets && node.subSets.length > 0) {
+      // Recursively filter only the leaf children
       const filteredSubSets = node.subSets
-        .map((subSet) => filterNodesWithData(subSet))
+        .map((subSet) => filterTreesWithData(subSet))
         .filter((subSet): subSet is ObsTreeNode => subSet !== null);
 
-      // Only include this node if it has valid subSets after filtering
-      if (filteredSubSets.length > 0) {
-        return { ...node, subSets: filteredSubSets };
-      }
+      // Always keep parent nodes to maintain test hierarchy structure
+      return { ...node, subSets: filteredSubSets };
     }
 
-    // No data found in this branch
-    return null;
+    // Parent node with empty subSets - keep it to preserve hierarchy
+    return node;
   };
 
   const roots = result
     .map((item) => item.data)
     .filter((data): data is ObsTreeNode => 'display' in data)
-    .map((data) => filterNodesWithData(data))
+    .map((data) => filterTreesWithData(data))
     .filter((data): data is ObsTreeNode => data !== null);
 
   const isLoading = result.some((item) => item.loading);
