@@ -70,8 +70,13 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: 🏷️ Version
-        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")${{ github.ref_name == 'main' && '-pre' || '-patch' }}.${{ github.run_number }}"
+      - name: 🏷️ Version (main)
+        if: github.ref_name == 'main'
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+
+      - name: 🏷️ Version (patch)
+        if: startsWith(github.ref_name, 'patch/')
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-patch.${{ github.run_number }}"
 
       - name: 🏗️ Build
         run: yarn turbo run build --color --concurrency=5
@@ -81,8 +86,15 @@ jobs:
       - name: 💾 Commit changes
         run: git add . && git commit -m "Prerelease version" --no-verify
 
-      - name: 📤 Pre-release
-        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish${{ github.ref_name == 'main' && '' || '-patch' }}
+      - name: 📤 Pre-release (main)
+        if: github.ref_name == 'main'
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: 📤 Pre-release (patch)
+        if: startsWith(github.ref_name, 'patch/')
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish-patch
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
