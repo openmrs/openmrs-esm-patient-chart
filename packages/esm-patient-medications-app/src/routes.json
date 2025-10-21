@@ -3,6 +3,24 @@
   "backendDependencies": {
     "webservices.rest": ">=2.2.0"
   },
+  "optionalBackendDependencies": {
+    "providermanagement": {
+      "version": "^2.16.0",
+      "feature": {
+        "flagName": "providermanagement-module",
+        "label": "Prescribing Clinician Roles",
+        "description": "Enable support for configuring prescribing clinicians roles when ordering drugs. Requires the backend providermanagement module."
+      }
+    },
+    "ordertemplates": {
+      "version": "^1.0.2",
+      "feature": {
+        "flagName": "ordertemplates-module",
+        "label": "Order Templates",
+        "description": "Enable support for order templates when ordering drugs. Requires the backend ordertemplates module."
+      }
+    }
+  },
   "extensions": [
     {
       "name": "medications-details-widget",
@@ -36,6 +54,14 @@
       "component": "drugOrderPanel",
       "slot": "order-basket-slot",
       "order": 1
+    },
+    {
+      "name": "drug-order-form",
+      "component": "drugOrderForm"
+    },
+    {
+      "name": "drug-search-combobox",
+      "component": "drugSearchComboBox"
     }
   ],
   "workspaces": [
@@ -44,6 +70,13 @@
       "title": "addDrugOrderWorkspaceTitle",
       "component": "addDrugOrderWorkspace",
       "type": "order"
+    },
+    {
+      "name": "fill-prescription-form",
+      "title": "fillPrescription",
+      "component": "fillPrescriptionFormWorkspace",
+      "type": "order"
     }
+    
   ]
 }
