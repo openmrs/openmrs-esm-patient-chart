@@ -38,7 +38,6 @@ jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
   useDrugSearch: jest.fn(),
   useDrugTemplate: jest.fn(),
-  useDebounce: jest.fn().mockImplementation((x) => x),
 }));
 
 jest.mock('../api/api', () => ({
@@ -57,6 +56,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
       isLoading: false,
       drugs: mockDrugSearchResultApiData,
       error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     }));
 
     mockUseDrugTemplate.mockImplementation((drugUuid) => ({
