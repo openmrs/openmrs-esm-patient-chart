@@ -3,29 +3,39 @@ import { useTranslation } from 'react-i18next';
 
 export const useStickerPdfPrinter = () => {
   const { t } = useTranslation();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   const printPdf = useCallback(
     (url: string) => {
+      if (isPrinting) {
+        return Promise.reject(new Error(t('printInProgress', 'Print already in progress')));
+      }
+
       return new Promise<void>((resolve, reject) => {
         setIsPrinting(true);
+
+        const sameOrigin = isSameOrigin(url);
 
         if (!iframeRef.current) {
           const iframe = document.createElement('iframe');
           iframe.name = 'pdfPrinterFrame';
+          iframe.setAttribute('aria-hidden', 'true');
           Object.assign(iframe.style, {
             position: 'fixed',
             width: '0',
             height: '0',
             border: 'none',
             visibility: 'hidden',
+            pointerEvents: 'none',
           });
           iframeRef.current = iframe;
           document.body.appendChild(iframe);
         }
 
         const iframe = iframeRef.current;
+        let printCompleted = false;
 
         const handleLoad = () => {
           try {
@@ -38,17 +48,32 @@ export const useStickerPdfPrinter = () => {
             contentWindow.focus();
             contentWindow.print();
 
-            if (isSameOrigin(url)) {
-              contentWindow.addEventListener('afterprint', handlePrintComplete);
+            if (sameOrigin) {
+              // Use afterprint event for same-origin
+              const afterPrintHandler = () => {
+                if (!printCompleted) {
+                  printCompleted = true;
+                  handlePrintComplete();
+                }
+              };
+              contentWindow.addEventListener('afterprint', afterPrintHandler);
+
+              cleanupRef.current = () => {
+                contentWindow.removeEventListener('afterprint', afterPrintHandler);
+              };
             } else {
-              // For cross-origin, we'll assume printing is immediate
-              // and rely on the browser's print dialog behavior
               setTimeout(() => {
-                handlePrintComplete();
-              }, 1000);
+                if (!printCompleted) {
+                  printCompleted = true;
+                  handlePrintComplete();
+                }
+              }, 500);
             }
           } catch (error) {
-            handlePrintError(error);
+            if (!printCompleted) {
+              printCompleted = true;
+              handlePrintError(error);
+            }
           }
         };
 
@@ -65,29 +90,32 @@ export const useStickerPdfPrinter = () => {
         const cleanup = () => {
           iframe.onload = null;
           iframe.onerror = null;
-          setIsPrinting(false);
 
-          // Remove event listener if same-origin
-          if (iframe.contentWindow && isSameOrigin(url)) {
+          if (cleanupRef.current) {
             try {
-              iframe.contentWindow.removeEventListener('afterprint', handlePrintComplete);
+              cleanupRef.current();
             } catch {
-              // Ignore cross-origin errors
+              // Ignore cleanup errors
             }
+            cleanupRef.current = null;
           }
+
+          setIsPrinting(false);
         };
 
         iframe.onload = handleLoad;
         iframe.onerror = () => handlePrintError(new Error(t('failedToLoadPDF', 'Failed to load PDF')));
+
         iframe.src = url;
       });
     },
-    [t],
+    [t, isPrinting],
   );
 
-  const isSameOrigin = (url: string) => {
+  const isSameOrigin = (url: string): boolean => {
     try {
-      return new URL(url).origin === window.location.origin;
+      const urlObj = new URL(url, window.location.href);
+      return urlObj.origin === window.location.origin;
     } catch {
       return false;
     }
@@ -95,7 +123,15 @@ export const useStickerPdfPrinter = () => {
 
   useEffect(() => {
     return () => {
-      if (iframeRef.current) {
+      if (cleanupRef.current) {
+        try {
+          cleanupRef.current();
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+
+      if (iframeRef.current && document.body.contains(iframeRef.current)) {
         document.body.removeChild(iframeRef.current);
         iframeRef.current = null;
       }
