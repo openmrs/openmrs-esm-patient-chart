@@ -1,7 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
-const moduleName = '@openmrs/esm-patient-printing-app';
+const moduleName = '@openmrs/esm-patient-label-printing-app';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
