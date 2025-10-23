@@ -30,9 +30,9 @@ const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
         isValidating={isValidating}
         title={t('pastMedicationsTableTitle', 'Past Medications')}
         medications={pastPatientOrders}
-        showDiscontinueButton={true}
-        showModifyButton={true}
-        showReorderButton={false}
+        showDiscontinueButton={false}
+        showModifyButton={false}
+        showReorderButton={true}
         patient={patient}
       />
     );
