@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { showSnackbar, getCoreTranslation, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, getCoreTranslation, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import styles from './action-button.scss';
 import { useStickerPdfPrinter } from '../hooks/useStickerPdfPrinter';
 import type { ConfigObject } from '../config-schema';
@@ -53,7 +53,9 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
   }
 
   return (
-    <OverflowMenuItem className={styles.menuitem} itemText={buttonText} onClick={handlePrint} disabled={isPrinting} />
+    <UserHasAccess privilege="App: Can generate a Patient Identity Sticker">
+      <OverflowMenuItem className={styles.menuitem} itemText={buttonText} onClick={handlePrint} disabled={isPrinting} />
+    </UserHasAccess>
   );
 };
 
