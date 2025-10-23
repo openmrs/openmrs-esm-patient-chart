@@ -2069,6 +2069,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@carbon/grid@npm:^11.45.0":
+  version: 11.45.0
+  resolution: "@carbon/grid@npm:11.45.0"
+  dependencies:
+    "@carbon/layout": "npm:^11.43.0"
+    "@ibm/telemetry-js": "npm:^1.5.0"
+  checksum: 10/1edce30dab10f971869806fa0fa31c67fbae9b94e06be6fbeabc5db41ed6b2543a86743e7a874a34c4cd34da3678809a34eba21cd3963cef3d6e2a1e13d5e0fa
+  languageName: node
+  linkType: hard
+
 "@carbon/icon-helpers@npm:^10.68.0":
   version: 10.68.0
   resolution: "@carbon/icon-helpers@npm:10.68.0"
@@ -2078,20 +2088,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/icons-react@npm:^11.64.0, @carbon/icons-react@npm:^11.68.0":
-  version: 11.69.0
-  resolution: "@carbon/icons-react@npm:11.69.0"
-  dependencies:
-    "@carbon/icon-helpers": "npm:^10.68.0"
-    "@ibm/telemetry-js": "npm:^1.5.0"
-    prop-types: "npm:^15.8.1"
-  peerDependencies:
-    react: ">=16"
-  checksum: 10/5485fdbf44416096988f0741db694efcb14b9ec394177f930fb10b1385eb6fd073354392cbc8e308bab2c1bcc9415873ea8799b938117d5c2f4bc498bc29f9b4
-  languageName: node
-  linkType: hard
-
-"@carbon/icons-react@npm:^11.69.0":
+"@carbon/icons-react@npm:^11.64.0, @carbon/icons-react@npm:^11.68.0, @carbon/icons-react@npm:^11.69.0":
   version: 11.69.0
   resolution: "@carbon/icons-react@npm:11.69.0"
   dependencies:
@@ -4806,7 +4803,7 @@ __metadata:
     ngx-bootstrap: "npm:^12.0.0"
     ngx-build-plus: "npm:^17.0.0"
     ngx-webcam: "npm:^0.4.1"
-    openmrs: "npm:next"
+    openmrs: "npm:^8.0.1-pre.3439"
     protractor: "npm:~7.0.0"
     reflect-metadata: "npm:^0.1.13"
     rxjs: "npm:^7.5.0"
@@ -5015,7 +5012,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
     "@hookform/resolvers": "npm:^3.3.1"
-    "@openmrs/esm-framework": "npm:next"
+    "@openmrs/esm-framework": "npm:^8.0.1-pre.3439"
     "@playwright/test": "npm:^1.51.1"
     "@swc/cli": "npm:^0.1.62"
     "@swc/core": "npm:^1.3.89"
@@ -5055,7 +5052,7 @@ __metadata:
     jest-environment-jsdom: "npm:^29.7.0"
     lint-staged: "npm:^14.0.1"
     lodash: "npm:^4.17.21"
-    openmrs: "npm:next"
+    openmrs: "npm:^8.0.1-pre.3439"
     prettier: "npm:^3.0.3"
     react: "npm:^18.3.1"
     react-barcode: "npm:^1.5.3"
