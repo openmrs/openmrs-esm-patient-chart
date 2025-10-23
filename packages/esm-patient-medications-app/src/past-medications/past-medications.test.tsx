@@ -10,14 +10,6 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-  };
-});
-
 describe('PastMedications', () => {
   test('renders an empty state view when there are no past medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });

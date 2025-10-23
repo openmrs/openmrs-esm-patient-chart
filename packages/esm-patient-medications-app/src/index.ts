@@ -4,7 +4,7 @@ import { configSchema } from './config-schema';
 import { dashboardMeta, moduleName } from './dashboard.meta';
 import medicationsSummaryComponent from './medications-summary/medications-summary.component';
 import activeMedicationsComponent from './active-medications/active-medications.component';
-import pastMedicationsComponent from './past-medications /past-medications.component';
+import pastMedicationsComponent from './past-medications/past-medications.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
