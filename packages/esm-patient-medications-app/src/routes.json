@@ -40,6 +40,15 @@
       "order": 4
     },
     {
+      "name": "past-medications-widget",
+      "component": "pastMedications",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "fullWidth": false
+      },
+      "order": 5
+    },
+    {
       "name": "medications-summary-dashboard",
       "component": "medicationsDashboardLink",
       "slot": "patient-chart-dashboard-slot",
