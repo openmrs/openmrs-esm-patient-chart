@@ -24,7 +24,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     if (!patient?.id) {
       throw new Error(t('patientIdNotFound', 'Patient ID not found'));
     }
-    return `${window.openmrsBase}/ws/rest/v1/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
+    return `${restBaseUrl}/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
   }, [patient?.id, t]);
 
   const handlePrint = useCallback(async () => {
