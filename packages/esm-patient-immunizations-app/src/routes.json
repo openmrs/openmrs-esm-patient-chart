@@ -6,6 +6,7 @@
   "extensions": [
     {
       "name": "immunization-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
       "component": "immunizationsOverview",
       "order": 8
     },
