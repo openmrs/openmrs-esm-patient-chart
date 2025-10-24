@@ -131,7 +131,7 @@ export function DrugOrderForm({
   allowSelectingDrug,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
@@ -139,9 +139,11 @@ export function DrugOrderForm({
   const allowAndSupportSelectingPrescribingClinician =
     isProviderManagementModuleInstalled && allowSelectingPrescribingClinician;
 
-  const { data: providers, isLoading: isLoadingProviders } = useProviders(
-    allowAndSupportSelectingPrescribingClinician ? config.prescriberProviderRoles : null,
-  );
+  const {
+    data: providers,
+    isLoading: isLoadingProviders,
+    error: errorLoadingProviders,
+  } = useProviders(allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null);
   const [isSaving, setIsSaving] = useState(false);
 
   const { currentProvider } = useSession();
@@ -234,11 +236,11 @@ export function DrugOrderForm({
     () =>
       orderConfigObject?.durationUnits ?? [
         {
-          valueCoded: config?.daysDurationUnit?.uuid,
-          value: config?.daysDurationUnit?.display,
+          valueCoded: daysDurationUnit?.uuid,
+          value: daysDurationUnit?.display,
         },
       ],
-    [orderConfigObject, config?.daysDurationUnit],
+    [orderConfigObject, daysDurationUnit],
   );
 
   const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
@@ -329,32 +331,41 @@ export function DrugOrderForm({
                     />
                   </InputWrapper>
                 )}
-                {allowAndSupportSelectingPrescribingClinician && !isLoadingProviders && providers.length === 0 && (
-                  <InlineNotification
-                    kind="warning"
-                    lowContrast
-                    className={styles.inlineNotification}
-                    title={t('noCliniciansFound', 'No clinicians found')}
-                    subtitle={t(
-                      'noCliniciansFoundDescription',
-                      'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
-                    )}
-                  />
-                )}
-                {allowAndSupportSelectingPrescribingClinician && !isLoadingProviders && (
-                  <ControlledFieldInput
-                    control={control}
-                    name="orderer"
-                    type="comboBox"
-                    getValues={getValues}
-                    id="orderer"
-                    shouldFilterItem={filterItemsByProviderName}
-                    placeholder={t('prescribingClinician', 'Prescribing Clinician')}
-                    titleText={t('prescribingClinician', 'Prescribing Clinician')}
-                    items={providers}
-                    itemToString={(item: Provider) => item?.person?.display}
-                  />
-                )}
+                {allowAndSupportSelectingPrescribingClinician &&
+                  !isLoadingProviders &&
+                  (providers?.length > 0 ? (
+                    <ControlledFieldInput
+                      control={control}
+                      name="orderer"
+                      type="comboBox"
+                      getValues={getValues}
+                      id="orderer"
+                      shouldFilterItem={filterItemsByProviderName}
+                      placeholder={t('prescribingClinician', 'Prescribing Clinician')}
+                      titleText={t('prescribingClinician', 'Prescribing Clinician')}
+                      items={providers}
+                      itemToString={(item: Provider) => item?.person?.display}
+                    />
+                  ) : errorLoadingProviders ? (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('errorLoadingProviders', 'Error loading clinicians list')}
+                      subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+                    />
+                  ) : (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('noCliniciansFound', 'No clinicians found')}
+                      subtitle={t(
+                        'noCliniciansFoundDescription',
+                        'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
+                      )}
+                    />
+                  ))}
               </Stack>
             </section>
           )}
