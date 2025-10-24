@@ -139,9 +139,11 @@ export function DrugOrderForm({
   const allowAndSupportSelectingPrescribingClinician =
     isProviderManagementModuleInstalled && allowSelectingPrescribingClinician;
 
-  const { data: providers, isLoading: isLoadingProviders } = useProviders(
-    allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null,
-  );
+  const {
+    data: providers,
+    isLoading: isLoadingProviders,
+    error: errorLoadingProviders,
+  } = useProviders(allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null);
   const [isSaving, setIsSaving] = useState(false);
 
   const { currentProvider } = useSession();
@@ -343,6 +345,14 @@ export function DrugOrderForm({
                       titleText={t('prescribingClinician', 'Prescribing Clinician')}
                       items={providers}
                       itemToString={(item: Provider) => item?.person?.display}
+                    />
+                  ) : errorLoadingProviders ? (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('errorLoadingProviders', 'Error loading clinicians list')}
+                      subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
                     />
                   ) : (
                     <InlineNotification
