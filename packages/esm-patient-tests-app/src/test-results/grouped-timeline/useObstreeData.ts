@@ -116,6 +116,27 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   return { ...outData } as ObsTreeNode;
 };
 
+const filterTreesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
+  // If this is a leaf node (has obs array), only keep it if it has data
+  if (node.obs !== undefined) {
+    return node.hasData ? node : null;
+  }
+
+  // This is an intermediate/parent node - always keep it to preserve hierarchy
+  if (node.subSets && node.subSets.length > 0) {
+    // Recursively filter only the leaf children
+    const filteredSubSets = node.subSets
+      .map((subSet) => filterTreesWithData(subSet))
+      .filter((subSet): subSet is ObsTreeNode => subSet !== null);
+
+    // Always keep parent nodes to maintain test hierarchy structure
+    return { ...node, subSets: filteredSubSets };
+  }
+
+  // Parent node with empty subSets - keep it to preserve hierarchy
+  return node;
+};
+
 const useGetObstreeData = (patientUuid: string, conceptUuid: string) => {
   const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
     `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
@@ -174,32 +195,10 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
     );
   }, [data]);
 
-  const filterTreesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
-    // If this is a leaf node (has obs array), only keep it if it has data
-    if (node.obs !== undefined) {
-      return node.hasData ? node : null;
-    }
-
-    // This is an intermediate/parent node - always keep it to preserve hierarchy
-    if (node.subSets && node.subSets.length > 0) {
-      // Recursively filter only the leaf children
-      const filteredSubSets = node.subSets
-        .map((subSet) => filterTreesWithData(subSet))
-        .filter((subSet): subSet is ObsTreeNode => subSet !== null);
-
-      // Always keep parent nodes to maintain test hierarchy structure
-      return { ...node, subSets: filteredSubSets };
-    }
-
-    // Parent node with empty subSets - keep it to preserve hierarchy
-    return node;
-  };
-
   const roots = result
     .map((item) => item.data)
-    .filter((data): data is ObsTreeNode => 'display' in data)
-    .map((data) => filterTreesWithData(data))
-    .filter((data): data is ObsTreeNode => data !== null);
+    .map((data: ObsTreeNode) => filterTreesWithData(data))
+    .filter(Boolean);
 
   const isLoading = result.some((item) => item.loading);
 
