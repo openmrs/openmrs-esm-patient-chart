@@ -26,3 +26,14 @@
     margin: layout.$spacing-05;
   }
 }
+
+.searchingContainer {
+  width: 100%;
+}
+
+.searchingMessage {
+  display: flex;
+  justify-content: center;
+  padding: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
