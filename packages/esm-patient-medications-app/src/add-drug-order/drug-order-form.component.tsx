@@ -48,7 +48,7 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { type Provider, useProviders } from '../api';
+import { type Provider, useActivePatientOrders, useProviders } from '../api';
 import styles from './drug-order-form.scss';
 import {
   drugOrderBasketItemToFormValue,
@@ -287,7 +287,15 @@ export function DrugOrderForm({
     },
     [setShowMedicationHeader],
   );
-  const now = new Date();
+  const {
+    fieldState: { error: drugFieldError },
+  } = useController<MedicationOrderFormData>({ name: 'drug', control });
+
+  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const drugAlreadyPrescribed = useMemo(
+    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug],
+  );
 
   return (
     <div className={styles.container}>
@@ -329,6 +337,12 @@ export function DrugOrderForm({
                         reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
                       }}
                     />
+                    {drugAlreadyPrescribed && (
+                      <FormLabel className={styles.errorLabel}>
+                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                      </FormLabel>
+                    )}
+                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
                   </InputWrapper>
                 )}
                 {allowAndSupportSelectingPrescribingClinician &&
@@ -678,7 +692,7 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribed}
           >
             {saveButtonText}
           </Button>
