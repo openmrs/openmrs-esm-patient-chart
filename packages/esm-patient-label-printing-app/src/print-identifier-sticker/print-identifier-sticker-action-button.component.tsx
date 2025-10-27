@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
-import { showSnackbar, getCoreTranslation, useConfig, UserHasAccess } from '@openmrs/esm-framework';
-import styles from './action-button.scss';
+import { showSnackbar, getCoreTranslation, useConfig, UserHasAccess, restBaseUrl } from '@openmrs/esm-framework';
+import styles from './print-identifier-sticker-action-button.scss';
 import { useStickerPdfPrinter } from '../hooks/useStickerPdfPrinter';
 import type { ConfigObject } from '../config-schema';
 
@@ -24,7 +24,7 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
     if (!patient?.id) {
       throw new Error(t('patientIdNotFound', 'Patient ID not found'));
     }
-    return `${restBaseUrl}/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
+    return `${window.openmrsBase}${restBaseUrl}/patientdocuments/patientIdSticker?patientUuid=${patient.id}`;
   }, [patient?.id, t]);
 
   const handlePrint = useCallback(async () => {
