@@ -34,7 +34,6 @@ export const renderTag = (
                 | 'outline')
             : undefined
         }
-        title={typeof columnStatus === 'string' ? columnStatus : ''}
         style={{ minWidth: '80px' }}
       >
         {typeof columnStatus === 'string' ? columnStatus : ''}
