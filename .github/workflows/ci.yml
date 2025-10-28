@@ -2,7 +2,7 @@ name: OpenMRS CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'patch/*']
   pull_request:
     branches: [main]
   release:
@@ -52,6 +52,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -68,8 +70,13 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: 🏷️ Version
+      - name: 🏷️ Version (main)
+        if: github.ref_name == 'main'
         run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+
+      - name: 🏷️ Version (patch)
+        if: startsWith(github.ref_name, 'patch/')
+        run: yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-patch.${{ github.run_number }}"
 
       - name: 🏗️ Build
         run: yarn turbo run build --color --concurrency=5
@@ -79,8 +86,15 @@ jobs:
       - name: 💾 Commit changes
         run: git add . && git commit -m "Prerelease version" --no-verify
 
-      - name: 📤 Pre-release
+      - name: 📤 Pre-release (main)
+        if: github.ref_name == 'main'
         run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: 📤 Pre-release (patch)
+        if: startsWith(github.ref_name, 'patch/')
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish-patch
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -97,7 +111,7 @@ jobs:
 
     needs: pre_release
 
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
 
     steps:
       - name: 🚀 Trigger RefApp Build

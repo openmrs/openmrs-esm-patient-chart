@@ -7,9 +7,12 @@ import { mockPatient } from 'tools';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
 
-const originalLocation = window.location;
-delete window.location;
-window.location = { ...originalLocation, reload: jest.fn() };
+const mockReload = jest.fn();
+
+Object.defineProperty(window, 'location', {
+  value: { ...window.location, reload: mockReload },
+  writable: true,
+});
 
 const mockMarkPatientDeceased = jest.mocked(markPatientDeceased);
 const mockUseCausesOfDeath = jest.mocked(useCausesOfDeath);
@@ -71,7 +74,7 @@ describe('MarkPatientDeceasedForm', () => {
   });
 
   afterAll(() => {
-    window.location = originalLocation;
+    jest.restoreAllMocks();
   });
 
   it('renders the cause of death form', () => {
