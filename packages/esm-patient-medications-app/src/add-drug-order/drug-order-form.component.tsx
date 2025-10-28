@@ -211,7 +211,7 @@ export function DrugOrderForm({
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
     if (errors) {
-      console.error(errors);
+      console.error("Error in drug order form", errors);
       showSnackbar({
         title: t('drugOrderValidationFailed', 'Validation failed'),
         subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
