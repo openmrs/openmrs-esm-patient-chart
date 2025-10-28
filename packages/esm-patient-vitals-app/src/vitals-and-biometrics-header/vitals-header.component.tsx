@@ -161,25 +161,30 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
                 latestVitals?.diastolic,
                 config?.concepts,
                 conceptRanges,
+                latestVitals?.systolicRenderInterpretation,
+                latestVitals?.diastolicRenderInterpretation,
               )}
               unitName={t('bp', 'BP')}
               unitSymbol={(latestVitals?.systolic && conceptUnits.get(config.concepts.systolicBloodPressureUuid)) ?? ''}
               value={`${latestVitals?.systolic ?? '--'} / ${latestVitals?.diastolic ?? '--'}`}
             />
             <VitalsHeaderItem
-              interpretation={assessValue(
-                latestVitals?.pulse,
-                getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges),
-              )}
+              interpretation={
+                latestVitals?.pulseRenderInterpretation ??
+                assessValue(latestVitals?.pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
+              }
               unitName={t('heartRate', 'Heart rate')}
               unitSymbol={(latestVitals?.pulse && conceptUnits.get(config.concepts.pulseUuid)) ?? ''}
               value={latestVitals?.pulse ?? '--'}
             />
             <VitalsHeaderItem
-              interpretation={assessValue(
-                latestVitals?.respiratoryRate,
-                getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
-              )}
+              interpretation={
+                latestVitals?.respiratoryRateRenderInterpretation ??
+                assessValue(
+                  latestVitals?.respiratoryRate,
+                  getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
+                )
+              }
               unitName={t('respiratoryRate', 'R. rate')}
               unitSymbol={
                 (latestVitals?.respiratoryRate && conceptUnits.get(config.concepts.respiratoryRateUuid)) ?? ''
@@ -187,19 +192,25 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
               value={latestVitals?.respiratoryRate ?? '--'}
             />
             <VitalsHeaderItem
-              interpretation={assessValue(
-                latestVitals?.spo2,
-                getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
-              )}
+              interpretation={
+                latestVitals?.spo2RenderInterpretation ??
+                assessValue(
+                  latestVitals?.spo2,
+                  getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
+                )
+              }
               unitName={t('spo2', 'SpO2')}
               unitSymbol={(latestVitals?.spo2 && conceptUnits.get(config.concepts.oxygenSaturationUuid)) ?? ''}
               value={latestVitals?.spo2 ?? '--'}
             />
             <VitalsHeaderItem
-              interpretation={assessValue(
-                latestVitals?.temperature,
-                getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
-              )}
+              interpretation={
+                latestVitals?.temperatureRenderInterpretation ??
+                assessValue(
+                  latestVitals?.temperature,
+                  getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
+                )
+              }
               unitName={t('temperatureAbbreviated', 'Temp')}
               unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
               value={latestVitals?.temperature ?? '--'}
