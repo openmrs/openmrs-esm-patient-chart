@@ -33,6 +33,7 @@
   "errorFetchingDrugOrderTemplates": "Error fetching drug order templates",
   "errorFetchingDrugResults": "Error fetching results for \"{{searchTerm}}\"",
   "errorFetchingOrderConfig": "Error occured when fetching Order config",
+  "errorLoadingClinicians": "Error loading clinicians",
   "female": "Female",
   "fillPrescription": "Fill prescription",
   "freeTextDosage": "Free text dosage",
