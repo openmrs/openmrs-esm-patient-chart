@@ -127,8 +127,8 @@ describe('ObsSwitchable', () => {
       1,
       expect.objectContaining({
         data: [
-          { group: 'Tallitude', key: '01-Jan-2021', value: 180 },
-          { group: 'Tallitude', key: '01-Feb-2021', value: 182 },
+          { group: 'Tallitude', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
+          { group: 'Tallitude', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
         ],
         options: expect.any(Object),
       }),
@@ -139,8 +139,8 @@ describe('ObsSwitchable', () => {
       2,
       expect.objectContaining({
         data: [
-          { group: 'Weight', key: '01-Jan-2021', value: 70 },
-          { group: 'Weight', key: '01-Feb-2021', value: 72 },
+          { group: 'Weight', key: new Date('2021-01-01T00:00:00.000Z'), value: 70 },
+          { group: 'Weight', key: new Date('2021-02-01T00:00:00.000Z'), value: 72 },
         ],
         options: expect.any(Object),
       }),
@@ -158,7 +158,7 @@ describe('ObsSwitchable', () => {
     expect(mockLineChart).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},
@@ -263,8 +263,8 @@ describe('ObsSwitchable', () => {
       1,
       expect.objectContaining({
         data: [
-          { group: 'Height', key: '01-Jan-2021', value: 180 },
-          { group: 'Height', key: '01-Feb-2021', value: 182 },
+          { group: 'Height', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
+          { group: 'Height', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
         ],
         options: expect.any(Object),
       }),
@@ -299,7 +299,7 @@ describe('ObsSwitchable', () => {
     expect(mockLineChart).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},
@@ -309,10 +309,10 @@ describe('ObsSwitchable', () => {
       2,
       expect.objectContaining({
         data: [
-          { group: 'Height', key: '01-Jan-2021', value: 180 },
-          { group: 'Height', key: '01-Feb-2021', value: 182 },
-          { group: 'Weight', key: '01-Jan-2021', value: 70 },
-          { group: 'Weight', key: '01-Feb-2021', value: 72 },
+          { group: 'Height', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
+          { group: 'Height', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
+          { group: 'Weight', key: new Date('2021-01-01T00:00:00.000Z'), value: 70 },
+          { group: 'Weight', key: new Date('2021-02-01T00:00:00.000Z'), value: 72 },
         ],
         options: expect.any(Object),
       }),
@@ -340,7 +340,7 @@ describe('ObsSwitchable', () => {
 
     expect(mockLineChart).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},
