@@ -241,12 +241,10 @@ const VisitForm: React.FC<VisitFormProps> = ({
         stopDatetime: hasStopTime ? stopDatetime : null,
         // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
         ...(!visitToEdit && { patient: patientUuid }),
-        ...(config.showExtraVisitAttributesSlot && extraAttributes && { attributes: extraAttributes }),
+        ...(extraAttributes && { attributes: extraAttributes }),
       };
 
-      if (config.showExtraVisitAttributesSlot) {
-        handleCreateExtraVisitInfo?.();
-      }
+      handleCreateExtraVisitInfo?.();
 
       const abortController = new AbortController();
       if (isOnline) {
@@ -375,7 +373,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
     [
       closeWorkspace,
       config.offlineVisitTypeUuid,
-      config.showExtraVisitAttributesSlot,
       extraVisitInfo,
       globalMutate,
       handleVisitAttributes,
