@@ -3,6 +3,10 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.container {
+  margin: layout.$spacing-03 layout.$spacing-05;
+}
+
 .label {
   @include type.type-style('label-01');
   color: $text-02;

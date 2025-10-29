@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
 import { getCoreTranslation } from '@openmrs/esm-framework';
@@ -19,12 +20,16 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   );
 
   if (isLoading) {
-    return <TagSkeleton />;
+    return (
+      <div className={styles.container}>
+        <TagSkeleton />
+      </div>
+    );
   }
 
   if (sortedAllergies?.length) {
     return (
-      <div className={styles.label}>
+      <div className={classNames(styles.label, styles.container)}>
         <span>{t('allergies', 'Allergies')}:</span>
         {sortedAllergies.map((allergy) => (
           <Tooltip
@@ -46,7 +51,7 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div className={styles.label}>
+    <div className={classNames(styles.label, styles.container)}>
       {t('allergies', 'Allergies')}: {getCoreTranslation('unknown')}
     </div>
   );

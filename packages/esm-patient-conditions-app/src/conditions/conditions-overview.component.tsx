@@ -55,7 +55,7 @@ interface ConditionsOverviewProps {
 const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) => {
   const { conditionPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
-  const displayText = t('conditions', 'Conditions');
+  const displayText = t('conditions_lower', 'conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Conditions`;

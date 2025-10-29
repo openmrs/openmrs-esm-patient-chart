@@ -99,8 +99,14 @@ function ConditionsDetailedSummary({ patient }) {
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem.id);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
