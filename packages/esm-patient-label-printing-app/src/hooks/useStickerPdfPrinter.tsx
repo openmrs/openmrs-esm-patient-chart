@@ -5,7 +5,6 @@ export const useStickerPdfPrinter = () => {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
-  const cleanupRef = useRef<(() => void) | null>(null);
 
   const printPdf = useCallback(
     (url: string) => {
@@ -13,10 +12,8 @@ export const useStickerPdfPrinter = () => {
         return Promise.reject(new Error(t('printInProgress', 'Print already in progress')));
       }
 
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<void>((resolve) => {
         setIsPrinting(true);
-
-        const sameOrigin = isSameOrigin(url);
 
         if (!iframeRef.current) {
           const iframe = document.createElement('iframe');
@@ -35,105 +32,59 @@ export const useStickerPdfPrinter = () => {
         }
 
         const iframe = iframeRef.current;
-        let printCompleted = false;
+        let hasClosed = false;
 
         const handleLoad = () => {
           try {
             const contentWindow = iframe.contentWindow;
+            if (!contentWindow) throw new Error('No content window');
 
-            if (!contentWindow) {
-              throw new Error(t('failedToAccessPrintWindow', 'Failed to access print window'));
+            const cleanup = () => {
+              if (hasClosed) return;
+              hasClosed = true;
+              setIsPrinting(false);
+              resolve();
+            };
+
+            try {
+              contentWindow.addEventListener('afterprint', cleanup, { once: true });
+            } catch (e) {
+              // Cross-origin, use polling fallback
             }
 
             contentWindow.focus();
             contentWindow.print();
 
-            if (sameOrigin) {
-              // Use afterprint event for same-origin
-              const afterPrintHandler = () => {
-                if (!printCompleted) {
-                  printCompleted = true;
-                  handlePrintComplete();
-                }
-              };
-              contentWindow.addEventListener('afterprint', afterPrintHandler);
+            let wasFocused = false;
+            const pollInterval = setInterval(() => {
+              const hasFocus = document.hasFocus();
+              if (hasFocus && wasFocused) cleanup();
+              if (!hasFocus) wasFocused = true;
+            }, 250);
 
-              cleanupRef.current = () => {
-                contentWindow.removeEventListener('afterprint', afterPrintHandler);
-              };
-            } else {
-              setTimeout(() => {
-                if (!printCompleted) {
-                  printCompleted = true;
-                  handlePrintComplete();
-                }
-              }, 500);
-            }
+            setTimeout(cleanup, 30000);
+            setTimeout(() => clearInterval(pollInterval), 30000);
           } catch (error) {
-            if (!printCompleted) {
-              printCompleted = true;
-              handlePrintError(error);
-            }
+            setIsPrinting(false);
+            resolve();
           }
-        };
-
-        const handlePrintComplete = () => {
-          cleanup();
-          resolve();
-        };
-
-        const handlePrintError = (error: unknown) => {
-          cleanup();
-          reject(error instanceof Error ? error : new Error(t('printingFailed', 'Printing failed')));
-        };
-
-        const cleanup = () => {
-          iframe.onload = null;
-          iframe.onerror = null;
-
-          if (cleanupRef.current) {
-            try {
-              cleanupRef.current();
-            } catch {
-              // Ignore cleanup errors
-            }
-            cleanupRef.current = null;
-          }
-
-          setIsPrinting(false);
         };
 
         iframe.onload = handleLoad;
-        iframe.onerror = () => handlePrintError(new Error(t('failedToLoadPDF', 'Failed to load PDF')));
-
+        iframe.onerror = () => {
+          setIsPrinting(false);
+          resolve();
+        };
         iframe.src = url;
       });
     },
     [t, isPrinting],
   );
 
-  const isSameOrigin = (url: string): boolean => {
-    try {
-      const urlObj = new URL(url, window.location.href);
-      return urlObj.origin === window.location.origin;
-    } catch {
-      return false;
-    }
-  };
-
   useEffect(() => {
     return () => {
-      if (cleanupRef.current) {
-        try {
-          cleanupRef.current();
-        } catch {
-          // Ignore cleanup errors
-        }
-      }
-
-      if (iframeRef.current && document.body.contains(iframeRef.current)) {
-        document.body.removeChild(iframeRef.current);
-        iframeRef.current = null;
+      if (iframeRef.current?.parentNode) {
+        iframeRef.current.parentNode.removeChild(iframeRef.current);
       }
     };
   }, []);
