@@ -57,7 +57,8 @@ export function useObs(patientUuid: string): UseObsResult {
       result?.data?.entry?.find((e) => (e.resource as fhir.Observation).code.coding.find((c) => d.concept === c.code)),
     ]),
   );
-  const conceptsNeedingLabel = data.filter((d) => !d.label && !obsForConcept[d.concept]);
+
+  const conceptsNeedingLabel = data.filter((d) => result && !d.label && !obsForConcept[d.concept]);
 
   const { concepts: conceptsForLabels } = useConcepts(conceptsNeedingLabel.map((d) => d.concept));
   const concepts = data.map((d) => ({
