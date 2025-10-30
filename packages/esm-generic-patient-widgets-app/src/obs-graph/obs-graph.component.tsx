@@ -188,7 +188,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
                   {groupedConfigData.map(({ groupLabel, concepts }) => (
                     <TabPanel key={groupLabel}>
                       <div className={styles.lineChartContainer}>
-                        <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
+                        <LineChart data={chartDataForConcepts(concepts)} options={chartOptions} />
                       </div>
                     </TabPanel>
                   ))}
@@ -198,7 +198,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           </div>
         ) : (
           <div className={styles.lineChartContainer}>
-            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts).flat()} options={chartOptions} />
+            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts)} options={chartOptions} />
           </div>
         )}
       </div>
