@@ -33,6 +33,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
       updateVisit(activeVisit.uuid, endVisitPayload, abortController)
         .then((response) => {
           mutate();
+          window.dispatchEvent(new CustomEvent('queue-entry-updated'));
           closeModal();
           if (visitContext?.uuid == activeVisit.uuid) {
             setVisitContext(null, null);

@@ -32,10 +32,10 @@ interface OrderableConceptSearchWorkspaceProps extends DefaultPatientWorkspacePr
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
-type DrugsOrOrders = Pick<OrderBasketItem, 'action'>;
+type DrugsOrOrders = Pick<OrderBasketItem, 'action' | 'concept'>;
 
 export function ordersEqual(order1: DrugsOrOrders, order2: DrugsOrOrders) {
-  return order1.action === order2.action;
+  return order1.action === order2.action && order1.concept.uuid === order2.concept.uuid;
 }
 
 const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceProps> = ({
@@ -166,8 +166,10 @@ function ConceptSearch({
     searchInputRef.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(event.target.value ?? '');
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value ?? ''),
+    [setSearchTerm],
+  );
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -181,7 +183,7 @@ function ConceptSearch({
           labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
             orderType: orderType?.display ?? '',
           })}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}
         />

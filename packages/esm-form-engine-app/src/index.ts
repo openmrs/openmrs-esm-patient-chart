@@ -1,5 +1,6 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
-import { configSchema } from './config-schema';
+import { defineConfigSchema, getAsyncLifecycle, getConfig } from '@openmrs/esm-framework';
+import { registerExpressionHelper } from '@openmrs/esm-form-engine-lib';
+import { configSchema, type ConfigObject } from './config-schema';
 
 const moduleName = '@openmrs/esm-form-engine-app';
 
@@ -10,8 +11,39 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export function startupApp() {
+export async function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+
+  try {
+    // Load config and register expression helper with configured concepts
+    const config = await getConfig<ConfigObject>(moduleName);
+    const { phq9Concepts } = config;
+
+    registerExpressionHelper('calcPHQ9Score', (...answers: Array<string | null | undefined>) => {
+      const scoreMap = {
+        [phq9Concepts.notAtAll]: 0,
+        [phq9Concepts.severalDays]: 1,
+        [phq9Concepts.moreThanHalf]: 2,
+        [phq9Concepts.nearlyEveryDay]: 3,
+      };
+
+      const result = answers.reduce((sum, answer) => {
+        if (!answer) {
+          return sum;
+        }
+        const score = scoreMap[answer];
+        if (score === undefined) {
+          console.warn(`Unknown PHQ-9 response concept: ${answer}`);
+          return sum;
+        }
+        return sum + score;
+      }, 0);
+
+      return result;
+    });
+  } catch (error) {
+    console.error('Failed to load PHQ-9 config, using defaults:', error);
+  }
 }
 
 export const formRenderer = getAsyncLifecycle(() => import('./form-renderer/form-renderer.component'), options);
@@ -42,11 +74,13 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t("cameraCapture", "Camera capture")
  * t("cancel", "Cancel")
  * t("cannotDiscontinueEnrollment", "Cannot discontinue an enrollment that does not exist")
+ * t("causeOfDeathQuestionIdIsNotConfigured", "Cause of death question ID is not configured")
  * t("chooseAnOption", "Choose an option")
  * t("clearFile", "Clear file")
  * t("close", "Close")
  * t("closeCamera", "Close camera")
  * t("closesNotification", "Closes notification")
+ * t("dateOfDeathQuestionIdIsNotConfigured", "Date of death question ID is not configured")
  * t("diagnosisSaved", "Diagnosis(es) saved successfully")
  * t("enrolledToProgram", "The patient has been successfully enrolled in the program.")
  * t("enrollmentAlreadyDiscontinued", "Enrollment already discontinued")
@@ -57,6 +91,7 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t("errorDescriptionTitle", "")
  * t("errorLoadingFormSchema", "Error loading form schema")
  * t("errorLoadingInitialValues", "Error loading initial values")
+ * t("errorMarkingPatientDeceased", "Error marking patient deceased")
  * t("errorRenderingField", "Error rendering field")
  * t("errorSavingAttachments", "Error saving attachment(s)")
  * t("errorSavingEncounter", "Error saving encounter")
@@ -74,6 +109,8 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t("notification", "Notification")
  * t("nullMandatoryField", "Please fill the required fields")
  * t("ordersSaved", "Order(s) saved successfully")
+ * t("patientIsAlreadyMarkedAsDeceased", "Patient is already marked as deceased")
+ * t("patientCannotBeMarkedAsDeceasedBecauseNoPayloadSupplied", "Patient cannot be marked as deceased because no payload is supplied")
  * t("patientIdentifiersSaved", "Patient identifier(s) saved successfully")
  * t("patientProgramsSaved", "Patient program(s) saved successfully")
  * t("preview", "Preview")
@@ -84,6 +121,7 @@ export const deleteQuestionModal = getAsyncLifecycle(
  * t("save", "Save")
  * t("search", "Search")
  * t("searching", "Searching")
+ * t("successfullyMarkedAsDeceased", "The patient has successfully been marked as deceased")
  * t("submitting", "Submitting")
  * t("time", "Time")
  * t("unspecified", "Unspecified")

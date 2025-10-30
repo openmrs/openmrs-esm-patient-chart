@@ -54,7 +54,7 @@
 
 // our special accordion rules
 .nestedAccordion > :global(.cds--accordion--start) > :global(.cds--accordion__item--active) {
-  border-left: 0.375rem solid var(--brand-01);
+  border-left: layout.$spacing-03 solid var(--brand-01);
 
   @media (max-width: $breakpoint-tablet-max) {
     margin: layout.$spacing-06 0;
@@ -86,9 +86,10 @@
   }
 
   .cds--accordion__arrow {
-    margin: layout.$spacing-03 0 0 layout.$spacing-05;
+    margin: 0 0 0 layout.$spacing-05;
+    align-self: center;
     @media (min-width: $breakpoint-small-desktop-min) {
-      margin: layout.$spacing-03 0 0 0.6rem;
+      margin: 0 0 0 layout.$spacing-04;
     }
   }
 
@@ -115,9 +116,9 @@
 }
 
 .filterItem {
-  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03 layout.$spacing-10;
+  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-03 layout.$spacing-03;
 
   @media (min-width: $breakpoint-small-desktop-min) {
-    padding: 0.2rem 0 0.2rem layout.$spacing-10;
+    padding: layout.$spacing-02 0 layout.$spacing-02 layout.$spacing-03;
   }
 }

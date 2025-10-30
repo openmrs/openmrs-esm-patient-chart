@@ -38,7 +38,7 @@ export interface Encounter extends OpenmrsResource {
 
 export interface Observation {
   uuid: string;
-  concept: { uuid: string; name: string };
+  concept: { uuid: string; name: string; units?: string };
   value:
     | {
         uuid: string;
@@ -244,7 +244,8 @@ export interface EncounterTileColumn {
   getObsValue: (encounter: Encounter) => string;
   getSummaryObsValue?: (encounter: Encounter) => string;
   encounter?: Encounter;
-  hasSummary?: Boolean;
+  hasSummary?: boolean;
+  summaryConcept?: SummaryConcept;
 }
 export interface EncounterTileProps {
   patientUuid: string;

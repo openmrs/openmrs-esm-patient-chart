@@ -1,7 +1,5 @@
 {
-  "chartView": "Chart View",
+  "date": "Date",
   "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "encounterType": "Encounter type"
 }

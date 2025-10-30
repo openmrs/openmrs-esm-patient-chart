@@ -2,12 +2,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .orderForm {
   flex-grow: 1;
   display: flex;
@@ -43,6 +37,16 @@
   :global(.cds--number__control-btn) {
     border: 0;
   }
+
+  counter-reset: section;
+
+  h3 {
+    counter-increment: section;
+
+    &::before {
+      content: counter(section) '. ';
+    }
+  }
 }
 
 .medicationInfo {
@@ -75,7 +79,7 @@
 }
 
 .patientHeader {
-  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
+  padding: layout.$spacing-05;
   background-color: colors.$gray-10;
 
   span:first-of-type {
@@ -90,6 +94,7 @@
 .orderFormHeading {
   @include type.type-style('heading-03');
   margin-bottom: 0;
+  margin-top: 1.25rem;
 }
 
 .formSection {

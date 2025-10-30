@@ -16,16 +16,16 @@ import {
   TableContainer,
   TableExpandedRow,
 } from '@carbon/react';
-import { orderBy, get, first } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 import {
   AddIcon,
   formatDate,
+  launchWorkspace,
   parseDate,
   useConfig,
   useLayoutType,
   usePagination,
   useVisit,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
 import {
   CardHeader,
@@ -41,7 +41,6 @@ import styles from './immunizations-detailed-summary.scss';
 
 interface ImmunizationsDetailedSummaryProps {
   patientUuid: string;
-  basePath: string;
   launchStartVisitPrompt: () => void;
 }
 
@@ -136,7 +135,8 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   immunizationId: null,
                   vaccinationDate: null,
                   doseNumber: 0,
-                  note: null,
+                  nextDoseDate: null,
+                  note: '',
                   expirationDate: null,
                   lotNumber: null,
                   manufacturer: null,
@@ -168,9 +168,10 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
+            data-testid="add-immunizations-button"
+            iconDescription={t('addImmunizations', 'Add immunizations')}
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            iconDescription={t('addImmunizations', 'Add immunizations')}
             onClick={launchImmunizationsForm}
           >
             {t('add', 'Add')}

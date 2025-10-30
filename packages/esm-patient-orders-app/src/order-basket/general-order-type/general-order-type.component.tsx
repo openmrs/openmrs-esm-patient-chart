@@ -1,7 +1,6 @@
 import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
-import styles from './general-order-panel.scss';
 import {
   AddIcon,
   ChevronDownIcon,
@@ -13,9 +12,10 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
-import OrderBasketItemTile from './order-basket-item-tile.component';
-import { prepOrderPostData } from './resources';
 import { type OrderTypeDefinition } from '../../config-schema';
+import { prepOrderPostData } from './resources';
+import OrderBasketItemTile from './order-basket-item-tile.component';
+import styles from './general-order-panel.scss';
 
 interface GeneralOrderTypeProps extends OrderTypeDefinition {
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
@@ -119,7 +119,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             className={styles.addButton}
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            iconDescription="Add medication"
+            iconDescription={t('addMedication', 'Add medication')}
             onClick={openConceptSearch}
             size={isTablet ? 'md' : 'sm'}
           >
@@ -132,7 +132,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
               isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
-            iconDescription="View"
+            iconDescription={t('view', 'View')}
             disabled={orders.length === 0}
             onClick={() => setIsExpanded(!isExpanded)}
           >
@@ -146,7 +146,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             <>
               {incompleteOrderBasketItems.map((order, index) => (
                 <OrderBasketItemTile
-                  key={index}
+                  key={`incomplete-${order.action}-${order.concept?.uuid}-${index}`}
                   orderBasketItem={order}
                   onItemClick={() => openOrderForm(order)}
                   onRemoveClick={() => removeOrder(order)}
@@ -158,7 +158,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             <>
               {newOrderBasketItems.map((order, index) => (
                 <OrderBasketItemTile
-                  key={index}
+                  key={`new-${order.action}-${order.concept?.uuid}-${index}`}
                   orderBasketItem={order}
                   onItemClick={() => openOrderForm(order)}
                   onRemoveClick={() => removeOrder(order)}
@@ -171,7 +171,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             <>
               {renewedOrderBasketItems.map((item, index) => (
                 <OrderBasketItemTile
-                  key={index}
+                  key={`renewed-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
                   onItemClick={() => openOrderForm(item)}
                   onRemoveClick={() => removeOrder(item)}
@@ -184,7 +184,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             <>
               {revisedOrderBasketItems.map((item, index) => (
                 <OrderBasketItemTile
-                  key={index}
+                  key={`revised-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
                   onItemClick={() => openOrderForm(item)}
                   onRemoveClick={() => removeOrder(item)}
@@ -197,7 +197,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             <>
               {discontinuedOrderBasketItems.map((item, index) => (
                 <OrderBasketItemTile
-                  key={index}
+                  key={`discontinued-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
                   onItemClick={() => openOrderForm(item)}
                   onRemoveClick={() => removeOrder(item)}

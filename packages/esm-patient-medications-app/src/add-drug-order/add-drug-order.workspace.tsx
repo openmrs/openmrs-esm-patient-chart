@@ -1,9 +1,9 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, launchWorkspace, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
+import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import type { DrugOrderBasketItem } from '../types';
 import { DrugOrderForm } from './drug-order-form.component';
@@ -16,6 +16,11 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
 
 export interface AddDrugOrderWorkspace extends DefaultPatientWorkspaceProps, AddDrugOrderWorkspaceAdditionalProps {}
 
+/**
+ * This workspace displays the drug order form. On form submission, it saves the drug order
+ * to the (frontend) order basket. For a form that submits the drug order directly on submit,
+ * see fill-prescription-form.workspace.tsx
+ */
 export default function AddDrugOrderWorkspace({
   order: initialOrder,
   closeWorkspace,
@@ -31,7 +36,6 @@ export default function AddDrugOrderWorkspace({
     prepMedicationOrderPostData,
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const session = useSession();
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({
@@ -53,9 +57,7 @@ export default function AddDrugOrderWorkspace({
   );
 
   const saveDrugOrder = useCallback(
-    (finalizedOrder: DrugOrderBasketItem) => {
-      finalizedOrder.careSetting = careSettingUuid;
-      finalizedOrder.orderer = session.currentProvider.uuid;
+    async (finalizedOrder: DrugOrderBasketItem) => {
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       if (existingOrder) {
@@ -72,7 +74,7 @@ export default function AddDrugOrderWorkspace({
         onWorkspaceClose: () => launchWorkspace('order-basket'),
       });
     },
-    [orders, setOrders, closeWorkspaceWithSavedChanges, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspaceWithSavedChanges],
   );
 
   if (!currentOrder) {
@@ -96,13 +98,31 @@ export default function AddDrugOrderWorkspace({
     );
   } else {
     return (
-      <DrugOrderForm
-        patientUuid={patient.id}
-        initialOrderBasketItem={currentOrder}
-        onSave={saveDrugOrder}
-        onCancel={cancelDrugOrder}
-        promptBeforeClosing={promptBeforeClosing}
-      />
+      <div className={styles.container}>
+        {!isTablet && (
+          <div className={styles.backButton}>
+            <Button
+              iconDescription="Return to order basket"
+              kind="ghost"
+              onClick={cancelDrugOrder}
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+              size="sm"
+            >
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            </Button>
+          </div>
+        )}
+        <DrugOrderForm
+          initialOrderBasketItem={currentOrder}
+          patient={patient}
+          onSave={saveDrugOrder}
+          saveButtonText={t('saveOrder', 'Save order')}
+          onCancel={cancelDrugOrder}
+          promptBeforeClosing={promptBeforeClosing}
+          allowSelectingPrescribingClinician={false}
+          allowSelectingDrug={false} // In this workspace, the drug is selected in <DrugSearch>, not in <DrugOrderForm>
+        />
+      </div>
     );
   }
 }

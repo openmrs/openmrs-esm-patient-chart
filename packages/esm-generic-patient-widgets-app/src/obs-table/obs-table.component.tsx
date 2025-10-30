@@ -23,17 +23,19 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
-  const { data: obss } = useObs(patientUuid, config.showEncounterType);
-  const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const {
+    data: { observations, concepts },
+  } = useObs(patientUuid);
+  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
   const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
-    obss.filter((o) => o.encounter.reference === reference),
+    observations.filter((o) => o.encounter.reference === reference),
   );
 
   const tableHeaders = [
     { key: 'date', header: t('dateAndTime', 'Date and time'), isSortable: true },
     ...config.data.map(({ concept, label }) => ({
       key: concept,
-      header: label,
+      header: label || concepts.find((c) => c.uuid == concept)?.display,
     })),
   ];
 

@@ -1,15 +1,14 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
-import { isObject } from 'lodash-es';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 import {
-  type TreeNode,
+  ReducerActionType,
   type FilterContextProps,
   type ReducerState,
-  ReducerActionType,
   type TimelineData,
+  type TreeNode,
 } from './filter-types';
 import reducer from './filter-reducer';
-import { type MappedObservation, type TestResult, type GroupedObservation, type Observation } from '../../types';
 
 function parseTime(sortedTimes: Array<string>) {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -53,6 +52,7 @@ const initialContext = {
   activeTests: [],
   someChecked: false,
   totalResultsCount: 0,
+  filteredResultsCount: 0,
   isLoading: false,
   initialize: () => {},
   toggleVal: () => {},
@@ -76,12 +76,8 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
   const actions = useMemo(
     () => ({
       initialize: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.INITIALIZE, trees: trees }),
-      toggleVal: (name: string) => {
-        dispatch({ type: ReducerActionType.TOGGLEVAL, name: name });
-      },
-      updateParent: (name: string) => {
-        dispatch({ type: ReducerActionType.UDPATEPARENT, name: name });
-      },
+      toggleVal: (name: string) => dispatch({ type: ReducerActionType.TOGGLE_CHECKBOX, name: name }),
+      updateParent: (name: string) => dispatch({ type: ReducerActionType.TOGGLE_PARENT, name: name }),
       resetTree: () => dispatch({ type: ReducerActionType.RESET_TREE }),
     }),
     [dispatch],
@@ -100,23 +96,30 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
         loaded: false,
       };
     }
+
     const tests: ReducerState['tests'] = activeTests?.length
-      ? Object.fromEntries(Object.entries(state.tests).filter(([name]) => activeTests.includes(name)))
+      ? Object.fromEntries(Object.entries(state.tests).filter(([key]) => activeTests.includes(key)))
       : state.tests;
 
     const allTimes = [
       ...new Set(
         Object.values(tests)
+          .filter((test) => test?.obs && Array.isArray(test.obs))
           .map((test: ReducerState['tests']) => test?.obs?.map((entry) => entry.obsDatetime))
           .flat(),
       ),
     ];
-    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+
+    allTimes.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
     const rows = [];
     Object.values(tests).forEach((testData) => {
-      const newEntries = allTimes.map((time) => testData.obs.find((entry) => entry.obsDatetime === time));
-      rows.push({ ...testData, entries: newEntries });
+      if (testData?.obs && Array.isArray(testData.obs)) {
+        const newEntries = allTimes.map((time) => testData.obs.find((entry) => entry.obsDatetime === time));
+        rows.push({ ...testData, entries: newEntries });
+      }
     });
+
     const panelName = 'timeline';
     return {
       data: { parsedTime: parseTime(allTimes), rowData: rows, panelName },
@@ -126,17 +129,24 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
 
   const tableData = useMemo<GroupedObservation[]>(() => {
     const flattenedObs: Observation[] = [];
+    const seenTests = new Set<string>();
 
     for (const key in state.tests) {
       const test = state.tests[key] as TestResult;
       if (test.obs && Array.isArray(test.obs)) {
         test.obs.forEach((obs) => {
-          const flattenedEntry = {
-            ...obs,
-            key: key,
-            ...test,
-          };
-          flattenedObs.push(flattenedEntry);
+          // Use a more specific key that includes the test name to avoid over-deduplication
+          const testKey = `${test.flatName}_${obs.obsDatetime}_${obs.value}`;
+
+          if (!seenTests.has(testKey)) {
+            seenTests.add(testKey);
+            const flattenedEntry = {
+              ...test,
+              ...obs,
+              key: key,
+            };
+            flattenedObs.push(flattenedEntry);
+          }
         });
       }
     }
@@ -145,7 +155,20 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
 
     flattenedObs.forEach((curr: MappedObservation) => {
       const flatNameParts = curr.flatName.split('-');
-      const groupKey = flatNameParts.length > 1 ? flatNameParts[1].trim() : flatNameParts[0].trim();
+
+      // Extract the actual panel name from the flatName
+      // Panel names are at index 1 (second part) like "Lipid panel", "Basic metabolic panel"
+      // This is based on the actual flatName structure we observed
+      let groupKey: string;
+      if (flatNameParts.length >= 2) {
+        // For names like "Hematology-Lipid panel-Total cholesterol" or "Chemistry-Basic metabolic panel-Serum sodium"
+        // Take the second part (index 1) which is the actual panel name
+        groupKey = flatNameParts[1];
+      } else {
+        // Fallback to first part if only one part exists
+        groupKey = flatNameParts[0];
+      }
+
       const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
 
       const compositeKey = `${groupKey}__${dateKey}`;
@@ -169,19 +192,38 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
   }, [state.tests]);
 
   useEffect(() => {
-    if (roots?.length && !Object.keys(state?.parents).length) {
+    if (roots.length && !Object.keys(state.parents).length) {
       actions.initialize(roots);
     }
   }, [actions, state, roots]);
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
-    if (!state?.tests || !isObject(state?.tests) || Object.keys(state?.tests).length === 0) return 0;
-    Object.values(state?.tests).forEach((testData) => {
-      count += testData.obs.length;
+    Object.values(state.tests).forEach((testData) => {
+      if (testData?.obs && Array.isArray(testData.obs)) {
+        count += testData.obs.length;
+      }
     });
+
     return count;
-  }, [state?.tests]);
+  }, [state.tests]);
+
+  const filteredResultsCount: number = useMemo(() => {
+    if (!someChecked) {
+      return totalResultsCount; // No filters applied, show total
+    }
+
+    // Count only the tests that are currently selected
+    let count = 0;
+    activeTests.forEach((testKey) => {
+      const test = state.tests[testKey];
+      if (test?.obs && Array.isArray(test.obs)) {
+        count += test.obs.length;
+      }
+    });
+
+    return count;
+  }, [someChecked, activeTests, state.tests, totalResultsCount]);
 
   return (
     <FilterContext.Provider
@@ -193,6 +235,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
         activeTests,
         someChecked,
         totalResultsCount,
+        filteredResultsCount,
         isLoading,
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,

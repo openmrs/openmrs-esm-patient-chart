@@ -10,7 +10,7 @@
   @include type.type-style('body-compact-01');
 }
 
-.graphContainer {
+.graphWidgetContainer {
   display: flex;
   margin: 0 layout.$spacing-05;
   flex-direction: row;
@@ -18,7 +18,6 @@
 }
 
 .conceptPickerTabs {
-  flex-grow: 1;
   margin: layout.$spacing-03 0;
   padding-right: layout.$spacing-05;
 }
@@ -36,17 +35,10 @@
   }
 }
 
-.conceptLabel {
-  @extend .label01;
-  margin-bottom: layout.$spacing-05;
-  display: inline-block;
-}
-
 .tab {
   outline: 0;
   outline-offset: 0;
   min-height: layout.$spacing-07 !important;
-  block-size: layout.$spacing-05 !important;
 
   &:active,
   &:focus {
@@ -55,9 +47,8 @@
 
   &[aria-selected='true'] {
     box-shadow: inset 4px 0 0 0 var(--brand-03) !important;
-    border-bottom: none;
-    font-weight: 600;
     margin-left: 0 !important;
+    line-height: normal !important;
   }
 
   &[aria-selected='false'] {
