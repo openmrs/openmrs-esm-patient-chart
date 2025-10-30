@@ -291,6 +291,9 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
+  
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const { data: activeOrders } = useActivePatientOrders(patient.id);
   const drugAlreadyPrescribed = useMemo(
     () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
@@ -365,7 +368,7 @@ export function DrugOrderForm({
                       kind="warning"
                       lowContrast
                       className={styles.inlineNotification}
-                      title={t('errorLoadingProviders', 'Error loading clinicians list')}
+                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
                       subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
                     />
                   ) : (
