@@ -15,24 +15,32 @@
   margin: 0 layout.$spacing-05;
   flex-direction: row;
   justify-content: space-between;
+
+  // This is a hack to override the max-width of the overflow menu button
+  :global(
+      .cds--chart-holder
+        .cds--cc--toolbar
+        .cds--overflow-menu-options
+        .cds--overflow-menu-options__option
+        .cds--overflow-menu-options__btn
+    ) {
+    max-width: none !important;
+  }
+
+  // Ensures the chart toolbar tooltips are visible
+  :global(.cds--tabs--vertical ~ .cds--tab-content) {
+    overflow-y: visible;
+  }
 }
 
 .conceptPickerTabs {
   margin: layout.$spacing-03 0;
-  padding-right: layout.$spacing-05;
+  flex-grow: 1;
 }
 
 .lineChartContainer {
-  flex-grow: 4;
-  padding: 0 layout.$spacing-05 layout.$spacing-09;
-
-  :global(.cds--cc--layout-row) {
-    height: 0;
-  }
-
-  :global(.layout-child) {
-    margin-top: layout.$spacing-03;
-  }
+  flex-grow: 1;
+  margin: layout.$spacing-03 0;
 }
 
 .tab {
