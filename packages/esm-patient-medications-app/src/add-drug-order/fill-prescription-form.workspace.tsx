@@ -72,7 +72,7 @@ const FillPrescriptionForm: React.FC<FillPrescriptionFormProps> = ({
           title: t('saveDrugOrderFailed', 'Error ordering {{orderName}}', {
             orderName: finalizedOrder.drug.display,
           }),
-          subtitle: e?.message,
+          subtitle: e?.responseBody?.error?.translatedMessage ?? e?.responseBody?.error?.message,
         });
       }
     },
