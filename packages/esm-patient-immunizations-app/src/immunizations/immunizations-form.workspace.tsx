@@ -155,7 +155,7 @@ const ImmunizationsForm: React.FC<DefaultPatientWorkspaceProps> = ({
           doseNumber,
           nextDoseDate: nextDoseDate ? dayjs(nextDoseDate).startOf('day').toDate().toISOString() : null,
           note,
-          expirationDate: expirationDate ? dayjs(expirationDate).startOf('day').toDate().toISOString() : null,
+          expirationDate: expirationDate ? dayjs(expirationDate).format('YYYY-MM-DD') : null,
           lotNumber,
           manufacturer,
         };
