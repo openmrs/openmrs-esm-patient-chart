@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_openmrs_esm_form_entry_app=self.webpackChunk_openmrs_esm_form_entry_app||[]).push([[53153],{73052:(p,n,_)=>{_.r(n),_.d(n,{default:()=>o});const e=void 0,o=[[["pono\u0107","podne","ujutro","poslijepodne","nave\u010der","po no\u0107i"],e,e],e,["00:00","12:00",["04:00","12:00"],["12:00","18:00"],["18:00","21:00"],["21:00","04:00"]]]}}]);

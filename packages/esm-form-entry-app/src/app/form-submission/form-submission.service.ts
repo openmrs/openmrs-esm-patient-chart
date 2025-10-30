@@ -23,12 +23,12 @@ import { PatientResourceService } from '../openmrs-api/patient-resource.service'
 import { ConfigResourceService } from '../services/config-resource.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppointmentService } from '../openmrs-api/appointment-resource.service';
-import { start } from 'single-spa';
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
  */
 interface FormSubmissionResult {
   encounter: Encounter;
+  encounters?: Array<Encounter>;
   identifiers?: Array<Identifier>;
   person?: Person;
 }
@@ -62,14 +62,16 @@ export class FormSubmissionService {
         if (isOfflineSubmission) {
           this.deepClearInitialNodeValues(form.rootNode);
         }
-        const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
+        
+        // Generate payloads with subforms support
+        const encounterPayloads = this.buildEncounterPayloadsWithSubforms(form);
         const personUpdate = this.buildPersonUpdatePayload(form);
         const identifierPayload = this.patientResourceService.buildIdentifierPayload(form);
         const appointmentPayload = this.appointmentAdapter.generateFormPayload(form);
 
         return isOfflineSubmission
-          ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
-          : this.submitPayloadOnline(encounterCreate, personUpdate, identifierPayload, appointmentPayload);
+          ? this.submitPayloadOffline(form, encounterPayloads, personUpdate, syncItem?.content._id)
+          : this.submitPayloadOnline(encounterPayloads, personUpdate, identifierPayload, appointmentPayload);
       }),
     );
   }
@@ -99,18 +101,32 @@ export class FormSubmissionService {
 
   private submitPayloadOffline(
     form: Form,
-    encounterCreate: EncounterCreate,
+    encounterCreates: Array<EncounterCreate>,
     personUpdate: PersonUpdate,
     syncItemIdToEdit: string | undefined,
   ): Observable<FormSubmissionResult> {
-    const encounter = mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreate));
-    const result: FormSubmissionResult = { encounter: encounter as any };
+    // Handle multiple encounters for subforms
+    if (encounterCreates.length === 0) {
+      throw new Error('No valid encounter payloads to submit');
+    }
+
+    // For now, store the first encounter as the primary encounter
+    // and store all encounters in the payloads
+    const primaryEncounter = mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreates[0]));
+    const allEncounters = encounterCreates.map(ec => mutateEncounterCreateToPartialEncounter(cloneDeep(ec)));
+    
+    const result: FormSubmissionResult = { 
+      encounter: primaryEncounter as any,
+      encounters: allEncounters as any
+    };
+    
     const syncItem: PatientFormSyncItemContent = {
       _id: syncItemIdToEdit ?? v4(),
       formSchemaUuid: form.schema.uuid,
-      encounter,
+      encounter: primaryEncounter,
       _payloads: {
-        encounterCreate,
+        encounterCreate: encounterCreates[0],
+        encounterCreates: encounterCreates, // Store all encounters
         personUpdate,
       },
     };
@@ -119,17 +135,35 @@ export class FormSubmissionService {
   }
 
   private submitPayloadOnline(
-    encounterCreate: EncounterCreate,
+    encounterCreates: Array<EncounterCreate>,
     personUpdate: PersonUpdate,
     identifierPayload: IdentifierPayload,
     appointmentPayload: any,
   ): Observable<FormSubmissionResult> {
+    if (encounterCreates.length === 0) {
+      throw new Error('No valid encounter payloads to submit');
+    }
+
+    // Submit all encounters
+    const encounterSubmissions = encounterCreates.map(ec => this.submitEncounter(ec));
+
     return forkJoin({
-      encounter: this.submitEncounter(encounterCreate),
+      encounters: forkJoin(encounterSubmissions),
       person: this.submitPersonUpdate(personUpdate),
       identifiers: this.submitPatientIdentifier(identifierPayload),
       appointment: this.submitAppointment(appointmentPayload),
-    });
+    }).pipe(
+      mergeMap((result) => {
+        // Return the first encounter as the primary encounter for backward compatibility
+        const primaryEncounter = result.encounters[0];
+        return of({
+          encounter: primaryEncounter!,
+          encounters: result.encounters.filter(e => e !== undefined) as Array<Encounter>,
+          person: result.person,
+          identifiers: result.identifiers,
+        });
+      })
+    );
   }
 
   private updateOrSaveEncounter(encounterCreate: EncounterCreate): Observable<Encounter | undefined> {
@@ -211,6 +245,40 @@ export class FormSubmissionService {
       encounterPayload.location = form.dataSourcesContainer.dataSources.userLocation.uuid;
 
     return isEmpty(encounterPayload) ? undefined : encounterPayload;
+  }
+
+  /**
+   * Builds encounter payloads with subforms support
+   * @param form The form to build payloads for
+   * @returns Array of encounter payloads (one or more if subforms exist)
+   */
+  public buildEncounterPayloadsWithSubforms(form: Form): Array<EncounterCreate> {
+    const providers = this.formDataSourceService.getCachedProviderSearchResults();
+
+    if (providers?.length && !form.valueProcessingInfo.providerUuid) {
+      const providerUuid = this.findProviderUuidFormForm(providers, form);
+      form.valueProcessingInfo.providerUuid = providerUuid;
+    }
+
+    // Try to generate payloads with subforms
+    const encounterPayloads = this.encounterAdapter.generateFormPayloadWithSubforms(form) as unknown as Array<EncounterCreate>;
+
+    // Filter out empty payloads and apply location to each
+    const validPayloads = encounterPayloads
+      .filter(payload => !isEmpty(payload))
+      .map(payload => {
+        // Apply onEncounterCreate hook to each payload
+        const processedPayload = this.onEncounterCreate(payload);
+        
+        // Assign location to encounter payload if no location field is present on the form
+        if (!processedPayload.hasOwnProperty('location') && form.dataSourcesContainer.dataSources?.userLocation?.uuid) {
+          processedPayload.location = form.dataSourcesContainer.dataSources.userLocation.uuid;
+        }
+        
+        return processedPayload;
+      });
+
+    return validPayloads;
   }
 
   private findProviderUuidFormForm(providers: Array<any>, form: Form): string | undefined {

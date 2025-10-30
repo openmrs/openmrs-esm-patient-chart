@@ -260,7 +260,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             title: this.form.schema.display ?? this.form.schema.name,
             timeoutInMs: 5000,
           });
-          this.closeWorkspaceWithSavedChanges(); // Close the form after showing the error
         },
       );
   }

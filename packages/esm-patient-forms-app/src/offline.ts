@@ -49,11 +49,18 @@ async function syncPatientForm(
 ) {
   const associatedOfflineVisit: Visit | undefined = options.dependencies[0];
   const {
-    _payloads: { encounterCreate, personUpdate },
+    _payloads: { encounterCreate, encounterCreates, personUpdate },
   } = item;
 
+  // Support both single encounter and multiple encounters (subforms)
+  const encountersToSync = encounterCreates && encounterCreates.length > 0 
+    ? encounterCreates 
+    : encounterCreate 
+    ? [encounterCreate] 
+    : [];
+
   await Promise.all([
-    syncEncounter(associatedOfflineVisit, encounterCreate),
+    ...encountersToSync.map(encounter => syncEncounter(associatedOfflineVisit, encounter)),
     syncPersonUpdate(personUpdate?.uuid, personUpdate),
   ]);
 }

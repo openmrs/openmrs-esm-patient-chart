@@ -14,6 +14,7 @@ export interface PatientFormSyncItemContent {
   encounter: Partial<Encounter>;
   _payloads: {
     encounterCreate?: EncounterCreate;
+    encounterCreates?: Array<EncounterCreate>; // Support for multiple encounters (subforms)
     personUpdate?: PersonUpdate;
   };
 }

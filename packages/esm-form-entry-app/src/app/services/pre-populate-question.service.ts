@@ -26,6 +26,9 @@ export class FormPrepopulationService {
   private collectQuestionsForPrepopulation(form: Form): Set<Question> {
     const questionsSet = new Set<Question>();
     for (const page of form.schema.pages) {
+      if (!page.sections || !Array.isArray(page.sections)) {
+        continue;
+      }
       for (const section of page.sections) {
         this.extractQuestionsWithRecentValues(section.questions, questionsSet);
       }
@@ -34,6 +37,10 @@ export class FormPrepopulationService {
   }
 
   private extractQuestionsWithRecentValues(questions: Question[], targetSet: Set<Question>): void {
+    if (!questions || !Array.isArray(questions)) {
+      return;
+    }
+    
     for (const question of questions) {
       if (this.shouldPrepopulate(question)) {
         if (this.hasValidConceptIdentifier(question)) {

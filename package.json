@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "start": "openmrs develop --sources packages/esm-patient-chart-app/ packages/esm-form-entry-app/ --backend https://test.kenyahmis.org --config-url https://test.kenyahmis.org/openmrs/spa/openmrs.config.json https://test.kenyahmis.org/openmrs/spa/kenyaemr.config.json --port 8580",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag next",
     "ci:prepublish-patch": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag patch",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
+    "@openmrs/ngx-formentry": "/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry",
     "classnames": "^2.3.2",
     "react-barcode": "^1.5.3",
     "react-hook-form": "^7.46.2",

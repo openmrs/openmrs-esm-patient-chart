@@ -1,0 +1,925 @@
+.ng-select {
+  padding-bottom: 0.25em;
+  min-width: 16rem;
+}
+
+/* error state */
+.ng-select.invalid > .ng-select-container {
+  outline: 2px solid #da1e28;
+  outline-offset: -2px;
+}
+
+.ng-select.invalid > .ng-select-container::after {
+  border: none;
+}
+
+.ng-select.ng-select-disabled .ng-select-container:after {
+  border-bottom-color: transparent;
+}
+
+.ng-select.ng-select-disabled
+  .ng-select-container
+  .ng-value-container
+  .ng-value {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.ng-select.ng-select-disabled
+  .ng-select-container
+  .ng-value-container
+  .ng-placeholder {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.ng-select.ng-select-disabled .ng-arrow-wrapper .ng-arrow,
+.ng-select.ng-select-disabled .ng-clear-wrapper {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.ng-select.ng-select-focused .ng-select-container:after {
+  border-color: #161616;
+  border-width: 2px;
+}
+
+.ng-select.ng-select-focused
+  .ng-select-container
+  .ng-value-container
+  .ng-placeholder {
+  transform: translateY(-1.28125em) scale(0.75) perspective(100px)
+    translateZ(0.001px);
+  color: #161616;
+}
+
+.ng-select.ng-select-focused .ng-select-container .ng-arrow-wrapper .ng-arrow {
+  color: #161616;
+}
+
+.ng-select .ng-has-value .ng-placeholder,
+.ng-select.ng-select-filtered .ng-select-container .ng-placeholder {
+  display: initial;
+}
+
+.ng-select .ng-has-value .ng-placeholder,
+.ng-select.ng-select-opened .ng-placeholder {
+  transform: translateY(-1.28125em) scale(0.75) perspective(100px)
+    translateZ(0.001px);
+}
+
+.ng-select .ng-select-container {
+  align-items: baseline;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+}
+
+.afe-custom.ng-select .ng-select-container {
+  background-color: #ffffff;
+}
+
+.ng-select .ng-select-container:after {
+  border-bottom: 1px solid #8d8d8d;
+  content: '';
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  transition: border-color 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+}
+
+.ng-select .ng-select-container .ng-value-container {
+  align-items: stretch;
+  border-top: 0.84375em solid transparent;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  position: absolute;
+  color: rgba(0, 0, 0, 0.54);
+  transform-origin: 0 0;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.ng-select .ng-select-container .ng-input {
+  padding: 0 1rem;
+}
+
+.ng-select.ng-select-single .ng-select-container .ng-arrow-wrapper {
+  align-self: center;
+  right: 4px;
+}
+
+.ng-select.ng-select-single .ng-select-container .ng-clear-wrapper {
+  align-self: center;
+}
+
+.ng-select.ng-select-multiple.ng-select-disabled
+  .ng-select-container
+  .ng-value-container
+  .ng-value {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.26);
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value {
+  background-color: #161616;
+  border-radius: 2px;
+  color: #fff;
+  padding: 2px 5px;
+  margin: 0 0.4375em 0.4375em 0;
+}
+
+[dir='rtl']
+  .ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value {
+  margin: 0 0 0.4375em 0.4375em;
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value.ng-value-disabled {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.26);
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value
+  .ng-value-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value
+  .ng-value-icon {
+  color: rgba(255, 255, 255, 0.54);
+  padding-right: 5px;
+}
+
+[dir='rtl']
+  .ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value
+  .ng-value-icon {
+  padding-left: 5px;
+  padding-right: 0;
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-value
+  .ng-value-icon:hover {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container
+  .ng-value-container
+  .ng-input {
+  line-height: 1.375em;
+}
+
+.ng-select.ng-select-multiple .ng-select-container.ng-has-value {
+  align-items: center;
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container.ng-has-value
+  .ng-value-container {
+  padding-bottom: 0;
+  padding-top: 0.1875em;
+}
+
+.ng-select.ng-select-multiple
+  .ng-select-container.ng-has-value
+  .ng-clear-wrapper,
+.ng-select.ng-select-multiple
+  .ng-select-container.ng-has-value
+  .ng-arrow-wrapper {
+  border-top: 0.84375em solid transparent;
+}
+
+.ng-select .ng-clear-wrapper {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.ng-select .ng-clear-wrapper:hover {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.ng-select .ng-has-value .ng-arrow-wrapper {
+  right: 4px;
+  top: 2px;
+}
+
+.ng-select .ng-arrow-wrapper .ng-arrow {
+  margin: 0 4px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.ng-select .ng-arrow-wrapper .ng-arrow::after {
+  content: url("data:image/svg+xml;charset=UTF-8, <svg  focusable='false' preserveAspectRatio='xMidYMid meet' xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' aria-hidden='true' class='cds--select__arrow' style='will-change: transform;'><path  d='M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z'></path></svg>");
+}
+
+.ng-select .ng-spinner-zone {
+  top: 3px;
+}
+
+.ng-dropdown-panel {
+  margin-top: 0;
+  background: #fff;
+  left: 0;
+}
+
+.ng-select > .ng-dropdown-panel {
+  margin-top: 0;
+}
+
+.ng-dropdown-panel.ng-select-bottom {
+  top: calc(100% - 1.25em);
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.ng-dropdown-panel.ng-select-top {
+  bottom: calc(100% - 0.84375em);
+  box-shadow: 0 -5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 -8px 10px 1px rgba(0, 0, 0, 0.14), 0 -3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.ng-dropdown-panel.multiple .ng-option.selected {
+  background: #fff;
+}
+
+.ng-dropdown-panel.multiple .ng-option.marked {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ng-dropdown-panel .ng-dropdown-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 16px;
+  line-height: 3em;
+  min-height: 3em;
+}
+
+.ng-dropdown-panel .ng-dropdown-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 16px;
+  line-height: 3em;
+  min-height: 3em;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-optgroup {
+  -webkit-user-select: none;
+          user-select: none;
+  cursor: pointer;
+  line-height: 3em;
+  height: 3em;
+  padding: 0 16px;
+  color: rgba(0, 0, 0, 0.54);
+  font-weight: 500;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-optgroup.ng-option-marked {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-optgroup.ng-option-disabled {
+  cursor: default;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-optgroup.ng-option-selected {
+  background: rgba(0, 0, 0, 0.12);
+  color: #161616;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  line-height: 3em;
+  min-height: 3em;
+  white-space: wrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 16px;
+  text-decoration: none;
+  position: relative;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+[dir='rtl'] .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  text-align: right;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected {
+  background: rgba(0, 0, 0, 0.12);
+  color: #161616;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-disabled {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-child {
+  padding-left: 32px;
+}
+
+[dir='rtl']
+  .ng-dropdown-panel
+  .ng-dropdown-panel-items
+  .ng-option.ng-option-child {
+  padding-right: 32px;
+  padding-left: 0;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option .ng-tag-label {
+  padding-right: 5px;
+  font-size: 80%;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.38);
+}
+
+[dir='rtl']
+  .ng-dropdown-panel
+  .ng-dropdown-panel-items
+  .ng-option
+  .ng-tag-label {
+  padding-left: 5px;
+  padding-right: 0;
+}
+
+.ng-select-container {
+  background-color: #f4f4f4;
+}
+
+.form-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.form-buttons > * + * {
+  margin-left: 0.75rem;
+}
+
+.owl-dt-container {
+  background-color: #f4f4f4;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 9999;
+}
+.cdk-overlay-container:empty {
+  display: none;
+}
+.cdk-global-overlay-wrapper {
+  display: flex;
+  position: absolute;
+  z-index: 1000;
+}
+.cdk-overlay-pane {
+  position: absolute;
+  pointer-events: auto;
+  box-sizing: border-box;
+  z-index: 1000;
+  display: flex;
+  max-width: 100%;
+  max-height: 100%;
+}
+.cdk-overlay-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0;
+}
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 1;
+}
+@media screen and (-ms-high-contrast: active) {
+  .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+    opacity: 0.6;
+  }
+}
+.cdk-overlay-dark-backdrop {
+  background: rgba(0, 0, 0, 0.288);
+}
+.cdk-overlay-transparent-backdrop,
+.cdk-overlay-transparent-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 0;
+}
+.cdk-overlay-connected-position-bounding-box {
+  position: absolute;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 1px;
+  min-height: 1px;
+}
+.cdk-global-scrollblock {
+  position: fixed;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.owl-dialog-container {
+  position: relative;
+  pointer-events: auto;
+  box-sizing: border-box;
+  display: block;
+  padding: 1.5em;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  overflow: auto;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  width: 100%;
+  height: 100%;
+  outline: 0;
+}
+.owl-dt-container,
+.owl-dt-container * {
+  box-sizing: border-box;
+}
+.owl-dt-container {
+  display: block;
+  font-size: 16px;
+  font-size: 1rem;
+  background: #fff;
+  pointer-events: auto;
+  z-index: 1000;
+}
+.owl-dt-container-row {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.owl-dt-container-row:last-child {
+  border-bottom: none;
+}
+.owl-dt-calendar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.owl-dt-calendar-control {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+  width: 100%;
+  padding: 0.5em;
+  color: #000;
+}
+.owl-dt-calendar-control .owl-dt-calendar-control-content {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.owl-dt-calendar-control
+  .owl-dt-calendar-control-content
+  .owl-dt-calendar-control-button {
+  padding: 0 0.8em;
+}
+.owl-dt-calendar-control
+  .owl-dt-calendar-control-content
+  .owl-dt-calendar-control-button:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.owl-dt-calendar-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 0 0.5em 0.5em;
+  outline: 0;
+}
+.owl-dt-calendar-view {
+  display: block;
+  flex: 1 1 auto;
+}
+.owl-dt-calendar-multi-year-view {
+  display: flex;
+  align-items: center;
+}
+.owl-dt-calendar-multi-year-view .owl-dt-calendar-table {
+  width: calc(100% - 3em);
+}
+.owl-dt-calendar-multi-year-view
+  .owl-dt-calendar-table
+  .owl-dt-calendar-header
+  th {
+  padding-bottom: 0.25em;
+}
+.owl-dt-calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.owl-dt-calendar-table .owl-dt-calendar-header {
+  color: rgba(0, 0, 0, 0.4);
+}
+.owl-dt-calendar-table .owl-dt-calendar-header .owl-dt-weekdays th {
+  font-size: 0.7em;
+  font-weight: 400;
+  text-align: center;
+  padding-bottom: 1em;
+}
+.owl-dt-calendar-table .owl-dt-calendar-header .owl-dt-calendar-table-divider {
+  position: relative;
+  height: 1px;
+  padding-bottom: 0.5em;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-header
+  .owl-dt-calendar-table-divider:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -0.5em;
+  right: -0.5em;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell {
+  position: relative;
+  height: 0;
+  line-height: 0;
+  text-align: center;
+  outline: 0;
+  color: rgba(0, 0, 0, 0.85);
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell-content {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 90%;
+  height: 90%;
+  font-size: 0.8em;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell-out {
+  opacity: 0.2;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-today:not(.owl-dt-calendar-cell-selected) {
+  border-color: rgba(0, 0, 0, 0.4);
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell-selected {
+  color: rgba(255, 255, 255, 0.85);
+  background-color: #3f51b5;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-selected.owl-dt-calendar-cell-today {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell-disabled {
+  cursor: default;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-disabled
+  > .owl-dt-calendar-cell-content:not(.owl-dt-calendar-cell-selected) {
+  color: rgba(0, 0, 0, 0.4);
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-disabled
+  > .owl-dt-calendar-cell-content.owl-dt-calendar-cell-selected {
+  opacity: 0.4;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-disabled
+  > .owl-dt-calendar-cell-today:not(.owl-dt-calendar-cell-selected) {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-active:focus
+  > .owl-dt-calendar-cell-content:not(.owl-dt-calendar-cell-selected),
+.owl-dt-calendar-table
+  :not(.owl-dt-calendar-cell-disabled):hover
+  > .owl-dt-calendar-cell-content:not(.owl-dt-calendar-cell-selected) {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.owl-dt-calendar-table .owl-dt-calendar-cell-in-range {
+  background: rgba(63, 81, 181, 0.2);
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-in-range.owl-dt-calendar-cell-range-from {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+.owl-dt-calendar-table
+  .owl-dt-calendar-cell-in-range.owl-dt-calendar-cell-range-to {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+.owl-dt-timer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 7em;
+  padding: 0.5em;
+  outline: 0;
+}
+.owl-dt-timer-box {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 25%;
+  height: 100%;
+}
+.owl-dt-timer-content {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0.2em 0;
+}
+.owl-dt-timer-content .owl-dt-timer-input {
+  display: block;
+  width: 2em;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  outline: medium none;
+  font-size: 1.2em;
+  padding: 0.2em;
+}
+.owl-dt-timer-divider {
+  display: inline-block;
+  align-self: flex-end;
+  position: absolute;
+  width: 0.6em;
+  height: 100%;
+  left: -0.3em;
+}
+.owl-dt-timer-divider:after,
+.owl-dt-timer-divider:before {
+  content: '';
+  display: inline-block;
+  width: 0.35em;
+  height: 0.35em;
+  position: absolute;
+  left: 50%;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background-color: currentColor;
+}
+.owl-dt-timer-divider:before {
+  top: 35%;
+}
+.owl-dt-timer-divider:after {
+  bottom: 35%;
+}
+.owl-dt-control-button {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-block;
+  white-space: nowrap;
+  text-decoration: none;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  font-size: 1em;
+  color: inherit;
+}
+.owl-dt-control-button .owl-dt-control-button-content {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  outline: 0;
+}
+.owl-dt-control-period-button .owl-dt-control-button-content {
+  height: 1.5em;
+  padding: 0 0.5em;
+  border-radius: 3px;
+  transition: background-color 0.1s linear;
+}
+.owl-dt-control-period-button:hover > .owl-dt-control-button-content {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.owl-dt-control-period-button .owl-dt-control-button-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: 1em;
+  margin: 0.1em;
+  transition: transform 0.2s ease;
+}
+.owl-dt-control-arrow-button .owl-dt-control-button-content {
+  padding: 0;
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+}
+.owl-dt-control-arrow-button[disabled] {
+  color: rgba(0, 0, 0, 0.4);
+  cursor: default;
+}
+.owl-dt-control-arrow-button svg {
+  width: 50%;
+  height: 50%;
+  fill: currentColor;
+}
+.owl-dt-inline-container,
+.owl-dt-popup-container {
+  position: relative;
+  width: 18.5em;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+.owl-dt-inline-container .owl-dt-calendar,
+.owl-dt-inline-container .owl-dt-timer,
+.owl-dt-popup-container .owl-dt-calendar,
+.owl-dt-popup-container .owl-dt-timer {
+  width: 100%;
+}
+.owl-dt-inline-container .owl-dt-calendar,
+.owl-dt-popup-container .owl-dt-calendar {
+  height: 20.25em;
+}
+.owl-dt-dialog-container {
+  max-height: 95vh;
+  margin: -1.5em;
+}
+.owl-dt-dialog-container .owl-dt-calendar {
+  min-width: 250px;
+  min-height: 330px;
+  max-width: 750px;
+  max-height: 750px;
+}
+.owl-dt-dialog-container .owl-dt-timer {
+  min-width: 250px;
+  max-width: 750px;
+}
+@media all and (orientation: landscape) {
+  .owl-dt-dialog-container .owl-dt-calendar {
+    width: 58vh;
+    height: 62vh;
+  }
+  .owl-dt-dialog-container .owl-dt-timer {
+    width: 58vh;
+  }
+}
+@media all and (orientation: portrait) {
+  .owl-dt-dialog-container .owl-dt-calendar {
+    width: 80vw;
+    height: 80vw;
+  }
+  .owl-dt-dialog-container .owl-dt-timer {
+    width: 80vw;
+  }
+}
+.owl-dt-container-buttons {
+  display: flex;
+  width: 100%;
+  height: 2em;
+  color: #3f51b5;
+}
+.owl-dt-container-control-button {
+  font-size: 1em;
+  width: 50%;
+  height: 100%;
+  border-radius: 0;
+}
+.owl-dt-container-control-button .owl-dt-control-button-content {
+  height: 100%;
+  width: 100%;
+  transition: background-color 0.1s linear;
+}
+.owl-dt-container-control-button:hover .owl-dt-control-button-content {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.owl-dt-container-info {
+  padding: 0 0.5em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.owl-dt-container-info .owl-dt-container-range {
+  outline: 0;
+}
+.owl-dt-container-info .owl-dt-container-range .owl-dt-container-range-content {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  font-size: 0.8em;
+}
+.owl-dt-container-info .owl-dt-container-range:last-child {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+.owl-dt-container-info .owl-dt-container-info-active {
+  color: #3f51b5;
+}
+.owl-dt-container-disabled,
+.owl-dt-trigger-disabled {
+  opacity: 0.35;
+  filter: Alpha(Opacity=35);
+  background-image: none;
+  cursor: default !important;
+}
+.owl-dt-timer-hour12 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #3f51b5;
+}
+.owl-dt-timer-hour12 .owl-dt-timer-hour12-box {
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+.owl-dt-timer-hour12 .owl-dt-timer-hour12-box .owl-dt-control-button-content {
+  width: 100%;
+  height: 100%;
+  padding: 0.5em;
+}
+.owl-dt-timer-hour12
+  .owl-dt-timer-hour12-box:focus
+  .owl-dt-control-button-content,
+.owl-dt-timer-hour12
+  .owl-dt-timer-hour12-box:hover
+  .owl-dt-control-button-content {
+  background: #3f51b5;
+  color: #fff;
+}
+.owl-dt-calendar-only-current-month .owl-dt-calendar-cell-out {
+  visibility: hidden;
+  cursor: default;
+}
+.owl-dt-inline {
+  display: inline-block;
+}
+.owl-dt-control {
+  outline: 0;
+  cursor: pointer;
+}
+.owl-dt-control .owl-dt-control-content {
+  outline: 0;
+}
+.owl-dt-control:focus > .owl-dt-control-content {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.owl-dt-control:not(:-moz-focusring):focus > .owl-dt-control-content {
+  box-shadow: none;
+}
+.owl-hidden-accessible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* You can add global styles to this file, and also import other style files */
+

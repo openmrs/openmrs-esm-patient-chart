@@ -1,0 +1,1 @@
+{"$schema":"https://json.openmrs.org/routes.schema.json","backendDependencies":{"webservices.rest":">=2.2.0","o3forms":"*"},"extensions":[{"name":"form-widget","component":"formWidget","slot":"form-widget-slot","online":true,"offline":true}],"version":"11.3.0"}

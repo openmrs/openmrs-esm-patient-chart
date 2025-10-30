@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_openmrs_esm_form_entry_app=self.webpackChunk_openmrs_esm_form_entry_app||[]).push([[18233],{10740:(s,_,a)=>{a.r(_),a.d(_,{default:()=>n});const e=void 0,n=[[["tengah malam","tengah hari","pagi","siang","sore","malam"],e,e],e,["00:00","12:00",["00:00","10:00"],["10:00","15:00"],["15:00","18:00"],["18:00","24:00"]]]}}]);

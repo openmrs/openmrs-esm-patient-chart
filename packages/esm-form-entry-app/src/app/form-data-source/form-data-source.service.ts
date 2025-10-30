@@ -116,6 +116,9 @@ export class FormDataSourceService {
   private getMostRecentObsDataSource(formSchema: FormSchema) {
     const conceptIdentifiers: Set<string> = new Set();
     for (const page of formSchema.pages) {
+      if (!page.sections || !Array.isArray(page.sections)) {
+        continue;
+      }
       for (const section of page.sections) {
         this.extractMostRecentObsConceptIds(section.questions, conceptIdentifiers);
       }
@@ -127,6 +130,10 @@ export class FormDataSourceService {
   }
 
   public extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
+    if (!questions || !Array.isArray(questions)) {
+      return;
+    }
+    
     for (const question of questions) {
       const conceptsForExpressionEvaluation = question.questionOptions?.conceptsForExpressionEvaluation;
       if (Array.isArray(conceptsForExpressionEvaluation)) {
