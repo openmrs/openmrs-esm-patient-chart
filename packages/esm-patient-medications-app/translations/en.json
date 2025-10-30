@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "Active Medications",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "Add",
   "addDrugOrderWorkspaceTitle": "Add drug order",
   "backToOrderBasket": "Back to order basket",

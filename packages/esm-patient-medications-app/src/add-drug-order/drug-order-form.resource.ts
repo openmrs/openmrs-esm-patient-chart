@@ -86,7 +86,8 @@ function useCreateMedicationOrderFormSchema() {
               .object({
                 uuid: z.string(),
               })
-              .passthrough(),
+              .passthrough()
+              .nullable(),
             strength: z.string().nullable(),
             display: z.string().nullable(),
           },
