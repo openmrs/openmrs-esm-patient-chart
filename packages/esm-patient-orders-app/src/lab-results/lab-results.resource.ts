@@ -197,6 +197,18 @@ export async function updateOrderResult(
   orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
+  if (!obsPayload && !orderPayload && fulfillerPayload) {
+    const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortController.signal,
+      body: fulfillerPayload,
+    });
+    return fulfillOrder;
+  }
+
   const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
