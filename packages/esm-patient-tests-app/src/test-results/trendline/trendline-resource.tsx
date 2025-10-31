@@ -16,7 +16,9 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
       tests.push({
         ...TreeNode,
         range: TreeNode.hiNormal && TreeNode.lowNormal ? `${TreeNode.lowNormal} - ${TreeNode.hiNormal}` : '',
-        obs: TreeNode.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) })),
+        obs: TreeNode.obs.map((ob) => {
+          return { ...ob, interpretation: ob.interpretation ?? assess(ob.value) };
+        }),
       });
     } else if (subNode?.subSets) {
       const subTreesTests = computeTrendlineData(subNode as TreeNode); // recursion
