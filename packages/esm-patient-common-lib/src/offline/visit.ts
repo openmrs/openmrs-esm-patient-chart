@@ -57,6 +57,9 @@ export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit
         });
       })
       .catch((err) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error fetching offline visit:', err);
+        }
         setOfflineVisitState({ error: err, data: null, isLoading: false });
       });
   }, [patientUuid]);
