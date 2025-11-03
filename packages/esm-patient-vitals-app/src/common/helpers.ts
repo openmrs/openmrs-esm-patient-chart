@@ -33,7 +33,9 @@ export function assessValue(value: number | undefined, range?: ObsReferenceRange
   return 'normal';
 }
 
-export function interpretFhirInterpretation(interpretation: FHIRInterpretation): ObservationInterpretation {
+export function mapFhirInterpretationToObservationInterpretation(
+  interpretation: FHIRInterpretation,
+): ObservationInterpretation {
   const normalized = interpretation?.trim();
   switch (normalized) {
     case 'Critically Low':

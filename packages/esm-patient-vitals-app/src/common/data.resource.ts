@@ -11,7 +11,12 @@ import {
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
-import { assessValue, calculateBodyMassIndex, interpretBloodPressure, interpretFhirInterpretation } from './helpers';
+import {
+  assessValue,
+  calculateBodyMassIndex,
+  interpretBloodPressure,
+  mapFhirInterpretationToObservationInterpretation,
+} from './helpers';
 import type {
   FHIRObservationResource,
   FHIRSearchBundleResponse,
@@ -463,7 +468,7 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
     interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
-      ? interpretFhirInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
+      ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
