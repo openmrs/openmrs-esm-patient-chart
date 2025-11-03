@@ -34,7 +34,8 @@ export function assessValue(value: number | undefined, range?: ObsReferenceRange
 }
 
 export function interpretFhirInterpretation(interpretation: FHIRInterpretation): ObservationInterpretation {
-  switch (interpretation) {
+  const normalized = interpretation?.trim();
+  switch (normalized) {
     case 'Critically Low':
       return 'critically_low';
     case 'Critically High':
@@ -44,6 +45,8 @@ export function interpretFhirInterpretation(interpretation: FHIRInterpretation):
     case 'Low':
       return 'low';
     case 'Normal':
+      return 'normal';
+    default:
       return 'normal';
   }
 }
@@ -62,12 +65,15 @@ export function interpretBloodPressure(
 
   const systolicAssessment =
     systolicInterpretation ??
-    assessValue(systolic, getReferenceRangesForConcept(concepts?.systolicBloodPressureUuid, conceptMetadata));
+    (concepts?.systolicBloodPressureUuid
+      ? assessValue(systolic, getReferenceRangesForConcept(concepts.systolicBloodPressureUuid, conceptMetadata))
+      : 'normal');
 
   const diastolicAssessment =
-    diastolicInterpretation ?? concepts?.diastolicBloodPressureUuid
+    diastolicInterpretation ??
+    (concepts?.diastolicBloodPressureUuid
       ? assessValue(diastolic, getReferenceRangesForConcept(concepts.diastolicBloodPressureUuid, conceptMetadata))
-      : 'normal';
+      : 'normal');
 
   if (systolicAssessment === 'critically_high' || diastolicAssessment === 'critically_high') {
     return 'critically_high';
