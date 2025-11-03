@@ -5,23 +5,23 @@ import React from 'react';
 import VisitContextHeader from './visit-context-header.extension';
 import { mockPatient } from 'tools';
 
-const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
-  systemVisitEnabled: true,
-  errorFetchingSystemVisitSetting: null,
-  isLoadingSystemVisitSetting: false,
-});
-
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+const mockUseSystemVisitSetting = jest.mocked(useSystemVisitSetting);
 
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   usePatientChartStore: jest.fn(),
-}));
-
-jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
-  useSystemVisitSetting: () => mockUseSystemVisitSetting(),
+  useSystemVisitSetting: jest.fn(),
 }));
 
 describe('VisitContextHeader', () => {
+  beforeEach(() => {
+    mockUseSystemVisitSetting.mockReturnValue({
+      systemVisitEnabled: true,
+      errorFetchingSystemVisitSetting: null,
+      isLoadingSystemVisitSetting: false,
+    });
+  });
+
   it('should not show header if system does not support visits', () => {
     mockUseSystemVisitSetting.mockReturnValueOnce({
       systemVisitEnabled: false,

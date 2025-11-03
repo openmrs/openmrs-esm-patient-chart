@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { type Visit, showSnackbar } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  invalidateVisitAndEncounterData,
+  invalidateVisitByUuid,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
 export function useDeleteVisit(
@@ -19,9 +23,13 @@ export function useDeleteVisit(
 
   const restoreDeletedVisit = () => {
     restoreVisit(activeVisit?.uuid)
-      .then(() => {
+      .then(({ data: updatedVisit }) => {
         // Update current visit data for critical components (useVisit hook)
         mutateActiveVisit();
+        if (!updatedVisit.stopDatetime) {
+          const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, updatedVisit.uuid);
+          setVisitContext(updatedVisit, mutateSavedOrUpdatedVisit);
+        }
 
         // Use targeted SWR invalidation instead of global mutateVisit
         invalidateVisitAndEncounterData(globalMutate, patientUuid);

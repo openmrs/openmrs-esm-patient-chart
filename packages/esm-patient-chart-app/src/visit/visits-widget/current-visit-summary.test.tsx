@@ -8,7 +8,8 @@ import CurrentVisitSummary from './current-visit-summary.extension';
 const mockGetConfig = jest.mocked(getConfig);
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 
@@ -24,10 +25,23 @@ describe('CurrentVisitSummary', () => {
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
-    expect(screen.getByText('There are no active visit to display for this patient')).toBeInTheDocument();
+    expect(screen.getByText('There are no active visits to display for this patient')).toBeInTheDocument();
   });
 
-  test('renders a visit summary when for the active visit', async () => {
+  test('returns null when patientUuid does not match store patientUuid', () => {
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: 'different-patient-id',
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
+    render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
+    expect(screen.queryByText(/current visit/i)).not.toBeInTheDocument();
+  });
+
+  test('renders a visit summary when visit context exists', async () => {
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
@@ -46,6 +60,10 @@ describe('CurrentVisitSummary', () => {
           display: 'Visit Type 1',
         },
         encounters: [],
+        patient: {
+          uuid: mockPatient.id,
+          display: 'Test Patient',
+        },
       },
       mutateVisitContext: null,
       setPatient: jest.fn(),
