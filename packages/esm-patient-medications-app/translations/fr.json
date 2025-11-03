@@ -32,7 +32,7 @@
   "editFrequencyComboBoxTitle": "Fréquence",
   "editRouteComboBoxTitle": "Voie d'administration",
   "error": "Erreur",
-  "errorFetchingDrugOrderTemplates": "Error lors de l'obtention des modèles de prescription",
+  "errorFetchingDrugOrderTemplates": "Erreur lors de l'obtention des modèles de prescription",
   "errorFetchingDrugResults": "Erreur lors de la recherche de « {{searchTerm}} »",
   "errorFetchingOrderConfig": " Une erreur s'est produite lors de l'obtention de la configuration de prescription",
   "errorLoadingClinicians": "Error loading clinicians",
