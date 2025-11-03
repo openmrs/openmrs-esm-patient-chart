@@ -105,7 +105,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 });
 
-test('visit context after starting / ending visit', async ({ page, patient, api }) => {
+test('Verify visit context when starting and ending a visit', async ({ page, patient, api }) => {
   await test.step('Ensure no active visits for the patient', async () => {
     const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
     const data = await res.json();
@@ -132,7 +132,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeVisible();
   });
 
-  await test.step('When cancel the start visit prompt modal', async () => {
+  await test.step('When I cancel the start visit prompt modal', async () => {
     await chartPage.page.getByRole('button', { name: /cancel/i }).click();
   });
 
@@ -146,7 +146,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await page.getByRole('button', { name: /note/i }).click();
   });
 
-  await test.step("And I click 'start new visit'in the prompt modal ", async () => {
+  await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
     await chartPage.page.getByRole('button', { name: /start new visit/i }).click();
   });
 
@@ -155,6 +155,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
+
   await test.step('When I select visit status: new', async () => {
     await chartPage.page.getByRole('tab', { name: /new/i }).click();
   });
@@ -190,7 +191,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await page.getByRole('button', { name: /discard/i }).click();
   });
 
-  await test.step('And when I end the active visit', async () => {
+  await test.step('And I end the active visit', async () => {
     await chartPage.page.getByRole('button', { name: /actions/i }).click();
     await chartPage.page.getByRole('menuitem', { name: /end active visit/i }).click();
     await chartPage.page.getByRole('button', { name: /end visit/i }).click();

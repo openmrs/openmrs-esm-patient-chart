@@ -10,11 +10,10 @@ import {
   useWorkspaces,
   type WorkspacesInfo,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
-import { mockVisit } from '__mocks__';
 
 const MockActionMenuButton = jest.mocked(ActionMenuButton);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace);

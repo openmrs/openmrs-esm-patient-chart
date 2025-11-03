@@ -45,7 +45,7 @@ const VisitContextHeader: React.FC<VisitContextHeaderProps> = ({ patientUuid }) 
       className={classNames(styles.visitContextHeader, isActiveVisit ? styles.activeVisit : styles.retroactiveVisit)}
     >
       <div className={styles.addingTo}>{t('addingToVisit', 'Adding to:')}</div>
-      <div className={styles.visitType}>{visitContext.visitType.display}</div>
+      <div className={styles.visitType}>{visitContext.visitType?.display}</div>
       <div className={styles.changeVisitButton}>
         <Button kind="ghost" size="sm" onClick={openVisitSwitcherModal}>
           {t('change', 'Change')}

@@ -25,7 +25,6 @@ import {
   useConfig,
   useLayoutType,
   usePagination,
-  useVisit,
 } from '@openmrs/esm-framework';
 import {
   CardHeader,

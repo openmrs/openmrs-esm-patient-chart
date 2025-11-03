@@ -1,5 +1,5 @@
 import { SelectItem, TimePickerSelect, TimePicker, Checkbox } from '@carbon/react';
-import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, useVisit, type Visit } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, ResponsiveWrapper, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { type Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,6 @@ type FormValues = {
 };
 
 type RetrospectiveDateTimePickerProps = {
-  patientUuid: string;
   visitContext: Visit;
   control?: Control<FormValues>;
   onChange?: (data: FormValues) => void;
