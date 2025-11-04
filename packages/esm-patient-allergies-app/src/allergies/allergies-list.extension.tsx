@@ -1,17 +1,18 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
-import { getCoreTranslation } from '@openmrs/esm-framework';
+import { getCoreTranslation, translateFrom } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
 import { severityOrder } from '../utils';
 import styles from './allergies-list.scss';
+
+const moduleName = '@openmrs/esm-patient-allergies-app';
 
 interface AllergyListProps {
   patientUuid: string;
 }
 
 const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 
   const sortedAllergies = allergies?.sort(
@@ -19,18 +20,22 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   );
 
   if (isLoading) {
-    return <TagSkeleton />;
+    return (
+      <div className={styles.container}>
+        <TagSkeleton />
+      </div>
+    );
   }
 
   if (sortedAllergies?.length) {
     return (
-      <div className={styles.label}>
-        <span>{t('allergies', 'Allergies')}:</span>
+      <div className={classNames(styles.label, styles.container)}>
+        <span>{translateFrom(moduleName, 'allergies', 'Allergies')}:</span>
         {sortedAllergies.map((allergy) => (
           <Tooltip
             align="bottom"
             key={allergy.id}
-            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity || getCoreTranslation('unknown')}`}
+            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity ? translateFrom(moduleName, allergy.reactionSeverity) : getCoreTranslation('unknown')}`}
           >
             <Tag
               className={styles.allergyLabel}
@@ -46,8 +51,8 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div className={styles.label}>
-      {t('allergies', 'Allergies')}: {getCoreTranslation('unknown')}
+    <div className={classNames(styles.label, styles.container)}>
+      {translateFrom(moduleName, 'allergies', 'Allergies')}: {getCoreTranslation('unknown')}
     </div>
   );
 };

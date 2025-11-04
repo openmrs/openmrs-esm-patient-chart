@@ -369,7 +369,7 @@ export function DrugOrderForm({
                       kind="warning"
                       lowContrast
                       className={styles.inlineNotification}
-                      title={t('errorLoadingProviders', 'Error loading clinicians list')}
+                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
                       subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
                     />
                   ) : (

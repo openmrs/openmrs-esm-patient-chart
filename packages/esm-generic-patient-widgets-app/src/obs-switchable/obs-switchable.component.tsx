@@ -20,16 +20,21 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const [chartView, setChartView] = React.useState<boolean>(config.showGraphByDefault);
   const isTablet = !isDesktop(useLayoutType());
 
-  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
+  const {
+    data: { observations },
+    error,
+    isLoading,
+    isValidating,
+  } = useObs(patientUuid);
 
-  const hasNumberType = obss.find((obs) => obs.dataType === 'Number');
+  const hasNumberType = observations.find((obs) => obs.dataType === 'Number');
 
   return (
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" />;
         if (error) return <ErrorState error={error} headerTitle={config.title} />;
-        if (obss?.length) {
+        if (observations?.length) {
           return (
             <div className={styles.widgetContainer}>
               <CardHeader title={t(config.title)}>

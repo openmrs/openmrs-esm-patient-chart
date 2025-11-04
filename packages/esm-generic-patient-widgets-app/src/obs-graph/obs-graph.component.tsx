@@ -20,7 +20,9 @@ interface ObsGraphProps {
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
   const { t } = useTranslation();
-  const { data: observations } = useObs(patientUuid);
+  const {
+    data: { observations, concepts },
+  } = useObs(patientUuid);
 
   const obsForConcepts = useMemo(() => {
     return Object.fromEntries(
@@ -30,7 +32,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     );
   }, [config.data, observations]);
 
-  const conceptForObs = useMemo(() => {
+  const configForObs = useMemo(() => {
     return Object.fromEntries(
       observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept == o.conceptUuid)]),
     );
@@ -46,7 +48,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .reduce((acc, curr) => {
           if (!curr.graphGroup) {
             acc.push({
-              groupLabel: curr.label || obsForConcepts[curr.concept][0]?.code.text,
+              groupLabel: curr.label || concepts.find((c) => c.uuid == curr.concept)?.display,
               concepts: [curr],
             });
           } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
@@ -59,7 +61,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           }
           return acc;
         }, [] as ConceptGroupDescriptor[]),
-    [config.data, obsForConcepts],
+    [config.data, obsForConcepts, concepts],
   );
 
   const [selectedMenuItem, setSelectedMenuItem] = useState<ConceptGroupDescriptor>(groupedConfigData[0]);
@@ -70,8 +72,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .map((c) => obsForConcepts[c.concept])
         .flat()
         .map((obs) => ({
-          group: conceptForObs[obs.conceptUuid].label
-            ? t(conceptForObs[obs.conceptUuid].label, conceptForObs[obs.conceptUuid].label)
+          group: configForObs[obs.conceptUuid].label
+            ? t(configForObs[obs.conceptUuid].label, configForObs[obs.conceptUuid].label)
             : obs.code.text,
           key: new Date(obs.effectiveDateTime),
           value: obs.valueQuantity.value,
@@ -83,45 +85,80 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
       return chartRecords;
     },
-    [obsForConcepts, conceptForObs, config.graphOldestFirst, t],
+    [obsForConcepts, configForObs, config.graphOldestFirst, t],
   );
 
-  const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
+  const chartColors = useMemo(
+  () => Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color])),
+  [selectedMenuItem.concepts],
+);
 
-  const chartOptions: LineChartOptions = {
-    axes: {
-      bottom: {
-        title: t('date', 'Date'),
-        mapsTo: 'key',
-        scaleType: ScaleTypes.TIME,
-        ticks: {
-          formatter: (value: Date) => formatDate(value, { year: true, time: false }),
+  const chartOptions: LineChartOptions = useMemo(() => {
+    return {
+      title: t(selectedMenuItem.groupLabel),
+      axes: {
+        bottom: {
+          title: t('date', 'Date'),
+          mapsTo: 'key',
+          scaleType: ScaleTypes.TIME,
+          ticks: {
+            formatter: (value: Date) => formatDate(value, { year: true, time: false }),
+          },
+        },
+        left: {
+          mapsTo: 'value',
+          title: t(selectedMenuItem.groupLabel),
+          scaleType: ScaleTypes.LINEAR,
+          includeZero: false,
         },
       },
-      left: {
-        mapsTo: 'value',
-        title: t(selectedMenuItem.groupLabel),
-        scaleType: ScaleTypes.LINEAR,
-        includeZero: false,
+      legend: {
+        enabled: false,
       },
-    },
-    legend: {
-      enabled: false,
-    },
-    color: {
-      scale: chartColors,
-    },
-    tooltip: {
-      alwaysShowRulerTooltip: true,
-      showTotal: false,
-      valueFormatter: (value: any, label: string) =>
-        label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
-      truncation: {
-        numCharacter: 40,
+      color: {
+        scale: chartColors,
       },
-    },
-    height: '400px',
-  };
+      tooltip: {
+        alwaysShowRulerTooltip: true,
+        showTotal: false,
+        valueFormatter: (value: any, label: string) =>
+          label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
+        truncation: {
+          numCharacter: 40,
+        },
+      },
+      toolbar: {
+        enabled: true,
+        numberOfIcons: 4,
+        controls: [
+          {
+            type: 'Zoom in',
+          },
+          {
+            type: 'Zoom out',
+          },
+          {
+            type: 'Reset zoom',
+          },
+          {
+            type: 'Export as CSV',
+          },
+          {
+            type: 'Export as PNG',
+          },
+          {
+            type: 'Make fullscreen',
+          },
+        ],
+      },
+      zoomBar: {
+        top: {
+          enabled: true,
+        },
+      },
+      height: '400px',
+    };
+  }, [selectedMenuItem.groupLabel, t, chartColors]);
 
   return (
     <>
@@ -151,7 +188,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
                   {groupedConfigData.map(({ groupLabel, concepts }) => (
                     <TabPanel key={groupLabel}>
                       <div className={styles.lineChartContainer}>
-                        <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
+                        <LineChart data={chartDataForConcepts(concepts)} options={chartOptions} />
                       </div>
                     </TabPanel>
                   ))}
@@ -161,7 +198,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           </div>
         ) : (
           <div className={styles.lineChartContainer}>
-            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts).flat()} options={chartOptions} />
+            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts)} options={chartOptions} />
           </div>
         )}
       </div>
