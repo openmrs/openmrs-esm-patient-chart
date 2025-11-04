@@ -211,7 +211,7 @@ export function DrugOrderForm({
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
     if (errors) {
-      console.error("Error in drug order form", errors);
+      console.error('Error in drug order form', errors);
       showSnackbar({
         title: t('drugOrderValidationFailed', 'Validation failed'),
         subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
@@ -305,13 +305,12 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  
   // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const { data: activeOrders } = useActivePatientOrders(patient.id);
-  const drugAlreadyPrescribed = useMemo(
-    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug],
+  const drugAlreadyPrescribedForNewOrder = useMemo(
+    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem.action],
   );
 
   return (
@@ -358,7 +357,7 @@ export function DrugOrderForm({
                         reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
                       }}
                     />
-                    {drugAlreadyPrescribed && (
+                    {drugAlreadyPrescribedForNewOrder && (
                       <FormLabel className={styles.errorLabel}>
                         {t('activePrescriptionExists', 'Active prescription exists for this drug')}
                       </FormLabel>
@@ -713,7 +712,7 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribed}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
           >
             {saveButtonText}
           </Button>
