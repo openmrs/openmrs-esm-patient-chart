@@ -105,7 +105,11 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 });
 
-test('Verify visit context when starting and ending a visit', async ({ page, patient, api }) => {
+test('Verify visit context when starting / ending / deleting / restoring active visit', async ({
+  page,
+  patient,
+  api,
+}) => {
   await test.step('Ensure no active visits for the patient', async () => {
     const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
     const data = await res.json();
@@ -176,6 +180,35 @@ test('Verify visit context when starting and ending a visit', async ({ page, pat
   });
 
   await test.step('And I should see the Active Visit tag on the patient header', async () => {
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
+  });
+
+  await test.step('When I click the patient header action menu', async () => {
+    await page.getByRole('button', { name: 'Actions' }).click();
+  });
+
+  await test.step('And I click on he "Delete active visit", button', async () => {
+    await page.getByRole('menuitem', { name: 'Delete active visit' }).click();
+  });
+
+  await test.step('Then I should see the confirmation dialog', async () => {
+    await expect(page.getByRole('heading', { name: 'Are you sure you want to delete this visit' })).toBeVisible();
+  });
+
+  await test.step('When I click on the "Delete visit" button', async () => {
+    await page.getByRole('button', { name: 'danger Delete visit' }).click();
+  });
+
+  await test.step('Then I should see a confirmation toast and active visit tag removed', async () => {
+    await expect(chartPage.page.getByText(/opd visit deleted successfully/i)).toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).not.toBeVisible();
+  });
+
+  await test.step('When I undo the delete visit', async () => {
+    await page.getByRole('button', { name: 'Undo' }).click();
+  });
+
+  await test.step('Then I should see the Active Visit tag on the patient header again', async () => {
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
   });
 
