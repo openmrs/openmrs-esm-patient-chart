@@ -49,7 +49,7 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { type Provider, useProviders } from '../api';
+import { type Provider, useActivePatientOrders, useProviders } from '../api';
 import styles from './drug-order-form.scss';
 import {
   drugOrderBasketItemToFormValue,
@@ -211,7 +211,7 @@ export function DrugOrderForm({
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
     if (errors) {
-      console.error("Error in drug order form", errors);
+      console.error('Error in drug order form', errors);
       showSnackbar({
         title: t('drugOrderValidationFailed', 'Validation failed'),
         subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
@@ -301,7 +301,17 @@ export function DrugOrderForm({
     },
     [setShowMedicationHeader],
   );
-  const now = new Date();
+  const {
+    fieldState: { error: drugFieldError },
+  } = useController<MedicationOrderFormData>({ name: 'drug', control });
+
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const drugAlreadyPrescribedForNewOrder = useMemo(
+    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem.action],
+  );
 
   return (
     <div className={styles.container}>
@@ -347,6 +357,12 @@ export function DrugOrderForm({
                         reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
                       }}
                     />
+                    {drugAlreadyPrescribedForNewOrder && (
+                      <FormLabel className={styles.errorLabel}>
+                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                      </FormLabel>
+                    )}
+                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
                   </InputWrapper>
                 )}
                 {allowAndSupportSelectingPrescribingClinician &&
@@ -696,7 +712,7 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
           >
             {saveButtonText}
           </Button>
