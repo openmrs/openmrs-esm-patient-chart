@@ -30,12 +30,13 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
+  showSnackbar,
   useConfig,
   useFeatureFlag,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, useController } from 'react-hook-form';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import { type Drug } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -208,6 +209,19 @@ export function DrugOrderForm({
     setIsSaving(false);
   };
 
+  const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
+    if (errors) {
+      console.error("Error in drug order form", errors);
+      showSnackbar({
+        title: t('drugOrderValidationFailed', 'Validation failed'),
+        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
+        kind: 'error',
+        timeoutInMs: 5000,
+        isLowContrast: true,
+      });
+    }
+  };
+
   const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
       orderConfigObject?.drugDosingUnits ?? [
@@ -315,7 +329,11 @@ export function DrugOrderForm({
         </span>
       </div>
       <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+      <Form
+        className={styles.orderForm}
+        onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
+        id="drugOrderForm"
+      >
         <div>
           {errorFetchingOrderConfig && (
             <InlineNotification
