@@ -26,4 +26,5 @@ export const ConfigMock = {
     visitDiagnosesConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     problemListConceptUuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  isPrimaryDiagnosisRequired: true,
 };

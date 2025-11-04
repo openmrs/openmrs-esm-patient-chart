@@ -110,7 +110,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const config = useConfig<ConfigObject>();
+  const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
   const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -131,7 +131,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const customResolver = useCallback(
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-      if (selectedPrimaryDiagnoses.length === 0) {
+
+      if (isPrimaryDiagnosisRequired && selectedPrimaryDiagnoses.length === 0) {
         return {
           ...zodResult,
           errors: {
@@ -146,7 +147,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       return zodResult;
     },
-    [visitNoteFormSchema, selectedPrimaryDiagnoses, t],
+    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedPrimaryDiagnoses.length, t],
   );
 
   const {
@@ -356,7 +357,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     (data: VisitNotesFormData) => {
       const { noteDate, clinicalNote, images } = data;
 
-      if (!selectedPrimaryDiagnoses.length) {
+      if (isPrimaryDiagnosisRequired && !selectedPrimaryDiagnoses.length) {
         return;
       }
 
@@ -489,6 +490,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       formConceptUuid,
       globalMutate,
       isEditing,
+      isPrimaryDiagnosisRequired,
       locationUuid,
       mutateAttachments,
       mutateVisitNotes,
