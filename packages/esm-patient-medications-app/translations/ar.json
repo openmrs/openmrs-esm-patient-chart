@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "الأدوية النشطة",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "أضف",
   "addDrugOrderWorkspaceTitle": "Add drug order",
   "backToOrderBasket": "العودة إلى سلة الطلب",

@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "traitement en cours",
   "activeMedicationsHeaderTitle": "Traitement en cours",
   "activeMedicationsTableTitle": "Traitements en cours",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "Ajouter",
   "addDrugOrderWorkspaceTitle": "Prescrire un médicament",
   "backToOrderBasket": "Retour à l'ordonnance",
