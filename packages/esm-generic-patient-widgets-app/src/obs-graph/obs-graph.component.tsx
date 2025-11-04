@@ -88,42 +88,77 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     [obsForConcepts, configForObs, config.graphOldestFirst, t],
   );
 
-  const chartColors = Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color]));
+  const chartColors = useMemo(
+    () => Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color])),
+    [selectedMenuItem.concepts],
+  );
 
-  const chartOptions: LineChartOptions = {
-    axes: {
-      bottom: {
-        title: t('date', 'Date'),
-        mapsTo: 'key',
-        scaleType: ScaleTypes.TIME,
-        ticks: {
-          formatter: (value: Date) => formatDate(value, { year: true, time: false }),
+  const chartOptions: LineChartOptions = useMemo(() => {
+    return {
+      title: t(selectedMenuItem.groupLabel),
+      axes: {
+        bottom: {
+          title: t('date', 'Date'),
+          mapsTo: 'key',
+          scaleType: ScaleTypes.TIME,
+          ticks: {
+            formatter: (value: Date) => formatDate(value, { year: true, time: false }),
+          },
+        },
+        left: {
+          mapsTo: 'value',
+          title: t(selectedMenuItem.groupLabel),
+          scaleType: ScaleTypes.LINEAR,
+          includeZero: false,
         },
       },
-      left: {
-        mapsTo: 'value',
-        title: t(selectedMenuItem.groupLabel),
-        scaleType: ScaleTypes.LINEAR,
-        includeZero: false,
+      legend: {
+        enabled: false,
       },
-    },
-    legend: {
-      enabled: false,
-    },
-    color: {
-      scale: chartColors,
-    },
-    tooltip: {
-      alwaysShowRulerTooltip: true,
-      showTotal: false,
-      valueFormatter: (value: any, label: string) =>
-        label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
-      truncation: {
-        numCharacter: 40,
+      color: {
+        scale: chartColors,
       },
-    },
-    height: '400px',
-  };
+      tooltip: {
+        alwaysShowRulerTooltip: true,
+        showTotal: false,
+        valueFormatter: (value: any, label: string) =>
+          label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
+        truncation: {
+          numCharacter: 40,
+        },
+      },
+      toolbar: {
+        enabled: true,
+        numberOfIcons: 4,
+        controls: [
+          {
+            type: 'Zoom in',
+          },
+          {
+            type: 'Zoom out',
+          },
+          {
+            type: 'Reset zoom',
+          },
+          {
+            type: 'Export as CSV',
+          },
+          {
+            type: 'Export as PNG',
+          },
+          {
+            type: 'Make fullscreen',
+          },
+        ],
+      },
+      zoomBar: {
+        top: {
+          enabled: true,
+        },
+      },
+      height: '400px',
+    };
+  }, [selectedMenuItem.groupLabel, t, chartColors]);
 
   return (
     <>
@@ -153,7 +188,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
                   {groupedConfigData.map(({ groupLabel, concepts }) => (
                     <TabPanel key={groupLabel}>
                       <div className={styles.lineChartContainer}>
-                        <LineChart data={chartDataForConcepts(concepts).flat()} options={chartOptions} />
+                        <LineChart data={chartDataForConcepts(concepts)} options={chartOptions} />
                       </div>
                     </TabPanel>
                   ))}
@@ -163,7 +198,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           </div>
         ) : (
           <div className={styles.lineChartContainer}>
-            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts).flat()} options={chartOptions} />
+            <LineChart data={chartDataForConcepts(selectedMenuItem.concepts)} options={chartOptions} />
           </div>
         )}
       </div>

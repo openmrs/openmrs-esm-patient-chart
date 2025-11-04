@@ -1,18 +1,18 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
-import { getCoreTranslation } from '@openmrs/esm-framework';
+import { getCoreTranslation, translateFrom } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
 import { severityOrder } from '../utils';
 import styles from './allergies-list.scss';
+
+const moduleName = '@openmrs/esm-patient-allergies-app';
 
 interface AllergyListProps {
   patientUuid: string;
 }
 
 const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
   const { allergies, isLoading } = useAllergies(patientUuid);
 
   const sortedAllergies = allergies?.sort(
@@ -30,12 +30,12 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   if (sortedAllergies?.length) {
     return (
       <div className={classNames(styles.label, styles.container)}>
-        <span>{t('allergies', 'Allergies')}:</span>
+        <span>{translateFrom(moduleName, 'allergies', 'Allergies')}:</span>
         {sortedAllergies.map((allergy) => (
           <Tooltip
             align="bottom"
             key={allergy.id}
-            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity || getCoreTranslation('unknown')}`}
+            label={`${allergy.reactionToSubstance} - ${allergy.reactionSeverity ? translateFrom(moduleName, allergy.reactionSeverity) : getCoreTranslation('unknown')}`}
           >
             <Tag
               className={styles.allergyLabel}
@@ -52,7 +52,7 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
 
   return (
     <div className={classNames(styles.label, styles.container)}>
-      {t('allergies', 'Allergies')}: {getCoreTranslation('unknown')}
+      {translateFrom(moduleName, 'allergies', 'Allergies')}: {getCoreTranslation('unknown')}
     </div>
   );
 };

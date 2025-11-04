@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
 
 export const getName = (prefix: string | undefined, name: string) => {
@@ -16,7 +17,7 @@ interface ObsTreeNode {
   lowNormal?: number;
   range?: string;
   subSets: Array<ObsTreeNode>;
-  obs: Array<{ value: string }>;
+  obs: Array<{ value: string; interpretation?: OBSERVATION_INTERPRETATION }>;
 }
 
 const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
@@ -44,7 +45,7 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   }
   if (outData?.obs?.length) {
     const assess = assessValue(outData);
-    outData.obs = outData.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) }));
+    outData.obs = outData.obs.map((ob) => ({ ...ob, interpretation: ob.interpretation ?? assess(ob.value) }));
     outData.hasData = true;
   }
 
