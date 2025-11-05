@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "Medicamentos Activos",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "Adicionar",
   "addDrugOrderWorkspaceTitle": "Adicionar prescrição",
   "backToOrderBasket": "Voltar ao carinho de pedidos",

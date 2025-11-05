@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "Obat Aktif",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "Tambah",
   "addDrugOrderWorkspaceTitle": "Tambahkan pesanan obat",
   "backToOrderBasket": "Kembali ke keranjang pesanan",

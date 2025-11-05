@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "在用药物",
   "activeMedicationsHeaderTitle": "在用药物",
   "activeMedicationsTableTitle": "当前用药",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "添加",
   "addDrugOrderWorkspaceTitle": "添加药物医嘱",
   "backToOrderBasket": "返回医嘱篮",
