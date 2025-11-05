@@ -6,6 +6,11 @@ export const configSchemaHorizontal = {
     _description: 'Displayed at the top of the widget.',
     _default: 'Vitals',
   },
+  editable: {
+    _type: Type.Boolean,
+    _description: 'Observations can be edited and encounters can be created',
+    _default: true,
+  },
   oldestFirst: {
     _type: Type.Boolean,
     _description: 'Sort columns from oldest to newest',
@@ -61,6 +66,7 @@ export const configSchemaHorizontal = {
 export interface ConfigObjectHorizontal {
   title: string;
   oldestFirst: boolean;
+  editable: boolean;
   data: Array<{
     concept: string;
     label: string;
