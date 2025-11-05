@@ -68,10 +68,10 @@ const mockObsData = [
 ];
 
 const mockConceptData = [
-  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height' },
-  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight' },
-  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint' },
-  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level' },
+  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height', dataType: 'Numeric' },
+  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight', dataType: 'Numeric' },
+  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint', dataType: 'Text' },
+  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level', dataType: 'Numeric' },
 ];
 
 const mockUseObs = jest.mocked(useObs);
@@ -83,6 +83,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -182,6 +183,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -215,6 +217,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -268,6 +271,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),

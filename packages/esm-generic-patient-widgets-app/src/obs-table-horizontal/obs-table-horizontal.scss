@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetContainer {
@@ -30,4 +31,36 @@
 
 .headerTime {
   font-weight: 400;
+}
+
+.editabilityNote {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-right: layout.$spacing-05;
+}
+
+.cellContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+}
+
+.cellValue {
+  flex: 1;
+}
+
+.editButton {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  flex-shrink: 0;
+}
+
+.editableCell {
+  &:hover {
+    text-decoration: underline;
+    .editButton {
+      opacity: 1;
+    }
+  }
 }
