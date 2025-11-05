@@ -23,10 +23,13 @@ interface ObsTableHorizontalProps {
 const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectHorizontal>();
-  const { data: obss, isValidating } = useObs(patientUuid, config.showEncounterType);
-  const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const {
+    data: { observations, concepts },
+    isValidating,
+  } = useObs(patientUuid);
+  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
   let obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
-    obss.filter((o) => o.encounter.reference === reference),
+    observations.filter((o) => o.encounter.reference === reference),
   );
 
   if (config.oldestFirst) {
@@ -41,7 +44,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
   let tableRowLabels = config.data.map(({ concept, label }) => ({
     key: concept,
-    header: t(label, label) || obss.find((o) => o.conceptUuid === concept)?.code?.text,
+    header: t(label, label) || concepts.find((c) => c.uuid === concept)?.display,
   }));
 
   if (config.showEncounterType) {

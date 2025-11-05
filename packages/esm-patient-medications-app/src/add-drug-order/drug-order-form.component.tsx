@@ -30,12 +30,13 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
+  showSnackbar,
   useConfig,
   useFeatureFlag,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, useController } from 'react-hook-form';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import { type Drug } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -48,7 +49,7 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { type Provider, useProviders } from '../api';
+import { type Provider, useActivePatientOrders, useProviders } from '../api';
 import styles from './drug-order-form.scss';
 import {
   drugOrderBasketItemToFormValue,
@@ -208,6 +209,19 @@ export function DrugOrderForm({
     setIsSaving(false);
   };
 
+  const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
+    if (errors) {
+      console.error('Error in drug order form', errors);
+      showSnackbar({
+        title: t('drugOrderValidationFailed', 'Validation failed'),
+        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
+        kind: 'error',
+        timeoutInMs: 5000,
+        isLowContrast: true,
+      });
+    }
+  };
+
   const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
       orderConfigObject?.drugDosingUnits ?? [
@@ -287,7 +301,17 @@ export function DrugOrderForm({
     },
     [setShowMedicationHeader],
   );
-  const now = new Date();
+  const {
+    fieldState: { error: drugFieldError },
+  } = useController<MedicationOrderFormData>({ name: 'drug', control });
+
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const drugAlreadyPrescribedForNewOrder = useMemo(
+    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem.action],
+  );
 
   return (
     <div className={styles.container}>
@@ -304,7 +328,11 @@ export function DrugOrderForm({
         </span>
       </div>
       <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+      <Form
+        className={styles.orderForm}
+        onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
+        id="drugOrderForm"
+      >
         <div>
           {errorFetchingOrderConfig && (
             <InlineNotification
@@ -329,6 +357,12 @@ export function DrugOrderForm({
                         reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
                       }}
                     />
+                    {drugAlreadyPrescribedForNewOrder && (
+                      <FormLabel className={styles.errorLabel}>
+                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                      </FormLabel>
+                    )}
+                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
                   </InputWrapper>
                 )}
                 {allowAndSupportSelectingPrescribingClinician &&
@@ -351,7 +385,7 @@ export function DrugOrderForm({
                       kind="warning"
                       lowContrast
                       className={styles.inlineNotification}
-                      title={t('errorLoadingProviders', 'Error loading clinicians list')}
+                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
                       subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
                     />
                   ) : (
@@ -678,7 +712,7 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
           >
             {saveButtonText}
           </Button>

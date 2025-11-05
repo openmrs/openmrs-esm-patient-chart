@@ -84,12 +84,6 @@ export const esmPatientChartSchema = {
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
     _default: true,
   },
-  showExtraVisitAttributesSlot: {
-    _type: Type.Boolean,
-    _description:
-      'Whether on start visit form should handle submission of the extra visit attributes from the extra visit attributes slot',
-    _default: false,
-  },
   showRecommendedVisitTypeTab: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
@@ -213,7 +207,6 @@ export interface ChartConfig {
   offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
-  showExtraVisitAttributesSlot: boolean;
   showRecommendedVisitTypeTab: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
   showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
