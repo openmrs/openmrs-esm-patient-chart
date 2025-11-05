@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { type LabOrderConcept } from './lab-results.resource';
+import { type TFunction } from 'i18next';
 
 type SchemaRecord = Record<string, z.ZodType>;
 
@@ -31,17 +32,23 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
  * @param labOrderConceptUuid - The UUID of the lab order concept.
  * @returns A Zod schema object for the lab results form.
  */
-export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) => {
+export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t: TFunction) => {
   if (!labOrderConcepts) {
     return z.object({
-      fulfillerComment: z.string().max(500, 'Comments cannot exceed 500 characters').optional(),
+      fulfillerComment: z
+        .string()
+        .max(500, t('commentsCannotExceed500Characters', 'Comments cannot exceed 500 characters'))
+        .optional(),
     });
   }
 
   const conceptSchema = createSchemaForConcept(labOrderConcepts);
 
   return z.object(conceptSchema).extend({
-    fulfillerComment: z.string().max(500, 'Comments cannot exceed 500 characters').optional(),
+    fulfillerComment: z
+      .string()
+      .max(500, t('commentsCannotExceed500Characters', 'Comments cannot exceed 500 characters'))
+      .optional(),
   });
 };
 

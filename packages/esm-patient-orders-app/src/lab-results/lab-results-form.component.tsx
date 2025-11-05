@@ -33,7 +33,11 @@ import styles from './lab-results-form.scss';
 import { type ConfigObject } from '../config-schema';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
-  order: Order;
+  order: Order & {
+    fulfillerStatus: 'DRAFT' | 'COMPLETED' | Order['fulfillerStatus'];
+  };
+  promptBeforeClosing: (isDirty: () => boolean) => void;
+  closeWorkspaceWithSavedChanges: () => void;
   invalidateLabOrders?: () => void;
 }
 
@@ -58,7 +62,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
+  const schema = useMemo(() => createLabResultsFormSchema(concept, t), [concept, t]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
   const { mutate } = useSWRConfig();
 
@@ -92,7 +96,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const commentValue = watch('fulfillerComment') || '';
 
   useEffect(() => {
-    const validStatuses = enableReviewingLabResultsBeforeApproval ? ['COMPLETED', 'ON_HOLD'] : ['COMPLETED'];
+    const validStatuses = enableReviewingLabResultsBeforeApproval ? ['COMPLETED', 'DRAFT'] : ['COMPLETED'];
 
     if (concept && completeLabResult && validStatuses.includes(order?.fulfillerStatus)) {
       if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
@@ -165,7 +169,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     const commentText = fulfillerComment?.trim() || '';
 
     if (enableReviewingLabResultsBeforeApproval) {
-      if (order.fulfillerStatus === 'COMPLETED' || order.fulfillerStatus === 'ON_HOLD') {
+      if (['COMPLETED', 'DRAFT'].includes(order.fulfillerStatus)) {
         try {
           const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
             const obs =
@@ -183,14 +187,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }, []);
 
           if (failedObsconceptUuids.length) {
-            const errorMessage = 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', ');
+            const errorMessage = t('couldNotSaveObsWithConceptUuids', 'Could not save obs {{failedObsconceptUuids}} ', {
+              failedObsconceptUuids: failedObsconceptUuids.join(', '),
+            });
             showNotification('error', errorMessage);
             return;
           }
 
           const resultsStatusPayload = {
             fulfillerStatus: 'COMPLETED',
-            fulfillerComment: commentText || 'Test Results Entered',
+            fulfillerComment: commentText,
           };
 
           await updateOrderResult(order.uuid, order.encounter.uuid, null, resultsStatusPayload, null, abortController);
@@ -231,7 +237,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         };
         const resultsStatusPayload = {
           fulfillerStatus: 'DRAFT',
-          fulfillerComment: commentText || 'Test Results Modified, pending approval',
+          fulfillerComment: commentText,
         };
 
         await updateOrderResult(
