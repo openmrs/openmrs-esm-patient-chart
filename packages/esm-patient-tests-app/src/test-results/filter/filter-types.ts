@@ -14,6 +14,7 @@ export interface TreeNode {
   flatName: string;
   subSets?: Array<TreeNode>;
   hasData?: boolean;
+  hiAbsolute?: number;
   hiCritical?: number;
   hiNormal?: number;
   lowAbsolute?: number;
@@ -75,6 +76,15 @@ export interface ObservationData {
   obsDatetime: string;
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
+  // Reference range fields from observation-level (criteria-based)
+  hiAbsolute?: number;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  units?: string;
+  range?: string; // Formatted range string for display
 }
 
 export interface ParsedTimeType {
@@ -124,6 +134,15 @@ export interface RowData extends TreeNode {
         obsDatetime: string;
         value: string;
         interpretation: OBSERVATION_INTERPRETATION;
+        // Reference range fields from observation-level (criteria-based)
+        hiAbsolute?: number;
+        hiCritical?: number;
+        hiNormal?: number;
+        lowAbsolute?: number;
+        lowCritical?: number;
+        lowNormal?: number;
+        units?: string;
+        range?: string; // Formatted range string for display
       }
     | undefined
   >;

@@ -142,6 +142,15 @@ export type Observation = {
   obsDatetime: string;
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
+  // Observation-level reference ranges (criteria-based)
+  hiAbsolute?: number;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  units?: string;
+  range?: string; // Formatted range string for display
 };
 
 export type TestResult = {
@@ -168,6 +177,8 @@ export type MappedObservation = {
   units: string;
   lowCritical: number;
   hiNormal: number;
+  hiAbsolute?: number;
+  hiCritical?: number;
   flatName: string;
   hasData: boolean;
   range: string;

@@ -4,6 +4,7 @@ import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import { usePatientChartStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
+import { selectReferenceRange, formatReferenceRange, type ReferenceRanges } from './reference-range-helpers';
 
 export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
@@ -13,11 +14,28 @@ interface ObsTreeNode {
   flatName?: string;
   display: string;
   hasData: boolean;
+  hiAbsolute?: number;
+  hiCritical?: number;
   hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
   lowNormal?: number;
+  units?: string;
   range?: string;
   subSets: Array<ObsTreeNode>;
-  obs: Array<{ value: string; interpretation?: OBSERVATION_INTERPRETATION }>;
+  obs: Array<{
+    value: string;
+    interpretation?: OBSERVATION_INTERPRETATION;
+    obsDatetime?: string;
+    // Observation-level reference ranges (criteria-based)
+    hiAbsolute?: number;
+    hiCritical?: number;
+    hiNormal?: number;
+    lowAbsolute?: number;
+    lowCritical?: number;
+    lowNormal?: number;
+    units?: string;
+  }>;
 }
 
 const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
@@ -40,12 +58,64 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
     outData.subSets = outData.subSets.map((subNode: ObsTreeNode) => augmentObstreeData(subNode, outData.flatName));
     outData.hasData = outData.subSets.some((subNode: ObsTreeNode) => subNode.hasData);
   }
+  // Format node-level range for display (using lowNormal/hiNormal)
   if (exist(outData?.hiNormal, outData?.lowNormal)) {
-    outData.range = `${outData.lowNormal} – ${outData.hiNormal}`;
+    outData.range = formatReferenceRange(
+      {
+        lowNormal: outData.lowNormal,
+        hiNormal: outData.hiNormal,
+        units: outData.units,
+      },
+      outData.units,
+    );
   }
+
   if (outData?.obs?.length) {
-    const assess = assessValue(outData);
-    outData.obs = outData.obs.map((ob) => ({ ...ob, interpretation: ob.interpretation ?? assess(ob.value) }));
+    // Process each observation: extract ranges and calculate interpretation
+    outData.obs = outData.obs.map((ob) => {
+      // Extract observation-level reference ranges if present
+      const observationRanges: ReferenceRanges | undefined =
+        ob.lowNormal !== undefined || ob.hiNormal !== undefined
+          ? {
+              hiAbsolute: ob.hiAbsolute,
+              hiCritical: ob.hiCritical,
+              hiNormal: ob.hiNormal,
+              lowAbsolute: ob.lowAbsolute,
+              lowCritical: ob.lowCritical,
+              lowNormal: ob.lowNormal,
+              units: ob.units,
+            }
+          : undefined;
+
+      // Node-level reference ranges
+      const nodeRanges: ReferenceRanges | undefined = {
+        hiAbsolute: outData.hiAbsolute,
+        hiCritical: outData.hiCritical,
+        hiNormal: outData.hiNormal,
+        lowAbsolute: outData.lowAbsolute,
+        lowCritical: outData.lowCritical,
+        lowNormal: outData.lowNormal,
+        units: outData.units,
+      };
+
+      // Select ranges: observation-level takes precedence
+      const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
+
+      // Calculate interpretation using selected ranges
+      const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
+      const interpretation = ob.interpretation ?? assess(ob.value);
+
+      // Format range for display (observation-level if available, otherwise node-level)
+      const displayRange = observationRanges
+        ? formatReferenceRange(observationRanges, observationRanges.units)
+        : outData.range || '--';
+
+      return {
+        ...ob,
+        interpretation,
+        range: displayRange,
+      };
+    });
     outData.hasData = true;
   }
 
