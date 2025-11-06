@@ -105,7 +105,11 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 });
 
-test('visit context after starting / ending visit', async ({ page, patient, api }) => {
+test('Verify visit context when starting / ending / deleting / restoring active visit', async ({
+  page,
+  patient,
+  api,
+}) => {
   await test.step('Ensure no active visits for the patient', async () => {
     const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
     const data = await res.json();
@@ -132,7 +136,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeVisible();
   });
 
-  await test.step('When cancel the start visit prompt modal', async () => {
+  await test.step('When I cancel the start visit prompt modal', async () => {
     await chartPage.page.getByRole('button', { name: /cancel/i }).click();
   });
 
@@ -146,7 +150,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await page.getByRole('button', { name: /note/i }).click();
   });
 
-  await test.step("And I click 'start new visit'in the prompt modal ", async () => {
+  await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
     await chartPage.page.getByRole('button', { name: /start new visit/i }).click();
   });
 
@@ -178,6 +182,35 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
   });
 
+  await test.step('When I click the patient header action menu', async () => {
+    await page.getByRole('button', { name: 'Actions' }).click();
+  });
+
+  await test.step('And I click on he "Delete active visit", button', async () => {
+    await page.getByRole('menuitem', { name: 'Delete active visit' }).click();
+  });
+
+  await test.step('Then I should see the confirmation dialog', async () => {
+    await expect(page.getByRole('heading', { name: 'Are you sure you want to delete this visit' })).toBeVisible();
+  });
+
+  await test.step('When I click on the "Delete visit" button', async () => {
+    await page.getByRole('button', { name: 'danger Delete visit' }).click();
+  });
+
+  await test.step('Then I should see a confirmation toast and active visit tag removed', async () => {
+    await expect(chartPage.page.getByText(/opd visit deleted successfully/i)).toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).not.toBeVisible();
+  });
+
+  await test.step('When I undo the delete visit', async () => {
+    await page.getByRole('button', { name: 'Undo' }).click();
+  });
+
+  await test.step('Then I should see the Active Visit tag on the patient header again', async () => {
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
+  });
+
   await test.step('When I click the `Visit note` button on the siderail', async () => {
     await page.getByRole('button', { name: /note/i }).click();
   });
@@ -190,7 +223,7 @@ test('visit context after starting / ending visit', async ({ page, patient, api 
     await page.getByRole('button', { name: /discard/i }).click();
   });
 
-  await test.step('And when I end the active visit', async () => {
+  await test.step('And I end the active visit', async () => {
     await chartPage.page.getByRole('button', { name: /actions/i }).click();
     await chartPage.page.getByRole('menuitem', { name: /end active visit/i }).click();
     await chartPage.page.getByRole('button', { name: /end visit/i }).click();

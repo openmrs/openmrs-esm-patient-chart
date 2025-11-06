@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useForm, FormProvider, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

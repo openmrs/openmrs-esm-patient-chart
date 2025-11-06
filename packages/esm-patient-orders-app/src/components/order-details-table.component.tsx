@@ -521,10 +521,10 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                       <TableCell className="cds--table-column-menu">
                                         {matchingOrder && isOmrsOrder(matchingOrder) ? (
                                           <OrderBasketItemActions
+                                            patient={patient}
                                             launchOrderForm={() => launchOrderForm(matchingOrder)}
                                             openOrderBasket={launchOrderBasket}
                                             orderItem={matchingOrder}
-                                            patient={patient}
                                           />
                                         ) : (
                                           <ExtensionSlot
@@ -609,7 +609,29 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
 function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, orderItem.orderType.uuid);
+
+  // Use the appropriate grouping key and postDataPrepFunction based on order type
+  const getOrderBasketConfig = useCallback(() => {
+    if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.DRUG_ORDER),
+        postDataPrepFn: prepMedicationOrderPostData,
+      };
+    } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.TEST_ORDER, orderItem.orderType.uuid),
+        postDataPrepFn: prepTestOrderPostData,
+      };
+    } else {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.GENERAL_ORDER, orderItem.orderType.uuid),
+        postDataPrepFn: prepOrderPostData,
+      };
+    }
+  }, [orderItem.type, orderItem.orderType.uuid]);
+
+  const { grouping, postDataPrepFn } = getOrderBasketConfig();
+  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
 
   const handleCancelOrder = useCallback(() => {

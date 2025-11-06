@@ -15,15 +15,8 @@ const mockLineChart = jest.mocked(LineChart);
 
 const mockUseConfig = jest.mocked(useConfig);
 
+// Make sure this respects the sort order of useObs
 const mockObsData = [
-  {
-    code: { text: 'Height' },
-    conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
-    effectiveDateTime: '2021-01-01T00:00:00Z',
-    valueQuantity: { value: 180 },
-    encounter: { reference: 'Encounter/123' },
-  },
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -36,17 +29,25 @@ const mockObsData = [
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     dataType: 'Number',
+    effectiveDateTime: '2021-02-01T00:00:00Z',
+    valueQuantity: { value: 72 },
+    encounter: { reference: 'Encounter/234' },
+  },
+  {
+    code: { text: 'Height' },
+    conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    dataType: 'Number',
     effectiveDateTime: '2021-01-01T00:00:00Z',
-    valueQuantity: { value: 70 },
+    valueQuantity: { value: 180 },
     encounter: { reference: 'Encounter/123' },
   },
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     dataType: 'Number',
-    effectiveDateTime: '2021-02-01T00:00:00Z',
-    valueQuantity: { value: 72 },
-    encounter: { reference: 'Encounter/234' },
+    effectiveDateTime: '2021-01-01T00:00:00Z',
+    valueQuantity: { value: 70 },
+    encounter: { reference: 'Encounter/123' },
   },
   {
     code: { text: 'Chief Complaint' },
@@ -66,12 +67,19 @@ const mockObsData = [
   },
 ];
 
+const mockConceptData = [
+  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height' },
+  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight' },
+  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint' },
+  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level' },
+];
+
 const mockUseObs = jest.mocked(useObs);
 
 describe('ObsSwitchable', () => {
   it('should render all obs in table and numeric obs in graph', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData as Array<ObsResult>,
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -102,11 +110,13 @@ describe('ObsSwitchable', () => {
     expect(headerRow).toHaveTextContent('Chief Complaint');
     expect(headerRow).toHaveTextContent('Power Level');
     const firstRow = screen.getAllByRole('row')[1];
+    expect(firstRow).toHaveTextContent('Jan');
     expect(firstRow).toHaveTextContent('180');
     expect(firstRow).toHaveTextContent('70');
     expect(firstRow).toHaveTextContent('Too strong');
     expect(firstRow).toHaveTextContent('9001');
     const secondRow = screen.getAllByRole('row')[2];
+    expect(secondRow).toHaveTextContent('Feb');
     expect(secondRow).toHaveTextContent('182');
     expect(secondRow).toHaveTextContent('72');
     expect(secondRow).toHaveTextContent('--');
@@ -122,13 +132,14 @@ describe('ObsSwitchable', () => {
     expect(tabs).toHaveTextContent('Weight');
     expect(tabs).not.toHaveTextContent('Chief Complaint');
     expect(tabs).toHaveTextContent('Power Level');
+    expect(tabs).not.toHaveTextContent('Mystery Concept');
 
     expect(mockLineChart).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
         data: [
-          { group: 'Tallitude', key: '01-Jan-2021', value: 180 },
-          { group: 'Tallitude', key: '01-Feb-2021', value: 182 },
+          { group: 'Tallitude', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
+          { group: 'Tallitude', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
         ],
         options: expect.any(Object),
       }),
@@ -139,8 +150,8 @@ describe('ObsSwitchable', () => {
       2,
       expect.objectContaining({
         data: [
-          { group: 'Weight', key: '01-Jan-2021', value: 70 },
-          { group: 'Weight', key: '01-Feb-2021', value: 72 },
+          { group: 'Weight', key: new Date('2021-02-01T00:00:00.000Z'), value: 72 },
+          { group: 'Weight', key: new Date('2021-01-01T00:00:00.000Z'), value: 70 },
         ],
         options: expect.any(Object),
       }),
@@ -158,7 +169,7 @@ describe('ObsSwitchable', () => {
     expect(mockLineChart).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},
@@ -167,7 +178,7 @@ describe('ObsSwitchable', () => {
 
   it('should support showing graph tab by default', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData as Array<ObsResult>,
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -189,8 +200,8 @@ describe('ObsSwitchable', () => {
       1,
       expect.objectContaining({
         data: [
-          { group: 'Height', key: '01-Jan-2021', value: 180 },
-          { group: 'Height', key: '01-Feb-2021', value: 182 },
+          { group: 'Height', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
+          { group: 'Height', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
         ],
         options: expect.any(Object),
       }),
@@ -200,7 +211,7 @@ describe('ObsSwitchable', () => {
 
   it('should support grouping into multiline graphs', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData as Array<ObsResult>,
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -225,7 +236,7 @@ describe('ObsSwitchable', () => {
     expect(mockLineChart).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},
@@ -235,10 +246,10 @@ describe('ObsSwitchable', () => {
       2,
       expect.objectContaining({
         data: [
-          { group: 'Height', key: '01-Jan-2021', value: 180 },
-          { group: 'Height', key: '01-Feb-2021', value: 182 },
-          { group: 'Weight', key: '01-Jan-2021', value: 70 },
-          { group: 'Weight', key: '01-Feb-2021', value: 72 },
+          { group: 'Height', key: new Date('2021-02-01T00:00:00.000Z'), value: 182 },
+          { group: 'Height', key: new Date('2021-01-01T00:00:00.000Z'), value: 180 },
+          { group: 'Weight', key: new Date('2021-02-01T00:00:00.000Z'), value: 72 },
+          { group: 'Weight', key: new Date('2021-01-01T00:00:00.000Z'), value: 70 },
         ],
         options: expect.any(Object),
       }),
@@ -248,7 +259,12 @@ describe('ObsSwitchable', () => {
 
   it('should hide the graph tab selection if there is only one graph', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData.filter((o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') as Array<ObsResult>,
+      data: {
+        observations: mockObsData.filter(
+          (o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        ) as Array<ObsResult>,
+        concepts: mockConceptData,
+      },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -266,7 +282,7 @@ describe('ObsSwitchable', () => {
 
     expect(mockLineChart).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: [{ group: 'Power Level', key: '01-Jan-2021', value: 9001 }],
+        data: [{ group: 'Power Level', key: new Date('2021-01-01T00:00:00.000Z'), value: 9001 }],
         options: expect.any(Object),
       }),
       {},

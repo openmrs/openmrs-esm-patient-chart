@@ -18,25 +18,28 @@ import {
   TextArea,
   TextInput,
   Toggle,
+  Stack,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
 import {
   AddIcon,
   age,
-  ArrowLeftIcon,
   ExtensionSlot,
   formatDate,
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
+  showSnackbar,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
+  useSession,
+  type Visit,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, useController, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import {
-  usePatientChartStore,
+  type Drug,
   type CommonMedicationValueCoded,
   type DosingUnit,
   type DrugOrderBasketItem,
@@ -45,147 +48,42 @@ import {
   type MedicationRoute,
   type QuantityUnit,
 } from '@openmrs/esm-patient-common-lib';
-import { z } from 'zod';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useRequireOutpatientQuantity } from '../api';
+import { type Provider, useActivePatientOrders, useProviders } from '../api';
 import styles from './drug-order-form.scss';
+import {
+  drugOrderBasketItemToFormValue,
+  type MedicationOrderFormData,
+  useDrugOrderForm,
+} from './drug-order-form.resource';
+import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
 
 export interface DrugOrderFormProps {
-  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
-  onSave: (finalizedOrder: DrugOrderBasketItem) => void;
+  patient: fhir.Patient;
+  visitContext: Visit;
+  onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
+  saveButtonText: string;
   onCancel: () => void;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+
+  /**
+   * If true, allows user to select the prescribing provider when ordering medications from the order basket.
+   * (Otherwise, the prescribing provider always defaults to the current user.)
+   * The `prescriberProviderRoles` config must be set for this to work properly.
+   */
+  allowSelectingPrescribingClinician: boolean;
+  allowSelectingDrug: boolean;
 }
-
-function useCreateMedicationOrderFormSchema() {
-  const { t } = useTranslation();
-  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
-  const { requireIndication } = useConfig<ConfigObject>();
-
-  const schema = useMemo(() => {
-    const comboSchema = {
-      default: z.boolean().optional(),
-      value: z.string(),
-      valueCoded: z.string(),
-    };
-
-    const baseSchemaFields = {
-      freeTextDosage: z.string().refine((value) => !!value, {
-        message: t('freeDosageErrorMessage', 'Add free dosage note'),
-      }),
-      dosage: z.number({
-        invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
-      }),
-      unit: z.object(
-        { ...comboSchema },
-        {
-          invalid_type_error: t('selectUnitErrorMessage', 'Dose unit is required'),
-        },
-      ),
-      route: z.object(
-        { ...comboSchema },
-        {
-          invalid_type_error: t('selectRouteErrorMessage', 'Route is required'),
-        },
-      ),
-      patientInstructions: z.string().nullable(),
-      asNeeded: z.boolean(),
-      asNeededCondition: z.string().nullable(),
-      duration: z.number().nullable(),
-      durationUnit: z.object({ ...comboSchema }).nullable(),
-      indication: requireIndication
-        ? z.string().refine((value) => value !== '', {
-            message: t('indicationErrorMessage', 'Indication is required'),
-          })
-        : z.string().nullish(),
-      startDate: z.date(),
-      frequency: z.object(
-        { ...comboSchema },
-        {
-          invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
-        },
-      ),
-    };
-
-    const outpatientDrugOrderFields = {
-      pillsDispensed: z
-        .number()
-        .nullable()
-        .refine(
-          (value) => {
-            if (requireOutpatientQuantity && (typeof value !== 'number' || value < 1)) {
-              return false;
-            }
-            return true;
-          },
-          {
-            message: t('pillDispensedErrorMessage', 'Quantity to dispense is required'),
-          },
-        ),
-      quantityUnits: z
-        .object(comboSchema)
-        .nullable()
-        .refine(
-          (value) => {
-            if (requireOutpatientQuantity && !value) {
-              return false;
-            }
-            return true;
-          },
-          {
-            message: t('selectQuantityUnitsErrorMessage', 'Quantity unit is required'),
-          },
-        ),
-      numRefills: z
-        .number()
-        .nullable()
-        .refine(
-          (value) => {
-            if (requireOutpatientQuantity && (typeof value !== 'number' || value < 0)) {
-              return false;
-            }
-            return true;
-          },
-          {
-            message: t('numRefillsErrorMessage', 'Number of refills is required'),
-          },
-        ),
-    };
-
-    const nonFreeTextDosageSchema = z.object({
-      ...baseSchemaFields,
-      ...outpatientDrugOrderFields,
-      isFreeTextDosage: z.literal(false),
-      freeTextDosage: z.string().optional(),
-    });
-
-    const freeTextDosageSchema = z.object({
-      ...baseSchemaFields,
-      ...outpatientDrugOrderFields,
-      isFreeTextDosage: z.literal(true),
-      dosage: z.number().nullable(),
-      unit: z.object(comboSchema).nullable(),
-      route: z.object(comboSchema).nullable(),
-      frequency: z.object(comboSchema).nullable(),
-    });
-
-    return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-  }, [requireIndication, requireOutpatientQuantity, t]);
-
-  return schema;
-}
-
-type MedicationOrderFormData = z.infer<ReturnType<typeof useCreateMedicationOrderFormSchema>>;
 
 function MedicationInfoHeader({
-  orderBasketItem,
+  drug,
   routeValue,
   unitValue,
   dosage,
 }: {
-  orderBasketItem: DrugOrderBasketItem;
+  drug: Drug;
   routeValue: string;
   unitValue: string;
   dosage: number | null;
@@ -195,11 +93,11 @@ function MedicationInfoHeader({
   return (
     <div className={styles.medicationInfo} id="medicationInfo">
       <strong className={styles.productiveHeading02}>
-        {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
+        {drug?.display} {drug?.strength && `(${drug?.strength})`}
       </strong>{' '}
       <span className={styles.bodyLong01}>
         {routeValue && <>&mdash; {routeValue}</>}{' '}
-        {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
+        {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
       </span>
       {dosage && unitValue ? (
         <>
@@ -211,7 +109,7 @@ function MedicationInfoHeader({
           </strong>
         </>
       ) : null}{' '}
-      <ExtensionSlot name="medication-info-slot" state={{ order: orderBasketItem }} />
+      <ExtensionSlot name="medication-info-slot" state={{ order: { drug } as DrugOrderBasketItem }} />
     </div>
   );
 }
@@ -226,58 +124,45 @@ function InputWrapper({ children }) {
 }
 
 export function DrugOrderForm({
-  patientUuid,
   initialOrderBasketItem,
+  patient,
   onSave,
+  saveButtonText,
   onCancel,
-  setHasUnsavedChanges,
+  allowSelectingPrescribingClinician,
+  allowSelectingDrug,
+  visitContext,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
-  const defaultStartDate = useMemo(() => {
-    if (typeof initialOrderBasketItem?.startDate === 'string') parseDate(initialOrderBasketItem?.startDate);
+  const isProviderManagementModuleInstalled = useFeatureFlag('providermanagement-module');
+  const allowAndSupportSelectingPrescribingClinician =
+    isProviderManagementModuleInstalled && allowSelectingPrescribingClinician;
 
-    return initialOrderBasketItem?.startDate as Date;
-  }, [initialOrderBasketItem?.startDate]);
+  const {
+    data: providers,
+    isLoading: isLoadingProviders,
+    error: errorLoadingProviders,
+  } = useProviders(allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
-
+  const { currentProvider } = useSession();
+  const defaultPrescribingProvider = allowAndSupportSelectingPrescribingClinician
+    ? providers?.find((p) => p.uuid === currentProvider.uuid)
+    : currentProvider;
+  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, defaultPrescribingProvider?.uuid);
   const {
     control,
     formState: { isDirty },
     getValues,
+    reset,
     handleSubmit,
     setValue,
     watch,
-  } = useForm<MedicationOrderFormData>({
-    mode: 'all',
-    resolver: zodResolver(medicationOrderFormSchema),
-    defaultValues: {
-      isFreeTextDosage: initialOrderBasketItem?.isFreeTextDosage,
-      freeTextDosage: initialOrderBasketItem?.freeTextDosage,
-      dosage: initialOrderBasketItem?.dosage ?? null,
-      unit: initialOrderBasketItem?.unit,
-      route: initialOrderBasketItem?.route,
-      patientInstructions: initialOrderBasketItem?.patientInstructions,
-      asNeeded: initialOrderBasketItem?.asNeeded,
-      asNeededCondition: initialOrderBasketItem?.asNeededCondition,
-      duration: initialOrderBasketItem?.duration,
-      durationUnit: initialOrderBasketItem?.durationUnit,
-      pillsDispensed: initialOrderBasketItem?.pillsDispensed ?? null,
-      quantityUnits: initialOrderBasketItem?.quantityUnits,
-      numRefills: initialOrderBasketItem?.numRefills ?? null,
-      indication: initialOrderBasketItem?.indication,
-      frequency: initialOrderBasketItem?.frequency,
-      startDate: defaultStartDate,
-    },
-  });
-
-  useEffect(() => {
-    setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  } = drugOrderForm;
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -288,13 +173,18 @@ export function DrugOrderForm({
     [setValue, getValues],
   );
 
+  const drug = watch('drug') as Drug;
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
   const dosage = watch('dosage');
+  const startDate = watch('startDate');
 
-  const handleFormSubmission = (data: MedicationOrderFormData) => {
+  const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItems = {
       ...initialOrderBasketItem,
+      drug: data.drug,
+      orderer: data.orderer.uuid,
+      careSetting: data.careSetting,
       isFreeTextDosage: data.isFreeTextDosage,
       freeTextDosage: data.freeTextDosage,
       dosage: data.dosage,
@@ -311,8 +201,23 @@ export function DrugOrderForm({
       indication: data.indication,
       frequency: data.frequency,
       startDate: data.startDate,
-    };
-    onSave(newBasketItems as DrugOrderBasketItem);
+    } as DrugOrderBasketItem;
+    setIsSaving(true);
+    await onSave(newBasketItems);
+    setIsSaving(false);
+  };
+
+  const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
+    if (errors) {
+      console.error('Error in drug order form', errors);
+      showSnackbar({
+        title: t('drugOrderValidationFailed', 'Validation failed'),
+        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
+        kind: 'error',
+        timeoutInMs: 5000,
+        isLowContrast: true,
+      });
+    }
   };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(
@@ -343,11 +248,11 @@ export function DrugOrderForm({
     () =>
       orderConfigObject?.durationUnits ?? [
         {
-          valueCoded: config?.daysDurationUnit?.uuid,
-          value: config?.daysDurationUnit?.display,
+          valueCoded: daysDurationUnit?.uuid,
+          value: daysDurationUnit?.display,
         },
       ],
-    [orderConfigObject, config?.daysDurationUnit],
+    [orderConfigObject, daysDurationUnit],
   );
 
   const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
@@ -358,6 +263,10 @@ export function DrugOrderForm({
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
 
+  const filterItemsByProviderName = useCallback((menu) => {
+    return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+  }, []);
+
   const filterItemsBySynonymNames = useCallback((menu) => {
     if (menu?.inputValue?.length) {
       return menu.item?.names?.some((abbr: string) => abbr.toLowerCase().includes(menu.inputValue.toLowerCase()));
@@ -366,7 +275,6 @@ export function DrugOrderForm({
   }, []);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
-  const { patient } = usePatientChartStore(patientUuid);
   const patientName = patient ? getPatientName(patient) : '';
 
   const observer = useRef(null);
@@ -391,30 +299,38 @@ export function DrugOrderForm({
     },
     [setShowMedicationHeader],
   );
+  const {
+    fieldState: { error: drugFieldError },
+  } = useController<MedicationOrderFormData>({ name: 'drug', control });
+
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const drugAlreadyPrescribedForNewOrder = useMemo(
+    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem.action],
+  );
 
   return (
     <div className={styles.container}>
       {showStickyMedicationHeader && (
         <div className={styles.stickyMedicationInfo}>
-          <MedicationInfoHeader
-            dosage={dosage}
-            orderBasketItem={initialOrderBasketItem}
-            routeValue={routeValue}
-            unitValue={unitValue}
-          />
+          <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
         </div>
       )}
-      {isTablet && (
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-          <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-        </div>
-      )}
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+      <div className={styles.patientHeader}>
+        <span className={styles.bodyShort02}>{patientName}</span>
+        <span className={classNames(styles.text02, styles.bodyShort01)}>
+          {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+          <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+        </span>
+      </div>
+      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+      <Form
+        className={styles.orderForm}
+        onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
+        id="drugOrderForm"
+      >
         <div>
           {errorFetchingOrderConfig && (
             <InlineNotification
@@ -425,36 +341,74 @@ export function DrugOrderForm({
               subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
             />
           )}
-          {!isTablet && initialOrderBasketItem.action != 'REVISE' && (
-            <div>
-              <div className={styles.backButton}>
-                <Button
-                  kind="ghost"
-                  renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-                  iconDescription="Return to order basket"
-                  size="sm"
-                  onClick={onCancel}
-                >
-                  <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-                </Button>
-              </div>
-              <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-            </div>
-          )}
-
           <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
+          {(allowSelectingDrug || allowSelectingPrescribingClinician) && (
+            <section className={styles.formSection}>
+              <h3 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h3>
+              <Stack gap={5}>
+                {allowSelectingDrug && (
+                  <InputWrapper>
+                    <DrugSearchComboBox
+                      setSelectedDrugItem={(item) => {
+                        // when selecting a new drug, it can have its own order template that populates many fields
+                        // we should just reset the entire form
+                        reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
+                      }}
+                      visit={visitContext}
+                    />
+                    {drugAlreadyPrescribedForNewOrder && (
+                      <FormLabel className={styles.errorLabel}>
+                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                      </FormLabel>
+                    )}
+                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
+                  </InputWrapper>
+                )}
+                {allowAndSupportSelectingPrescribingClinician &&
+                  !isLoadingProviders &&
+                  (providers?.length > 0 ? (
+                    <ControlledFieldInput
+                      control={control}
+                      name="orderer"
+                      type="comboBox"
+                      getValues={getValues}
+                      id="orderer"
+                      shouldFilterItem={filterItemsByProviderName}
+                      placeholder={t('prescribingClinician', 'Prescribing Clinician')}
+                      titleText={t('prescribingClinician', 'Prescribing Clinician')}
+                      items={providers}
+                      itemToString={(item: Provider) => item?.person?.display}
+                    />
+                  ) : errorLoadingProviders ? (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
+                      subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+                    />
+                  ) : (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('noCliniciansFound', 'No clinicians found')}
+                      subtitle={t(
+                        'noCliniciansFoundDescription',
+                        'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
+                      )}
+                    />
+                  ))}
+              </Stack>
+            </section>
+          )}
           <div ref={medicationInfoHeaderRef}>
-            <MedicationInfoHeader
-              dosage={dosage}
-              orderBasketItem={initialOrderBasketItem}
-              routeValue={routeValue}
-              unitValue={unitValue}
-            />
+            <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
           </div>
           <section className={styles.formSection}>
             <Grid className={styles.gridRow}>
               <Column lg={12} md={6} sm={4}>
-                <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
+                <h3 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h3>
               </Column>
               <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
                 <ControlledFieldInput
@@ -606,7 +560,7 @@ export function DrugOrderForm({
             )}
           </section>
           <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription duration')}</h3>
+            <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
             <Grid className={styles.gridRow}>
               {/* TODO: This input does nothing */}
               <Column lg={16} md={4} sm={4}>
@@ -672,7 +626,7 @@ export function DrugOrderForm({
             </Grid>
           </section>
           <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('dispensingInformation', '3. Dispensing instructions')}</h3>
+            <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
             <Grid className={styles.gridRow}>
               <Column lg={8} md={3} sm={4}>
                 <InputWrapper>
@@ -757,9 +711,9 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
           >
-            {t('saveOrder', 'Save order')}
+            {saveButtonText}
           </Button>
         </ButtonSet>
       </Form>
@@ -859,7 +813,6 @@ const ControlledFieldInput = ({
     fieldState: { error },
   } = useController<MedicationOrderFormData>({ name, control });
   const isTablet = useLayoutType() === 'tablet';
-  const responsiveSize = isTablet ? 'md' : 'sm';
 
   const fieldErrorStyles = classNames({
     [styles.fieldError]: error?.message,
@@ -960,6 +913,7 @@ const ControlledFieldInput = ({
           ref={ref}
           size={isTablet ? 'md' : 'sm'}
           selectedItem={value}
+          initialSelectedItem={value}
           {...comboBoxProps}
         />
       );
@@ -975,3 +929,5 @@ const ControlledFieldInput = ({
     </>
   );
 };
+
+export default DrugOrderForm;

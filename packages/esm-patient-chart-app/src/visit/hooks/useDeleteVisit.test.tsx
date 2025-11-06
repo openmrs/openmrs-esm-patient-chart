@@ -56,8 +56,6 @@ const mockVisit = {
 
 describe('useDeleteVisit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,

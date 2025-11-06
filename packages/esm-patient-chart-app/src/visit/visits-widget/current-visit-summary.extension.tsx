@@ -20,6 +20,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
   if (patientUuid !== storePatientUuid) {
     return null;
   }
+
   if (!visitContext) {
     return (
       <EmptyState

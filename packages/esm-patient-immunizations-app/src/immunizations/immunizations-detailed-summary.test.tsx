@@ -11,6 +11,10 @@ import { mockCurrentVisit } from '__mocks__';
 jest.mock('../hooks/useImmunizations', () => ({
   useImmunizations: jest.fn(),
 }));
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  usePatientChartStore: jest.fn(),
+}));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -21,7 +25,6 @@ const mockUseImmunizations = jest.mocked(require('../hooks/useImmunizations').us
 const mockLaunchWorkspace = launchWorkspace2 as jest.Mock;
 const mockUseVisit = jest.mocked(useVisit);
 const mockUseConfig = jest.mocked(require('@openmrs/esm-framework').useConfig);
-
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
 mockUseConfig.mockReturnValue({
@@ -218,7 +221,14 @@ describe('ImmunizationsDetailedSummary', () => {
   it('prompts to start visit when add button is clicked without an active visit', async () => {
     const user = userEvent.setup();
     const mockLaunchStartVisitPrompt = jest.fn();
-    mockUseVisit.mockReturnValue({ currentVisit: null } as VisitReturnType);
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
     mockUseImmunizations.mockReturnValueOnce({
       data: mockImmunizationData,
       isLoading: false,

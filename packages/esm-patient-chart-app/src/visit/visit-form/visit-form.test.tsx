@@ -29,9 +29,6 @@ import {
 import VisitForm, { type VisitFormProps } from './visit-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
-// Fixed reference time used in time-dependent tests
-const FIXED_NOW = new Date('2023-01-01T08:00:00.000Z');
-
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
   punctuality: {

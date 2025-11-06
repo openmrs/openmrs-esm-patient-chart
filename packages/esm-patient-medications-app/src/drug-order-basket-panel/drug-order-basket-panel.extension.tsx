@@ -13,6 +13,13 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
 import styles from './drug-order-basket-panel.scss';
 
+interface OrderBasketSlotProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
+}
+
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
  * Slotted into order-basket-slot by default

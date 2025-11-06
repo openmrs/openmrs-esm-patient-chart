@@ -43,8 +43,6 @@ import {
   type PatientWorkspace2DefinitionProps,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig } from '../../config-schema';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
   convertToDate,
@@ -64,7 +62,31 @@ import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
+
+interface VisitAttribute {
+  attributeType: string;
+  value: string;
+}
+
+/**
+ * Extra visit information provided by extensions via the extra-visit-attribute-slot.
+ * Extensions can use this to add custom attributes to visits.
+ */
+export interface ExtraVisitInfo {
+  /**
+   * Optional callback that extensions can provide to perform final
+   * preparation or validation before the visit is created/updated.
+   */
+  handleCreateExtraVisitInfo?: () => void;
+  /**
+   * Array of visit attributes to be included in the visit payload.
+   * Each attribute must have an attributeType (UUID) and a value (string).
+   */
+  attributes?: Array<VisitAttribute>;
+}
 
 export interface VisitFormProps {
   /**
@@ -107,7 +129,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
   } | null>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
-  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
+  const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
 
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit);
@@ -130,6 +152,14 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
+
+  const isValidVisitAttributesArray = useCallback((attributes: unknown): boolean => {
+    return (
+      Array.isArray(attributes) &&
+      attributes.length > 0 &&
+      attributes.every((attr) => attr?.attributeType?.trim().length > 0 && attr?.value?.trim().length > 0)
+    );
+  }, []);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -237,12 +267,10 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
         stopDatetime: hasStopTime ? stopDatetime : null,
         // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
         ...(!visitToEdit && { patient: patientUuid }),
-        ...(config.showExtraVisitAttributesSlot && extraAttributes && { attributes: extraAttributes }),
+        ...(isValidVisitAttributesArray(extraAttributes) && { attributes: extraAttributes }),
       };
 
-      if (config.showExtraVisitAttributesSlot) {
-        handleCreateExtraVisitInfo?.();
-      }
+      handleCreateExtraVisitInfo?.();
 
       const abortController = new AbortController();
       if (isOnline) {
@@ -394,7 +422,6 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
       patient,
       closeWorkspace,
       config.offlineVisitTypeUuid,
-      config.showExtraVisitAttributesSlot,
       extraVisitInfo,
       globalMutate,
       handleVisitAttributes,
@@ -406,6 +433,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
       visitFormCallbacks,
       visitToEdit,
       mutateActiveVisit,
+      isValidVisitAttributesArray,
     ],
   );
 

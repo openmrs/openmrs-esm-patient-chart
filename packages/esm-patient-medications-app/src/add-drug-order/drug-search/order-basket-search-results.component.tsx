@@ -147,6 +147,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug, visit))),
     [orders, drug, visit],
   );
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const drugAlreadyPrescribed = useMemo(
     () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
     [activeOrders, drug?.uuid],

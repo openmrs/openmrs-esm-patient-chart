@@ -21,7 +21,9 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
 }
 
 /**
- * This workspace is used for adding a new drug order or to modify an existing drug order
+ * This workspace displays the drug order form. On form submission, it saves the drug order
+ * to the (frontend) order basket. For a form that submits the drug order directly on submit,
+ * see fill-prescription-form.workspace.tsx
  */
 export default function AddDrugOrderWorkspace({
   workspaceProps: { order: initialOrder },
@@ -53,7 +55,7 @@ export default function AddDrugOrderWorkspace({
   );
 
   const saveDrugOrderToBasket = useCallback(
-    (finalizedOrder: DrugOrderBasketItem) => {
+    async (finalizedOrder: DrugOrderBasketItem) => {
       finalizedOrder.careSetting = careSettingUuid;
       finalizedOrder.orderer = session.currentProvider.uuid;
       const newOrders = [...orders];
@@ -74,7 +76,7 @@ export default function AddDrugOrderWorkspace({
   );
 
   const submitDrugOrderToServer = useCallback(
-    (finalizedOrder: DrugOrderBasketItem) => {
+    async (finalizedOrder: DrugOrderBasketItem) => {
       postOrder(prepMedicationOrderPostData(finalizedOrder, patientUuid, finalizedOrder?.encounterUuid))
         .then(() => {
           clearOrders();
@@ -132,11 +134,15 @@ export default function AddDrugOrderWorkspace({
         </>
       ) : (
         <DrugOrderForm
-          patientUuid={patient.id}
           initialOrderBasketItem={currentOrder}
           onSave={currentOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
           onCancel={currentOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : closeWorkspace}
           setHasUnsavedChanges={setHasUnsavedChanges}
+          patient={patient}
+          visitContext={visitContext}
+          saveButtonText={t('saveOrder', 'Save order')}
+          allowSelectingPrescribingClinician={false}
+          allowSelectingDrug={false}
         />
       )}
     </Workspace2>

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
+import { ActionableNotification, Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
 import {
   ExtensionSlot,
   useConfig,
@@ -90,6 +90,12 @@ const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       }
     } else {
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
+      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+      // Only revalidate current visit since orders create new encounters
+      mutateVisitContext?.();
+      await mutateOrders();
+      invalidateVisitAndEncounterData(mutate, patientUuid);
+
       if (erroredItems.length == 0) {
         await closeWorkspace({ discardUnsavedChanges: true });
         showOrderSuccessToast(t, orders);
