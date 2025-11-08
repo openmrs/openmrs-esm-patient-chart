@@ -20,11 +20,13 @@ export type ObservationInterpretation = 'critically_low' | 'critically_high' | '
 
 export type MappedVitals = {
   code: string;
-  interpretation: string;
+  interpretation: ObservationInterpretation;
   recordedDate: string | Date;
   encounterId: string;
   value: number | string;
 };
+
+export type FHIRInterpretation = 'Critically Low' | 'Critically High' | 'High' | 'Low' | 'Normal';
 
 export interface FHIRObservationResource {
   resourceType: string;
@@ -82,6 +84,14 @@ export interface FHIRObservationResource {
   hasMember?: Array<{
     reference: string;
   }>;
+  interpretation?: Array<{
+    coding: Array<{
+      code: string;
+      display: FHIRInterpretation;
+      system: string;
+    }>;
+    text: string;
+  }>;
 }
 
 export interface PatientVitalsAndBiometrics {
@@ -89,7 +99,9 @@ export interface PatientVitalsAndBiometrics {
   id: string;
   date: string;
   systolic?: number;
+  systolicRenderInterpretation?: ObservationInterpretation;
   diastolic?: number;
+  diastolicRenderInterpretation?: ObservationInterpretation;
   bloodPressureRenderInterpretation?: ObservationInterpretation;
   pulse?: number;
   pulseRenderInterpretation?: ObservationInterpretation;

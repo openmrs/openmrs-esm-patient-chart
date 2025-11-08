@@ -31,12 +31,12 @@ export default function AddDrugOrderWorkspace({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  patient,
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const { patient } = usePatientChartStore();
 
   const cancelDrugOrder = useCallback(() => {
     closeWorkspace({

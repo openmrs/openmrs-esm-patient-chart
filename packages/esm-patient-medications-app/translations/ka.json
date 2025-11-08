@@ -3,6 +3,7 @@
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "აქტიური წამლები",
+  "activePrescriptionExists": "Active prescription exists for this drug",
   "add": "დამატება",
   "addDrugOrderWorkspaceTitle": "წამლების მიმდევრობის დამატება",
   "backToOrderBasket": "დაბრუნება შეკვეთების კალათაზე",
