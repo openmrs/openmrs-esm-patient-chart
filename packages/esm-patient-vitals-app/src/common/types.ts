@@ -22,8 +22,8 @@ export type MappedVitals = {
   code: string;
   interpretation: string;
   recordedDate: string | Date;
-  value: number;
   encounterId: string;
+  value: number | string;
 };
 
 export interface FHIRObservationResource {
@@ -85,6 +85,7 @@ export interface FHIRObservationResource {
 }
 
 export interface PatientVitalsAndBiometrics {
+  note?: string;
   id: string;
   date: string;
   systolic?: number;
