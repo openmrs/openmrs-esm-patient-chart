@@ -35,6 +35,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
+        showRefillButton={true}
         patient={patient}
       />
     );

@@ -269,9 +269,257 @@ test.describe('Drug Order Tests', () => {
       await expect(page.getByText(/Discontinued Aspirin 81mg./i)).toBeVisible();
     });
   });
+
+  test('Refill an active medication', async ({ page, patient }) => {
+    const medicationsPage = new MedicationsPage(page);
+    const form = page.locator('#drugOrderForm');
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('Then I should see the existing active medication in the medications table', async () => {
+      await expect(page.getByText(/aspirin 81mg/i)).toBeVisible();
+      await expect(medicationsPage.medicationsTable()).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu (kebab menu) for the medication', async () => {
+      await page
+        .getByRole('button', { name: /options/i })
+        .first()
+        .click();
+    });
+
+    await test.step('Then I should see the "Refill" menu option', async () => {
+      await expect(page.getByRole('menuitem', { name: /refill/i })).toBeVisible();
+    });
+
+    await test.step('When I click on the "Refill" button', async () => {
+      await page.getByRole('menuitem', { name: /refill/i }).click();
+    });
+
+    await test.step('Then the drug order form workspace should open with pre-populated data', async () => {
+      await expect(page.getByText(/order form/i)).toBeVisible();
+      await expect(form.getByText(/aspirin 81mg/i)).toBeVisible();
+    });
+
+    await test.step('And the form fields should be pre-populated with the original medication data', async () => {
+      // Verify dose is pre-filled
+      await expect(page.getByLabel(/^dose$/i)).toHaveValue('1');
+
+      // Verify route is pre-filled
+      await expect(page.getByRole('combobox', { name: /route/i })).toContainText(/oral/i);
+
+      // Verify frequency is pre-filled
+      await expect(page.getByRole('combobox', { name: /frequency/i })).toContainText(/once daily/i);
+
+      // Verify indication is pre-filled
+      await expect(page.getByRole('textbox', { name: /indication/i })).toHaveValue(/order reason/i);
+    });
+
+    await test.step('And the start date should be set to today', async () => {
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      // Verify start date field contains today's date
+      await expect(page.getByLabel(/start date/i)).toBeVisible();
+    });
+
+    await test.step('When I modify the duration to "7" days to test editability', async () => {
+      await page.getByText(/^duration$/i).clear();
+      await page.getByText(/^duration$/i).fill('7');
+    });
+
+    await test.step('And I modify the quantity to dispense to "7"', async () => {
+      await page.getByText(/^quantity to dispense$/i).clear();
+      await page.getByText(/^quantity to dispense$/i).fill('7');
+    });
+
+    await test.step('And I modify the indication to "Chronic pain management"', async () => {
+      await page.getByRole('textbox', { name: /indication/i }).clear();
+      await page.getByRole('textbox', { name: /indication/i }).fill('Chronic pain management');
+    });
+
+    await test.step('And I click on the "Save Order" button', async () => {
+      await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('Then the order status should be changed to "Renew"', async () => {
+      await expect(orderBasket.getByText(/renew/i)).toBeVisible();
+    });
+
+    await test.step('When I click on the "Sign and close" button', async () => {
+      await page.getByRole('button', { name: /sign and close/i }).click();
+    });
+
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
+    });
+
+    await test.step('And I should see the newly refilled order in the active medications table', async () => {
+      const dataRows = page.locator('tbody > tr');
+
+      // Should have at least 2 rows now (original + refilled)
+      await expect(dataRows).toHaveCount(2);
+
+      // Verify the new order has the modified values
+      await expect(page.getByText(/7 days/i).first()).toBeVisible();
+      await expect(page.getByText(/chronic pain management/i)).toBeVisible();
+    });
+
+    await test.step('And the original medication order should remain unchanged in the table', async () => {
+      // The original order should still exist (now as second row or marked as historical)
+      const allRows = page.locator('tbody > tr');
+      await expect(allRows.first()).toContainText(/aspirin 81mg/i);
+    });
+  });
+
+  test('Refill a past medication', async ({ page, patient }) => {
+    const medicationsPage = new MedicationsPage(page);
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('When I discontinue the active medication to move it to past medications', async () => {
+      await page
+        .getByRole('button', { name: /options/i })
+        .first()
+        .click();
+      await page.getByRole('menuitem', { name: /discontinue/i }).click();
+      await page.getByRole('button', { name: /sign and close/i }).click();
+      await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
+    });
+
+    await test.step('And I navigate to the Past Medications section', async () => {
+      // Wait for the page to update
+      await page.waitForTimeout(1000);
+      // Scroll to past medications section if needed
+      await page.getByText(/past medications/i).scrollIntoViewIfNeeded();
+    });
+
+    await test.step('Then I should see the discontinued medication in the past medications table', async () => {
+      await expect(
+        page
+          .locator('tbody')
+          .getByText(/discontinued/i)
+          .first(),
+      ).toBeVisible();
+    });
+
+    await test.step('When I click the overflow menu for the past medication', async () => {
+      // Find the discontinued medication row's overflow menu
+      await page
+        .getByRole('button', { name: /options/i })
+        .last()
+        .click();
+    });
+
+    await test.step('Then I should see the "Refill" option for the past medication', async () => {
+      await expect(page.getByRole('menuitem', { name: /refill/i })).toBeVisible();
+    });
+
+    await test.step('When I click on the "Refill" button', async () => {
+      await page.getByRole('menuitem', { name: /refill/i }).click();
+    });
+
+    await test.step('Then the drug order form should open with the past medication data pre-populated', async () => {
+      await expect(page.getByText(/order form/i)).toBeVisible();
+      await expect(page.getByText(/aspirin 81mg/i)).toBeVisible();
+    });
+
+    await test.step('When I click on the "Save Order" button', async () => {
+      await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('And I click on the "Sign and close" button', async () => {
+      await page.getByRole('button', { name: /sign and close/i }).click();
+    });
+
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(/placed order for aspirin/i)).toBeVisible();
+    });
+
+    await test.step('And the refilled medication should appear in the active medications table', async () => {
+      // Navigate back to active medications
+      await page
+        .getByText(/active medications/i)
+        .first()
+        .scrollIntoViewIfNeeded();
+      await expect(page.getByRole('table', { name: /medications/i }).first()).toContainText(/aspirin 81mg/i);
+    });
+  });
+
+  test('Cancel refill workflow without saving', async ({ page, patient }) => {
+    const medicationsPage = new MedicationsPage(page);
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('When I click the overflow menu for a medication', async () => {
+      await page
+        .getByRole('button', { name: /options/i })
+        .first()
+        .click();
+    });
+
+    await test.step('And I click on the "Refill" button', async () => {
+      await page.getByRole('menuitem', { name: /refill/i }).click();
+    });
+
+    await test.step('Then the drug order form should open', async () => {
+      await expect(page.getByText(/order form/i)).toBeVisible();
+    });
+
+    await test.step('When I modify some fields', async () => {
+      await page.getByText(/^duration$/i).clear();
+      await page.getByText(/^duration$/i).fill('10');
+    });
+
+    await test.step('And I close the workspace without saving', async () => {
+      await page.getByRole('button', { name: /close/i }).first().click();
+    });
+
+    await test.step('Then I should see a discard confirmation modal', async () => {
+      await expect(page.getByText(/discard/i)).toBeVisible();
+    });
+
+    await test.step('When I confirm discarding the changes', async () => {
+      await page.getByRole('button', { name: /discard/i }).click();
+    });
+
+    await test.step('Then the order basket should be empty', async () => {
+      await expect(orderBasket.getByText(/renew/i)).not.toBeVisible();
+    });
+
+    await test.step('And no new medication order should be created', async () => {
+      const dataRows = page.locator('tbody > tr');
+      // Should have only the original medication
+      await expect(dataRows).toHaveCount(1);
+    });
+  });
 });
 
 test.afterEach(async ({ api }) => {
-  await deleteEncounter(api, encounter.uuid);
-  await deleteDrugOrder(api, drugOrder.uuid);
+  if (encounter?.uuid) {
+    try {
+      await deleteEncounter(api, encounter.uuid);
+    } catch (error) {
+      console.error('Failed to clean up encounter:', error);
+    }
+  }
+  if (drugOrder?.uuid) {
+    try {
+      await deleteDrugOrder(api, drugOrder.uuid);
+    } catch (error) {
+      console.error('Failed to clean up drug order:', error);
+    }
+  }
 });

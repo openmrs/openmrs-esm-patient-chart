@@ -49,6 +49,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 showDiscontinueButton={true}
                 showModifyButton={true}
                 showReorderButton={false}
+                showRefillButton={true}
                 patient={patient}
               />
             );
@@ -76,6 +77,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 showDiscontinueButton={false}
                 showModifyButton={false}
                 showReorderButton={true}
+                showRefillButton={true}
                 patient={patient}
               />
             );
