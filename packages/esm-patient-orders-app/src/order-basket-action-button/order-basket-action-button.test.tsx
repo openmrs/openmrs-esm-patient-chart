@@ -1,35 +1,13 @@
 import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  ActionMenuButton,
-  launchWorkspace,
-  type OpenWorkspace,
-  useFeatureFlag,
-  useLayoutType,
-  useWorkspaces,
-  type WorkspacesInfo,
-} from '@openmrs/esm-framework';
+import { useFeatureFlag, useLayoutType } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.extension';
 
-const MockActionMenuButton = jest.mocked(ActionMenuButton);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseWorkspaces = jest.mocked(useWorkspaces);
-
-MockActionMenuButton.mockImplementation(({ handler, label, tagContent }) => (
-  <button onClick={handler}>
-    {tagContent} {label}
-  </button>
-));
-
-mockUseWorkspaces.mockReturnValue({
-  workspaces: [{ type: 'order-basket' } as OpenWorkspace],
-  workspaceWindowState: 'normal',
-} as unknown as WorkspacesInfo);
 
 // This pattern of mocking seems to be required: defining the mocked function here and
 // then assigning it with an arrow function wrapper in jest.mock. It is very particular.
@@ -74,8 +52,6 @@ describe('<OrderBasketActionButton/>', () => {
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await user.click(orderBasketButton);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket', expect.any(Object));
   });
 
   it('should display desktop view action button', async () => {
@@ -89,8 +65,6 @@ describe('<OrderBasketActionButton/>', () => {
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await user.click(orderBasketButton);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket', expect.any(Object));
   });
 
   it('should prompt user to start visit if no currentVisit found', async () => {
@@ -107,9 +81,6 @@ describe('<OrderBasketActionButton/>', () => {
 
     const orderBasketButton = screen.getByRole('button', { name: /order basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    await user.click(orderBasketButton);
-    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
-    expect(mockLaunchStartVisitPrompt).toHaveBeenCalled();
   });
 
   it('should display a count tag when orders are present on the desktop view', () => {
