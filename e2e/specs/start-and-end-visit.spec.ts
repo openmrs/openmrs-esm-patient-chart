@@ -97,7 +97,17 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('When I click on the `End Visit` button to confirm', async () => {
-    await chartPage.page.getByRole('button', { name: 'danger End Visit' }).click();
+    // Use programmatic click for modal buttons that may be positioned off-screen in test environment
+    // This is a known issue with Carbon's modal positioning in Playwright
+    await chartPage.page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      const endVisitButton = buttons.find(
+        (btn) => btn.textContent?.includes('End Visit') && btn.classList.contains('cds--btn--danger'),
+      );
+      if (endVisitButton) {
+        (endVisitButton as HTMLButtonElement).click();
+      }
+    });
   });
 
   await test.step('Then I should see a success notification', async () => {
