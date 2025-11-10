@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { type Visit } from '@openmrs/esm-framework';
 import { useDeleteVisit } from '../hooks/useDeleteVisit';
+import { AccessibleModal } from '../../components/accessible-modal';
 import styles from './start-visit-dialog.scss';
 
 interface DeleteVisitDialogProps {
@@ -16,13 +17,23 @@ const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patie
   const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, closeModal);
 
   return (
-    <div>
+    <AccessibleModal
+      isOpen={true}
+      onClose={closeModal}
+      size="sm"
+      modalHeadingId="delete-visit-modal-heading"
+      modalDescriptionId="delete-visit-modal-description"
+    >
       <ModalHeader
         closeModal={closeModal}
-        title={t('deleteVisitDialogHeader', 'Are you sure you want to delete this visit?')}
+        title={
+          <span id="delete-visit-modal-heading">
+            {t('deleteVisitDialogHeader', 'Are you sure you want to delete this visit?')}
+          </span>
+        }
       />
       <ModalBody>
-        <p className={styles.body}>
+        <p id="delete-visit-modal-description" className={styles.body}>
           {t('confirmDeleteVisitText', 'Deleting this {{visit}} will delete its associated encounters.', {
             visit: visit?.visitType?.display ?? t('visit', 'Visit'),
           })}
@@ -40,7 +51,7 @@ const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, patie
           )}
         </Button>
       </ModalFooter>
-    </div>
+    </AccessibleModal>
   );
 };
 

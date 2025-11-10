@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
+import { AccessibleModal } from '../../../components/accessible-modal';
 import styles from './delete-encounter.scss';
 
 interface DeleteEncounterConfirmationProps {
@@ -17,14 +18,21 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   const { t } = useTranslation();
   const handleCancel = (event: React.MouseEvent<Element, MouseEvent>) => close(event);
   const handleDelete = () => onConfirmation?.();
+  const handleClose = () => close({} as React.MouseEvent<Element, MouseEvent>);
 
   return (
-    <>
+    <AccessibleModal
+      isOpen={true}
+      onClose={handleClose}
+      size="sm"
+      modalHeadingId="delete-encounter-modal-heading"
+      modalDescriptionId="delete-encounter-modal-description"
+    >
       <ModalHeader closeModal={close} className={styles.productiveHeading03}>
-        {t('deleteEncounter', 'Delete Encounter')}?
+        <span id="delete-encounter-modal-heading">{t('deleteEncounter', 'Delete Encounter')}?</span>
       </ModalHeader>
       <ModalBody>
-        <p className={styles.bodyLong01}>
+        <p id="delete-encounter-modal-description" className={styles.bodyLong01}>
           {t(
             'deleteEncounterConfirmationText',
             `Are you sure you want to delete this encounter? This action can't be undone.`,
@@ -40,7 +48,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>
-    </>
+    </AccessibleModal>
   );
 };
 
