@@ -41,14 +41,14 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
           {isTablet ? (
             <Layer>
               <Search
-                labelText=""
+                labelText={t('searchForAVisitType', 'Search for a visit type')}
                 onChange={handleSearchTermChange}
                 placeholder={t('searchForAVisitType', 'Search for a visit type')}
               />
             </Layer>
           ) : (
             <Search
-              labelText=""
+              labelText={t('searchForAVisitType', 'Search for a visit type')}
               onChange={handleSearchTermChange}
               placeholder={t('searchForAVisitType', 'Search for a visit type')}
             />

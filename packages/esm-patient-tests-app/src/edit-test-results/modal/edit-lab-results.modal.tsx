@@ -96,7 +96,11 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                     <RadioButton
                       key={order.uuid}
                       id={order.uuid}
-                      labelText={<span className={styles.radioLabel}>{order.concept.display}</span>}
+                      labelText={
+                        <span className={styles.radioLabel}>
+                          {order.concept.display || order.concept.name?.display || 'Unnamed test'}
+                        </span>
+                      }
                       value={order.uuid}
                       className={styles.radioItem}
                     />

@@ -233,7 +233,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
           <Form onSubmit={handleSearchTerm} className={styles.flexBaseline}>
             <Search
               autoFocus
-              labelText=""
+              labelText={t('searchByTestName', 'Search by test name')}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               placeholder={t('searchByTestName', 'Search by test name')}
               size="sm"
@@ -263,7 +263,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
             <Form onSubmit={handleSearchTerm} className={classNames(styles.flex)}>
               <Search
                 autoFocus
-                labelText=""
+                labelText={t('searchByTestName', 'Search by test name')}
                 onChange={(e) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
                 size="lg"

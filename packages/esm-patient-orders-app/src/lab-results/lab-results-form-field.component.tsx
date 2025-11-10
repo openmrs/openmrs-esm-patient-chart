@@ -65,7 +65,11 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
     [defaultValue],
   );
 
-  const labelText = useMemo(() => `${concept.display} ${formatLabRange(concept)}`, [concept]);
+  const labelText = useMemo(() => {
+    const displayText =
+      concept.display?.trim() || concept.name?.name?.trim() || concept.name?.display?.trim() || t('unnamed', 'Unnamed');
+    return `${displayText} ${formatLabRange(concept)}`.trim();
+  }, [concept, t]);
 
   const { isTextField, isNumericField, isCodedField, isPanelField } = useMemo(
     () => ({
@@ -136,7 +140,10 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
         />
         {isPanelField ? (
           <Accordion>
-            <AccordionItem title={concept.display} open>
+            <AccordionItem
+              title={concept.display || concept.name?.name || concept.name?.display || t('unnamed', 'Unnamed')}
+              open
+            >
               {concept.setMembers.map((member) => (
                 <ResultFormField
                   key={member.uuid}
@@ -154,7 +161,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
 
   return (
     <div className={styles.formField}>
-      <label className={styles.label}>{labelText}</label>
+      <span className={styles.label}>{labelText}</span>
       <InlineNotification
         kind="error"
         hideCloseButton

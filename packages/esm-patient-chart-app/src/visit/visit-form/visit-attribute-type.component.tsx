@@ -115,7 +115,8 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
   const baseId = useId();
-  const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
+  const displayText = data?.display?.trim() || data?.name?.trim() || t('unnamed', 'Unnamed');
+  const labelText = !required ? `${displayText} (${t('optional', 'optional')})` : displayText;
 
   const {
     formState: { errors },
