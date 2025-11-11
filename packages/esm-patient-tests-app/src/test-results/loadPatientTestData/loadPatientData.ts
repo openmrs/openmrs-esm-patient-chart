@@ -7,13 +7,21 @@ import {
   type ObsMetaInfo,
 } from '@openmrs/esm-patient-common-lib';
 import {
+  addUserDataToCache,
+  assessValue,
+  extractMetaInformation,
+  extractObservationReferenceRanges,
+  extractObservationInterpretation,
   getEntryConceptClassUuid,
   getUserDataFromCache,
   loadObsEntries,
   loadPresentConcepts,
-  extractMetaInformation,
-  addUserDataToCache,
 } from './helpers';
+import {
+  selectReferenceRange,
+  formatReferenceRange,
+  type ReferenceRanges,
+} from '../grouped-timeline/reference-range-helpers';
 
 function parseSingleObsData(
   testConceptNameMap: Record<ConceptUuid, string>,
@@ -23,6 +31,11 @@ function parseSingleObsData(
   return (entry: ObsRecord) => {
     entry.conceptClass = getEntryConceptClassUuid(entry);
 
+    // Extract observation-level reference ranges from FHIR Observation referenceRange field
+    const observationRanges = extractObservationReferenceRanges(entry);
+    // Extract observation-level interpretation from FHIR Observation interpretation field
+    const observationInterpretation = extractObservationInterpretation(entry);
+
     if (entry.hasMember) {
       // is a panel
       entry.members = new Array(entry.hasMember.length);
@@ -31,17 +44,60 @@ function parseSingleObsData(
       });
     } else {
       // is a single test
-      entry.meta = metaInfomation[entry.conceptClass];
-    }
 
-    if (entry.valueQuantity) {
-      entry.value = entry.valueQuantity.value;
-      delete entry.valueQuantity;
-    }
+      // Extract value FIRST before computing interpretation
+      if (entry.valueQuantity) {
+        entry.value = String(entry.valueQuantity.value);
+        delete entry.valueQuantity;
+      } else if (entry.valueCodeableConcept) {
+        entry.value = entry.valueCodeableConcept.coding?.[0]?.display;
+        delete entry.valueCodeableConcept;
+      } else if (entry.valueString) {
+        entry.value = entry.valueString;
+        delete entry.valueString;
+      }
 
-    if (entry.valueCodeableConcept) {
-      entry.value = entry?.valueCodeableConcept.coding[0].display;
-      delete entry.valueCodeableConcept;
+      const conceptMeta = metaInfomation[entry.conceptClass];
+
+      // Node-level (concept-level) reference ranges
+      const nodeRanges: ReferenceRanges = {
+        hiAbsolute: conceptMeta.hiAbsolute,
+        hiCritical: conceptMeta.hiCritical,
+        hiNormal: conceptMeta.hiNormal,
+        lowAbsolute: conceptMeta.lowAbsolute,
+        lowCritical: conceptMeta.lowCritical,
+        lowNormal: conceptMeta.lowNormal,
+        units: conceptMeta.units,
+      };
+
+      // Merge observation-level and concept-level ranges (observation takes precedence)
+      const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
+
+      // Create merged meta with observation-level ranges taking precedence
+      const mergedMeta: ObsMetaInfo = {
+        ...conceptMeta,
+        // Update meta with merged ranges
+        hiAbsolute: selectedRanges?.hiAbsolute ?? conceptMeta.hiAbsolute,
+        hiCritical: selectedRanges?.hiCritical ?? conceptMeta.hiCritical,
+        hiNormal: selectedRanges?.hiNormal ?? conceptMeta.hiNormal,
+        lowAbsolute: selectedRanges?.lowAbsolute ?? conceptMeta.lowAbsolute,
+        lowCritical: selectedRanges?.lowCritical ?? conceptMeta.lowCritical,
+        lowNormal: selectedRanges?.lowNormal ?? conceptMeta.lowNormal,
+        units: selectedRanges?.units ?? conceptMeta.units,
+        // Update range string with merged ranges
+        range: selectedRanges ? formatReferenceRange(selectedRanges, selectedRanges.units) : conceptMeta.range,
+      };
+
+      // Update assessValue to use merged ranges (computed after mergedMeta to avoid unsafe cast)
+      if (selectedRanges) {
+        mergedMeta.assessValue = assessValue(mergedMeta);
+      }
+
+      entry.meta = mergedMeta;
+
+      // Use observation-level interpretation if available, otherwise compute using merged ranges
+      entry.interpretation =
+        observationInterpretation ?? (mergedMeta.assessValue ? mergedMeta.assessValue(entry.value) : 'NORMAL');
     }
 
     entry.name = testConceptNameMap[entry.conceptClass];

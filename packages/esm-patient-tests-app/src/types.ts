@@ -67,6 +67,14 @@ export interface FHIRObservationResource {
   hasMember?: Array<{
     reference: string;
   }>;
+  interpretation?: Array<{
+    coding: Array<{
+      code: string;
+      display: string;
+      system?: string;
+    }>;
+    text?: string;
+  }>;
 }
 
 export interface Concept {
@@ -107,7 +115,7 @@ export interface ConceptMeta {
   range: string;
 }
 
-export interface ObsRecord extends FHIRObservationResource {
+export interface ObsRecord extends Omit<FHIRObservationResource, 'interpretation'> {
   conceptUuid: string;
   relatedObs: Array<ObsRecord>;
   meta: ConceptMeta;
