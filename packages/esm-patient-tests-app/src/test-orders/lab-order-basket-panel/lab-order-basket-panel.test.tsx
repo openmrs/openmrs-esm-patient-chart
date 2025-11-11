@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { useOrderType } from '@openmrs/esm-patient-common-lib';
+import { patientChartOrderBasketWindowProps, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import type { TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -45,6 +45,7 @@ const testProps = {
   mutateVisitContext: null,
   closeWorkspace: null,
   launchChildWorkspace: null,
+  windowProps: { ...patientChartOrderBasketWindowProps, encounterUuid: '' },
 };
 
 describe('LabOrderBasketPanel', () => {

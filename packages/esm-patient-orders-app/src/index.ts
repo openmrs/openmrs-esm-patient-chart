@@ -39,7 +39,7 @@ export const orderStockDetailsExtension = getAsyncLifecycle(
 );
 
 export const ShoppingCartIcon = getAsyncLifecycle(
-  () => import('./order-basket-action-button/order-basket-action-button.extension'),
+  () => import('./order-basket-action-button/order-basket-action-button.component'),
   options,
 );
 

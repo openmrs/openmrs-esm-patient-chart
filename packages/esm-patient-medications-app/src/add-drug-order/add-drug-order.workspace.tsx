@@ -4,6 +4,7 @@ import { Button } from '@carbon/react';
 import { ArrowLeftIcon, showSnackbar, useLayoutType, useSession, Workspace2 } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
+  type OrderBasketWindowProps,
   type PatientWorkspace2DefinitionProps,
   postOrder,
   showOrderSuccessToast,
@@ -21,15 +22,18 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
 }
 
 /**
- * This workspace displays the drug order form. On form submission, it saves the drug order
- * to the (frontend) order basket. For a form that submits the drug order directly on submit,
+ * This workspace displays the drug order form for adding or editing a drug order.
+ * On form submission, it saves the drug order to the (frontend) order basket.
+ * For a form that submits the drug order directly on submit,
  * see fill-prescription-form.workspace.tsx
  */
 export default function AddDrugOrderWorkspace({
   workspaceProps: { order: initialOrder },
+  windowProps: { orderBasketWorkspaceName },
   groupProps: { patient, patientUuid, visitContext },
   closeWorkspace,
-}: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, {}>) {
+  launchChildWorkspace,
+}: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, OrderBasketWindowProps>) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders, clearOrders } = useOrderBasket<DrugOrderBasketItem>(
@@ -130,6 +134,9 @@ export default function AddDrugOrderWorkspace({
             visit={visitContext}
             closeWorkspace={closeWorkspace}
             openOrderForm={openOrderForm}
+            launchOrderBasketChildWorkspace={() => {
+              launchChildWorkspace(orderBasketWorkspaceName);
+            }}
           />
         </>
       ) : (

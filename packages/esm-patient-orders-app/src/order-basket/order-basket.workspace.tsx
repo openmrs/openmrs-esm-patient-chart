@@ -14,6 +14,7 @@ import {
 import {
   invalidateVisitAndEncounterData,
   type OrderBasketItem,
+  type OrderBasketWindowProps,
   type PatientWorkspace2DefinitionProps,
   postOrders,
   postOrdersOnNewEncounter,
@@ -33,10 +34,12 @@ interface OrderBasketSlotProps {
   visitContext: Visit;
   mutateVisitContext: () => void;
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  windowProps: OrderBasketWindowProps;
 }
 
-const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
+const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, OrderBasketWindowProps>> = ({
   groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
+  windowProps,
   closeWorkspace,
   launchChildWorkspace,
 }) => {
@@ -141,6 +144,7 @@ const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
     visitContext,
     mutateVisitContext,
     launchChildWorkspace,
+    windowProps,
   };
 
   return (
@@ -162,7 +166,7 @@ const OrderBasket: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
               <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
                 <GeneralOrderType
                   {...orderType}
-                  closeWorkspace={closeWorkspace}
+                  windowProps={windowProps}
                   launchChildWorkspace={launchChildWorkspace}
                   patient={patient}
                 />

@@ -13,18 +13,11 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
 import styles from './drug-order-basket-panel.scss';
 
-interface OrderBasketSlotProps {
-  patientUuid: string;
-  patient: fhir.Patient;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
-}
-
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
  * Slotted into order-basket-slot by default
  */
-function DrugOrderBasketPanelExtension({ patient, launchChildWorkspace }: OrderBasketExtensionProps) {
+function DrugOrderBasketPanelExtension({ patient, launchChildWorkspace, windowProps }: OrderBasketExtensionProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
@@ -70,11 +63,11 @@ function DrugOrderBasketPanelExtension({ patient, launchChildWorkspace }: OrderB
   }, [orders]);
 
   const openDrugSearch = () => {
-    launchChildWorkspace('add-drug-order');
+    launchChildWorkspace(windowProps.drugOrderWorkspaceName);
   };
 
   const openDrugForm = (order: DrugOrderBasketItem) => {
-    launchChildWorkspace('add-drug-order', { order });
+    launchChildWorkspace(windowProps.drugOrderWorkspaceName, { order });
   };
 
   const removeMedication = useCallback(

@@ -1,7 +1,11 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type OrderBasketExtensionProps, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketExtensionProps,
+  type DrugOrderBasketItem,
+  patientChartOrderBasketWindowProps,
+} from '@openmrs/esm-patient-common-lib';
 import { getByTextWithMarkup } from 'tools';
 import { mockDrugSearchResultApiData, mockFhirPatient, mockPatientDrugOrdersApiData } from '__mocks__';
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
@@ -18,6 +22,7 @@ const testProps: OrderBasketExtensionProps = {
   patient: mockFhirPatient,
   closeWorkspace: jest.fn(),
   launchChildWorkspace: jest.fn(),
+  windowProps: { ...patientChartOrderBasketWindowProps, encounterUuid: '' },
 };
 
 describe('OrderBasketPanel', () => {

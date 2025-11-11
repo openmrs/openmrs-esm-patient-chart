@@ -226,11 +226,15 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
-    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /laboratory test results/i })).toBeVisible();
   });
 
   await test.step('And I maximize the form', async () => {
-    await page.getByRole('button', { name: /maximize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /maximize/i })
+      .click();
   });
 
   await test.step('And I fill in values for the `White Blood Cells (WBC)`, `Platelets`, and `Neutrophils` questions', async () => {
@@ -241,11 +245,19 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I minimize the form in the workspace', async () => {
-    await page.getByRole('button', { name: /minimize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /minimize/i })
+      .click();
   });
 
   await test.step('And then I maximize the form in the workspace', async () => {
-    await page.getByRole('button', { name: /maximize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /maximize/i })
+      .click();
   });
 
   await test.step('And I should see the original form state retained', async () => {

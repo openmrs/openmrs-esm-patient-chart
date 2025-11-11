@@ -10,14 +10,19 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type OrderBasketItem,
+  type OrderBasketWindowProps,
+  useOrderBasket,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
 import { type OrderTypeDefinition } from '../../config-schema';
 import { prepOrderPostData } from './resources';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import styles from './general-order-panel.scss';
 
 interface GeneralOrderTypeProps extends OrderTypeDefinition {
-  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  windowProps: OrderBasketWindowProps;
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
   patient: fhir.Patient;
 }
@@ -25,7 +30,7 @@ interface GeneralOrderTypeProps extends OrderTypeDefinition {
 const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
   patient,
   orderTypeUuid,
-  closeWorkspace,
+  windowProps,
   label,
   icon,
   launchChildWorkspace,
@@ -73,27 +78,15 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({
   }, [orders]);
 
   const openConceptSearch = () => {
-    closeWorkspace({
-      discardUnsavedChanges: true,
-    }).then((didClose) => {
-      if (didClose) {
-        launchChildWorkspace('orderable-concept-workspace', {
-          orderTypeUuid,
-        });
-      }
+    launchChildWorkspace(windowProps.generalOrderWorkspaceName, {
+      orderTypeUuid,
     });
   };
 
   const openOrderForm = (order: OrderBasketItem) => {
-    closeWorkspace({
-      discardUnsavedChanges: true,
-    }).then((didClose) => {
-      if (didClose) {
-        launchChildWorkspace('orderable-concept-workspace', {
-          order,
-          orderTypeUuid,
-        });
-      }
+    launchChildWorkspace(windowProps.generalOrderWorkspaceName, {
+      order,
+      orderTypeUuid,
     });
   };
 

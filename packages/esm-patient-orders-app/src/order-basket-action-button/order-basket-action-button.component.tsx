@@ -5,6 +5,7 @@ import {
   useStartVisitIfNeeded,
   useOrderBasket,
   type PatientChartWorkspaceActionButtonProps,
+  patientChartOrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 
 /**
@@ -25,7 +26,7 @@ const OrderBasketActionButton: React.FC<PatientChartWorkspaceActionButtonProps> 
       tagContent={orders?.length > 0 ? orders?.length : null}
       workspaceToLaunch={{
         workspaceName: 'order-basket',
-        windowProps: { encounterUuid: '' },
+        windowProps: { ...patientChartOrderBasketWindowProps, encounterUuid: '' },
       }}
       onBeforeWorkspaceLaunch={startVisitIfNeeded}
     />

@@ -36,18 +36,18 @@ export interface OrderBasketSearchResultsProps {
 interface DrugSearchResultItemProps {
   patient: fhir.Patient;
   drug: DrugSearchResult;
-  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   visit: Visit;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  closeWorkspace,
   openOrderForm,
   focusAndClearSearchInput,
   patient,
   visit,
+  closeWorkspace,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -119,8 +119,8 @@ export default function OrderBasketSearchResults({
             patient={patient}
             drug={drug}
             openOrderForm={openOrderForm}
-            closeWorkspace={closeWorkspace}
             visit={visit}
+            closeWorkspace={closeWorkspace}
           />
         ))}
       </div>
@@ -132,8 +132,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   patient,
   drug,
   openOrderForm,
-  closeWorkspace,
   visit,
+  closeWorkspace,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(

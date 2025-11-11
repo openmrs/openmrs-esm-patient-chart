@@ -117,5 +117,5 @@ test('clicking the Add button opens the order basket form', async () => {
   await waitForLoadingToFinish();
   const button = screen.getByRole('button', { name: /Add/i });
   await user.click(button);
-  expect(mocklaunchWorkspace2).toHaveBeenCalledWith('add-drug-order');
+  expect(mocklaunchWorkspace2).toHaveBeenCalledWith('order-basket');
 });

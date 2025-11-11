@@ -200,7 +200,14 @@ function renderAddDrugOrderWorkspace() {
       workspaceName={''}
       launchChildWorkspace={jest.fn()}
       closeWorkspace={mockCloseWorkspace}
-      windowProps={{}}
+      windowProps={{
+        encounterUuid: '',
+        orderBasketWorkspaceName: '',
+        drugOrderWorkspaceName: '',
+        generalOrderWorkspaceName: '',
+        labOrderWorkspaceName: '',
+        cancelOrderWorkspaceName: '',
+      }}
     />,
   );
 }

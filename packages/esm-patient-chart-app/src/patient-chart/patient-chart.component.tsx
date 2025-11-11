@@ -1,6 +1,6 @@
 import { ExtensionSlot, useWorkspaces, useLeftNav } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { spaBasePath } from '../constants';
 import Loader from '../loader/loader.component';
@@ -28,6 +28,7 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
   const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
   const state = usePatientChartPatientAndVisit(patientUuid);
+  const { isLoadingPatient, patient } = state;
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
@@ -44,7 +45,7 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
               workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
             )}
           >
-            {state.isLoadingPatient ? (
+            {isLoadingPatient ? (
               <Loader />
             ) : (
               <>
@@ -58,8 +59,8 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
                     className={classNames(styles.chartReview, { [styles.widthContained]: layoutMode == 'contained' })}
                   >
                     <ChartReview
-                      patient={state.patient}
-                      patientUuid={state.patientUuid}
+                      patient={patient}
+                      patientUuid={patientUuid}
                       view={view}
                       setDashboardLayoutMode={setLayoutMode}
                     />

@@ -5,7 +5,7 @@ import { useFeatureFlag, useLayoutType } from '@openmrs/esm-framework';
 import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
-import OrderBasketActionButton from './order-basket-action-button.extension';
+import OrderBasketActionButton from './order-basket-action-button.component';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
 

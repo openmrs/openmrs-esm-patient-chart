@@ -39,6 +39,7 @@ import {
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
+  patientChartOrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
 import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
@@ -189,22 +190,31 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     (orderItem: Order) => {
       switch (orderItem.type) {
         case ORDER_TYPES.DRUG_ORDER:
-          launchAddDrugOrder({ order: buildMedicationOrder(orderItem, 'REVISE') });
+          launchAddDrugOrder(
+            { order: buildMedicationOrder(orderItem, 'REVISE') },
+            { encounterUuid: orderItem.encounter.uuid, ...patientChartOrderBasketWindowProps },
+          );
           break;
         case ORDER_TYPES.TEST_ORDER:
-          launchModifyLabOrder({
-            order: buildLabOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem.orderType.uuid,
-          });
+          launchModifyLabOrder(
+            {
+              order: buildLabOrder(orderItem, 'REVISE'),
+              orderTypeUuid: orderItem.orderType.uuid,
+            },
+            { encounterUuid: orderItem.encounter.uuid, ...patientChartOrderBasketWindowProps },
+          );
           break;
         case ORDER_TYPES.GENERAL_ORDER:
-          launchModifyGeneralOrder({
-            order: buildGeneralOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem.orderType.uuid,
-          });
+          launchModifyGeneralOrder(
+            {
+              order: buildGeneralOrder(orderItem, 'REVISE'),
+              orderTypeUuid: orderItem.orderType.uuid,
+            },
+            { encounterUuid: orderItem.encounter.uuid, ...patientChartOrderBasketWindowProps },
+          );
           break;
         default:
-          launchOrderBasket();
+          launchOrderBasket(null, { encounterUuid: orderItem.encounter.uuid, ...patientChartOrderBasketWindowProps });
       }
     },
     [launchAddDrugOrder, launchModifyGeneralOrder, launchModifyLabOrder, launchOrderBasket],

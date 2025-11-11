@@ -221,6 +221,7 @@ export interface OrderBasketExtensionProps {
   patient: fhir.Patient;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  windowProps: OrderBasketWindowProps;
 }
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
@@ -303,4 +304,13 @@ export interface TestOrderBasketItem extends OrderBasketItem {
   };
   orderReason?: string;
   specimenSource?: string;
+}
+
+export interface OrderBasketWindowProps {
+  encounterUuid: string;
+  orderBasketWorkspaceName: string;
+  drugOrderWorkspaceName: string;
+  generalOrderWorkspaceName: string;
+  labOrderWorkspaceName: string;
+  cancelOrderWorkspaceName: string;
 }

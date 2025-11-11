@@ -29,6 +29,7 @@ import {
   type PatientWorkspaceGroupProps,
   invalidateVisitByUuid,
   invalidateVisitAndEncounterData,
+  patientChartOrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -74,7 +75,6 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   const pageSize = 5;
   const { t } = useTranslation();
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patient.id, 'add-drug-order');
   const config = useConfig<ConfigObject>();
   const showPrintButton = config.showPrintButton;
   const contentToPrintRef = useRef(null);
@@ -256,7 +256,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={launchAddDrugOrder}
+              onClick={() => launchOrderBasket({}, { ...patientChartOrderBasketWindowProps, encounterUuid: '' })}
             >
               {t('add', 'Add')}
             </Button>
@@ -423,10 +423,13 @@ function OrderBasketItemActions({
         visit: medication.encounter?.visit,
       },
     ]);
-    launchWorkspace2<{}, { encounter: Encounter }, PatientWorkspaceGroupProps>(
+    launchWorkspace2(
       'order-basket',
       {},
-      { encounter: medication.encounter },
+      {
+        encounterUuid: medication.encounter.uuid,
+        ...patientChartOrderBasketWindowProps,
+      },
       workspaceGroupProps,
     );
   }, [items, setItems, medication, workspaceGroupProps]);
@@ -479,7 +482,15 @@ function OrderBasketItemActions({
     };
     setItems([...items, newItem]);
 
-    launchWorkspace2('add-drug-order', { order: newItem }, { encounter: medication.encounter }, workspaceGroupProps);
+    launchWorkspace2(
+      'add-drug-order',
+      { order: newItem },
+      {
+        encounterUuid: medication.encounter.uuid,
+        ...patientChartOrderBasketWindowProps,
+      },
+      workspaceGroupProps,
+    );
   }, [items, setItems, medication, workspaceGroupProps]);
 
   const handleReorderClick = useCallback(() => {
