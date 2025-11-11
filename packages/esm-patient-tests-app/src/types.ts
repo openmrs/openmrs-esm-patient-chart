@@ -143,13 +143,13 @@ export type Observation = {
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
   // Observation-level reference ranges (criteria-based)
+  // Note: Units are only at the concept/node level (TestResult.units), not observation-level
   hiAbsolute?: number;
   hiCritical?: number;
   hiNormal?: number;
   lowAbsolute?: number;
   lowCritical?: number;
   lowNormal?: number;
-  units?: string;
   range?: string; // Formatted range string for display
 };
 

@@ -28,12 +28,10 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      // Format node-level range for display
       const range = formatReferenceRange(nodeRanges, subTreeNode.units);
 
-      // Process observations: use observation-level ranges for interpretation if available
       const processedObs = subTreeNode.obs.map((ob) => {
-        // Extract observation-level reference ranges if present
+        // Note: Units are only at the concept/node level, not observation-level
         const observationRanges: ReferenceRanges | undefined =
           ob.lowNormal !== undefined || ob.hiNormal !== undefined
             ? {
@@ -43,24 +41,18 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
                 lowAbsolute: ob.lowAbsolute,
                 lowCritical: ob.lowCritical,
                 lowNormal: ob.lowNormal,
-                units: ob.units,
               }
             : undefined;
 
-        // Select ranges: observation-level takes precedence
         const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
-
-        // Calculate interpretation using selected ranges
         const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
         const interpretation = ob.interpretation ?? assess(ob.value);
 
         return {
           ...ob,
           interpretation,
-          // Preserve range fields for potential future use (e.g., getMostRecentObservationWithRange)
           lowNormal: ob.lowNormal,
           hiNormal: ob.hiNormal,
-          units: ob.units,
         };
       });
 

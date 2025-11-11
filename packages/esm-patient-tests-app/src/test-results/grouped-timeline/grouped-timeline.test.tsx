@@ -91,7 +91,7 @@ describe('GroupedTimeline', () => {
                   lowNormal: 35,
                   hiNormal: 50,
                   range: '35 – 50', // Observation-level range (most recent)
-                  units: 'umol/L',
+                  // Note: Units are only at the concept/node level, not observation-level
                 },
                 {
                   obsDatetime: '2023-11-09 23:15:03.0',
@@ -100,7 +100,7 @@ describe('GroupedTimeline', () => {
                   lowNormal: 20,
                   hiNormal: 45,
                   range: '20 – 45', // Older observation-level range
-                  units: 'umol/L',
+                  // Note: Units are only at the concept/node level, not observation-level
                 },
               ],
             },

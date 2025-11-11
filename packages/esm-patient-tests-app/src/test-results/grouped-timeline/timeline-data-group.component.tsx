@@ -200,10 +200,10 @@ const DataRows: React.FC<DataRowsProps> = ({ patientUuid, timeColumns, rowData, 
         const { obs: values } = row;
         const isString = isNaN(parseFloat(values?.[0]?.value));
 
-        // Find most recent observation with observation-level range data, otherwise use node-level range
+        // Note: Units are only at the concept/node level, not observation-level
         const mostRecentObsWithRange = getMostRecentObservationWithRange(row.entries);
         const displayRange = mostRecentObsWithRange?.range ?? row.range ?? '';
-        const displayUnits = mostRecentObsWithRange?.units ?? row.units ?? '';
+        const displayUnits = row.units ?? '';
 
         return (
           <React.Fragment key={index}>

@@ -31,7 +31,8 @@ export function selectReferenceRange(
     return observationRanges;
   }
 
-  // Merge: observation takes precedence for available fields
+  // Merge: observation takes precedence for available fields.
+  // Note: Units are only at the concept/node level, so units will always come from nodeRanges.
   return {
     hiAbsolute: observationRanges.hiAbsolute ?? nodeRanges.hiAbsolute,
     hiCritical: observationRanges.hiCritical ?? nodeRanges.hiCritical,

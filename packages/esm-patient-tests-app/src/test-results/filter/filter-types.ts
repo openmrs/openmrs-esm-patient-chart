@@ -77,13 +77,13 @@ export interface ObservationData {
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
   // Reference range fields from observation-level (criteria-based)
+  // Note: Units are only at the concept/node level, not observation-level
   hiAbsolute?: number;
   hiCritical?: number;
   hiNormal?: number;
   lowAbsolute?: number;
   lowCritical?: number;
   lowNormal?: number;
-  units?: string;
   range?: string; // Formatted range string for display
 }
 
@@ -135,13 +135,13 @@ export interface RowData extends TreeNode {
         value: string;
         interpretation: OBSERVATION_INTERPRETATION;
         // Reference range fields from observation-level (criteria-based)
+        // Note: Units are only at the concept/node level, not observation-level
         hiAbsolute?: number;
         hiCritical?: number;
         hiNormal?: number;
         lowAbsolute?: number;
         lowCritical?: number;
         lowNormal?: number;
-        units?: string;
         range?: string; // Formatted range string for display
       }
     | undefined

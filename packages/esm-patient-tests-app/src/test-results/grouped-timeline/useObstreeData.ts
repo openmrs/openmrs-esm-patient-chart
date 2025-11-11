@@ -28,13 +28,13 @@ interface ObsTreeNode {
     interpretation?: OBSERVATION_INTERPRETATION;
     obsDatetime?: string;
     // Observation-level reference ranges (criteria-based)
+    // Note: Units are only at the concept/node level, not observation-level
     hiAbsolute?: number;
     hiCritical?: number;
     hiNormal?: number;
     lowAbsolute?: number;
     lowCritical?: number;
     lowNormal?: number;
-    units?: string;
   }>;
 }
 
@@ -71,9 +71,8 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   }
 
   if (outData?.obs?.length) {
-    // Process each observation: extract ranges and calculate interpretation
     outData.obs = outData.obs.map((ob) => {
-      // Extract observation-level reference ranges if present
+      // Note: Units are only at the concept/node level, not observation-level
       const observationRanges: ReferenceRanges | undefined =
         ob.lowNormal !== undefined || ob.hiNormal !== undefined
           ? {
@@ -83,11 +82,9 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
               lowAbsolute: ob.lowAbsolute,
               lowCritical: ob.lowCritical,
               lowNormal: ob.lowNormal,
-              units: ob.units,
             }
           : undefined;
 
-      // Node-level reference ranges
       const nodeRanges: ReferenceRanges | undefined = {
         hiAbsolute: outData.hiAbsolute,
         hiCritical: outData.hiCritical,
@@ -98,16 +95,13 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
         units: outData.units,
       };
 
-      // Select ranges: observation-level takes precedence
       const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
-
-      // Calculate interpretation using selected ranges
       const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
       const interpretation = ob.interpretation ?? assess(ob.value);
 
-      // Format range for display (observation-level if available, otherwise node-level)
+      // Always use node-level units since observation-level ranges don't have units
       const displayRange = observationRanges
-        ? formatReferenceRange(observationRanges, observationRanges.units)
+        ? formatReferenceRange(observationRanges, outData.units)
         : outData.range || '--';
 
       return {
