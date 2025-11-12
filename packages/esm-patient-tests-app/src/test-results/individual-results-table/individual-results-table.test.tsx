@@ -98,6 +98,7 @@ describe('IndividualResultsTable', () => {
   it('uses observation-level range when available', () => {
     render(
       <IndividualResultsTable
+        patientUuid={'patient-uuid'}
         isLoading={false}
         subRows={mockSubRowsWithObservationRange}
         index={0}
