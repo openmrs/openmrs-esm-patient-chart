@@ -176,7 +176,7 @@ export function OrderForm({
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
-                <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
+                <span className={styles.testTypeLabel}>{t('testType', 'Test type')}</span>
                 <p className={styles.testType}>{initialOrder?.concept?.display}</p>
               </InputWrapper>
             </Column>
