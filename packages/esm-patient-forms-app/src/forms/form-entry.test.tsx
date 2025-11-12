@@ -33,6 +33,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, Cl
   },
   workspaceName: '',
   launchChildWorkspace: jest.fn(),
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 const mockFormEntrySub = jest.fn();

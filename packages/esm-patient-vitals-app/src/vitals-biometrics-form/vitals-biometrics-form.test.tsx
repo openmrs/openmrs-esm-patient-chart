@@ -32,6 +32,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProp
   workspaceName: '',
   launchChildWorkspace: jest.fn(),
   closeWorkspace: jest.fn(),
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 const mockShowSnackbar = jest.mocked(showSnackbar);

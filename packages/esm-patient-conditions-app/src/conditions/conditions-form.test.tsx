@@ -27,6 +27,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, {}> = {
     formContext: 'creating' as 'creating' | 'editing',
   },
   windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 function renderConditionsForm(workspaceProps?: ConditionFormProps) {

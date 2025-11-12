@@ -77,6 +77,8 @@ const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   launchChildWorkspace: jest.fn(),
   workspaceProps: {},
   windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 mockUseConfig.mockReturnValue({

@@ -41,6 +41,8 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   launchChildWorkspace: jest.fn(),
   workspaceProps: {},
   windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 jest.mock('./programs.resource', () => ({

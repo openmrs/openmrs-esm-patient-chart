@@ -29,6 +29,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
   workspaceName: '',
   launchChildWorkspace: jest.fn(),
   windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 const mockPatientListData = [

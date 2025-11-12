@@ -89,6 +89,8 @@ function renderPatientListWorkspace() {
         patientUuid: null,
         visitContext: null,
       }}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 }

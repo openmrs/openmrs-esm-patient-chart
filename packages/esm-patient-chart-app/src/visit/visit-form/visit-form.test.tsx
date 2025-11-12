@@ -69,6 +69,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
   },
   workspaceName: '',
   launchChildWorkspace: jest.fn(),
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);

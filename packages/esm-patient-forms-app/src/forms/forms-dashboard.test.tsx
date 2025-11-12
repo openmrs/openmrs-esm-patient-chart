@@ -38,6 +38,8 @@ describe('FormsDashboard', () => {
       },
       workspaceName: '',
       launchChildWorkspace: jest.fn(),
+      windowName: '',
+      isRootWorkspace: false,
     };
 
     render(<FormsDashboard {...defaultProps} />);

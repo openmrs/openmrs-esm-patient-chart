@@ -41,6 +41,8 @@ describe('MarkPatientDeceasedForm', () => {
       visitContext: null,
       mutateVisitContext: null,
     },
+    windowName: '',
+    isRootWorkspace: false,
   };
 
   const codedCausesOfDeath = [

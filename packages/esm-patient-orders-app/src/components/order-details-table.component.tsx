@@ -76,8 +76,8 @@ interface OrderDetailsProps {
 }
 
 interface OrderBasketItemActionsProps {
-  openOrderBasket: () => void;
-  launchOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
+  openOrderBasket: (encounterUuid) => void;
+  launchOrderForm: (order: Order) => void;
   orderItem: Order;
   patient: fhir.Patient;
 }
@@ -103,7 +103,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'md';
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const _launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
   const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-drug-order');
   const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'add-lab-order');
   const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit(patientUuid, 'orderable-concept-workspace');
@@ -168,6 +168,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     },
     [t],
   );
+
   const {
     data: allOrders,
     error,
@@ -184,6 +185,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     }
     return allOrders.filter((order) => order.orderType?.uuid === selectedOrderTypeUuid);
   }, [allOrders, selectedOrderTypeUuid]);
+
+  const launchOrderBasket = useCallback(
+    (encounterUuid: string) => {
+      _launchOrderBasket(null, { encounterUuid, ...patientChartOrderBasketWindowProps });
+    },
+    [_launchOrderBasket],
+  );
 
   // launch respective order basket based on order type
   const launchOrderForm = useCallback(
@@ -214,7 +222,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
           );
           break;
         default:
-          launchOrderBasket(null, { encounterUuid: orderItem.encounter.uuid, ...patientChartOrderBasketWindowProps });
+          launchOrderBasket(orderItem.encounter.uuid);
       }
     },
     [launchAddDrugOrder, launchModifyGeneralOrder, launchModifyLabOrder, launchOrderBasket],
@@ -429,7 +437,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
       ) : orderTypes && orderTypes?.length > 0 ? (
         <>
           {!tableRows?.length ? (
-            <EmptyState headerTitle={headerTitle} displayText={emptyStateDisplayText} launchForm={launchOrderBasket} />
+            <EmptyState
+              headerTitle={headerTitle}
+              displayText={emptyStateDisplayText}
+              launchForm={() => launchOrderBasket('')}
+            />
           ) : (
             <div className={styles.widgetCard}>
               <CardHeader title={title}>
@@ -456,7 +468,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                       kind="ghost"
                       renderIcon={AddIcon}
                       iconDescription={t('launchOrderBasket', 'Launch order basket')}
-                      onClick={launchOrderBasket}
+                      onClick={() => launchOrderBasket('')}
                     >
                       {t('add', 'Add')}
                     </Button>
@@ -532,7 +544,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                         {matchingOrder && isOmrsOrder(matchingOrder) ? (
                                           <OrderBasketItemActions
                                             patient={patient}
-                                            launchOrderForm={() => launchOrderForm(matchingOrder)}
+                                            launchOrderForm={launchOrderForm}
                                             openOrderBasket={launchOrderBasket}
                                             orderItem={matchingOrder}
                                           />
@@ -649,16 +661,16 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
       getDrugOrderByUuid(orderItem.uuid).then((res) => {
         const medicationOrder = res.data;
         const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
-        openOrderBasket();
+        openOrderBasket(orderItem.encounter.uuid);
         setOrders([...orders, discontinueItem]);
       });
     } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
-      openOrderBasket();
+      openOrderBasket(orderItem.encounter.uuid);
       setOrders([...orders, labItem]);
     } else {
       const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
-      openOrderBasket();
+      openOrderBasket(orderItem.encounter.uuid);
       setOrders([...orders, order]);
     }
   }, [orderItem, setOrders, orders, openOrderBasket]);
@@ -670,7 +682,7 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
           const medicationOrder = res.data;
           const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
           setOrders([...orders, medicationItem]);
-          launchOrderForm({ order: medicationItem });
+          launchOrderForm(medicationOrder);
         })
         .catch((e) => {
           console.error('Error modifying drug order: ', e);
@@ -678,35 +690,17 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
     } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'REVISE');
       setOrders([...orders, labItem]);
-      launchOrderForm({ order: labItem });
+      launchOrderForm(orderItem);
     } else if (orderItem.type === ORDER_TYPES.GENERAL_ORDER) {
       const order = buildGeneralOrder(orderItem, 'REVISE');
       setOrders([...orders, order]);
-      launchOrderForm({ order });
+      launchOrderForm(orderItem);
     }
   }, [orderItem, launchOrderForm, orders, setOrders]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem });
   }, [orderItem]);
-
-  const handleCancelClick = useCallback(() => {
-    if (orderItem.type === 'drugorder') {
-      getDrugOrderByUuid(orderItem.uuid).then((res) => {
-        let medicationOrder = res.data;
-        setOrders([...orders, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
-        openOrderBasket();
-      });
-    } else if (orderItem.type === 'testorder') {
-      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
-      setOrders([...orders, labItem]);
-      openOrderBasket();
-    } else {
-      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
-      setOrders([...orders, order]);
-      openOrderBasket();
-    }
-  }, [orderItem, setOrders, orders, openOrderBasket]);
 
   return (
     <Layer className={styles.layer}>

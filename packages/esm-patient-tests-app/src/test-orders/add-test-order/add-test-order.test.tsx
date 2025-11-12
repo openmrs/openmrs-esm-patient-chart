@@ -73,6 +73,8 @@ function renderAddLabOrderWorkspace() {
       workspaceName={''}
       launchChildWorkspace={jest.fn()}
       windowProps={{}}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 }

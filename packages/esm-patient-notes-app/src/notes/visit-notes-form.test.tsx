@@ -1,7 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { type Encounter, getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  type Encounter,
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
 import {
@@ -29,6 +35,8 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = 
   launchChildWorkspace: jest.fn(),
   windowProps: {},
   workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {}) {

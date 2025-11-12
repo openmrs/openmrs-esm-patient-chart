@@ -208,6 +208,8 @@ function renderAddDrugOrderWorkspace() {
         labOrderWorkspaceName: '',
         cancelOrderWorkspaceName: '',
       }}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 }

@@ -55,6 +55,8 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   launchChildWorkspace: jest.fn(),
   windowProps: {},
   workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 describe('LabResultsForm', () => {

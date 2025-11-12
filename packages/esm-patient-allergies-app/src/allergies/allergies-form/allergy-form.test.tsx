@@ -214,6 +214,8 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
     launchChildWorkspace: jest.fn(),
     windowProps: {},
     workspaceName: '',
+    windowName: '',
+    isRootWorkspace: false,
   };
 
   const props = {
