@@ -1,7 +1,5 @@
 {
-  "chartView": "មើលគំនូសតាង",
+  "date": "Date",
   "dateAndTime": "កាលបរិច្ឆេទ និងម៉ោង",
-  "displaying": "ការបង្ហាញ",
-  "encounterType": "ប្រភេទនៃការជួបប្រទះ",
-  "tableView": "មើលតារាង"
+  "encounterType": "ប្រភេទនៃការជួបប្រទះ"
 }

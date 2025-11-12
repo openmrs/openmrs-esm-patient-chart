@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
-import { useTranslation, type TFunction } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

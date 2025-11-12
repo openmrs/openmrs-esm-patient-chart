@@ -1,7 +1,5 @@
 {
-  "chartView": "תצוגת תרשים",
+  "date": "Date",
   "dateAndTime": "תאריך ושעה",
-  "displaying": "מציג",
-  "encounterType": "סוג הביקור",
-  "tableView": "תצוגת טבלה"
+  "encounterType": "סוג הביקור"
 }

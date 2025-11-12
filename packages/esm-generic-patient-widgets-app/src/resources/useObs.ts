@@ -2,17 +2,21 @@ import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { type ConfigObjectHorizontal } from '../config-schema-obs-horizontal';
+import { useConcepts } from './useConcepts';
 
 type CommonConfig = ConfigObjectSwitchable | ConfigObjectHorizontal;
 
 export interface UseObsResult {
-  data: Array<ObsResult>;
+  data: {
+    observations: Array<ObsResult>;
+    concepts: Array<{ uuid: string; display: string }>;
+  };
   error: Error;
   isLoading: boolean;
   isValidating: boolean;
 }
 
-type ObsResult = fhir.Observation & {
+export type ObsResult = fhir.Observation & {
   conceptUuid: string;
   dataType?: string;
   valueDateTime?: string;
@@ -27,10 +31,16 @@ type ObsResult = fhir.Observation & {
 
 export const pageSize = 100;
 
-export function useObs(patientUuid: string, includeEncounters: boolean = false): UseObsResult {
+/**
+ * Fetches the observations for the concepts in the config for this widget.
+ * For any concept that has neither label nor obs, the concept is fetched to
+ * get the label.
+ */
+export function useObs(patientUuid: string): UseObsResult {
   const { encounterTypes, data, showEncounterType } = useConfig<CommonConfig>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
+  // TODO: Make sorting respect oldestFirst/graphOldestFirst
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
     .join(',')}&_summary=data&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
@@ -41,11 +51,28 @@ export function useObs(patientUuid: string, includeEncounters: boolean = false):
 
   const { data: result, error, isLoading, isValidating } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
 
+  const obsForConcept = Object.fromEntries(
+    data.map((d) => [
+      d.concept,
+      result?.data?.entry?.find((e) => (e.resource as fhir.Observation).code.coding.find((c) => d.concept === c.code)),
+    ]),
+  );
+
+  const conceptsNeedingLabel = data.filter((d) => result && !d.label && !obsForConcept[d.concept]);
+
+  const { concepts: conceptsForLabels } = useConcepts(conceptsNeedingLabel.map((d) => d.concept));
+  const concepts = data.map((d) => ({
+    uuid: d.concept,
+    display:
+      d.label ||
+      obsForConcept[d.concept]?.resource?.code?.text ||
+      conceptsForLabels.find((c) => c.uuid === d.concept)?.display,
+  }));
+
   const encounters = showEncounterType ? getEncountersByResources(result?.data?.entry) : [];
   const observations = filterAndMapObservations(result?.data?.entry, encounters);
-
   return {
-    data: observations,
+    data: { observations, concepts },
     error: error,
     isLoading,
     isValidating,

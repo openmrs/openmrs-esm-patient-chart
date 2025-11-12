@@ -43,6 +43,54 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await page.getByText(/hepatitis b vaccination/i).click();
   });
 
+  await test.step('And I set the dose number to 1', async () => {
+    await page.getByRole('spinbutton', { name: /dose number within series/i }).fill('1');
+  });
+
+  await test.step('And I set the manufacturer to Serum Institute of India', async () => {
+    await page.getByRole('textbox', { name: /manufacturer/i }).fill('Serum Institute of India');
+  });
+
+  await test.step('And I set the lot number to A12345B67', async () => {
+    await page.getByRole('textbox', { name: /lot number/i }).fill('A12345B67');
+  });
+
+  await test.step('And I set the expiration date to 12/11/2027', async () => {
+    await page
+      .getByLabel(/expiration date/i)
+      .getByRole('spinbutton', { name: /day/i })
+      .fill('12');
+    await page
+      .getByLabel(/expiration date/i)
+      .getByRole('spinbutton', { name: /month/i })
+      .fill('11');
+    await page
+      .getByLabel(/expiration date/i)
+      .getByRole('spinbutton', { name: /year/i })
+      .fill('2027');
+  });
+
+  await test.step('And I add a note', async () => {
+    await page
+      .getByRole('textbox', { name: /note/i })
+      .fill('Administered in left deltoid. No adverse reaction observed.');
+  });
+
+  await test.step('And I set the next dose date to 12/05/2025', async () => {
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /day/i })
+      .fill('12');
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /month/i })
+      .fill('05');
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /year/i })
+      .fill('2025');
+  });
+
   await test.step('And I save the immunization', async () => {
     await page.getByRole('button', { name: /save/i }).click();
   });
@@ -75,9 +123,28 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await immunizationsSummaryTable.getByRole('button', { name: /expand all rows/i }).click();
   });
 
-  await test.step('Then I should see the expanded immunization details section showing the dose number and vaccination date', async () => {
+  await test.step('Then I should see the expanded immunization details with headers for dose number, vaccination date, next dose date, expiration date, note, and actions', async () => {
     await expect(immunizationsSummaryTable.getByText(/dose number within series/i)).toBeVisible();
     await expect(immunizationsSummaryTable.getByText(/vaccination date/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/next dose date/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/expiration date/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/note/i)).toBeVisible();
+    await expect(immunizationsSummaryTable.getByText(/actions/i)).toBeVisible();
+  });
+
+  await test.step('And the expanded section should show the immunization details', async () => {
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '1', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '08-Mar-2024', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '12-May-2025', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '12-Nov-2027', exact: true })).toBeVisible();
+    await expect(
+      immunizationsSummaryTable.getByRole('cell', {
+        name: 'Administered in left deltoid. No adverse reaction observed.',
+        exact: true,
+      }),
+    ).toBeVisible();
+    await immunizationsSummaryTable.getByRole('button', { name: /edit/i }).isVisible();
+    await immunizationsSummaryTable.getByRole('button', { name: /delete/i }).isVisible();
   });
 
   await test.step('And I edit the immunization', async () => {
@@ -115,6 +182,21 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await doseNumberInput.fill('2');
   });
 
+  await test.step('And I set the next dose date to 02/01/2026', async () => {
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /day/i })
+      .fill('02');
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /month/i })
+      .fill('01');
+    await page
+      .getByLabel(/next dose date/i)
+      .getByRole('spinbutton', { name: /year/i })
+      .fill('2026');
+  });
+
   await test.step('And I save the changes', async () => {
     await page.getByRole('button', { name: /save/i }).click();
   });
@@ -138,6 +220,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
     await expect(immunizationsSummaryTable.getByText(/dose number within series/i)).toBeVisible();
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '2', exact: true })).toBeVisible();
     await expect(immunizationsSummaryTable.getByRole('cell', { name: '02-Jan-2025', exact: true })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('cell', { name: '02-Jan-2026', exact: true })).toBeVisible();
   });
 
   await test.step('And when I delete the immunization dose', async () => {

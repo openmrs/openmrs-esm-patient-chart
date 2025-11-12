@@ -6,6 +6,7 @@ import { Tag, Tooltip } from '@carbon/react';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
 import type { OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
+import { type ChartConfig } from '../../../config-schema';
 
 interface MedicationSummaryProps {
   medications: Array<OrderItem>;
@@ -13,9 +14,7 @@ interface MedicationSummaryProps {
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
-  const { drugOrderTypeUUID } = useConfig({
-    externalModuleName: '@openmrs/esm-patient-medications-app',
-  });
+  const { drugOrderTypeUUID } = useConfig<ChartConfig>();
 
   const isPastMedication = (order: OrderItem['order']) => {
     if (!order) {
