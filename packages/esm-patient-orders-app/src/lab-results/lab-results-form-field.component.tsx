@@ -2,18 +2,18 @@ import React, { useCallback, useMemo } from 'react';
 import {
   Accordion,
   AccordionItem,
+  InlineNotification,
   NumberInput,
   Select,
   SelectItem,
   TextInput,
-  InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Control, Controller } from 'react-hook-form';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { isCoded, isNumeric, isPanel, isText, type LabOrderConcept } from './lab-results.resource';
 import { type Observation } from '../types/encounter';
 import styles from './lab-results-form.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
 
 interface ResultFormFieldProps {
   concept: LabOrderConcept;
@@ -66,10 +66,9 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
   );
 
   const labelText = useMemo(() => {
-    const displayText =
-      concept.display?.trim() || concept.name?.name?.trim() || concept.name?.display?.trim() || t('unnamed', 'Unnamed');
+    const displayText = concept.display?.trim() || concept.name?.name?.trim() || concept.name?.display?.trim() || '--';
     return `${displayText} ${formatLabRange(concept)}`.trim();
-  }, [concept, t]);
+  }, [concept]);
 
   const { isTextField, isNumericField, isCodedField, isPanelField } = useMemo(
     () => ({
@@ -140,10 +139,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, def
         />
         {isPanelField ? (
           <Accordion>
-            <AccordionItem
-              title={concept.display || concept.name?.name || concept.name?.display || t('unnamed', 'Unnamed')}
-              open
-            >
+            <AccordionItem title={concept.display || concept.name?.name || concept.name?.display || '--'} open>
               {concept.setMembers.map((member) => (
                 <ResultFormField
                   key={member.uuid}
