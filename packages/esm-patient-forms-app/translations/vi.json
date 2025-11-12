@@ -7,6 +7,7 @@
   "lastCompleted": "Last completed",
   "never": "Không bao giờ",
   "noFormsToDisplay": "There are no forms to display.",
+  "off": "Off",
   "offlineForms": "Offline forms",
   "offlineForms__lower": "offline forms",
   "offlineFormsOverviewCardAvailableOffline": "Available offline",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "Search this list",
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
+  "on": "On",
   "searchThisList": "Search this list"
 }
