@@ -88,10 +88,9 @@ function parseSingleObsData(
         range: selectedRanges ? formatReferenceRange(selectedRanges, selectedRanges.units) : conceptMeta.range,
       };
 
-      // Update assessValue to use merged ranges (computed after mergedMeta to avoid unsafe cast)
-      if (selectedRanges) {
-        mergedMeta.assessValue = assessValue(mergedMeta);
-      }
+      // Always update assessValue to use merged ranges (computed after mergedMeta to avoid unsafe cast)
+      // This ensures assessValue is computed even when only concept-level ranges exist
+      mergedMeta.assessValue = assessValue(mergedMeta);
 
       entry.meta = mergedMeta;
 
