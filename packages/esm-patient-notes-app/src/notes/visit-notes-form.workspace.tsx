@@ -147,7 +147,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       return zodResult;
     },
-    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedPrimaryDiagnoses.length, t],
+    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedPrimaryDiagnoses, t],
   );
 
   const {
