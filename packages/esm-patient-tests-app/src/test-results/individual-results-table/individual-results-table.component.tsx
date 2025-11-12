@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { rangeAlreadyHasUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   DataTableSkeleton,
@@ -91,8 +92,18 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
     () =>
       subRows?.entries.length &&
       subRows.entries.map((row, i) => {
-        const { units = '', range = '' } = row;
+        // Use observation-level range/units if available, otherwise fallback to node-level
+        // MappedObservation has range and units fields, but they may come from node-level
+        const displayRange = row.range ?? '';
+        const displayUnits = row.units ?? '';
         const isString = isNaN(parseFloat(row.value));
+
+        // Check if range already includes units to avoid duplication
+        // formatReferenceRange includes units, so if range has units, don't append again
+        const hasUnits = rangeAlreadyHasUnits(displayRange, displayUnits);
+        const referenceRangeDisplay = hasUnits
+          ? displayRange
+          : `${displayRange || '--'} ${displayUnits || ''}`.trim() || '--';
 
         return {
           ...row,
@@ -112,10 +123,10 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
             </span>
           ),
           value: {
-            value: `${row.value} ${row.units ?? ''}`,
+            value: `${row.value} ${displayUnits}`,
             interpretation: row?.interpretation,
           },
-          referenceRange: `${range || '--'} ${units || '--'}`,
+          referenceRange: referenceRangeDisplay,
         };
       }),
     [index, subRows, launchResultsDialog],

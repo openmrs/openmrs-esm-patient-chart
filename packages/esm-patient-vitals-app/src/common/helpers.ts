@@ -65,6 +65,10 @@ export function interpretBloodPressure(
     return 'normal';
   }
 
+  // Use interpretation from FHIR Observation when available (preferred).
+  // Fallback to calculation for backward compatibility: existing observations may not have
+  // interpretation set if they were created before interpretation was added, or if reference
+  // ranges weren't available at creation time.
   const systolicAssessment =
     systolicInterpretation ??
     (concepts?.systolicBloodPressureUuid
