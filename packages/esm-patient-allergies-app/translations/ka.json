@@ -47,5 +47,6 @@
   "severityRequired": "სიმძიმე აუცილებელია",
   "typeAdditionalComments": "დაწერეთ აქ ნებისმიერი დამატებითი კომენტარი",
   "typeAllergenName": "Please type in the name of the allergen",
-  "typeAllergicReactionName": "Please type in the name of the allergic reaction"
+  "typeAllergicReactionName": "Please type in the name of the allergic reaction",
+  "unknown": "Unknown"
 }

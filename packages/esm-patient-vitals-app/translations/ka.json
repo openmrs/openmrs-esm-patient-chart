@@ -33,6 +33,8 @@
   "goToSummary": "შეჯამებაზე გადასვლა",
   "heartRate": "გულისცემის სიხშირე",
   "height": "სიმაღლე",
+  "hoursOldVitals_one": "<0>These vitals are <1>{{count}} hour old</1></0>",
+  "hoursOldVitals_other": "<0>These vitals are <1>{{count}} hours old</1></0>",
   "loading": "მიმდინარეობს ჩატვირთვა",
   "male": "მამრი",
   "muac": "შუამხრის გარშემოწერილობა",
@@ -73,6 +75,6 @@
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "სასიცოცხლო მნიშვნელობების ისტორია",
   "vitalSignDisplayed": "ნაჩვენები სიცოცხლის ნიშანი",
-  "vitalSigns": "სასიცოცხლო მნიშვნელობის ნიშნები",
+  "vitalSigns": "vital signs",
   "weight": "წონა"
 }

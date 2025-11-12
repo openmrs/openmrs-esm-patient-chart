@@ -16,28 +16,23 @@
 
 .tileTitle {
   @include type.type-style('body-long-01');
+  @include type.type-style('label-01');
+  color: $text-02;
   display: block;
-  padding-top: layout.$spacing-05;
-}
-
-.columnContainer {
-  display: flex;
-  flex-direction: row;
-}
-
-.tileSubTitle {
-  @include type.type-style('body-compact-01');
 }
 
 .tileValue {
-  @include type.type-style('label-01');
   margin: layout.$spacing-04 0 layout.$spacing-04;
   display: block;
 }
 
 .tileBox {
+  width: 25%;
   display: flex;
+  flex-direction: row;
+  flex: 1;
   gap: layout.$spacing-05;
+  justify-content: space-around;
 }
 
 .desktopHeading {

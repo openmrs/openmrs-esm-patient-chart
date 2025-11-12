@@ -1,12 +1,11 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
   daysDurationUnit: {
-    _description:
-      'The default medication duration unit is days. The concept for that medication duration unit is specified here.',
     uuid: {
       _type: Type.ConceptUuid,
       _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      _description: 'The uuid of the concept of medication duration unit in days',
     },
     display: {
       _type: Type.String,
@@ -25,21 +24,29 @@ export const configSchema = {
     _description:
       'Determines whether or not to display the Print button in both the active and past medications datatable headers. If set to true, a Print button gets shown in both the active and past medications table headers. When clicked, this button enables the user to print out the contents of the table',
   },
-  maxDispenseDurationInDays: {
-    _type: Type.Number,
-    _default: 99,
-    _description: 'The maximum number of days for medication dispensing.',
-  },
   debounceDelayInMs: {
     _type: Type.Number,
     _description:
       'Number of milliseconds to delay the search operation in the drug search input by after the user starts typing. The useDebounce hook delays the search by 300ms by default',
     _default: 300,
+    _validators: [validator((v: unknown) => typeof v === 'number' && v > 0, 'Must be greater than zero')],
   },
   requireIndication: {
     _type: Type.Boolean,
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
+  },
+  prescriberProviderRoles: {
+    _type: Type.Array,
+    _description:
+      'Array of provider roles uuids. If specified, the drug order form shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit the drug order form may still do so with themselves as the prescriber.',
+    _default: [],
+  },
+  drugOrderEncounterType: {
+    _type: Type.UUID,
+    _description:
+      'The encounter type of the encounter for the Fill Prescription form. Defaults to the "Order" encounter type.',
+    _default: '39da3525-afe4-45ff-8977-c53b7b359158',
   },
 };
 
@@ -50,7 +57,8 @@ export interface ConfigObject {
   };
   drugOrderTypeUUID: string;
   showPrintButton: boolean;
-  maxDispenseDurationInDays: number;
   debounceDelayInMs: number;
   requireIndication: boolean;
+  prescriberProviderRoles: Array<string>;
+  drugOrderEncounterType: string;
 }

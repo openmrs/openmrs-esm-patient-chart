@@ -19,6 +19,8 @@ import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
+import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
+import { type ChartConfig } from '../../../config-schema';
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
@@ -29,7 +31,7 @@ interface VisitSummaryProps {
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
-  const config = useConfig();
+  const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
@@ -84,6 +86,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     // Sort the diagnoses by rank, so that primary diagnoses come first
     diagnoses.sort((a, b) => a.rank - b.rank);
 
+    // Sort medications by dateActivated DESC (newest first) to align with backend ordering
+    medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
+
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
@@ -108,6 +113,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       </div>
       <Tabs>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
+            {t('timeline', 'Timeline')}
+          </Tab>
           <Tab
             className={classNames(styles.tab, styles.bodyLong01)}
             id="notes-tab"
@@ -142,6 +150,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           ))}
         </TabList>
         <TabPanels>
+          <TabPanel>
+            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+          </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
           </TabPanel>

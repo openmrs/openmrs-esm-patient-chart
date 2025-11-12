@@ -1,10 +1,4 @@
-import {
-  type FetchResponse,
-  openmrsFetch,
-  type OpenmrsResource,
-  restBaseUrl,
-  toOmrsIsoString,
-} from '@openmrs/esm-framework';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
   priorityOptions,
@@ -17,7 +11,7 @@ export function createEmptyOrder(concept: OrderableConcept, orderer: string): Or
   return {
     action: 'NEW',
     urgency: priorityOptions[0].value as OrderUrgency,
-    display: concept.label,
+    display: concept.display,
     concept,
     orderer,
   };

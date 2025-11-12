@@ -1,4 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -25,28 +29,18 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
-  useVisitContextStore,
+  useVisit,
   type AssignedExtension,
   type NewVisitPayload,
   type Visit,
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { type ChartConfig } from '../../config-schema';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import BaseVisitType from './base-visit-type.component';
-import LocationSelector from './location-selector.component';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import VisitAttributeTypeFields from './visit-attribute-type.component';
-import VisitDateTimeSection from './visit-date-time.component';
 import {
   convertToDate,
   createVisitAttribute,
@@ -61,8 +55,35 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import BaseVisitType from './base-visit-type.component';
+import LocationSelector from './location-selector.component';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
+import VisitDateTimeSection from './visit-date-time.component';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
-dayjs.extend(isSameOrBefore);
+
+interface VisitAttribute {
+  attributeType: string;
+  value: string;
+}
+
+/**
+ * Extra visit information provided by extensions via the extra-visit-attribute-slot.
+ * Extensions can use this to add custom attributes to visits.
+ */
+export interface ExtraVisitInfo {
+  /**
+   * Optional callback that extensions can provide to perform final
+   * preparation or validation before the visit is created/updated.
+   */
+  handleCreateExtraVisitInfo?: () => void;
+  /**
+   * Array of visit attributes to be included in the visit payload.
+   * Each attribute must have an attributeType (UUID) and a value (string).
+   */
+  attributes?: Array<VisitAttribute>;
+}
 
 interface VisitFormProps extends DefaultPatientWorkspaceProps {
   /**
@@ -99,15 +120,16 @@ const VisitForm: React.FC<VisitFormProps> = ({
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
+  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
-  }>(null);
+  } | null>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
-  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
+  const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
 
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit);
@@ -134,6 +156,14 @@ const VisitForm: React.FC<VisitFormProps> = ({
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
+
+  const isValidVisitAttributesArray = useCallback((attributes: unknown): boolean => {
+    return (
+      Array.isArray(attributes) &&
+      attributes.length > 0 &&
+      attributes.every((attr) => attr?.attributeType?.trim().length > 0 && attr?.value?.trim().length > 0)
+    );
+  }, []);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -241,12 +271,10 @@ const VisitForm: React.FC<VisitFormProps> = ({
         stopDatetime: hasStopTime ? stopDatetime : null,
         // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
         ...(!visitToEdit && { patient: patientUuid }),
-        ...(config.showExtraVisitAttributesSlot && extraAttributes && { attributes: extraAttributes }),
+        ...(isValidVisitAttributesArray(extraAttributes) && { attributes: extraAttributes }),
       };
 
-      if (config.showExtraVisitAttributesSlot) {
-        handleCreateExtraVisitInfo?.();
-      }
+      handleCreateExtraVisitInfo?.();
 
       const abortController = new AbortController();
       if (isOnline) {
@@ -277,7 +305,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
               OpenmrsFetchError && error instanceof OpenmrsFetchError
                 ? typeof error.responseBody === 'string'
                   ? error.responseBody
-                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject)
+                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
                 : error?.message;
 
             showSnackbar({
@@ -294,6 +322,18 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // now that visit is created / updated, we run post-submit actions
             // to update visit attributes or any other OnVisitCreatedOrUpdated actions
             const visit = response.data;
+
+            // For visit creation, we need to update:
+            // 1. Current visit data (for critical components like visit summary, action buttons)
+            // 2. Visit history table (for the paginated visit list)
+
+            // Update current visit data for critical components (useVisit hook)
+            mutateCurrentVisit();
+
+            // Use targeted SWR invalidation instead of global mutateVisit
+            // This will invalidate visit history and encounter tables for this patient
+            // (current visit is already updated with mutateCurrentVisit)
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
@@ -323,9 +363,6 @@ const VisitForm: React.FC<VisitFormProps> = ({
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
-          })
-          .finally(() => {
-            mutateVisit();
           });
       } else {
         createOfflineVisitForPatient(
@@ -335,7 +372,11 @@ const VisitForm: React.FC<VisitFormProps> = ({
           payload.startDatetime,
         ).then(
           () => {
-            mutateVisit();
+            // Use same targeted approach for offline visits for consistency
+            mutateCurrentVisit();
+
+            // Also invalidate visit history and encounter tables
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
             closeWorkspace({ ignoreChanges: true });
             showSnackbar({
               isLowContrast: true,
@@ -362,15 +403,16 @@ const VisitForm: React.FC<VisitFormProps> = ({
     [
       closeWorkspace,
       config.offlineVisitTypeUuid,
-      config.showExtraVisitAttributesSlot,
       extraVisitInfo,
+      globalMutate,
       handleVisitAttributes,
       isOnline,
-      mutateVisit,
-      visitFormCallbacks,
+      mutateCurrentVisit,
       patientUuid,
       t,
+      visitFormCallbacks,
       visitToEdit,
+      isValidVisitAttributesArray,
     ],
   );
 
@@ -422,7 +464,8 @@ const VisitForm: React.FC<VisitFormProps> = ({
                   control={control}
                   render={({ field: { onChange, value } }) => {
                     const validVisitStatuses = visitToEdit ? ['ongoing', 'past'] : visitStatuses;
-                    const selectedIndex = validVisitStatuses.indexOf(value) ?? 0;
+                    const idx = validVisitStatuses.indexOf(value);
+                    const selectedIndex = idx >= 0 ? idx : 0;
 
                     // For some reason, Carbon throws NPE when trying to conditionally
                     // render a <Switch> component

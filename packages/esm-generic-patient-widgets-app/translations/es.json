@@ -1,7 +1,5 @@
 {
-  "chartView": "Vista de Gráfico",
+  "date": "Date",
   "dateAndTime": "Fecha y hora",
-  "displaying": "Mostrando",
-  "encounterType": "Tipo de encuentro",
-  "tableView": "Vista de Tabla"
+  "encounterType": "Tipo de encuentro"
 }

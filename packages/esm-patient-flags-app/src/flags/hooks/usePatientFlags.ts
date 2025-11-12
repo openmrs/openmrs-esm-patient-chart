@@ -12,30 +12,65 @@ interface FlagFetchResponse {
   auditInfo: { dateCreated: string };
 }
 
+interface FlagDefinition {
+  uuid: string;
+  display: string;
+  priority: { uuid: string; name: string };
+  tags: Array<{ uuid: string; display: string }>;
+}
+
 interface FlagsFetchResponse {
   results: Array<FlagFetchResponse>;
+}
+
+interface FlagDefinitionsFetchResponse {
+  results: Array<FlagDefinition>;
+}
+
+interface FlagWithPriority extends FlagFetchResponse {
+  flagWithPriority?: FlagDefinition;
 }
 
 /**
  * React hook that takes in a patient uuid and returns
  * patient flags for that patient together with helper objects
- * @param patientUuid Unique patient idenfier
- * @returns An array of patient identifiers
+ * @param patientUuid Unique patient identifier
+ * @returns An array of patient identifiers with priority information
  */
 export function usePatientFlags(patientUuid: string) {
-  const url = `${restBaseUrl}/patientflags/patientflag?patient=${patientUuid}&v=full`;
+  const patientFlagsUrl = `${restBaseUrl}/patientflags/patientflag?patient=${patientUuid}&v=full`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(
-    patientUuid ? url : null,
-    openmrsFetch,
-  );
+  const {
+    data: patientFlagsData,
+    error: patientFlagsError,
+    isLoading: isLoadingPatientFlags,
+  } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(patientUuid ? patientFlagsUrl : null, openmrsFetch);
+
+  const patientFlags = patientFlagsData?.data?.results ?? [];
+  const flagUuids = patientFlags.map((pf) => pf.flag.uuid);
+
+  const flagDefinitionsUrl = flagUuids.length > 0 ? `${restBaseUrl}/patientflags/flag?v=full` : null;
+
+  const {
+    data: flagDefinitionsData,
+    error: flagDefinitionsError,
+    isLoading: isLoadingFlagDefinitions,
+  } = useSWR<FetchResponse<FlagDefinitionsFetchResponse>, Error>(flagDefinitionsUrl, openmrsFetch);
+
+  const flagDefinitions = flagDefinitionsData?.data?.results ?? [];
+
+  // Merge patient flags with flag definitions to get priority information
+  const flagsWithPriority: FlagWithPriority[] = patientFlags.map((pf) => ({
+    ...pf,
+    flagWithPriority: flagDefinitions.find((f) => f.uuid === pf.flag.uuid),
+  }));
 
   const result = {
-    flags: data?.data?.results ?? [],
-    error: error,
-    isLoading: isLoading,
-    isValidating: isValidating,
-    mutate: mutate,
+    flags: flagsWithPriority,
+    error: patientFlagsError || flagDefinitionsError,
+    isLoading: isLoadingPatientFlags || isLoadingFlagDefinitions,
+    isValidating: false,
+    mutate: () => {},
   };
 
   return result;
@@ -71,7 +106,7 @@ export function enablePatientFlag(flagUuid: string) {
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: { deleted: 'false' },
+    body: { voided: false },
     signal: controller.signal,
   });
 }

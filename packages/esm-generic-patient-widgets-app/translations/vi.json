@@ -1,7 +1,5 @@
 {
-  "chartView": "Xem biểu đồ",
+  "date": "Date",
   "dateAndTime": "Ngày và giờ",
-  "displaying": "Đang hiển thị",
-  "encounterType": "Loại gặp gỡ",
-  "tableView": "Xem bảng"
+  "encounterType": "Loại gặp gỡ"
 }

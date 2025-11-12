@@ -25,8 +25,8 @@ export function usePatientOrders(
   const { mutate } = useSWRConfig();
   const baseOrdersUrl =
     startDate && endDate
-      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}`
-      : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=full&status=${status}`;
+      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=default&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}`
+      : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=default&status=${status}`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderTypes=${orderType}` : baseOrdersUrl;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
@@ -43,7 +43,9 @@ export function usePatientOrders(
   const orders = useMemo(
     () =>
       data?.data?.results
-        ? data.data.results?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
+        ? [...data.data.results]?.sort(
+            (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+          )
         : null,
     [data],
   );

@@ -1,3 +1,8 @@
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import dayjs from 'dayjs';
+import { z } from 'zod';
 import {
   openmrsFetch,
   restBaseUrl,
@@ -10,13 +15,9 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';
-import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { type ChartConfig } from '../../config-schema';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
+import { type ChartConfig } from '../../config-schema';
 
 export const visitStatuses = ['new', 'ongoing', 'past'] as const;
 export type VisitStatus = (typeof visitStatuses)[number];
@@ -57,7 +58,7 @@ export type ErrorObject = {
   };
 };
 
-export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
+export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TFunction) {
   const {
     error: { fieldErrors, globalErrors, message, code },
   } = errorObject ?? {};
@@ -74,7 +75,7 @@ export function extractErrorMessagesFromResponse(errorObject: ErrorObject) {
       .join('\n');
   }
 
-  return message ?? code ?? this.translateService.instant('unknownError');
+  return message ?? code ?? t('unknownError', 'Unknown error');
 }
 // *****************
 
@@ -268,7 +269,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
                   },
                 },
               ),
-              path: ['visitStartTime'],
+              path: ['visitStopTime'],
             });
           }
         }
@@ -285,7 +286,7 @@ export const convertToDate = (
   date: Date, // Date object that only contains info for year, month, day
   time12h: string, // hh:mm, where hh is 01 to 12
   timeFormat: amPm, // AM / PM
-): Date => {
+): Date | null => {
   if (!date || !time12h || !timeFormat) {
     return null;
   }

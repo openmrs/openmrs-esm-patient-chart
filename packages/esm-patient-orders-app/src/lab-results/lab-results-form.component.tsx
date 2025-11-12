@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
-import { Button, ButtonSet, Form, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -19,7 +19,8 @@ import {
   useCompletedLabResults,
   useOrderConceptByUuid,
 } from './lab-results.resource';
-import { useLabResultsFormSchema } from './useLabResultsFormSchema';
+import { createLabResultsFormSchema } from './lab-results-schema.resource';
+
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 
@@ -44,7 +45,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useLabResultsFormSchema(order.concept.uuid);
+  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
   const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
   const { mutate } = useSWRConfig();
 
@@ -207,30 +208,32 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
-      <div className={styles.grid}>
-        {concept.setMembers.length > 0 && <p className={styles.heading}>{concept.display}</p>}
-        {concept && (
-          <Stack gap={5}>
-            {!isLoading ? (
-              <ResultFormField
-                defaultValue={completeLabResult}
-                concept={concept}
-                control={control as unknown as Control<Record<string, unknown>>}
-              />
-            ) : (
-              <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
-            )}
-          </Stack>
-        )}
-        {showEmptyFormErrorNotification && (
-          <InlineNotification
-            className={styles.emptyFormError}
-            lowContrast
-            title={t('error', 'Error')}
-            subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
-          />
-        )}
-      </div>
+      <Layer level={isTablet ? 1 : 0}>
+        <div className={styles.grid}>
+          {concept && (
+            <Stack gap={5}>
+              {!isLoading ? (
+                <ResultFormField
+                  defaultValue={completeLabResult}
+                  concept={concept}
+                  control={control as unknown as Control<Record<string, unknown>>}
+                />
+              ) : (
+                <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+              )}
+            </Stack>
+          )}
+          {showEmptyFormErrorNotification && (
+            <InlineNotification
+              className={styles.emptyFormError}
+              lowContrast
+              title={t('error', 'Error')}
+              subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+            />
+          )}
+        </div>
+      </Layer>
+
       <ButtonSet
         className={classNames({
           [styles.tablet]: isTablet,

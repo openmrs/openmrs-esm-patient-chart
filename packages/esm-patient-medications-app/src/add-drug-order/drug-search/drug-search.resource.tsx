@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { type DrugOrderBasketItem, type DrugOrderTemplate, type OrderTemplate } from '../../types';
 
@@ -19,12 +19,20 @@ export interface DrugSearchResult {
   };
 }
 
-export function useDrugSearch(query: string): {
-  isLoading: boolean;
-  drugs: Array<DrugSearchResult>;
-  error: Error;
-} {
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
+interface OrderTemplateResource {
+  uuid: string;
+  drug: Drug;
+  name: string;
+  template: string;
+}
+
+/**
+ * Search for a list of drugs based on the given query string
+ * @param query
+ * @returns
+ */
+export function useDrugSearch(query: string) {
+  const { data, ...rest } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
     query
       ? `${restBaseUrl}/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
@@ -33,32 +41,36 @@ export function useDrugSearch(query: string): {
 
   const results = useMemo(
     () => ({
-      isLoading,
       drugs: data?.data?.results,
-      error,
+      ...rest,
     }),
-    [data, error, isLoading],
+    [data, rest],
   );
 
   return results;
 }
 
+/**
+ * Search for a list of order templates associated with the given drug.
+ * Requires the ordertemplates module installed to work properly.
+ * @param drugUuid
+ * @returns
+ */
 export function useDrugTemplate(drugUuid: string): {
   isLoading: boolean;
   templates: Array<DrugOrderTemplate>;
   error: Error;
 } {
+  const isOrderTemplatesModuleInstalled = useFeatureFlag('ordertemplates-module');
   const { data, error, isLoading } = useSWRImmutable<
     FetchResponse<{
-      results: Array<{
-        uuid: string;
-        drug: Drug;
-        name: string;
-        template: string;
-      }>;
+      results: Array<OrderTemplateResource>;
     }>,
     Error
-  >(drugUuid ? `${restBaseUrl}/ordertemplates/orderTemplate?drug=${drugUuid}` : null, openmrsFetch);
+  >(
+    isOrderTemplatesModuleInstalled && drugUuid ? `${restBaseUrl}/ordertemplates/orderTemplate?drug=${drugUuid}` : null,
+    openmrsFetch,
+  );
 
   const results = useMemo(
     () => ({
@@ -72,6 +84,50 @@ export function useDrugTemplate(drugUuid: string): {
     [data, error, isLoading],
   );
   return results;
+}
+
+/**
+ * Search for a list of order templates associated with drugs in the given array
+ * Requires the ordertemplates module installed to work properly.
+ *
+ * Note: This hook is inefficient as it makes a request for each uuid. Having a
+ * backend search handler that supports passing in multiple drug uuids will fix that.
+ * See: https://openmrs.atlassian.net/browse/OEUI-312
+ * @param drugUuids
+ * @returns a Map mapping each drug uuid to a list of associated order templates
+ */
+export function useDrugTemplates(drugs: Drug[]) {
+  const drugUuids = drugs?.map((d) => d.uuid);
+  const isOrderTemplatesModuleInstalled = useFeatureFlag('ordertemplates-module');
+  const { data, ...rest } = useSWRImmutable<FetchResponse<OrderTemplateResource>[], Error>(
+    isOrderTemplatesModuleInstalled ? drugUuids : null,
+    (drugUuids: string[]) => {
+      return Promise.all(
+        drugUuids.map((drugUuid) => {
+          return openmrsFetch<OrderTemplateResource>(`${restBaseUrl}/ordertemplates/orderTemplate?drug=${drugUuid}`);
+        }),
+      );
+    },
+  );
+
+  const templateByDrugUuid = useMemo(() => {
+    const templateByDrugUuid: Map<string, DrugOrderTemplate[]> = new Map();
+    for (const d of data ?? []) {
+      if (d.data?.drug) {
+        const key = d.data.drug.uuid;
+        if (!templateByDrugUuid.has(key)) {
+          templateByDrugUuid.set(key, []);
+        }
+        templateByDrugUuid.get(key).push({
+          ...d.data,
+          template: JSON.parse(d.data.template) as OrderTemplate,
+        });
+      }
+    }
+    return templateByDrugUuid;
+  }, [data]);
+
+  return { templateByDrugUuid, ...rest };
 }
 
 export function getDefault(template: OrderTemplate, prop: string) {
@@ -114,8 +170,8 @@ export function getTemplateOrderBasketItem(
               valueCoded: configDefaultDurationConcept?.uuid,
             }
           : null,
-        pillsDispensed: 0,
-        numRefills: 0,
+        pillsDispensed: null,
+        numRefills: null,
         freeTextDosage: '',
         indication: '',
         template: template.template,
@@ -155,8 +211,8 @@ export function getTemplateOrderBasketItem(
               valueCoded: configDefaultDurationConcept?.uuid,
             }
           : null,
-        pillsDispensed: 0,
-        numRefills: 0,
+        pillsDispensed: null,
+        numRefills: null,
         freeTextDosage: '',
         indication: '',
         orderer: null,

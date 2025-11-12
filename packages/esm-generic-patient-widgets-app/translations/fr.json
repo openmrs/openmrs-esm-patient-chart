@@ -1,7 +1,5 @@
 {
-  "chartView": "Vue graphique",
+  "date": "Date",
   "dateAndTime": "Date et heure",
-  "displaying": "En cours d'affichage",
-  "encounterType": "Type de consultation",
-  "tableView": "Vue tabulaire"
+  "encounterType": "Type de consultation"
 }

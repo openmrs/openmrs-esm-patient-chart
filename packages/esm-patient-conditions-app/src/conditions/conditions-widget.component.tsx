@@ -1,5 +1,6 @@
 import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';

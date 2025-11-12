@@ -1,12 +1,12 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type IconId, type OpenmrsResource } from '@openmrs/esm-framework';
 
 export * from './test-results';
 
 export interface DashboardLinkConfig {
   path: string;
   title: string;
-  icon: string;
-  moduleName: string;
+  icon?: IconId;
+  moduleName?: string;
 }
 
 export interface DashboardConfig extends DashboardLinkConfig {

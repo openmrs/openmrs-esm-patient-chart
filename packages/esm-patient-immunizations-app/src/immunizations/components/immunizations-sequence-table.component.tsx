@@ -1,9 +1,8 @@
-import React, { type ComponentProps, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isEmpty } from 'lodash-es';
 import {
-  Button,
   DataTable,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -12,7 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { EditIcon, formatDate, getCoreTranslation, parseDate } from '@openmrs/esm-framework';
+import {
+  EditIcon,
+  formatDate,
+  getCoreTranslation,
+  parseDate,
+  showModal,
+  TrashCanIcon,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { immunizationFormSub } from '../utils';
 import { type ImmunizationGrouped } from '../../types';
 import styles from './immunizations-sequence-table.scss';
@@ -20,59 +27,120 @@ import styles from './immunizations-sequence-table.scss';
 interface SequenceTableProps {
   immunizationsByVaccine: ImmunizationGrouped;
   launchPatientImmunizationForm: () => void;
+  patientUuid: string;
 }
 
-const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, launchPatientImmunizationForm }) => {
+interface DeleteImmunizationParams {
+  doseNumber: number;
+  immunizationId: string;
+  vaccineUuid: string;
+}
+
+const SequenceTable: React.FC<SequenceTableProps> = ({
+  immunizationsByVaccine,
+  launchPatientImmunizationForm,
+  patientUuid,
+}) => {
   const { t } = useTranslation();
   const { existingDoses, sequences, vaccineUuid } = immunizationsByVaccine;
+  const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
 
   const tableHeaders = useMemo(
     () => [
-      { key: 'sequence', header: sequences.length ? t('sequence', 'Sequence') : t('doseNumber', 'Dose number') },
+      {
+        key: 'sequence',
+        header: sequences.length ? t('sequence', 'Sequence') : t('doseNumberWithinSeries', 'Dose number within series'),
+      },
       { key: 'vaccinationDate', header: t('vaccinationDate', 'Vaccination date') },
+      { key: 'nextDoseDate', header: t('nextDoseDate', 'Next dose date') },
       { key: 'expirationDate', header: t('expirationDate', 'Expiration date') },
-      { key: 'edit', header: '' },
+      { key: 'note', header: t('note', 'Note') },
+      { key: 'actions', header: t('actions', 'Actions') },
     ],
     [t, sequences.length],
   );
 
-  const tableRows = existingDoses?.map((dose) => {
-    return {
-      id: dose?.immunizationObsUuid,
-      sequence: isEmpty(sequences)
-        ? dose.doseNumber || 0
-        : sequences?.find((s) => s.sequenceNumber === dose.doseNumber).sequenceLabel || dose.doseNumber,
-      vaccinationDate: dose?.occurrenceDateTime && formatDate(parseDate(dose.occurrenceDateTime), { noToday: true }),
-      expirationDate: dose?.expirationDate && formatDate(parseDate(dose.expirationDate), { noToday: true }),
-      edit: (
-        <Button
+  const handleDeleteImmunization = ({ doseNumber, immunizationId, vaccineUuid }: DeleteImmunizationParams) => {
+    const dispose = showModal('immunization-delete-confirmation-modal', {
+      doseNumber,
+      immunizationId,
+      patientUuid,
+      vaccineUuid,
+      close: () => dispose?.(),
+    });
+  };
+
+  const tableRows = existingDoses?.map((dose) => ({
+    id: dose?.immunizationObsUuid,
+    sequence: !sequences.length
+      ? dose.doseNumber || 0
+      : sequences?.find((s) => s.sequenceNumber === dose.doseNumber)?.sequenceLabel || dose.doseNumber,
+    vaccinationDate:
+      dose?.occurrenceDateTime &&
+      formatDate(new Date(dose.occurrenceDateTime), {
+        mode: 'standard',
+        noToday: true,
+        time: false,
+      }),
+    nextDoseDate: dose?.nextDoseDate
+      ? formatDate(new Date(dose.nextDoseDate), { mode: 'standard', noToday: true, time: false })
+      : '--',
+    expirationDate:
+      (dose?.expirationDate &&
+        formatDate(new Date(dose.expirationDate), {
+          mode: 'standard',
+          noToday: true,
+          time: false,
+        })) ||
+      '--',
+    note: dose?.note[0]?.text || '--',
+    actions: (
+      <div className={styles.actionButtons}>
+        <IconButton
           kind="ghost"
-          iconDescription={getCoreTranslation('edit', 'Edit')}
-          renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
+          label={getCoreTranslation('edit')}
           onClick={() => {
             immunizationFormSub.next({
               vaccineUuid: vaccineUuid,
               immunizationId: dose.immunizationObsUuid,
-              vaccinationDate: dose.occurrenceDateTime && parseDate(dose.occurrenceDateTime),
+              vaccinationDate: dose.occurrenceDateTime,
               doseNumber: dose.doseNumber,
-              expirationDate: dose.expirationDate && parseDate(dose.expirationDate),
+              nextDoseDate: dose.nextDoseDate,
+              note: dose.note[0]?.text,
+              expirationDate: dose.expirationDate,
               lotNumber: dose.lotNumber,
               manufacturer: dose.manufacturer,
               visitId: dose.visitUuid,
             });
             launchPatientImmunizationForm();
           }}
+          size={responsiveSize}
         >
-          {getCoreTranslation('edit', 'Edit')}
-        </Button>
-      ),
-    };
-  });
+          <EditIcon size={16} />
+        </IconButton>
+        <IconButton
+          kind="ghost"
+          label={getCoreTranslation('delete')}
+          onClick={() =>
+            handleDeleteImmunization({
+              doseNumber: dose.doseNumber,
+              immunizationId: dose.immunizationObsUuid,
+              vaccineUuid,
+            })
+          }
+          size={responsiveSize}
+        >
+          <TrashCanIcon size={16} />
+        </IconButton>
+      </div>
+    ),
+  }));
 
-  return (
-    tableRows.length > 0 && (
+  if (tableRows?.length) {
+    return (
       <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer className={styles.sequenceTable}>
             <Table {...getTableProps()}>
               <TableHead>
@@ -85,7 +153,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
               <TableBody>
                 {rows.map((row) => {
                   return (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell?.id} className={styles.tableCell}>
                           {cell?.value}
@@ -99,8 +167,8 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizationsByVaccine, l
           </TableContainer>
         )}
       </DataTable>
-    )
-  );
+    );
+  }
 };
 
 export default SequenceTable;
