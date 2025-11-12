@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { AccessibleModal } from '../../components/accessible-modal';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -51,13 +52,23 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   };
 
   return (
-    <div>
+    <AccessibleModal
+      isOpen={true}
+      onClose={closeModal}
+      size="sm"
+      modalHeadingId="end-visit-modal-heading"
+      modalDescriptionId="end-visit-modal-description"
+    >
       <ModalHeader
         closeModal={closeModal}
-        title={t('endActiveVisitConfirmation', 'Are you sure you want to end this active visit?')}
+        title={
+          <span id="end-visit-modal-heading">
+            {t('endActiveVisitConfirmation', 'Are you sure you want to end this active visit?')}
+          </span>
+        }
       />
       <ModalBody>
-        <p className={styles.bodyShort02}>
+        <p id="end-visit-modal-description" className={styles.bodyShort02}>
           {t('youCanAddAdditionalEncounters', 'You can add additional encounters to this visit in the visit summary.')}
         </p>
       </ModalBody>
@@ -69,7 +80,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           {t('endVisit_title', 'End Visit')}
         </Button>
       </ModalFooter>
-    </div>
+    </AccessibleModal>
   );
 };
 
