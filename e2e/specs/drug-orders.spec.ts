@@ -139,8 +139,6 @@ test.describe('Drug Order Tests', () => {
     await test.step('When I visit the medications page', async () => {
       await medicationsPage.goTo(patient.uuid);
       // Wait for the page to fully load
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(2000);
     });
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
