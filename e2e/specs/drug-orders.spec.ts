@@ -443,6 +443,7 @@ test.describe('Drug Order Tests', () => {
       await page.getByRole('button', { name: /sign and close/i }).click();
       await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
     });
+
     await test.step('And I navigate to the Past Medications section', async () => {
       // Wait for the page to update after discontinuing
       await page.waitForLoadState('networkidle');
