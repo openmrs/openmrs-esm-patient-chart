@@ -48,7 +48,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
 
   const testResultObs = useMemo(() => {
     if (!encounter) return null;
-    return encounter.obs?.filter((obs) => obs.order.uuid === testOrder.uuid);
+    return encounter.obs?.filter((obs) => obs.order?.uuid === testOrder.uuid);
   }, [encounter, testOrder.uuid]);
 
   const obsUuids = useMemo(
