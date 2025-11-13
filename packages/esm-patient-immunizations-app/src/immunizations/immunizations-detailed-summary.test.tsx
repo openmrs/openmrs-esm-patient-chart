@@ -5,15 +5,21 @@ import { getDefaultsFromConfigSchema, launchWorkspace, useVisit, type VisitRetur
 import { configSchema } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { mockCurrentVisit } from '__mocks__';
 
 jest.mock('../hooks/useImmunizations', () => ({
   useImmunizations: jest.fn(),
 }));
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  usePatientChartStore: jest.fn(),
+}));
 
 const mockUseImmunizations = jest.mocked(require('../hooks/useImmunizations').useImmunizations);
 const mockLaunchWorkspace = launchWorkspace as jest.Mock;
-const mockUseVisit = jest.mocked(useVisit);
 const mockUseConfig = jest.mocked(require('@openmrs/esm-framework').useConfig);
+const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -73,6 +79,15 @@ describe('ImmunizationsDetailedSummary', () => {
           },
         ],
       },
+    });
+
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: mockCurrentVisit,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
     });
   });
 
@@ -166,7 +181,6 @@ describe('ImmunizationsDetailedSummary', () => {
   it('opens immunization form when add button is clicked during an active visit', async () => {
     const user = userEvent.setup();
     const mockLaunchStartVisitPrompt = jest.fn();
-    mockUseVisit.mockReturnValue({ currentVisit: { uuid: 'visit-uuid' } } as VisitReturnType);
     mockUseImmunizations.mockReturnValueOnce({
       data: mockImmunizationData,
       isLoading: false,
@@ -191,7 +205,14 @@ describe('ImmunizationsDetailedSummary', () => {
   it('prompts to start visit when add button is clicked without an active visit', async () => {
     const user = userEvent.setup();
     const mockLaunchStartVisitPrompt = jest.fn();
-    mockUseVisit.mockReturnValue({ currentVisit: null } as VisitReturnType);
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+      setPatient: jest.fn(),
+      setVisitContext: jest.fn(),
+    });
     mockUseImmunizations.mockReturnValueOnce({
       data: mockImmunizationData,
       isLoading: false,

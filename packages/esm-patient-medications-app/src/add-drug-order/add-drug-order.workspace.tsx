@@ -1,19 +1,14 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ArrowLeftIcon, launchWorkspace, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  useOrderBasket,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { ArrowLeftIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import type { DrugOrderBasketItem } from '../types';
 import { DrugOrderForm } from './drug-order-form.component';
 import DrugSearch from './drug-search/drug-search.component';
 import styles from './add-drug-order.scss';
-import { type ConfigObject } from '../config-schema';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
@@ -35,7 +30,11 @@ export default function AddDrugOrderWorkspace({
 }: AddDrugOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications', prepMedicationOrderPostData);
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
+    patient,
+    'medications',
+    prepMedicationOrderPostData,
+  );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
 
   const cancelDrugOrder = useCallback(() => {
@@ -94,7 +93,7 @@ export default function AddDrugOrderWorkspace({
             </Button>
           </div>
         )}
-        <DrugSearch openOrderForm={openOrderForm} />
+        <DrugSearch patient={patient} openOrderForm={openOrderForm} />
       </>
     );
   } else {
@@ -114,6 +113,7 @@ export default function AddDrugOrderWorkspace({
           </div>
         )}
         <DrugOrderForm
+          patientUuid={patient.id}
           initialOrderBasketItem={currentOrder}
           patient={patient}
           onSave={saveDrugOrder}

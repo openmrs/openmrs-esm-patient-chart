@@ -1,7 +1,6 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
-import { formatDate, useConfig } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { formatDate, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../config-schema';
 
 interface VisitAttributeTagsProps {
@@ -26,13 +25,16 @@ const getAttributeValue = (attributeType, value) => {
   }
 };
 
+/**
+ * This extension slots to the patient-banner-tags-slot by default.
+ */
 const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) => {
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
   const { visitAttributeTypes } = useConfig<ChartConfig>();
 
   return (
     <>
-      {currentVisit?.attributes
+      {activeVisit?.attributes
         ?.filter(
           (attribute) =>
             visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,

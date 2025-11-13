@@ -53,7 +53,7 @@ export function deleteVisit(visitUuid: string) {
 }
 
 export function restoreVisit(visitUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}`, {
+  return openmrsFetch<Visit>(`${restBaseUrl}/visit/${visitUuid}`, {
     headers: {
       'content-type': 'application/json',
     },

@@ -10,7 +10,7 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisit,
+  type Visit,
 } from '@openmrs/esm-framework';
 import {
   type DefaultPatientWorkspaceProps,
@@ -19,7 +19,6 @@ import {
   postOrders,
   postOrdersOnNewEncounter,
   useOrderBasket,
-  useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { useSWRConfig } from 'swr';
 import { type ConfigObject } from '../config-schema';
@@ -27,18 +26,27 @@ import { useMutatePatientOrders, useOrderEncounter } from '../api/api';
 import GeneralOrderType from './general-order-type/general-order-type.component';
 import styles from './order-basket.scss';
 
+interface OrderBasketSlotProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
+}
+
 const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   patientUuid,
+  patient,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  visitContext,
+  mutateVisitContext,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig<ConfigObject>();
   const session = useSession();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const { orders, clearOrders } = useOrderBasket();
+  const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
     visitRequired,
@@ -46,11 +54,10 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid, config.orderEncounterType);
+  } = useOrderEncounter(patientUuid, visitContext, mutateVisitContext, config.orderEncounterType);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
   const { mutate } = useSWRConfig();
 
   useEffect(() => {
@@ -75,14 +82,13 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
         await postOrdersOnNewEncounter(
           patientUuid,
           config?.orderEncounterType,
-          visitRequired ? currentVisit : null,
+          visitRequired ? visitContext : null,
           session?.sessionLocation?.uuid,
           abortController,
         );
         mutateEncounterUuid();
         // Only revalidate current visit since orders create new encounters
-        mutateCurrentVisit();
-        invalidateVisitAndEncounterData(mutate, patientUuid);
+        mutateVisitContext?.();
         clearOrders();
         await mutateOrders();
 
@@ -99,7 +105,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
       const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
       clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
       // Only revalidate current visit since orders create new encounters
-      mutateCurrentVisit();
+      mutateVisitContext?.();
       await mutateOrders();
       invalidateVisitAndEncounterData(mutate, patientUuid);
 
@@ -113,7 +119,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
-    currentVisit,
+    visitContext,
     visitRequired,
     clearOrders,
     closeWorkspaceWithSavedChanges,
@@ -121,7 +127,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     encounterUuid,
     mutateEncounterUuid,
     mutateOrders,
-    mutateCurrentVisit,
+    mutateVisitContext,
     orders,
     patientUuid,
     session,
@@ -133,21 +139,36 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
     closeWorkspace({ onWorkspaceClose: clearOrders });
   }, [clearOrders, closeWorkspace]);
 
+  const extensionProps = {
+    patientUuid,
+    patient,
+    visitContext,
+    mutateVisitContext,
+  } satisfies OrderBasketSlotProps;
+
   return (
     <>
       <div className={styles.container}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        <ExtensionSlot name="visit-context-header-slot" state={extensionProps} />
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
               [styles.orderBasketSlotTablet]: isTablet,
             })}
             name="order-basket-slot"
+            state={extensionProps}
           />
           {config?.orderTypes?.length > 0 &&
             config.orderTypes.map((orderType) => (
               <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                <GeneralOrderType key={orderType.orderTypeUuid} {...orderType} closeWorkspace={closeWorkspace} />
+                <GeneralOrderType
+                  key={orderType.orderTypeUuid}
+                  orderTypeUuid={orderType.orderTypeUuid}
+                  label={orderType.label}
+                  orderableConceptSets={orderType.orderableConceptSets}
+                  closeWorkspace={closeWorkspace}
+                  patient={patient}
+                />
               </div>
             ))}
         </div>
@@ -183,7 +204,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                 isSavingOrders ||
                 !orders?.length ||
                 isLoadingEncounterUuid ||
-                (visitRequired && !currentVisit) ||
+                (visitRequired && !visitContext) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
               }
             >
@@ -196,7 +217,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           </ButtonSet>
         </div>
       </div>
-      {visitRequired && !currentVisit && (
+      {visitRequired && !visitContext && (
         <ActionableNotification
           kind="error"
           actionButtonLabel={t('startVisit', 'Start visit')}
