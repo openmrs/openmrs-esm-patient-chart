@@ -44,7 +44,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
-  const { isLoading: isAnyConceptLoading, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
+  const { isLoading: isLoadingResultConcepts, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
