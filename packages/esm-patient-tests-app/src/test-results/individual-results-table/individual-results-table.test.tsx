@@ -64,13 +64,29 @@ describe('IndividualResultsTable', () => {
   } as GroupedObservation;
 
   it('renders a loading skeleton when fetching results data', () => {
-    render(<IndividualResultsTable isLoading={true} subRows={mockEmptySubRows} index={0} title={'HIV viral load'} />);
+    render(
+      <IndividualResultsTable
+        patientUuid={'patient-uuid'}
+        isLoading={true}
+        subRows={mockEmptySubRows}
+        index={0}
+        title={'HIV viral load'}
+      />,
+    );
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders a tabular overview of the available test result data', () => {
-    render(<IndividualResultsTable isLoading={false} subRows={mockSubRows} index={0} title={'HIV viral load'} />);
+    render(
+      <IndividualResultsTable
+        patientUuid={'patient-uuid'}
+        isLoading={false}
+        subRows={mockSubRows}
+        index={0}
+        title={'HIV viral load'}
+      />,
+    );
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByText(/15-Oct-2024/i)).toBeInTheDocument();
@@ -82,6 +98,7 @@ describe('IndividualResultsTable', () => {
   it('uses observation-level range when available', () => {
     render(
       <IndividualResultsTable
+        patientUuid={'patient-uuid'}
         isLoading={false}
         subRows={mockSubRowsWithObservationRange}
         index={0}

@@ -48,6 +48,7 @@ export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   prevWorkSpace: string;
   isWorkSpaceType: (value: string) => boolean;
   prevOrder: Order;
+  patient: fhir.Patient;
 }
 
 // Designs:
@@ -63,12 +64,14 @@ export function LabOrderForm({
   prevWorkSpace,
   isWorkSpaceType,
   prevOrder,
+  patientUuid,
+  patient,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);

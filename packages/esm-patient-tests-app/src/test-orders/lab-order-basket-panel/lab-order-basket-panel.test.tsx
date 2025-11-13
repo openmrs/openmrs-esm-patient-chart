@@ -6,6 +6,7 @@ import { getDefaultsFromConfigSchema, useConfig, useWorkspaces, type WorkspacesI
 import { type ConfigObject, configSchema } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
+import { mockPatient } from 'tools';
 
 const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -38,13 +39,20 @@ mockUseOrderType.mockReturnValue({
   errorFetchingOrderType: undefined,
 });
 
+const testProps = {
+  patientUuid: mockPatient.id,
+  patient: mockPatient,
+  visitContext: null,
+  mutateVisitContext: null,
+};
+
 describe('LabOrderBasketPanel', () => {
   beforeEach(() => {
     mockUseWorkSpaces.mockReturnValue(mockWorkSpacesInfo);
   });
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
-    render(<LabOrderBasketPanel />);
+    render(<LabOrderBasketPanel {...testProps} />);
     expect(screen.getByRole('heading', { name: /Lab orders \(0\)/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
   });
@@ -81,7 +89,7 @@ describe('LabOrderBasketPanel', () => {
       orders: orders,
       setOrders: mockSetOrders,
     }));
-    const { rerender } = render(<LabOrderBasketPanel />);
+    const { rerender } = render(<LabOrderBasketPanel {...testProps} />);
     expect(screen.getByText(/Lab orders \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV VIRAL LOAD/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
@@ -90,7 +98,7 @@ describe('LabOrderBasketPanel', () => {
     expect(removeHivButton).toBeVisible();
 
     await user.click(removeHivButton);
-    rerender(<LabOrderBasketPanel />);
+    rerender(<LabOrderBasketPanel {...testProps} />);
     await expect(screen.getByText(/Lab orders \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText(/CD4 COUNT/i)).toBeInTheDocument();
     expect(screen.queryByText(/HIV VIRAL LOAD/i)).not.toBeInTheDocument();

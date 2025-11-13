@@ -9,12 +9,13 @@ import {
   OpenmrsDatePicker,
   useDebounce,
   useOnVisible,
-  useVisitContextStore,
   type Visit,
 } from '@openmrs/esm-framework';
+import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
+import { useSWRConfig } from 'swr';
 
 interface VisitContextSwitcherProps {
   patientUuid: string;
@@ -37,10 +38,9 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
     { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() },
     rep,
   );
-  const { patientUuid: selectedVisitPatientUuid, manuallySetVisitUuid, setVisitContext } = useVisitContextStore();
-  const [selectedVisit, setSelectedVisit] = useState<string>(
-    selectedVisitPatientUuid === patientUuid ? manuallySetVisitUuid : null,
-  );
+  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
+  const [selectedVisitUuid, setSelectedVisitUuid] = useState<string>(visitContext?.uuid ?? null);
+  const { mutate: globalMutate } = useSWRConfig();
 
   const onScrollToEnd = useCallback(() => {
     if (hasMore) {
@@ -71,7 +71,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
       <ModalBody>
         {error ? (
           <ErrorState headerTitle={t('visits', 'visits')} error={error} />
-        ) : visits?.length == 0 ? (
+        ) : visits?.length === 0 ? (
           <Tile className={styles.tile}>
             <div className={styles.tileContent}>
               <p className={styles.content}>{t('noVisitsToDisplay', 'No visits to display')}</p>
@@ -85,8 +85,8 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
                 <VisitCardRow
                   key={visit.uuid}
                   visit={visit}
-                  setSelectedVisit={setSelectedVisit}
-                  isSelected={selectedVisit === visit.uuid}
+                  setSelectedVisit={setSelectedVisitUuid}
+                  isSelected={selectedVisitUuid === visit.uuid}
                 />
               );
             })}
@@ -104,9 +104,11 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
           {t('cancel', 'Cancel')}
         </Button>
         <Button
-          disabled={selectedVisit === null || isLoading}
+          disabled={selectedVisitUuid === null || isLoading}
           onClick={() => {
-            setVisitContext(visits.find((v) => v.uuid === selectedVisit));
+            const selectedVisit = visits.find((v) => v.uuid === selectedVisitUuid);
+            const mutateVisitContext = () => invalidateVisitByUuid(globalMutate, selectedVisit.uuid);
+            setVisitContext(selectedVisit, mutateVisitContext);
             onAfterVisitSelected?.();
             closeModal();
           }}
@@ -125,7 +127,7 @@ interface VisitCardRowProps {
 }
 
 /**
- * A clickable row within the the visit context switcher to select a visit. This
+ * A clickable row within the visit context switcher to select a visit. This
  * has slightly different UX than a regular radio button, as the entire card
  * (not just the radio button and the label) is clickable
  */

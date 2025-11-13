@@ -59,6 +59,7 @@ import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
+  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   patient: fhir.Patient;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;

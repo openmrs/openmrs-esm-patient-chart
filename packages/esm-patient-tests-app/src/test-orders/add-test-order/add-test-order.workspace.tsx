@@ -20,6 +20,7 @@ import {
   useOrderType,
   usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type OrderBasketItem, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
@@ -48,10 +49,13 @@ export default function AddLabOrderWorkspace({
   prevWorkSpace,
   isWorkSpaceType,
   prevOrder,
+  patientUuid,
+  patient,
+  visitContext,
+  mutateVisitContext,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { patientUuid, patient } = usePatientChartStore();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
@@ -143,6 +147,8 @@ export default function AddLabOrderWorkspace({
           prevWorkSpace={prevWorkSpace}
           isWorkSpaceType={isWorkSpaceType}
           prevOrder={prevOrder}
+          visitContext={visitContext}
+          mutateVisitContext={mutateVisitContext}
         />
       ) : (
         <TestTypeSearch
@@ -152,6 +158,7 @@ export default function AddLabOrderWorkspace({
           prevWorkSpace={prevWorkSpace}
           isWorkSpaceType={isWorkSpaceType}
           prevOrder={prevOrder}
+          patient={patient}
         />
       )}
     </div>

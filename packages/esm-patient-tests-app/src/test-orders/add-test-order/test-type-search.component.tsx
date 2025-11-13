@@ -28,12 +28,14 @@ export interface TestTypeSearchProps {
   prevWorkSpace: string;
   isWorkSpaceType: (value: string) => boolean;
   prevOrder: Order;
+  patient: fhir.Patient;
 }
 
 interface TestTypeSearchResultsProps extends TestTypeSearchProps {
   cancelOrder: () => void;
   searchTerm: string;
   focusAndClearSearchInput: () => void;
+  patient: fhir.Patient;
 }
 
 interface TestTypeSearchResultItemProps {
@@ -53,6 +55,10 @@ export function TestTypeSearch({
   isWorkSpaceType,
   prevOrder,
 }: TestTypeSearchProps) {
+  patient: fhir.Patient;
+}
+
+export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets, patient }: TestTypeSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
@@ -105,6 +111,7 @@ export function TestTypeSearch({
         prevWorkSpace={prevWorkSpace}
         isWorkSpaceType={isWorkSpaceType}
         prevOrder={prevOrder}
+        patient={patient}
       />
     </>
   );
@@ -120,6 +127,7 @@ function TestTypeSearchResults({
   prevWorkSpace,
   isWorkSpaceType,
   prevOrder,
+  patient,
 }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -173,6 +181,7 @@ function TestTypeSearchResults({
                 prevWorkSpace={prevWorkSpace}
                 isWorkSpaceType={isWorkSpaceType}
                 prevOrder={prevOrder}
+                patient={patient}
               />
             ))}
           </div>
@@ -220,11 +229,12 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   prevWorkSpace,
   isWorkSpaceType,
   prevOrder,
+  patient,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
 
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),

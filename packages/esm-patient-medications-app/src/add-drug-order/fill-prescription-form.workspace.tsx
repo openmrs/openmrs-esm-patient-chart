@@ -1,18 +1,17 @@
 import React, { useCallback } from 'react';
-import { type DrugOrderBasketItem } from '../types';
+import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
   type DefaultWorkspaceProps,
-  Encounter,
   showSnackbar,
   useConfig,
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
 import { type EncounterPost, postEncounter } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '../types';
 import { prepMedicationOrderPostData } from '../api';
 import DrugOrderForm from './drug-order-form.component';
-import { useTranslation } from 'react-i18next';
 
 export interface FillPrescriptionFormProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
@@ -96,6 +95,7 @@ const FillPrescriptionForm: React.FC<FillPrescriptionFormProps> = ({
   }
   return (
     <DrugOrderForm
+      patientUuid={patientUuid}
       initialOrderBasketItem={{ action: 'NEW' } as DrugOrderBasketItem}
       patient={patient}
       onSave={submitDrugOrder}
