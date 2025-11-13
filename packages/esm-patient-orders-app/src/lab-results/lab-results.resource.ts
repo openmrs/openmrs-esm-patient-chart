@@ -183,7 +183,7 @@ export function useObservation(obsUuid: string) {
   };
 }
 
-export function useObservations(obsUuids: string[]) {
+export function useObservations(obsUuids: Array<string>) {
   const fetchMultipleObservations = async (): Promise<Observation[]> => {
     if (!obsUuids || obsUuids.length === 0) return [];
 
