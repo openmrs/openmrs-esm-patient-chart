@@ -59,7 +59,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     [testResultObs],
   );
 
-  const { isLoading: isAnyConceptLoading, concepts: conceptList } = useOrderConceptsByUuids(obsUuids);
+  const { isLoading: isLoadingResultsConcepts, concepts: conceptList } = useOrderConceptsByUuids(obsUuids);
 
   const testRows = useMemo(() => {
     if (!Array.isArray(testResultObs) || testResultObs.length === 0) return [];
