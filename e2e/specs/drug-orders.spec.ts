@@ -438,7 +438,6 @@ test.describe('Drug Order Tests', () => {
 
       // Wait for the order basket to show the discontinue status
       await page.waitForTimeout(1000);
-      const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
       await expect(orderBasket.getByText(/discontinue/i)).toBeVisible();
 
       await page.getByRole('button', { name: /sign and close/i }).click();
