@@ -3,10 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { ActionMenuButton, PenIcon } from '@openmrs/esm-framework';
 import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 
-const VisitNoteActionButton: React.FC = () => {
+/**
+ * This button uses the patient chart store and MUST only be used
+ * within the patient chart
+ */
+const VisitNoteActionButton: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const launchVisitNotesWorkspace = useLaunchWorkspaceRequiringVisit('visit-notes-form-workspace');
+  const launchVisitNotesWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, 'visit-notes-form-workspace');
 
   return (
     <ActionMenuButton

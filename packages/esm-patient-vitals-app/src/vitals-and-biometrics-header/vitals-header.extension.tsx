@@ -8,8 +8,7 @@ dayjs.extend(duration);
 import { Trans, useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { ConfigurableLink, formatDate, parseDate, useConfig, useWorkspaces } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { ConfigurableLink, formatDate, parseDate, useConfig, useVisit, useWorkspaces } from '@openmrs/esm-framework';
 import {
   assessValue,
   getReferenceRangesForConcept,
@@ -41,11 +40,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
   const { workspaces } = useWorkspaces();
 
   const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
-  const launchForm = useLaunchVitalsAndBiometricsForm();
+  const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -62,7 +61,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   }
 
   if (latestVitals && Object.keys(latestVitals)?.length && conceptRanges?.length) {
-    const hasActiveVisit = Boolean(currentVisit?.uuid);
+    const hasActiveVisit = Boolean(activeVisit?.uuid);
     const now = dayjs();
     const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
     const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;

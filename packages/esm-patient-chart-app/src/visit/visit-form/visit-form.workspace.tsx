@@ -36,8 +36,10 @@ import {
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateVisitByUuid,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
+  usePatientChartStore,
   type DefaultPatientWorkspaceProps,
 } from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
@@ -120,9 +122,10 @@ const VisitForm: React.FC<VisitFormProps> = ({
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutate: mutateCurrentVisit } = useVisit(patientUuid);
+  const { mutate: mutateActiveVisit } = useVisit(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
+  const { setVisitContext } = usePatientChartStore(patientUuid);
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -327,12 +330,15 @@ const VisitForm: React.FC<VisitFormProps> = ({
             // 1. Current visit data (for critical components like visit summary, action buttons)
             // 2. Visit history table (for the paginated visit list)
 
-            // Update current visit data for critical components (useVisit hook)
-            mutateCurrentVisit();
+            // Update patient's visit data for critical components
+            const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
+            mutateActiveVisit();
+            setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
+            visitToEdit && mutateSavedOrUpdatedVisit();
 
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
-            // (current visit is already updated with mutateCurrentVisit)
+            // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
@@ -371,9 +377,12 @@ const VisitForm: React.FC<VisitFormProps> = ({
           config.offlineVisitTypeUuid,
           payload.startDatetime,
         ).then(
-          () => {
+          (visit) => {
             // Use same targeted approach for offline visits for consistency
-            mutateCurrentVisit();
+            const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
+            mutateActiveVisit();
+            setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
+            visitToEdit && mutateSavedOrUpdatedVisit();
 
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
@@ -407,12 +416,13 @@ const VisitForm: React.FC<VisitFormProps> = ({
       globalMutate,
       handleVisitAttributes,
       isOnline,
-      mutateCurrentVisit,
+      setVisitContext,
       patientUuid,
       t,
       visitFormCallbacks,
       visitToEdit,
       isValidVisitAttributesArray,
+      mutateActiveVisit,
     ],
   );
 

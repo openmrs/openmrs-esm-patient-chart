@@ -32,6 +32,8 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       patient={mockPatient}
       promptBeforeClosing={jest.fn()}
       setTitle={jest.fn()}
+      visitContext={null}
+      mutateVisitContext={null}
     />,
   );
 
@@ -58,6 +60,8 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
 
   render(
     <FlagsList
+      visitContext={null}
+      mutateVisitContext={null}
       closeWorkspace={jest.fn()}
       closeWorkspaceWithSavedChanges={jest.fn()}
       patientUuid={mockPatient.id}

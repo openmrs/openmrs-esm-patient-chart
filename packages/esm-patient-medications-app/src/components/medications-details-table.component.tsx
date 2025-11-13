@@ -70,15 +70,15 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
 }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
+  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit(patient.id, 'add-drug-order');
   const config = useConfig<ConfigObject>();
   const showPrintButton = config.showPrintButton;
   const contentToPrintRef = useRef(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(patient, 'medications');
   const { results, goTo, currentPage } = usePagination(medications, pageSize);
 
   const tableHeaders = [
