@@ -7,6 +7,8 @@ import {
   type ObsMetaInfo,
   type OBSERVATION_INTERPRETATION,
 } from '@openmrs/esm-patient-common-lib';
+import type { FHIRObservationResource } from '../../types';
+import { type ReferenceRanges } from '../grouped-timeline/reference-range-helpers';
 
 const PAGE_SIZE = 300;
 const CHUNK_PREFETCH_COUNT = 1;
@@ -149,6 +151,118 @@ export function exist(...args: any[]): boolean {
   }
 
   return true;
+}
+
+/**
+ * Extracts reference ranges from FHIR Observation referenceRange field.
+ * Handles different range types: normal, treatment, and absolute.
+ */
+export function extractObservationReferenceRanges(
+  resource: FHIRObservationResource | ObsRecord,
+): ReferenceRanges | undefined {
+  if (!resource.referenceRange || resource.referenceRange.length === 0) {
+    return undefined;
+  }
+
+  const ranges: ReferenceRanges = {
+    units: resource.valueQuantity?.unit,
+  };
+
+  resource.referenceRange.forEach((range) => {
+    const rangeType = range.type?.coding?.[0]?.code;
+    const rangeSystem = range.type?.coding?.[0]?.system;
+
+    if (rangeSystem === 'http://terminology.hl7.org/CodeSystem/referencerange-meaning') {
+      if (rangeType === 'normal') {
+        ranges.hiNormal = range.high?.value;
+        ranges.lowNormal = range.low?.value;
+      } else if (rangeType === 'treatment') {
+        ranges.hiCritical = range.high?.value;
+        ranges.lowCritical = range.low?.value;
+      }
+    } else if (rangeSystem === 'http://fhir.openmrs.org/ext/obs/reference-range' && rangeType === 'absolute') {
+      ranges.hiAbsolute = range.high?.value;
+      ranges.lowAbsolute = range.low?.value;
+    }
+  });
+
+  // Only return if we found at least one range value
+  if (
+    ranges.hiNormal !== undefined ||
+    ranges.lowNormal !== undefined ||
+    ranges.hiCritical !== undefined ||
+    ranges.lowCritical !== undefined ||
+    ranges.hiAbsolute !== undefined ||
+    ranges.lowAbsolute !== undefined
+  ) {
+    return ranges;
+  }
+
+  return undefined;
+}
+
+/**
+ * Extracts and maps FHIR Observation interpretation to OBSERVATION_INTERPRETATION.
+ * Supports both interpretation codes (e.g., "LL", "N", "H") and display values (e.g., "Critically Low", "Normal").
+ */
+export function extractObservationInterpretation(
+  resource: FHIRObservationResource | ObsRecord,
+): OBSERVATION_INTERPRETATION | undefined {
+  if (!resource.interpretation || resource.interpretation.length === 0) {
+    return undefined;
+  }
+
+  const interpretation = resource.interpretation[0];
+  const code = interpretation.coding?.[0]?.code;
+  const display = interpretation.coding?.[0]?.display || interpretation.text;
+
+  // Map FHIR interpretation codes (HL7 v3 ObservationInterpretation codes)
+  if (code) {
+    switch (code.toUpperCase()) {
+      case 'LL':
+        return 'CRITICALLY_LOW';
+      case 'HH':
+        return 'CRITICALLY_HIGH';
+      case 'L':
+        return 'LOW';
+      case 'H':
+        return 'HIGH';
+      case 'N':
+        return 'NORMAL';
+      case 'LU':
+        return 'OFF_SCALE_LOW';
+      case 'HU':
+        return 'OFF_SCALE_HIGH';
+      default:
+        // Fall through to display mapping
+        break;
+    }
+  }
+
+  // Map FHIR interpretation display values
+  if (display) {
+    const normalized = display.trim().toLowerCase();
+    switch (normalized) {
+      case 'critically low':
+        return 'CRITICALLY_LOW';
+      case 'critically high':
+        return 'CRITICALLY_HIGH';
+      case 'low':
+        return 'LOW';
+      case 'high':
+        return 'HIGH';
+      case 'normal':
+        return 'NORMAL';
+      case 'off scale low':
+        return 'OFF_SCALE_LOW';
+      case 'off scale high':
+        return 'OFF_SCALE_HIGH';
+      default:
+        return undefined;
+    }
+  }
+
+  return undefined;
 }
 
 export const assessValue =

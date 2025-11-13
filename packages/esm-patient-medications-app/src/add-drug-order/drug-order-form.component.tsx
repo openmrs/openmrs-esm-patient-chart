@@ -1,5 +1,4 @@
 import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
   Button,
@@ -7,21 +6,23 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  IconButton,
   Form,
   FormGroup,
   FormLabel,
   Grid,
+  IconButton,
   InlineNotification,
   Layer,
   NumberInput,
+  Stack,
   TextArea,
   TextInput,
   Toggle,
-  Stack,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import {
   AddIcon,
   age,
@@ -36,7 +37,6 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import { type Drug } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -50,13 +50,13 @@ import type {
   QuantityUnit,
 } from '../types';
 import { type Provider, useActivePatientOrders, useProviders } from '../api';
-import styles from './drug-order-form.scss';
 import {
   drugOrderBasketItemToFormValue,
   type MedicationOrderFormData,
   useDrugOrderForm,
 } from './drug-order-form.resource';
 import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
+import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
   initialOrderBasketItem: DrugOrderBasketItem;
@@ -757,7 +757,9 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
 
   return (
     <div className={styles.customElement}>
-      <span className="cds--label">{labelText}</span>
+      <span className="cds--label" id={`${name}-label`}>
+        {labelText}
+      </span>
       <div className={styles.customNumberInput}>
         <IconButton onClick={decrement} label={t('decrement', 'Decrement')} size={responsiveSize}>
           <Subtract size={16} />
@@ -771,6 +773,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
           size={responsiveSize}
           id={name}
           labelText=""
+          aria-labelledby={`${name}-label`}
           {...inputProps}
         />
         <IconButton onClick={increment} label={t('increment', 'Increment')} size={responsiveSize}>

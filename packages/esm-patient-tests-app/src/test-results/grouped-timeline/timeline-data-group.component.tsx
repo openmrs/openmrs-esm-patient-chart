@@ -10,6 +10,7 @@ import type {
   TimelineDataGroupProps,
 } from './grouped-timeline-types';
 import FilterContext from '../filter/filter-context';
+import { getMostRecentObservationWithRange } from './reference-range-helpers';
 import styles from './grouped-timeline.scss';
 
 export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} />;
@@ -196,14 +197,20 @@ const DataRows: React.FC<DataRowsProps> = ({ patientUuid, timeColumns, rowData, 
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
         const obs = row.entries;
-        const { units = '', range = '', obs: values } = row;
+        const { obs: values } = row;
         const isString = isNaN(parseFloat(values?.[0]?.value));
+
+        // Note: Units are only at the concept/node level, not observation-level
+        const mostRecentObsWithRange = getMostRecentObservationWithRange(row.entries);
+        const displayRange = mostRecentObsWithRange?.range ?? row.range ?? '';
+        const displayUnits = row.units ?? '';
+
         return (
           <React.Fragment key={index}>
             <NewRowStartCell
               {...{
-                units,
-                range,
+                units: displayUnits,
+                range: displayRange,
                 title: row.display,
                 shadow: showShadow,
                 conceptUuid: row.conceptUuid,

@@ -107,7 +107,9 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
     <>
       <div className={containerClasses} style={{ width: fieldWidth }}>
         <section className={styles.labelContainer}>
-          <span className={styles.label}>{label}</span>
+          <span className={styles.label} id={`${fieldId}-label`}>
+            {label}
+          </span>
 
           {Boolean(hasAbnormalValue) ? (
             <span className={styles[interpretation.replace('_', '-')]} title={t('abnormalValue', 'Abnormal value')} />
@@ -178,6 +180,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                           className={styles.textarea}
                           id={`${fieldId}-${fieldProperty.id}`}
                           labelText={''}
+                          aria-labelledby={`${fieldId}-label`}
                           maxCount={100}
                           name={fieldProperty.name}
                           onBlur={() => handleFocusChange(false)}

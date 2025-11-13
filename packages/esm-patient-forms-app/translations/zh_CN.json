@@ -7,6 +7,7 @@
   "lastCompleted": "最后完成",
   "never": "从未",
   "noFormsToDisplay": "没有表单可显示",
+  "off": "Off",
   "offlineForms": "离线表单",
   "offlineForms__lower": "离线表单",
   "offlineFormsOverviewCardAvailableOffline": "离线可用",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "搜索此列表",
   "offlinePatientsTableSearchPlaceholder": "搜索此列表",
   "offlineToggle": "离线切换",
+  "on": "On",
   "searchThisList": "搜索此列表"
 }
