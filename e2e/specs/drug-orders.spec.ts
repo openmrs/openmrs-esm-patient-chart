@@ -577,7 +577,7 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then the order basket should be empty', async () => {
-      await expect(orderBasket.getByText(/renew/i)).not.toBeVisible();
+      await expect(orderBasket.getByText(/renew/i)).toBeEmpty();
     });
 
     await test.step('And no new medication order should be created', async () => {
