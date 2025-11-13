@@ -133,10 +133,7 @@ export function useOrderConceptByUuid(uuid: string) {
 export function useOrderConceptsByUuids(uuids: string[]) {
   const { data, error, isLoading, isValidating, mutate } = useSWR<Array<LabOrderConcept>, Error>(
     uuids.length ? ['concepts', ...uuids] : null,
-    async () => {
-      const results = await Promise.all(uuids.map((uuid) => fetchAllSetMembers(uuid)));
-      return results;
-    },
+    () => Promise.all(uuids.map((uuid) => fetchAllSetMembers(uuid))),
   );
 
   const results = useMemo(
