@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { type KeyedMutator, useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -23,7 +23,6 @@ import {
   ExtensionSlot,
   launchWorkspaceGroup2,
   OpenmrsFetchError,
-  restBaseUrl,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -40,12 +39,10 @@ import {
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateVisitByUuid,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
-  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig } from '../../config-schema';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
   convertToDate,
@@ -65,10 +62,33 @@ import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
+import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
 
+interface VisitAttribute {
+  attributeType: string;
+  value: string;
+}
+
+/**
+ * Extra visit information provided by extensions via the extra-visit-attribute-slot.
+ * Extensions can use this to add custom attributes to visits.
+ */
+export interface ExtraVisitInfo {
+  /**
+   * Optional callback that extensions can provide to perform final
+   * preparation or validation before the visit is created/updated.
+   */
+  handleCreateExtraVisitInfo?: () => void;
+  /**
+   * Array of visit attributes to be included in the visit payload.
+   * Each attribute must have an attributeType (UUID) and a value (string).
+   */
+  attributes?: Array<VisitAttribute>;
+}
+
 export interface ExportedVisitFormProps {
-  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   /**
    * A unique string identifying where the visit form is opened from.
    * This string is passed into various extensions within the form to
@@ -76,7 +96,7 @@ export interface ExportedVisitFormProps {
    */
   openedFrom: string;
   showPatientHeader?: boolean;
-  onVisitStarted?: () => void;
+  onVisitStarted?: (visit: Visit) => void;
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
@@ -112,17 +132,16 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const { mutate: mutateActiveVisit } = useVisit(patientUuid);
+
   const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
-  const setVisitContext = null; // TODO: refactor this once workspace migration is merged in
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   } | null>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
-  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
+  const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
 
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit);
@@ -145,6 +164,14 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
+
+  const isValidVisitAttributesArray = useCallback((attributes: unknown): boolean => {
+    return (
+      Array.isArray(attributes) &&
+      attributes.length > 0 &&
+      attributes.every((attr) => attr?.attributeType?.trim().length > 0 && attr?.value?.trim().length > 0)
+    );
+  }, []);
 
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
@@ -252,12 +279,10 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
         stopDatetime: hasStopTime ? stopDatetime : null,
         // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
         ...(!visitToEdit && { patient: patientUuid }),
-        ...(config.showExtraVisitAttributesSlot && extraAttributes && { attributes: extraAttributes }),
+        ...(isValidVisitAttributesArray(extraAttributes) && { attributes: extraAttributes }),
       };
 
-      if (config.showExtraVisitAttributesSlot) {
-        handleCreateExtraVisitInfo?.();
-      }
+      handleCreateExtraVisitInfo?.();
 
       const abortController = new AbortController();
       if (isOnline) {
@@ -306,16 +331,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             // to update visit attributes or any other OnVisitCreatedOrUpdated actions
             const visit = response.data;
 
-            // For visit creation, we need to update:
-            // 1. Current visit data (for critical components like visit summary, action buttons)
-            // 2. Visit history table (for the paginated visit list)
-
-            // Update patient's visit data for critical components
-            const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
-            mutateActiveVisit();
-            setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
-            visitToEdit && mutateSavedOrUpdatedVisit();
-
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
             // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
@@ -344,13 +359,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
             await Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
             await closeWorkspace({ discardUnsavedChanges: true });
-            await launchWorkspaceGroup2('patient-chart', {
-              patient,
-              patientUuid,
-              visitContext: visit,
-              mutateVisitContext: mutateSavedOrUpdatedVisit,
-            });
-            onVisitStarted?.();
+            onVisitStarted?.(visit);
           })
           .catch(() => {
             // do nothing, this catches any reject promises used for short-circuiting
@@ -361,72 +370,51 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           visitLocation.uuid,
           config.offlineVisitTypeUuid,
           payload.startDatetime,
-        )
-          .then(
-            async (visit) => {
-              // Use same targeted approach for offline visits for consistency
-              const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
-              mutateActiveVisit();
-              setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
-              visitToEdit && mutateSavedOrUpdatedVisit();
+        ).then(
+          async (visit) => {
+            // Also invalidate visit history and encounter tables
+            invalidateVisitAndEncounterData(globalMutate, patientUuid);
+            showSnackbar({
+              isLowContrast: true,
+              kind: 'success',
+              subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
+                visit: t('offlineVisit', 'Offline Visit'),
+              }),
+              title: t('visitStarted', 'Visit started'),
+            });
+            await closeWorkspace({ discardUnsavedChanges: true });
+            onVisitStarted?.(visit);
+          },
+          (error: Error) => {
+            showSnackbar({
+              title: t('startVisitError', 'Error starting visit'),
+              kind: 'error',
+              isLowContrast: false,
+              subtitle: error?.message,
+            });
 
-              // Also invalidate visit history and encounter tables
-              invalidateVisitAndEncounterData(globalMutate, patientUuid);
-              showSnackbar({
-                isLowContrast: true,
-                kind: 'success',
-                subtitle: t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                  visit: t('offlineVisit', 'Offline Visit'),
-                }),
-                title: t('visitStarted', 'Visit started'),
-              });
-              await closeWorkspace({ discardUnsavedChanges: true });
-              await launchWorkspaceGroup2('patient-chart', {
-                patient,
-                patientUuid,
-                visitContext: visit,
-                mutateVisitContext: mutateSavedOrUpdatedVisit,
-              });
-              onVisitStarted?.();
-            },
-            (error: Error) => {
-              showSnackbar({
-                title: t('startVisitError', 'Error starting visit'),
-                kind: 'error',
-                isLowContrast: false,
-                subtitle: error?.message,
-              });
-
-              return Promise.reject(error);
-            },
-          )
-          .then(() => onVisitStarted?.());
+            return Promise.reject(error);
+          },
+        );
 
         return;
       }
     },
     [
-      patient,
       closeWorkspace,
       config.offlineVisitTypeUuid,
-      config.showExtraVisitAttributesSlot,
       extraVisitInfo,
       globalMutate,
       handleVisitAttributes,
       isOnline,
       onVisitStarted,
-      setVisitContext,
       patientUuid,
       t,
       visitFormCallbacks,
       visitToEdit,
-      mutateActiveVisit,
+      isValidVisitAttributesArray,
     ],
   );
-
-  const handleDiscard = useCallback(() => {
-    closeWorkspace();
-  }, [closeWorkspace]);
 
   return (
     <Workspace2
@@ -633,7 +621,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
               [styles.desktop]: !isTablet,
             })}
           >
-            <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
+            <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
               {t('discard', 'Discard')}
             </Button>
             <Button
@@ -708,15 +696,5 @@ const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo
     );
   },
 );
-
-/**
- * TODO: move this to common-libs
- * Invalidates a visit fetched by URL /visit/<uuid>
- * @param mutate - SWR mutate function from useSWRConfig()
- * @param visitUuid
- */
-export function invalidateVisitByUuid(mutate: KeyedMutator<unknown>, visitUuid: string) {
-  mutate(new RegExp(`${restBaseUrl}/visit${visitUuid}`));
-}
 
 export default ExportedVisitForm;
