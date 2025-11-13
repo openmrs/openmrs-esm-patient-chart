@@ -47,7 +47,7 @@ const HeaderedQuickInfo: React.FC<HeaderedQuickInfoProps> = ({ header, children,
   return (
     <div>
       <h4 className={styles.label}>{header}</h4>
-      {isLoading ? <SkeletonText heading /> : <span className={styles.heading}>{children}</span>}
+      {isLoading ? <SkeletonText heading /> : <div className={styles.heading}>{children}</div>}
     </div>
   );
 };
