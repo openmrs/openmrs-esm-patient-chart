@@ -11,7 +11,7 @@ import { moduleName } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 import deleteVisitActionButtonComponent from './actions-buttons/delete-visit.component';
-import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.component';
+import currentVisitSummaryComponent from './visit/visits-widget/current-visit-summary.extension';
 import markPatientAliveActionButtonComponent from './actions-buttons/mark-patient-alive.component';
 import markPatientDeceasedActionButtonComponent from './actions-buttons/mark-patient-deceased.component';
 import pastVisitsOverviewComponent from './visit/visits-widget/visit-detail-overview.component';
@@ -20,7 +20,7 @@ import patientDetailsTileComponent from './patient-details-tile/patient-details-
 import startVisitActionButtonComponent from './actions-buttons/start-visit.component';
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
-import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.component';
+import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.extension';
 
 // This allows @openmrs/esm-framework to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -187,7 +187,7 @@ export const activeVisitActionsComponent = getAsyncLifecycle(
 );
 
 export const encounterListTableTabs = getAsyncLifecycle(
-  () => import('./clinical-views/encounter-list/encounter-list-tabs.component'),
+  () => import('./clinical-views/encounter-list/encounter-list-tabs.extension'),
   { featureName: 'encounter-list-table-tabs', moduleName },
 );
 
@@ -197,7 +197,7 @@ export const visitContextSwitcherModal = getAsyncLifecycle(
 );
 
 export const visitContextHeader = getAsyncLifecycle(
-  () => import('./visit/visits-widget/visit-context/visit-context-header.component'),
+  () => import('./visit/visits-widget/visit-context/visit-context-header.extension'),
   { featureName: 'visit-context-header', moduleName },
 );
 

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { type DrugOrderBasketItem } from '../types';
+import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
   type DefaultWorkspaceProps,
@@ -9,12 +9,13 @@ import {
   useVisit,
 } from '@openmrs/esm-framework';
 import { type EncounterPost, postEncounter } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '../types';
 import { prepMedicationOrderPostData } from '../api';
 import DrugOrderForm from './drug-order-form.component';
-import { useTranslation } from 'react-i18next';
 
-export interface OrderBasketDrugOrderFormProps extends DefaultWorkspaceProps {
+export interface FillPrescriptionFormProps extends DefaultWorkspaceProps {
   patient: fhir.Patient;
+  onAfterSave?(patient: fhir.Patient, encounterUuid: string);
 }
 
 /**
@@ -26,11 +27,12 @@ export interface OrderBasketDrugOrderFormProps extends DefaultWorkspaceProps {
  * This component is not used in the medications app itself, but is intended to be used in other apps
  * (like dispensing).
  */
-const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
+const FillPrescriptionForm: React.FC<FillPrescriptionFormProps> = ({
   patient,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  onAfterSave,
 }) => {
   const { sessionLocation } = useSession();
   const { t } = useTranslation();
@@ -51,7 +53,7 @@ const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
         orders: [drugOrderPost],
       };
       try {
-        await postEncounter(encounter);
+        const encounterUuid = await postEncounter(encounter);
         showSnackbar({
           isLowContrast: true,
           kind: 'success',
@@ -61,6 +63,7 @@ const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
           }),
         });
         closeWorkspaceWithSavedChanges();
+        onAfterSave?.(patient, encounterUuid);
       } catch (e) {
         showSnackbar({
           isLowContrast: true,
@@ -68,11 +71,19 @@ const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
           title: t('saveDrugOrderFailed', 'Error ordering {{orderName}}', {
             orderName: finalizedOrder.drug.display,
           }),
-          subtitle: e?.message,
+          subtitle: e?.responseBody?.error?.translatedMessage ?? e?.responseBody?.error?.message,
         });
       }
     },
-    [patientUuid, closeWorkspaceWithSavedChanges, sessionLocation.uuid, t, drugOrderEncounterType],
+    [
+      patientUuid,
+      closeWorkspaceWithSavedChanges,
+      sessionLocation.uuid,
+      t,
+      drugOrderEncounterType,
+      onAfterSave,
+      patient,
+    ],
   );
 
   if (!isLoadingVisit && !activeVisit) {
@@ -84,6 +95,7 @@ const FillPrescriptionForm: React.FC<OrderBasketDrugOrderFormProps> = ({
   }
   return (
     <DrugOrderForm
+      patientUuid={patientUuid}
       initialOrderBasketItem={{ action: 'NEW' } as DrugOrderBasketItem}
       patient={patient}
       onSave={submitDrugOrder}

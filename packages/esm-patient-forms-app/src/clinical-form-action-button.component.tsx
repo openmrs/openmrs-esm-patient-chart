@@ -8,10 +8,14 @@ import {
   useLaunchWorkspaceRequiringVisit,
 } from '@openmrs/esm-patient-common-lib';
 
-const ClinicalFormActionButton: React.FC = () => {
+/**
+ * This button uses the patient chart store and MUST only be used
+ * within the patient chart
+ */
+const ClinicalFormActionButton: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
-  const launchFormsWorkspace = useLaunchWorkspaceRequiringVisit(clinicalFormsWorkspace);
+  const launchFormsWorkspace = useLaunchWorkspaceRequiringVisit(patientUuid, clinicalFormsWorkspace);
 
   const formEntryWorkspaces = workspaces.filter((w) => w.name === formEntryWorkspace);
   const recentlyOpenedForm = formEntryWorkspaces[0];

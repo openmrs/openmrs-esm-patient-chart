@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { rangeAlreadyHasUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   TableContainer,
@@ -70,7 +71,10 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
       hasRange
         ? panel.entries.map((test) => {
             const units = test.units ?? '';
-            const range = test.range ? `${test.range} ${units}` : '--';
+            // Check if range already includes units to avoid duplication
+            // formatReferenceRange includes units, so if range has units, don't append again
+            const hasUnits = rangeAlreadyHasUnits(test.range, units);
+            const range = hasUnits ? test.range : test.range ? `${test.range} ${units}` : '--';
             return {
               id: test.conceptUuid,
               testName: test.display,

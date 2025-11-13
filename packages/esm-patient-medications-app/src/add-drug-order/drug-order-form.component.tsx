@@ -1,5 +1,4 @@
 import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
   Button,
@@ -7,21 +6,23 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  IconButton,
   Form,
   FormGroup,
   FormLabel,
   Grid,
+  IconButton,
   InlineNotification,
   Layer,
   NumberInput,
+  Stack,
   TextArea,
   TextInput,
   Toggle,
-  Stack,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import {
   AddIcon,
   age,
@@ -30,12 +31,12 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
+  showSnackbar,
   useConfig,
   useFeatureFlag,
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, useController } from 'react-hook-form';
 import { type Drug } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
@@ -48,16 +49,17 @@ import type {
   MedicationRoute,
   QuantityUnit,
 } from '../types';
-import { type Provider, useProviders } from '../api';
-import styles from './drug-order-form.scss';
+import { type Provider, useActivePatientOrders, useProviders } from '../api';
 import {
   drugOrderBasketItemToFormValue,
   type MedicationOrderFormData,
   useDrugOrderForm,
 } from './drug-order-form.resource';
 import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
+import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
+  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   patient: fhir.Patient;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
@@ -131,7 +133,7 @@ export function DrugOrderForm({
   allowSelectingDrug,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
+  const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
@@ -139,9 +141,11 @@ export function DrugOrderForm({
   const allowAndSupportSelectingPrescribingClinician =
     isProviderManagementModuleInstalled && allowSelectingPrescribingClinician;
 
-  const { data: providers, isLoading: isLoadingProviders } = useProviders(
-    allowAndSupportSelectingPrescribingClinician ? config.prescriberProviderRoles : null,
-  );
+  const {
+    data: providers,
+    isLoading: isLoadingProviders,
+    error: errorLoadingProviders,
+  } = useProviders(allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null);
   const [isSaving, setIsSaving] = useState(false);
 
   const { currentProvider } = useSession();
@@ -206,6 +210,19 @@ export function DrugOrderForm({
     setIsSaving(false);
   };
 
+  const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
+    if (errors) {
+      console.error('Error in drug order form', errors);
+      showSnackbar({
+        title: t('drugOrderValidationFailed', 'Validation failed'),
+        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
+        kind: 'error',
+        timeoutInMs: 5000,
+        isLowContrast: true,
+      });
+    }
+  };
+
   const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
       orderConfigObject?.drugDosingUnits ?? [
@@ -234,11 +251,11 @@ export function DrugOrderForm({
     () =>
       orderConfigObject?.durationUnits ?? [
         {
-          valueCoded: config?.daysDurationUnit?.uuid,
-          value: config?.daysDurationUnit?.display,
+          valueCoded: daysDurationUnit?.uuid,
+          value: daysDurationUnit?.display,
         },
       ],
-    [orderConfigObject, config?.daysDurationUnit],
+    [orderConfigObject, daysDurationUnit],
   );
 
   const orderFrequencies: Array<MedicationFrequency> = useMemo(() => {
@@ -285,7 +302,17 @@ export function DrugOrderForm({
     },
     [setShowMedicationHeader],
   );
-  const now = new Date();
+  const {
+    fieldState: { error: drugFieldError },
+  } = useController<MedicationOrderFormData>({ name: 'drug', control });
+
+  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const drugAlreadyPrescribedForNewOrder = useMemo(
+    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem.action],
+  );
 
   return (
     <div className={styles.container}>
@@ -302,7 +329,11 @@ export function DrugOrderForm({
         </span>
       </div>
       <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission)} id="drugOrderForm">
+      <Form
+        className={styles.orderForm}
+        onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
+        id="drugOrderForm"
+      >
         <div>
           {errorFetchingOrderConfig && (
             <InlineNotification
@@ -327,34 +358,49 @@ export function DrugOrderForm({
                         reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
                       }}
                     />
+                    {drugAlreadyPrescribedForNewOrder && (
+                      <FormLabel className={styles.errorLabel}>
+                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                      </FormLabel>
+                    )}
+                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
                   </InputWrapper>
                 )}
-                {allowAndSupportSelectingPrescribingClinician && !isLoadingProviders && providers.length === 0 && (
-                  <InlineNotification
-                    kind="warning"
-                    lowContrast
-                    className={styles.inlineNotification}
-                    title={t('noCliniciansFound', 'No clinicians found')}
-                    subtitle={t(
-                      'noCliniciansFoundDescription',
-                      'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
-                    )}
-                  />
-                )}
-                {allowAndSupportSelectingPrescribingClinician && !isLoadingProviders && (
-                  <ControlledFieldInput
-                    control={control}
-                    name="orderer"
-                    type="comboBox"
-                    getValues={getValues}
-                    id="orderer"
-                    shouldFilterItem={filterItemsByProviderName}
-                    placeholder={t('prescribingClinician', 'Prescribing Clinician')}
-                    titleText={t('prescribingClinician', 'Prescribing Clinician')}
-                    items={providers}
-                    itemToString={(item: Provider) => item?.person?.display}
-                  />
-                )}
+                {allowAndSupportSelectingPrescribingClinician &&
+                  !isLoadingProviders &&
+                  (providers?.length > 0 ? (
+                    <ControlledFieldInput
+                      control={control}
+                      name="orderer"
+                      type="comboBox"
+                      getValues={getValues}
+                      id="orderer"
+                      shouldFilterItem={filterItemsByProviderName}
+                      placeholder={t('prescribingClinician', 'Prescribing Clinician')}
+                      titleText={t('prescribingClinician', 'Prescribing Clinician')}
+                      items={providers}
+                      itemToString={(item: Provider) => item?.person?.display}
+                    />
+                  ) : errorLoadingProviders ? (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
+                      subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+                    />
+                  ) : (
+                    <InlineNotification
+                      kind="warning"
+                      lowContrast
+                      className={styles.inlineNotification}
+                      title={t('noCliniciansFound', 'No clinicians found')}
+                      subtitle={t(
+                        'noCliniciansFoundDescription',
+                        'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
+                      )}
+                    />
+                  ))}
               </Stack>
             </section>
           )}
@@ -667,7 +713,7 @@ export function DrugOrderForm({
             kind="primary"
             type="submit"
             size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving}
+            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
           >
             {saveButtonText}
           </Button>
@@ -712,7 +758,9 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
 
   return (
     <div className={styles.customElement}>
-      <span className="cds--label">{labelText}</span>
+      <span className="cds--label" id={`${name}-label`}>
+        {labelText}
+      </span>
       <div className={styles.customNumberInput}>
         <IconButton onClick={decrement} label={t('decrement', 'Decrement')} size={responsiveSize}>
           <Subtract size={16} />
@@ -726,6 +774,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
           size={responsiveSize}
           id={name}
           labelText=""
+          aria-labelledby={`${name}-label`}
           {...inputProps}
         />
         <IconButton onClick={increment} label={t('increment', 'Increment')} size={responsiveSize}>

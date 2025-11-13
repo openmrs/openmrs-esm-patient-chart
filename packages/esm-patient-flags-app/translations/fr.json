@@ -1,9 +1,9 @@
 {
   "activeFirst": "Actif en premier",
   "alphabetically": "A - Z",
-  "assigned": "Assigned",
+  "assigned": "Assigné",
   "clearSearch": "Effacer la recherche",
-  "clinical": "Clinical",
+  "clinical": "Clinique",
   "closeFlagsBar": "Fermer la barre des drapeaux",
   "disableFlagError": "Erreur de désactivation du drapeau",
   "disablingFlag": "Désactivation du drapeau en cours...",
@@ -30,5 +30,5 @@
   "riskFlag": "Risk flag",
   "saveAndClose": "Sauvegarder et fermer",
   "searchForAFlag": "Rechercher un drapeau",
-  "sortBy": "Sort by"
+  "sortBy": "Trier par"
 }
