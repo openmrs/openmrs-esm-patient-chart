@@ -25,7 +25,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
     return (
       <EmptyState
         headerTitle={t('currentVisit', 'Current visit')}
-        displayText={t('noActiveVisitMessage', 'active visit')}
+        displayText={t('noActiveVisitMessage', 'active visits')}
         launchForm={() =>
           launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-current-visit-summary' })
         }

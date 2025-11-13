@@ -25,7 +25,7 @@ describe('CurrentVisitSummary', () => {
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
-    expect(screen.getByText('There are no active visit to display for this patient')).toBeInTheDocument();
+    expect(screen.getByText('There are no active visits to display for this patient')).toBeInTheDocument();
   });
 
   test('returns null when patientUuid does not match store patientUuid', () => {

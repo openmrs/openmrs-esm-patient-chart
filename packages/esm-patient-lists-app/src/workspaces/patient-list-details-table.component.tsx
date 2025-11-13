@@ -93,7 +93,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
           <Layer>
             <Search
               id={`${id}-search`}
-              labelText=""
+              labelText={t('searchThisList', 'Search this list')}
               onChange={handleSearchTermChange}
               placeholder={t('searchThisList', 'Search this list')}
               size={responsiveSize}
