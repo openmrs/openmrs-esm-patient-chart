@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { usePatientChartStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
 import { selectReferenceRange, formatReferenceRange, type ReferenceRanges } from './reference-range-helpers';
 

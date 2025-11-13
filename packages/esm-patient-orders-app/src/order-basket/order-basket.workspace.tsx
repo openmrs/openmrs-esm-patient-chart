@@ -58,6 +58,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
     promptBeforeClosing(() => !!orders.length);
@@ -159,20 +160,7 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
           />
           {config?.orderTypes?.length > 0 &&
             config.orderTypes.map((orderType) => (
-<<<<<<< HEAD
               <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                <GeneralOrderType key={orderType.orderTypeUuid} {...orderType} closeWorkspace={closeWorkspace} />
-||||||| parent of c58406ef ((feat) O3-4962 store visitContext in patient chart store)
-              <div className={styles.orderPanel}>
-                <GeneralOrderType
-                  key={orderType.orderTypeUuid}
-                  orderTypeUuid={orderType.orderTypeUuid}
-                  label={orderType.label}
-                  orderableConceptSets={orderType.orderableConceptSets}
-                  closeWorkspace={closeWorkspace}
-                />
-=======
-              <div className={styles.orderPanel}>
                 <GeneralOrderType
                   key={orderType.orderTypeUuid}
                   orderTypeUuid={orderType.orderTypeUuid}
@@ -181,7 +169,6 @@ const OrderBasket: React.FC<DefaultPatientWorkspaceProps> = ({
                   closeWorkspace={closeWorkspace}
                   patient={patient}
                 />
->>>>>>> c58406ef ((feat) O3-4962 store visitContext in patient chart store)
               </div>
             ))}
         </div>

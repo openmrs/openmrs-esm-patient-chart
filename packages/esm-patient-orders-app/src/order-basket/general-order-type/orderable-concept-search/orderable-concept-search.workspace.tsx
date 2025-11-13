@@ -21,7 +21,6 @@ import { prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
 import OrderableConceptSearchResults from './search-results.component';
 import styles from './orderable-concept-search.scss';
-import { mutate } from 'swr';
 
 interface OrderableConceptSearchWorkspaceProps extends DefaultPatientWorkspaceProps {
   order: OrderBasketItem;

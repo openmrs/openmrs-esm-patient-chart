@@ -76,6 +76,7 @@
   "errorUpdatingVisitAttribute": "Could not update {{attributeName}} attribute",
   "errorUpdatingVisitDetails": "Error updating visit details",
   "errorWhenRestoringVisit": "Error occurred when restoring {{visit}}",
+  "fieldRequired": "This field is required",
   "filterByEncounterType": "Filter by encounter type",
   "form": "Form name",
   "fromDateToDate": "{{fromDate}} - {{toDate}}",

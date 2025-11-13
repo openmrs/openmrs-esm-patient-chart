@@ -71,7 +71,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
       <ModalBody>
         {error ? (
           <ErrorState headerTitle={t('visits', 'visits')} error={error} />
-        ) : visits?.length == 0 ? (
+        ) : visits?.length === 0 ? (
           <Tile className={styles.tile}>
             <div className={styles.tileContent}>
               <p className={styles.content}>{t('noVisitsToDisplay', 'No visits to display')}</p>
@@ -127,7 +127,7 @@ interface VisitCardRowProps {
 }
 
 /**
- * A clickable row within the the visit context switcher to select a visit. This
+ * A clickable row within the visit context switcher to select a visit. This
  * has slightly different UX than a regular radio button, as the entire card
  * (not just the radio button and the label) is clickable
  */

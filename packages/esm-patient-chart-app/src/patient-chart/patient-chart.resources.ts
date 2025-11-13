@@ -32,7 +32,7 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  * in‑app navigation. On a full page reload, visitContext is rehydrated by refetching
  * (via useVisit/useVisitByUuId) rather than restored from storage.
  * When we enter the chart, we want to update the visit context as follows:
- * does the the stored visitContext exist and belong to the patient?
+ * does the stored visitContext exist and belong to the patient?
  * 1. If so, the visitContext should be valid but possibly stale; fetch the visit again
  *    and update the context
  * 2. If not, fetch the active visit of the patient, If it exists, set it as the
@@ -50,7 +50,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     setVisitContext,
   } = usePatientChartStore(patientUuid);
 
-  const isVisitContextValid = visitContext && visitContext.patient.uuid === patientUuid;
+  const isVisitContextValid = visitContext && visitContext.patient?.uuid === patientUuid;
   const {
     visit: newVisitContext,
     mutate: newMutateVisitContext,

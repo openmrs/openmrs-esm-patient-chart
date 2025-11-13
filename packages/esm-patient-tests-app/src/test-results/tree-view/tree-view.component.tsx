@@ -71,19 +71,7 @@ const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; lo
             })}
           >
             <IndividualResultsTable
-              className={classNames({
-                [styles.border]: filteredSubRows?.entries.length,
-              })}
-            >
-              <IndividualResultsTable
-                isLoading={loadingPanelData}
-                subRows={filteredSubRows}
-                index={index}
-                title={filteredSubRows.key}
-              />
-            </div>
-          ) : null;
-        })}
+              patientUuid={patientUuid}
               isLoading={loadingPanelData}
               subRows={filteredSubRows}
               index={index}
@@ -127,7 +115,11 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
           {!isLoading && view === 'over-time' ? (
             <GroupedTimeline patientUuid={patientUuid} />
           ) : view === 'individual-test' ? (
-            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={isLoading} />
+            <GroupedPanelsTables
+              patientUuid={patientUuid}
+              className={styles.groupPanelsTables}
+              loadingPanelData={isLoading}
+            />
           ) : (
             <DataTableSkeleton role="progressbar" />
           )}

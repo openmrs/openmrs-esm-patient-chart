@@ -60,6 +60,8 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
 
   render(
     <FlagsList
+      visitContext={null}
+      mutateVisitContext={null}
       closeWorkspace={jest.fn()}
       closeWorkspaceWithSavedChanges={jest.fn()}
       patientUuid={mockPatient.id}

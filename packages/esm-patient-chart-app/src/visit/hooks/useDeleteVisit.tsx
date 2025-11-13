@@ -64,7 +64,7 @@ export function useDeleteVisit(
       .then(() => {
         // Update active visit data
         mutateActiveVisit();
-        if (activeVisit.uuid == visitContext?.uuid) {
+        if (activeVisit.uuid === visitContext?.uuid) {
           setVisitContext(null, null);
         }
 
