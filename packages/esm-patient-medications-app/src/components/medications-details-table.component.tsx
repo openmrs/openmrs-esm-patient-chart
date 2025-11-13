@@ -539,8 +539,8 @@ function OrderBasketItemActions({
           value: order.frequency?.display,
         },
         route: {
-          valueCoded: typeof order.route === 'string' ? order.route : order.route?.uuid,
-          value: typeof order.route === 'string' ? undefined : order.route?.display,
+          valueCoded: order.route?.uuid,
+          value: order.route?.display,
         },
         commonMedicationName: order.drug?.display,
         isFreeTextDosage: order.dosingType === 'org.openmrs.FreeTextDosingInstructions',
