@@ -7,6 +7,8 @@ import {
 } from '../types/fhir-immunization-domain';
 import { type ExistingDoses, type ImmunizationFormData, type ImmunizationGrouped } from '../types';
 
+export const FHIR_NEXT_DOSE_DATE_EXTENSION_URL = 'http://hl7.eu/fhir/StructureDefinition/immunization-nextDoseDate';
+
 const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizationResource): ExistingDoses | null => {
   if (!immunizationResource) {
     return null;
@@ -17,12 +19,21 @@ const mapToImmunizationDoseFromResource = (immunizationResource: FHIRImmunizatio
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const doseNumber = protocolApplied?.doseNumberPositiveInt;
   const occurrenceDateTime = immunizationResource?.occurrenceDateTime?.toString();
+
+  const nextDoseDateExtension = immunizationResource?.extension?.find(
+    (ext) => ext.url === FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
+  );
+  const nextDoseDate = nextDoseDateExtension?.valueDateTime?.toString();
+
   const expirationDate = immunizationResource?.expirationDate?.toString();
+  const note = immunizationResource?.note?.length > 0 && immunizationResource?.note[0]?.text;
   return {
     immunizationObsUuid,
     manufacturer,
     lotNumber,
+    nextDoseDate,
     doseNumber,
+    note: note ? [{ text: note }] : [],
     occurrenceDateTime,
     expirationDate,
     visitUuid: fromReference(immunizationResource?.encounter),
@@ -69,7 +80,7 @@ export const mapFromFHIRImmunizationBundle = (
 
   const validGroups = Object.entries(groupByImmunization).filter(([key]) => key);
 
-  return validGroups.map(([key, immunizationsForOneVaccine]) => {
+  const groups = validGroups.map(([key, immunizationsForOneVaccine]) => {
     const existingDoses: Array<ExistingDoses> = immunizationsForOneVaccine
       .map(mapToImmunizationDoseFromResource)
       .filter((dose) => dose !== null);
@@ -82,6 +93,9 @@ export const mapFromFHIRImmunizationBundle = (
       existingDoses: orderBy(existingDoses, [(dose) => dose.occurrenceDateTime], ['desc']),
     };
   });
+
+  // Sort vaccine groups by most recent dose date (descending)
+  return orderBy(groups, [(g) => g.existingDoses?.[0]?.occurrenceDateTime ?? ''], ['desc']);
 };
 
 function toReferenceOfType(type: string, referenceValue: string): Reference {
@@ -105,31 +119,54 @@ export const mapToFHIRImmunizationResource = (
   locationUuid: string,
   providerUuid: string,
 ): FHIRImmunizationResource => {
-  return {
+  const resource: FHIRImmunizationResource = {
     resourceType: 'Immunization',
     status: 'completed',
     id: immunizationFormData.immunizationId,
     vaccineCode: {
-      coding: [
-        {
-          code: immunizationFormData.vaccineUuid,
-          display: immunizationFormData.vaccineName,
-        },
-      ],
+      coding: [{ code: immunizationFormData.vaccineUuid, display: immunizationFormData.vaccineName }],
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
-    encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
+    encounter: toReferenceOfType('Encounter', visitUuid),
     occurrenceDateTime: immunizationFormData.vaccinationDate,
-    expirationDate: immunizationFormData.expirationDate,
+    expirationDate: immunizationFormData.expirationDate || undefined,
+    extension: immunizationFormData.nextDoseDate
+      ? [
+          {
+            url: FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
+            valueDateTime: immunizationFormData.nextDoseDate,
+          },
+        ]
+      : [],
+    note: immunizationFormData.note?.trim() ? [{ text: immunizationFormData.note.trim() }] : [],
     location: toReferenceOfType('Location', locationUuid),
-    performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
-    manufacturer: { display: immunizationFormData.manufacturer },
-    lotNumber: immunizationFormData.lotNumber,
-    protocolApplied: [
-      {
-        doseNumberPositiveInt: immunizationFormData.doseNumber,
-        series: null, // the backend currently does not support "series"
-      },
-    ],
   };
+
+  // performer: only when provider is present
+  if (providerUuid) {
+    resource.performer = [{ actor: toReferenceOfType('Practitioner', providerUuid) }];
+  }
+
+  // manufacturer: only when non-empty
+  const manufacturer = immunizationFormData.manufacturer?.trim();
+  if (manufacturer) {
+    resource.manufacturer = {
+      display: manufacturer,
+    };
+  }
+
+  // lotNumber: only when non-empty
+  const lotNumber = immunizationFormData.lotNumber?.trim();
+  if (lotNumber) {
+    resource.lotNumber = lotNumber;
+  }
+
+  // protocolApplied: only when dose is a number >= 1
+  const dose = immunizationFormData.doseNumber;
+  if (typeof dose === 'number' && dose >= 1) {
+    resource.protocolApplied = [{ doseNumberPositiveInt: dose }];
+  }
+  // if dose is null/undefined, omit protocolApplied entirely to clear backend dose
+
+  return resource;
 };

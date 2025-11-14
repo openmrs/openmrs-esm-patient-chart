@@ -73,9 +73,9 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
           testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
           result: resultValue,
           normalRange:
-            memberConcept.hiNormal && memberConcept.lowNormal
+            memberConcept.lowNormal != null && memberConcept.hiNormal != null
               ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
-              : 'N/A',
+              : t('notApplicable', 'Not applicable'),
         };
       });
     }
@@ -95,13 +95,16 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
         result: resultValue,
-        normalRange: concept.hiNormal && concept.lowNormal ? `${concept.lowNormal} - ${concept.hiNormal}` : 'N/A',
+        normalRange:
+          concept.lowNormal != null && concept.hiNormal != null
+            ? `${concept.lowNormal} - ${concept.hiNormal}`
+            : t('notApplicable', 'Not applicable'),
       },
     ];
-  }, [concept, isLoadingResult, testResultObs]);
+  }, [concept, isLoadingResult, testResultObs, t]);
 
   if (isLoadingTestConcepts || isLoadingResult) {
-    return <DataTableSkeleton role="progressbar" compact={isTablet} zebra />;
+    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
   if (!concept) {
@@ -113,7 +116,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
       <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label="test orders">
+            <Table {...getTableProps()} aria-label={t('testOrders', 'Test orders')}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -123,7 +126,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })} key={row.id}>
+                  <TableRow {...getRowProps({ row })}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id} className={styles.testCell}>
                         {cell.value}

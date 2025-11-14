@@ -41,14 +41,14 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
           {isTablet ? (
             <Layer>
               <Search
-                labelText=""
+                labelText={t('searchForAVisitType', 'Search for a visit type')}
                 onChange={handleSearchTermChange}
                 placeholder={t('searchForAVisitType', 'Search for a visit type')}
               />
             </Layer>
           ) : (
             <Search
-              labelText=""
+              labelText={t('searchForAVisitType', 'Search for a visit type')}
               onChange={handleSearchTermChange}
               placeholder={t('searchForAVisitType', 'Search for a visit type')}
             />
@@ -77,7 +77,13 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ visitTypes }) => {
                   valueSelected={value}
                 >
                   {results.map(({ uuid, display, name }) => (
-                    <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+                    <RadioButton
+                      className={styles.radioButton}
+                      id={`visit-type-${uuid}`}
+                      key={uuid}
+                      labelText={display}
+                      value={uuid}
+                    />
                   ))}
                 </RadioButtonGroup>
               )}

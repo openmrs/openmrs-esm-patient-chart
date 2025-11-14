@@ -53,7 +53,7 @@ export function deleteVisit(visitUuid: string) {
 }
 
 export function restoreVisit(visitUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}`, {
+  return openmrsFetch<Visit>(`${restBaseUrl}/visit/${visitUuid}`, {
     headers: {
       'content-type': 'application/json',
     },
@@ -64,8 +64,11 @@ export function restoreVisit(visitUuid: string) {
 
 export interface Order {
   uuid: string;
+  action?: string | null;
+  autoExpireDate?: Date | null;
   dateActivated: string;
   dateStopped?: Date | null;
+  fulfillerStatus?: string | null;
   dose: number;
   dosingInstructions: string | null;
   dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
@@ -92,13 +95,7 @@ export interface Order {
   orderNumber: string;
   orderReason: string | null;
   orderReasonNonCoded: string | null;
-  orderer: {
-    uuid: string;
-    person: {
-      uuid: string;
-      display: string;
-    };
-  };
+  orderer: OpenmrsResource;
   orderType: {
     uuid: string;
     display: string;

@@ -37,7 +37,13 @@ const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({
   return (
     <UserHasAccess privilege="Edit Visits">
       {compact ? (
-        <IconButton onClick={editVisitDetails} label={getCoreTranslation('edit')} size={responsiveSize} kind="ghost">
+        <IconButton
+          onClick={editVisitDetails}
+          label={getCoreTranslation('edit')}
+          size={responsiveSize}
+          kind="ghost"
+          align="top-end"
+        >
           <EditIcon size={16} />
         </IconButton>
       ) : (

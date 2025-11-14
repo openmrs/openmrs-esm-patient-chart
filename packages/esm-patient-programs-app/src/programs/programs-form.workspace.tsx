@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -207,7 +208,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           {...field}
           id="enrollmentDate"
           data-testid="enrollmentDate"
-          maxDate={new Date()}
+          maxDate={(() => {
+            const completionDate = watch('completionDate');
+            return completionDate ? dayjs(completionDate).subtract(1, 'day').toDate() : new Date();
+          })()}
           labelText={t('dateEnrolled', 'Date enrolled')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}
@@ -225,8 +229,9 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           {...field}
           id="completionDate"
           data-testid="completionDate"
-          minDate={new Date(watch('enrollmentDate'))}
+          minDate={dayjs(watch('enrollmentDate')).add(1, 'day').toDate()}
           maxDate={new Date()}
+          isDisabled={dayjs(watch('enrollmentDate')).isSame(dayjs(), 'day')}
           labelText={t('dateCompleted', 'Date completed')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}

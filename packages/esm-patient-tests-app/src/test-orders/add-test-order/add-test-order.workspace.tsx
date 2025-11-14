@@ -13,12 +13,7 @@ import {
   useLayoutType,
   useConfig,
 } from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  type OrderBasketItem,
-  useOrderType,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { type DefaultPatientWorkspaceProps, type OrderBasketItem, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
@@ -40,10 +35,13 @@ export default function AddLabOrderWorkspace({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   setTitle,
+  patientUuid,
+  patient,
+  visitContext,
+  mutateVisitContext,
 }: AddLabOrderWorkspace) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { patientUuid, patient } = usePatientChartStore();
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
@@ -115,12 +113,15 @@ export default function AddLabOrderWorkspace({
           setTitle={() => {}}
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
+          visitContext={visitContext}
+          mutateVisitContext={mutateVisitContext}
         />
       ) : (
         <TestTypeSearch
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
           openLabForm={setCurrentLabOrder}
+          patient={patient}
         />
       )}
     </div>

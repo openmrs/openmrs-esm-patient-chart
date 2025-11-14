@@ -38,7 +38,6 @@ jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
   useDrugSearch: jest.fn(),
   useDrugTemplate: jest.fn(),
-  useDebounce: jest.fn().mockImplementation((x) => x),
 }));
 
 jest.mock('../api/api', () => ({
@@ -57,6 +56,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
       isLoading: false,
       drugs: mockDrugSearchResultApiData,
       error: null,
+      isValidating: false,
+      mutate: jest.fn(),
     }));
 
     mockUseDrugTemplate.mockImplementation((drugUuid) => ({
@@ -114,7 +115,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
 
     const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('div').parentElement;
@@ -138,7 +139,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
     const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
     const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
@@ -153,7 +154,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     renderAddDrugOrderWorkspace();
 
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
@@ -194,6 +195,8 @@ function renderAddDrugOrderWorkspace() {
       patientUuid={mockPatient.id}
       patient={mockPatient}
       setTitle={jest.fn()}
+      visitContext={null}
+      mutateVisitContext={null}
     />,
   );
 }

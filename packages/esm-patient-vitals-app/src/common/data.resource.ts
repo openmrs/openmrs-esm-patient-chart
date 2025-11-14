@@ -11,7 +11,12 @@ import {
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
-import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
+import {
+  assessValue,
+  calculateBodyMassIndex,
+  interpretBloodPressure,
+  mapFhirInterpretationToObservationInterpretation,
+} from './helpers';
 import type {
   FHIRObservationResource,
   FHIRSearchBundleResponse,
@@ -323,23 +328,13 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalSigns.diastolic,
           concepts,
           conceptRanges,
+          vitalSigns.systolicRenderInterpretation,
+          vitalSigns.diastolicRenderInterpretation,
         );
-        result.pulseRenderInterpretation = assessValue(
-          vitalSigns.pulse,
-          getReferenceRangesForConcept(concepts.pulseUuid, conceptRanges),
-        );
-        result.temperatureRenderInterpretation = assessValue(
-          vitalSigns.temperature,
-          getReferenceRangesForConcept(concepts.temperatureUuid, conceptRanges),
-        );
-        result.spo2RenderInterpretation = assessValue(
-          vitalSigns.spo2,
-          getReferenceRangesForConcept(concepts.oxygenSaturationUuid, conceptRanges),
-        );
-        result.respiratoryRateRenderInterpretation = assessValue(
-          vitalSigns.respiratoryRate,
-          getReferenceRangesForConcept(concepts.respiratoryRateUuid, conceptRanges),
-        );
+        result.pulseRenderInterpretation = vitalSigns.pulseRenderInterpretation;
+        result.temperatureRenderInterpretation = vitalSigns.temperatureRenderInterpretation;
+        result.spo2RenderInterpretation = vitalSigns.spo2RenderInterpretation;
+        result.respiratoryRateRenderInterpretation = vitalSigns.respiratoryRateRenderInterpretation;
       }
 
       return result;
@@ -472,7 +467,14 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   return {
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
-    interpretation: assessValue(resource?.valueQuantity?.value, referenceRanges),
+    // Use Observation.interpretation from FHIR when available (preferred).
+    // Fallback to calculation for backward compatibility: existing observations may not have
+    // interpretation set if they were created before interpretation was added, or if reference
+    // ranges weren't available at creation time (OpenMRS core only sets interpretation when
+    // ObsReferenceRange is present).
+    interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
+      ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
+      : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
   };

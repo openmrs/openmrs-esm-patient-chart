@@ -1,7 +1,5 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import flagTagsComponent from './flags/flags-highlight-bar.component';
-import flagsOverviewComponent from './flags/flags.component';
 
 const moduleName = '@openmrs/esm-patient-flags-app';
 
@@ -11,18 +9,18 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const flagTags = getSyncLifecycle(flagTagsComponent, {
+export const flagTags = getAsyncLifecycle(() => import('./flags/flags-highlight-bar.component'), {
   featureName: 'patient-flag-tags',
   moduleName,
 });
 
-export const flagsOverview = getSyncLifecycle(flagsOverviewComponent, {
+export const flagsOverview = getAsyncLifecycle(() => import('./flags/flags.component'), {
   featureName: 'patient-flags-overview',
   moduleName,
 });
 
-export const editPatientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/flags-list.component'), {
-  featureName: 'edit-flags-side-panel-form',
+export const patientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/patient-flags.workspace'), {
+  featureName: 'patient-flags-workspace',
   moduleName,
 });
 

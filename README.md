@@ -1,4 +1,4 @@
-:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org) :teacher:	
+:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/x/IABBHg) :teacher:
 
 ![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
 
@@ -8,17 +8,18 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 
 - [Allergies](packages/esm-patient-allergies-app/README.md)
 - [Attachments](packages/esm-patient-attachments-app/README.md)
-- [Biometrics](packages/esm-patient-biometrics-app/README.md)
 - [Conditions](packages/esm-patient-conditions-app/README.md)
+- [Flags](packages/esm-patient-flags-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
+- [Lists](packages/esm-patient-lists-app/README.md)
 - [Medications](packages/esm-patient-medications-app/README.md)
 - [Notes](packages/esm-patient-notes-app/README.md)
+- [Orders](packages/esm-patient-orders-app/README.md)
 - [Patient banner](packages/esm-patient-banner-app/README.md)
-- [Patient chart](packages/esm-patient-chart-app/README.md)
 - [Programs](packages/esm-patient-programs-app/README.md)
 - [Tests](packages/esm-patient-tests-app/README.md)
-- [Vitals](packages/esm-patient-vitals-app/README.md)
+- [Vitals and Biometrics](packages/esm-patient-vitals-app/README.md)
 
 In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
 
@@ -27,7 +28,7 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 ## Setup
 
-Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
+Check out the developer documentation [in the Wiki](https://openmrs.atlassian.net/wiki/x/IABBHg).
 
 This monorepo uses [yarn](https://yarnpkg.com).
 
@@ -53,11 +54,11 @@ You could run `yarn start` with as many `sources` arguments as you require. For 
 yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/esm-patient-vitals-app'
 ```
 
-Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
+Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962685/Develop+Frontend+Modules#Using-import-map-overrides).
 
-## Running tests
+## Running unit and integration tests
 
-To run tests for all packages, run:
+To run unit and integration tests for all packages, run:
 
 ```bash
 yarn turbo run test
@@ -83,8 +84,7 @@ yarn turbo run test -- visit-notes-form
 
 The above command will only run tests in the file or files that match the provided string.
 
-You can also run the matching tests from above in watch mode. In order to interact with the
-test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
+You can also run the matching tests from above in watch mode. In order to interact with the test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
 and then press "enter" in the Turbo UI to activate interactive mode.
 
 ```bash
@@ -103,13 +103,60 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
-To run end-to-end tests, run:
+## Running End-to-End (E2E) tests 
+
+Before running the E2E tests, you need to set up the test environment. Install Playwright browsers and setup the default test environment variables by running the following commands: 
+
+```bash
+npx playwright install
+cp example.env .env
+```
+
+By default, tests run against a local backend at http://localhost:8080/openmrs. To test local changes, make sure your dev server is running before executing tests. For example, to test local changes to the Allergies app, run:
+
+```bash
+yarn start --sources packages/esm-patient-allergies-app
+```
+
+To test against a remote instance (such as the OpenMRS refapp hosted on dev3.openmrs.org, update the E2E_BASE_URL environment variable in your .env file:
+
+```
+E2E_BASE_URL=https://dev3.openmrs.org/openmrs
+```
+
+To run E2E tests:
 
 ```bash
 yarn test-e2e
 ```
 
-Read the [e2e testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/end-to-end-testing) to learn more about End-to-End tests in this project.
+This will run all the E2E tests (files in the e2e directory with the *.spec.ts extension) in headless mode. That means no browser UI will be visible.
+
+To run tests in headed mode (shows the browser while tests run) use:
+
+```bash
+yarn test-e2e --headed
+```
+
+To run tests in Playwright's UI mode (interactive debugger), use:
+
+```bash
+yarn test-e2e --ui
+```
+
+You'll most often want to run tests in both headed and UI mode:
+
+```bash
+yarn test-e2e --headed --ui
+```
+
+To run a specific test file:
+
+```bash
+yarn test-e2e <test-name>
+```
+
+Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) to learn more about End-to-End tests in this project.
 
 ### Updating Playwright
 
@@ -162,4 +209,4 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 
 ## Deployment
 
-See [Creating a Distribution](http://o3-dev.docs.openmrs.org/#/main/distribution?id=creating-a-distribution) for information about adding microfrontends to a distribution.
+See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.

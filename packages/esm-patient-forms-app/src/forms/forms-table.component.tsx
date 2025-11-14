@@ -80,7 +80,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                         </Link>
                       </TableCell>
                       <TableCell className={styles.editCell}>
-                        <label>{row.cells[1].value ?? t('never', 'Never')}</label>
+                        <span>{row.cells[1].value ?? t('never', 'Never')}</span>
                       </TableCell>
                     </TableRow>
                   ))}

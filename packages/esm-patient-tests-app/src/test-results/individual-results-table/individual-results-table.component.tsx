@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { rangeAlreadyHasUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   DataTableSkeleton,
@@ -13,11 +14,12 @@ import {
   TableRow,
 } from '@carbon/react';
 import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-framework';
-import { getPatientUuidFromStore, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
 
 interface IndividualResultsTableProps {
+  patientUuid;
   isLoading: boolean;
   subRows: GroupedObservation;
   index: number;
@@ -50,10 +52,15 @@ const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
   }
 };
 
-const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoading, subRows, index, title }) => {
+const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
+  patientUuid,
+  isLoading,
+  subRows,
+  index,
+  title,
+}) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const patientUuid = getPatientUuidFromStore();
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const headerTitle = t(title);
@@ -85,8 +92,18 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
     () =>
       subRows?.entries.length &&
       subRows.entries.map((row, i) => {
-        const { units = '', range = '' } = row;
+        // Use observation-level range/units if available, otherwise fallback to node-level
+        // MappedObservation has range and units fields, but they may come from node-level
+        const displayRange = row.range ?? '';
+        const displayUnits = row.units ?? '';
         const isString = isNaN(parseFloat(row.value));
+
+        // Check if range already includes units to avoid duplication
+        // formatReferenceRange includes units, so if range has units, don't append again
+        const hasUnits = rangeAlreadyHasUnits(displayRange, displayUnits);
+        const referenceRangeDisplay = hasUnits
+          ? displayRange
+          : `${displayRange || '--'} ${displayUnits || ''}`.trim() || '--';
 
         return {
           ...row,
@@ -106,10 +123,10 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({ isLoadi
             </span>
           ),
           value: {
-            value: `${row.value} ${row.units ?? ''}`,
+            value: `${row.value} ${displayUnits}`,
             interpretation: row?.interpretation,
           },
-          referenceRange: `${range || '--'} ${units || '--'}`,
+          referenceRange: referenceRangeDisplay,
         };
       }),
     [index, subRows, launchResultsDialog],

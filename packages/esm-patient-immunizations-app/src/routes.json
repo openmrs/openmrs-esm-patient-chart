@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "extensions": [
     {
@@ -10,9 +10,20 @@
       "order": 8
     },
     {
+      "name": "immunization-detailed-history-card",
+      "component": "immunizationHistorySummary",
+      "slot": "patient-chart-immunizations-dashboard-slot",
+      "meta": {
+        "fullWidth": true
+      }
+    },
+    {
       "name": "immunization-details-widget",
       "component": "immunizationsDetailedSummary",
-      "slot": "patient-chart-immunizations-dashboard-slot"
+      "slot": "patient-chart-immunizations-dashboard-slot",
+      "meta": {
+        "fullWidth": true
+      }
     },
     {
       "name": "immunization-summary-dashboard",

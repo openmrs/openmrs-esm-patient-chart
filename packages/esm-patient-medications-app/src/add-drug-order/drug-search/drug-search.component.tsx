@@ -16,9 +16,10 @@ import styles from './order-basket-search.scss';
 
 export interface DrugSearchProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
+  patient: fhir.Patient;
 }
 
-export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
+export default function DrugSearch({ openOrderForm, patient }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,10 +33,17 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
     });
   }, []);
 
-  const focusAndClearSearchInput = () => {
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value ?? '');
+    },
+    [setSearchTerm],
+  );
+
+  const focusAndClearSearchInput = useCallback(() => {
     setSearchTerm('');
     searchInputRef.current?.focus();
-  };
+  }, [setSearchTerm]);
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -44,7 +52,7 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
           size="lg"
           placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}
         />
@@ -53,6 +61,7 @@ export default function DrugSearch({ openOrderForm }: DrugSearchProps) {
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
+        patient={patient}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>

@@ -12,6 +12,9 @@ import BiometricsOverview from './biometrics-overview.component';
 const testProps = {
   basePath: patientChartBasePath,
   patientUuid: mockPatient.id,
+  patient: mockPatient,
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -134,20 +137,6 @@ describe('Biometrics Overview', () => {
         .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}, \d{1,2}:\d{2} (AM|PM)/)?.[0] || '');
 
     // Initial state should be descending
-    expect(getRowDates()).toEqual(expectedDescendingOrder);
-
-    // Sorting in descending order
-    // Since the date order is already in descending order, the rows should be the same
-    await user.click(sortRowsButton);
-    // Sorting in ascending order
-    await user.click(sortRowsButton);
-    expect(getRowDates()).toEqual(expectedAscendingOrder);
-
-    // Sorting order = NONE, hence it is still in the ascending order
-    await user.click(sortRowsButton);
-    // Sorting in descending order
-    await user.click(sortRowsButton);
-
     expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 

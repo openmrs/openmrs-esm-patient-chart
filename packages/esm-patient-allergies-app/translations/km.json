@@ -47,5 +47,6 @@
   "severityRequired": "Severity is required",
   "typeAdditionalComments": "វាយបញ្ចូលមតិបន្ថែមនៅទីនេះ",
   "typeAllergenName": "សូមវាយបញ្ចូលឈ្មោះអាឡែហ្ស៊ី",
-  "typeAllergicReactionName": "សូមវាយបញ្ចូលឈ្មោះប្រតិកម្មអាលែហ្សី"
+  "typeAllergicReactionName": "សូមវាយបញ្ចូលឈ្មោះប្រតិកម្មអាលែហ្សី",
+  "unknown": "Unknown"
 }

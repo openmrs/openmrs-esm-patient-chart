@@ -5,7 +5,7 @@ import {
   queueSynchronizationItem,
   useConnectivity,
   useSession,
-  useVisit,
+  type useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
@@ -21,20 +21,6 @@ export const visitSyncType = 'visit';
  */
 export interface OfflineVisit extends NewVisitPayload {
   uuid: string;
-}
-
-/**
- * Similar to {@link useVisit}, returns the given patient's active visit, but also considers
- * offline visits created by the patient chart while offline.
- * @param patientUuid The UUID of the patient.
- */
-export function useVisitOrOfflineVisit(patientUuid: string) {
-  const isOnline = useConnectivity();
-
-  const onlineVisit = useVisit(patientUuid);
-  const offlineVisit = useOfflineVisit(patientUuid);
-
-  return isOnline ? onlineVisit : offlineVisit;
 }
 
 /**
@@ -132,7 +118,7 @@ export async function createOfflineVisitForPatient(
   };
 
   await queueSynchronizationItem(visitSyncType, offlineVisit, descriptor);
-  return offlineVisit;
+  return offlineVisitToVisit(offlineVisit);
 }
 
 function offlineVisitToVisit(offlineVisit: OfflineVisit): Visit {

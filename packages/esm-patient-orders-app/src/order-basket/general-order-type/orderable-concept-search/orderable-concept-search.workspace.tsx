@@ -11,10 +11,10 @@ import {
   type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
 import {
+  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   useOrderBasket,
   useOrderType,
-  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
@@ -22,7 +22,7 @@ import { type ConfigObject } from '../../../config-schema';
 import OrderableConceptSearchResults from './search-results.component';
 import styles from './orderable-concept-search.scss';
 
-interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
+interface OrderableConceptSearchWorkspaceProps extends DefaultPatientWorkspaceProps {
   order: OrderBasketItem;
   orderTypeUuid: string;
   orderableConceptClasses: Array<string>;
@@ -31,10 +31,10 @@ interface OrderableConceptSearchWorkspaceProps extends DefaultWorkspaceProps {
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
-type DrugsOrOrders = Pick<OrderBasketItem, 'action'>;
+type DrugsOrOrders = Pick<OrderBasketItem, 'action' | 'concept'>;
 
 export function ordersEqual(order1: DrugsOrOrders, order2: DrugsOrOrders) {
-  return order1.action === order2.action;
+  return order1.action === order2.action && order1.concept.uuid === order2.concept.uuid;
 }
 
 const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceProps> = ({
@@ -44,11 +44,14 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   setTitle,
+  patientUuid,
+  patient,
+  visitContext,
+  mutateVisitContext,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
-  const { patientUuid, patient } = usePatientChartStore();
+  const { orders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { orderType } = useOrderType(orderTypeUuid);
@@ -112,6 +115,8 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           orderableConceptSets={orderableConceptSets}
           patientUuid={patientUuid}
           patient={patient}
+          visitContext={visitContext}
+          mutateVisitContext={mutateVisitContext}
           setTitle={() => {}}
         />
       ) : (
@@ -120,6 +125,7 @@ const OrderableConceptSearchWorkspace: React.FC<OrderableConceptSearchWorkspaceP
           closeWorkspace={closeWorkspace}
           orderableConceptSets={orderableConceptSets}
           orderTypeUuid={orderTypeUuid}
+          patient={patient}
         />
       )}
     </div>
@@ -131,9 +137,16 @@ interface ConceptSearchProps {
   openOrderForm: (search: OrderBasketItem) => void;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  patient: fhir.Patient;
 }
 
-function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderableConceptSets }: ConceptSearchProps) {
+function ConceptSearch({
+  closeWorkspace,
+  orderTypeUuid,
+  openOrderForm,
+  orderableConceptSets,
+  patient,
+}: ConceptSearchProps) {
   const { t } = useTranslation();
   const { orderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
@@ -152,8 +165,10 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
     searchInputRef.current?.focus();
   };
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchTerm(event.target.value ?? '');
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value ?? ''),
+    [setSearchTerm],
+  );
 
   return (
     <div className={styles.searchPopupContainer}>
@@ -167,7 +182,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
           labelText={t('searchFieldOrder', 'Search for {{orderType}} order', {
             orderType: orderType?.display ?? '',
           })}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}
         />
@@ -180,6 +195,7 @@ function ConceptSearch({ closeWorkspace, orderTypeUuid, openOrderForm, orderable
         orderTypeUuid={orderTypeUuid}
         cancelOrder={() => {}}
         orderableConceptSets={orderableConceptSets}
+        patient={patient}
       />
       {isTablet && (
         <div className={styles.separatorContainer}>

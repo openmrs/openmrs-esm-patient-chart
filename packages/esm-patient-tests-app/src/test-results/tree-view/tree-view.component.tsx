@@ -19,9 +19,10 @@ interface TreeViewProps {
   error?: string;
 }
 
-const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boolean }> = ({
+const GroupedPanelsTables: React.FC<{ patientUuid: string; className: string; loadingPanelData: boolean }> = ({
   className,
   loadingPanelData,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
   const { checkboxes, someChecked, tableData } = useContext(FilterContext);
@@ -33,16 +34,23 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
         ?.filter(
           (row) =>
             !someChecked ||
-            row.entries?.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey)),
+            (row.entries &&
+              Array.isArray(row.entries) &&
+              row.entries.some((entry) => selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey))),
         )
         .map((subRows: GroupedObservation, index) => {
           return {
             ...subRows,
-            entries: subRows.entries?.filter(
-              (entry) =>
-                !someChecked ||
-                selectedCheckboxes.some((selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey),
-            ),
+            entries:
+              subRows.entries && Array.isArray(subRows.entries)
+                ? subRows.entries.filter(
+                    (entry) =>
+                      !someChecked ||
+                      selectedCheckboxes.some(
+                        (selectedKey) => entry.flatName === selectedKey || entry.key === selectedKey,
+                      ),
+                  )
+                : [],
           };
         }),
     [tableData, someChecked, selectedCheckboxes],
@@ -58,19 +66,20 @@ const GroupedPanelsTables: React.FC<{ className: string; loadingPanelData: boole
         return filteredSubRows.entries?.length > 0 ? (
           <div
             key={index}
-              className={classNames({
-                [styles.border]: filteredSubRows?.entries.length,
-              })}
-            >
-              <IndividualResultsTable
-                isLoading={loadingPanelData}
-                subRows={filteredSubRows}
-                index={index}
-                title={filteredSubRows.key}
-              />
-            </div>
-          ) : null;
-        })}
+            className={classNames({
+              [styles.border]: filteredSubRows?.entries.length,
+            })}
+          >
+            <IndividualResultsTable
+              patientUuid={patientUuid}
+              isLoading={loadingPanelData}
+              subRows={filteredSubRows}
+              index={index}
+              title={filteredSubRows.key}
+            />
+          </div>
+        ) : null;
+      })}
     </Layer>
   );
 };
@@ -81,9 +90,10 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const config = useConfig<ConfigObject>();
   const conceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, error } = useGetManyObstreeData(patientUuid, conceptUuids);
 
-  const { timelineData, resetTree, isLoading } = useContext(FilterContext);
+  const { timelineData, tableData, totalResultsCount, filteredResultsCount, resetTree, isLoading } =
+    useContext(FilterContext);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
@@ -102,7 +112,17 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
     return (
       <>
         <div>
-          {!isLoading ? <GroupedTimeline patientUuid={patientUuid} /> : <DataTableSkeleton role="progressbar" />}
+          {!isLoading && view === 'over-time' ? (
+            <GroupedTimeline patientUuid={patientUuid} />
+          ) : view === 'individual-test' ? (
+            <GroupedPanelsTables
+              patientUuid={patientUuid}
+              className={styles.groupPanelsTables}
+              loadingPanelData={isLoading}
+            />
+          ) : (
+            <DataTableSkeleton role="progressbar" />
+          )}
         </div>
         <div className={styles.floatingTreeButton}>
           <Button
@@ -122,9 +142,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
                   {t('resetTreeText', 'Reset tree')}
                 </Button>
                 <Button kind="primary" size="xl" onClick={() => setShowTreeOverlay(false)} disabled={isLoading}>
-                  {`${t('view', 'View')} ${
-                    !isLoading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
-                  } ${t('resultsText', 'results')}`}
+                  {`${t('view', 'View')} ${!isLoading ? filteredResultsCount : ''} ${t('resultsText', 'results')}`}
                 </Button>
               </div>
             }
@@ -148,7 +166,11 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
           <div className={styles.panelViewTimeline}>
-            <GroupedPanelsTables className={styles.groupPanelsTables} loadingPanelData={isLoading} />
+            <GroupedPanelsTables
+              patientUuid={patientUuid}
+              className={styles.groupPanelsTables}
+              loadingPanelData={isLoading}
+            />
           </div>
         ) : view === 'over-time' ? (
           <GroupedTimeline patientUuid={patientUuid} />

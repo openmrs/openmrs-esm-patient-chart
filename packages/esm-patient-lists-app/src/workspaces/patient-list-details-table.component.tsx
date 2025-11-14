@@ -15,7 +15,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { useLayoutType, isDesktop, useDebounce, ConfigurableLink } from '@openmrs/esm-framework';
+import { useLayoutType, isDesktop, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { type MappedListMembers } from '../patient-lists.resource';
 import styles from './patient-list-details-table.scss';
@@ -31,7 +31,6 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm);
 
   const tableHeaders = useMemo(
     () => [
@@ -56,19 +55,17 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
   );
 
   const filteredListMembers = useMemo(() => {
-    if (!debouncedSearchTerm) {
+    if (!searchTerm) {
       return listMembers;
     }
 
-    return debouncedSearchTerm
-      ? fuzzy
-          .filter(debouncedSearchTerm, listMembers, {
-            extract: (member) => `${member.name} ${member.identifier} ${member.sex}`,
-          })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : listMembers;
-  }, [debouncedSearchTerm, listMembers]);
+    return fuzzy
+      .filter(searchTerm, listMembers, {
+        extract: (member) => `${member.name} ${member.identifier} ${member.sex}`,
+      })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
+  }, [searchTerm, listMembers]);
 
   const tableRows = useMemo(
     () =>
@@ -96,7 +93,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
           <Layer>
             <Search
               id={`${id}-search`}
-              labelText=""
+              labelText={t('searchThisList', 'Search this list')}
               onChange={handleSearchTermChange}
               placeholder={t('searchThisList', 'Search this list')}
               size={responsiveSize}
@@ -116,6 +113,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
                     <TableRow>
                       {headers.map((header) => (
                         <TableHeader
+                          key={header.key}
                           {...getHeaderProps({
                             header,
                           })}

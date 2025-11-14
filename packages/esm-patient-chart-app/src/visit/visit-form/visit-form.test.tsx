@@ -1,3 +1,7 @@
+import React from 'react';
+import dayjs from 'dayjs';
+import { fireEvent, render, renderHook, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -7,15 +11,10 @@ import {
   useConfig,
   useEmrConfiguration,
   useLocations,
-  useVisitContextStore,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
-import { fireEvent, render, renderHook, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
-import dayjs from 'dayjs';
-import React from 'react';
 import { mockPatient } from 'tools';
 import { type ChartConfig, esmPatientChartSchema } from '../../config-schema';
 import { useVisitAttributeType } from '../hooks/useVisitAttributeType';
@@ -28,6 +27,9 @@ import {
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
 import VisitForm from './visit-form.workspace';
+
+// Fixed reference time used in time-dependent tests
+const FIXED_NOW = new Date('2023-01-01T08:00:00.000Z');
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -56,6 +58,7 @@ const visitAttributes = {
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockSetTitle = jest.fn();
+const mockMutateVisitContext = jest.fn();
 
 const testProps = {
   openedFrom: 'test',
@@ -65,6 +68,8 @@ const testProps = {
   closeWorkspaceWithSavedChanges: mockCloseWorkspace,
   promptBeforeClosing: mockPromptBeforeClosing,
   setTitle: mockSetTitle,
+  visitContext: null,
+  mutateVisitContext: mockMutateVisitContext,
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);
@@ -178,14 +183,6 @@ mockSaveVisit.mockResolvedValue({
   },
 } as unknown as FetchResponse<Visit>);
 
-jest.mocked(useVisitContextStore).mockReturnValue({
-  manuallySetVisitUuid: null,
-  patientUuid: null,
-  setVisitContext: jest.fn(),
-  mutateVisitCallbacks: {},
-  mutateVisit: jest.fn(),
-});
-
 describe('Visit form', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -216,6 +213,7 @@ describe('Visit form', () => {
   });
 
   it('renders the Start Visit form with all the relevant fields and values', async () => {
+    const user = userEvent.setup();
     renderVisitForm();
 
     // ===================
@@ -235,7 +233,7 @@ describe('Visit form', () => {
     const visitEndTimeFormat = () => screen.queryByRole('combobox', { name: /end time format/i });
 
     // when visit status is new, no start date / end date fields
-    await visitStatusNew.click();
+    await user.click(visitStatusNew);
     expect(visitStartDate()).not.toBeInTheDocument();
     expect(visitStartTime()).not.toBeInTheDocument();
     expect(visitStartTimeFormat()).not.toBeInTheDocument();
@@ -272,7 +270,7 @@ describe('Visit form', () => {
     // Testing the location picker
     const combobox = screen.getByRole('combobox', { name: /Select a location/i });
     expect(screen.getByText(/Outpatient Visit/i)).toBeInTheDocument();
-    await userEvent.click(combobox);
+    await user.click(combobox);
     expect(screen.getByText(/Mosoriot/i)).toBeInTheDocument();
     expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
   });
@@ -325,6 +323,7 @@ describe('Visit form', () => {
     await user.clear(dateInput);
     await user.click(dateInput);
     fireEvent.change(dateInput, { target: { value: futureTime.format('YYYY-MM-DD') } });
+
     await user.clear(timeInput);
     await user.type(timeInput, futureTime.format('hh:mm'));
     await user.selectOptions(amPmSelect, futureTime.format('A'));
@@ -731,7 +730,7 @@ describe('Visit form', () => {
     });
 
     mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema,
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       visitAttributeTypes: [
         {
           uuid: visitAttributes.punctuality.uuid,
@@ -812,7 +811,7 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       }),
     );
 
-    // verity start time set past first encounter time
+    // verify start time set past first encounter time
     const firstEncounterDatetime = dayjs(mockPastVisitWithEncounters.encounters[0].encounterDatetime);
     const badStartTimeAfterEncounterTime = firstEncounterDatetime.add(1, 'minute');
     const badStartTimeAfterEncounterTimeFields = convertToDateTimeFields(badStartTimeAfterEncounterTime);

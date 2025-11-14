@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "extensions": [
     {
@@ -52,7 +52,7 @@
       "type": "clinical-form",
       "canMaximize": true,
       "canHide": true,
-      "width": "extra-wide"
+      "width": "wider"
     },
     {
       "name": "ward-patient-form-entry-workspace",

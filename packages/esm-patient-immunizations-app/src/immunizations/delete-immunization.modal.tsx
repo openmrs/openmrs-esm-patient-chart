@@ -4,7 +4,7 @@ import { Button, InlineLoading, ModalHeader, ModalBody, ModalFooter } from '@car
 import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { deletePatientImmunization, useImmunizations } from '../hooks/useImmunizations';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
-import { type ConfigObject } from '../config-schema';
+import { type ImmunizationConfigObject } from '../config-schema';
 import styles from './delete-immunization.scss';
 
 interface DeleteConfirmModelProps {
@@ -23,8 +23,8 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
   vaccineUuid,
 }) => {
   const { t } = useTranslation();
-  const { immunizationsConfig } = useConfig<ConfigObject>();
-  const { immunizationsConceptSet } = useImmunizationsConceptSet(immunizationsConfig);
+  const config = useConfig<ImmunizationConfigObject>();
+  const { immunizationsConceptSet } = useImmunizationsConceptSet(config);
   const { mutate } = useImmunizations(patientUuid);
   const [isDeleting, setIsDeleting] = useState(false);
 

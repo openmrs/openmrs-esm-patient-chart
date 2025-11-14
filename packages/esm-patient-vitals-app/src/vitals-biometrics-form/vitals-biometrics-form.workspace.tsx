@@ -21,7 +21,6 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useVisit,
 } from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
@@ -46,7 +45,7 @@ import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
 
-interface VitalsAndBiometricsFormProps extends DefaultPatientWorkspaceProps {
+export interface VitalsAndBiometricsFormProps extends DefaultPatientWorkspaceProps {
   formContext: 'creating' | 'editing';
   editEncounterUuid?: string;
 }
@@ -59,6 +58,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
+  visitContext,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -67,7 +67,6 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
   const useMuacColorStatus = config.vitals.useMuacColors;
 
   const session = useSession();
-  const { currentVisit } = useVisit(patientUuid);
   const { conceptUnits, isLoading: isLoadingConceptUnits } = useConceptUnits();
   const { conceptRanges, conceptRangeMap } = useVitalsConceptMetadata(patientUuid);
   const {
@@ -108,7 +107,7 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
 
   useEffect(() => promptBeforeClosing(() => isDirty), [isDirty, promptBeforeClosing]);
 
-  const encounterUuid = currentVisit?.encounters?.find(
+  const encounterUuid = visitContext?.encounters?.find(
     (encounter) => encounter?.form?.uuid === config.vitals.formUuid,
   )?.uuid;
 
@@ -251,8 +250,8 @@ const VitalsAndBiometricsForm: React.FC<VitalsAndBiometricsFormProps> = ({
         state={{
           view: 'form',
           formUuid: config.vitals.formUuid,
-          visitUuid: currentVisit?.uuid,
-          visitTypeUuid: currentVisit?.visitType?.uuid,
+          visitUuid: visitContext?.uuid,
+          visitTypeUuid: visitContext?.visitType?.uuid,
           patientUuid: patientUuid ?? null,
           patient,
           encounterUuid,

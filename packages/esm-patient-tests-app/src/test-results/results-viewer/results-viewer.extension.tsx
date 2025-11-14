@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { type TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -22,14 +23,14 @@ interface RefreshDataButtonProps {
 
 interface ResultsViewerProps {
   basePath: string;
-  patientUuid?: string;
+  patientUuid: string;
 }
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const conceptUuids = config.resultsViewerConcepts.map((concept) => concept.conceptUuid) ?? [];
-  const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, isLoading, error } = useGetManyObstreeData(patientUuid, conceptUuids);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
@@ -56,7 +57,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
   const isTablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('individual-test');
   const [selectedSection, setSelectedSection] = useState<panelOpts>('tree');
-  const { totalResultsCount, resetTree, isLoading } = useContext(FilterContext);
+  const { totalResultsCount, filteredResultsCount, resetTree, isLoading } = useContext(FilterContext);
   const isExpanded = view === 'full';
   const responsiveSize = isTablet ? 'lg' : 'md';
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -94,7 +95,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
         <div ref={headerRef} className={styles.headerSentinel} />
         <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-            totalResultsCount ? `(${totalResultsCount})` : ''
+            filteredResultsCount ? `(${filteredResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
             <RefreshDataButton isTablet={isTablet} t={t} />
@@ -131,7 +132,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
             <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
-              totalResultsCount ? `(${totalResultsCount})` : ''
+              filteredResultsCount ? `(${filteredResultsCount})` : ''
             }`}</h4>
             <div className={styles.buttonsContainer}>
               <RefreshDataButton isTablet={isTablet} t={t} />

@@ -55,7 +55,7 @@ interface ConditionsOverviewProps {
 const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) => {
   const { conditionPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
-  const displayText = t('conditions', 'Conditions');
+  const displayText = t('conditions_lower', 'conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Conditions`;
@@ -131,7 +131,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
 
   const { results: paginatedConditions, goTo, currentPage } = usePagination(sortedRows, conditionPageSize);
 
-  const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
+  const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem.id);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
@@ -150,11 +150,16 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem={'Active'}
+                initialSelectedItem={{ id: 'Active', label: t('active', 'Active') }}
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"
-                items={['All', 'Active', 'Inactive']}
+                items={[
+                  { id: 'All', label: t('all', 'All') },
+                  { id: 'Active', label: t('active', 'Active') },
+                  { id: 'Inactive', label: t('inactive', 'Inactive') },
+                ]}
+                itemToString={(item) => (item ? item.label : '')}
                 onChange={handleConditionStatusChange}
                 size={isTablet ? 'lg' : 'sm'}
               />
@@ -206,7 +211,11 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                       return (
                         <TableRow key={row.id}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                            <TableCell key={cell.id}>
+                              {cell.value?.content ?? cell.info.header === 'status'
+                                ? t(cell.value.toLowerCase(), cell.value)
+                                : cell.value}
+                            </TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <ConditionsActionMenu condition={matchingCondition} patientUuid={patientUuid} />

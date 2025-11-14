@@ -1,7 +1,5 @@
 {
-  "chartView": "გრაფიკის ხედი",
+  "date": "Date",
   "dateAndTime": "თარიღი და დრო",
-  "displaying": "ნაჩვენებია",
-  "encounterType": "კონსულტაციის ტიპი",
-  "tableView": "ცხრილის ხედი"
+  "encounterType": "კონსულტაციის ტიპი"
 }

@@ -186,7 +186,7 @@ export interface Order {
     changedBy: string;
     dateChanged: string;
   };
-  fulfillerStatus: 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED' | 'DISCONINTUED';
+  fulfillerStatus: FulfillerStatus;
   fulfillerComment: string;
   specimenSource: string;
   laterality: string;
@@ -207,7 +207,13 @@ export interface OrderType {
   description: string;
 }
 
-export type FulfillerStatus = 'EXCEPTION' | 'RECEIVED' | 'COMPLETED' | 'IN_PROGRESS' | 'ON_HOLD' | 'DECLINED';
+export type FulfillerStatus =
+  | 'RECEIVED'
+  | 'IN_PROGRESS'
+  | 'EXCEPTION'
+  | 'ON_HOLD'
+  | 'DECLINED'
+  | 'COMPLETED';
 
 export type PostDataPrepFunction = (
   order: OrderBasketItem,

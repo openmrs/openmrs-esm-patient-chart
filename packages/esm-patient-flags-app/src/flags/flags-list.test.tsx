@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
-import FlagsList from './flags-list.component';
+import FlagsList from './patient-flags.workspace';
 
 const mockUsePatientFlags = usePatientFlags as jest.Mock;
 
@@ -31,6 +32,8 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       patient={mockPatient}
       promptBeforeClosing={jest.fn()}
       setTitle={jest.fn()}
+      visitContext={null}
+      mutateVisitContext={null}
     />,
   );
 
@@ -46,4 +49,35 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   expect(screen.getByText(/future appointment/i)).toBeInTheDocument();
   expect(screen.getByText(/needs follow up/i)).toBeInTheDocument();
   expect(screen.getByText(/social/i)).toBeInTheDocument();
+});
+
+it('sorts by active and retired correctly via controlled dropdown', async () => {
+  mockUsePatientFlags.mockReturnValue({
+    flags: mockPatientFlags,
+    isLoading: false,
+    error: null,
+  });
+
+  render(
+    <FlagsList
+      visitContext={null}
+      mutateVisitContext={null}
+      closeWorkspace={jest.fn()}
+      closeWorkspaceWithSavedChanges={jest.fn()}
+      patientUuid={mockPatient.id}
+      patient={mockPatient}
+      promptBeforeClosing={jest.fn()}
+      setTitle={jest.fn()}
+    />,
+  );
+
+  const user = userEvent.setup();
+  const sortDropdown = screen.getByRole('combobox');
+  expect(sortDropdown).toBeInTheDocument();
+
+  // select "Retired first" then "Active first" to exercise both flows
+  await user.click(sortDropdown);
+  await user.click(screen.getByText(/Retired first/i));
+  await user.click(sortDropdown);
+  await user.click(screen.getByText(/Active first/i));
 });

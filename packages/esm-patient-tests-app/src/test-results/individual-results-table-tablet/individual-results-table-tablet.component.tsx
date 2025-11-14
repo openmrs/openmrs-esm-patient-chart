@@ -99,14 +99,12 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
           <Overlay close={() => setActivePanel(null)} headerText={activePanel?.key}>
             <div className={styles.overlay}>
               <TimelineDataGroup
-                patientUuid={patientUuid}
-                parent={activeTimelineParent}
-                subRows={activeTimelineData}
-                panelName={activePanel.key}
                 groupNumber={1}
-                setPanelName={() => {}}
-                xScroll={0}
+                parent={activeTimelineParent}
+                patientUuid={patientUuid}
                 setXScroll={() => {}}
+                subRows={activeTimelineData}
+                xScroll={0}
               />
             </div>
           </Overlay>
@@ -161,9 +159,7 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
                 patientUuid={patientUuid}
                 parent={activeTimelineParent}
                 subRows={activeTimelineData}
-                panelName={activePanel.key}
                 groupNumber={1}
-                setPanelName={() => {}}
                 xScroll={0}
                 setXScroll={() => {}}
               />
@@ -237,7 +233,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
           <Form onSubmit={handleSearchTerm} className={styles.flexBaseline}>
             <Search
               autoFocus
-              labelText=""
+              labelText={t('searchByTestName', 'Search by test name')}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               placeholder={t('searchByTestName', 'Search by test name')}
               size="sm"
@@ -267,7 +263,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
             <Form onSubmit={handleSearchTerm} className={classNames(styles.flex)}>
               <Search
                 autoFocus
-                labelText=""
+                labelText={t('searchByTestName', 'Search by test name')}
                 onChange={(e) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
                 size="lg"

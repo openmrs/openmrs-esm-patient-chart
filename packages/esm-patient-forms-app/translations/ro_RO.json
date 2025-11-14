@@ -7,6 +7,7 @@
   "lastCompleted": "Ultima completare",
   "never": "Niciodata",
   "noFormsToDisplay": "Nu exista formulare de afisat.",
+  "off": "Off",
   "offlineForms": "Formulare offline",
   "offlineForms__lower": "formulare offline",
   "offlineFormsOverviewCardAvailableOffline": "Disponibil offline",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "Cauta in aceasta lista",
   "offlinePatientsTableSearchPlaceholder": "Cauta in aceasta lista",
   "offlineToggle": "Comutare offline",
+  "on": "On",
   "searchThisList": "Cauta in aceasta lista"
 }

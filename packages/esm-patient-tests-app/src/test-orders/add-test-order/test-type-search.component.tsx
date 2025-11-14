@@ -24,30 +24,33 @@ export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  patient: fhir.Patient;
 }
 
 interface TestTypeSearchResultsProps extends TestTypeSearchProps {
   cancelOrder: () => void;
   searchTerm: string;
   focusAndClearSearchInput: () => void;
+  patient: fhir.Patient;
 }
 
 interface TestTypeSearchResultItemProps {
   orderTypeUuid: string;
   testType: TestType;
   openOrderForm: (searchResult: TestOrderBasketItem) => void;
+  patient: fhir.Patient;
 }
 
-export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets }: TestTypeSearchProps) {
+export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets, patient }: TestTypeSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
 
-  const focusAndClearSearchInput = () => {
+  const focusAndClearSearchInput = useCallback(() => {
     setSearchTerm('');
     searchInputRef.current?.focus();
-  };
+  }, [setSearchTerm]);
 
   const cancelOrder = useCallback(() => {
     closeWorkspace('add-lab-order', {
@@ -56,9 +59,12 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
     });
   }, []);
 
-  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value ?? '');
-  };
+  const handleSearchTermChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value ?? '');
+    },
+    [setSearchTerm],
+  );
 
   return (
     <>
@@ -66,7 +72,7 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
         <Search
           autoFocus
           labelText={t('searchFieldPlaceholder', 'Search for a test type')}
-          onChange={(e) => setSearchTerm(e.target.value ?? '')}
+          onChange={handleSearchTermChange}
           placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
           ref={searchInputRef}
           size="lg"
@@ -80,6 +86,7 @@ export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSet
         focusAndClearSearchInput={focusAndClearSearchInput}
         openLabForm={openLabForm}
         searchTerm={debouncedSearchTerm}
+        patient={patient}
       />
     </>
   );
@@ -92,6 +99,7 @@ function TestTypeSearchResults({
   orderableConceptSets,
   openLabForm,
   focusAndClearSearchInput,
+  patient,
 }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -142,6 +150,7 @@ function TestTypeSearchResults({
                 orderTypeUuid={orderTypeUuid}
                 openOrderForm={openLabForm}
                 testType={testType}
+                patient={patient}
               />
             ))}
           </div>
@@ -182,11 +191,12 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
   testType,
   openOrderForm,
   orderTypeUuid,
+  patient,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
 
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),

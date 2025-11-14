@@ -2,18 +2,18 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
-import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import {
-  formattedVitals,
-  mockConceptUnits,
-  mockCurrentVisit,
-  mockVitalsConceptMetadata,
-  mockVitalsConfig,
-} from '__mocks__';
+  type WorkspacesInfo,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useVisit,
+  useWorkspaces,
+} from '@openmrs/esm-framework';
+import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { formattedVitals, mockConceptUnits, mockVisit, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { useVitalsAndBiometrics } from '../common';
-import VitalsHeader from './vitals-header.component';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -23,6 +23,7 @@ const testProps = {
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockUseWorkspaces = jest.mocked(useWorkspaces);
+const mockUseVisit = jest.mocked(useVisit);
 
 mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
@@ -35,7 +36,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
@@ -76,6 +76,7 @@ describe('VitalsHeader', () => {
   });
 
   it('renders the most recently recorded values in the vitals header', async () => {
+    mockUseVisit.mockReturnValueOnce({ activeVisit: mockVisit } as ReturnType<typeof useVisit>);
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [
         {
@@ -129,6 +130,7 @@ describe('VitalsHeader', () => {
   });
 
   it('displays correct overdue tag for vitals 5 days old', async () => {
+    mockUseVisit.mockReturnValueOnce({ activeVisit: mockVisit } as ReturnType<typeof useVisit>);
     const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
     const vitalsData = [
       {
@@ -259,5 +261,99 @@ describe('VitalsHeader', () => {
 
     expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
+  });
+
+  it('uses backend interpretation without recalculating', async () => {
+    // Pulse 240 would normally be calculated as "critically_high" (>= 230)
+    // Temperature 41 would normally be calculated as "high" (> 37.5 but < 43)
+    // SpO2 70 would normally be calculated as "critically_low" (< 95)
+    // Respiratory Rate 5 would normally be calculated as "critically_low" (< 12)
+    // Backend sends the interpretation for all vitals as "normal", except for Respiratory Rate which is "critically_low" (< 12)
+    // It should use backend's interpretation and NOT recalculate
+    const vitalsWithConflictingInterpretation: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 240,
+        temperature: 41,
+        respiratoryRate: 5,
+        diastolic: 145,
+        systolic: 240,
+        spo2: 70,
+        diastolicRenderInterpretation: 'normal',
+        systolicRenderInterpretation: 'normal',
+        bloodPressureRenderInterpretation: 'normal',
+        pulseRenderInterpretation: 'normal',
+        temperatureRenderInterpretation: 'normal',
+        respiratoryRateRenderInterpretation: 'critically_low',
+        spo2RenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsWithConflictingInterpretation,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getByTextWithMarkup(/BP\s*240 \/ 145\s*mmHg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Heart rate\s*240\s*beats\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Temp\s*41\s*DEG C/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
+
+    expect(screen.getAllByTitle(/abnormal value/i)).toHaveLength(1);
+    expect(screen.getByTitle(/abnormal value/i)).toHaveClass('critically-low');
+  });
+
+  it('recalculates interpretation when backend does not provide interpretation', async () => {
+    // All vitals are abnormal, and backend does not provide interpretation for any of them.
+    // It should fallback to recalculating and mark them as abnormal.
+    const vitalsWithoutInterpretation: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 240, // should be marked as "critically_high"
+        temperature: 41, // should be marked as "high"
+        respiratoryRate: 5, // should be marked as "low"
+        diastolic: 145,
+        systolic: 240, // blood pressure should be marked as "high"
+        spo2: 70, // should be marked as "low"
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsWithoutInterpretation,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getByTextWithMarkup(/BP\s*240 \/ 145\s*mmHg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Heart rate\s*240\s*beats\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Temp\s*41\s*DEG C/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
+
+    const abnormalValueElements = screen.getAllByTitle(/abnormal value/i);
+    expect(abnormalValueElements).toHaveLength(5);
+
+    const lowElements = abnormalValueElements.filter((element) => {
+      return element.className === 'low';
+    });
+    expect(lowElements).toHaveLength(2);
+
+    const highElements = abnormalValueElements.filter((element) => {
+      return element.className === 'high';
+    });
+    expect(highElements).toHaveLength(2);
+
+    const criticallyHighElements = abnormalValueElements.filter((element) => {
+      return element.className === 'critically-high';
+    });
+    expect(criticallyHighElements).toHaveLength(1);
   });
 });

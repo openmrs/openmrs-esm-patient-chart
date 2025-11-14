@@ -31,7 +31,7 @@ describe('Trendline', () => {
 
     render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
 
-    expect(screen.getByRole('paragraph')).toBeInTheDocument();
+    expect(screen.getAllByRole('paragraph')).toHaveLength(8);
   });
 
   it('renders an empty state when there are no observations', () => {
