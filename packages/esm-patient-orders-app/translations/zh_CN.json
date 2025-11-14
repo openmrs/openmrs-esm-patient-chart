@@ -65,6 +65,7 @@
   "orderBasketWorkspaceTitle": "医嘱篮",
   "orderCancellation": "医嘱取消",
   "orderCancelled": "医嘱已取消",
+  "orderCompleted": "Placed orders",
   "orderDetails": "医嘱详情",
   "ordered": "已开具医嘱给",
   "orderedBy": "医嘱人",
