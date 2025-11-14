@@ -26,8 +26,7 @@
       "name": "visit-note",
       "icon": "visitNotesActionButton",
       "group": "patient-chart",
-      "order": 2,
-      "canHide": true
+      "order": 2
     }
   ]
 }

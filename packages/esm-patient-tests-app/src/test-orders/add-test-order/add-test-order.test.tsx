@@ -7,7 +7,6 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
-  launchWorkspace2,
   useConfig,
   useLayoutType,
   useSession,
@@ -17,7 +16,7 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
-import AddLabOrderWorkspace from './add-test-order.workspace';
+import AddTestOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -59,7 +58,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 
 function renderAddLabOrderWorkspace() {
   return render(
-    <AddLabOrderWorkspace
+    <AddTestOrderWorkspace
       closeWorkspace={mockCloseWorkspace}
       workspaceProps={{
         orderTypeUuid: 'test-lab-order-type-uuid',
@@ -72,8 +71,8 @@ function renderAddLabOrderWorkspace() {
       }}
       workspaceName={''}
       launchChildWorkspace={jest.fn()}
-      windowProps={{}}
       windowName={''}
+      windowProps={{ encounterUuid: '' }}
       isRootWorkspace={false}
     />,
   );

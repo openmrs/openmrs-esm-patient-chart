@@ -1,26 +1,34 @@
 import React, { useMemo } from 'react';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import {
   type OrderBasketExtensionProps,
-  type OrderBasketWindowProps,
   type OrderBasketItem,
-  type PatientWorkspace2DefinitionProps,
+  type ExportedOrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import OrderBasket from './order-basket.component';
 
-const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderBasketWindowProps>> = ({
-  groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
+const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, ExportedOrderBasketWindowProps, {}>> = ({
+  windowProps: {
+    patientUuid,
+    patient,
+    visitContext,
+    mutateVisitContext,
+    drugOrderWorkspaceName,
+    labOrderWorkspaceName,
+    generalOrderWorkspaceName,
+  },
   closeWorkspace,
   launchChildWorkspace,
 }) => {
   const orderBasketExtensionProps = useMemo(() => {
     const launchDrugOrderForm = (order: OrderBasketItem) => {
-      launchChildWorkspace('add-drug-order', { order });
+      launchChildWorkspace(drugOrderWorkspaceName, { order });
     };
     const launchLabOrderForm = (orderTypeUuid: string, order: OrderBasketItem) => {
-      launchChildWorkspace('add-lab-order', { orderTypeUuid, order });
+      launchChildWorkspace(labOrderWorkspaceName, { orderTypeUuid, order });
     };
     const launchGeneralOrderForm = (orderTypeUuid: string, order: OrderBasketItem) => {
-      launchChildWorkspace('orderable-concept-workspace', { orderTypeUuid, order });
+      launchChildWorkspace(generalOrderWorkspaceName, { orderTypeUuid, order });
     };
 
     return {
@@ -29,7 +37,7 @@ const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderB
       launchLabOrderForm,
       launchGeneralOrderForm,
     } satisfies OrderBasketExtensionProps;
-  }, [launchChildWorkspace, patient]);
+  }, [launchChildWorkspace, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName, patient]);
 
   return (
     <OrderBasket
@@ -43,4 +51,4 @@ const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderB
   );
 };
 
-export default OrderBasketWorkspace;
+export default ExportedOrderBasketWorkspace;

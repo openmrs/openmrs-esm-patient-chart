@@ -102,7 +102,6 @@
   "scheduledDateRequired": "Scheduled date is required",
   "searchAgain": "search again",
   "searchFieldOrder": "Search for {{orderType}} order",
-  "searchOrderables": "Search orderables",
   "searchResultsMatchesForTerm_one": "{{count}} results for \"{{searchTerm}}\"",
   "searchResultsMatchesForTerm_other": "{{count}} results for \"{{searchTerm}}\"",
   "searchTable": "Search table",

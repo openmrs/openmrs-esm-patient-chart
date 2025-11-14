@@ -59,10 +59,6 @@ export interface HtmlFormEntryForm {
   formEditUiPage: 'editHtmlFormWithSimpleUi' | 'editHtmlFormWithStandardUi';
 }
 
-export interface ClinicalFormsWorkspaceWindowProps {
-  formEntryWorkspaceName: string;
-}
-
 export interface OpenmrsEncounter extends OpenmrsResource {
   encounterDatetime: Date;
   encounterType: string;

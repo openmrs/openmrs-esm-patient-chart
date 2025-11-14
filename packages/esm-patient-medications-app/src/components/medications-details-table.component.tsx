@@ -29,7 +29,7 @@ import {
   type PatientWorkspaceGroupProps,
   invalidateVisitByUuid,
   invalidateVisitAndEncounterData,
-  patientChartOrderBasketWindowProps,
+  type OrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -50,6 +50,7 @@ import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 import { useSWRConfig } from 'swr';
+import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
@@ -256,7 +257,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={() => launchOrderBasket({}, { ...patientChartOrderBasketWindowProps, encounterUuid: '' })}
+              onClick={() => launchOrderBasket({}, { encounterUuid: '' })}
             >
               {t('add', 'Add')}
             </Button>
@@ -423,13 +424,10 @@ function OrderBasketItemActions({
         visit: medication.encounter?.visit,
       },
     ]);
-    launchWorkspace2(
+    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      {
-        encounterUuid: medication.encounter.uuid,
-        ...patientChartOrderBasketWindowProps,
-      },
+      { encounterUuid: medication.encounter.uuid },
       workspaceGroupProps,
     );
   }, [items, setItems, medication, workspaceGroupProps]);
@@ -482,13 +480,10 @@ function OrderBasketItemActions({
     };
     setItems([...items, newItem]);
 
-    launchWorkspace2(
+    launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'add-drug-order',
       { order: newItem },
-      {
-        encounterUuid: medication.encounter.uuid,
-        ...patientChartOrderBasketWindowProps,
-      },
+      { encounterUuid: medication.encounter.uuid },
       workspaceGroupProps,
     );
   }, [items, setItems, medication, workspaceGroupProps]);
@@ -542,11 +537,10 @@ function OrderBasketItemActions({
         visit: medication.encounter?.visit,
       },
     ]);
-
-    launchWorkspace2<{}, { encounter: Encounter }, PatientWorkspaceGroupProps>(
+    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounter: medication.encounter },
+      { encounterUuid: medication.encounter.uuid },
       workspaceGroupProps,
     );
   }, [items, setItems, medication, workspaceGroupProps]);

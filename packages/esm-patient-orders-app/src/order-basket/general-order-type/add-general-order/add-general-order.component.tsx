@@ -11,39 +11,29 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import {
-  type OrderBasketItem,
-  type PatientWorkspace2DefinitionProps,
-  useOrderBasket,
-  useOrderType,
-} from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
 import OrderableConceptSearchResults from './search-results.component';
 import styles from './orderable-concept-search.scss';
-import { mutate } from 'swr';
 
-interface OrderableConceptSearchWorkspaceProps {
-  order: OrderBasketItem;
+interface AddGeneralOrderProps {
+  initialOrder: OrderBasketItem;
   orderTypeUuid: string;
-  orderableConceptClasses: Array<string>;
-  orderableConceptSets: Array<string>;
+  patient: fhir.Patient;
+  visitContext: Visit;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
-export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
-
-type DrugsOrOrders = Pick<OrderBasketItem, 'action' | 'concept'>;
-
-export function ordersEqual(order1: DrugsOrOrders, order2: DrugsOrOrders) {
-  return order1.action === order2.action && order1.concept.uuid === order2.concept.uuid;
-}
-
-const OrderableConceptSearchWorkspace: React.FC<
-  PatientWorkspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, {}>
-> = ({
-  workspaceProps: { order: initialOrder, orderTypeUuid },
-  groupProps: { patient, patientUuid, visitContext, mutateVisitContext },
+/**
+ * This workspace displays the drug order form for adding or editing a general order.
+ */
+const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
+  initialOrder,
+  orderTypeUuid,
+  patient,
+  visitContext,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -208,4 +198,10 @@ function ConceptSearch({
   );
 }
 
-export default OrderableConceptSearchWorkspace;
+type DrugsOrOrders = Pick<OrderBasketItem, 'action' | 'concept'>;
+
+function ordersEqual(order1: DrugsOrOrders, order2: DrugsOrOrders) {
+  return order1.action === order2.action && order1.concept.uuid === order2.concept.uuid;
+}
+
+export default AddGeneralOrder;

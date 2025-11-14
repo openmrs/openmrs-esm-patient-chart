@@ -40,23 +40,22 @@
     {
       "name": "patient-form-entry-workspace",
       "component": "patientFormEntryWorkspace",
-      "window": "clinical-forms"
+      "window": "patient-chart-clinical-forms"
     },
     {
       "name": "clinical-forms-workspace",
       "component": "clinicalFormsWorkspace",
-      "window": "clinical-forms"
+      "window": "patient-chart-clinical-forms"
     }
   ],
   "workspaceWindows2": [
     {
-      "name": "clinical-forms",
+      "name": "patient-chart-clinical-forms",
       "icon": "clinicalFormActionButton",
       "order": 3,
       "width": "extra-wide",
       "group": "patient-chart",
-      "canMaximize": true,
-      "canHide": true
+      "canMaximize": true
     }
   ]
 }

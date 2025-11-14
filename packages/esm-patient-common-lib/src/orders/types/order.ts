@@ -219,9 +219,9 @@ export type PostDataPrepFunction = (
 
 export interface OrderBasketExtensionProps {
   patient: fhir.Patient;
-  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
-  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
-  windowProps: OrderBasketWindowProps;
+  launchDrugOrderForm(order?: DrugOrderBasketItem): void;
+  launchLabOrderForm(orderTypeUuid: string, order?: TestOrderBasketItem): void;
+  launchGeneralOrderForm(orderTypeUuid: string, order?: OrderBasketItem): void;
 }
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
@@ -308,9 +308,15 @@ export interface TestOrderBasketItem extends OrderBasketItem {
 
 export interface OrderBasketWindowProps {
   encounterUuid: string;
-  orderBasketWorkspaceName: string;
+}
+
+export interface ExportedOrderBasketWindowProps {
+  encounterUuid: string;
   drugOrderWorkspaceName: string;
-  generalOrderWorkspaceName: string;
   labOrderWorkspaceName: string;
-  cancelOrderWorkspaceName: string;
+  generalOrderWorkspaceName: string;
+  patient: fhir.Patient;
+  patientUuid: string;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
 }

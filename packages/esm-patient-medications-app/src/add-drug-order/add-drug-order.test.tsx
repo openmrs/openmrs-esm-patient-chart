@@ -202,11 +202,6 @@ function renderAddDrugOrderWorkspace() {
       closeWorkspace={mockCloseWorkspace}
       windowProps={{
         encounterUuid: '',
-        orderBasketWorkspaceName: '',
-        drugOrderWorkspaceName: '',
-        generalOrderWorkspaceName: '',
-        labOrderWorkspaceName: '',
-        cancelOrderWorkspaceName: '',
       }}
       windowName={''}
       isRootWorkspace={false}

@@ -1,16 +1,20 @@
 import React from 'react';
-import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 import FormEntry from './form-entry.component';
+import { type ExportedClinicalFormsWindowProps } from './exported-forms-dashboard.workspace';
 
 interface FormEntryWorkspaceProps {
   form: Form;
   encounterUuid: string;
 }
 
-const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, {}>> = ({
+const ExportedFormEntryWorkspace: React.FC<
+  Workspace2DefinitionProps<FormEntryWorkspaceProps, ExportedClinicalFormsWindowProps, {}>
+> = ({
   closeWorkspace,
   workspaceProps: { form, encounterUuid },
-  groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
+  windowProps: { patient, patientUuid, visitContext, mutateVisitContext },
 }) => {
   return (
     <FormEntry
@@ -25,4 +29,4 @@ const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWor
   );
 };
 
-export default FormEntryWorkspace;
+export default ExportedFormEntryWorkspace;

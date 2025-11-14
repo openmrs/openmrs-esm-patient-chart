@@ -55,7 +55,7 @@
     {
       "name": "add-lab-order",
       "component": "addLabOrderWorkspace",
-      "window": "order"
+      "window": "patient-chart-order-basket"
     }
   ]
 }

@@ -118,6 +118,12 @@ export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit
   moduleName,
 });
 
+export const exportedVisitForm = getAsyncLifecycle(() => import('./visit/visit-form/exported-visit-form.workspace'), {
+  featureName: 'exported-visit-form',
+  moduleName,
+});
+
+// t('markPatientDeceased', 'Mark patient deceased')
 export const markPatientDeceasedForm = getAsyncLifecycle(
   () => import('./mark-patient-deceased/mark-patient-deceased-form.workspace'),
   {

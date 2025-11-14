@@ -8,9 +8,9 @@ import ActiveMedications from './active-medications.component';
 
 const mockUseSession = jest.mocked(useSession);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mocklaunchWorkspace2 = launchWorkspace2 as jest.Mock;
+const mockLaunchWorkspace2 = launchWorkspace2 as jest.Mock;
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((_, name) => {
-  return () => mocklaunchWorkspace2(name);
+  return () => mockLaunchWorkspace2(name);
 });
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
@@ -105,7 +105,7 @@ test('clicking the Record active medications link opens the order basket form', 
   await waitForLoadingToFinish();
   const orderLink = screen.getByText(/Record active medications/i);
   await user.click(orderLink);
-  expect(mocklaunchWorkspace2).toHaveBeenCalledWith('add-drug-order');
+  expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
 });
 
 test('clicking the Add button opens the order basket form', async () => {
@@ -117,5 +117,5 @@ test('clicking the Add button opens the order basket form', async () => {
   await waitForLoadingToFinish();
   const button = screen.getByRole('button', { name: /Add/i });
   await user.click(button);
-  expect(mocklaunchWorkspace2).toHaveBeenCalledWith('order-basket');
+  expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
 });

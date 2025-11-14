@@ -1,12 +1,9 @@
 import React from 'react';
-import {
-  type DrugOrderBasketItem,
-  type OrderBasketWindowProps,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type ExportedOrderBasketWindowProps, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import AddDrugOrder from './add-drug-order.component';
 
-export interface AddDrugOrderWorkspaceProps {
+export interface AddDrugOrderWorkspaceAdditionalProps {
   order: DrugOrderBasketItem;
 }
 
@@ -16,11 +13,11 @@ export interface AddDrugOrderWorkspaceProps {
  * For a form that submits the drug order directly on submit,
  * see fill-prescription-form.workspace.tsx
  */
-export default function AddDrugOrderWorkspace({
+export default function ExportedAddDrugOrderWorkspace({
   workspaceProps: { order: initialOrder },
-  groupProps: { patient, patientUuid, visitContext },
+  windowProps: { patient, patientUuid, visitContext },
   closeWorkspace,
-}: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceProps, OrderBasketWindowProps>) {
+}: Workspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, ExportedOrderBasketWindowProps, {}>) {
   return (
     <AddDrugOrder
       initialOrder={initialOrder}

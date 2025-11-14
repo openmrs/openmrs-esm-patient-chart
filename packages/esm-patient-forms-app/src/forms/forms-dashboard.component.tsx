@@ -1,22 +1,20 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
-import { ResponsiveWrapper, useConfig, useConnectivity } from '@openmrs/esm-framework';
-import {
-  type ClinicalFormsWorkspaceWindowProps,
-  EmptyDataIllustration,
-  type Form,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
+import { ResponsiveWrapper, useConfig, useConnectivity, type Visit } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, type Form } from '@openmrs/esm-patient-common-lib';
 import type { FormEntryConfigSchema } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
-const FormsDashboard: React.FC<PatientWorkspace2DefinitionProps<{}, ClinicalFormsWorkspaceWindowProps>> = ({
-  groupProps: { patientUuid, visitContext },
-  launchChildWorkspace,
-}) => {
+interface FormsDashbaordProps {
+  handleFormOpen: (form: Form, encounterUuid: string) => void;
+  patient: fhir.Patient;
+  visitContext: Visit;
+}
+
+const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient, visitContext }) => {
   const { t } = useTranslation();
   const config = useConfig<FormEntryConfigSchema>();
   const isOnline = useConnectivity();
@@ -24,17 +22,7 @@ const FormsDashboard: React.FC<PatientWorkspace2DefinitionProps<{}, ClinicalForm
     data: forms,
     error,
     mutateForms,
-  } = useForms(patientUuid, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
-
-  const handleFormOpen = useCallback(
-    (form: Form, encounterUuid: string) => {
-      launchChildWorkspace('patient-form-entry-workspace', {
-        form,
-        encounterUuid,
-      });
-    },
-    [launchChildWorkspace],
-  );
+  } = useForms(patient.id, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const sections = useMemo(() => {
     return config.formSections?.map((formSection) => ({

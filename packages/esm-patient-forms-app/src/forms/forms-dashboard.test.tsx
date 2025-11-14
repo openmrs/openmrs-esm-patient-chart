@@ -1,10 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import {
-  type ClinicalFormsWorkspaceWindowProps,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
 import { configSchema, type FormEntryConfigSchema } from '../config-schema';
 import FormsDashboard from './forms-dashboard.component';
 import { mockPatient } from 'tools';
@@ -24,25 +20,7 @@ mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema), ht
 
 describe('FormsDashboard', () => {
   test('renders an empty state if there are no forms persisted on the server', async () => {
-    const defaultProps: PatientWorkspace2DefinitionProps<{}, ClinicalFormsWorkspaceWindowProps> = {
-      closeWorkspace: jest.fn(),
-      workspaceProps: {},
-      windowProps: {
-        formEntryWorkspaceName: '',
-      },
-      groupProps: {
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        mutateVisitContext: null,
-        visitContext: null,
-      },
-      workspaceName: '',
-      launchChildWorkspace: jest.fn(),
-      windowName: '',
-      isRootWorkspace: false,
-    };
-
-    render(<FormsDashboard {...defaultProps} />);
+    render(<FormsDashboard handleFormOpen={jest.fn()} patient={mockPatient} visitContext={null} />);
 
     expect(screen.getByText(/there are no forms to display/i)).toBeInTheDocument();
   });

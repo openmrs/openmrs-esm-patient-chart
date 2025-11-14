@@ -59,12 +59,7 @@
     {
       "name": "order-basket",
       "component": "orderBasketWorkspace",
-      "window": "order"
-    },
-    {
-      "name": "patient-orders-form-workspace",
-      "component": "patientOrdersFormWorkspace",
-      "window": "order"
+      "window": "patient-chart-order-basket"
     },
     {
       "name": "test-results-form-workspace",
@@ -73,15 +68,14 @@
     },
     {
       "name": "orderable-concept-workspace",
-      "component": "orderableConceptSearch",
-      "window": "order"
+      "component": "addGeneralOrderWorkspace",
+      "window": "patient-chart-order-basket"
     }
   ],
   "workspaceWindows2": [
     {
-      "name": "order",
+      "name": "patient-chart-order-basket",
       "icon": "ShoppingCartIcon",
-      "canHide": true,
       "group": "patient-chart",
       "order": 1
     },

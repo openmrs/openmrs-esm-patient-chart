@@ -19,16 +19,9 @@ export interface DrugSearchProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
   visit: Visit;
-  launchOrderBasketChildWorkspace: () => void;
 }
 
-export default function DrugSearch({
-  closeWorkspace,
-  openOrderForm,
-  patient,
-  visit,
-  launchOrderBasketChildWorkspace,
-}: DrugSearchProps) {
+export default function DrugSearch({ closeWorkspace, openOrderForm, patient, visit }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');

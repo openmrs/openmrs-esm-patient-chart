@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { patientChartOrderBasketWindowProps, useOrderType } from '@openmrs/esm-patient-common-lib';
+import { useOrderType } from '@openmrs/esm-patient-common-lib';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import type { TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { OrderBasketExtensionProps, TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 import { mockPatient } from 'tools';
@@ -38,14 +38,11 @@ mockUseOrderType.mockReturnValue({
   errorFetchingOrderType: undefined,
 });
 
-const testProps = {
-  patientUuid: mockPatient.id,
+const testProps: OrderBasketExtensionProps = {
   patient: mockPatient,
-  visitContext: null,
-  mutateVisitContext: null,
-  closeWorkspace: null,
-  launchChildWorkspace: null,
-  windowProps: { ...patientChartOrderBasketWindowProps, encounterUuid: '' },
+  launchDrugOrderForm: jest.fn(),
+  launchLabOrderForm: jest.fn(),
+  launchGeneralOrderForm: jest.fn(),
 };
 
 describe('LabOrderBasketPanel', () => {

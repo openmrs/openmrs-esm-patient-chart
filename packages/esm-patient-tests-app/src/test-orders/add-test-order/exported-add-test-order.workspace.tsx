@@ -1,9 +1,6 @@
 import React from 'react';
-import {
-  type OrderBasketWindowProps,
-  type OrderBasketItem,
-  type PatientWorkspace2DefinitionProps,
-} from '@openmrs/esm-patient-common-lib';
+import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type ExportedOrderBasketWindowProps, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import AddLabOrder from './add-test-order.component';
 
 export interface AddTestOrderWorkspaceProps {
@@ -16,11 +13,11 @@ export interface AddTestOrderWorkspaceProps {
  *
  * Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
  */
-export default function AddTestOrderWorkspace({
-  groupProps: { patient, visitContext },
+export default function ExportedAddTestOrderWorkspace({
+  windowProps: { patient, visitContext },
   workspaceProps: { order: initialOrder, orderTypeUuid },
   closeWorkspace,
-}: PatientWorkspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps>) {
+}: Workspace2DefinitionProps<AddTestOrderWorkspaceProps, ExportedOrderBasketWindowProps, {}>) {
   return (
     <AddLabOrder
       patient={patient}

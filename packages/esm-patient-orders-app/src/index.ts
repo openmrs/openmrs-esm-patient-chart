@@ -29,6 +29,11 @@ export const testResultsFormWorkspace = getAsyncLifecycle(
   options,
 );
 
+export const exportedTestResultsFormWorkspace = getAsyncLifecycle(
+  () => import('./lab-results/exported-lab-results-form.workspace'),
+  options,
+);
+
 export const orderPriceDetailsExtension = getAsyncLifecycle(
   () => import('./components/order-price-details.component'),
   options,
@@ -59,8 +64,7 @@ export const printLabResultModal = getAsyncLifecycle(
   options,
 );
 
-// t('searchOrderables','Search orderables')
-export const orderableConceptSearch = getAsyncLifecycle(
-  () => import('./order-basket/general-order-type/orderable-concept-search/orderable-concept-search.workspace'),
+export const addGeneralOrderWorkspace = getAsyncLifecycle(
+  () => import('./order-basket/general-order-type/add-general-order/add-general-order.workspace'),
   options,
 );
