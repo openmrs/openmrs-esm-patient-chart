@@ -2,6 +2,7 @@ import React from 'react';
 import { Tag } from '@carbon/react';
 import { formatDate, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../config-schema';
+import styles from './visit-attribute-tags.scss';
 
 interface VisitAttributeTagsProps {
   patientUuid: string;
@@ -32,19 +33,29 @@ const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) 
   const { activeVisit } = useVisit(patientUuid);
   const { visitAttributeTypes } = useConfig<ChartConfig>();
 
+  const displayableAttributes = activeVisit?.attributes
+    ?.filter(
+      (attribute) =>
+        visitAttributeTypes?.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
+    )
+    .map((attribute) => ({
+      attribute,
+      value: getAttributeValue(attribute?.attributeType, attribute?.value),
+    }))
+    .filter(({ value }) => value != null && value !== '');
+
+  if (!displayableAttributes?.length) {
+    return null;
+  }
+
   return (
-    <>
-      {activeVisit?.attributes
-        ?.filter(
-          (attribute) =>
-            visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
-        )
-        .map((attribute) => (
-          <Tag key={attribute?.attributeType?.uuid} type="gray">
-            {getAttributeValue(attribute?.attributeType, attribute?.value)}
-          </Tag>
-        ))}
-    </>
+    <div className={styles.tagsContainer}>
+      {displayableAttributes.map(({ attribute, value }) => (
+        <Tag key={attribute?.attributeType?.uuid} type="gray">
+          {value}
+        </Tag>
+      ))}
+    </div>
   );
 };
 
