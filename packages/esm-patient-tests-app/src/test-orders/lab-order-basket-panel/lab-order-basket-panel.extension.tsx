@@ -75,8 +75,6 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
   const [prevOrder, setPrevOrder] = useState(
     workspaces[0]?.name === WORKSPACES.TEST_RESULTS_FORM ? workspaces[0].additionalProps['order'] : null,
   );
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
-
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {

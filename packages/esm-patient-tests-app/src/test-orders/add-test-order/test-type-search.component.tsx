@@ -45,6 +45,7 @@ interface TestTypeSearchResultItemProps {
   prevWorkSpace: string;
   isWorkSpaceType: (value: string) => boolean;
   prevOrder: Order;
+  patient: fhir.Patient;
 }
 
 export function TestTypeSearch({
@@ -54,11 +55,8 @@ export function TestTypeSearch({
   prevWorkSpace,
   isWorkSpaceType,
   prevOrder,
+  patient,
 }: TestTypeSearchProps) {
-  patient: fhir.Patient;
-}
-
-export function TestTypeSearch({ openLabForm, orderTypeUuid, orderableConceptSets, patient }: TestTypeSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);

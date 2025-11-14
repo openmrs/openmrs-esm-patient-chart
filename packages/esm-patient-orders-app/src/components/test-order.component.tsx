@@ -114,7 +114,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     });
   }, [isLoadingResult, testResultObs, conceptList, t]);
 
-  if (isAnyConceptLoading || isLoadingResult) {
+  if (isLoadingResultsConcepts || isLoadingResult) {
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 

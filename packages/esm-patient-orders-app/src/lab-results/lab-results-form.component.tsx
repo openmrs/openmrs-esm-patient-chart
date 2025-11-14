@@ -5,7 +5,14 @@ import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType, ExtensionSlot } from '@openmrs/esm-framework';
+import {
+  restBaseUrl,
+  showSnackbar,
+  useAbortController,
+  useLayoutType,
+  ExtensionSlot,
+  usePatient,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
@@ -29,6 +36,10 @@ export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   invalidateLabOrders?: () => void;
 }
 
+interface OrderBasketSlotProps {
+  patient: fhir.Patient;
+}
+
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
@@ -48,7 +59,8 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
-  const { orders, clearOrders } = useOrderBasket();
+  const { isLoading: isLoadingPatient, patient } = usePatient(order.patient.uuid);
+  const { orders, clearOrders } = useOrderBasket(patient);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
 
@@ -87,6 +99,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     }
   }, [completeLabResults]);
 
+  const extensionProps = {
+    patient,
+  } satisfies OrderBasketSlotProps;
+
   useEffect(() => {
     conceptArray.forEach((concept, index) => {
       const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
@@ -119,7 +135,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  if (isAnyConceptLoading) {
+  if (isLoadingResultConcepts) {
     return (
       <div className={styles.loaderContainer}>
         <InlineLoading
@@ -153,7 +169,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     };
 
     // Handle update operation for completed lab order results
-    //const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
     if (order.fulfillerStatus === 'COMPLETED') {
       const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
         const completeLabResult = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
@@ -257,6 +272,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                       [orderStyles.orderBasketSlotTablet]: isTablet,
                     })}
                     name="result-order-basket-slot"
+                    state={extensionProps}
                   />
                 </div>
               )}
