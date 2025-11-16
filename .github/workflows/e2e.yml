@@ -31,6 +31,12 @@ jobs:
           node-version: '20.x'
           cache: 'yarn'
 
+      - name: Clean Yarn and Node Modules
+        run: |
+          yarn cache clean
+          rm -rf node_modules
+          rm -rf .yarn/install-state.gz    
+
       - name: 📦 Install dependencies
         run: yarn install --immutable
 
