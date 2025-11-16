@@ -10,6 +10,7 @@ import {
   type Datatype,
   useCompletedLabResultsArray,
 } from './lab-results.resource';
+import { usePatient } from '@openmrs/esm-framework/src';
 import LabResultsForm from './lab-results-form.component';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
@@ -19,6 +20,7 @@ const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 const mockUseCompletedLabResultsArray = jest.mocked(useCompletedLabResultsArray);
+const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
@@ -95,6 +97,12 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       mutate: jest.fn(),
+    });
+    mockUsePatient.mockReturnValue({
+      isLoading: false,
+      patient: mockPatient,
+      patientUuid: '',
+      error: null,
     });
   });
 

@@ -185,8 +185,6 @@ export function useObservation(obsUuid: string) {
 
 export function useObservations(obsUuids: Array<string>) {
   const fetchMultipleObservations = async (): Promise<Array<Observation>> => {
-    if (!obsUuids || obsUuids.length === 0) return [];
-
     const results = await Promise.all(
       obsUuids.map(async (uuid) => {
         const url = `${restBaseUrl}/obs/${uuid}?v=${conceptObsRepresentation}`;

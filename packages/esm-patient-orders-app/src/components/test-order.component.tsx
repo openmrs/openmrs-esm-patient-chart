@@ -46,18 +46,11 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
     [t, testOrder?.orderType?.display],
   );
 
-  const testResultObs = useMemo(() => {
-    if (!encounter) return null;
-    return encounter.obs?.filter((obs) => obs.order?.uuid === testOrder.uuid);
+  const [testResultObs, obsUuids] = useMemo(() => {
+    if (!encounter) return [[], []];
+    const testObs = encounter.obs?.filter((obs) => obs.order?.uuid === testOrder.uuid) ?? [];
+    return [testObs, testObs.map((obs) => obs.concept?.uuid).filter(Boolean)];
   }, [encounter, testOrder.uuid]);
-
-  const obsUuids = useMemo(
-    () =>
-      Array.isArray(testResultObs) && testResultObs.length > 0
-        ? testResultObs.map((o) => o.concept?.uuid).filter(Boolean)
-        : [],
-    [testResultObs],
-  );
 
   const { isLoading: isLoadingResultsConcepts, concepts: conceptList } = useOrderConceptsByUuids(obsUuids);
 
