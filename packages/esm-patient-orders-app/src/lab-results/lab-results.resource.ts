@@ -130,7 +130,7 @@ export function useOrderConceptByUuid(uuid: string) {
   return results;
 }
 
-export function useOrderConceptsByUuids(uuids: string[]) {
+export function useOrderConceptsByUuids(uuids: Array<string>) {
   const { data, error, isLoading, isValidating, mutate } = useSWR<Array<LabOrderConcept>, Error>(
     uuids.length ? ['concepts', ...uuids] : null,
     () => Promise.all(uuids.map((uuid) => fetchAllSetMembers(uuid))),
