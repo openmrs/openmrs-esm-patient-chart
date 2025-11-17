@@ -19,11 +19,6 @@ export function startupApp() {
 
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
-export const patientOrdersFormWorkspace = getAsyncLifecycle(
-  () => import('./order-cancellation-form/cancel-order-form.component'),
-  options,
-);
-
 export const testResultsFormWorkspace = getAsyncLifecycle(
   () => import('./lab-results/lab-results-form.workspace'),
   options,
