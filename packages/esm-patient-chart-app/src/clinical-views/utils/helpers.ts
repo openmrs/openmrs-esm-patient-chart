@@ -65,7 +65,8 @@ export function resolveValueUsingMappings(encounter: Encounter, concept: string,
   const obs = findObs(encounter, concept);
   for (const key in mappings) {
     if (typeof obs?.value === 'object' && 'uuid' in obs.value && mappings[key] === obs?.value?.uuid) {
-      return key;
+      if (obs?.value?.name?.name) return obs?.value?.name?.name;
+      else return key;
     }
   }
   return '--';
