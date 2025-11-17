@@ -1,0 +1,8 @@
+@use '@carbon/layout';
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-02;
+  margin: 0 layout.$spacing-02;
+}
