@@ -15,6 +15,9 @@ export interface AddDrugOrderWorkspaceProps {
  * On form submission, it saves the drug order to the (frontend) order basket.
  * For a form that submits the drug order directly on submit,
  * see fill-prescription-form.workspace.tsx
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-add-drug-order.workspace.tsx
  */
 export default function AddDrugOrderWorkspace({
   workspaceProps: { order: initialOrder },

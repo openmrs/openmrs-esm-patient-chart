@@ -56,6 +56,10 @@ export interface VitalsAndBiometricsFormProps {
   visitContext: Visit;
 }
 
+/**
+ * This workspace is meant for use outside the patient chart.
+ * @see vitals-biometrics-form.workspace.tsx
+ */
 const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<VitalsAndBiometricsFormProps, {}, {}>> = ({
   closeWorkspace,
   workspaceProps: { editEncounterUuid, formContext = 'creating', patientUuid, patient, visitContext },

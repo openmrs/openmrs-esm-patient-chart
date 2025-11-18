@@ -9,8 +9,9 @@ export interface VitalsAndBiometricsFormProps {
 
 /**
  * This workspace displays the form to input patient vitals and biometrics.
- * This workspace should only be used within the patient chart. Use ExportedVitalsAndBiometricsForm
- * for use cases outside the patient chart.
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-vitals-biometrics-form.workspace.tsx
  */
 const VitalsAndBiometricsForm: React.FC<PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}>> = ({
   workspaceProps: { editEncounterUuid, formContext = 'creating' },

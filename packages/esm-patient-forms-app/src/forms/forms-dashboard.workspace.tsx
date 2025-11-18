@@ -9,7 +9,8 @@ import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
  * This workspace lists a table of available forms. When clicking on a row, it launches
  * either the form-entry workspace or the html-form-entry workspace.
  *
- * This workspace should only be used within the patient chart
+ * This workspace must only be used within the patient chart.
+ * @see exported-forms-dashboard.workspace.tsx
  */
 const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   launchChildWorkspace,

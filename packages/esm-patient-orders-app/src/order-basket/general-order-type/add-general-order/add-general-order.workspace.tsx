@@ -12,7 +12,10 @@ interface OrderableConceptSearchWorkspaceProps {
 }
 
 /**
- * This workspace displays the drug order form for adding or editing a general order.
+ * This workspace displays the order form for adding or editing a general order.
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-add-general-order.workspace.tsx
  */
 const AddGeneralOrderWorkspace: React.FC<
   PatientWorkspace2DefinitionProps<OrderableConceptSearchWorkspaceProps, OrderBasketWindowProps>

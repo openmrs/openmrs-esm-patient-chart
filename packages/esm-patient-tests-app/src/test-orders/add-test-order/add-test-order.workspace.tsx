@@ -15,6 +15,9 @@ export interface AddTestOrderWorkspaceProps {
  * This workspace displays the labs order form for adding or editing a labs order.
  *
  * Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-add-test-order.workspace.tsx
  */
 export default function AddTestOrderWorkspace({
   groupProps: { patient, visitContext },

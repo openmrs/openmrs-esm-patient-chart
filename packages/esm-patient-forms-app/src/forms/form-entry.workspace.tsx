@@ -7,6 +7,12 @@ interface FormEntryWorkspaceProps {
   encounterUuid: string;
 }
 
+/**
+ * This workspace renders a React or HTML form to be filled out for a given patient.
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-form-entry.workspace.tsx
+ */
 const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, {}>> = ({
   closeWorkspace,
   workspaceProps: { form, encounterUuid },

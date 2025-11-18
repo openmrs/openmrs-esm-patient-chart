@@ -14,10 +14,8 @@ export interface ExportedClinicalFormsWindowProps {
 }
 
 /**
- * This workspace lists a table of available forms. When clicking on a row, it launches
- * either the form-entry workspace or the html-form-entry workspace.
- *
- * This workspace should only be used within the patient chart
+ * This workspace is meant for use outside the patient chart.
+ * @see forms-dashboard.workspace.tsx
  */
 const ExportedFormsDashboardWorkspace: React.FC<
   Workspace2DefinitionProps<{}, ExportedClinicalFormsWindowProps, {}>

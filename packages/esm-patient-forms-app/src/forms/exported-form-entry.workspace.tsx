@@ -9,6 +9,11 @@ interface FormEntryWorkspaceProps {
   encounterUuid: string;
 }
 
+/**
+ * This workspace is meant for use outside the patient chart.
+ *
+ * @see form-entry.workspace.tsx
+ */
 const ExportedFormEntryWorkspace: React.FC<
   Workspace2DefinitionProps<FormEntryWorkspaceProps, ExportedClinicalFormsWindowProps, {}>
 > = ({

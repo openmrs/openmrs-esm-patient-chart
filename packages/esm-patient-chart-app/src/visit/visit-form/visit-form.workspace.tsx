@@ -8,28 +8,6 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import ExportedVisitForm from './exported-visit-form.workspace';
 
-interface VisitAttribute {
-  attributeType: string;
-  value: string;
-}
-
-/**
- * Extra visit information provided by extensions via the extra-visit-attribute-slot.
- * Extensions can use this to add custom attributes to visits.
- */
-export interface ExtraVisitInfo {
-  /**
-   * Optional callback that extensions can provide to perform final
-   * preparation or validation before the visit is created/updated.
-   */
-  handleCreateExtraVisitInfo?: () => void;
-  /**
-   * Array of visit attributes to be included in the visit payload.
-   * Each attribute must have an attributeType (UUID) and a value (string).
-   */
-  attributes?: Array<VisitAttribute>;
-}
-
 export interface VisitFormProps {
   /**
    * A unique string identifying where the visit form is opened from.
@@ -43,6 +21,9 @@ export interface VisitFormProps {
 /**
  * This form is used for starting a new visit and for editing
  * an existing visit
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-visit-form.workspace.tsx
  */
 const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> = ({
   workspaceProps: { openedFrom, showPatientHeader = false },

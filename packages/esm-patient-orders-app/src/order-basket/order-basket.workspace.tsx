@@ -7,6 +7,12 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import OrderBasket from './order-basket.component';
 
+/**
+ * This workspace renders the main order basket, which contains the buttons to add a drug order and to add a lab order.
+ *
+ * This workspace must only be used within the patient chart
+ * @see exported-order-basket.workspace.tsx
+ */
 const OrderBasketWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, OrderBasketWindowProps>> = ({
   groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
   closeWorkspace,

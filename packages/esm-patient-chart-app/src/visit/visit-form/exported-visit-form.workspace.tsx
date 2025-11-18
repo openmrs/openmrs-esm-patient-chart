@@ -100,13 +100,8 @@ export interface ExportedVisitFormProps {
 }
 
 /**
- * This form is used for starting a new visit and for editing
- * an existing visit for a patient. It is similar to visit-form.workspace.tsx, but
- * is not tied to the patient-chart workspace group (i.e. it is not required to operate on
- * the same patient and same visit as all other workspaces within that group.) This workspace is
- * suitable for use *outside* the patient chart, in workflows where we need to start a visit for any
- * arbitrary patient (ex: the patient search workspace window).
- *
+ * This workspace is meant for use outside the patient chart.
+ * @see visit-form.workspace.tsx
  */
 const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormProps, {}, {}>> = ({
   closeWorkspace,
