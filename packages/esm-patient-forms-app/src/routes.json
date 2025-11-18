@@ -29,11 +29,6 @@
       "slot": "offline-tools-page-forms-slot",
       "offline": true,
       "online": true
-    },
-    {
-      "name": "clinical-forms-workspaceExtension",
-      "component": "clinicalFormsWorkspaceExtension",
-      "slot": "ward-patient-clinical-forms-workspace-slot"
     }
   ],
   "workspaces2": [

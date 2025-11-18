@@ -30,7 +30,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
     (visitUuid: string, updates: Partial<Visit>) => {
       // Update current visit SWR cache if it matches
       if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext();
+        mutateVisitContext?.();
       }
 
       // Update visit lists across all hooks using regex pattern matching
@@ -82,7 +82,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       // If deleted visit was current, revalidate current visit to get new state
       if (visitContext?.uuid === visitUuid) {
-        mutateVisitContext();
+        mutateVisitContext?.();
       }
     },
     [visitContext, mutateVisitContext, mutate, patientUuid],

@@ -1,4 +1,4 @@
-import { ExtensionSlot, useWorkspaces, useLeftNav } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLeftNav } from '@openmrs/esm-framework';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -25,7 +25,6 @@ interface WrappedPatientChartProps {
 
 const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, encodedView }) => {
   const view = decodeURIComponent(encodedView);
-  const { workspaceWindowState, active } = useWorkspaces();
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
   const state = usePatientChartPatientAndVisit(patientUuid);
   const { isLoadingPatient, patient } = state;
@@ -39,12 +38,7 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
       <SideMenuPanel />
       <main className={classNames('omrs-main-content', styles.chartContainer)}>
         <>
-          <div
-            className={classNames(
-              styles.innerChartContainer,
-              workspaceWindowState === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace,
-            )}
-          >
+          <div className={classNames(styles.innerChartContainer)}>
             {isLoadingPatient ? (
               <Loader />
             ) : (

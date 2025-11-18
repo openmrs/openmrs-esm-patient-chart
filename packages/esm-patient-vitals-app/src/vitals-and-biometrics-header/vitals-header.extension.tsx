@@ -8,7 +8,7 @@ dayjs.extend(duration);
 import { Trans, useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { ConfigurableLink, formatDate, parseDate, useConfig, useVisit, useWorkspaces } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, parseDate, useConfig, type Visit } from '@openmrs/esm-framework';
 import {
   assessValue,
   getReferenceRangesForConcept,
@@ -24,6 +24,13 @@ import styles from './vitals-header.scss';
 
 interface VitalsHeaderProps {
   patientUuid: string;
+  visitContext: Visit;
+
+  /**
+   * custom function to launch the vitals form. Use this in places outside of the patient chart
+   * to launch the exported vitals form.
+   */
+  launchCustomVitalsForm?: () => void;
 
   /**
    * This is useful for extensions slots using the Vitals Header
@@ -31,7 +38,12 @@ interface VitalsHeaderProps {
   hideLinks?: boolean;
 }
 
-const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = false }) => {
+const VitalsHeader: React.FC<VitalsHeaderProps> = ({
+  patientUuid,
+  visitContext,
+  launchCustomVitalsForm,
+  hideLinks = false,
+}) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const { conceptUnits } = useConceptUnits();
@@ -40,10 +52,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
-  const { activeVisit } = useVisit(patientUuid);
-  const { workspaces } = useWorkspaces();
-
-  const isWorkspaceOpen = useCallback(() => Boolean(workspaces?.length), [workspaces]);
+  const isVisitActive = !visitContext.stopDatetime;
   const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const launchVitalsAndBiometricsForm = useCallback(
@@ -61,11 +70,10 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
   }
 
   if (latestVitals && Object.keys(latestVitals)?.length && conceptRanges?.length) {
-    const hasActiveVisit = Boolean(activeVisit?.uuid);
     const now = dayjs();
     const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
     const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;
-    const areVitalsOverdue = hasActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
+    const areVitalsOverdue = isVisitActive && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
     const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
     const hoursSinceVitalsTaken = Math.round(vitalsTakenTimeAgo.asHours());
     let overdueVitalsTagContent: React.ReactNode = null;
@@ -139,7 +147,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
                 className={styles.recordVitalsButton}
                 data-openmrs-role="Record Vitals"
                 kind="ghost"
-                onClick={launchVitalsAndBiometricsForm}
+                onClick={launchCustomVitalsForm ?? launchVitalsAndBiometricsForm}
                 size="sm"
               >
                 {t('recordVitals', 'Record vitals')}
@@ -148,11 +156,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, hideLinks = fa
             </div>
           )}
         </div>
-        <div
-          className={classNames(styles.rowContainer, {
-            [styles.workspaceOpen]: isWorkspaceOpen(),
-          })}
-        >
+        <div className={styles.rowContainer}>
           <div className={styles.row}>
             <VitalsHeaderItem
               interpretation={interpretBloodPressure(

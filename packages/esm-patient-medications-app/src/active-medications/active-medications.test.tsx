@@ -20,9 +20,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useLaunchWorkspaceRequiringVisit: (...args) => mockUseLaunchWorkspaceRequiringVisit(...args),
-    useWorkspaces: jest.fn(() => {
-      return { workspaces: [{ name: 'order-basket' }] };
-    }),
   };
 });
 

@@ -19,6 +19,11 @@ export function startupApp() {
 
 export const orderBasketWorkspace = getAsyncLifecycle(() => import('./order-basket/order-basket.workspace'), options);
 
+export const exportedOrderBasketWorkspace = getAsyncLifecycle(
+  () => import('./order-basket/exported-order-basket.workspace'),
+  options,
+);
+
 export const testResultsFormWorkspace = getAsyncLifecycle(
   () => import('./lab-results/lab-results-form.workspace'),
   options,
@@ -61,5 +66,10 @@ export const printLabResultModal = getAsyncLifecycle(
 
 export const addGeneralOrderWorkspace = getAsyncLifecycle(
   () => import('./order-basket/general-order-type/add-general-order/add-general-order.workspace'),
+  options,
+);
+
+export const exportedAddGeneralOrderWorkspace = getAsyncLifecycle(
+  () => import('./order-basket/general-order-type/add-general-order/exported-add-general-order.workspace'),
   options,
 );

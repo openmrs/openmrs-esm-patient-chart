@@ -1,16 +1,10 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
-import { type LayoutType, useLayoutType, useWorkspaces, launchWorkspace2 } from '@openmrs/esm-framework';
+import { type LayoutType, useLayoutType } from '@openmrs/esm-framework';
 import VisitNoteActionButton from './visit-note-action-button.extension';
 import { mockPatient } from 'tools';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseWorkspaces = useWorkspaces as jest.Mock;
-
-mockUseWorkspaces.mockReturnValue({
-  workspaces: [{ type: 'visit-note' }],
-  workspaceWindowState: 'normal',
-});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
