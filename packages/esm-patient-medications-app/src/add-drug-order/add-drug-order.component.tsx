@@ -55,7 +55,6 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const session = useSession();
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   const openOrderForm = useCallback(
@@ -117,52 +116,50 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     closeWorkspace();
   }, [clearOrders, closeWorkspace]);
 
-  return (
-    <Workspace2
-      title={
-        currentOrder?.action == 'REVISE'
-          ? t('editDrugOrderWorkspaceTitle', 'Edit drug order')
-          : t('addDrugOrderWorkspaceTitle', 'Add drug order')
-      }
-      hasUnsavedChanges={hasUnsavedChanges}
-    >
-      {!currentOrder ? (
-        <>
-          {!isTablet && (
-            <div className={styles.backButton}>
-              <Button
-                iconDescription="Return to order basket"
-                kind="ghost"
-                onClick={() => closeWorkspace()}
-                renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-                size="sm"
-              >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-              </Button>
-            </div>
-          )}
-          <DrugSearch
-            patient={patient}
-            visit={visitContext}
-            closeWorkspace={closeWorkspace}
-            openOrderForm={openOrderForm}
-          />
-        </>
-      ) : (
-        <DrugOrderForm
-          initialOrderBasketItem={currentOrder}
-          onSave={currentOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
-          onCancel={currentOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : closeWorkspace}
-          setHasUnsavedChanges={setHasUnsavedChanges}
+  const workspaceTitle =
+    currentOrder?.action == 'REVISE'
+      ? t('editDrugOrderWorkspaceTitle', 'Edit drug order')
+      : t('addDrugOrderWorkspaceTitle', 'Add drug order');
+
+  if (!currentOrder) {
+    return (
+      <Workspace2 title={workspaceTitle}>
+        {!isTablet && (
+          <div className={styles.backButton}>
+            <Button
+              iconDescription="Return to order basket"
+              kind="ghost"
+              onClick={() => closeWorkspace()}
+              renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
+              size="sm"
+            >
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            </Button>
+          </div>
+        )}
+        <DrugSearch
           patient={patient}
-          visitContext={visitContext}
-          saveButtonText={t('saveOrder', 'Save order')}
-          allowSelectingPrescribingClinician={false}
-          allowSelectingDrug={false}
+          visit={visitContext}
+          closeWorkspace={closeWorkspace}
+          openOrderForm={openOrderForm}
         />
-      )}
-    </Workspace2>
-  );
+      </Workspace2>
+    );
+  } else {
+    return (
+      <DrugOrderForm
+        initialOrderBasketItem={currentOrder}
+        onSave={currentOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
+        onCancel={currentOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : closeWorkspace}
+        patient={patient}
+        visitContext={visitContext}
+        saveButtonText={t('saveOrder', 'Save order')}
+        allowSelectingPrescribingClinician={false}
+        allowSelectingDrug={false}
+        workspaceTitle={workspaceTitle}
+      />
+    );
+  }
 };
 
 export default AddDrugOrder;

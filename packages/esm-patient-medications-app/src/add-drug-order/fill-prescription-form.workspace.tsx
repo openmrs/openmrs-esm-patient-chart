@@ -102,9 +102,7 @@ const FillPrescriptionForm: React.FC<FillPrescriptionFormProps> = ({
       allowSelectingPrescribingClinician={true}
       visitContext={activeVisit}
       allowSelectingDrug={true}
-      setHasUnsavedChanges={function (hasUnsavedChanges: boolean): void {
-        throw new Error('Function not implemented.');
-      }}
+      workspaceTitle={t('fillPrescription', 'Fill prescription')}
     />
   );
 };
