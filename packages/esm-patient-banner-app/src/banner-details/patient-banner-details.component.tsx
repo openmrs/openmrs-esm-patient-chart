@@ -1,0 +1,291 @@
+/** @module @category UI */
+import React, { useMemo } from 'react';
+import classNames from 'classnames';
+import { InlineLoading } from '@carbon/react';
+import {
+  type CoreTranslationKey,
+  getCoreTranslation,
+  ConfigurableLink,
+  usePatient,
+  parseDate,
+} from '@openmrs/esm-framework';
+import { usePatientContactAttributes, usePatientAttributes } from './usePatientAttributes';
+import { usePatientListsForPatient } from './usePatientListsForPatient';
+import { useRelationships } from './useRelationships';
+import styles from './patient-banner-details.scss';
+
+interface ContactDetailsProps {
+  patientId: string;
+  deceased: boolean;
+}
+
+const PatientLists: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+  const { cohorts = [], isLoading } = usePatientListsForPatient(patientUuid);
+
+  return (
+    <>
+      <p className={styles.heading}>
+        {getCoreTranslation('patientLists', 'Patient Lists')} ({cohorts?.length ?? 0})
+      </p>
+      {isLoading ? (
+        <InlineLoading description={`${getCoreTranslation('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {(() => {
+            if (cohorts?.length > 0) {
+              const sortedLists = cohorts.sort(
+                (a, b) => parseDate(a?.startDate).getTime() - parseDate(b?.startDate).getTime(),
+              );
+              const slicedLists = sortedLists.slice(0, 3);
+              return slicedLists?.map((cohort) => (
+                <li key={cohort.uuid}>
+                  <ConfigurableLink to={`${window.spaBase}/home/patient-lists/${cohort.uuid}`} key={cohort.uuid}>
+                    {cohort.name}
+                  </ConfigurableLink>
+                </li>
+              ));
+            }
+            return <li>--</li>;
+          })()}
+          {cohorts.length > 3 && (
+            <li className={styles.link}>
+              <ConfigurableLink to={`${window.spaBase}/home/patient-lists`}>
+                {getCoreTranslation('seeMoreLists', 'See {{count}} more lists', {
+                  count: cohorts?.length - 3,
+                })}
+              </ConfigurableLink>
+            </li>
+          )}
+        </ul>
+      )}
+    </>
+  );
+};
+
+const Address: React.FC<{ patientId: string }> = ({ patientId }) => {
+  const { patient, isLoading } = usePatient(patientId);
+  const address = patient?.address?.find((a) => a.use === 'home');
+  const getAddressKey = (url: string) => url.split('#')[1];
+
+  if (isLoading) {
+    return <InlineLoading description={`${getCoreTranslation('loading', 'Loading')} ...`} role="progressbar" />;
+  }
+
+  return (
+    <>
+      <p className={styles.heading}>{getCoreTranslation('address', 'Address')}</p>
+      <ul>
+        {address ? (
+          Object.entries(address)
+            .filter(([key]) => key !== 'id' && key !== 'use')
+            .map(([key, value]) =>
+              key === 'extension' ? (
+                address.extension?.[0]?.extension?.map((add, i) => (
+                  <li key={`address-${key}-${i}`}>
+                    {getCoreTranslation(
+                      getAddressKey(add.url) as CoreTranslationKey,
+                      getAddressKey(add.url) as CoreTranslationKey,
+                    )}
+                    : {add.valueString}
+                  </li>
+                ))
+              ) : (
+                <li key={`address-${key}`}>
+                  {getCoreTranslation(key as CoreTranslationKey, key)}: {value}
+                </li>
+              ),
+            )
+        ) : (
+          <li>--</li>
+        )}
+      </ul>
+    </>
+  );
+};
+
+const Contact: React.FC<{ patientUuid: string; deceased?: boolean }> = ({ patientUuid }) => {
+  const { isLoading: isLoadingAttributes, contactAttributes } = usePatientContactAttributes(patientUuid);
+  const contacts = useMemo(
+    () =>
+      contactAttributes
+        ? [
+            ...contactAttributes?.map((contact) => [
+              contact.attributeType.display
+                ? getCoreTranslation(
+                    /** TODO: We should probably add translation strings for some of these */
+                    contact.attributeType.display as CoreTranslationKey,
+                    contact.attributeType.display,
+                  )
+                : '',
+              contact.value,
+            ]),
+          ]
+        : [],
+    [contactAttributes],
+  );
+
+  return (
+    <>
+      <p className={styles.heading}>{getCoreTranslation('contactDetails', 'Contact Details')}</p>
+      {isLoadingAttributes ? (
+        <InlineLoading description={`${getCoreTranslation('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {contacts.length ? (
+            contacts.map(([label, value], index) => (
+              <li key={`${label}-${value}-${index}`}>
+                {label}: {value}
+              </li>
+            ))
+          ) : (
+            <li>--</li>
+          )}
+        </ul>
+      )}
+    </>
+  );
+};
+
+const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
+  const { data: relationships, isLoading } = useRelationships(patientId);
+
+  return (
+    <>
+      <p className={styles.heading}>{getCoreTranslation('relationships', 'Relationships')}</p>
+      {isLoading ? (
+        <InlineLoading description={`${getCoreTranslation('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {relationships && relationships.length > 0 ? (
+            <>
+              {relationships.map((r) => (
+                <li key={r.uuid} className={styles.relationship}>
+                  <div>
+                    <ConfigurableLink to={`${window.spaBase}/patient/${r.relativeUuid}/chart`}>
+                      {r.display}
+                    </ConfigurableLink>
+                  </div>
+                  <div>{r.relationshipType}</div>
+                  <div>
+                    {`${r.relativeAge ? r.relativeAge : '--'} ${
+                      r.relativeAge ? (r.relativeAge === 1 ? 'yr' : 'yrs') : ''
+                    }`}
+                  </div>
+                </li>
+              ))}
+            </>
+          ) : (
+            <li>--</li>
+          )}
+        </ul>
+      )}
+    </>
+  );
+};
+
+const ContactSection: React.FC<{
+  patientUuid: string;
+  contactType: 'Accompanying contact' | 'Trusted contact' | 'Emergency contact';
+  heading: string;
+}> = ({ patientUuid, contactType, heading }) => {
+  const { isLoading: isLoadingAttributes, attributes } = usePatientAttributes(patientUuid);
+
+  let contactData = null;
+  if (attributes) {
+    const filteredAttributes = attributes.filter((attribute) => {
+      const displayName = attribute.attributeType?.display || attribute.attributeType?.name || '';
+      return displayName.toLowerCase().startsWith(contactType.toLowerCase());
+    });
+
+    if (filteredAttributes.length > 0) {
+      const nameAttr = filteredAttributes.find((attr) => {
+        const displayName = attr.attributeType?.display || attr.attributeType?.name || '';
+        return displayName.toLowerCase().includes('name');
+      });
+      const phoneAttr = filteredAttributes.find((attr) => {
+        const displayName = attr.attributeType?.display || attr.attributeType?.name || '';
+        return displayName.toLowerCase().includes('phone');
+      });
+      const relationAttr = filteredAttributes.find((attr) => {
+        const displayName = attr.attributeType?.display || attr.attributeType?.name || '';
+        return displayName.toLowerCase().includes('relation');
+      });
+
+      contactData = {
+        name: nameAttr?.value || '--',
+        phone: phoneAttr?.value || '--',
+        relation: relationAttr?.value || '--',
+      };
+    }
+  }
+
+  return (
+    <>
+      <p className={styles.heading}>{heading}</p>
+      {isLoadingAttributes ? (
+        <InlineLoading description={`${getCoreTranslation('loading', 'Loading')} ...`} role="progressbar" />
+      ) : (
+        <ul>
+          {contactData ? (
+            <>
+              <li>Nom: {contactData.name}</li>
+              <li>Téléphone: {contactData.phone}</li>
+              <li>Relation: {contactData.relation}</li>
+            </>
+          ) : (
+            <li>--</li>
+          )}
+        </ul>
+      )}
+    </>
+  );
+};
+
+const AccompanyingContact: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+  return (
+    <ContactSection patientUuid={patientUuid} contactType="Accompanying contact" heading="Personne accompagnante" />
+  );
+};
+
+const TrustedContact: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+  return <ContactSection patientUuid={patientUuid} contactType="Trusted contact" heading="Personne de confiance" />;
+};
+
+const EmergencyContact: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
+  return <ContactSection patientUuid={patientUuid} contactType="Emergency contact" heading="Contact d'urgence" />;
+};
+
+export default function PatientBannerContactDetails({ patientId, deceased }: ContactDetailsProps) {
+  return (
+    <div
+      className={classNames(styles.contactDetails, {
+        [styles.deceased]: deceased,
+      })}
+    >
+      <div className={styles.row}>
+        <div className={styles.col}>
+          <Address patientId={patientId} />
+        </div>
+        <div className={styles.col}>
+          <Contact patientUuid={patientId} />
+        </div>
+      </div>
+      <div className={styles.row}>
+        <div className={styles.col}>
+          <Relationships patientId={patientId} />
+        </div>
+        <div className={styles.col}>
+          <AccompanyingContact patientUuid={patientId} />
+        </div>
+      </div>
+      <div className={styles.row}>
+        <div className={styles.col}>
+          <TrustedContact patientUuid={patientId} />
+        </div>
+        <div className={styles.col}>
+          <EmergencyContact patientUuid={patientId} />
+        </div>
+      </div>
+    </div>
+  );
+}
