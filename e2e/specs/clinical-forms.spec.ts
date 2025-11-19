@@ -37,7 +37,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(page.getByText(/soap note template/i).filter({ visible: true })).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /soap note template/i })).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
@@ -131,7 +131,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page, patient
   });
 
   await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
-    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /laboratory test results/i })).toBeVisible();
   });
 
   await test.step('When I fill the `White Blood Cells (WBC)` result as `5000', async () => {
@@ -179,7 +179,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(page.getByText(/soap note template/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /soap note template/i })).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` and `Objective findings` questions', async () => {

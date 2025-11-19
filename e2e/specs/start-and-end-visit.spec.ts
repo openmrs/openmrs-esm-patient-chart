@@ -29,7 +29,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
-    await expect(chartPage.page.getByText(/visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByRole('heading', { name: /visit type/i })).toBeVisible();
     await expect(chartPage.page.getByRole('search', { name: /search for a visit type/i })).toBeVisible();
     await expect(chartPage.page.getByLabel(/Facility Visit/i)).toBeVisible();
     await expect(chartPage.page.getByLabel(/Home Visit/i)).toBeVisible();
