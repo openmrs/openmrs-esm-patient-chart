@@ -7,7 +7,7 @@
   "lastCompleted": "Dernière modification",
   "never": "Jamais",
   "noFormsToDisplay": "Il n'y a pas de formulaires à afficher",
-  "off": "Off",
+  "off": "Arrêter",
   "offlineForms": "Formulaires disponibles en mode déconnecté",
   "offlineForms__lower": "formulaires disponibles en mode déconnecté",
   "offlineFormsOverviewCardAvailableOffline": "Disponible en mode déconnecté",
@@ -17,6 +17,6 @@
   "offlinePatientsTableSearchLabel": "Chercher dans cette liste",
   "offlinePatientsTableSearchPlaceholder": "Chercher dans cette liste",
   "offlineToggle": "Basculer en mode déconnecté",
-  "on": "On",
+  "on": "Activer",
   "searchThisList": "Chercher dans cette liste"
 }
