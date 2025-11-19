@@ -26,7 +26,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    useVisitOrOfflineVisit: jest.fn().mockReturnValue({ currentVisit: null }),
     useLaunchWorkspaceRequiringVisit: jest.fn(),
   };
 });
@@ -37,14 +36,14 @@ describe('VisitNoteActionButton', () => {
 
     mockUseLayoutType.mockReturnValue('tablet');
 
-    render(<VisitNoteActionButton />);
+    render(<VisitNoteActionButton patientUuid="patient-uuid" />);
 
     const visitNoteButton = screen.getByRole('button', { name: /Visit note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
     await user.click(visitNoteButton);
 
-    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('patient-uuid', 'visit-notes-form-workspace');
   });
 
   it('should display desktop view', async () => {
@@ -52,13 +51,13 @@ describe('VisitNoteActionButton', () => {
 
     mockUseLayoutType.mockReturnValue('desktop' as LayoutType);
 
-    render(<VisitNoteActionButton />);
+    render(<VisitNoteActionButton patientUuid="patient-uuid" />);
 
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
     expect(visitNoteButton).toBeInTheDocument();
 
     await user.click(visitNoteButton);
 
-    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('visit-notes-form-workspace');
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('patient-uuid', 'visit-notes-form-workspace');
   });
 });

@@ -23,24 +23,36 @@ export type OverviewPanelEntry = [string, string, Array<OverviewPanelData>, Date
 
 export function parseSingleEntry(entry: ObsRecord, type: string, panelName: string): Array<OverviewPanelData> {
   if (type === 'Test') {
+    // Use observation-level interpretation set during data loading
+    const interpretation = entry.interpretation || 'NORMAL';
     return [
       {
         id: entry.id,
         name: panelName,
         range: entry.meta?.range || '--',
-        interpretation: entry.meta.assessValue ? entry.meta.assessValue(entry.value) : '--',
-        value: entry.value,
+        interpretation,
+        value: {
+          value: entry.value,
+          interpretation,
+        },
       },
     ];
   } else {
-    return entry.members.map((gm) => ({
-      id: gm.id,
-      key: gm.id,
-      name: gm.name,
-      range: gm.meta?.range || '--',
-      interpretation: gm.meta.assessValue(gm.value),
-      value: gm.value,
-    }));
+    return entry.members.map((member) => {
+      // Use observation-level interpretation set during data loading
+      const interpretation = member.interpretation || 'NORMAL';
+      return {
+        id: member.id,
+        key: member.id,
+        name: member.name,
+        range: member.meta?.range || '--',
+        interpretation,
+        value: {
+          value: member.value,
+          interpretation,
+        },
+      };
+    });
   }
 }
 

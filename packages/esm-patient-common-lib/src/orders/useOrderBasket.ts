@@ -1,16 +1,15 @@
 import { type Actions, useStoreWithActions } from '@openmrs/esm-framework';
 import type { OrderBasketItem, PostDataPrepFunction } from './types';
-import { getPatientUuidFromStore } from '../store/patient-chart-store';
 import { useEffect } from 'react';
 import { type OrderBasketStore, orderBasketStore } from './store';
 
 const orderBasketStoreActions = {
   setOrderBasketItems(
     state: OrderBasketStore,
+    patientUuid: string,
     grouping: string,
     value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>),
   ) {
-    const patientUuid = getPatientUuidFromStore();
     if (!Object.keys(state.postDataPrepFunctions).includes(grouping)) {
       console.warn(`Programming error: You must register a postDataPrepFunction for grouping ${grouping} `);
     }
@@ -34,8 +33,11 @@ const orderBasketStoreActions = {
   },
 } satisfies Actions<OrderBasketStore>;
 
-function getOrderItems(items: OrderBasketStore['items'], grouping?: string | null): Array<OrderBasketItem> {
-  const patientUuid = getPatientUuidFromStore();
+function getOrderItems(
+  patientUuid: string,
+  items: OrderBasketStore['items'],
+  grouping?: string | null,
+): Array<OrderBasketItem> {
   const patientItems = items?.[patientUuid] ?? {};
   return grouping ? patientItems[grouping] ?? [] : Object.values(patientItems).flat();
 }
@@ -44,9 +46,8 @@ export interface ClearOrdersOptions {
   exceptThoseMatching: (order: OrderBasketItem) => boolean;
 }
 
-function clearOrders(options?: ClearOrdersOptions) {
+function clearOrders(patientUuid: string, options?: ClearOrdersOptions) {
   const exceptThoseMatchingFcn = options?.exceptThoseMatching ?? (() => false);
-  const patientUuid = getPatientUuidFromStore();
   const items = orderBasketStore.getState().items;
   const patientItems = items[patientUuid] ?? {};
   const newPatientItems = Object.fromEntries(
@@ -77,13 +78,18 @@ type UseOrderBasketReturn<T, U> = {
  *  A PostDataPrepFunction must be provided for each grouping, but does not necessarily have to be provided
  *  in every usage of useOrderBasket with a grouping key.
  */
-export function useOrderBasket<T extends OrderBasketItem>(): UseOrderBasketReturn<T, void>;
-export function useOrderBasket<T extends OrderBasketItem>(grouping: string): UseOrderBasketReturn<T, string>;
+export function useOrderBasket<T extends OrderBasketItem>(patient: fhir.Patient): UseOrderBasketReturn<T, void>;
 export function useOrderBasket<T extends OrderBasketItem>(
+  patient: fhir.Patient,
+  grouping: string,
+): UseOrderBasketReturn<T, string>;
+export function useOrderBasket<T extends OrderBasketItem>(
+  patient: fhir.Patient,
   grouping: string,
   postDataPrepFunction: PostDataPrepFunction,
 ): UseOrderBasketReturn<T, string>;
 export function useOrderBasket<T extends OrderBasketItem>(
+  patient: fhir.Patient,
   grouping?: string | null,
   postDataPrepFunction?: PostDataPrepFunction,
 ): UseOrderBasketReturn<T, string | void> {
@@ -91,7 +97,7 @@ export function useOrderBasket<T extends OrderBasketItem>(
     orderBasketStore,
     orderBasketStoreActions,
   );
-  const orders = getOrderItems(items, grouping);
+  const orders = getOrderItems(patient.id, items, grouping);
 
   useEffect(() => {
     if (postDataPrepFunction && !postDataPrepFunctions[grouping]) {
@@ -99,15 +105,19 @@ export function useOrderBasket<T extends OrderBasketItem>(
     }
   }, [postDataPrepFunction, grouping, postDataPrepFunctions, setPostDataPrepFunctionForGrouping]);
 
+  const clearOrdersForPatient = (options?: ClearOrdersOptions) => {
+    clearOrders(patient.id, options);
+  };
+
   if (typeof grouping === 'string') {
     const setOrders = (value: Array<T> | (() => Array<T>)) => {
-      return setOrderBasketItems(grouping, value);
+      return setOrderBasketItems(patient.id, grouping, value);
     };
-    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<T, string>;
+    return { orders, clearOrders: clearOrdersForPatient, setOrders } as UseOrderBasketReturn<T, string>;
   } else {
     const setOrders = (groupingKey: string, value: Array<T> | (() => Array<T>)) => {
-      setOrderBasketItems(groupingKey, value);
+      setOrderBasketItems(patient.id, groupingKey, value);
     };
-    return { orders, clearOrders, setOrders } as UseOrderBasketReturn<T, void>;
+    return { orders, clearOrders: clearOrdersForPatient, setOrders } as UseOrderBasketReturn<T, void>;
   }
 }

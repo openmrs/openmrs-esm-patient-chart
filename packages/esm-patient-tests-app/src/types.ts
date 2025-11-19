@@ -67,6 +67,14 @@ export interface FHIRObservationResource {
   hasMember?: Array<{
     reference: string;
   }>;
+  interpretation?: Array<{
+    coding: Array<{
+      code: string;
+      display: string;
+      system?: string;
+    }>;
+    text?: string;
+  }>;
 }
 
 export interface Concept {
@@ -107,7 +115,7 @@ export interface ConceptMeta {
   range: string;
 }
 
-export interface ObsRecord extends FHIRObservationResource {
+export interface ObsRecord extends Omit<FHIRObservationResource, 'interpretation'> {
   conceptUuid: string;
   relatedObs: Array<ObsRecord>;
   meta: ConceptMeta;
@@ -142,6 +150,15 @@ export type Observation = {
   obsDatetime: string;
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
+  // Observation-level reference ranges (criteria-based)
+  // Note: Units are only at the concept/node level (TestResult.units), not observation-level
+  hiAbsolute?: number;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  range?: string; // Formatted range string for display
 };
 
 export type TestResult = {
@@ -168,6 +185,8 @@ export type MappedObservation = {
   units: string;
   lowCritical: number;
   hiNormal: number;
+  hiAbsolute?: number;
+  hiCritical?: number;
   flatName: string;
   hasData: boolean;
   range: string;

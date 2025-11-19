@@ -43,6 +43,7 @@ export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  patient: fhir.Patient;
 }
 
 // Designs:
@@ -55,12 +56,14 @@ export function LabOrderForm({
   promptBeforeClosing,
   orderTypeUuid,
   orderableConceptSets,
+  patientUuid,
+  patient,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
+  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -207,7 +210,7 @@ export function LabOrderForm({
         <Grid className={styles.gridRow}>
           <Column lg={16} md={8} sm={4}>
             <InputWrapper>
-              <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
+              <span className={styles.testTypeLabel}>{t('testType', 'Test type')}</span>
               <p className={styles.testType}>{initialOrder?.testType?.label}</p>
             </InputWrapper>
           </Column>

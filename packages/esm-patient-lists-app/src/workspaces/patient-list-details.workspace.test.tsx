@@ -22,6 +22,8 @@ const defaultProps = {
     type: 'My List',
   },
   setTitle: jest.fn(),
+  visitContext: null,
+  mutateVisitContext: null,
 };
 
 const mockPatientListData = [

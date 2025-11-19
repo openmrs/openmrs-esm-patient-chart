@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
-import { formatDate, useConfig } from '@openmrs/esm-framework';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { formatDate, useConfig, useVisit } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../config-schema';
+import styles from './visit-attribute-tags.scss';
 
 interface VisitAttributeTagsProps {
   patientUuid: string;
@@ -26,23 +26,36 @@ const getAttributeValue = (attributeType, value) => {
   }
 };
 
+/**
+ * This extension slots to the patient-banner-tags-slot by default.
+ */
 const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) => {
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
   const { visitAttributeTypes } = useConfig<ChartConfig>();
 
+  const displayableAttributes = activeVisit?.attributes
+    ?.filter(
+      (attribute) =>
+        visitAttributeTypes?.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
+    )
+    .map((attribute) => ({
+      attribute,
+      value: getAttributeValue(attribute?.attributeType, attribute?.value),
+    }))
+    .filter(({ value }) => value != null && value !== '');
+
+  if (!displayableAttributes?.length) {
+    return null;
+  }
+
   return (
-    <>
-      {currentVisit?.attributes
-        ?.filter(
-          (attribute) =>
-            visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
-        )
-        .map((attribute) => (
-          <Tag key={attribute?.attributeType?.uuid} type="gray">
-            {getAttributeValue(attribute?.attributeType, attribute?.value)}
-          </Tag>
-        ))}
-    </>
+    <div className={styles.tagsContainer}>
+      {displayableAttributes.map(({ attribute, value }) => (
+        <Tag key={attribute?.attributeType?.uuid} type="gray">
+          {value}
+        </Tag>
+      ))}
+    </div>
   );
 };
 

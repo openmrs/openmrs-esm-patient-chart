@@ -23,14 +23,14 @@ interface RefreshDataButtonProps {
 
 interface ResultsViewerProps {
   basePath: string;
-  patientUuid?: string;
+  patientUuid: string;
 }
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const conceptUuids = config.resultsViewerConcepts.map((concept) => concept.conceptUuid) ?? [];
-  const { roots, isLoading, error } = useGetManyObstreeData(conceptUuids);
+  const { roots, isLoading, error } = useGetManyObstreeData(patientUuid, conceptUuids);
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;

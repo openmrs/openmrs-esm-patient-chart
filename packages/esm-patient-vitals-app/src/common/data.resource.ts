@@ -467,6 +467,11 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   return {
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
+    // Use Observation.interpretation from FHIR when available (preferred).
+    // Fallback to calculation for backward compatibility: existing observations may not have
+    // interpretation set if they were created before interpretation was added, or if reference
+    // ranges weren't available at creation time (OpenMRS core only sets interpretation when
+    // ObsReferenceRange is present).
     interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
       ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),

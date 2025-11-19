@@ -1,4 +1,4 @@
-import type { Encounter, Visit, VisitType } from '@openmrs/esm-framework';
+import type { Visit, VisitType } from '@openmrs/esm-framework';
 import { mockEncounter } from './encounters.mock';
 
 export const mockVisitTypes: VisitType[] = [
