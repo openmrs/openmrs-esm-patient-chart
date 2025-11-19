@@ -69,7 +69,8 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/opd visit/i).click();
+    await chartPage.page.getByText(/^OPD Visit$/i).click();
+    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -141,9 +142,9 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('Then the prompt modal should close', async () => {
-    await expect(chartPage.page.getByText(/no active visit/i)).not.toBeVisible();
-    await expect(chartPage.page.getByRole('button', { name: /cancel/i })).not.toBeVisible();
-    await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).not.toBeVisible();
+    await expect(chartPage.page.getByText(/no active visit/i)).toBeHidden();
+    await expect(chartPage.page.getByRole('button', { name: /cancel/i })).toBeHidden();
+    await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeHidden();
   });
 
   await test.step('When I click the `Visit note` button on the siderail again with no visit', async () => {
@@ -165,7 +166,8 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/opd visit/i).click();
+    await chartPage.page.getByText(/^OPD Visit$/i).click();
+    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -201,7 +203,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
 
   await test.step('Then I should see a confirmation toast and active visit tag removed', async () => {
     await expect(chartPage.page.getByText(/opd visit deleted successfully/i)).toBeVisible();
-    await expect(chartPage.page.getByLabel(/active visit/i)).not.toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeHidden();
   });
 
   await test.step('When I undo the delete visit', async () => {
@@ -231,7 +233,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('Then I should not see the Active Visit tag on the patient header', async () => {
-    await expect(chartPage.page.getByLabel(/active visit/i)).not.toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeHidden();
   });
 
   await test.step('When I click the `Visit note` button on the siderail', async () => {
