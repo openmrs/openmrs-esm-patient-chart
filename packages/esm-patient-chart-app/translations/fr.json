@@ -39,6 +39,7 @@
   "dosingInstructions": "Posologie",
   "editEncounter": "Modifier",
   "editThisEncounter": "Modifier cette consultation",
+  "editVisit": "Modifier la visite",
   "editVisitDetails": "Modifier les informations sur la visite",
   "emptyStateText": "Aucun(e) {{displayText}} à afficher pour ce patient.",
   "enable": "Activer",
