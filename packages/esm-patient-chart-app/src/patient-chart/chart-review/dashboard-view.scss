@@ -12,6 +12,9 @@
   grid-auto-rows: auto;
   grid-gap: 1.3125rem;
   margin: 1.3125rem;
+  > :has([data-extension-id='immunization-detailed-history-card']:empty) {
+    display: none;
+  }
 }
 
 // See https://zpl.io/lrlmdq0 for the Visits dashboard design
