@@ -100,10 +100,15 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
     await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
 
+    // Wait for end date field to appear (confirms form has updated after status change)
+    await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible();
+
     await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');
     await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
 
-    await chartPage.page.getByRole('textbox', { name: /end time/i }).fill('12:10');
+    const endTimeInput = chartPage.page.getByRole('textbox', { name: /end time/i });
+    await expect(endTimeInput).toBeVisible();
+    await endTimeInput.fill('12:10');
     await chartPage.page.getByLabel(/end time format/i).selectOption('AM');
   });
 
