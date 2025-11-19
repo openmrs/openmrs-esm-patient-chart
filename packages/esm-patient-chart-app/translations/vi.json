@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "Chỉnh sửa cuộc gặp gỡ này",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Chỉnh sửa chi tiết lượt khám",
   "emptyStateText": "Không có {{displayText}} để hiển thị cho bệnh nhân này",
   "enable": "Enable",

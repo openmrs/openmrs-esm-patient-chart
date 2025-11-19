@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "ჩასწორება",
   "editThisEncounter": "ამ კონსულტაციის ჩასწორება",
+  "editVisit": "Edit visit",
   "editVisitDetails": "ვიზიტის დეტალების ჩასწორება",
   "emptyStateText": "There are no {{displayText}} to display for this patient",
   "enable": "ჩართვა",

@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Editar",
   "editThisEncounter": "Editar este encontro",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Editar detalhes da visita",
   "emptyStateText": "Não há {{displayText}} para exibir para esse paciente",
   "enable": "Enable",

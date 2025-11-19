@@ -57,6 +57,8 @@
   "noCliniciansFoundDescription": "Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.",
   "noResultsForDrugSearch": "Não há resultados a mostrar para  \"{{searchTerm}}\"",
   "numRefillsErrorMessage": "Number of refills is required",
+  "off": "Off",
+  "on": "On",
   "onDate": "no",
   "or": "ou",
   "orderActionDiscontinue": "Discontinuar",

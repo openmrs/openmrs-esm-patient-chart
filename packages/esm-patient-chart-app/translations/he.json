@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "ערוך ביקור זה",
+  "editVisit": "Edit visit",
   "editVisitDetails": "ערוך את פרטי הביקור",
   "emptyStateText": "אין {{displayText}} להצגה עבור מטופל זה",
   "enable": "Enable",
