@@ -6,11 +6,11 @@ The immunizations widget provides a visual, intuitive system for clinicians to r
 
 This module is a patient chart widget that can be added to any patient chart dashboard. It provides two main views:
 
-1.  **Immunization Summary**: A detailed, collapsible table that groups immunizations by vaccine type. It provides an overview of the patient's vaccination history with expandable rows for more detail.
-    From this view, users can add new immunizations or edit/delete existing doses, which launches the immunization workspace form.
+1. **Immunization Summary**: A detailed, collapsible table that groups immunizations by vaccine type. It provides an overview of the patient's vaccination history with expandable rows for more detail.
+   From this view, users can add new immunizations or edit/delete existing doses, which launches the immunization workspace form.
 
-2.  **Immunization History**: A separate card that provides a simple, chronological list of all immunizations the patient has received.
-    This card, in conjunction with the summary view, helps clinicians track whether a patient's next scheduled dose is upcoming or overdue.
+2. **Immunization History**: A separate card that provides a simple, chronological list of all immunizations the patient has received.
+   This card, in conjunction with the summary view, helps clinicians track whether a patient's next scheduled dose is upcoming or overdue.
 
 ## Key Features
 
@@ -25,7 +25,7 @@ This module is a patient chart widget that can be added to any patient chart das
   - Expiration Date
   - Next Dose Date
   - Free-text Notes
-- **Smart Validation**: Includes checks for future dates and ensures the vaccination date is after the patient's birth date.
+- **Smart Validation**: Includes checks for future dates and ensures the vaccination date is on or after the patient's birth date.
 - **Loading & Error States**: Provides clear user feedback during form submission and validation.
 
 ### Detailed Summary & History
@@ -53,13 +53,13 @@ This module is a patient chart widget that can be added to any patient chart das
 
 This module registers several extensions that create the complete immunization feature. Here is a breakdown of the key widgets and how they are used:
 
-1.  **Immunizations Dashboard Link (`immunization-summary-dashboard`)**: This extension adds the "Immunizations" link to the patient chart's side navigation menu. It creates a dedicated dashboard page to house the main immunization widgets.
+1. **Immunizations Dashboard Link (`immunization-summary-dashboard`)**: Adds the "Immunizations" link to the patient chart's side navigation menu and automatically creates a dedicated dashboard page for immunization widgets.
 
-2.  **Immunization Summary Table (`immunization-details-widget`)**: This is the main, collapsible table that groups immunizations by vaccine type. It is placed on the **Immunizations Dashboard** by default.
+2. **Immunization Summary Table (`immunization-details-widget`)**: The main collapsible table that groups immunizations by vaccine type. Automatically placed on the Immunizations Dashboard.
 
-3.  **Immunization History Card (`immunization-detailed-history-card`)**: This widget displays a simple, chronological list of all immunizations. It is also placed on the **Immunizations Dashboard** by default.
+3. **Immunization History Card (`immunization-detailed-history-card`)**: A chronological list of all immunizations. Automatically placed on the Immunizations Dashboard.
 
-4.  **Immunization Overview Widget (`immunization-overview-widget`)**: This is a small, summary card intended for placement on other dashboards, like the main patient summary. It is **not assigned to a dashboard slot by default**.
+4. **Immunization Overview Widget (`immunization-overview-widget`)**: This is a small, summary card intended for placement on other dashboards, like the main patient summary. It is **not assigned to a dashboard slot by default**.
 
 To add the overview widget to the patient summary dashboard, add the following to your `extensions.json` configuration:
 
@@ -71,16 +71,9 @@ To add the overview widget to the patient summary dashboard, add the following t
 }
 ```
 
+### Frontend Configuration
 
-###  Customization Options
-
-The immunizations widget is **fully configurable** to match your implementation’s vaccine setup and scheduling needs.
-Configuration is managed through the `configSchema`, which allows you to define:
-
-* Which concept set contains all available vaccines
-* Dose and booster schedules for each vaccine
-
-This makes it easy to adapt the widget for different clinical workflows or national immunization programs.
+Configure the widget by setting values in your implementation's configuration file (typically `config.json` or via the System Administration module). The following parameters are available:
 
 ---
 
@@ -88,7 +81,7 @@ This makes it easy to adapt the widget for different clinical workflows or natio
 
 | Parameter                    | Type     | Description                                                                                                                  | Default           |
 | ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| **`immunizationConceptSet`** | `string` | A UUID or concept mapping representing the **concept set** that contains all possible vaccine concepts.                      | `"CIEL:984"`      |
+| **`immunizationConceptSet`** | `string` | A UUID or concept mapping (e.g., `"CIEL:984"`) that resolves to a **concept set** containing all available vaccine concepts. | `"CIEL:984"`      |
 | **`sequenceDefinitions`**    | `array`  | Defines the **dose and booster schedules** for each vaccine. Each entry represents one vaccine and its sequence definitions. | See example below |
 
 ---
@@ -114,21 +107,54 @@ This makes it easy to adapt the widget for different clinical workflows or natio
 }
 ```
 
+**Note**: Replace `vaccineConceptUuid` with your actual vaccine concept UUIDs.
+
 ---
 
-### Notes
+### Configuration Notes
 
-* If `sequenceDefinitions` is **not provided**, vaccines will be treated as **single-dose vaccines** without predefined schedules.
-* You can add multiple vaccine definitions as needed to represent your national or local vaccine program.
-* **Dose numbering convention**:
+- **Dose numbering convention**:
+  - `1–9` → Primary doses
+  - `11–19` → Booster doses
+- If `sequenceDefinitions` is not provided, vaccines are treated as single-dose vaccines without predefined schedules.
+- `sequenceLabel` values are used as translation keys in the UI for localization.
+- You can add multiple vaccine definitions to represent your national or local immunization program.
 
-  * `1–9` → Primary doses
-  * `11–19` → Booster doses
-* `sequenceLabel` values are also used as **translation keys** in the UI for localization
+## Backend Setup Requirements
+
+The immunizations feature requires backend configuration in the OpenMRS [FHIR2 module](https://github.com/openmrs/openmrs-module-fhir2).
+
+### Required Global Properties
+
+- `fhir2.immunizationsEncounterTypeUuid` - UUID of the encounter type for immunization encounters
+- `fhir2.administeringEncounterRoleUuid` - UUID of the encounter role for the administering provider
+
+### Required Concept Mappings
+
+The following CIEL concepts must be mapped:
+
+| CIEL Code | Concept Name | Required |
+|-----------|--------------|----------|
+| CIEL:1421 | Immunization grouping concept | ✅ Required |
+| CIEL:984 | Vaccine | ✅ Required |
+| CIEL:1410 | Vaccination date | ✅ Required |
+| CIEL:1418 | Dose number | ✅ Required |
+| CIEL:1419 | Manufacturer | ✅ Required |
+| CIEL:1420 | Lot number | ✅ Required |
+| CIEL:165907 | Expiration date | ✅ Required |
+| CIEL:161011 | Free text comment | ⚠️ Optional |
+| CIEL:170000 | Date next dose | ⚠️ Optional |
 
 ## Implementation Checklist
 
-### Required Setup
+### Backend Setup (Required)
+
+- [ ] Configure global property `fhir2.immunizationsEncounterTypeUuid` with encounter type UUID
+- [ ] Configure global property `fhir2.administeringEncounterRoleUuid` with encounter role UUID
+- [ ] Verify all required CIEL concept mappings exist (CIEL:1421, CIEL:984, CIEL:1410, CIEL:1418, CIEL:1419, CIEL:1420, CIEL:165907)
+- [ ] Verify optional CIEL concept mappings if using notes or next dose date features (CIEL:161011, CIEL:170000)
+
+### Frontend Setup (Required)
 
 - [ ] Configure `immunizationConceptSet` to point to your implementation's concept set for vaccines.
 - [ ] Configure `sequenceDefinitions` for all vaccines that have a multi-dose or booster schedule.
@@ -141,7 +167,7 @@ This makes it easy to adapt the widget for different clinical workflows or natio
 
 ## Key Files for Customization
 
-- **`config-schema.ts`**: Main configuration for vaccine concept sets and dose schedules.
-- **`src/widgets/immunizations-summary/immunizations-summary.component.tsx`**: The main component for the immunization summary view.
-- **`src/widgets/immunization-history/immunization-history.component.tsx`**: The component for the chronological history view.
-- **`src/workspace/immunization-form/immunization-form.component.tsx`**: The workspace form for adding and editing immunizations.
+- **`src/config-schema.ts`**: Main configuration for vaccine concept sets and dose schedules.
+- **`src/immunizations/immunizations-detailed-summary.component.tsx`**: The main component for the immunization summary view.
+- **`src/immunizations/immunization-history-dashboard.component.tsx`**: The component for the chronological history view.
+- **`src/immunizations/immunizations-form.workspace.tsx`**: The workspace form for adding and editing immunizations.
