@@ -52,7 +52,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
-  const isVisitActive = !visitContext.stopDatetime;
+  const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
   const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
 
   const launchVitalsAndBiometricsForm = useCallback(
@@ -73,7 +73,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
     const now = dayjs();
     const vitalsTakenTimeAgo = dayjs.duration(now.diff(latestVitals?.date));
     const vitalsOverdueThresholdHours = config.vitals.vitalsOverdueThresholdHours;
-    const areVitalsOverdue = isVisitActive && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
+    const areVitalsOverdue = isActiveVisit && vitalsTakenTimeAgo.asHours() >= vitalsOverdueThresholdHours;
     const vitalsOverdueDayCount = Math.round(vitalsTakenTimeAgo.asDays());
     const hoursSinceVitalsTaken = Math.round(vitalsTakenTimeAgo.asHours());
     let overdueVitalsTagContent: React.ReactNode = null;
