@@ -1,5 +1,4 @@
 import { exist } from '../loadPatientTestData/helpers';
-import type { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
 export interface ReferenceRanges {
   hiAbsolute?: number;
@@ -80,6 +79,56 @@ export function rangeAlreadyHasUnits(range: string | undefined, units: string | 
   const trimmedRange = range.trim();
   const trimmedUnits = units.trim();
   return trimmedRange.endsWith(trimmedUnits) || trimmedRange.endsWith(` ${trimmedUnits}`);
+}
+
+/**
+ * Checks if a range string already contains any units (common unit patterns).
+ * This helps detect if a range already has units even if they differ from the parameter.
+ * @param range The formatted range string (e.g., "0 – 50 mg/dL")
+ * @returns true if the range appears to already contain units, false otherwise
+ */
+function rangeHasAnyUnits(range: string): boolean {
+  if (!range) {
+    return false;
+  }
+
+  const trimmedRange = range.trim();
+  // Common unit patterns: ends with common unit abbreviations or contains unit-like patterns
+  // This is a heuristic to detect if units are already present
+  const unitPattern = /\s+[a-zA-Z\/%°]+$/;
+  return unitPattern.test(trimmedRange);
+}
+
+/**
+ * Formats a reference range with units for display, avoiding duplicate units.
+ * @param range The formatted range string (may or may not include units)
+ * @param units The units string to append if not already present
+ * @returns Formatted string with range and units (e.g., "0 – 50 U/L")
+ */
+export function formatRangeWithUnits(range: string | undefined, units: string | undefined): string {
+  const trimmedRange = range?.trim() || '';
+  const trimmedUnits = units?.trim() || '';
+
+  // If range is empty, return '--' (even if units exist, we need a range to display)
+  if (!trimmedRange) {
+    return '--';
+  }
+
+  // Check if range already includes the specific units parameter
+  const hasSpecificUnits = rangeAlreadyHasUnits(trimmedRange, trimmedUnits);
+  if (hasSpecificUnits) {
+    return trimmedRange;
+  }
+
+  // Check if range already has any units (even if different from parameter)
+  // This prevents appending units when range already has different units (e.g., "0 – 50 mg/dL" with "U/L" parameter)
+  const hasAnyUnits = rangeHasAnyUnits(trimmedRange);
+  if (hasAnyUnits) {
+    return trimmedRange;
+  }
+
+  // Append units if not already present
+  return trimmedUnits ? `${trimmedRange} ${trimmedUnits}` : trimmedRange;
 }
 
 /**
