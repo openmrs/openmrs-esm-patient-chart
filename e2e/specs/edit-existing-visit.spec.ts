@@ -98,6 +98,9 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   });
 
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
+    // Wait for default location to load to ensure form is stable before interaction
+    await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).not.toHaveValue('');
+
     await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
 
     // Wait for end date field to appear (confirms form has updated after status change)
