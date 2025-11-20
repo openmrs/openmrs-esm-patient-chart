@@ -39,20 +39,63 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
+  // const StyledTableCell = ({ children, interpretation}: { children: React.ReactNode; interpretation: string,  }) => {
+
+    
+  //   switch (interpretation) {
+  //     case 'critically_high':
+  //       return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
+  //     case 'critically_low':
+  //       return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
+  //     case 'high':
+  //       return <TableCell className={styles.high}>{children}</TableCell>;
+  //     case 'low':
+  //       return <TableCell className={styles.low}>{children}</TableCell>;
+      
+  //     default:
+  //       return <TableCell>{children}</TableCell>;
+  //   }
+  // };
+
+const StyledTableCell = ({
+  children,
+  interpretation,
+  headerKey,
+}: {
+  children: React.ReactNode;
+  interpretation: string;
+  headerKey: string;
+}) => {
+  const isNoteCell = headerKey === 'note';
+
+  let cellClass = '';
+
+  if (isNoteCell) {
+    // Note column → applying note styling
+    cellClass = styles.note;
+  } else {
+    // All other columns → applying interpretation styling
     switch (interpretation) {
       case 'critically_high':
-        return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
+        cellClass = styles.criticallyHigh;
+        break;
       case 'critically_low':
-        return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
+        cellClass = styles.criticallyLow;
+        break;
       case 'high':
-        return <TableCell className={styles.high}>{children}</TableCell>;
+        cellClass = styles.high;
+        break;
       case 'low':
-        return <TableCell className={styles.low}>{children}</TableCell>;
+        cellClass = styles.low;
+        break;
       default:
-        return <TableCell>{children}</TableCell>;
+        break;
     }
-  };
+  }
+
+  return <TableCell className={cellClass}>{children}</TableCell>;
+};
+
 
   const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
     key: '',
@@ -128,7 +171,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       const interpretation = vitalsObj?.[interpretationKey];
 
                       return (
-                        <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
+                        <StyledTableCell
+                          key={`styled-cell-${cell.id}`}
+                          interpretation={interpretation}
+                          headerKey={cell.info.header}
+                        >
                           {cell.value?.content ?? cell.value}
                         </StyledTableCell>
                       );
