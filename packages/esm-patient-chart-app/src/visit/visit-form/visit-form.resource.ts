@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
+import { useMemo, useRef } from 'react';
+import { useTranslation, type TFunction } from 'react-i18next';
 import dayjs from 'dayjs';
 import { z } from 'zod';
 import {
@@ -91,7 +90,8 @@ export interface VisitFormCallbacks {
 }
 
 export function useVisitFormCallbacks() {
-  return useState<Map<string, VisitFormCallbacks>>(new Map());
+  const callbacksRef = useRef<Map<string, VisitFormCallbacks>>(new Map());
+  return callbacksRef;
 }
 
 export function createVisitAttribute(visitUuid: string, attributeType: string, value: string) {
