@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import {
   getPatientName,
   PatientBannerActionsMenu,
-  PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
 } from '@openmrs/esm-framework';
+import PatientBannerDetails from '../banner-details/patient-banner-details.component';
 import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
@@ -94,7 +94,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
             [styles.tabletContactDetails]: isTabletViewport,
           })}
         >
-          <PatientBannerContactDetails deceased={isDeceased} patientId={patient?.id} />
+          <PatientBannerDetails deceased={isDeceased} patientId={patient?.id} />
         </div>
       )}
     </header>
