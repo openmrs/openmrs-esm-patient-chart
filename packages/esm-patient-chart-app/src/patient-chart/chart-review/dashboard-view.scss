@@ -12,6 +12,8 @@
   grid-auto-rows: auto;
   grid-gap: 1.3125rem;
   margin: 1.3125rem;
+  // Hide empty extension wrappers when components return null
+  // This prevents empty space in the grid when supplementary widgets have no data
   > :has([data-extension-id='immunization-detailed-history-card']:empty) {
     display: none;
   }
