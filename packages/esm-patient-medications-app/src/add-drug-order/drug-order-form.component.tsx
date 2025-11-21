@@ -91,9 +91,9 @@ function MedicationInfoHeader({
 
   return (
     <div className={styles.medicationInfo} id="medicationInfo">
-      <strong className={styles.productiveHeading02}>
+      <h3 className={styles.productiveHeading02}>
         {drug?.display} {drug?.strength && `(${drug?.strength})`}
-      </strong>{' '}
+      </h3>{' '}
       <span className={styles.bodyLong01}>
         {routeValue && <>&mdash; {routeValue}</>}{' '}
         {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
@@ -347,7 +347,7 @@ export function DrugOrderForm({
           <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
           {(allowSelectingDrug || allowSelectingPrescribingClinician) && (
             <section className={styles.formSection}>
-              <h3 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h3>
+              <h2 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h2>
               <Stack gap={5}>
                 {allowSelectingDrug && (
                   <InputWrapper>
@@ -410,7 +410,7 @@ export function DrugOrderForm({
           <section className={styles.formSection}>
             <Grid className={styles.gridRow}>
               <Column lg={12} md={6} sm={4}>
-                <h3 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h3>
+                <h2 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h2>
               </Column>
               <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
                 <ControlledFieldInput
@@ -562,7 +562,7 @@ export function DrugOrderForm({
             )}
           </section>
           <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
+            <h2 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h2>
             <Grid className={styles.gridRow}>
               {/* TODO: This input does nothing */}
               <Column lg={16} md={4} sm={4}>
@@ -628,7 +628,7 @@ export function DrugOrderForm({
             </Grid>
           </section>
           <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
+            <h2 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h2>
             <Grid className={styles.gridRow}>
               <Column lg={8} md={3} sm={4}>
                 <InputWrapper>
