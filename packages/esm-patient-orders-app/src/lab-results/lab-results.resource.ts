@@ -130,6 +130,26 @@ export function useOrderConceptByUuid(uuid: string) {
   return results;
 }
 
+export function useOrderConceptsByUuids(uuids: Array<string>) {
+  const { data, error, isLoading, isValidating, mutate } = useSWR<Array<LabOrderConcept>, Error>(
+    uuids.length ? ['concepts', ...uuids] : null,
+    () => Promise.all(uuids.map((uuid) => fetchAllSetMembers(uuid))),
+  );
+
+  const results = useMemo(
+    () => ({
+      concepts: data ?? [],
+      isLoading,
+      error,
+      isValidating,
+      mutate,
+    }),
+    [data, error, isLoading, isValidating, mutate],
+  );
+
+  return results;
+}
+
 export function useLabEncounter(encounterUuid: string) {
   const apiUrl = `${restBaseUrl}/encounter/${encounterUuid}?v=${labEncounterRepresentation}`;
 
@@ -163,6 +183,33 @@ export function useObservation(obsUuid: string) {
   };
 }
 
+export function useObservations(obsUuids: Array<string>) {
+  const fetchMultipleObservations = async (): Promise<Array<Observation>> => {
+    const results = await Promise.all(
+      obsUuids.map(async (uuid) => {
+        const url = `${restBaseUrl}/obs/${uuid}?v=${conceptObsRepresentation}`;
+        const res = await openmrsFetch(url);
+        return res.data;
+      }),
+    );
+
+    return results;
+  };
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<Observation[], Error>(
+    obsUuids && obsUuids.length > 0 ? ['observations', ...obsUuids] : null,
+    fetchMultipleObservations,
+  );
+
+  return {
+    data: data ?? [],
+    isLoading,
+    error,
+    isValidating,
+    mutate,
+  };
+}
+
 export function useCompletedLabResults(order: Order) {
   const {
     encounter,
@@ -185,6 +232,29 @@ export function useCompletedLabResults(order: Order) {
       mutateObs();
     },
     error: isErrorObs ?? encounterError,
+  };
+}
+
+export function useCompletedLabResultsArray(order: Order) {
+  const {
+    encounter,
+    isLoading: isLoadingEncounter,
+    mutate: mutateLabOrders,
+    error: encounterError,
+  } = useLabEncounter(order.encounter.uuid);
+
+  const obsUuids = encounter?.obs.filter((o) => o?.order.uuid === order?.uuid).map((o) => o.uuid);
+
+  const { data: observations, isLoading: isLoadingObs, error: errorObs, mutate: mutateObs } = useObservations(obsUuids);
+
+  return {
+    isLoading: isLoadingEncounter || isLoadingObs,
+    completeLabResults: observations,
+    mutate: () => {
+      mutateLabOrders();
+      mutateObs();
+    },
+    error: errorObs ?? encounterError,
   };
 }
 
@@ -256,6 +326,33 @@ export function createObservationPayload(
   }
 }
 
+export function createCompositeObservationPayload(
+  concepts: LabOrderConcept[],
+  order: Order,
+  values: Record<string, unknown>,
+  status: string,
+) {
+  if (!concepts || concepts.length === 0) return { obs: [] };
+
+  const allObs = concepts.flatMap((concept) => {
+    if (concept.set && concept.setMembers.length > 0) {
+      const groupMembers = concept.setMembers
+        .map((member) => createGroupMember(member, order, values, status))
+        .filter((member) => member !== null && member.value !== null && member.value !== undefined);
+
+      if (groupMembers.length === 0) return [];
+
+      return [createObservationByConcept(concept, order, groupMembers, null, status)];
+    } else {
+      const value = getValue(concept, values);
+      if (value === null || value === undefined) return [];
+      return [createObservationByConcept(concept, order, null, value, status)];
+    }
+  });
+
+  return { obs: allObs };
+}
+
 export function updateObservation(observationUuid: string, payload: Record<string, any>) {
   return openmrsFetch(`${restBaseUrl}/obs/${observationUuid}`, {
     method: 'POST',
@@ -282,6 +379,22 @@ function createGroupMember(member: LabOrderConcept, order: Order, values: Record
 function createObservation(order: Order, groupMembers = null, value = null, status: string) {
   return {
     concept: { uuid: order.concept.uuid },
+    status: status,
+    order: { uuid: order.uuid },
+    ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
+    ...(value !== null && value !== undefined && { value }),
+  };
+}
+
+function createObservationByConcept(
+  concept: LabOrderConcept,
+  order: Order,
+  groupMembers = null,
+  value = null,
+  status: string,
+) {
+  return {
+    concept: { uuid: concept.uuid },
     status: status,
     order: { uuid: order.uuid },
     ...(groupMembers && groupMembers.length > 0 && { groupMembers }),
