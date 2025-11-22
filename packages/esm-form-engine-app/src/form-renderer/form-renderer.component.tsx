@@ -2,49 +2,26 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
-import { launchWorkspace, showModal, type Visit, type Encounter } from '@openmrs/esm-framework';
-import { clinicalFormsWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { showModal, type Visit, type Encounter } from '@openmrs/esm-framework';
+import { type FormRendererProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
 
-interface FormRendererProps
-  extends Omit<
-    DefaultPatientWorkspaceProps,
-    'closeWorkspace' | 'promptBeforeClosing' | 'closeWorkspaceWithSavedChanges' | 'setTitle'
-  > {
-  additionalProps?: Record<string, any>;
-  encounterUuid?: string;
-  formUuid: string;
-  patientUuid: string;
-  visit?: Visit;
-  visitUuid?: string;
-  clinicalFormsWorkspaceName?: string;
-  /**
-   * These workspace control props are made optional to support usage in non-workspace contexts,
-   * such as the Fast Data Entry app or other standalone form zones.
-   */
-  closeWorkspace?: DefaultPatientWorkspaceProps['closeWorkspace'];
-  promptBeforeClosing?: DefaultPatientWorkspaceProps['promptBeforeClosing'];
-  closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
-  setTitle?: DefaultPatientWorkspaceProps['setTitle'];
-  hideControls?: boolean;
-  hidePatientBanner?: boolean;
-  handlePostResponse?: (encounter: Encounter) => void;
-  preFilledQuestions?: Record<string, string>;
-}
-
+/**
+ * This component is a thin wrapper to load an O3 form from the server,
+ * then display it using the React form engine
+ *
+ */
 const FormRenderer: React.FC<FormRendererProps> = ({
   additionalProps,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
   encounterUuid,
   formUuid,
   patientUuid,
-  promptBeforeClosing,
+  setHasUnsavedChanges,
   visit: visitRaw,
   visitUuid,
-  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
   hideControls,
   hidePatientBanner,
   handlePostResponse,
@@ -53,13 +30,11 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   const { t } = useTranslation();
 
   const { schema, error, isLoading } = useFormSchema(formUuid);
-  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
   const formSessionIntent = additionalProps?.formSessionIntent ?? '*';
 
   const handleCloseForm = useCallback(() => {
     closeWorkspace?.();
-    !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchWorkspace(clinicalFormsWorkspaceName);
-  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose, clinicalFormsWorkspaceName]);
+  }, [closeWorkspace]);
 
   const visit = useMemo(() => {
     if (visitRaw) {
@@ -85,17 +60,12 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     });
   }, []);
 
-  const handleMarkFormAsDirty = useCallback(
-    (isDirty: boolean) => promptBeforeClosing?.(() => isDirty),
-    [promptBeforeClosing],
-  );
-
   const handleOnSubmit = useCallback(
     (encounters?: Array<Encounter>) => {
-      closeWorkspaceWithSavedChanges?.();
+      closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
       handlePostResponse?.(encounters[0]);
     },
-    [closeWorkspaceWithSavedChanges, handlePostResponse],
+    [closeWorkspace, handlePostResponse],
   );
 
   if (isLoading) {
@@ -122,7 +92,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           formJson={schema}
           handleClose={handleCloseForm}
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
-          markFormAsDirty={handleMarkFormAsDirty}
+          markFormAsDirty={setHasUnsavedChanges}
           mode={additionalProps?.mode}
           formSessionIntent={formSessionIntent}
           onSubmit={handleOnSubmit}

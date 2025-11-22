@@ -5,7 +5,7 @@ import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, InlineLoading
 import { useTranslation } from 'react-i18next';
 import {
   ErrorState,
-  launchWorkspace,
+  launchWorkspace2,
   OpenmrsDatePicker,
   useDebounce,
   useOnVisible,
@@ -51,7 +51,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
 
   const openStartVisitWorkspace = () => {
     closeModal();
-    launchWorkspace('start-visit-workspace-form', {
+    launchWorkspace2('start-visit-workspace-form', {
       openedFrom: 'visit-context-switcher',
     });
   };

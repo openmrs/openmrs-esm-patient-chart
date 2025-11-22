@@ -89,9 +89,9 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   );
 
   const chartColors = useMemo(
-  () => Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color])),
-  [selectedMenuItem.concepts],
-);
+    () => Object.fromEntries(selectedMenuItem.concepts.map((d) => [d.label, d.color])),
+    [selectedMenuItem.concepts],
+  );
 
   const chartOptions: LineChartOptions = useMemo(() => {
     return {

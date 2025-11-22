@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { parseDate, useConfig } from '@openmrs/esm-framework';
+import { type Drug, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { careSettingUuid, useRequireOutpatientQuantity } from '../api';
 import { type ConfigObject } from '../config-schema';
-import { type DrugOrderBasketItem } from '../types';
-import { type Drug } from '@openmrs/esm-patient-common-lib';
 
 export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, defaultPrescribingProviderUuid: string) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();

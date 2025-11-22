@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { AddIcon, formatDate, launchWorkspace, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
@@ -33,7 +33,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
 
-  const launchAllergiesForm = useCallback(() => launchWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = useCallback(() => launchWorkspace2(patientAllergiesFormWorkspace), []);
 
   const tableHeaders = [
     { key: 'display', header: t('allergen', 'Allergen') },

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { orderBy } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, showSnackbar, parseDate, formatDate, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
 import { getFlagType } from './utils';
@@ -10,10 +10,9 @@ import styles from './flags-list.scss';
 
 type SortKey = 'alpha' | 'active' | 'retired';
 
-const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
-  patientUuid,
+const FlagsList: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
+  groupProps: { patientUuid },
 }) => {
   const { t } = useTranslation();
   const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
@@ -219,7 +218,7 @@ const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
           disabled={isEnabling || isDisabling}
           kind="primary"
           type="submit"
-          onClick={() => closeWorkspaceWithSavedChanges()}
+          onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
         >
           {(() => {
             if (isEnabling) return t('enablingFlag', 'Enabling flag...');

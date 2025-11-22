@@ -21,7 +21,7 @@ import {
   type ConfigObject,
   formatDate,
   formatDatetime,
-  launchWorkspace,
+  launchWorkspace2,
   useConfig,
   useLayoutType,
   usePagination,
@@ -54,7 +54,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
 
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
-  const launchProgramsForm = useCallback(() => launchWorkspace('programs-form-workspace'), []);
+  const launchProgramsForm = useCallback(() => launchWorkspace2('programs-form-workspace'), []);
 
   const tableHeaders = [
     {

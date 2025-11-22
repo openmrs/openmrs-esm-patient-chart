@@ -46,9 +46,13 @@ export const labOrderPanel = getAsyncLifecycle(
   options,
 );
 
-// t('addLabOrderWorkspaceTitle', 'Add lab order')
 export const addLabOrderWorkspace = getAsyncLifecycle(
   () => import('./test-orders/add-test-order/add-test-order.workspace'),
+  options,
+);
+
+export const exportedAddLabOrderWorkspace = getAsyncLifecycle(
+  () => import('./test-orders/add-test-order/exported-add-test-order.workspace'),
   options,
 );
 

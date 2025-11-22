@@ -10,19 +10,18 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import { closeWorkspace, launchWorkspace, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
-const mockCloseWorkspace = closeWorkspace as jest.Mock;
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockCloseWorkspace = jest.fn();
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 const mockUseSession = jest.mocked(useSession);
 const mockUseDrugSearch = jest.mocked(useDrugSearch);
 const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
 const usePatientOrdersMock = jest.fn();
 
-mockCloseWorkspace.mockImplementation((name, { onWorkspaceClose }) => onWorkspaceClose());
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
 /** This is needed to render the order form */
@@ -124,12 +123,12 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
-        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2]),
+        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null),
         isOrderIncomplete: true,
         startDate: expect.any(Date),
       }),
     ]);
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
   test('can open the drug form ', async () => {
@@ -172,6 +171,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
         expect.objectContaining({
           ...getTemplateOrderBasketItem(
             mockDrugSearchResultApiData[0],
+            null,
             undefined,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
@@ -188,15 +188,23 @@ describe('AddDrugOrderWorkspace drug search', () => {
 function renderAddDrugOrderWorkspace() {
   render(
     <AddDrugOrderWorkspace
-      order={undefined as any}
-      closeWorkspace={({ onWorkspaceClose }) => onWorkspaceClose()}
-      closeWorkspaceWithSavedChanges={({ onWorkspaceClose }) => onWorkspaceClose()}
-      promptBeforeClosing={() => false}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      setTitle={jest.fn()}
-      visitContext={null}
-      mutateVisitContext={null}
+      workspaceProps={{
+        order: undefined as any,
+      }}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceName={''}
+      launchChildWorkspace={jest.fn()}
+      closeWorkspace={mockCloseWorkspace}
+      windowProps={{
+        encounterUuid: '',
+      }}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 }

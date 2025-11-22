@@ -51,12 +51,11 @@
       "component": "editLabResultsModal"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "add-lab-order",
-      "type": "order",
       "component": "addLabOrderWorkspace",
-      "title": "addLabOrderWorkspaceTitle"
+      "window": "patient-chart-order-basket"
     }
   ]
 }

@@ -20,7 +20,7 @@ import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
-import { EmptyState, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps, EmptyState } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
   useLayoutType,
@@ -28,12 +28,16 @@ import {
   ResponsiveWrapper,
   useConfig,
   OpenmrsDatePicker,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import { type ChartConfig } from '../config-schema';
 import styles from './mark-patient-deceased-form.scss';
 
-const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
+  closeWorkspace,
+  groupProps: { patientUuid },
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);
@@ -78,7 +82,7 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
 
   const {
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     handleSubmit,
     watch,
   } = useForm<MarkPatientDeceasedFormSchema>({
@@ -117,151 +121,156 @@ const MarkPatientDeceasedForm: React.FC<DefaultPatientWorkspaceProps> = ({ close
   const onError = (errors) => console.error(errors);
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <div>
-        {isTablet && (
-          <Row className={styles.headerGridRow}>
-            <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedPatientUuid} />
-          </Row>
-        )}
-        <div className={styles.container}>
-          <span className={styles.warningContainer}>
-            <WarningFilled aria-label={t('warning', 'Warning')} className={styles.warningIcon} size={20} />
-            <span className={styles.warningText}>
-              {t('markDeceasedWarning', 'Marking the patient as deceased will end any active visits for this patient')}
+    <Workspace2 title={t('markPatientDeceased', 'Mark patient deceased')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <div>
+          {isTablet && (
+            <Row className={styles.headerGridRow}>
+              <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedPatientUuid} />
+            </Row>
+          )}
+          <div className={styles.container}>
+            <span className={styles.warningContainer}>
+              <WarningFilled aria-label={t('warning', 'Warning')} className={styles.warningIcon} size={20} />
+              <span className={styles.warningText}>
+                {t(
+                  'markDeceasedWarning',
+                  'Marking the patient as deceased will end any active visits for this patient',
+                )}
+              </span>
             </span>
-          </span>
-          <section>
-            <div className={styles.sectionTitle}>{t('dateOfDeath', 'Date of death')}</div>
-            {causesOfDeath?.length ? (
-              <ResponsiveWrapper>
-                <Controller
-                  name="deathDate"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <OpenmrsDatePicker
-                      {...field}
-                      className={styles.datePicker}
-                      id="deceasedDate"
-                      data-testid="deceasedDate"
-                      labelText={t('date', 'Date')}
-                      maxDate={new Date()}
-                      invalid={Boolean(fieldState?.error?.message)}
-                      invalidText={fieldState?.error?.message}
-                    />
-                  )}
-                />
-              </ResponsiveWrapper>
-            ) : (
-              <DatePickerSkeleton />
-            )}
-          </section>
-          <section>
-            <div className={styles.sectionTitle}>{t('causeOfDeath', 'Cause of death')}</div>
-            <div
-              className={classNames(styles.conceptAnswerOverviewWrapper, {
-                [styles.conceptAnswerOverviewWrapperTablet]: isTablet,
-                [styles.conceptAnswerOverviewWrapperDesktop]: !isTablet,
-                [styles.errorOutline]: errors?.causeOfDeath?.message,
-              })}
-            >
-              {isLoadingCausesOfDeath ? <StructuredListSkeleton /> : null}
-
+            <section>
+              <div className={styles.sectionTitle}>{t('dateOfDeath', 'Date of death')}</div>
               {causesOfDeath?.length ? (
                 <ResponsiveWrapper>
-                  <Search
-                    labelText={t('searchForCauseOfDeath', 'Search for a cause of death')}
-                    onChange={handleSearchTermChange}
-                    placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+                  <Controller
+                    name="deathDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <OpenmrsDatePicker
+                        {...field}
+                        className={styles.datePicker}
+                        id="deceasedDate"
+                        data-testid="deceasedDate"
+                        labelText={t('date', 'Date')}
+                        maxDate={new Date()}
+                        invalid={Boolean(fieldState?.error?.message)}
+                        invalidText={fieldState?.error?.message}
+                      />
+                    )}
                   />
                 </ResponsiveWrapper>
-              ) : null}
-
-              {causesOfDeath?.length && filteredCausesOfDeath.length > 0 ? (
-                <Controller
-                  name="causeOfDeath"
-                  control={control}
-                  render={({ field: { onChange } }) => (
-                    <RadioButtonGroup
-                      className={styles.radioButtonGroup}
-                      name={
-                        causeOfDeathValue === freeTextFieldConceptUuid
-                          ? 'freeTextFieldCauseOfDeath'
-                          : 'codedCauseOfDeath'
-                      }
-                      orientation="vertical"
-                      onChange={onChange}
-                    >
-                      {filteredCausesOfDeath.map(({ uuid, display, name }) => (
-                        <RadioButton
-                          className={styles.radioButton}
-                          id={name}
-                          key={uuid}
-                          labelText={display}
-                          value={uuid}
-                        />
-                      ))}
-                    </RadioButtonGroup>
-                  )}
-                />
-              ) : null}
-
-              {searchTerm && filteredCausesOfDeath.length === 0 && (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>
-                        {t('noMatchingCodedCausesOfDeath', 'No matching coded causes of death')}
-                      </p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
-                </div>
+              ) : (
+                <DatePickerSkeleton />
               )}
+            </section>
+            <section>
+              <div className={styles.sectionTitle}>{t('causeOfDeath', 'Cause of death')}</div>
+              <div
+                className={classNames(styles.conceptAnswerOverviewWrapper, {
+                  [styles.conceptAnswerOverviewWrapperTablet]: isTablet,
+                  [styles.conceptAnswerOverviewWrapperDesktop]: !isTablet,
+                  [styles.errorOutline]: errors?.causeOfDeath?.message,
+                })}
+              >
+                {isLoadingCausesOfDeath ? <StructuredListSkeleton /> : null}
 
-              {!isLoadingCausesOfDeath && !causesOfDeath?.length ? (
-                <EmptyState
-                  displayText={t('causeOfDeath_lower', 'cause of death concepts configured in the system')}
-                  headerTitle={t('causeOfDeath', 'Cause of death')}
-                />
-              ) : null}
-            </div>
-            {errors?.causeOfDeath && <p className={styles.errorMessage}>{errors?.causeOfDeath?.message}</p>}
-          </section>
-        </div>
-        {causeOfDeathValue === freeTextFieldConceptUuid && (
-          <div className={styles.nonCodedCauseOfDeath}>
-            <Controller
-              name="nonCodedCauseOfDeath"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  id="freeTextCauseOfDeath"
-                  invalid={!!errors?.nonCodedCauseOfDeath}
-                  invalidText={errors?.nonCodedCauseOfDeath?.message}
-                  labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
-                  onChange={onChange}
-                  placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}
-                  value={value}
-                />
-              )}
-            />
+                {causesOfDeath?.length ? (
+                  <ResponsiveWrapper>
+                    <Search
+                      labelText={t('searchForCauseOfDeath', 'Search for a cause of death')}
+                      onChange={handleSearchTermChange}
+                      placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+                    />
+                  </ResponsiveWrapper>
+                ) : null}
+
+                {causesOfDeath?.length && filteredCausesOfDeath.length > 0 ? (
+                  <Controller
+                    name="causeOfDeath"
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <RadioButtonGroup
+                        className={styles.radioButtonGroup}
+                        name={
+                          causeOfDeathValue === freeTextFieldConceptUuid
+                            ? 'freeTextFieldCauseOfDeath'
+                            : 'codedCauseOfDeath'
+                        }
+                        orientation="vertical"
+                        onChange={onChange}
+                      >
+                        {filteredCausesOfDeath.map(({ uuid, display, name }) => (
+                          <RadioButton
+                            className={styles.radioButton}
+                            id={name}
+                            key={uuid}
+                            labelText={display}
+                            value={uuid}
+                          />
+                        ))}
+                      </RadioButtonGroup>
+                    )}
+                  />
+                ) : null}
+
+                {searchTerm && filteredCausesOfDeath.length === 0 && (
+                  <div className={styles.tileContainer}>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>
+                          {t('noMatchingCodedCausesOfDeath', 'No matching coded causes of death')}
+                        </p>
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      </div>
+                    </Tile>
+                  </div>
+                )}
+
+                {!isLoadingCausesOfDeath && !causesOfDeath?.length ? (
+                  <EmptyState
+                    displayText={t('causeOfDeath_lower', 'cause of death concepts configured in the system')}
+                    headerTitle={t('causeOfDeath', 'Cause of death')}
+                  />
+                ) : null}
+              </div>
+              {errors?.causeOfDeath && <p className={styles.errorMessage}>{errors?.causeOfDeath?.message}</p>}
+            </section>
           </div>
-        )}
-      </div>
-      <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} role="progressbar" />
-          ) : (
-            t('saveAndClose', 'Save and close')
+          {causeOfDeathValue === freeTextFieldConceptUuid && (
+            <div className={styles.nonCodedCauseOfDeath}>
+              <Controller
+                name="nonCodedCauseOfDeath"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    id="freeTextCauseOfDeath"
+                    invalid={!!errors?.nonCodedCauseOfDeath}
+                    invalidText={errors?.nonCodedCauseOfDeath?.message}
+                    labelText={t('nonCodedCauseOfDeath', 'Non-coded cause of death')}
+                    onChange={onChange}
+                    placeholder={t('enterNonCodedCauseOfDeath', 'Enter non-coded cause of death')}
+                    value={value}
+                  />
+                )}
+              />
+            </div>
           )}
-        </Button>
-      </ButtonSet>
-    </Form>
+        </div>
+        <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} role="progressbar" />
+            ) : (
+              t('saveAndClose', 'Save and close')
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 

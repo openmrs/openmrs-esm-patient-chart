@@ -5162,6 +5162,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.21"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@openmrs/esm-framework": 8.x
     "@openmrs/esm-patient-common-lib": 11.x

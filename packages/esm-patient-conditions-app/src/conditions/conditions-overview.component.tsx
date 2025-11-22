@@ -21,7 +21,7 @@ import {
   AddIcon,
   formatDate,
   isDesktop as isDesktopLayout,
-  launchWorkspace,
+  launchWorkspace2,
   parseDate,
   useConfig,
   useLayoutType,
@@ -67,7 +67,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () =>
-      launchWorkspace('conditions-form-workspace', {
+      launchWorkspace2('conditions-form-workspace', {
         formContext: 'creating',
       }),
     [],

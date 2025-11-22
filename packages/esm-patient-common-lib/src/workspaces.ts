@@ -1,22 +1,28 @@
 import { useCallback } from 'react';
 import {
-  type DefaultWorkspaceProps,
-  launchWorkspace,
-  navigateAndLaunchWorkspace,
+  launchWorkspace2,
+  navigate,
   showModal,
   useFeatureFlag,
   type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { launchStartVisitPrompt } from './launchStartVisitPrompt';
 import { usePatientChartStore } from './store/patient-chart-store';
 import { useSystemVisitSetting } from './useSystemVisitSetting';
 
-export interface DefaultPatientWorkspaceProps extends DefaultWorkspaceProps {
+export interface PatientWorkspaceGroupProps {
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
   mutateVisitContext: () => void;
 }
+
+export interface PatientChartWorkspaceActionButtonProps {
+  groupProps: PatientWorkspaceGroupProps;
+}
+
+export interface PatientWorkspace2DefinitionProps<WorkspaceProps extends Object, WindowProps extends Object>
+  extends Workspace2DefinitionProps<WorkspaceProps, WindowProps, PatientWorkspaceGroupProps> {}
 
 export function launchPatientChartWithWorkspaceOpen({
   patientUuid,
@@ -29,37 +35,55 @@ export function launchPatientChartWithWorkspaceOpen({
   dashboardName?: string;
   additionalProps?: object;
 }) {
-  navigateAndLaunchWorkspace({
-    targetUrl: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` + (dashboardName ? `/${dashboardName}` : ''),
-    workspaceName: workspaceName,
-    contextKey: `patient/${patientUuid}`,
-    additionalProps,
-  });
+  launchWorkspace2(workspaceName, additionalProps);
+  navigate({ to: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` + (dashboardName ? `/${dashboardName}` : '') });
 }
 
 export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: string, workspaceName: string) {
+  const startVisitIfNeeded = useStartVisitIfNeeded(patientUuid);
+  const launchPatientWorkspaceCb = useCallback(
+    (workspaceProps?: T, windowProps?: any, groupProps?: any) => {
+      startVisitIfNeeded().then((didStartVisit) => {
+        if (didStartVisit) {
+          launchWorkspace2(workspaceName, workspaceProps, windowProps);
+        }
+      });
+    },
+    [startVisitIfNeeded, workspaceName],
+  );
+  return launchPatientWorkspaceCb;
+}
+
+export function useStartVisitIfNeeded(patientUuid: string) {
   const { visitContext } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
 
-  const launchPatientWorkspaceCb = useCallback(
-    (additionalProps?: T) => {
-      if (!systemVisitEnabled || visitContext) {
-        launchWorkspace(workspaceName, additionalProps);
-      } else {
+  const startVisitIfNeeded = useCallback(async (): Promise<boolean> => {
+    if (!systemVisitEnabled || visitContext) {
+      return true;
+    } else {
+      return new Promise<boolean>((resolve) => {
         if (isRdeEnabled) {
           const dispose = showModal('visit-context-switcher', {
             patientUuid,
-            closeModal: () => dispose(),
-            onAfterVisitSelected: () => launchWorkspace(workspaceName, additionalProps),
+            closeModal: () => {
+              dispose();
+              resolve(false);
+            },
+            onAfterVisitSelected: () => {
+              resolve(true);
+            },
             size: 'sm',
           });
         } else {
-          launchStartVisitPrompt();
+          const dispose = showModal('start-visit-dialog', {
+            closeModal: () => dispose(),
+            onVisitStarted: () => resolve(true),
+          });
         }
-      }
-    },
-    [visitContext, systemVisitEnabled, workspaceName, isRdeEnabled, patientUuid],
-  );
-  return launchPatientWorkspaceCb;
+      });
+    }
+  }, [visitContext, systemVisitEnabled, isRdeEnabled, patientUuid]);
+  return startVisitIfNeeded;
 }

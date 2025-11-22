@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
 import { mockPatient } from 'tools';
-import DeleteVisitDialog from './delete-visit-dialog.component';
+import DeleteVisitDialog from './delete-visit-dialog.modal';
 
 const mockCloseModal = jest.fn();
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
