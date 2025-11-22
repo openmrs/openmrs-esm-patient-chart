@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   TableContainer,
@@ -70,7 +71,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
       hasRange
         ? panel.entries.map((test) => {
             const units = test.units ?? '';
-            const range = test.range ? `${test.range} ${units}` : '--';
+            const range = formatRangeWithUnits(test.range, units);
             return {
               id: test.conceptUuid,
               testName: test.display,

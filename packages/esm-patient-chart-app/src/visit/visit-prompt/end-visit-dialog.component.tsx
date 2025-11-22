@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { AccessibleModal } from '../../components/accessible-modal';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -14,10 +15,13 @@ interface EndVisitDialogProps {
  * This modal shows up when user clicks on the "End visit" button in the action menu within the
  * patient banner. It should only show when the patient has an active visit. See stop-visit.component.tsx
  * for the button.
+ *
+ * This dialog uses the patient chart store and SHOULD only be mounted within the patient chart
  */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { activeVisit, mutate } = useVisit(patientUuid);
+  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
 
   const handleEndVisit = () => {
     if (activeVisit) {
@@ -32,7 +36,9 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           mutate();
           window.dispatchEvent(new CustomEvent('queue-entry-updated'));
           closeModal();
-
+          if (visitContext?.uuid === activeVisit.uuid) {
+            setVisitContext(null, null);
+          }
           showSnackbar({
             isLowContrast: true,
             kind: 'success',

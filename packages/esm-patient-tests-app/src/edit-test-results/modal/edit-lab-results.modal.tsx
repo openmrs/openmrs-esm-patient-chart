@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
 import { launchWorkspace, useSession } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
@@ -96,7 +96,11 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
                     <RadioButton
                       key={order.uuid}
                       id={order.uuid}
-                      labelText={<span className={styles.radioLabel}>{order.concept.display}</span>}
+                      labelText={
+                        <span className={styles.radioLabel}>
+                          {order.concept.display || order.concept.name?.display || '--'}
+                        </span>
+                      }
                       value={order.uuid}
                       className={styles.radioItem}
                     />
