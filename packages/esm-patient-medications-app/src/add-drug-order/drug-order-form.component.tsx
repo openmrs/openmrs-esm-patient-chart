@@ -167,6 +167,22 @@ export function DrugOrderForm({
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
+  // reset the dosage information if set to free text dosage
+  const handleIsFreeTextDosageAfterChange = useCallback(
+    (newValue: MedicationOrderFormData['isFreeTextDosage']) => {
+      if (newValue) {
+        setValue('dosage', null, { shouldValidate: true });
+        setValue('unit', null, { shouldValidate: true });
+        setValue('route', null, { shouldValidate: true });
+        setValue('frequency', null, { shouldValidate: true });
+        setValue('patientInstructions', null, { shouldValidate: true });
+      } else {
+        setValue('freeTextDosage', null, { shouldValidate: true });
+      }
+    },
+    [setValue],
+  );
+
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
       if (prevValue?.valueCoded === getValues('quantityUnits')?.valueCoded) {
@@ -421,6 +437,7 @@ export function DrugOrderForm({
                   id="freeTextDosageToggle"
                   aria-label={t('freeTextDosage', 'Free text dosage')}
                   labelText={t('freeTextDosage', 'Free text dosage')}
+                  handleAfterChange={handleIsFreeTextDosageAfterChange}
                 />
               </Column>
             </Grid>
