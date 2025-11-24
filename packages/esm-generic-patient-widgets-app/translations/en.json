@@ -1,5 +1,6 @@
 {
   "addEncounter": "Add encounter",
+  "cancel": "Cancel",
   "date": "Date",
   "dateAndTime": "Date and time",
   "edit": "Edit",
@@ -9,5 +10,6 @@
   "errorSavingObservation": "Error saving observation",
   "noValue": "No value",
   "observationSaved": "Observation saved successfully",
+  "save": "Save",
   "success": "Success"
 }

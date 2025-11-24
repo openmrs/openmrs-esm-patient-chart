@@ -28,6 +28,7 @@ import {
   SelectItem,
   IconButton,
 } from '@carbon/react';
+import { Checkmark, Close } from '@carbon/react/icons';
 import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table-horizontal.scss';
@@ -417,60 +418,71 @@ const Cell: React.FC<{
   );
 
   if (isEditing) {
-    if (dataType === 'Numeric') {
-      return (
-        <TableCell key={cellKey}>
-          <NumberInput
-            id={cellKey}
-            size="sm"
-            value={editingValue}
-            onChange={(e: any, data: any) => setEditingValue(data.value ?? '')}
-            onBlur={() => handleSave(conceptKey)}
-            onKeyDown={(e) => handleKeyDown(e)}
-            autoFocus
-            hideSteppers
-            allowEmpty
-          />
-        </TableCell>
-      );
-    } else if (dataType === 'Text') {
-      return (
-        <TableCell key={cellKey}>
-          <TextInput
-            id={cellKey}
-            labelText=""
-            size="sm"
-            value={editingValue}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingValue(e.target.value)}
-            onBlur={() => handleSave(conceptKey)}
-            onKeyDown={(e) => handleKeyDown(e)}
-            autoFocus
-          />
-        </TableCell>
-      );
-    } else if (dataType === 'Coded') {
-      return (
-        <TableCell key={cellKey}>
-          <Select
-            id={cellKey}
-            labelText=""
-            size="sm"
-            value={editingValue}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              setEditingValue(e.target.value);
-            }}
-            onBlur={() => handleSave(conceptKey)}
-            onKeyDown={(e) => handleKeyDown(e)}
-            autoFocus
-          >
-            <SelectItem text={t('noValue', 'No value')} value="" />
-            {concepts
-              .find((c) => c.uuid === label.key)
-              ?.answers?.map((answer) => <SelectItem key={answer.uuid} text={answer.display} value={answer.uuid} />)}
-          </Select>
-        </TableCell>
-      );
-    }
+    return (
+      <TableCell key={cellKey}>
+        <div className={styles.editContainer}>
+          {dataType === 'Numeric' ? (
+            <NumberInput
+              id={cellKey}
+              size="sm"
+              value={editingValue}
+              onChange={(e: any, data: any) => setEditingValue(data.value ?? '')}
+              onKeyDown={(e) => handleKeyDown(e)}
+              autoFocus
+              hideSteppers
+              allowEmpty
+            />
+          ) : dataType === 'Text' ? (
+            <TextInput
+              id={cellKey}
+              labelText=""
+              size="sm"
+              value={editingValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingValue(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e)}
+              autoFocus
+            />
+          ) : (
+            <Select
+              id={cellKey}
+              labelText=""
+              size="sm"
+              value={editingValue}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                setEditingValue(e.target.value);
+              }}
+              onKeyDown={(e) => handleKeyDown(e)}
+              autoFocus
+            >
+              <SelectItem text={t('noValue', 'No value')} value="" />
+              {concepts
+                .find((c) => c.uuid === label.key)
+                ?.answers?.map((answer) => <SelectItem key={answer.uuid} text={answer.display} value={answer.uuid} />)}
+            </Select>
+          )}
+          <div className={styles.editButtons}>
+            <IconButton
+              kind="ghost"
+              size="sm"
+              label={t('cancel', 'Cancel')}
+              onClick={handleCancel}
+              className={styles.cancelButton}
+            >
+              <Close size={16} />
+            </IconButton>
+            <IconButton
+              kind="ghost"
+              size="sm"
+              label={t('save', 'Save')}
+              onClick={() => handleSave(conceptKey)}
+              className={styles.saveButton}
+            >
+              <Checkmark size={16} />
+            </IconButton>
+          </div>
+        </div>
+      </TableCell>
+    );
   }
 
   return (

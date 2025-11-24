@@ -313,7 +313,8 @@ describe('ObsTableHorizontal editable mode', () => {
     await user.clear(input);
     await user.type(input, '185');
 
-    await user.tab(); // Trigger blur to save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockUpdateObservation).toHaveBeenCalledWith('obs-1', 185);
@@ -376,7 +377,8 @@ describe('ObsTableHorizontal editable mode', () => {
     const input = screen.getByRole('spinbutton');
     await user.type(input, '75');
 
-    await user.tab(); // Trigger blur to save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockCreateObservationInEncounter).toHaveBeenCalledWith(
@@ -387,6 +389,56 @@ describe('ObsTableHorizontal editable mode', () => {
       );
     });
     expect(mockMutate).toHaveBeenCalled();
+  });
+
+  it('should cancel editing when cancel button is clicked', async () => {
+    const user = userEvent.setup();
+    const mockMutate = jest.fn().mockResolvedValue(undefined);
+
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData, concepts: mockConceptData },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      title: 'Vitals',
+      editable: true,
+      data: [
+        { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height' },
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight' },
+      ],
+    });
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    const heightCell = screen.getByRole('cell', { name: /182/ });
+    await user.hover(heightCell);
+    const editButton = within(heightCell).getByRole('button', { name: 'Edit' });
+    await user.click(editButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+    });
+
+    const input = screen.getByRole('spinbutton');
+    await user.clear(input);
+    await user.type(input, '185');
+
+    // Click cancel button
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    await user.click(cancelButton);
+
+    // Verify that the input is no longer visible and value was not saved
+    await waitFor(() => {
+      expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
+    });
+    expect(mockUpdateObservation).not.toHaveBeenCalled();
+    expect(mockMutate).not.toHaveBeenCalled();
+    // Verify the original value is still displayed
+    expect(screen.getByRole('cell', { name: /182/ })).toBeInTheDocument();
   });
 
   it('should cancel editing when Escape key is pressed', async () => {
@@ -430,6 +482,49 @@ describe('ObsTableHorizontal editable mode', () => {
     expect(mockUpdateObservation).not.toHaveBeenCalled();
   });
 
+  it('should save when Enter key is pressed', async () => {
+    const user = userEvent.setup();
+    const mockMutate = jest.fn().mockResolvedValue(undefined);
+
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData, concepts: mockConceptData },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      title: 'Vitals',
+      editable: true,
+      data: [
+        { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height' },
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight' },
+      ],
+    });
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    const heightCell = screen.getByRole('cell', { name: /182/ });
+    await user.hover(heightCell);
+    const editButton = within(heightCell).getByRole('button', { name: 'Edit' });
+    await user.click(editButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+    });
+
+    const input = screen.getByRole('spinbutton');
+    await user.clear(input);
+    await user.type(input, '185');
+    await user.type(input, '{Enter}');
+
+    await waitFor(() => {
+      expect(mockUpdateObservation).toHaveBeenCalledWith('obs-1', 185);
+    });
+    expect(mockMutate).toHaveBeenCalled();
+  });
+
   it('should handle text observations', async () => {
     const user = userEvent.setup();
     const mockMutate = jest.fn().mockResolvedValue(undefined);
@@ -464,7 +559,8 @@ describe('ObsTableHorizontal editable mode', () => {
     await user.clear(textInput);
     await user.type(textInput, 'Fever');
 
-    await user.tab(); // Trigger blur to save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockUpdateObservation).toHaveBeenCalledWith('obs-5', 'Fever');
@@ -508,7 +604,8 @@ describe('ObsTableHorizontal editable mode', () => {
     // Change to a different answer
     await user.selectOptions(select, 'answer-uuid-2');
 
-    await user.tab(); // Trigger blur to save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockUpdateObservation).toHaveBeenCalledWith('obs-6', 'answer-uuid-2');
@@ -554,7 +651,9 @@ describe('ObsTableHorizontal editable mode', () => {
       expect(screen.getByRole('spinbutton')).toBeInTheDocument();
     });
 
-    await user.tab(); // Trigger blur without changing value
+    // Click save without changing value - should not save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockUpdateObservation).not.toHaveBeenCalled();
@@ -611,8 +710,9 @@ describe('ObsTableHorizontal editable mode', () => {
       expect(screen.getByRole('spinbutton')).toBeInTheDocument();
     });
 
-    // Tab out without entering any value
-    await user.tab();
+    // Click cancel without entering any value
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    await user.click(cancelButton);
 
     // Wait a bit to ensure no API calls are made
     await waitFor(() => {
@@ -688,8 +788,9 @@ describe('ObsTableHorizontal editable mode', () => {
     const input = screen.getByRole('spinbutton');
     await user.type(input, '75');
 
-    // Tab out to save
-    await user.tab();
+    // Click save button
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     // Verify that createEncounter was called with correct parameters
     await waitFor(() => {
@@ -756,7 +857,8 @@ describe('ObsTableHorizontal editable mode', () => {
     await user.clear(input);
     await user.type(input, '185');
 
-    await user.tab(); // Trigger blur to save
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
 
     await waitFor(() => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(
