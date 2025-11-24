@@ -175,6 +175,9 @@ export function DrugOrderForm({
         setValue('unit', null, { shouldValidate: true });
         setValue('route', null, { shouldValidate: true });
         setValue('frequency', null, { shouldValidate: true });
+        setValue('patientInstructions', null, { shouldValidate: true });
+      } else {
+        setValue('freeTextDosage', null, { shouldValidate: true });
       }
     },
     [setValue],
