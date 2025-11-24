@@ -61,6 +61,11 @@ export const configSchemaHorizontal = {
     _description: 'Display Encounter type row',
     _default: false,
   },
+  encounterTypeToCreateUuid: {
+    _type: Type.String,
+    _description: 'Encounter type UUID to use when creating a new encounter',
+    _default: 'dd528487-82a5-4082-9c72-ed246bd49591',
+  },
 };
 
 export interface ConfigObjectHorizontal {
@@ -75,4 +80,5 @@ export interface ConfigObjectHorizontal {
   maxColumns: number;
   encounterTypes: Array<string>;
   showEncounterType: boolean;
+  encounterTypeToCreateUuid: string;
 }

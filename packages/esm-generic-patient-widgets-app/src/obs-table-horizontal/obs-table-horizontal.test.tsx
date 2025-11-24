@@ -1,11 +1,18 @@
 import React from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig, showSnackbar, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import {
+  getDefaultsFromConfigSchema,
+  useConfig,
+  showSnackbar,
+  useLayoutType,
+  isDesktop,
+  useSession,
+} from '@openmrs/esm-framework';
 import ObsTableHorizontal from './obs-table-horizontal.component';
 import { useObs, type ObsResult } from '../resources/useObs';
 import { configSchemaHorizontal } from '../config-schema-obs-horizontal';
-import { updateObservation, createObservationInEncounter } from './obs-table-horizontal.resource';
+import { updateObservation, createObservationInEncounter, createEncounter } from './obs-table-horizontal.resource';
 
 jest.mock('../resources/useObs', () => ({
   useObs: jest.fn(),
@@ -14,6 +21,7 @@ jest.mock('../resources/useObs', () => ({
 jest.mock('./obs-table-horizontal.resource', () => ({
   updateObservation: jest.fn(),
   createObservationInEncounter: jest.fn(),
+  createEncounter: jest.fn(),
 }));
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -23,6 +31,7 @@ jest.mock('@openmrs/esm-framework', () => {
     showSnackbar: jest.fn(),
     useLayoutType: jest.fn(),
     isDesktop: jest.fn(),
+    useSession: jest.fn(),
     formatDate: jest.fn((date, options) => {
       if (options?.time) return 'Jan 1, 2021, 12:00 AM';
       return 'Jan 1, 2021';
@@ -36,8 +45,10 @@ const mockUseConfig = jest.mocked(useConfig);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdateObservation = jest.mocked(updateObservation);
 const mockCreateObservationInEncounter = jest.mocked(createObservationInEncounter);
+const mockCreateEncounter = jest.mocked(createEncounter);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseSession = jest.mocked(useSession);
 
 const mockObsData = [
   {
@@ -153,8 +164,12 @@ describe('ObsTableHorizontal editable mode', () => {
     jest.clearAllMocks();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockIsDesktop.mockReturnValue(true);
+    mockUseSession.mockReturnValue({
+      sessionLocation: { uuid: 'location-uuid-123' },
+    } as any);
     mockUpdateObservation.mockResolvedValue({ data: {} } as any);
     mockCreateObservationInEncounter.mockResolvedValue({ data: {} } as any);
+    mockCreateEncounter.mockResolvedValue({ data: { uuid: 'new-encounter-uuid' } } as any);
   });
 
   it('should show edit button on hover when editable is true', async () => {
@@ -545,6 +560,162 @@ describe('ObsTableHorizontal editable mode', () => {
       expect(mockUpdateObservation).not.toHaveBeenCalled();
     });
     expect(mockMutate).not.toHaveBeenCalled();
+  });
+
+  it('should not create observation when editing empty cell and nothing is entered', async () => {
+    const user = userEvent.setup();
+    const mockMutate = jest.fn().mockResolvedValue(undefined);
+
+    // Create obs data where one encounter is missing a Weight observation
+    // This will create an empty cell in an existing encounter
+    const obsDataWithoutWeightInOneEncounter = mockObsData.filter(
+      (obs) =>
+        !(obs.conceptUuid === '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' && obs.encounter.reference === 'Encounter/234'),
+    );
+
+    mockUseObs.mockReturnValue({
+      data: { observations: obsDataWithoutWeightInOneEncounter, concepts: mockConceptData },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      title: 'Vitals',
+      editable: true,
+      data: [
+        { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height' },
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight' },
+      ],
+    });
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    // Find an empty cell in the Weight row (should show '--')
+    const weightRow = screen.getByRole('row', { name: /Weight/i });
+    const allCells = within(weightRow).getAllByRole('cell');
+    const emptyCell = allCells.slice(1).find((cell) => {
+      const cellText = cell.textContent || '';
+      return cellText.includes('--');
+    });
+    expect(emptyCell).toBeInTheDocument();
+
+    // Hover and click the edit button
+    await user.hover(emptyCell);
+    const editButton = within(emptyCell).getByRole('button', { name: 'Edit' });
+    await user.click(editButton);
+
+    // Wait for the input to appear
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+    });
+
+    // Tab out without entering any value
+    await user.tab();
+
+    // Wait a bit to ensure no API calls are made
+    await waitFor(() => {
+      expect(mockCreateObservationInEncounter).not.toHaveBeenCalled();
+    });
+
+    expect(mockCreateEncounter).not.toHaveBeenCalled();
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
+
+  it('should create and save encounter', async () => {
+    const user = userEvent.setup();
+    const mockMutate = jest.fn().mockResolvedValue(undefined);
+    const newEncounterUuid = 'new-encounter-uuid-123';
+
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData, concepts: mockConceptData },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      title: 'Vitals',
+      editable: true,
+      encounterTypeToCreateUuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
+      data: [
+        { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height' },
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight' },
+      ],
+    });
+
+    mockCreateEncounter.mockResolvedValue({
+      data: { uuid: newEncounterUuid },
+    } as any);
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    // Click the "+" button to add a new encounter
+    const addButton = screen.getByRole('button', { name: /add encounter/i });
+    await user.click(addButton);
+
+    // Wait for the new column to appear
+    await waitFor(() => {
+      const headers = screen.getAllByRole('columnheader');
+      expect(headers.length).toBeGreaterThan(2); // Should have label column + existing columns + new column
+    });
+
+    expect(mockCreateEncounter).not.toHaveBeenCalled();
+
+    // Find an empty cell in the Weight row in the new temporary encounter
+    const weightRow = screen.getByRole('row', { name: /Weight/i });
+    const allCells = within(weightRow).getAllByRole('cell');
+    // Find a cell that contains '--' (empty value cell) - should be the last one (new temporary encounter)
+    const emptyCell = allCells.slice(1).find((cell) => {
+      const cellText = cell.textContent || '';
+      return cellText.includes('--');
+    });
+    expect(emptyCell).toBeInTheDocument();
+
+    // Hover and click the edit button
+    await user.hover(emptyCell);
+    const editButton = within(emptyCell).getByRole('button', { name: 'Edit' });
+    await user.click(editButton);
+
+    // Wait for the input to appear
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+    });
+
+    // Enter a value
+    const input = screen.getByRole('spinbutton');
+    await user.type(input, '75');
+
+    // Tab out to save
+    await user.tab();
+
+    // Verify that createEncounter was called with correct parameters
+    await waitFor(() => {
+      expect(mockCreateEncounter).toHaveBeenCalledWith(
+        'patient-123',
+        'dd528487-82a5-4082-9c72-ed246bd49591',
+        'location-uuid-123',
+        [{ concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 75 }],
+      );
+    });
+
+    // Verify that mutate was called (via onEncounterCreated)
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalled();
+    });
+
+    // Verify success snackbar is shown
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'success',
+          title: 'Success',
+          subtitle: 'Observation saved successfully',
+        }),
+      );
+    });
   });
 
   it('should show error snackbar when update fails', async () => {

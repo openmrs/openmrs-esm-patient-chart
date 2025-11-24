@@ -9,6 +9,7 @@ import {
   useLayoutType,
   isDesktop,
   EditIcon,
+  AddIcon,
   type Concept,
 } from '@openmrs/esm-framework';
 import {
@@ -25,13 +26,14 @@ import {
   NumberInput,
   Select,
   SelectItem,
+  IconButton,
 } from '@carbon/react';
 import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table-horizontal.scss';
 import { useTranslation } from 'react-i18next';
 import { type ConfigObjectHorizontal } from '../config-schema-obs-horizontal';
-import { updateObservation, createObservationInEncounter } from './obs-table-horizontal.resource';
+import { updateObservation, createObservationInEncounter, createEncounter } from './obs-table-horizontal.resource';
 import classNames from 'classnames';
 
 interface ObsTableHorizontalProps {
@@ -43,8 +45,9 @@ interface ColumnData {
   date: Date;
   encounter: { value: string };
   encounterReference: string;
-  encounterUuid: string;
+  encounterUuid: string | null; // null for temporary encounters
   obs: Record<string, CellData>;
+  isTemporary?: boolean; // true for encounters that haven't been saved yet
 }
 
 interface CellData {
@@ -54,16 +57,26 @@ interface CellData {
   display?: string;
 }
 
+/**
+ * This component displays a table of observations, where each column represents an encounter.
+ * It may be 'editable' or not. If it is editable, then
+ *  - Individual observations can be edited by tapping them or clicking an edit button.
+ *  - New encounters can be created by tapping a "plus" button. When the plus button is
+ *     tapped, a temporary encounter is created on the front-end only. The new encounter is
+ *     only saved to the backend when the first obs value for it is entered.
+ */
 const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectHorizontal>();
-  const session = useSession();
   const isTablet = !isDesktop(useLayoutType());
   const {
     data: { observations, concepts },
     isValidating,
     mutate,
   } = useObs(patientUuid);
+
+  const [temporaryEncounters, setTemporaryEncounters] = useState<Array<ColumnData>>([]);
+
   const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
   let obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
     observations.filter((o) => o.encounter.reference === reference),
@@ -92,64 +105,87 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     tableRowLabels = [{ key: 'encounter', header: t('encounterType', 'Encounter type') }, ...tableRowLabels];
   }
 
-  const tableColumns = React.useMemo(
-    () =>
-      obssGroupedByEncounters?.map((obss, index) => {
-        const encounterReference = obss[0].encounter.reference;
-        const encounterUuid = encounterReference.split('/')[1];
-        const columnData = {
-          id: `${index}`,
-          date: new Date(obss[0].effectiveDateTime),
-          encounter: { value: obss[0].encounter.name },
-          encounterReference,
-          encounterUuid,
-          obs: {} as Record<string, CellData>,
-        };
+  const handleAddEncounter = useCallback(() => {
+    const now = new Date();
+    const newTemporaryEncounter: ColumnData = {
+      id: `temp-${Date.now()}`,
+      date: now,
+      encounter: { value: '' },
+      encounterReference: '',
+      encounterUuid: null,
+      obs: {},
+      isTemporary: true,
+    };
+    setTemporaryEncounters((prev) => [...prev, newTemporaryEncounter]);
+  }, []);
 
-        for (const obs of obss) {
-          switch (conceptByUuid[obs.conceptUuid]?.dataType) {
-            case 'Text':
-              columnData.obs[obs.conceptUuid] = {
-                value: obs.valueString,
-                obsUuid: obs.id,
-                dataType: 'Text',
-              };
-              break;
-
-            case 'Numeric': {
-              const decimalPlaces: number | undefined = config.data.find(
-                (ele: any) => ele.concept === obs.conceptUuid,
-              )?.decimalPlaces;
-
-              let value;
-              if (obs.valueQuantity?.value % 1 !== 0) {
-                value = obs.valueQuantity?.value.toFixed(decimalPlaces);
-              } else {
-                value = obs.valueQuantity?.value;
-              }
-              columnData.obs[obs.conceptUuid] = {
-                value: value,
-                obsUuid: obs.id,
-                dataType: 'Numeric',
-              };
-              break;
-            }
-
-            case 'Coded':
-              columnData.obs[obs.conceptUuid] = {
-                value: obs.valueCodeableConcept?.coding[0]?.code,
-                display: obs.valueCodeableConcept?.coding[0]?.display,
-                obsUuid: obs.id,
-                dataType: 'Coded',
-              };
-              break;
-          }
-        }
-
-        return columnData;
-      }),
-    [config.data, obssGroupedByEncounters, conceptByUuid],
+  const handleEncounterCreated = useCallback(
+    async (tempEncounterId: string, encounterUuid: string) => {
+      await mutate();
+      // Remove the temporary encounter from state since it's now in the real data
+      setTemporaryEncounters((prev) => prev.filter((enc) => enc.id !== tempEncounterId));
+    },
+    [mutate],
   );
+
+  const tableColumns = React.useMemo(() => {
+    const existingColumns = obssGroupedByEncounters?.map((obss, index) => {
+      const encounterReference = obss[0].encounter.reference;
+      const encounterUuid = encounterReference.split('/')[1];
+      const columnData: ColumnData = {
+        id: `${index}`,
+        date: new Date(obss[0].effectiveDateTime),
+        encounter: { value: obss[0].encounter.name },
+        encounterReference,
+        encounterUuid,
+        obs: {} as Record<string, CellData>,
+      };
+
+      for (const obs of obss) {
+        switch (conceptByUuid[obs.conceptUuid]?.dataType) {
+          case 'Text':
+            columnData.obs[obs.conceptUuid] = {
+              value: obs.valueString,
+              obsUuid: obs.id,
+              dataType: 'Text',
+            };
+            break;
+
+          case 'Numeric': {
+            const decimalPlaces: number | undefined = config.data.find(
+              (ele: any) => ele.concept === obs.conceptUuid,
+            )?.decimalPlaces;
+
+            let value;
+            if (obs.valueQuantity?.value % 1 !== 0) {
+              value = obs.valueQuantity?.value.toFixed(decimalPlaces);
+            } else {
+              value = obs.valueQuantity?.value;
+            }
+            columnData.obs[obs.conceptUuid] = {
+              value: value,
+              obsUuid: obs.id,
+              dataType: 'Numeric',
+            };
+            break;
+          }
+
+          case 'Coded':
+            columnData.obs[obs.conceptUuid] = {
+              value: obs.valueCodeableConcept?.coding[0]?.code,
+              display: obs.valueCodeableConcept?.coding[0]?.display,
+              obsUuid: obs.id,
+              dataType: 'Coded',
+            };
+            break;
+        }
+      }
+
+      return columnData;
+    });
+
+    return [...existingColumns, ...temporaryEncounters];
+  }, [config.data, obssGroupedByEncounters, conceptByUuid, temporaryEncounters]);
 
   const { results, goTo, currentPage } = usePagination(tableColumns, config.maxColumns);
 
@@ -170,6 +206,8 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
         patientUuid={patientUuid}
         mutate={mutate}
         concepts={concepts}
+        onAddEncounter={handleAddEncounter}
+        onEncounterCreated={handleEncounterCreated}
       />
       <PatientChartPagination
         currentItems={results.length}
@@ -189,6 +227,8 @@ interface HorizontalTableProps {
   patientUuid: string;
   concepts: Array<Concept>;
   mutate: () => Promise<any>;
+  onAddEncounter?: () => void;
+  onEncounterCreated?: (tempEncounterId: string, encounterUuid: string) => void;
 }
 
 const HorizontalTable: React.FC<HorizontalTableProps> = ({
@@ -198,6 +238,8 @@ const HorizontalTable: React.FC<HorizontalTableProps> = ({
   patientUuid,
   concepts,
   mutate,
+  onAddEncounter,
+  onEncounterCreated,
 }) => {
   const { t } = useTranslation();
 
@@ -214,6 +256,19 @@ const HorizontalTable: React.FC<HorizontalTableProps> = ({
                 <div className={styles.headerTime}>{formatTime(column.date)}</div>
               </TableHeader>
             ))}
+            {editable && (
+              <TableHeader>
+                <IconButton
+                  align="bottom-end"
+                  kind="ghost"
+                  size="sm"
+                  label={t('addEncounter', 'Add encounter')}
+                  onClick={onAddEncounter}
+                >
+                  <AddIcon size={16} />
+                </IconButton>
+              </TableHeader>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -238,9 +293,11 @@ const HorizontalTable: React.FC<HorizontalTableProps> = ({
                       label={label}
                       concepts={concepts}
                       mutate={mutate}
+                      onEncounterCreated={onEncounterCreated}
                     />
                   );
                 })}
+                {onAddEncounter && <TableCell />}
               </TableRow>
             );
           })}
@@ -255,15 +312,19 @@ const Cell: React.FC<{
   editable: boolean;
   dataType: string;
   patientUuid: string;
-  column: { id: string; encounterUuid: string };
+  column: ColumnData;
   label: { key: string; header: string };
   concepts: Array<Concept>;
   mutate: () => Promise<any>;
-}> = ({ cellData, dataType, editable, patientUuid, column, label, concepts, mutate }) => {
+  onEncounterCreated?: (tempEncounterId: string, encounterUuid: string) => void;
+}> = ({ cellData, dataType, editable, patientUuid, column, label, concepts, mutate, onEncounterCreated }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editingValue, setEditingValue] = useState<string | number>('');
   const isTablet = !isDesktop(useLayoutType());
+  const session = useSession();
+  const locationUuid = session?.sessionLocation?.uuid;
+  const { encounterTypeToCreateUuid } = useConfig<ConfigObjectHorizontal>();
 
   const conceptKey = label.key;
   const cellKey = `obs-hz-value-${column.id}-${label.key}`;
@@ -273,25 +334,39 @@ const Cell: React.FC<{
     setEditingValue(cellData?.value ?? '');
   }, [cellData?.value]);
 
+  const handleCreateEncounter = useCallback(async () => {
+    const response = await createEncounter(patientUuid, encounterTypeToCreateUuid, locationUuid, [
+      { concept: conceptKey, value: editingValue },
+    ]);
+    const createdEncounterUuid = response?.data?.uuid;
+    if (createdEncounterUuid) {
+      // onEncounterCreated will call mutate() and remove the temporary encounter
+      onEncounterCreated(column.id, createdEncounterUuid);
+    } else {
+      throw new Error('Failed to create encounter');
+    }
+  }, [patientUuid, encounterTypeToCreateUuid, locationUuid, conceptKey, editingValue, onEncounterCreated, column.id]);
+
   const handleSave = useCallback(
     async (conceptKey: string) => {
-      const obsUuid = cellData?.obsUuid;
-      const encounterUuid = column.encounterUuid;
-
-      if (editingValue === cellData?.value) {
+      if (!editingValue || editingValue === cellData?.value) {
         setIsEditing(false);
         setEditingValue('');
         return;
       }
 
       try {
-        if (obsUuid) {
-          await updateObservation(obsUuid, editingValue);
+        if (cellData?.obsUuid) {
+          await updateObservation(cellData.obsUuid, editingValue);
+          await mutate();
+        } else if (column.isTemporary) {
+          await handleCreateEncounter();
+        } else if (column.encounterUuid) {
+          await createObservationInEncounter(column.encounterUuid, patientUuid, conceptKey, editingValue);
+          await mutate();
         } else {
-          await createObservationInEncounter(encounterUuid, patientUuid, conceptKey, editingValue);
+          throw new Error('Cannot save observation: missing encounter information');
         }
-
-        await mutate();
 
         showSnackbar({
           title: t('success', 'Success'),
@@ -302,6 +377,7 @@ const Cell: React.FC<{
         setIsEditing(false);
         setEditingValue('');
       } catch (error) {
+        await mutate();
         showSnackbar({
           title: t('error', 'Error'),
           kind: 'error',
@@ -309,7 +385,17 @@ const Cell: React.FC<{
         });
       }
     },
-    [editingValue, patientUuid, mutate, t, cellData?.obsUuid, cellData?.value, column.encounterUuid],
+    [
+      editingValue,
+      patientUuid,
+      mutate,
+      t,
+      cellData?.obsUuid,
+      cellData?.value,
+      column.encounterUuid,
+      column.isTemporary,
+      handleCreateEncounter,
+    ],
   );
 
   const handleCancel = useCallback(() => {
@@ -396,15 +482,15 @@ const Cell: React.FC<{
       <div className={styles.cellContent}>
         <div className={styles.cellValue}>{cellData?.display ?? cellData?.value ?? '--'}</div>
         {editable && (
-          <Button
-            hasIconOnly
+          <IconButton
             kind="ghost"
             size="sm"
-            renderIcon={(props: ComponentProps<typeof EditIcon>) => <EditIcon size={16} {...props} />}
+            label={t('edit', 'Edit')}
             onClick={() => handleEditClick()}
-            iconDescription={t('edit', 'Edit')}
             className={styles.editButton}
-          />
+          >
+            <EditIcon size={16} />
+          </IconButton>
         )}
       </div>
     </TableCell>

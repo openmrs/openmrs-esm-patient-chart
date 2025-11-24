@@ -11,6 +11,35 @@ export function updateObservation(observationUuid: string, value: string | numbe
 }
 
 /**
+ * Creates a new encounter
+ * @param patientUuid - The UUID of the patient
+ * @param encounterTypeUuid - The UUID of the encounter type
+ * @param locationUuid - The UUID of the location
+ * @param obs - Array of observations to include in the encounter
+ * @returns Promise with the created encounter
+ */
+export function createEncounter(
+  patientUuid: string,
+  encounterTypeUuid: string,
+  locationUuid: string,
+  obs: Array<{ concept: string; value: string | number }>,
+) {
+  return openmrsFetch(`${restBaseUrl}/encounter`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      patient: patientUuid,
+      encounterType: encounterTypeUuid,
+      location: locationUuid,
+      encounterDatetime: new Date().toISOString(),
+      obs: obs,
+    }),
+  });
+}
+
+/**
  * Creates a new observation in an existing encounter
  * @returns Promise with the updated encounter containing the new observation
  */
