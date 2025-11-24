@@ -813,6 +813,7 @@ const ControlledFieldInput = ({
   handleAfterChange,
   ...restProps
 }: ControlledFieldInputProps) => {
+  const { t } = useTranslation();
   const {
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
@@ -841,6 +842,8 @@ const ControlledFieldInput = ({
           ref={ref}
           // @ts-ignore
           size={isTablet ? 'md' : 'sm'}
+          labelA={t('on', 'On')}
+          labelB={t('off', 'Off')}
           {...restProps}
         />
       );
@@ -925,7 +928,7 @@ const ControlledFieldInput = ({
     }
 
     return null;
-  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet]);
+  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet, t]);
 
   return (
     <>

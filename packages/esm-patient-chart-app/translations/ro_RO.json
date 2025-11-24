@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Editeaza",
   "editThisEncounter": "Editeaza interactiunea",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Editeaza detalii vizita",
   "emptyStateText": "Nu exista {{displayText}} pentru acest pacient",
   "enable": "Activeaza",

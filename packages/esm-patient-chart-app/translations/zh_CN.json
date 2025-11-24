@@ -39,6 +39,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "编辑",
   "editThisEncounter": "编辑这次问诊",
+  "editVisit": "Edit visit",
   "editVisitDetails": "编辑就诊详情",
   "emptyStateText": "该患者没有可显示的{{displayText}}",
   "enable": "启用",
