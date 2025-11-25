@@ -8,6 +8,7 @@
   "diagnoses": "Diagnoses",
   "discard": "Discard",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
+  "emptyDiagnosisTextOptional": "No diagnosis selected (optional)",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
   "enterSecondaryDiagnoses": "Enter Secondary diagnoses",
   "error": "Error",

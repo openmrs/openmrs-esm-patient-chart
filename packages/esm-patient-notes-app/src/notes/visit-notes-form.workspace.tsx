@@ -576,7 +576,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               !selectedPrimaryDiagnoses.length &&
               selectedSecondaryDiagnoses &&
               !selectedSecondaryDiagnoses.length && (
-                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+                <span>
+                  {isPrimaryDiagnosisRequired
+                    ? t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')
+                    : t('emptyDiagnosisTextOptional', 'No diagnosis selected (optional)')}
+                </span>
               )}
           </div>
           <Row className={styles.row}>

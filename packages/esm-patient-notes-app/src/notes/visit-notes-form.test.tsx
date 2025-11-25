@@ -111,7 +111,7 @@ test('renders an error message when no matching diagnoses are found', async () =
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'COVID-21');
 
-  const errorMessage = await screen.findByText(/No diagnoses found/i);
+  await screen.findByText(/No diagnoses found/i);
   expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
 });
 
@@ -377,4 +377,95 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
 
   // Verify new diagnosis is displayed
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+});
+
+test('allows saving visit note without primary diagnosis when isPrimaryDiagnosisRequired is false', async () => {
+  const user = userEvent.setup();
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+
+  const successPayload = {
+    encounterProviders: expect.arrayContaining([
+      {
+        encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
+        provider: mockSessionDataResponse.data.currentProvider.uuid,
+      },
+    ]),
+    encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
+    form: ConfigMock.visitNoteConfig.formConceptUuid,
+    location: mockSessionDataResponse.data.sessionLocation.uuid,
+    obs: expect.arrayContaining([
+      {
+        concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        value: 'Clinical note without diagnosis',
+      },
+    ]),
+    patient: mockPatient.id,
+    encounterDatetime: undefined,
+  };
+
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as ReturnType<
+    typeof saveVisitNote
+  >);
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Clinical note without diagnosis');
+  expect(clinicalNote).toHaveValue('Clinical note without diagnosis');
+
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
+
+  // Should not show validation error for missing primary diagnosis
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+
+  // Should successfully save the visit note
+  expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+  expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
+
+  // Reset mock for other tests
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+  });
+});
+
+test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async () => {
+  const user = userEvent.setup();
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: true,
+  });
+
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Clinical note without diagnosis');
+
+  const submitButton = screen.getByRole('button', { name: /save and close/i });
+  await user.click(submitButton);
+
+  // Should show validation error for missing primary diagnosis
+  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+
+  // Should not attempt to save
+  expect(mockSaveVisitNote).not.toHaveBeenCalled();
+
+  // Reset mock for other tests
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+  });
 });
