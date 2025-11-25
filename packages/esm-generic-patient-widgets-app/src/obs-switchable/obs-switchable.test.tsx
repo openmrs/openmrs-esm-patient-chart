@@ -20,7 +20,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 182 },
     encounter: { reference: 'Encounter/234' },
@@ -28,7 +28,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 72 },
     encounter: { reference: 'Encounter/234' },
@@ -36,7 +36,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 180 },
     encounter: { reference: 'Encounter/123' },
@@ -44,7 +44,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 70 },
     encounter: { reference: 'Encounter/123' },
@@ -60,7 +60,7 @@ const mockObsData = [
   {
     code: { text: 'Power Level' },
     conceptUuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 9001 },
     encounter: { reference: 'Encounter/123' },

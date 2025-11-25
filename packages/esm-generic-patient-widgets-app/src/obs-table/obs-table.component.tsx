@@ -26,6 +26,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const {
     data: { observations, concepts },
   } = useObs(patientUuid);
+
   const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
   const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
     observations.filter((o) => o.encounter.reference === reference),
@@ -58,7 +59,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               rowData[obs.conceptUuid] = obs.valueString;
               break;
 
-            case 'Number': {
+            case 'Numeric': {
               const decimalPlaces: number | undefined = config.data.find(
                 (ele: any) => ele.concept === obs.conceptUuid,
               )?.decimalPlaces;
