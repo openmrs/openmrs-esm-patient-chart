@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { type ConfigObjectHorizontal } from '../config-schema-obs-horizontal';
-import { ConceptReferenceResponse, useConcepts } from './useConcepts';
+import { useConcepts } from './useConcepts';
 
 type CommonConfig = ConfigObjectSwitchable | ConfigObjectHorizontal;
 
@@ -10,6 +10,7 @@ export interface UseObsResult {
   data: {
     observations: Array<ObsResult>;
     concepts: Array<{ uuid: string; display: string; dataType: string }>;
+    encounters: Array<{ reference: string; display: string; encounterTypeUuid: string }>;
   };
   error: Error;
   isLoading: boolean;
@@ -27,6 +28,7 @@ export type ObsResult = fhir.Observation & {
      * Reference to the encounter resource, in the format `Encounter/{uuid}`
      */
     reference: string;
+    encounterTypeUuid?: string;
   };
 };
 
@@ -38,17 +40,13 @@ export const pageSize = 100;
  * get the label.
  */
 export function useObs(patientUuid: string): UseObsResult {
-  const { encounterTypes, data, showEncounterType } = useConfig<CommonConfig>();
+  const { encounterTypes, data } = useConfig<CommonConfig>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   // TODO: Make sorting respect oldestFirst/graphOldestFirst
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
-    .join(',')}&_summary=data&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
-
-  if (showEncounterType) {
-    url += '&_include=Observation:encounter';
-  }
+    .join(',')}&_summary=data&_include=Observation:encounter&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
 
   const {
     data: result,
@@ -60,10 +58,10 @@ export function useObs(patientUuid: string): UseObsResult {
 
   const { concepts } = useConcepts(data.map((d) => d.concept));
 
-  const encounters = showEncounterType ? getEncountersByResources(result?.data?.entry) : [];
+  const encounters = getEncountersFromResources(result?.data?.entry);
   const observations = filterAndMapObservations(result?.data?.entry, encounters, concepts);
   return {
-    data: { observations, concepts },
+    data: { observations, concepts, encounters },
     error: error,
     isLoading,
     isValidating,
@@ -73,7 +71,7 @@ export function useObs(patientUuid: string): UseObsResult {
 
 function filterAndMapObservations(
   entries: Array<fhir.BundleEntry>,
-  encounters: Array<{ reference: string; display: string }>,
+  encounters: Array<{ reference: string; display: string; encounterTypeUuid: string }>,
   concepts: Array<{ uuid: string; display: string; dataType: string }>,
 ): ObsResult[] {
   const conceptByUuid = Object.fromEntries(concepts.map((c) => [c.uuid, c]));
@@ -88,22 +86,26 @@ function filterAndMapObservations(
           dataType: conceptByUuid[resource.code.coding.find((c) => isUuid(c.code))?.code]?.dataType,
         };
 
-        observation.encounter.name = encounters.find(
+        const encounter = encounters.find(
           (e) =>
             e.reference === (resource as fhir.Observation & { encounter: { reference?: string } }).encounter.reference,
-        )?.display;
+        );
+
+        observation.encounter.name = encounter?.display;
+        observation.encounter.encounterTypeUuid = encounter?.encounterTypeUuid;
 
         return observation;
       }) || []
   );
 }
 
-function getEncountersByResources(resources: Array<fhir.BundleEntry>) {
+function getEncountersFromResources(resources: Array<fhir.BundleEntry>) {
   return resources
     ?.filter((entry) => entry?.resource?.resourceType === 'Encounter')
     .map((entry: fhir.BundleEntry) => ({
       reference: `Encounter/${entry.resource.id}`,
       display: (entry.resource as fhir.Encounter).type?.[0]?.coding?.[0]?.display || '--',
+      encounterTypeUuid: (entry.resource as fhir.Encounter).type?.[0]?.coding?.[0]?.code,
     }));
 }
 

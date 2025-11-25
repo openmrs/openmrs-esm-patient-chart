@@ -8,14 +8,20 @@ import {
   useLayoutType,
   isDesktop,
   useSession,
+  userHasAccess,
 } from '@openmrs/esm-framework';
 import ObsTableHorizontal from './obs-table-horizontal.component';
 import { useObs, type ObsResult } from '../resources/useObs';
 import { configSchemaHorizontal } from '../config-schema-obs-horizontal';
 import { updateObservation, createObservationInEncounter, createEncounter } from './obs-table-horizontal.resource';
+import { useEncounterTypes } from '../resources/useEncounterTypes';
 
 jest.mock('../resources/useObs', () => ({
   useObs: jest.fn(),
+}));
+
+jest.mock('../resources/useEncounterTypes', () => ({
+  useEncounterTypes: jest.fn(),
 }));
 
 jest.mock('./obs-table-horizontal.resource', () => ({
@@ -32,6 +38,7 @@ jest.mock('@openmrs/esm-framework', () => {
     useLayoutType: jest.fn(),
     isDesktop: jest.fn(),
     useSession: jest.fn(),
+    userHasAccess: jest.fn(() => true),
     formatDate: jest.fn((date, options) => {
       if (options?.time) return 'Jan 1, 2021, 12:00 AM';
       return 'Jan 1, 2021';
@@ -49,6 +56,7 @@ const mockCreateEncounter = jest.mocked(createEncounter);
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockIsDesktop = jest.mocked(isDesktop);
 const mockUseSession = jest.mocked(useSession);
+const mockUseEncounterTypes = jest.mocked(useEncounterTypes);
 
 const mockObsData = [
   {
@@ -125,16 +133,31 @@ const mockConceptData = [
   },
 ];
 
+const mockEncounters = [
+  { reference: 'Encounter/123', display: 'Inpatient', encounterTypeUuid: 'encounter-type-uuid-1' },
+  { reference: 'Encounter/234', display: 'Outpatient', encounterTypeUuid: 'encounter-type-uuid-2' },
+];
+
 describe('ObsTableHorizontal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseLayoutType.mockReturnValue('small-desktop');
     mockIsDesktop.mockReturnValue(true);
+    mockUseEncounterTypes.mockReturnValue({
+      encounterTypes: [
+        { uuid: 'encounter-type-uuid-1', editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1' } },
+        { uuid: 'encounter-type-uuid-2', editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2' } },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
   });
 
   it('should render observations in a horizontal table', () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -166,7 +189,18 @@ describe('ObsTableHorizontal editable mode', () => {
     mockIsDesktop.mockReturnValue(true);
     mockUseSession.mockReturnValue({
       sessionLocation: { uuid: 'location-uuid-123' },
+      user: { uuid: 'user-uuid-123' },
     } as any);
+    mockUseEncounterTypes.mockReturnValue({
+      encounterTypes: [
+        { uuid: 'encounter-type-uuid-1', editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1' } },
+        { uuid: 'encounter-type-uuid-2', editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2' } },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
     mockUpdateObservation.mockResolvedValue({ data: {} } as any);
     mockCreateObservationInEncounter.mockResolvedValue({ data: {} } as any);
     mockCreateEncounter.mockResolvedValue({ data: { uuid: 'new-encounter-uuid' } } as any);
@@ -177,7 +211,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -207,7 +241,7 @@ describe('ObsTableHorizontal editable mode', () => {
 
   it('should not show edit button when editable is false', () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -232,6 +266,13 @@ describe('ObsTableHorizontal editable mode', () => {
   it("should show 'tap to edit' message when editable is true and on tablet", () => {
     mockUseLayoutType.mockReturnValue('tablet');
     mockIsDesktop.mockReturnValue(false);
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
       title: 'Vitals',
@@ -247,7 +288,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -282,7 +323,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -338,7 +379,7 @@ describe('ObsTableHorizontal editable mode', () => {
     );
 
     mockUseObs.mockReturnValue({
-      data: { observations: obsDataWithoutWeight, concepts: mockConceptData },
+      data: { observations: obsDataWithoutWeight, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -396,7 +437,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -446,7 +487,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -487,7 +528,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -530,7 +571,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -573,7 +614,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -624,7 +665,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -673,7 +714,7 @@ describe('ObsTableHorizontal editable mode', () => {
     );
 
     mockUseObs.mockReturnValue({
-      data: { observations: obsDataWithoutWeightInOneEncounter, concepts: mockConceptData },
+      data: { observations: obsDataWithoutWeightInOneEncounter, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -729,7 +770,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const newEncounterUuid = 'new-encounter-uuid-123';
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -826,7 +867,7 @@ describe('ObsTableHorizontal editable mode', () => {
     mockUpdateObservation.mockRejectedValue(error);
 
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData, concepts: mockConceptData },
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,

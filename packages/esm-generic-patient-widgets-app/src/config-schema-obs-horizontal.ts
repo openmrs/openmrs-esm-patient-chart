@@ -62,8 +62,8 @@ export const configSchemaHorizontal = {
     _default: false,
   },
   encounterTypeToCreateUuid: {
+    _description: 'Encounter type UUID to use when creating a new encounter. Defaults to "Consultation".',
     _type: Type.String,
-    _description: 'Encounter type UUID to use when creating a new encounter',
     _default: 'dd528487-82a5-4082-9c72-ed246bd49591',
   },
 };

@@ -11,6 +11,8 @@ import {
   EditIcon,
   AddIcon,
   type Concept,
+  userHasAccess,
+  type Privilege,
 } from '@openmrs/esm-framework';
 import {
   Button,
@@ -36,6 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { type ConfigObjectHorizontal } from '../config-schema-obs-horizontal';
 import { updateObservation, createObservationInEncounter, createEncounter } from './obs-table-horizontal.resource';
 import classNames from 'classnames';
+import { useEncounterTypes } from '../resources/useEncounterTypes';
 
 interface ObsTableHorizontalProps {
   patientUuid: string;
@@ -44,7 +47,7 @@ interface ObsTableHorizontalProps {
 interface ColumnData {
   id: string;
   date: Date;
-  encounter: { value: string };
+  encounter: { value: string; editPrivilege: Privilege };
   encounterReference: string;
   encounterUuid: string | null; // null for temporary encounters
   obs: Record<string, CellData>;
@@ -71,17 +74,42 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
   const config = useConfig<ConfigObjectHorizontal>();
   const isTablet = !isDesktop(useLayoutType());
   const {
-    data: { observations, concepts },
+    data: { observations, concepts, encounters },
     isValidating,
     mutate,
   } = useObs(patientUuid);
 
   const [temporaryEncounters, setTemporaryEncounters] = useState<Array<ColumnData>>([]);
 
-  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
-  let obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
-    observations.filter((o) => o.encounter.reference === reference),
+  let obssGroupedByEncounters = useMemo(
+    () =>
+      encounters?.length
+        ? encounters.map((encounter) => observations.filter((o) => o.encounter.reference === encounter.reference))
+        : [],
+    [encounters, observations],
   );
+
+  const { encounterTypes, isLoading: isLoadingEncounterTypes, error: errorEncounterTypes } = useEncounterTypes();
+
+  const encounterTypeToCreateEditPrivilege = useMemo(() => {
+    return encounterTypes.find((et) => et.uuid === config.encounterTypeToCreateUuid)?.editPrivilege;
+  }, [encounterTypes, config.encounterTypeToCreateUuid]);
+
+  const editPrivilegePerEncounterReference = useMemo(() => {
+    if (!encounters?.length || isLoadingEncounterTypes || errorEncounterTypes) {
+      return {};
+    }
+    return encounters.reduce(
+      (acc, encounter) => {
+        const encounterType = encounterTypes.find((et) => et.uuid === encounter.encounterTypeUuid);
+        if (encounterType) {
+          acc[encounter.reference] = encounterType.editPrivilege;
+        }
+        return acc;
+      },
+      {} as Record<string, Privilege>,
+    );
+  }, [encounterTypes, encounters, isLoadingEncounterTypes, errorEncounterTypes]);
 
   const conceptByUuid = useMemo(() => {
     return Object.fromEntries(concepts.map((c) => [c.uuid, c]));
@@ -111,14 +139,14 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     const newTemporaryEncounter: ColumnData = {
       id: `temp-${Date.now()}`,
       date: now,
-      encounter: { value: '' },
+      encounter: { value: '', editPrivilege: encounterTypeToCreateEditPrivilege },
       encounterReference: '',
       encounterUuid: null,
       obs: {},
       isTemporary: true,
     };
     setTemporaryEncounters((prev) => [...prev, newTemporaryEncounter]);
-  }, []);
+  }, [encounterTypeToCreateEditPrivilege]);
 
   const handleEncounterCreated = useCallback(
     async (tempEncounterId: string, encounterUuid: string) => {
@@ -136,7 +164,10 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
       const columnData: ColumnData = {
         id: `${index}`,
         date: new Date(obss[0].effectiveDateTime),
-        encounter: { value: obss[0].encounter.name },
+        encounter: {
+          value: obss[0].encounter.name,
+          editPrivilege: editPrivilegePerEncounterReference[encounterReference],
+        },
         encounterReference,
         encounterUuid,
         obs: {} as Record<string, CellData>,
@@ -186,7 +217,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     });
 
     return [...existingColumns, ...temporaryEncounters];
-  }, [config.data, obssGroupedByEncounters, conceptByUuid, temporaryEncounters]);
+  }, [config.data, obssGroupedByEncounters, conceptByUuid, temporaryEncounters, editPrivilegePerEncounterReference]);
 
   const { results, goTo, currentPage } = usePagination(tableColumns, config.maxColumns);
 
@@ -203,7 +234,9 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
       <HorizontalTable
         tableRowLabels={tableRowLabels}
         tableColumns={results}
-        editable={config.editable}
+        // If encounter types are not loaded or can't be loaded, assume the user does
+        // not have the necessary privileges.
+        editable={config.editable && !isLoadingEncounterTypes && !errorEncounterTypes}
         patientUuid={patientUuid}
         mutate={mutate}
         concepts={concepts}
@@ -243,6 +276,11 @@ const HorizontalTable: React.FC<HorizontalTableProps> = ({
   onEncounterCreated,
 }) => {
   const { t } = useTranslation();
+  const patientChartConfig = useConfig({ externalModuleName: '@openmrs/esm-patient-chart-app' });
+  const encounterEditableDuration = patientChartConfig?.encounterEditableDuration ?? 0;
+  const encounterEditableDurationOverridePrivileges =
+    patientChartConfig?.encounterEditableDurationOverridePrivileges ?? [];
+  const session = useSession();
 
   return (
     <TableContainer>
@@ -280,8 +318,21 @@ const HorizontalTable: React.FC<HorizontalTableProps> = ({
                 <TableCell>{label.header}</TableCell>
                 {tableColumns.map((column) => {
                   const cellData = column.obs[label.key];
+                  const encounterAgeInMinutes = (Date.now() - column.date.getTime()) / (1000 * 60);
+                  const canEditEncounter =
+                    userHasAccess(column.encounter.editPrivilege?.uuid, session?.user) &&
+                    (!encounterEditableDuration ||
+                      encounterEditableDuration === 0 ||
+                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                      encounterEditableDurationOverridePrivileges.some((privilege) =>
+                        userHasAccess(privilege, session?.user),
+                      ));
+
                   const canEditCell =
-                    editable && label.key !== 'encounter' && ['Text', 'Numeric', 'Coded'].includes(dataType);
+                    editable &&
+                    canEditEncounter &&
+                    label.key !== 'encounter' &&
+                    ['Text', 'Numeric', 'Coded'].includes(dataType);
 
                   return (
                     <Cell

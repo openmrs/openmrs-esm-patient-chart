@@ -74,12 +74,17 @@ const mockConceptData = [
   { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level', dataType: 'Numeric' },
 ];
 
+const mockEncounters = [
+  { reference: 'Encounter/123', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
+  { reference: 'Encounter/234', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
+];
+
 const mockUseObs = jest.mocked(useObs);
 
 describe('ObsSwitchable', () => {
   it('should render all obs in table and numeric obs in graph', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -179,7 +184,7 @@ describe('ObsSwitchable', () => {
 
   it('should support showing graph tab by default', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -213,7 +218,7 @@ describe('ObsSwitchable', () => {
 
   it('should support grouping into multiline graphs', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
@@ -267,6 +272,7 @@ describe('ObsSwitchable', () => {
           (o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         ) as Array<ObsResult>,
         concepts: mockConceptData,
+        encounters: mockEncounters,
       },
       error: null,
       isLoading: false,
