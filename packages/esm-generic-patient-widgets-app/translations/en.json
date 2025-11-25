@@ -1,15 +1,10 @@
 {
   "addEncounter": "Add encounter",
-  "cancel": "Cancel",
   "date": "Date",
   "dateAndTime": "Date and time",
-  "edit": "Edit",
   "editabilityNote": "Tap an observation to edit",
   "encounterType": "Encounter type",
-  "error": "Error",
   "errorSavingObservation": "Error saving observation",
   "noValue": "No value",
-  "observationSaved": "Observation saved successfully",
-  "save": "Save",
-  "success": "Success"
+  "observationSaved": "Observation saved successfully"
 }

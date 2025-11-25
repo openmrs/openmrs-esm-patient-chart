@@ -13,6 +13,7 @@ import {
   type Concept,
   userHasAccess,
   type Privilege,
+  getCoreTranslation,
 } from '@openmrs/esm-framework';
 import {
   Button,
@@ -157,7 +158,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     [mutate],
   );
 
-  const tableColumns = React.useMemo(() => {
+  const tableColumns = useMemo(() => {
     const existingColumns = obssGroupedByEncounters?.map((obss, index) => {
       const encounterReference = obss[0].encounter.reference;
       const encounterUuid = encounterReference.split('/')[1];
@@ -421,9 +422,8 @@ const Cell: React.FC<{
         }
 
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('observationSaved', 'Observation saved successfully'),
           kind: 'success',
-          subtitle: t('observationSaved', 'Observation saved successfully'),
         });
 
         setIsEditing(false);
@@ -431,9 +431,8 @@ const Cell: React.FC<{
       } catch (error) {
         await mutate();
         showSnackbar({
-          title: t('error', 'Error'),
+          title: t('errorSavingObservation', 'Error saving observation'),
           kind: 'error',
-          subtitle: t('errorSavingObservation', 'Error saving observation'),
         });
       }
     },
@@ -515,7 +514,7 @@ const Cell: React.FC<{
             <IconButton
               kind="ghost"
               size="sm"
-              label={t('cancel', 'Cancel')}
+              label={getCoreTranslation('cancel')}
               onClick={handleCancel}
               className={styles.cancelButton}
             >
@@ -524,7 +523,7 @@ const Cell: React.FC<{
             <IconButton
               kind="ghost"
               size="sm"
-              label={t('save', 'Save')}
+              label={getCoreTranslation('save')}
               onClick={() => handleSave(conceptKey)}
               className={styles.saveButton}
             >
@@ -548,7 +547,7 @@ const Cell: React.FC<{
           <IconButton
             kind="ghost"
             size="sm"
-            label={t('edit', 'Edit')}
+            label={getCoreTranslation('edit')}
             onClick={() => handleEditClick()}
             className={styles.editButton}
           >

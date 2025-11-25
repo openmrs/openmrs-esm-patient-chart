@@ -364,7 +364,7 @@ describe('ObsTableHorizontal editable mode', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'success',
-        title: 'Success',
+        title: 'Observation saved successfully',
       }),
     );
   });
@@ -655,7 +655,7 @@ describe('ObsTableHorizontal editable mode', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'success',
-        title: 'Success',
+        title: 'Observation saved successfully',
       }),
     );
   });
@@ -853,8 +853,7 @@ describe('ObsTableHorizontal editable mode', () => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(
         expect.objectContaining({
           kind: 'success',
-          title: 'Success',
-          subtitle: 'Observation saved successfully',
+          title: 'Observation saved successfully',
         }),
       );
     });
@@ -905,7 +904,7 @@ describe('ObsTableHorizontal editable mode', () => {
       expect(mockShowSnackbar).toHaveBeenCalledWith(
         expect.objectContaining({
           kind: 'error',
-          title: 'Error',
+          title: 'Error saving observation',
         }),
       );
     });
