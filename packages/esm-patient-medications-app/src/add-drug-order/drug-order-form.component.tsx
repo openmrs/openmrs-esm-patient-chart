@@ -719,9 +719,7 @@ export function DrugOrderForm({
           </section>
         </div>
 
-        <ButtonSet
-          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-        >
+        <ButtonSet className={styles.buttonSet}>
           <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>
