@@ -16,6 +16,7 @@ import {
   type ConfigConcepts,
 } from '../types';
 import { renderTag } from '../encounter-list/tag.component';
+import type { TFunction } from 'i18next';
 
 export interface FormattedColumn {
   key: string;
@@ -25,7 +26,12 @@ export interface FormattedColumn {
   concept?: string;
 }
 
-const getColumnValue = (encounter: Encounter, column: ColumnDefinition, config: ConfigConcepts): ColumnValue => {
+const getColumnValue = (
+  encounter: Encounter,
+  column: ColumnDefinition,
+  config: ConfigConcepts,
+  t: TFunction,
+): ColumnValue => {
   if (column.id === 'actions') {
     return getActions(encounter, column, config);
   }
@@ -42,7 +48,7 @@ const getColumnValue = (encounter: Encounter, column: ColumnDefinition, config: 
   }
 
   if (column.valueMappings) {
-    return resolveValueUsingMappings(encounter, column.concept, column.valueMappings);
+    return resolveValueUsingMappings(encounter, column.concept, column.valueMappings, t);
   }
 
   if (column.conceptMappings) {
@@ -112,12 +118,12 @@ const getMappedConceptValue = (encounter: Encounter, column: ColumnDefinition, c
   });
 };
 
-export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>, config: ConfigConcepts) => {
+export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>, config: ConfigConcepts, t: TFunction) => {
   const columns: Array<FormattedColumn> = columnsDefinition.map((column: ColumnDefinition) => ({
     key: column.id,
     header: column.title,
     concept: column.concept,
-    getValue: (encounter) => getColumnValue(encounter, column, config),
+    getValue: (encounter) => getColumnValue(encounter, column, config, t),
     link: column.isLink
       ? {
           getUrl: (encounter) => encounter.url,
@@ -129,7 +135,11 @@ export const getTabColumns = (columnsDefinition: Array<ColumnDefinition>, config
   return columns;
 };
 
-export const getMenuItemTabsConfiguration = (tabDefinitions: Array<TabSchema>, config: ConfigConcepts) => {
+export const getMenuItemTabsConfiguration = (
+  tabDefinitions: Array<TabSchema>,
+  config: ConfigConcepts,
+  t: TFunction,
+) => {
   const tabs = tabDefinitions.map((tab) => {
     return {
       name: tab.tabName,
@@ -138,7 +148,7 @@ export const getMenuItemTabsConfiguration = (tabDefinitions: Array<TabSchema>, c
       headerTitle: tab.headerTitle,
       description: tab.displayText,
       formList: tab.formList,
-      columns: getTabColumns(tab.columns, config),
+      columns: getTabColumns(tab.columns, config, t),
       launchOptions: tab.launchOptions,
     };
   });
