@@ -14,10 +14,6 @@ export interface UseEncountersResult {
   mutate: () => Promise<any>;
 }
 
-/**
- * Fetches encounters from the REST API given a list of encounter UUIDs.
- * Returns UUID, date, encounter type name, and edit privilege.
- */
 export function useEncounterTypes() {
   const customRep = 'custom:(uuid,editPrivilege)';
   const url = new URL(`${restBaseUrl}/encountertype`, window.location.toString());

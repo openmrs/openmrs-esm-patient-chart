@@ -373,7 +373,7 @@ describe('ObsTableHorizontal editable mode', () => {
     const user = userEvent.setup();
     const mockMutate = jest.fn().mockResolvedValue(undefined);
 
-    // Create obs data without one of the concepts
+    // Create obs data without weight observation
     const obsDataWithoutWeight = mockObsData.filter(
       (obs) => obs.conceptUuid !== '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     );
