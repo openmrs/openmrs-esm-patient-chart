@@ -1,5 +1,10 @@
 {
+  "addEncounter": "Add encounter",
   "date": "Date",
   "dateAndTime": "Date et heure",
-  "encounterType": "Type de consultation"
+  "editabilityNote": "Tap an observation to edit",
+  "encounterType": "Type de consultation",
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }
