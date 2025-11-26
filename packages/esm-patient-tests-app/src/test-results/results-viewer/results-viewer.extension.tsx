@@ -7,12 +7,12 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
+import { type Roots } from '../filter/filter-context';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTableTablet from '../individual-results-table-tablet/individual-results-table-tablet.component';
 import TreeView from '../tree-view/tree-view.component';
 import styles from './results-viewer.scss';
-import { type Roots } from '../filter/filter-context';
 
 type panelOpts = 'tree' | 'panel';
 
