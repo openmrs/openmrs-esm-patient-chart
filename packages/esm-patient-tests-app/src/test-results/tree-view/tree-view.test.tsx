@@ -100,9 +100,9 @@ describe('TreeView', () => {
 
     renderTreeViewWithMockContext();
 
-    expect(screen.getAllByRole('table')).toHaveLength(3);
-    expect(screen.getAllByText('Complete blood count').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Haemoglobin').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Hematocrit').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('table')).toHaveLength(1);
+    expect(screen.getAllByText('Complete blood count').length).toEqual(2);
+    expect(screen.getAllByText('Haemoglobin').length).toEqual(1);
+    expect(screen.getAllByText('Hematocrit').length).toEqual(1);
   });
 });

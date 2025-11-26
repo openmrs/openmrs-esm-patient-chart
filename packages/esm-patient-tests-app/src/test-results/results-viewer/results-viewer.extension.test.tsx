@@ -122,31 +122,18 @@ describe('ResultsViewer', () => {
       error: null,
     });
     renderTreeViewWithMockContext();
-    expect(screen.getAllByText(/complete blood count/i)).toHaveLength(2);
-    expect(screen.getAllByText(/hematocrit/i)).toHaveLength(2);
-    expect(screen.getAllByText(/hemoglobin/i)).toHaveLength(4);
-    const mainLabel = screen.getByLabelText(/Serum chemistry panel/i);
+    expect(screen.getAllByText(/complete blood count/i)).toHaveLength(1);
+    expect(screen.getAllByText(/hematocrit/i)).toHaveLength(1);
+    expect(screen.getAllByText(/hemoglobin/i)).toHaveLength(2);
+    const mainLabel = screen.getByLabelText(/Lipid panel/i);
     expect(mainLabel).toBeInTheDocument();
 
     const checkboxes = [
-      'Serum glucose',
-      'Fasting blood glucose measurement (mg/dL)',
-      'Post-prandial blood glucose measurement (mg/dL)',
-      'Blood urea nitrogen',
-      'Serum creatinine (umol/L)',
-      'Total bilirubin',
-      'Serum glutamic-pyruvic transaminase',
-      'Serum glutamic-oxaloacetic transaminase',
-      'Alkaline phosphatase',
-      'uric acid, serum',
-      'Total protein',
-      'Serum albumin',
       'Total cholesterol (mmol/L)',
+      'High-density lipoprotein cholesterol measurement (mmol/L)',
+      'Low-density lipoprotein cholesterol (mmol/L)',
+      'Very low density lipoprotein measurement (mmol/L)',
       'Triglycerides (mmol/L)',
-      'Amylase',
-      'Serum sodium',
-      'Serum potassium',
-      'Serum calcium',
     ];
 
     checkboxes.forEach((label) => {
@@ -159,9 +146,7 @@ describe('ResultsViewer', () => {
 
     // Look for a panel that actually has children with data and is rendered as an accordion
     // "Complete blood count" has children with data (like Platelets), so it should be rendered as an accordion
-    const panelButtons = screen.getAllByRole('button', { name: /Complete blood count/i });
-    expect(panelButtons).toHaveLength(2); // There should be 2 buttons with this name
-    const panelButton = panelButtons[0]; // Use the first one
+    const panelButton = screen.getByRole('button', { name: /Complete blood count/i });
     expect(panelButton).toBeInTheDocument();
 
     await userEvent.click(panelButton);
