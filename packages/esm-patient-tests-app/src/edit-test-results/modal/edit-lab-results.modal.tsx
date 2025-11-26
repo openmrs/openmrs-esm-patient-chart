@@ -9,9 +9,10 @@ import styles from './edit-lab-results.scss';
 type EditLabResultModalProps = {
   orders: Array<Order>;
   closeModal: () => void;
+  patient: fhir.Patient;
 };
 
-const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeModal }) => {
+const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeModal, patient }) => {
   const { t } = useTranslation();
   const [selectedOrder, setSelectedOrder] = useState<Order>(orders?.[0]);
   const { sessionLocation } = useSession();
@@ -26,7 +27,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
   const handleLaunchWorkspace = () => {
     if (selectedOrder) {
-      launchWorkspace2('test-results-form-workspace', { order: selectedOrder });
+      launchWorkspace2('test-results-form-workspace', { order: selectedOrder, patient });
       closeModal();
     }
   };

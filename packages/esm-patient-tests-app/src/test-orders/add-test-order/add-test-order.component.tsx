@@ -90,11 +90,11 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              iconDescription="Return to order basket"
+              iconDescription={t('back', 'Back')}
               size="sm"
               onClick={() => closeWorkspace()}
             >
-              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+              <span>{t('back', 'Back')}</span>
             </Button>
           </div>
         )}

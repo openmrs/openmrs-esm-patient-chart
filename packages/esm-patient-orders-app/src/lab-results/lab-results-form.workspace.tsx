@@ -17,9 +17,10 @@ export interface LabResultsFormProps {
  */
 const LabResultsForm: React.FC<PatientWorkspace2DefinitionProps<LabResultsFormProps, {}>> = ({
   workspaceProps: { order, invalidateLabOrders },
+  groupProps: { patient },
   ...rest
 }) => {
-  return <ExportedLabResultsForm workspaceProps={{ order, invalidateLabOrders }} {...rest} />;
+  return <ExportedLabResultsForm workspaceProps={{ patient, order, invalidateLabOrders }} groupProps={{}} {...rest} />;
 };
 
 export default LabResultsForm;

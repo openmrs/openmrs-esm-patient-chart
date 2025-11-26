@@ -24,7 +24,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     data: { observations, concepts },
   } = useObs(patientUuid);
 
-  const obsForConcepts = useMemo(() => {
+  const obsByConceptUuid = useMemo(() => {
     return Object.fromEntries(
       config.data
         .map((c) => c.concept)
@@ -32,7 +32,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     );
   }, [config.data, observations]);
 
-  const configForObs = useMemo(() => {
+  const configByConceptUuid = useMemo(() => {
     return Object.fromEntries(
       observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept == o.conceptUuid)]),
     );
@@ -42,8 +42,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     () =>
       config.data
         .filter((c) => {
-          const obs = obsForConcepts[c.concept][0];
-          return obs && obs.dataType === 'Number';
+          const obs = obsByConceptUuid[c.concept][0];
+          return obs && obs.dataType === 'Numeric';
         })
         .reduce((acc, curr) => {
           if (!curr.graphGroup) {
@@ -61,7 +61,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           }
           return acc;
         }, [] as ConceptGroupDescriptor[]),
-    [config.data, obsForConcepts, concepts],
+    [config.data, obsByConceptUuid, concepts],
   );
 
   const [selectedMenuItem, setSelectedMenuItem] = useState<ConceptGroupDescriptor>(groupedConfigData[0]);
@@ -69,11 +69,11 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const chartDataForConcepts = useCallback(
     (concepts: ConfigObjectSwitchable['data']) => {
       const chartRecords = concepts
-        .map((c) => obsForConcepts[c.concept])
+        .map((c) => obsByConceptUuid[c.concept])
         .flat()
         .map((obs) => ({
-          group: configForObs[obs.conceptUuid].label
-            ? t(configForObs[obs.conceptUuid].label, configForObs[obs.conceptUuid].label)
+          group: configByConceptUuid[obs.conceptUuid].label
+            ? t(configByConceptUuid[obs.conceptUuid].label, configByConceptUuid[obs.conceptUuid].label)
             : obs.code.text,
           key: new Date(obs.effectiveDateTime),
           value: obs.valueQuantity.value,
@@ -85,7 +85,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
       return chartRecords;
     },
-    [obsForConcepts, configForObs, config.graphOldestFirst, t],
+    [obsByConceptUuid, configByConceptUuid, config.graphOldestFirst, t],
   );
 
   const chartColors = useMemo(

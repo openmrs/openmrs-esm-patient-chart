@@ -698,8 +698,8 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
   }, [orderItem, launchOrderForm, orders, setOrders]);
 
   const handleAddOrEditTestResults = useCallback(() => {
-    launchWorkspace2('test-results-form-workspace', { order: orderItem });
-  }, [orderItem]);
+    launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
+  }, [orderItem, patient]);
 
   return (
     <Layer className={styles.layer}>

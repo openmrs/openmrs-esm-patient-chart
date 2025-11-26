@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { AddIcon, ChevronDownIcon, ChevronUpIcon, useLayoutType, useConfig, MaybeIcon } from '@openmrs/esm-framework';
 import {
-  type OrderBasketExtensionProps,
+  type TestOrderBasketItem,
   useOrderBasket,
   useOrderType,
-  type TestOrderBasketItem,
+  type OrderBasketExtensionProps,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../../config-schema';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
@@ -58,7 +58,6 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {

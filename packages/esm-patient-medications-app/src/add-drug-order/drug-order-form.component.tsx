@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -7,18 +7,18 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  IconButton,
   Form,
   FormGroup,
   FormLabel,
   Grid,
+  IconButton,
   InlineNotification,
   Layer,
   NumberInput,
+  Stack,
   TextArea,
   TextInput,
   Toggle,
-  Stack,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
@@ -165,6 +165,22 @@ export function DrugOrderForm({
     setValue,
     watch,
   } = drugOrderForm;
+
+  // reset the dosage information if set to free text dosage
+  const handleIsFreeTextDosageAfterChange = useCallback(
+    (newValue: MedicationOrderFormData['isFreeTextDosage']) => {
+      if (newValue) {
+        setValue('dosage', null, { shouldValidate: true });
+        setValue('unit', null, { shouldValidate: true });
+        setValue('route', null, { shouldValidate: true });
+        setValue('frequency', null, { shouldValidate: true });
+        setValue('patientInstructions', null, { shouldValidate: true });
+      } else {
+        setValue('freeTextDosage', null, { shouldValidate: true });
+      }
+    },
+    [setValue],
+  );
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -422,6 +438,7 @@ export function DrugOrderForm({
                     id="freeTextDosageToggle"
                     aria-label={t('freeTextDosage', 'Free text dosage')}
                     labelText={t('freeTextDosage', 'Free text dosage')}
+                    handleAfterChange={handleIsFreeTextDosageAfterChange}
                   />
                 </Column>
               </Grid>
@@ -703,9 +720,7 @@ export function DrugOrderForm({
             </section>
           </div>
 
-          <ButtonSet
-            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-          >
+          <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}
             </Button>
@@ -760,7 +775,9 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
 
   return (
     <div className={styles.customElement}>
-      <span className="cds--label">{labelText}</span>
+      <span className="cds--label" id={`${name}-label`}>
+        {labelText}
+      </span>
       <div className={styles.customNumberInput}>
         <IconButton onClick={decrement} label={t('decrement', 'Decrement')} size={responsiveSize}>
           <Subtract size={16} />
@@ -774,6 +791,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
           size={responsiveSize}
           id={name}
           labelText=""
+          aria-labelledby={`${name}-label`}
           {...inputProps}
         />
         <IconButton onClick={increment} label={t('increment', 'Increment')} size={responsiveSize}>
@@ -812,6 +830,7 @@ const ControlledFieldInput = ({
   handleAfterChange,
   ...restProps
 }: ControlledFieldInputProps) => {
+  const { t } = useTranslation();
   const {
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
@@ -840,6 +859,8 @@ const ControlledFieldInput = ({
           ref={ref}
           // @ts-ignore
           size={isTablet ? 'md' : 'sm'}
+          labelA={t('on', 'On')}
+          labelB={t('off', 'Off')}
           {...restProps}
         />
       );
@@ -924,7 +945,7 @@ const ControlledFieldInput = ({
     }
 
     return null;
-  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet]);
+  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet, t]);
 
   return (
     <>

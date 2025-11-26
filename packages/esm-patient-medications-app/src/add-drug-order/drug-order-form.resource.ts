@@ -190,7 +190,7 @@ function useCreateMedicationOrderFormSchema() {
       ...baseSchemaFields,
       ...outpatientDrugOrderFields,
       isFreeTextDosage: z.literal(false),
-      freeTextDosage: z.string().optional(),
+      freeTextDosage: z.string().nullable(),
     });
 
     const freeTextDosageSchema = z.object({

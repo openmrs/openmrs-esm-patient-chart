@@ -169,7 +169,7 @@ function TestTypeSearchResults({
               kind="ghost"
               onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
             >
-              {t('returnToOrderBasket', 'Return to order basket')}
+              {t('back', 'Back')}
             </Button>
           </div>
         )}

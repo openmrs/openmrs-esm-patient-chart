@@ -10,6 +10,8 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  useWorkspaces,
+  type WorkspacesInfo,
 } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
@@ -187,7 +189,7 @@ describe('AddLabOrder', () => {
   test('back to order basket', async () => {
     const user = userEvent.setup();
     renderAddLabOrderWorkspace();
-    const back = screen.getByText('Back to order basket');
+    const back = screen.getByText('Back');
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
