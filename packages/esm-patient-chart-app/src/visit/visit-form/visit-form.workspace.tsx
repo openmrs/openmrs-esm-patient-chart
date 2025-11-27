@@ -131,8 +131,15 @@ const VisitForm: React.FC<VisitFormProps> = ({
     blockSavingForm: boolean;
   } | null>(null);
   const { visitAttributeTypes } = useVisitAttributeTypes();
-  const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
-  const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
+  const visitFormCallbacksRef = useVisitFormCallbacks();
+  const [extraVisitInfo, setExtraVisitInfo] = useState(null);
+
+  const registerVisitFormCallbacks = useCallback(
+    (extensionId: string, callbacks: VisitFormCallbacks) => {
+      visitFormCallbacksRef.current.set(extensionId, callbacks);
+    },
+    [visitFormCallbacksRef],
+  );
 
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit);
@@ -358,7 +365,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
               },
             );
 
-            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
+            const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacksRef.current.values()].map((callbacks) =>
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
@@ -419,7 +426,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
       setVisitContext,
       patientUuid,
       t,
-      visitFormCallbacks,
+      visitFormCallbacksRef,
       visitToEdit,
       isValidVisitAttributesArray,
       mutateActiveVisit,
@@ -504,7 +511,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
                     name="visit-form-top-slot"
                     patientUuid={patientUuid}
                     visitFormOpenedFrom={openedFrom}
-                    setVisitFormCallbacks={setVisitFormCallbacks}
+                    registerVisitFormCallbacks={registerVisitFormCallbacks}
                   />
                 </div>
               </section>
@@ -615,7 +622,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
                   name="visit-form-bottom-slot"
                   patientUuid={patientUuid}
                   visitFormOpenedFrom={openedFrom}
-                  setVisitFormCallbacks={setVisitFormCallbacks}
+                  registerVisitFormCallbacks={registerVisitFormCallbacks}
                 />
               </div>
             </section>
@@ -659,7 +666,7 @@ interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
   visitFormOpenedFrom: string;
-  setVisitFormCallbacks: React.Dispatch<React.SetStateAction<Map<string, VisitFormCallbacks>>>;
+  registerVisitFormCallbacks: (extensionId: string, callbacks: VisitFormCallbacks) => void;
 }
 
 type VisitFormExtensionState = {
@@ -679,7 +686,7 @@ type VisitFormExtensionState = {
 };
 
 const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
-  ({ name, patientUuid, visitFormOpenedFrom, setVisitFormCallbacks }) => {
+  ({ name, patientUuid, visitFormOpenedFrom, registerVisitFormCallbacks }) => {
     const config = useConfig<ChartConfig>();
 
     return (
@@ -688,9 +695,7 @@ const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo
           const state: VisitFormExtensionState = {
             patientUuid,
             setVisitFormCallbacks: (callbacks) => {
-              setVisitFormCallbacks((old) => {
-                return new Map(old).set(extension.id, callbacks);
-              });
+              registerVisitFormCallbacks(extension.id, callbacks);
             },
             visitFormOpenedFrom,
             patientChartConfig: config,
