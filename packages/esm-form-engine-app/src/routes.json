@@ -19,6 +19,10 @@
     {
       "name": "form-engine-delete-question-confirm-modal",
       "component": "deleteQuestionModal"
+    },
+    {
+      "name": "form-engine-empty-form-confirm-modal",
+      "component": "emptyFormModal"
     }
   ],
   "pages": []
