@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
+  ExtensionSlot,
   getPatientName,
   PatientBannerActionsMenu,
   PatientBannerContactDetails,
@@ -71,6 +72,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               />
             ) : null}
           </div>
+          <ExtensionSlot name="patient-information-slot" state={{ patientUuid }} />
           {!showDetailsButtonBelowHeader ? (
             <PatientBannerToggleContactDetailsButton
               className={styles.toggleContactDetailsButton}
