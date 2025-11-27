@@ -19,8 +19,8 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
-import AddLabOrderWorkspace from './add-test-order.workspace';
 import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
+import AddLabOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);

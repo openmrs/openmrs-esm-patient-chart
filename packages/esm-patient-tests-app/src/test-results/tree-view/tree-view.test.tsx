@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { useGetManyObstreeData } from '../grouped-timeline';
-import TreeView from './tree-view.component';
 import { FilterProvider, type Roots } from '../filter/filter-context';
 import { type ObsTreeNode } from '../grouped-timeline/useObstreeData';
+import TreeView from './tree-view.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -105,5 +106,120 @@ describe('TreeView', () => {
     expect(screen.getAllByText('Complete blood count').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Haemoglobin').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Hematocrit').length).toBeGreaterThan(0);
+  });
+
+  describe('Reset button - Tablet overlay', () => {
+    beforeEach(() => {
+      mockUseLayoutType.mockReturnValue('tablet');
+      mockUseGetManyObstreeData.mockReturnValue({
+        roots: mockResults as unknown as Array<ObsTreeNode>,
+        isLoading: false,
+        error: null,
+      });
+    });
+
+    it('should show reset tree button in tablet overlay when tree is opened', async () => {
+      const user = userEvent.setup();
+
+      renderTreeViewWithMockContext();
+
+      // Open the tree overlay by clicking the tree button
+      const treeButton = screen.getByRole('button', { name: /show tree/i });
+      await user.click(treeButton);
+
+      // Reset tree button should be visible in the overlay
+      const resetButton = screen.getByRole('button', { name: /reset tree/i });
+      expect(resetButton).toBeInTheDocument();
+      expect(resetButton).toBeEnabled();
+    });
+
+    it('should show both reset and view buttons in overlay', async () => {
+      const user = userEvent.setup();
+
+      renderTreeViewWithMockContext();
+
+      // Open the tree overlay
+      const treeButton = screen.getByRole('button', { name: /show tree/i });
+      await user.click(treeButton);
+
+      // Both buttons should be visible and enabled
+      const resetButton = screen.getByRole('button', { name: /reset tree/i });
+      const viewButton = screen.getByRole('button', { name: /view.*results/i });
+
+      expect(resetButton).toBeInTheDocument();
+      expect(resetButton).toBeEnabled();
+      expect(viewButton).toBeInTheDocument();
+      expect(viewButton).toBeEnabled();
+    });
+
+    it('should reset filters when reset tree button is clicked', async () => {
+      const user = userEvent.setup();
+
+      renderTreeViewWithMockContext();
+
+      // Open the tree overlay
+      const treeButton = screen.getByRole('button', { name: /show tree/i });
+      await user.click(treeButton);
+
+      // Find an enabled checkbox (one with hasData: true in mock data)
+      // Mock data has "Platelets" with data
+      const plateletsCheckboxes = screen.getAllByRole('checkbox', { name: /platelets/i });
+      // Find the first enabled one
+      const plateletsCheckbox = plateletsCheckboxes.find((cb) => !cb.hasAttribute('disabled'));
+
+      expect(plateletsCheckbox).toBeDefined();
+      await user.click(plateletsCheckbox);
+      expect(plateletsCheckbox).toBeChecked();
+
+      // Click reset tree button
+      const resetButton = screen.getByRole('button', { name: /reset tree/i });
+      await user.click(resetButton);
+
+      // Checkbox should be unchecked
+      expect(plateletsCheckbox).not.toBeChecked();
+    });
+
+    it('should show filtered results count in view button', async () => {
+      const user = userEvent.setup();
+
+      renderTreeViewWithMockContext();
+
+      // Open the tree overlay
+      const treeButton = screen.getByRole('button', { name: /show tree/i });
+      await user.click(treeButton);
+
+      // Initially should show total count
+      const viewButton = screen.getByRole('button', { name: /view.*results/i });
+      expect(viewButton).toBeInTheDocument();
+
+      // Check a filter - find an enabled checkbox
+      const plateletsCheckboxes = screen.getAllByRole('checkbox', { name: /platelets/i });
+      const plateletsCheckbox = plateletsCheckboxes.find((cb) => !cb.hasAttribute('disabled'));
+      await user.click(plateletsCheckbox);
+
+      // View button should update with filtered count
+      expect(screen.getByRole('button', { name: /view.*results/i })).toBeInTheDocument();
+    });
+
+    it('should close overlay when view results button is clicked', async () => {
+      const user = userEvent.setup();
+
+      renderTreeViewWithMockContext();
+
+      // Open the tree overlay
+      const treeButton = screen.getByRole('button', { name: /show tree/i });
+      await user.click(treeButton);
+
+      // Reset tree button should be visible in the overlay
+      const resetButton = screen.getByRole('button', { name: /reset tree/i });
+      expect(resetButton).toBeInTheDocument();
+
+      // Click view results button
+      const viewButton = screen.getByRole('button', { name: /view.*results/i });
+      await user.click(viewButton);
+
+      // Overlay should be closed (reset button no longer visible)
+      expect(screen.queryByRole('button', { name: /reset tree/i })).not.toBeInTheDocument();
+    });
   });
 });
