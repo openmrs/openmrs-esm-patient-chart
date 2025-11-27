@@ -48,7 +48,10 @@ const getColumnValue = (
   }
 
   if (column.valueMappings) {
-    return resolveValueUsingMappings(encounter, column.concept, column.valueMappings, t);
+    const resolvedValue = resolveValueUsingMappings(encounter, column.concept, column.valueMappings, t);
+    if (resolvedValue !== null && resolvedValue !== undefined) {
+      return resolvedValue;
+    }
   }
 
   if (column.conceptMappings) {
