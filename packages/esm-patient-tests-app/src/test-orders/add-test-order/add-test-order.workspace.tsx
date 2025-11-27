@@ -13,16 +13,25 @@ import {
   useLayoutType,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type OrderBasketItem, useOrderType } from '@openmrs/esm-patient-common-lib';
+import {
+  type DefaultPatientWorkspaceProps,
+  type Order,
+  type OrderBasketItem,
+  useOrderType,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
 import styles from './add-test-order.scss';
+import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
   orderTypeUuid: string;
+  prevWorkSpace: string;
+  isWorkSpaceType: (value: string) => boolean;
+  prevOrder: Order | null;
 }
 
 export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
@@ -35,6 +44,9 @@ export default function AddLabOrderWorkspace({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
   setTitle,
+  prevWorkSpace,
+  isWorkSpaceType,
+  prevOrder,
   patientUuid,
   patient,
   visitContext,
@@ -50,11 +62,16 @@ export default function AddLabOrderWorkspace({
     if (orderType) {
       setTitle(
         t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
-          orderTypeDisplay: orderType.display.toLocaleLowerCase(),
+          orderTypeDisplay:
+            typeof isWorkSpaceType === 'function' &&
+            isWorkSpaceType(prevWorkSpace) &&
+            prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+              ? 'tests'
+              : orderType.display.toLocaleLowerCase(),
         }),
       );
     }
-  }, [orderType, t, setTitle]);
+  }, [orderType, t, setTitle, isWorkSpaceType, prevWorkSpace]);
 
   const orderableConceptSets = useMemo(() => {
     const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
@@ -73,10 +90,16 @@ export default function AddLabOrderWorkspace({
   const cancelOrder = useCallback(() => {
     closeWorkspace({
       ignoreChanges: true,
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
+      onWorkspaceClose: () =>
+        typeof isWorkSpaceType === 'function' &&
+        isWorkSpaceType(prevWorkSpace) &&
+        prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+          ? launchWorkspace(prevWorkSpace, { order: prevOrder })
+          : launchWorkspace(WORKSPACES.ORDER_BASKET),
+
       closeWorkspaceGroup: false,
     });
-  }, [closeWorkspace]);
+  }, [closeWorkspace, isWorkSpaceType, prevOrder, prevWorkSpace]);
 
   return (
     <div className={styles.container}>
@@ -98,7 +121,13 @@ export default function AddLabOrderWorkspace({
             size="sm"
             onClick={cancelOrder}
           >
-            <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            <span>
+              {typeof isWorkSpaceType === 'function' &&
+              isWorkSpaceType(prevWorkSpace) &&
+              prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
+                ? t('backToTestResults', 'Back to test Results')
+                : t('backToOrderBasket', 'Back to order basket')}
+            </span>
           </Button>
         </div>
       )}
@@ -113,6 +142,9 @@ export default function AddLabOrderWorkspace({
           setTitle={() => {}}
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
+          prevWorkSpace={prevWorkSpace}
+          isWorkSpaceType={isWorkSpaceType}
+          prevOrder={prevOrder}
           visitContext={visitContext}
           mutateVisitContext={mutateVisitContext}
         />
@@ -121,6 +153,9 @@ export default function AddLabOrderWorkspace({
           orderTypeUuid={orderTypeUuid}
           orderableConceptSets={orderableConceptSets}
           openLabForm={setCurrentLabOrder}
+          prevWorkSpace={prevWorkSpace}
+          isWorkSpaceType={isWorkSpaceType}
+          prevOrder={prevOrder}
           patient={patient}
         />
       )}

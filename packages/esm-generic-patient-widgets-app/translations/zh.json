@@ -1,5 +1,10 @@
 {
+  "addEncounter": "Add encounter",
   "date": "Date",
   "dateAndTime": "日期&时间",
-  "encounterType": "问诊类型"
+  "editabilityNote": "Tap an observation to edit",
+  "encounterType": "问诊类型",
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

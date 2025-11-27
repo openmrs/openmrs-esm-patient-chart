@@ -5,28 +5,39 @@ import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { restBaseUrl, showSnackbar, useAbortController, useLayoutType } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  restBaseUrl,
+  showSnackbar,
+  useAbortController,
+  useLayoutType,
+  ExtensionSlot,
+  usePatient,
+} from '@openmrs/esm-framework';
+import { type DefaultPatientWorkspaceProps, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
-  createObservationPayload,
+  createCompositeObservationPayload,
   isCoded,
   isNumeric,
   isPanel,
   isText,
   updateObservation,
   updateOrderResult,
-  useCompletedLabResults,
-  useOrderConceptByUuid,
+  useCompletedLabResultsArray,
+  useOrderConceptsByUuids,
 } from './lab-results.resource';
-import { createLabResultsFormSchema } from './lab-results-schema.resource';
-
+import { createLabResultsFormCompositeSchema } from './lab-results-schema.resource';
 import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
+import orderStyles from '../order-basket/order-basket.scss';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
   order: Order;
   invalidateLabOrders?: () => void;
+}
+
+interface OrderBasketSlotProps {
+  patient: fhir.Patient;
 }
 
 const LabResultsForm: React.FC<LabResultsFormProps> = ({
@@ -43,11 +54,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const { t } = useTranslation();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
-  const { concept, isLoading: isLoadingConcepts } = useOrderConceptByUuid(order.concept.uuid);
+  const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
+  const { isLoading: isLoadingResultConcepts, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
-  const schema = useMemo(() => createLabResultsFormSchema(concept), [concept]);
-  const { completeLabResult, isLoading, mutate: mutateResults } = useCompletedLabResults(order);
+  const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
+  const { isLoading: isLoadingPatient, patient } = usePatient(order.patient.uuid);
+  const { orders, clearOrders } = useOrderBasket(patient);
+  const [isSavingOrders, setIsSavingOrders] = useState(false);
+  const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -57,6 +72,16 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     );
   }, [mutate, order.patient.uuid]);
 
+  const handleCancel = useCallback(() => {
+    clearOrders();
+  }, [clearOrders]);
+
+  const handleSave = useCallback(() => {
+    const newConceptUuids = orders.map((order) => order['testType']['conceptUuid']);
+    setOrderConceptUuids([order.concept.uuid, ...newConceptUuids]);
+    clearOrders();
+  }, [clearOrders, orders, order.concept.uuid]);
+
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
@@ -64,40 +89,53 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     handleSubmit,
   } = useForm<Record<string, ObservationValue>>({
     defaultValues: {} as Record<string, ObservationValue>,
-    resolver: zodResolver(schema),
+    resolver: zodResolver(compositeSchema),
     mode: 'all',
   });
+  useEffect(() => {
+    if (Array.isArray(completeLabResults) && completeLabResults.length > 1) {
+      const conceptUuids = completeLabResults.map((r) => r.concept.uuid);
+      setOrderConceptUuids(conceptUuids);
+    }
+  }, [completeLabResults]);
+
+  const extensionProps = {
+    patient,
+  } satisfies OrderBasketSlotProps;
 
   useEffect(() => {
-    if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
-      if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
-        setValue(concept.uuid, completeLabResult.value.uuid);
-      } else if (isNumeric(concept) && completeLabResult?.value) {
-        setValue(concept.uuid, parseFloat(completeLabResult.value as string));
-      } else if (isText(concept) && completeLabResult?.value) {
-        setValue(concept.uuid, completeLabResult?.value);
-      } else if (isPanel(concept)) {
-        concept.setMembers.forEach((member) => {
-          const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
-          let value: ObservationValue;
-          if (isCoded(member)) {
-            value = typeof obs?.value === 'object' ? obs.value.uuid : obs?.value;
-          } else if (isNumeric(member)) {
-            value = obs?.value ? parseFloat(obs.value as string) : undefined;
-          } else if (isText(member)) {
-            value = obs?.value;
-          }
-          if (value) setValue(member.uuid, value);
-        });
+    conceptArray.forEach((concept, index) => {
+      const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
+      if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+        if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
+          setValue(concept.uuid, completeLabResult.value.uuid);
+        } else if (isNumeric(concept) && completeLabResult?.value) {
+          setValue(concept.uuid, parseFloat(completeLabResult.value as string));
+        } else if (isText(concept) && completeLabResult?.value) {
+          setValue(concept.uuid, completeLabResult?.value);
+        } else if (isPanel(concept)) {
+          concept.setMembers.forEach((member) => {
+            const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
+            let value: ObservationValue;
+            if (isCoded(member)) {
+              value = typeof obs?.value === 'object' ? obs.value.uuid : obs?.value;
+            } else if (isNumeric(member)) {
+              value = obs?.value ? parseFloat(obs.value as string) : undefined;
+            } else if (isText(member)) {
+              value = obs?.value;
+            }
+            if (value) setValue(member.uuid, value);
+          });
+        }
       }
-    }
-  }, [concept, completeLabResult, order, setValue]);
+    });
+  }, [conceptArray, completeLabResults, order?.fulfillerStatus, setValue]);
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty, promptBeforeClosing]);
 
-  if (isLoadingConcepts) {
+  if (isLoadingResultConcepts) {
     return (
       <div className={styles.loaderContainer}>
         <InlineLoading
@@ -133,6 +171,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     // Handle update operation for completed lab order results
     if (order.fulfillerStatus === 'COMPLETED') {
       const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
+        const completeLabResult = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
         const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
         return updateObservation(obs?.uuid, { value });
       });
@@ -162,7 +201,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     // Handle Creation logic
 
     // Set the observation status to 'FINAL' as we're not capturing it in the form
-    const obsPayload = createObservationPayload(concept, order, formValues, 'FINAL');
+    const obsPayload = createCompositeObservationPayload(conceptArray, order, formValues, 'FINAL');
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
@@ -210,16 +249,57 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
       <Layer level={isTablet ? 1 : 0}>
         <div className={styles.grid}>
-          {concept && (
+          {conceptArray?.length > 0 && (
             <Stack gap={5}>
               {!isLoading ? (
-                <ResultFormField
-                  defaultValue={completeLabResult}
-                  concept={concept}
-                  control={control as unknown as Control<Record<string, unknown>>}
-                />
+                conceptArray.map((c) => (
+                  <ResultFormField
+                    defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
+                    concept={c}
+                    control={control as unknown as Control<Record<string, unknown>>}
+                  />
+                ))
               ) : (
                 <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+              )}
+              {order.fulfillerStatus !== 'COMPLETED' && (
+                <div className={orderStyles.orderBasketContainer}>
+                  <div className={styles.heading}>
+                    <span>{t('addOrderTests', 'Add Tests to this order')}</span>
+                  </div>
+                  <ExtensionSlot
+                    className={classNames(orderStyles.orderBasketSlot, {
+                      [orderStyles.orderBasketSlotTablet]: isTablet,
+                    })}
+                    name="result-order-basket-slot"
+                    state={extensionProps}
+                  />
+                </div>
+              )}
+
+              {orders?.length > 0 && (
+                <div className={orderStyles.orderBasketContainer}>
+                  <ButtonSet className={styles.buttonSet}>
+                    <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
+                      {t('cancelOrder', 'Cancel order')}
+                    </Button>
+                    <Button
+                      className={styles.actionButton}
+                      kind="primary"
+                      onClick={handleSave}
+                      size="sm"
+                      disabled={
+                        isSavingOrders || !orders?.length || orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                      }
+                    >
+                      {isSavingOrders ? (
+                        <InlineLoading description={t('saving', 'Saving') + '...'} />
+                      ) : (
+                        <span>{t('saveTests', 'Save Tests')}</span>
+                      )}
+                    </Button>
+                  </ButtonSet>
+                </div>
               )}
             </Stack>
           )}

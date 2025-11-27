@@ -31,7 +31,7 @@ const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({
     otherConceptUuid: config.otherConceptUuid,
   };
 
-  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions, configConcepts);
+  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions, configConcepts, t);
 
   const tabFilters = useMemo(() => {
     return tabsConfig.reduce((result, tab) => {

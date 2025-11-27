@@ -9,16 +9,8 @@
   "deceased": "已故的",
   "district": "区县",
   "from_lower": "从",
-  "implementationLogo": "实施图标",
-  "patientAge": "年龄",
-  "patientDateOfBirthWithSeparator": "出生日期：",
-  "patientGenderWithSeparator": "性别：",
-  "patientIdentifierSticker": "患者标识符标签",
-  "patientNameWithSeparator": "患者姓名：",
   "postalCode": "邮政编码",
-  "printIdentifierSticker": "患者标识符标签",
   "started": "已开始",
   "state": "省份",
-  "stateProvince": "省份",
-  "telephoneNumberWithSeparator": "电话号码："
+  "stateProvince": "省份"
 }

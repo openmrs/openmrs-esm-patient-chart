@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { useOrderType } from '@openmrs/esm-patient-common-lib';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useWorkspaces, type WorkspacesInfo } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
@@ -11,6 +11,8 @@ import { mockPatient } from 'tools';
 const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
+const mockUseWorkSpaces = jest.mocked(useWorkspaces);
+const mockWorkSpacesInfo = {} as WorkspacesInfo;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
@@ -45,6 +47,9 @@ const testProps = {
 };
 
 describe('LabOrderBasketPanel', () => {
+  beforeEach(() => {
+    mockUseWorkSpaces.mockReturnValue(mockWorkSpacesInfo);
+  });
   test('renders an empty state when no items are selected in the order basket', () => {
     mockUseOrderBasket.mockReturnValue({ orders: [] });
     render(<LabOrderBasketPanel {...testProps} />);

@@ -9,16 +9,8 @@
   "deceased": "გარდაცვლილია",
   "district": "რაიონი",
   "from_lower": "საიდან",
-  "implementationLogo": "იმპლემენტაციის ლოგო",
-  "patientAge": "ასაკი:",
-  "patientDateOfBirthWithSeparator": "დაბადების დღე:",
-  "patientGenderWithSeparator": "სქესი:",
-  "patientIdentifierSticker": "პაკეტის იდენტიფიკატორი ეტიკეტი",
-  "patientNameWithSeparator": "პაციენტის სახელი:",
   "postalCode": "საფოსტო კოდი",
-  "printIdentifierSticker": "იდენტიფიკატორი ეტიკეტის დაბეჭდვა",
   "started": "დაწყებულია",
   "state": "შტატი",
-  "stateProvince": "შტატი",
-  "telephoneNumberWithSeparator": "ტელეფონის ნომერი:"
+  "stateProvince": "შტატი"
 }

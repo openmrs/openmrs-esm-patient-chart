@@ -9,6 +9,7 @@ import type {
   GetObsFromEncounterParams,
   Observation,
 } from '../types';
+import type { TFunction } from 'i18next';
 
 export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
@@ -61,11 +62,11 @@ export function getObsFromEncounters(encounters: Encounter, obsConcept: string, 
   return getObsFromEncounter({ encounter: filteredEnc, obsConcept: obsConcept, config: config });
 }
 
-export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings) {
+export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings, t: TFunction) {
   const obs = findObs(encounter, concept);
   for (const key in mappings) {
     if (typeof obs?.value === 'object' && 'uuid' in obs.value && mappings[key] === obs?.value?.uuid) {
-      return key;
+      return t(key);
     }
   }
   return '--';

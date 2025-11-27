@@ -1,7 +1,7 @@
 import React, { useContext, useState, useMemo } from 'react';
 import classNames from 'classnames';
+import { AccordionSkeleton, Button, DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
 import { useLayoutType, TreeViewAltIcon, useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';

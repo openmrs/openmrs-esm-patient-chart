@@ -9,16 +9,8 @@
   "deceased": "Decedat",
   "district": "District",
   "from_lower": "de la",
-  "implementationLogo": "Logo implementare",
-  "patientAge": "Vârstă:",
-  "patientDateOfBirthWithSeparator": "Data nașterii:",
-  "patientGenderWithSeparator": "Sex:",
-  "patientIdentifierSticker": "Etichetă identificare pacient",
-  "patientNameWithSeparator": "Nume pacient:",
   "postalCode": "Cod poștal",
-  "printIdentifierSticker": "Printează etichetă identificare",
   "started": "Început",
   "state": "Stat",
-  "stateProvince": "Stat/Provincie",
-  "telephoneNumberWithSeparator": "Număr de telefon:"
+  "stateProvince": "Stat/Provincie"
 }

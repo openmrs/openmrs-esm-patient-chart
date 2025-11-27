@@ -1,5 +1,10 @@
 {
+  "addEncounter": "Add encounter",
   "date": "Date",
   "dateAndTime": "التاريخ والوقت",
-  "encounterType": "نوع اللقاء"
+  "editabilityNote": "Tap an observation to edit",
+  "encounterType": "نوع اللقاء",
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

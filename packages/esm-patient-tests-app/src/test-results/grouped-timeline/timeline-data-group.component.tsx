@@ -9,8 +9,8 @@ import type {
   NewRowStartCellProps,
   TimelineDataGroupProps,
 } from './grouped-timeline-types';
+import { getMostRecentObservationWithRange, formatRangeWithUnits } from './reference-range-helpers';
 import FilterContext from '../filter/filter-context';
-import { getMostRecentObservationWithRange } from './reference-range-helpers';
 import styles from './grouped-timeline.scss';
 
 export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} />;
@@ -131,6 +131,8 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
     });
   }, [patientUuid, conceptUuid, title]);
 
+  const rangeUnitsDisplay = formatRangeWithUnits(range, units);
+
   return (
     <div
       className={styles.rowStartCell}
@@ -147,9 +149,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
           <span className={styles.trendlineLink}>{title}</span>
         )}
       </span>
-      <span className={styles.rangeUnits}>
-        {range} {units}
-      </span>
+      <span className={styles.rangeUnits}>{rangeUnitsDisplay}</span>
     </div>
   );
 };

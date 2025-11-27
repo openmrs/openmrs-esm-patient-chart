@@ -1,5 +1,10 @@
 {
+  "addEncounter": "Add encounter",
   "date": "Date",
   "dateAndTime": "Data si ora",
-  "encounterType": "Tip intalnire"
+  "editabilityNote": "Tap an observation to edit",
+  "encounterType": "Tip intalnire",
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

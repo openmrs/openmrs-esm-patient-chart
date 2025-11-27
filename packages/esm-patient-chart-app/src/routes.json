@@ -2,7 +2,7 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "optionalBackendDependencies": {
     "emrapi": {
-      "version": "^2.0.0",
+      "version": ">=2.0.0 <4.0.0",
       "feature": {
         "flagName": "emrapi-module",
         "label": "EMR API Module",
