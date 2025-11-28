@@ -174,7 +174,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
         [styles.collapsedTile]: !isExpanded,
       })}
     >
-      <div className={classNames()}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
           {isDefaultLabOrder ? (
             <LabIcon isTablet={isTablet} />
