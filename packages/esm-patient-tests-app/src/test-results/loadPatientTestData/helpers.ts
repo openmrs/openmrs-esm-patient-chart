@@ -39,7 +39,7 @@ export function addUserDataToCache(patientUuid: string, data: PatientData, indic
   }
 }
 
-async function getLatestObsUuid(patientUuid: string): Promise<string> {
+async function getLatestObsUuid(patientUuid: string): Promise<string | undefined> {
   const request = fhirObservationRequests({
     patient: patientUuid,
     category: 'laboratory',
@@ -61,12 +61,13 @@ async function getLatestObsUuid(patientUuid: string): Promise<string> {
  * @param { string } indicator UUID of the newest observation
  */
 export function getUserDataFromCache(patientUuid: string): [PatientData | undefined, Promise<boolean>] {
-  const [data] = patientResultsDataCache[patientUuid] || [];
+  const cacheEntry = patientResultsDataCache[patientUuid];
+  const [data, , indicator] = cacheEntry || [];
 
   return [
     data,
-    !!data
-      ? getLatestObsUuid(patientUuid).then((obsUuid) => obsUuid !== patientResultsDataCache?.[patientUuid]?.[2])
+    !!data && indicator
+      ? getLatestObsUuid(patientUuid).then((obsUuid) => obsUuid !== indicator)
       : Promise.resolve(true),
   ];
 }
@@ -109,31 +110,47 @@ export const loadObsEntries = async (patientUuid: string): Promise<Array<ObsReco
 
   let responses = await Promise.all(retrieveFromIterator(requests, CHUNK_PREFETCH_COUNT));
 
-  const total = responses[0].total;
+  const total = responses[0]?.total ?? 0;
 
   if (total > CHUNK_PREFETCH_COUNT * PAGE_SIZE) {
     const missingRequestsCount = Math.ceil(total / PAGE_SIZE) - CHUNK_PREFETCH_COUNT;
     responses = [...responses, ...(await Promise.all(retrieveFromIterator(requests, missingRequestsCount)))];
   }
 
-  return responses.slice(0, Math.ceil(total / PAGE_SIZE)).flatMap((res) => res.entry.map((e) => e.resource));
+  return responses.slice(0, Math.ceil(total / PAGE_SIZE)).flatMap((res) => res?.entry?.map((e) => e.resource) ?? []);
 };
 
-export const getEntryConceptClassUuid = (entry) => entry.code.coding[0].code;
+export const getEntryConceptClassUuid = (entry: ObsRecord | FHIRObservationResource): string =>
+  entry?.code?.coding?.[0]?.code ?? '';
 
 const conceptCache: Record<ConceptUuid, Promise<ConceptRecord>> = {};
 /**
  * fetch all concepts for all given observation entries
  */
 export function loadPresentConcepts(entries: Array<ObsRecord>): Promise<Array<ConceptRecord>> {
-  return Promise.all(
-    [...new Set(entries.map(getEntryConceptClassUuid))].map(
+  const conceptUuids = [...new Set(entries.map(getEntryConceptClassUuid).filter(Boolean))];
+
+  return Promise.allSettled(
+    conceptUuids.map(
       (conceptUuid) =>
         conceptCache[conceptUuid] ||
-        (conceptCache[conceptUuid] = fetch(`${window.openmrsBase}${restBaseUrl}/concept/${conceptUuid}?v=full`).then(
-          (res) => res.json(),
-        )),
+        (conceptCache[conceptUuid] = fetch(`${window.openmrsBase}${restBaseUrl}/concept/${conceptUuid}?v=full`)
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`Failed to fetch concept ${conceptUuid}: ${res.statusText}`);
+            }
+            return res.json();
+          })
+          .catch((error) => {
+            // Remove failed promise from cache so it can be retried
+            delete conceptCache[conceptUuid];
+            throw error;
+          })),
     ),
+  ).then((results) =>
+    results
+      .filter((result): result is PromiseFulfilledResult<ConceptRecord> => result.status === 'fulfilled')
+      .map((result) => result.value),
   );
 }
 

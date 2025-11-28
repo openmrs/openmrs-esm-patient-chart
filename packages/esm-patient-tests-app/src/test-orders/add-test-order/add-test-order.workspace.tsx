@@ -23,8 +23,8 @@ import { type ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';
-import styles from './add-test-order.scss';
 import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
+import styles from './add-test-order.scss';
 
 export interface AddLabOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;

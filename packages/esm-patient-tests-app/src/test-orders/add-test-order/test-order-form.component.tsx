@@ -38,8 +38,8 @@ import { prepTestOrderPostData, useOrderReasons } from '../api';
 import { ordersEqual } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import { type TestOrderBasketItem } from '../../types';
-import styles from './test-order-form.scss';
 import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
+import styles from './test-order-form.scss';
 
 export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
   initialOrder: TestOrderBasketItem;

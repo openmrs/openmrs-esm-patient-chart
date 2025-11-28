@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { getByTextWithMarkup } from 'tools';
 import { showModal } from '@openmrs/esm-framework';
 import { mockGroupedResults } from '__mocks__';

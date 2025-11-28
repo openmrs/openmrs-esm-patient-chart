@@ -14,8 +14,8 @@ const FilterEmptyDataIllustration: React.FC<FilterEmptyDataIllustrationProps> = 
       <path
         d="M57 57H1V1h56v56zM1 29h56M1 15h56M1 43h56M29 1v56M15 1v56M43 1v56"
         stroke="#9ACBCA"
-        stroke-width="1.44"
-        stroke-linejoin="round"
+        strokeWidth="1.44"
+        strokeLinejoin="round"
       />
     </g>
   </svg>

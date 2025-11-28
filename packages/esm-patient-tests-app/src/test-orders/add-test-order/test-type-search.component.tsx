@@ -18,8 +18,8 @@ import type { TestOrderBasketItem } from '../../types';
 import { prepTestOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import { useTestTypes, type TestType } from './useTestTypes';
-import styles from './test-type-search.scss';
 import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
+import styles from './test-type-search.scss';
 
 export interface TestTypeSearchProps {
   openLabForm: (searchResult: TestOrderBasketItem) => void;

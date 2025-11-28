@@ -8,9 +8,9 @@ import {
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './test-results/dashboard.meta';
+import { moduleName } from './constants';
 import externalOverviewComponent from './test-results/overview/external-overview.extension';
 import resultsViewerComponent from './test-results/results-viewer';
-import { moduleName } from './constants';
 
 const options = {
   featureName: 'patient-tests',

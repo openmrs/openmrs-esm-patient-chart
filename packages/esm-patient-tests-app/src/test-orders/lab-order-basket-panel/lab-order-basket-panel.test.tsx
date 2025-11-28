@@ -4,9 +4,9 @@ import { screen, render } from '@testing-library/react';
 import { useOrderType } from '@openmrs/esm-patient-common-lib';
 import { getDefaultsFromConfigSchema, useConfig, useWorkspaces, type WorkspacesInfo } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import type { TestOrderBasketItem } from '../../types';
-import LabOrderBasketPanel from './lab-order-basket-panel.extension';
+import { type TestOrderBasketItem } from '../../types';
 import { mockPatient } from 'tools';
+import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 
 const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
