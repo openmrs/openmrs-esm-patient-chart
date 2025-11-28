@@ -1,0 +1,22 @@
+{
+  "procedures": "Procedures",
+  "procedureName": "Procedure Name",
+  "year": "Year",
+  "status": "Status",
+  "add": "Add",
+  "recordProcedure": "Record a Procedure",
+  "enterProcedureName": "Enter procedure name",
+  "procedureDate": "Procedure Date",
+  "enterStatus": "Enter status (optional)",
+  "comments": "Comments",
+  "enterComments": "Enter any additional comments (optional)",
+  "cancel": "Cancel",
+  "saveAndClose": "Save and close",
+  "saving": "Saving...",
+  "missingFields": "Missing required fields",
+  "pleaseFillAllRequiredFields": "Please fill all required fields",
+  "procedureRecorded": "Procedure recorded",
+  "procedureRecordedSuccessfully": "Procedure has been recorded successfully",
+  "errorRecordingProcedure": "Error recording procedure",
+  "unknownError": "An unknown error occurred"
+}
