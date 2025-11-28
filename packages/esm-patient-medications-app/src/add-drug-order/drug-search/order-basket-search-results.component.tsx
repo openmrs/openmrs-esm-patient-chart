@@ -178,11 +178,13 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, dr
           })}
         >
           <div className={classNames(styles.searchResultTileContent, styles.text02)}>
-            <p>
-              <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
-              {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
-              {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
-            </p>
+            <div>
+              <h4 className={styles.productiveHeading01}>{drug?.display}</h4>
+              <p>
+                {drug?.strength && <>{drug?.strength.toLowerCase()}</>}{' '}
+                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+              </p>
+            </div>
             <UserHasAccess privilege="Manage OrderTemplates">
               {fetchingDrugOrderTemplatesError ? (
                 <p>

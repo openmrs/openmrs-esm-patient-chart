@@ -205,9 +205,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
       role="listitem"
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
-        <p>
-          <span className={styles.heading}>{concept.display}</span>{' '}
-        </p>
+        <h4 className={styles.heading}>{concept.display}</h4>
       </div>
       <div className={styles.searchResultActions}>
         {orderAlreadyInBasket ? (

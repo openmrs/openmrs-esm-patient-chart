@@ -517,7 +517,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
           to true. */}
             {config.showRecommendedVisitTypeTab && (
               <section>
-                <h1 className={styles.sectionTitle}>{t('program', 'Program')}</h1>
+                <h2 className={styles.sectionTitle}>{t('program', 'Program')}</h2>
                 <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles.sectionField}>
                   <Controller
                     name="programType"
@@ -549,7 +549,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
             {/* Lists available visit types if no atFacilityVisitType enabled. The content switcher only gets shown when recommended visit types are enabled */}
             {!emrConfiguration?.atFacilityVisitType && (
               <section>
-                <h1 className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</h1>
+                <h2 className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</h2>
                 <div className={styles.sectionField}>
                   {config.showRecommendedVisitTypeTab ? (
                     <>
@@ -601,7 +601,7 @@ const VisitForm: React.FC<VisitFormProps> = ({
 
             {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
             <section>
-              <h1 className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</h1>
+              <h2 className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</h2>
               <div className={styles.sectionField}>
                 <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
               </div>
