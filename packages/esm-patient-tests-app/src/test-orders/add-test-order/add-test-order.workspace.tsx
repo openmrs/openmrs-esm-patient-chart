@@ -1,164 +1,36 @@
-import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
-import { capitalize } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
+import React from 'react';
 import {
-  age,
-  ArrowLeftIcon,
-  getPatientName,
-  formatDate,
-  launchWorkspace,
-  parseDate,
-  useLayoutType,
-  useConfig,
-} from '@openmrs/esm-framework';
-import {
-  type DefaultPatientWorkspaceProps,
-  type Order,
+  type OrderBasketWindowProps,
   type OrderBasketItem,
-  useOrderType,
+  type PatientWorkspace2DefinitionProps,
 } from '@openmrs/esm-patient-common-lib';
-import { type ConfigObject } from '../../config-schema';
-import type { TestOrderBasketItem } from '../../types';
-import { LabOrderForm } from './test-order-form.component';
-import { TestTypeSearch } from './test-type-search.component';
-import styles from './add-test-order.scss';
-import { WORKSPACES } from '../lab-order-basket-panel/lab-order-basket-panel.extension';
+import AddLabOrder from './add-test-order.component';
 
-export interface AddLabOrderWorkspaceAdditionalProps {
+export interface AddTestOrderWorkspaceProps {
   order?: OrderBasketItem;
   orderTypeUuid: string;
-  prevWorkSpace: string;
-  isWorkSpaceType: (value: string) => boolean;
-  prevOrder: Order | null;
 }
 
-export interface AddLabOrderWorkspace extends DefaultPatientWorkspaceProps, AddLabOrderWorkspaceAdditionalProps {}
-
-// Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
-export default function AddLabOrderWorkspace({
-  order: initialOrder,
-  orderTypeUuid,
+/**
+ * This workspace displays the labs order form for adding or editing a labs order.
+ *
+ * Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-add-test-order.workspace.tsx
+ */
+export default function AddTestOrderWorkspace({
+  groupProps: { patient, visitContext },
+  workspaceProps: { order: initialOrder, orderTypeUuid },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  setTitle,
-  prevWorkSpace,
-  isWorkSpaceType,
-  prevOrder,
-  patientUuid,
-  patient,
-  visitContext,
-  mutateVisitContext,
-}: AddLabOrderWorkspace) {
-  const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
-  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
-  const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
-  const { orderType } = useOrderType(orderTypeUuid);
-
-  useEffect(() => {
-    if (orderType) {
-      setTitle(
-        t(`addOrderableForOrderType`, 'Add {{orderTypeDisplay}}', {
-          orderTypeDisplay:
-            typeof isWorkSpaceType === 'function' &&
-            isWorkSpaceType(prevWorkSpace) &&
-            prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
-              ? 'tests'
-              : orderType.display.toLocaleLowerCase(),
-        }),
-      );
-    }
-  }, [orderType, t, setTitle, isWorkSpaceType, prevWorkSpace]);
-
-  const orderableConceptSets = useMemo(() => {
-    const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
-      {
-        label: t('labOrders', 'Lab orders'),
-        orderTypeUuid: orders.labOrderTypeUuid,
-        orderableConceptSets: orders.labOrderableConcepts,
-      },
-      ...additionalTestOrderTypes,
-    ];
-    return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets;
-  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
-
-  const patientName = patient ? getPatientName(patient) : '';
-
-  const cancelOrder = useCallback(() => {
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        typeof isWorkSpaceType === 'function' &&
-        isWorkSpaceType(prevWorkSpace) &&
-        prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
-          ? launchWorkspace(prevWorkSpace, { order: prevOrder })
-          : launchWorkspace(WORKSPACES.ORDER_BASKET),
-
-      closeWorkspaceGroup: false,
-    });
-  }, [closeWorkspace, isWorkSpaceType, prevOrder, prevWorkSpace]);
-
+}: PatientWorkspace2DefinitionProps<AddTestOrderWorkspaceProps, OrderBasketWindowProps>) {
   return (
-    <div className={styles.container}>
-      {isTablet && (
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
-      )}
-      {!isTablet && (
-        <div className={styles.backButton}>
-          <Button
-            kind="ghost"
-            renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-            iconDescription="Return to order basket"
-            size="sm"
-            onClick={cancelOrder}
-          >
-            <span>
-              {typeof isWorkSpaceType === 'function' &&
-              isWorkSpaceType(prevWorkSpace) &&
-              prevWorkSpace === WORKSPACES.TEST_RESULTS_FORM
-                ? t('backToTestResults', 'Back to test Results')
-                : t('backToOrderBasket', 'Back to order basket')}
-            </span>
-          </Button>
-        </div>
-      )}
-      {currentLabOrder ? (
-        <LabOrderForm
-          initialOrder={currentLabOrder}
-          patientUuid={patientUuid}
-          patient={patient}
-          closeWorkspace={closeWorkspace}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          promptBeforeClosing={promptBeforeClosing}
-          setTitle={() => {}}
-          orderTypeUuid={orderTypeUuid}
-          orderableConceptSets={orderableConceptSets}
-          prevWorkSpace={prevWorkSpace}
-          isWorkSpaceType={isWorkSpaceType}
-          prevOrder={prevOrder}
-          visitContext={visitContext}
-          mutateVisitContext={mutateVisitContext}
-        />
-      ) : (
-        <TestTypeSearch
-          orderTypeUuid={orderTypeUuid}
-          orderableConceptSets={orderableConceptSets}
-          openLabForm={setCurrentLabOrder}
-          prevWorkSpace={prevWorkSpace}
-          isWorkSpaceType={isWorkSpaceType}
-          prevOrder={prevOrder}
-          patient={patient}
-        />
-      )}
-    </div>
+    <AddLabOrder
+      patient={patient}
+      visitContext={visitContext}
+      initialOrder={initialOrder}
+      orderTypeUuid={orderTypeUuid}
+      closeWorkspace={closeWorkspace}
+    />
   );
 }

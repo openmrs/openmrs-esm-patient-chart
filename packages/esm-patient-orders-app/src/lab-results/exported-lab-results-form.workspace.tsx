@@ -6,14 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ExtensionSlot,
   restBaseUrl,
   showSnackbar,
   useAbortController,
   useLayoutType,
-  ExtensionSlot,
-  usePatient,
+  Workspace2,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, type Order, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket, type Order } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 import {
   createCompositeObservationPayload,
@@ -31,8 +32,12 @@ import ResultFormField from './lab-results-form-field.component';
 import styles from './lab-results-form.scss';
 import orderStyles from '../order-basket/order-basket.scss';
 
-export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
+export interface LabResultsFormProps {
+  patient: fhir.Patient;
   order: Order;
+  /** Callback to refresh lab orders in the Laboratory app after results are saved.
+   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
+   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
 }
 
@@ -40,16 +45,9 @@ interface OrderBasketSlotProps {
   patient: fhir.Patient;
 }
 
-const LabResultsForm: React.FC<LabResultsFormProps> = ({
+const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
+  workspaceProps: { patient, order, invalidateLabOrders },
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  order,
-  promptBeforeClosing,
-  /* Callback to refresh lab orders in the Laboratory app after results are saved.
-   * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
-   * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117
-   */
-  invalidateLabOrders,
 }) => {
   const { t } = useTranslation();
   const abortController = useAbortController();
@@ -59,7 +57,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
   const compositeSchema = useMemo(() => createLabResultsFormCompositeSchema(conceptArray), [conceptArray]);
   const { mutate } = useSWRConfig();
-  const { isLoading: isLoadingPatient, patient } = usePatient(order.patient.uuid);
   const { orders, clearOrders } = useOrderBasket(patient);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
@@ -131,10 +128,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     });
   }, [conceptArray, completeLabResults, order?.fulfillerStatus, setValue]);
 
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
-
   if (isLoadingResultConcepts) {
     return (
       <div className={styles.loaderContainer}>
@@ -186,7 +179,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       if (failedObsconceptUuids.length) {
         showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
       } else {
-        closeWorkspaceWithSavedChanges();
+        closeWorkspace({ discardUnsavedChanges: true });
         showNotification(
           'success',
           t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
@@ -227,7 +220,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
         abortController,
       );
 
-      closeWorkspaceWithSavedChanges();
+      closeWorkspace({ discardUnsavedChanges: true });
       mutateOrderData();
       mutateResults();
       invalidateLabOrders?.();
@@ -246,98 +239,102 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
   };
 
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
-      <Layer level={isTablet ? 1 : 0}>
-        <div className={styles.grid}>
-          {conceptArray?.length > 0 && (
-            <Stack gap={5}>
-              {!isLoading ? (
-                conceptArray.map((c) => (
-                  <ResultFormField
-                    defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
-                    concept={c}
-                    control={control as unknown as Control<Record<string, unknown>>}
-                  />
-                ))
-              ) : (
-                <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
-              )}
-              {order.fulfillerStatus !== 'COMPLETED' && (
-                <div className={orderStyles.orderBasketContainer}>
-                  <div className={styles.heading}>
-                    <span>{t('addOrderTests', 'Add Tests to this order')}</span>
+    <Workspace2 title={t('enterTestResults', 'Enter test results')} hasUnsavedChanges={isDirty}>
+      <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
+        <Layer level={isTablet ? 1 : 0}>
+          <div className={styles.grid}>
+            {conceptArray?.length > 0 && (
+              <Stack gap={5}>
+                {!isLoading ? (
+                  conceptArray.map((c) => (
+                    <ResultFormField
+                      defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
+                      concept={c}
+                      control={control as unknown as Control<Record<string, unknown>>}
+                    />
+                  ))
+                ) : (
+                  <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
+                )}
+                {order.fulfillerStatus !== 'COMPLETED' && (
+                  <div className={orderStyles.orderBasketContainer}>
+                    <div className={styles.heading}>
+                      <span>{t('addOrderTests', 'Add Tests to this order')}</span>
+                    </div>
+                    <ExtensionSlot
+                      className={classNames(orderStyles.orderBasketSlot, {
+                        [orderStyles.orderBasketSlotTablet]: isTablet,
+                      })}
+                      name="result-order-basket-slot"
+                      state={extensionProps}
+                    />
                   </div>
-                  <ExtensionSlot
-                    className={classNames(orderStyles.orderBasketSlot, {
-                      [orderStyles.orderBasketSlotTablet]: isTablet,
-                    })}
-                    name="result-order-basket-slot"
-                    state={extensionProps}
-                  />
-                </div>
-              )}
+                )}
 
-              {orders?.length > 0 && (
-                <div className={orderStyles.orderBasketContainer}>
-                  <ButtonSet className={styles.buttonSet}>
-                    <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
-                      {t('cancelOrder', 'Cancel order')}
-                    </Button>
-                    <Button
-                      className={styles.actionButton}
-                      kind="primary"
-                      onClick={handleSave}
-                      size="sm"
-                      disabled={
-                        isSavingOrders || !orders?.length || orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
-                      }
-                    >
-                      {isSavingOrders ? (
-                        <InlineLoading description={t('saving', 'Saving') + '...'} />
-                      ) : (
-                        <span>{t('saveTests', 'Save Tests')}</span>
-                      )}
-                    </Button>
-                  </ButtonSet>
-                </div>
-              )}
-            </Stack>
-          )}
-          {showEmptyFormErrorNotification && (
-            <InlineNotification
-              className={styles.emptyFormError}
-              lowContrast
-              title={t('error', 'Error')}
-              subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
-            />
-          )}
-        </div>
-      </Layer>
+                {orders?.length > 0 && (
+                  <div className={orderStyles.orderBasketContainer}>
+                    <ButtonSet className={styles.buttonSet}>
+                      <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
+                        {t('cancelOrder', 'Cancel order')}
+                      </Button>
+                      <Button
+                        className={styles.actionButton}
+                        kind="primary"
+                        onClick={handleSave}
+                        size="sm"
+                        disabled={
+                          isSavingOrders ||
+                          !orders?.length ||
+                          orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                        }
+                      >
+                        {isSavingOrders ? (
+                          <InlineLoading description={t('saving', 'Saving') + '...'} />
+                        ) : (
+                          <span>{t('saveTests', 'Save Tests')}</span>
+                        )}
+                      </Button>
+                    </ButtonSet>
+                  </div>
+                )}
+              </Stack>
+            )}
+            {showEmptyFormErrorNotification && (
+              <InlineNotification
+                className={styles.emptyFormError}
+                lowContrast
+                title={t('error', 'Error')}
+                subtitle={t('pleaseFillField', 'Please fill at least one field') + '.'}
+              />
+            )}
+          </div>
+        </Layer>
 
-      <ButtonSet
-        className={classNames({
-          [styles.tablet]: isTablet,
-          [styles.desktop]: !isTablet,
-        })}
-      >
-        <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={() => closeWorkspace()}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          disabled={isSubmitting || Object.keys(errors).length > 0}
-          type="submit"
+        <ButtonSet
+          className={classNames({
+            [styles.tablet]: isTablet,
+            [styles.desktop]: !isTablet,
+          })}
         >
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            t('saveAndClose', 'Save and close')
-          )}
-        </Button>
-      </ButtonSet>
-    </Form>
+          <Button className={styles.button} kind="secondary" disabled={isSubmitting} onClick={() => closeWorkspace()}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            kind="primary"
+            disabled={isSubmitting || Object.keys(errors).length > 0}
+            type="submit"
+          >
+            {isSubmitting ? (
+              <InlineLoading description={t('saving', 'Saving') + '...'} />
+            ) : (
+              t('saveAndClose', 'Save and close')
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 
-export default LabResultsForm;
+export default ExportedLabResultsForm;

@@ -6,18 +6,35 @@ import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextSwitcherModal from './visit-context-switcher.modal';
 
-const mockUseInfiniteVisits = jest.fn(useInfiniteVisits);
+const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
+  errorFetchingSystemVisitSetting: null,
+  isLoadingSystemVisitSetting: false,
+  systemVisitEnabled: true,
+});
+
+const mockUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
+  visits: [mockCurrentVisit, mockVisit2, mockVisit3],
+  error: null,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  totalCount: 3,
+  hasMore: false,
+  loadMore: jest.fn(),
+  nextUri: '',
+});
+
+jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
+  useSystemVisitSetting: () => mockUseSystemVisitSetting(),
+}));
 
 jest.mock('../visit.resource', () => ({
   useInfiniteVisits: () => mockUseInfiniteVisits('some-uuid'),
 }));
 
 const mockSetVisitContext = jest.fn();
-const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting);
-
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useSystemVisitSetting: jest.fn(),
   usePatientChartStore: jest.fn(() => ({
     visitContext: null,
     setVisitContext: mockSetVisitContext,
@@ -26,22 +43,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 
 describe('VisitContextSwitcherModal', () => {
   beforeEach(() => {
-    mockUseInfiniteVisits.mockReturnValue({
-      visits: [mockCurrentVisit, mockVisit2, mockVisit3],
-      error: null,
-      mutate: jest.fn(),
-      isValidating: false,
-      isLoading: false,
-      totalCount: 3,
-      hasMore: false,
-      loadMore: jest.fn(),
-      nextUri: '',
-    });
-    mockUseSystemVisitSetting.mockReturnValue({
-      errorFetchingSystemVisitSetting: null,
-      isLoadingSystemVisitSetting: false,
-      systemVisitEnabled: true,
-    });
+    jest.clearAllMocks();
   });
 
   it('should display a list of past visits', () => {

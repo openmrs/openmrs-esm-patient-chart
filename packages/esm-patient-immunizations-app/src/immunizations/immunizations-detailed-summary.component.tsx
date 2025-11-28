@@ -20,11 +20,11 @@ import { orderBy } from 'lodash-es';
 import {
   AddIcon,
   formatDate,
-  launchWorkspace,
   parseDate,
   useConfig,
   useLayoutType,
   usePagination,
+  launchWorkspace2,
 } from '@openmrs/esm-framework';
 import {
   CardHeader,
@@ -66,7 +66,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
       launchStartVisitPrompt();
       return;
     }
-    launchWorkspace('immunization-form-workspace');
+    launchWorkspace2('immunization-form-workspace');
   }, [visitContext, launchStartVisitPrompt]);
 
   const sortedImmunizations = useMemo(() => {

@@ -1,14 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import FlagsHighlightBar from './flags-highlight-bar.component';
 
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');

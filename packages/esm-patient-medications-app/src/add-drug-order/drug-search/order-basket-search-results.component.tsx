@@ -3,15 +3,15 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
-import { useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
-  closeWorkspace,
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
   UserHasAccess,
-  launchWorkspace,
+  type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, useActivePatientOrders } from '../../api/api';
@@ -22,20 +22,23 @@ import {
   useDrugSearch,
   useDrugTemplate,
 } from './drug-search.resource';
-import type { DrugOrderBasketItem } from '../../types';
 import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   patient: fhir.Patient;
   searchTerm: string;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
+  visit: Visit;
 }
 
 interface DrugSearchResultItemProps {
   patient: fhir.Patient;
   drug: DrugSearchResult;
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
+  visit: Visit;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
 }
 
 export default function OrderBasketSearchResults({
@@ -43,6 +46,8 @@ export default function OrderBasketSearchResults({
   openOrderForm,
   focusAndClearSearchInput,
   patient,
+  visit,
+  closeWorkspace,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -109,14 +114,27 @@ export default function OrderBasketSearchResults({
       </div>
       <div className={styles.resultsContainer}>
         {drugs?.map((drug) => (
-          <DrugSearchResultItem patient={patient} key={drug.uuid} drug={drug} openOrderForm={openOrderForm} />
+          <DrugSearchResultItem
+            key={drug.uuid}
+            patient={patient}
+            drug={drug}
+            openOrderForm={openOrderForm}
+            visit={visit}
+            closeWorkspace={closeWorkspace}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, drug, openOrderForm }) => {
+const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
+  patient,
+  drug,
+  openOrderForm,
+  visit,
+  closeWorkspace,
+}) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
@@ -126,14 +144,14 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, dr
   const patientUuid = patient.id;
   const { data: activeOrders, isLoading: isLoadingActiveOrders } = useActivePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
-    () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug))),
-    [orders, drug],
+    () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug, visit))),
+    [orders, drug, visit],
   );
   // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const drugAlreadyPrescribed = useMemo(
     () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug],
+    [activeOrders, drug?.uuid],
   );
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
@@ -142,9 +160,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, dr
   const drugItemTemplateOptions: Array<DrugOrderBasketItem> = useMemo(
     () =>
       templates?.length
-        ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
-        : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
-    [templates, drug, config?.daysDurationUnit],
+        ? templates.map((template) => getTemplateOrderBasketItem(drug, visit, config?.daysDurationUnit, template))
+        : [getTemplateOrderBasketItem(drug, visit, config?.daysDurationUnit)],
+    [templates, drug, config?.daysDurationUnit, visit],
   );
 
   const addToBasket = useCallback(
@@ -152,12 +170,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ patient, dr
       // Directly adding the order to basket should be marked as incomplete
       searchResult.isOrderIncomplete = true;
       setOrders([...orders, searchResult]);
-      closeWorkspace('add-drug-order', {
-        ignoreChanges: true,
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-      });
+      closeWorkspace();
     },
-    [orders, setOrders],
+    [orders, setOrders, closeWorkspace],
   );
 
   const removeFromBasket = useCallback(

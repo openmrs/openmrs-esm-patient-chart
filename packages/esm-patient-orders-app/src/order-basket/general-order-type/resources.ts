@@ -1,4 +1,4 @@
-import { toOmrsIsoString } from '@openmrs/esm-framework';
+import { toOmrsIsoString, type Visit } from '@openmrs/esm-framework';
 import {
   type OrderBasketItem,
   priorityOptions,
@@ -7,13 +7,14 @@ import {
   type OrderableConcept,
 } from '@openmrs/esm-patient-common-lib';
 
-export function createEmptyOrder(concept: OrderableConcept, orderer: string): OrderBasketItem {
+export function createEmptyOrder(concept: OrderableConcept, orderer: string, visit: Visit): OrderBasketItem {
   return {
     action: 'NEW',
     urgency: priorityOptions[0].value as OrderUrgency,
     display: concept.display,
     concept,
     orderer,
+    visit,
   };
 }
 

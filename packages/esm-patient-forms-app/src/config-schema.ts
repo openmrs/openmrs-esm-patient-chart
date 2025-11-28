@@ -123,7 +123,7 @@ export interface FormsSection {
   forms: Array<string>;
 }
 
-export interface ConfigObject {
+export interface FormEntryConfigSchema {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
   formSections: Array<FormsSection>;
   customFormsUrl: string;
