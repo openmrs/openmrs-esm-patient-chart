@@ -11,6 +11,7 @@ import {
   useOnVisible,
   type Visit,
 } from '@openmrs/esm-framework';
+import { AccessibleModal } from '../../../components/accessible-modal';
 import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
@@ -57,8 +58,16 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   };
 
   return (
-    <>
-      <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')}>
+    <AccessibleModal
+      isOpen={true}
+      onClose={closeModal}
+      modalHeadingId="visit-context-switcher-modal-heading"
+      modalDescriptionId="visit-context-switcher-modal-description"
+    >
+      <ModalHeader
+        closeModal={closeModal}
+        title={<span id="visit-context-switcher-modal-heading">{t('selectAVisit', 'Select a visit')}</span>}
+      >
         <OpenmrsDatePicker
           id="visit-context-switcher-date-picker"
           className={styles.datepicker}
@@ -74,12 +83,17 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
         ) : visits?.length === 0 ? (
           <Tile className={styles.tile}>
             <div className={styles.tileContent}>
-              <p className={styles.content}>{t('noVisitsToDisplay', 'No visits to display')}</p>
+              <p id="visit-context-switcher-modal-description" className={styles.content}>
+                {t('noVisitsToDisplay', 'No visits to display')}
+              </p>
               <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
             </div>
           </Tile>
         ) : (
           <div>
+            <p id="visit-context-switcher-modal-description" className="cds--visually-hidden">
+              {t('selectVisitDescription', 'Select a visit from the list below to continue')}
+            </p>
             {visits?.map((visit) => {
               return (
                 <VisitCardRow
@@ -116,7 +130,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
           {t('continue', 'Continue')}
         </Button>
       </ModalFooter>
-    </>
+    </AccessibleModal>
   );
 };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { AccessibleModal } from '../../components/accessible-modal';
 import styles from './start-visit-dialog.scss';
 
 interface ModifyVisitDateConfirmationModalProps {
@@ -15,10 +16,19 @@ const ModifyVisitDateConfirmationModal: React.FC<ModifyVisitDateConfirmationModa
   const { t } = useTranslation();
 
   return (
-    <div>
-      <ModalHeader closeModal={onDiscard} title={t('modifyVisitDate', 'Modify visit date')} />
+    <AccessibleModal
+      isOpen={true}
+      onClose={onDiscard}
+      size="sm"
+      modalHeadingId="modify-visit-date-modal-heading"
+      modalDescriptionId="modify-visit-date-modal-description"
+    >
+      <ModalHeader
+        closeModal={onDiscard}
+        title={<span id="modify-visit-date-modal-heading">{t('modifyVisitDate', 'Modify visit date')}</span>}
+      />
       <ModalBody>
-        <p className={styles.body}>
+        <p id="modify-visit-date-modal-description" className={styles.body}>
           {t(
             'confirmModifyingVisitDateToAccomodateEncounter',
             'The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?',
@@ -33,7 +43,7 @@ const ModifyVisitDateConfirmationModal: React.FC<ModifyVisitDateConfirmationModa
           {t('confirm', 'Confirm')}
         </Button>
       </ModalFooter>
-    </div>
+    </AccessibleModal>
   );
 };
 
