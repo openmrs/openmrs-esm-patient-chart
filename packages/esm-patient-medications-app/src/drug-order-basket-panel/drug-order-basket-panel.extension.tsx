@@ -32,6 +32,7 @@ interface OrderBasketSlotProps {
 const DrugOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
     'medications',
@@ -107,7 +108,7 @@ const DrugOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient
     <Tile
       className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
     >
-      <div className={styles.container}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
           <RxIcon isTablet={isTablet} />
           <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
@@ -119,7 +120,7 @@ const DrugOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add medication"
             onClick={openDrugSearch}
-            size={isTablet ? 'md' : 'sm'}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -133,6 +134,7 @@ const DrugOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient
             iconDescription="View"
             disabled={orders.length === 0}
             onClick={() => setIsExpanded(!isExpanded)}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>

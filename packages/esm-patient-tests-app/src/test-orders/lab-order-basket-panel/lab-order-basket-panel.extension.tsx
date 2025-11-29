@@ -19,6 +19,7 @@ import type { ConfigObject } from '../../config-schema';
 import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepTestOrderPostData } from '../api';
+import LabIcon from './lab-icon.component';
 import styles from './lab-order-basket-panel.scss';
 
 interface OrderBasketSlotProps {
@@ -69,6 +70,8 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
   const { t } = useTranslation();
   type WorkSpaceType = (typeof WORKSPACES)[keyof typeof WORKSPACES];
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
+  const isDefaultLabOrder = icon === 'omrs-icon-lab-order';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const { workspaces = [{ name: WORKSPACES.ORDER_BASKET, additionalProps: {} }] } = useWorkspaces();
   const [prevWorkSpace, setPrevWorkSpace] = useState(workspaces[0]?.name);
@@ -171,9 +174,13 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
         [styles.collapsedTile]: !isExpanded,
       })}
     >
-      <div className={styles.container}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
-          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          {isDefaultLabOrder ? (
+            <LabIcon isTablet={isTablet} />
+          ) : (
+            <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          )}
           <h4 className={styles.heading}>{`${
             isWorkSpaceType(prevWorkSpace) && prevWorkSpace === WORKSPACES.ORDER_BASKET
               ? label
@@ -189,7 +196,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
             kind="ghost"
             onClick={openNewLabForm}
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            size={isTablet ? 'md' : 'sm'}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -203,6 +210,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
               isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
