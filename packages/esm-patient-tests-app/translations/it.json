@@ -100,7 +100,7 @@
   "testName": "Nome del test",
   "testResults": "Risultati test",
   "testResults_title": "Risultati test",
-  "testResultsData": "Dati risultati test",
+  "testResultsData": "test results data",
   "tests": "Test",
   "testType": "Tipo di test",
   "testTypeRequired": "Il tipo di test è obbligatorio",

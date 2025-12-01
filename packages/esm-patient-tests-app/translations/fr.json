@@ -100,7 +100,7 @@
   "testName": "Nom Examen",
   "testResults": "Résultats d'examens",
   "testResults_title": "Résultats d'examens",
-  "testResultsData": "Résultats d'examens",
+  "testResultsData": "test results data",
   "tests": "Examens",
   "testType": "Analyse",
   "testTypeRequired": "Le type d'examen est requis",
