@@ -21,29 +21,27 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
 
   if (activeTests && timelineData && loaded && tableData) {
     return (
-      <div>
-        <div className={styles.timelineDataContainer}>
-          {tableData.map((panel, index) => {
-            // Filter rowData to only include tests that belong to this panel
-            const panelTestNames = panel.entries.map((entry) => entry.flatName);
-            const subRows = rowData?.filter((row: { flatName: string }) => panelTestNames.includes(row.flatName));
+      <div className={styles.timelineDataContainer}>
+        {tableData.map((panel, index) => {
+          // Filter rowData to only include tests that belong to this panel
+          const panelTestNames = panel.entries.map((entry) => entry.flatName);
+          const subRows = rowData?.filter((row: { flatName: string }) => panelTestNames.includes(row.flatName));
 
-            return (
-              subRows?.length > 0 && (
-                <div key={index}>
-                  <TimelineDataGroup
-                    groupNumber={index + 1}
-                    parent={{ display: panel.key, flatName: panel.key }}
-                    patientUuid={patientUuid}
-                    setXScroll={setXScroll}
-                    subRows={subRows}
-                    xScroll={xScroll}
-                  />
-                </div>
-              )
-            );
-          })}
-        </div>
+          return (
+            subRows?.length > 0 && (
+              <div key={index}>
+                <TimelineDataGroup
+                  groupNumber={index + 1}
+                  parent={{ display: panel.key, flatName: panel.key }}
+                  patientUuid={patientUuid}
+                  setXScroll={setXScroll}
+                  subRows={subRows}
+                  xScroll={xScroll}
+                />
+              </div>
+            )
+          );
+        })}
       </div>
     );
   }
