@@ -99,11 +99,16 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
 
+  // Don't show empty state while loading - wait for data to finish loading
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
   if (!roots || roots.length === 0) {
     return (
       <EmptyState
         headerTitle={t('testResults_title', 'Test Results')}
-        displayText={t('testResultsData', 'Test results data')}
+        displayText={t('testResultsData', 'test results data')}
       />
     );
   }

@@ -37,7 +37,6 @@ function getFilteredOverviewData(sortedObs: PatientData, filter) {
 
 function useFilteredOverviewData(patientUuid: string, filter: (filterProps: PanelFilterProps) => boolean = () => true) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-
   const overviewData = useMemo(() => getFilteredOverviewData(sortedObs, filter), [filter, sortedObs]);
 
   return { overviewData, loaded, error };
@@ -46,8 +45,8 @@ function useFilteredOverviewData(patientUuid: string, filter: (filterProps: Pane
 const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }) => {
   const { t } = useTranslation();
   const { overviewData, loaded } = useFilteredOverviewData(patientUuid, filter);
-
   const cardTitle = t('recentResults', 'Recent Results');
+
   const handleSeeAll = useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results` });
   }, [patientUuid]);
