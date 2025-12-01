@@ -100,7 +100,7 @@
   "testName": "Tên bài kiểm tra",
   "testResults": "kết quả kiểm tra",
   "testResults_title": "Kết quả kiểm tra",
-  "testResultsData": "Dữ liệu kết quả kiểm tra",
+  "testResultsData": "test results data",
   "tests": "Kiểm tra",
   "testType": "Loại kiểm tra",
   "testTypeRequired": "Test type is required",
