@@ -21,9 +21,13 @@ export function useMutatePatientOrders(patientUuid: string) {
   const { mutate } = useSWRConfig();
   const mutateOrders = useCallback(
     () =>
-      mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
-      }),
+      mutate(
+        (key) => {
+          return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
+        },
+        undefined,
+        { revalidate: true },
+      ),
     [patientUuid, mutate],
   );
 
