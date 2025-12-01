@@ -22,6 +22,7 @@ import styles from './drug-order-basket-panel.scss';
 function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBasketExtensionProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
     'medications',
@@ -81,7 +82,7 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
     <Tile
       className={classNames(isTablet ? styles.tabletTile : styles.desktopTile, { [styles.collapsedTile]: !isExpanded })}
     >
-      <div className={styles.container}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
           <RxIcon isTablet={isTablet} />
           <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
@@ -93,7 +94,7 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription="Add medication"
             onClick={() => launchDrugOrderForm()}
-            size={isTablet ? 'md' : 'sm'}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -107,6 +108,7 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
             iconDescription="View"
             disabled={orders.length === 0}
             onClick={() => setIsExpanded(!isExpanded)}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>

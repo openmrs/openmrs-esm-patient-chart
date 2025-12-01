@@ -10,8 +10,6 @@ import {
   useConfig,
   useLayoutType,
   useSession,
-  useWorkspaces,
-  type WorkspacesInfo,
 } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';

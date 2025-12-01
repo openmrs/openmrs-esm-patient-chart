@@ -12,6 +12,7 @@ import {
 import type { ConfigObject } from '../../config-schema';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepTestOrderPostData } from '../api';
+import LabIcon from './lab-icon.component';
 import styles from './lab-order-basket-panel.scss';
 
 /**
@@ -57,6 +58,8 @@ interface LabOrderBasketPanelProps extends OrderTypeConfig {
 function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrderForm }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
+  const isDefaultLabOrder = icon === 'omrs-icon-lab-order';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
@@ -119,9 +122,13 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
         [styles.collapsedTile]: !isExpanded,
       })}
     >
-      <div className={styles.container}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
-          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          {isDefaultLabOrder ? (
+            <LabIcon isTablet={isTablet} />
+          ) : (
+            <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          )}
           <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
@@ -131,7 +138,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
             kind="ghost"
             onClick={() => launchLabOrderForm(orderTypeUuid)}
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            size={isTablet ? 'md' : 'sm'}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -145,6 +152,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
               isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
