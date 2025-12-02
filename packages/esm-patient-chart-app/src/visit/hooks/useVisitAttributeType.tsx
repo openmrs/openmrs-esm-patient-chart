@@ -40,7 +40,7 @@ export function useVisitAttributeTypes() {
     openmrsFetch,
   );
 
-  if (error) {
+  if (error && process.env.NODE_ENV === 'development') {
     console.error('Failed to fetch visit attribute types: ', error);
   }
 
@@ -62,7 +62,7 @@ export function useVisitAttributeType(uuid) {
     openmrsFetch,
   );
 
-  if (error) {
+  if (error && process.env.NODE_ENV === 'development') {
     console.error(`Failed to fetch visit attribute type ${uuid}: `, error);
   }
 
@@ -84,7 +84,7 @@ export function useConceptAnswersForVisitAttributeType(conceptUuid) {
     openmrsFetch,
   );
 
-  if (error) {
+  if (error && process.env.NODE_ENV === 'development') {
     console.error(`Failed to fetch concept answers for visit attribute type ${conceptUuid}: `, error);
   }
 

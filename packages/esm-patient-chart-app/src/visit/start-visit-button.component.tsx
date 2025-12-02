@@ -26,7 +26,9 @@ const StartVisitButton = ({ patientUuid, handleReturnToSearchList, hidePatientSe
         handleReturnToSearchList,
       });
     } catch (error) {
-      console.error('Error launching visit form workspace:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error launching visit form workspace:', error);
+      }
 
       showSnackbar({
         isLowContrast: false,

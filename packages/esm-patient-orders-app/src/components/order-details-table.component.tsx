@@ -675,7 +675,9 @@ function OrderBasketItemActions({
           launchOrderForm({ order: medicationItem });
         })
         .catch((e) => {
-          console.error('Error modifying drug order: ', e);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error modifying drug order: ', e);
+          }
         });
     } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'REVISE');

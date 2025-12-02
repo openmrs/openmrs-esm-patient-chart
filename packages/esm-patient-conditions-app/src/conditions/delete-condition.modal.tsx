@@ -30,7 +30,9 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         title: t('conditionDeleted', 'Condition deleted'),
       });
     } catch (error) {
-      console.error('Error deleting condition: ', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error deleting condition: ', error);
+      }
 
       showSnackbar({
         isLowContrast: false,
