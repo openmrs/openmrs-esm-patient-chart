@@ -170,13 +170,21 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
         {isLoading ? (
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
-          <div className={styles.panelViewTimeline}>
+          tableData && tableData.length > 0 ? (
+            <div className={styles.panelViewTimeline}>
+              <GroupedPanelsTables
+                patientUuid={patientUuid}
+                className={styles.groupPanelsTables}
+                loadingPanelData={isLoading}
+              />
+            </div>
+          ) : (
             <GroupedPanelsTables
               patientUuid={patientUuid}
               className={styles.groupPanelsTables}
               loadingPanelData={isLoading}
             />
-          </div>
+          )
         ) : view === 'over-time' ? (
           <GroupedTimeline patientUuid={patientUuid} />
         ) : null}

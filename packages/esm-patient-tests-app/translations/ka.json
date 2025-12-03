@@ -100,7 +100,7 @@
   "testName": "ტესტის სახელი",
   "testResults": "ტესტის შედეგი",
   "testResults_title": "ტესტის შედეგები",
-  "testResultsData": "ტესტის შედეგის მონაცემები",
+  "testResultsData": "test results data",
   "tests": "ტესტები",
   "testType": "ტესტის ტიპი",
   "testTypeRequired": "ტესტის ტიპი აუცილებელია",

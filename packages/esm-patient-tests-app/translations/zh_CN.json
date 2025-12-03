@@ -100,7 +100,7 @@
   "testName": "检验名称",
   "testResults": "检验结果",
   "testResults_title": "检验结果",
-  "testResultsData": "检验结果数据",
+  "testResultsData": "test results data",
   "tests": "检验",
   "testType": "检验类型",
   "testTypeRequired": "检验检查类型是必填项",

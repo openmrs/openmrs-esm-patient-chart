@@ -100,7 +100,7 @@
   "testName": "اسم الاختبار",
   "testResults": "نتائج الاختبار",
   "testResults_title": "نتائج الاختبار",
-  "testResultsData": "بيانات نتائج الاختبار",
+  "testResultsData": "test results data",
   "tests": "Tests",
   "testType": "نوع الاختبار",
   "testTypeRequired": "Test type is required",
