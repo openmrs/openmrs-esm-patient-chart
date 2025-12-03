@@ -18,6 +18,11 @@
       "component": "visitNotesActionButton",
       "slot": "action-menu-patient-chart-items-slot",
       "order": 1
+    },
+    {
+      "name": "sticky-note-launcher",
+      "component": "noteIconComponent",
+      "slot": "patient-information-slot"
     }
   ],
   "workspaces": [
@@ -27,6 +32,12 @@
       "component": "visitNotesFormWorkspace",
       "type": "visit-note",
       "canHide": true
+    }
+  ],
+  "modals": [
+    {
+      "name": "delete-sticky-note-confirmation-modal",
+      "component": "deleteStickyNoteConfirmationModal"
     }
   ]
 }
