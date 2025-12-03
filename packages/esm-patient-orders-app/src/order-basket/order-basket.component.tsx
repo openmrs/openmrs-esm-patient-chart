@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
+import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
   useConfig,
@@ -21,7 +22,6 @@ import {
   useMutatePatientOrders,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { useSWRConfig } from 'swr';
 import { type ConfigObject } from '../config-schema';
 import { useOrderEncounter } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
@@ -84,7 +84,19 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
-        showOrderSuccessToast(t, orders);
+
+        // Translation keys used by showOrderSuccessToast:
+        // t('discontinued', 'Discontinued')
+        // t('orderDiscontinued', 'Order discontinued')
+        // t('orderedFor', 'Placed order for')
+        // t('orderPlaced', 'Order placed')
+        // t('ordersCompleted', 'Orders completed')
+        // t('ordersDiscontinued', 'Orders discontinued')
+        // t('ordersPlaced', 'Orders placed')
+        // t('ordersUpdated', 'Orders updated')
+        // t('orderUpdated', 'Order updated')
+        // t('updated', 'Updated')
+        showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
       } catch (e) {
         console.error(e);
         setCreatingEncounterError(
@@ -102,7 +114,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
 
       if (erroredItems.length == 0) {
         await closeWorkspace({ discardUnsavedChanges: true });
-        showOrderSuccessToast(t, orders);
+        showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
       } else {
         setOrdersWithErrors(erroredItems);
       }

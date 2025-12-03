@@ -183,7 +183,19 @@ export function LabOrderForm({
         .then(() => {
           clearOrders();
           mutateOrders();
-          showOrderSuccessToast(t, [finalizedOrder]);
+
+          // Translation keys used by showOrderSuccessToast:
+          // t('ordersCompleted', 'Orders completed')
+          // t('orderPlaced', 'Order placed')
+          // t('ordersPlaced', 'Orders placed')
+          // t('orderUpdated', 'Order updated')
+          // t('ordersUpdated', 'Orders updated')
+          // t('orderDiscontinued', 'Order discontinued')
+          // t('ordersDiscontinued', 'Orders discontinued')
+          // t('orderedFor', 'Placed order for')
+          // t('updated', 'Updated')
+          // t('discontinued', 'Discontinued')
+          showOrderSuccessToast('@openmrs/esm-patient-tests-app', [finalizedOrder]);
           closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch((error) => {
