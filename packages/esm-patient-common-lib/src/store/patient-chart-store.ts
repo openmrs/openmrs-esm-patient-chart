@@ -16,7 +16,7 @@ const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStore
   mutateVisitContext: null,
 });
 
-const patientCharStoreActions = {
+const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {
     return { patient, patientUuid: patient?.id ?? null };
   },
@@ -33,11 +33,11 @@ const patientCharStoreActions = {
  * the clinical forms workspace in the ward app)
  * should have the patient / visitContext explicitly passed in as props.
  *
- * As a safety feature, this hook requires the the patientUuid as the input, and only
+ * As a safety feature, this hook requires the patientUuid as the input, and only
  * returns the actual store values if input patientUuid matches that in the store.
  */
 export function usePatientChartStore(patientUuid: string) {
-  const store = useStoreWithActions(patientChartStore, patientCharStoreActions);
+  const store = useStoreWithActions(patientChartStore, patientChartStoreActions);
   if (store.patientUuid === patientUuid) {
     return store;
   } else {

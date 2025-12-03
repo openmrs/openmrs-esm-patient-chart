@@ -50,7 +50,7 @@
   ],
   "workspaceWindows2": [
     {
-    "name": "conditions-form-window",
+      "name": "conditions-form-window",
       "group": "patient-chart"
     }
   ]
