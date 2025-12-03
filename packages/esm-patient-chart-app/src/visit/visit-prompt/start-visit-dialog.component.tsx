@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
+import { AccessibleModal } from '../../components/accessible-modal';
 import styles from './start-visit-dialog.scss';
 
 interface StartVisitDialogProps {
@@ -36,12 +37,22 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeM
   );
 
   return (
-    <div>
+    <AccessibleModal
+      isOpen={true}
+      onClose={closeModal}
+      size="sm"
+      modalHeadingId="start-visit-modal-heading"
+      modalDescriptionId="start-visit-modal-description"
+    >
       <ModalHeader closeModal={closeModal}>
-        <span className={styles.header}>{modalHeaderText}</span>
+        <span id="start-visit-modal-heading" className={styles.header}>
+          {modalHeaderText}
+        </span>
       </ModalHeader>
       <ModalBody>
-        <p className={styles.body}>{modalBodyText}</p>
+        <p id="start-visit-modal-description" className={styles.body}>
+          {modalBodyText}
+        </p>
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
@@ -51,7 +62,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeM
           {t('startNewVisit', 'Start new visit')}
         </Button>
       </ModalFooter>
-    </div>
+    </AccessibleModal>
   );
 };
 
