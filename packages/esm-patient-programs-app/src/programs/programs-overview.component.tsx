@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -41,7 +41,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const programsCount = 5;
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const displayText = t('programs', 'Program enrollments');
+  const displayText = t('programEnrollmentsLower', 'program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
@@ -83,7 +83,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     },
   ];
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => {
       const state = enrollment ? findLastState(enrollment.states) : null;
       return {
@@ -182,6 +182,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 

@@ -40,7 +40,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);
-  const displayText = t('programEnrollments', 'Program enrollments');
+  const displayText = t('programEnrollmentsLower', 'program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
   const { enrollments, isLoading, error, isValidating, availablePrograms } = usePrograms(patientUuid);
@@ -173,6 +173,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 
