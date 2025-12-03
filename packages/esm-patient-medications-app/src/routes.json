@@ -86,6 +86,6 @@
       "name": "add-drug-order",
       "component": "addDrugOrderWorkspace",
       "window": "patient-chart-order-basket"
-    } 
+    }
   ]
 }
