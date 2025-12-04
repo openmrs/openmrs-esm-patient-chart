@@ -1,6 +1,5 @@
 {
   "actions": "Acciones",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Agregando a:",
   "additionalVisitInformationUpdatedSuccessfully": "Información adicional de la visita actualizada con éxito",
   "addVisit": "Agregar Consulta",
@@ -99,6 +98,7 @@
   "nextPage": "Siguiente página",
   "no": "No",
   "noActiveVisit": "No hay Consulta Activa",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "No puede agregar datos a la historia clínica del paciente sin una consulta activa. ¿Desea comenzar una nueva consulta?",
   "noDiagnosesFound": "No se encontraron diagnósticos",
   "noEncountersToDisplay": "No hay encuentros para mostrar",
