@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -99,6 +98,7 @@
   "nextPage": "Next page",
   "no": "Không",
   "noActiveVisit": "Không có chuyến thăm khám nào hoạt động",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "Bạn không thể thêm dữ liệu vào biểu đồ bệnh nhân nếu không có chuyến thăm khám đang hoạt động. Bạn có muốn bắt đầu một chuyến thăm khám mới không?",
   "noDiagnosesFound": "Không tìm thấy chẩn đoán",
   "noEncountersToDisplay": "Không có cuộc gặp gỡ nào để hiển thị",
