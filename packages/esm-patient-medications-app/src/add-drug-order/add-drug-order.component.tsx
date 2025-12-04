@@ -96,17 +96,19 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         .then(() => {
           clearOrders();
           mutateOrders();
-          // Translation keys used by showOrderSuccessToast:
-          // t('ordersCompleted', 'Orders completed')
-          // t('orderPlaced', 'Order placed')
-          // t('ordersPlaced', 'Orders placed')
-          // t('orderUpdated', 'Order updated')
-          // t('ordersUpdated', 'Orders updated')
-          // t('orderDiscontinued', 'Order discontinued')
-          // t('ordersDiscontinued', 'Orders discontinued')
-          // t('orderedFor', 'Placed order for')
-          // t('updated', 'Updated')
-          // t('discontinued', 'Discontinued')
+
+          /* Translation keys used by showOrderSuccessToast:
+           * t('ordersCompleted', 'Orders completed')
+           * t('orderPlaced', 'Order placed')
+           * t('ordersPlaced', 'Orders placed')
+           * t('orderUpdated', 'Order updated')
+           * t('ordersUpdated', 'Orders updated')
+           * t('orderDiscontinued', 'Order discontinued')
+           * t('ordersDiscontinued', 'Orders discontinued')
+           * t('orderedFor', 'Placed order for')
+           * t('updated', 'Updated')
+           * t('discontinued', 'Discontinued')
+           */
           showOrderSuccessToast('@openmrs/esm-patient-medications-app', [finalizedOrder]);
           closeWorkspace({ discardUnsavedChanges: true });
         })

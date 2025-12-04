@@ -85,17 +85,18 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         clearOrders();
         await mutateOrders();
 
-        // Translation keys used by showOrderSuccessToast:
-        // t('discontinued', 'Discontinued')
-        // t('orderDiscontinued', 'Order discontinued')
-        // t('orderedFor', 'Placed order for')
-        // t('orderPlaced', 'Order placed')
-        // t('ordersCompleted', 'Orders completed')
-        // t('ordersDiscontinued', 'Orders discontinued')
-        // t('ordersPlaced', 'Orders placed')
-        // t('ordersUpdated', 'Orders updated')
-        // t('orderUpdated', 'Order updated')
-        // t('updated', 'Updated')
+        /* Translation keys used by showOrderSuccessToast:
+         * t('discontinued', 'Discontinued')
+         * t('orderDiscontinued', 'Order discontinued')
+         * t('orderedFor', 'Placed order for')
+         * t('orderPlaced', 'Order placed')
+         * t('ordersCompleted', 'Orders completed')
+         * t('ordersDiscontinued', 'Orders discontinued')
+         * t('ordersPlaced', 'Orders placed')
+         * t('ordersUpdated', 'Orders updated')
+         * t('orderUpdated', 'Order updated')
+         * t('updated', 'Updated')
+         */
         showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
       } catch (e) {
         console.error(e);
