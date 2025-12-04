@@ -49,7 +49,12 @@ export function usePatientOrders(patientUuid: string) {
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
+    () =>
+      mutate(
+        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
+        undefined,
+        { revalidate: true },
+      ),
     [mutate, patientUuid],
   );
 
