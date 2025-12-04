@@ -160,7 +160,6 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
-
   await test.step('When I select visit status: new', async () => {
     await chartPage.page.getByRole('tab', { name: /new/i }).click();
   });
@@ -246,3 +245,8 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeVisible();
   });
 });
+
+// TODO: add the following tests:
+// - prompt appears when attempting to add a visit with unsaved changes in workspaces
+// - when editing a previous visit, attempting to add a visit or to edit another visit results in prompt
+// - when filling out the visit form, attempting to edit a previous visit results in prompt

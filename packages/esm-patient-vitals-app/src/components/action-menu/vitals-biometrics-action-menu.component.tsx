@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import styles from './vitals-biometrics-action-menu.scss';
 
@@ -16,7 +16,7 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, patient }: Vitals
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchVitalsAndBiometricsForm = useCallback(() => {
-    launchWorkspace(patientVitalsBiometricsFormWorkspace, {
+    launchWorkspace2(patientVitalsBiometricsFormWorkspace, {
       workspaceTitle: t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics'),
       editEncounterUuid: encounterUuid,
       formContext: 'editing',

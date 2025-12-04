@@ -6,13 +6,20 @@ import {
   UserHasAccess,
   type Visit,
   getCoreTranslation,
-  launchWorkspace,
+  launchWorkspace2,
   useLayoutType,
 } from '@openmrs/esm-framework';
+import { type VisitFormProps } from '../visit-form/visit-form.workspace';
+import {
+  invalidateVisitAndEncounterData,
+  invalidateVisitByUuid,
+  type PatientWorkspaceGroupProps,
+} from '@openmrs/esm-patient-common-lib';
+import { useSWRConfig } from 'swr';
 
 interface EditVisitDetailsActionItemProps {
-  patientUuid: string;
   visit: Visit;
+  patient: fhir.Patient;
 
   /**
    * If true, renders as IconButton instead
@@ -20,18 +27,32 @@ interface EditVisitDetailsActionItemProps {
   compact?: boolean;
 }
 
-const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({ visit, compact }) => {
+/**
+ * This component
+ */
+const EditVisitDetailsActionItem: React.FC<EditVisitDetailsActionItemProps> = ({ visit, patient, compact }) => {
   const { t } = useTranslation();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
+  const patientUuid = patient.id;
 
   const editVisitDetails = () => {
-    launchWorkspace('start-visit-workspace-form', {
-      workspaceTitle: t('editVisitDetails', 'Edit visit details'),
-      visitToEdit: visit,
-      openedFrom: 'patient-chart-edit-visit',
-    });
+    launchWorkspace2<VisitFormProps, {}, PatientWorkspaceGroupProps>(
+      'start-visit-workspace-form',
+      { openedFrom: 'patient-chart-edit-visit' },
+      {},
+      {
+        patient,
+        patientUuid: patientUuid,
+        visitContext: visit,
+        mutateVisitContext: () => {
+          invalidateVisitByUuid(globalMutate, visit.uuid);
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
+        },
+      },
+    );
   };
 
   return (

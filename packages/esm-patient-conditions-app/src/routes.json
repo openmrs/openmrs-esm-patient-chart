@@ -41,11 +41,17 @@
       "component": "conditionDeleteConfirmationDialog"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "conditions-form-workspace",
-      "title": "recordCondition",
-      "component": "conditionsFormWorkspace"
+      "component": "conditionsFormWorkspace",
+      "window": "conditions-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "conditions-form-window",
+      "group": "patient-chart"
     }
   ]
 }

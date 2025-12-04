@@ -1,15 +1,7 @@
 import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
-import {
-  AddIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  type DefaultWorkspaceProps,
-  MaybeIcon,
-  useLayoutType,
-  launchWorkspace,
-} from '@openmrs/esm-framework';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, MaybeIcon, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { type OrderTypeDefinition } from '../../config-schema';
@@ -18,11 +10,24 @@ import OrderBasketItemTile from './order-basket-item-tile.component';
 import styles from './general-order-panel.scss';
 
 interface GeneralOrderTypeProps extends OrderTypeDefinition {
-  closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
   patient: fhir.Patient;
+  orderTypeUuid: string;
+  launchGeneralOrderForm(orderTypeUuid: string, order?: OrderBasketItem): void;
 }
 
-const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeUuid, closeWorkspace, label, icon }) => {
+/**
+ * The extension is slotted into order-basket-slot in the main Order Basket workspace by default.
+ * It renders the "Add +" button for general orders, and lists pending general orders in the order basket.
+ *
+ * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
+ */
+const GeneralOrderPanel: React.FC<GeneralOrderTypeProps> = ({
+  patient,
+  orderTypeUuid,
+  label,
+  icon,
+  launchGeneralOrderForm,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
@@ -65,29 +70,6 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
     };
   }, [orders]);
 
-  const openConceptSearch = () => {
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
-          orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
-    });
-  };
-
-  const openOrderForm = (order: OrderBasketItem) => {
-    closeWorkspace({
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('orderable-concept-workspace', {
-          order,
-          orderTypeUuid,
-        }),
-      closeWorkspaceGroup: false,
-    });
-  };
-
   const removeOrder = useCallback(
     (order: OrderBasketItem) => {
       const newOrders = [...orders];
@@ -120,7 +102,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription={t('addMedication', 'Add medication')}
-            onClick={openConceptSearch}
+            onClick={() => launchGeneralOrderForm(orderTypeUuid)}
             size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
@@ -148,7 +130,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
                 <OrderBasketItemTile
                   key={`incomplete-${order.action}-${order.concept?.uuid}-${index}`}
                   orderBasketItem={order}
-                  onItemClick={() => openOrderForm(order)}
+                  onItemClick={() => launchGeneralOrderForm(orderTypeUuid, order)}
                   onRemoveClick={() => removeOrder(order)}
                 />
               ))}
@@ -160,7 +142,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
                 <OrderBasketItemTile
                   key={`new-${order.action}-${order.concept?.uuid}-${index}`}
                   orderBasketItem={order}
-                  onItemClick={() => openOrderForm(order)}
+                  onItemClick={() => launchGeneralOrderForm(orderTypeUuid, order)}
                   onRemoveClick={() => removeOrder(order)}
                 />
               ))}
@@ -173,7 +155,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
                 <OrderBasketItemTile
                   key={`renewed-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
-                  onItemClick={() => openOrderForm(item)}
+                  onItemClick={() => launchGeneralOrderForm(orderTypeUuid, item)}
                   onRemoveClick={() => removeOrder(item)}
                 />
               ))}
@@ -186,7 +168,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
                 <OrderBasketItemTile
                   key={`revised-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
-                  onItemClick={() => openOrderForm(item)}
+                  onItemClick={() => launchGeneralOrderForm(orderTypeUuid, item)}
                   onRemoveClick={() => removeOrder(item)}
                 />
               ))}
@@ -199,7 +181,7 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
                 <OrderBasketItemTile
                   key={`discontinued-${item.action}-${item.concept?.uuid}-${index}`}
                   orderBasketItem={item}
-                  onItemClick={() => openOrderForm(item)}
+                  onItemClick={() => launchGeneralOrderForm(orderTypeUuid, item)}
                   onRemoveClick={() => removeOrder(item)}
                 />
               ))}
@@ -211,4 +193,4 @@ const GeneralOrderType: React.FC<GeneralOrderTypeProps> = ({ patient, orderTypeU
   );
 };
 
-export default GeneralOrderType;
+export default GeneralOrderPanel;

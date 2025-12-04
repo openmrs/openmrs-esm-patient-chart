@@ -1,13 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { ProgramsActionMenu } from './programs-action-menu.component';
 
 const mockShowModal = jest.mocked(showModal);
 const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 const testProps = {
   programEnrollmentId: '123',

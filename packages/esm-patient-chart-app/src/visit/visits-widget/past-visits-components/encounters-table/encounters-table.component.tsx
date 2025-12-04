@@ -27,7 +27,7 @@ import {
 import {
   EditIcon,
   isDesktop,
-  launchWorkspace,
+  launchWorkspace2,
   showModal,
   showSnackbar,
   TrashCanIcon,
@@ -35,17 +35,11 @@ import {
   useLayoutType,
   userHasAccess,
   useSession,
-  useVisit,
   type EncounterType,
   ExtensionSlot,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
-import {
-  type HtmlFormEntryForm,
-  launchFormEntryOrHtmlForms,
-  invalidateVisitAndEncounterData,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
@@ -86,12 +80,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-
   const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
-  const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
-    externalModuleName: '@openmrs/esm-patient-forms-app',
-  });
-  const { htmlFormEntryForms } = formsConfig;
   const paginatedMappedEncounters = useMemo(
     () => (paginatedEncounters ?? []).map(mapEncounter).filter(Boolean),
     [paginatedEncounters],
@@ -270,22 +259,16 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
                                       onClick={() => {
                                         if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
+                                          launchWorkspace2('visit-notes-form-workspace', {
                                             encounter,
                                             formContext: 'editing',
                                             patientUuid,
                                           });
                                         } else {
-                                          launchFormEntryOrHtmlForms(
-                                            htmlFormEntryForms,
-                                            patientUuid,
-                                            encounter.form,
-                                            encounter.visitUuid,
-                                            encounter.id,
-                                            encounter.visitTypeUuid,
-                                            encounter.visitStartDatetime,
-                                            encounter.visitStopDatetime,
-                                          );
+                                          launchWorkspace2('patient-form-entry-workspace', {
+                                            form: encounter.form,
+                                            encounterUuid: encounter.id,
+                                          });
                                         }
                                       }}
                                     />
@@ -327,22 +310,16 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     kind="ghost"
                                     onClick={() => {
                                       if (isVisitNoteEncounter(encounter)) {
-                                        launchWorkspace('visit-notes-form-workspace', {
+                                        launchWorkspace2('visit-notes-form-workspace', {
                                           encounter,
                                           formContext: 'editing',
                                           patientUuid,
                                         });
                                       } else {
-                                        launchFormEntryOrHtmlForms(
-                                          htmlFormEntryForms,
-                                          patientUuid,
-                                          encounter.form,
-                                          encounter.visitUuid,
-                                          encounter.id,
-                                          encounter.visitTypeUuid,
-                                          encounter.visitStartDatetime,
-                                          encounter.visitStopDatetime,
-                                        );
+                                        launchWorkspace2('patient-form-entry-workspace', {
+                                          form: encounter.form,
+                                          encounterUuid: encounter.id,
+                                        });
                                       }
                                     }}
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (

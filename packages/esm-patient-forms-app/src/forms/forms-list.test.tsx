@@ -7,7 +7,7 @@ import FormsList, { type FormsListProps } from './forms-list.component';
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const defaultProps: FormsListProps & { reset: () => void } = {
-  completedForms: [],
+  forms: [],
   handleFormOpen: jest.fn(),
   reset() {
     this.completedForms = [];
@@ -25,7 +25,7 @@ beforeEach(async () => {
 it('renders a list of forms fetched from the server', async () => {
   const user = userEvent.setup();
 
-  renderFormsList({ completedForms: forms.map((form) => ({ form, associatedEncounters: [] })) });
+  renderFormsList({ forms: forms.map((form) => ({ form, associatedEncounters: [] })) });
 
   const searchbox = screen.getByRole('searchbox');
   expect(searchbox).toBeInTheDocument();

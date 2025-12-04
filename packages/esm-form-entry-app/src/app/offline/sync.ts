@@ -1,5 +1,6 @@
 import { getFullSynchronizationItems, queueSynchronizationItem, SyncItem } from '@openmrs/esm-framework';
 import { Encounter, EncounterCreate, PersonUpdate } from '../types';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 
 // General note:
 // The synchronization handler which actually synchronizes the queued items has been moved to `esm-patient-forms-app`.
@@ -10,7 +11,7 @@ export const patientFormSyncItem = 'patient-form';
 
 export interface PatientFormSyncItemContent {
   _id: string;
-  formSchemaUuid: string;
+  form: Form;
   encounter: Partial<Encounter>;
   _payloads: {
     encounterCreate?: EncounterCreate;

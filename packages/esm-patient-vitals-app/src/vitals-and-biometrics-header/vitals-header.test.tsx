@@ -2,15 +2,15 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  type WorkspacesInfo,
-  getDefaultsFromConfigSchema,
-  useConfig,
-  useVisit,
-  useWorkspaces,
-} from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useVisit } from '@openmrs/esm-framework';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { formattedVitals, mockConceptUnits, mockVisit, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
+import {
+  formattedVitals,
+  mockConceptUnits,
+  mockOngoingVisitWithEncounters,
+  mockVitalsConceptMetadata,
+  mockVitalsConfig,
+} from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.extension';
@@ -18,14 +18,12 @@ import VitalsHeader from './vitals-header.extension';
 const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
+  visitContext: mockOngoingVisitWithEncounters,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockUseWorkspaces = jest.mocked(useWorkspaces);
-const mockUseVisit = jest.mocked(useVisit);
 
-mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
@@ -76,7 +74,6 @@ describe('VitalsHeader', () => {
   });
 
   it('renders the most recently recorded values in the vitals header', async () => {
-    mockUseVisit.mockReturnValueOnce({ activeVisit: mockVisit } as ReturnType<typeof useVisit>);
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [
         {
@@ -130,7 +127,6 @@ describe('VitalsHeader', () => {
   });
 
   it('displays correct overdue tag for vitals 5 days old', async () => {
-    mockUseVisit.mockReturnValueOnce({ activeVisit: mockVisit } as ReturnType<typeof useVisit>);
     const fiveDaysAgo = dayjs().subtract(5, 'days').toISOString();
     const vitalsData = [
       {

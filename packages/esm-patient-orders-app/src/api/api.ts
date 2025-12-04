@@ -11,31 +11,6 @@ import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
-/**
- * Returns a function which refreshes the patient orders cache. Uses SWR's mutate function.
- * Refreshes patient orders for all kinds of orders.
- *
- * @param patientUuid The UUID of the patient to get an order mutate function for.
- */
-export function useMutatePatientOrders(patientUuid: string) {
-  const { mutate } = useSWRConfig();
-  const mutateOrders = useCallback(
-    () =>
-      mutate(
-        (key) => {
-          return typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`);
-        },
-        undefined,
-        { revalidate: true },
-      ),
-    [patientUuid, mutate],
-  );
-
-  return {
-    mutate: mutateOrders,
-  };
-}
-
 export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
     signal: abortController.signal,

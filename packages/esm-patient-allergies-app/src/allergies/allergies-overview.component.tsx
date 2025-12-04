@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { AddIcon, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { AddIcon, launchWorkspace2, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
@@ -57,7 +57,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     }));
   }, [paginatedAllergies]);
 
-  const launchAllergiesForm = useCallback(() => launchWorkspace(patientAllergiesFormWorkspace), []);
+  const launchAllergiesForm = useCallback(() => launchWorkspace2(patientAllergiesFormWorkspace), []);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;

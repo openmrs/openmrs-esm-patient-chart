@@ -10,9 +10,8 @@ import {
   type Datatype,
   useCompletedLabResultsArray,
 } from './lab-results.resource';
-import { usePatient } from '@openmrs/esm-framework/src';
-import LabResultsForm from './lab-results-form.component';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
+import { type PatientWorkspace2DefinitionProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
@@ -20,7 +19,6 @@ const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 const mockUseCompletedLabResultsArray = jest.mocked(useCompletedLabResultsArray);
-const mockUsePatient = jest.mocked(usePatient);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
@@ -42,16 +40,24 @@ const mockOrder = {
   orderer: { uuid: 'orderer-uuid' },
 };
 
-const testProps = {
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  order: mockOrder as Order,
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
-  visitContext: null,
-  mutateVisitContext: null,
+const mockCloseWorkspace = jest.fn();
+
+const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
+  closeWorkspace: mockCloseWorkspace,
+  workspaceProps: {
+    order: mockOrder as Order,
+  },
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  launchChildWorkspace: jest.fn(),
+  windowProps: {},
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 describe('LabResultsForm', () => {
@@ -97,12 +103,6 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       mutate: jest.fn(),
-    });
-    mockUsePatient.mockReturnValue({
-      isLoading: false,
-      patient: mockPatient,
-      patientUuid: '',
-      error: null,
     });
   });
 
@@ -339,16 +339,8 @@ describe('LabResultsForm', () => {
 
   test('submits form with valid data', async () => {
     const user = userEvent.setup();
-    const mockCloseWorkspace = jest.fn();
-    const mockCloseWorkspaceWithSavedChanges = jest.fn();
 
-    render(
-      <LabResultsForm
-        {...testProps}
-        closeWorkspace={mockCloseWorkspace}
-        closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
-      />,
-    );
+    render(<LabResultsForm {...testProps} />);
 
     const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '50');
@@ -357,7 +349,7 @@ describe('LabResultsForm', () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
+      expect(mockCloseWorkspace).toHaveBeenCalled();
     });
   });
 
@@ -402,13 +394,7 @@ describe('LabResultsForm', () => {
     const mockCloseWorkspace = jest.fn();
     const mockCloseWorkspaceWithSavedChanges = jest.fn();
 
-    render(
-      <LabResultsForm
-        {...testProps}
-        closeWorkspace={mockCloseWorkspace}
-        closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
-      />,
-    );
+    render(<LabResultsForm {...testProps} closeWorkspace={mockCloseWorkspace} />);
 
     const input = await screen.findByLabelText(`Test Concept (0 - 60 mg/dL)`);
     await user.type(input, '50');
@@ -420,7 +406,7 @@ describe('LabResultsForm', () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
+      expect(mockCloseWorkspace).toHaveBeenCalled();
     });
   });
 

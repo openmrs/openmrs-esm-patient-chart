@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { CloseIcon, EditIcon, launchWorkspace } from '@openmrs/esm-framework';
+import { CloseIcon, EditIcon, launchWorkspace2 } from '@openmrs/esm-framework';
 import { usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags.scss';
 
@@ -18,7 +18,7 @@ const Flags: React.FC<FlagsProps> = ({ patientUuid, onHandleCloseHighlightBar, s
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((flag: FlagWithPriority) => !flag.voided);
 
-  const handleClickEditFlags = useCallback(() => launchWorkspace('patient-flags-workspace'), []);
+  const handleClickEditFlags = useCallback(() => launchWorkspace2('patient-flags-workspace'), []);
 
   const renderFlag = (flag: FlagWithPriority) => {
     const hasPriority = flag.flagWithPriority?.priority?.name;
