@@ -213,13 +213,14 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         });
       } else {
         this.formSubmissionService.submitPayload(this.form).subscribe(
-          ({ encounter }) => {
-            this.onPostResponse(encounter);
+          ({ encounters }) => {
+            const primaryEncounter = encounters?.[0];
+            this.onPostResponse(primaryEncounter);
             const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
 
-            if (!isOffline && encounter?.uuid) {
+            if (!isOffline && primaryEncounter?.uuid) {
               this.encounterResourceService
-                .getEncounterByUuid(encounter.uuid)
+                .getEncounterByUuid(primaryEncounter.uuid)
                 .pipe(take(1))
                 .subscribe((encounter) => {
                   if (Array.isArray(encounter?.orders)) {
@@ -229,7 +230,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
                 });
             }
 
-            this.programService.handlePatientCareProgram(this.form, encounter.uuid);
+            this.programService.handlePatientCareProgram(this.form, primaryEncounter?.uuid);
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -291,9 +292,12 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const encounterToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
+    const encountersToSubmit = this.formSubmissionService.buildEncounterPayload(this.form);
 
-    const isEncounterDatetimeValid = this.validateEncounterDatetimeWithVisit(encounterToSubmit);
+    // Validate the first encounter for visit date compatibility
+    const isEncounterDatetimeValid = encountersToSubmit?.[0]
+      ? this.validateEncounterDatetimeWithVisit(encountersToSubmit[0])
+      : true;
 
     if (isEncounterDatetimeValid) {
       this.handleFormSubmission();
