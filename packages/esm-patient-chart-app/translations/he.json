@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -99,6 +98,7 @@
   "nextPage": "Next page",
   "no": "לא",
   "noActiveVisit": "אין ביקור פעיל",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "אין אפשרות להוסיף נתונים לקריאת המטופל ללא ביקור פעיל. האם ברצונך להתחיל ביקור חדש?",
   "noDiagnosesFound": "לא נמצאו אבחנות",
   "noEncountersToDisplay": "אין ביקורים להצגה",

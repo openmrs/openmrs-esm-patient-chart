@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "visites actives",
   "addingToVisit": "Ajout à :",
   "additionalVisitInformationUpdatedSuccessfully": "Informations sur la visite mises à jour",
   "addVisit": "Ajouter une visite",
@@ -99,6 +98,7 @@
   "nextPage": "Page suivante",
   "no": "Non",
   "noActiveVisit": "Aucune de visite en cours",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "Vous ne pouvez pas ajouter de données au dossier du patient sans une visite ouverte. Souhaitez-vous démarrer une nouvelle visite ?",
   "noDiagnosesFound": "Aucun diagnostic trouvé",
   "noEncountersToDisplay": "Aucune consultation à afficher",
