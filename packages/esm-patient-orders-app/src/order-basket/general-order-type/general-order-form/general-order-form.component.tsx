@@ -34,7 +34,6 @@ import {
   OpenmrsDatePicker,
   type Workspace2DefinitionProps,
   showSnackbar,
-  useAbortController,
 } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';

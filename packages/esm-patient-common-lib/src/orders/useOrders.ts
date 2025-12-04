@@ -36,8 +36,12 @@ export function usePatientOrders(
 
   const mutateOrders = useCallback(
     () =>
-      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`), data),
-    [data, mutate, patientUuid],
+      mutate(
+        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
+        undefined,
+        { revalidate: true },
+      ),
+    [mutate, patientUuid],
   );
 
   const orders = useMemo(
