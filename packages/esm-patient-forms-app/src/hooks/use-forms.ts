@@ -1,7 +1,6 @@
+import { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { useMemo, useCallback } from 'react';
 import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
 import {
   getDynamicOfflineDataEntries,
   interpolateUrl,
@@ -20,6 +19,7 @@ import {
   formEncounterUrlPoc,
 } from '../constants';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import useSWRInfinite from 'swr/infinite';
 
 const PAGE_SIZE = 50;
 
@@ -113,7 +113,7 @@ export function useForms(
   cachedOfflineFormsOnly = false,
   orderBy: 'name' | 'most-recent' = 'name',
 ) {
-  const { htmlFormEntryForms } = useConfig<ConfigObject>();
+  const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
@@ -171,7 +171,7 @@ export function useInfiniteForms(
   orderBy: 'name' | 'most-recent' = 'name',
   searchQuery?: string,
 ) {
-  const { htmlFormEntryForms } = useConfig<ConfigObject>();
+  const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
   const { url: baseUrl, hasCustomFormsUrl } = useCustomFormsUrl(patientUuid, visitUuid);
   const session = useSession();
 
@@ -328,14 +328,15 @@ export function useInfiniteForms(
 
   return {
     data: processedForms,
-    error,
+    isError: error,
     isValidating: isValidating || encountersRes.isValidating,
     isLoading,
     loadMore,
     canLoadMore,
     hasMore: canLoadMore,
     allForms: allLoadedForms,
-    mutateForms,
+    mutateScrollableForms: mutateForms,
+    isValidatingScrollableForms: isValidating,
     totalLoaded: allLoadedForms.length,
   };
 }
