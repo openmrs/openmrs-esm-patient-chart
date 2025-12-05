@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  InlineLoading,
   Link,
   Table,
   TableBody,
@@ -31,10 +32,9 @@ interface FormsTableProps {
     form: Form;
   }>;
   isTablet: boolean;
-  handleSearch?: (search: string) => void;
+  handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
-  customSearchComponent?: React.ReactNode;
-  totalLoaded?: number;
+  isSearching?: boolean;
 }
 
 const FormsTable = ({
@@ -43,34 +43,32 @@ const FormsTable = ({
   isTablet,
   handleSearch,
   handleFormOpen,
-  customSearchComponent,
+  isSearching,
 }: FormsTableProps) => {
   const { t } = useTranslation();
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
         <>
-          {customSearchComponent && <div className={styles.customSearchWrapper}>{customSearchComponent}</div>}
           <TableContainer className={styles.tableContainer}>
-            {!customSearchComponent && (
-              <div className={styles.toolbarWrapper}>
-                <TableToolbar className={styles.tableToolbar}>
-                  <TableToolbarContent>
-                    <TableToolbarSearch
-                      className={styles.search}
-                      expanded
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        // Call the debounced handler from parent component
-                        handleSearch?.(event.target.value);
-                      }}
-                      placeholder={t('searchThisList', 'Search this list')}
-                      size="sm"
-                      labelText={t('searchForms', 'Search forms')}
-                    />
-                  </TableToolbarContent>
-                </TableToolbar>
-              </div>
-            )}
+            <div className={styles.toolbarWrapper}>
+              <TableToolbar className={styles.tableToolbar}>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    expanded
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
+                  {isSearching && (
+                    <div className={styles.searchingIndicator}>
+                      <InlineLoading description={t('searching', 'Searching...')} />
+                    </div>
+                  )}
+                </TableToolbarContent>
+              </TableToolbar>
+            </div>
             {rows.length > 0 && (
               <Table aria-label="forms" {...getTableProps()} className={styles.table}>
                 <TableHead>
