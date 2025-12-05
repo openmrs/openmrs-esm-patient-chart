@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  InlineLoading,
   Link,
   Table,
   TableBody,
@@ -33,9 +34,17 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
+  isSearching?: boolean;
 }
 
-const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
+const FormsTable = ({
+  tableHeaders,
+  tableRows,
+  isTablet,
+  handleSearch,
+  handleFormOpen,
+  isSearching,
+}: FormsTableProps) => {
   const { t } = useTranslation();
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
@@ -52,6 +61,11 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                     placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
                   />
+                  {isSearching && (
+                    <div className={styles.searchingIndicator}>
+                      <InlineLoading description={t('searching', 'Searching...')} />
+                    </div>
+                  )}
                 </TableToolbarContent>
               </TableToolbar>
             </div>
