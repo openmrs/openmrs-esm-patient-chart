@@ -41,7 +41,7 @@ test('Add and edit a program enrollment', async ({ page, patient }) => {
     await completionDateDayInput.fill('05');
     await completionDateMonthInput.fill('07');
     await completionDateYearInput.fill('2023');
-    await page.locator('#search-1').focus();
+    await completionDateYearInput.blur();
   });
 
   await test.step('And I select `Outpatient Clinic` as the enrollment location', async () => {
@@ -94,7 +94,7 @@ test('Add and edit a program enrollment', async ({ page, patient }) => {
     await completionDateDayInput.fill('04');
     await completionDateMonthInput.fill('07');
     await completionDateYearInput.fill('2023');
-    await page.locator('#search-1').focus();
+    await completionDateYearInput.blur();
   });
 
   await test.step('And I change the enrollment location to `Community Outreach`', async () => {

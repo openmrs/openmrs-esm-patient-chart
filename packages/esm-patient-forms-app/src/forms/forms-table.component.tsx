@@ -71,7 +71,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                         <Link
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            handleFormOpen(tableRows[i].form, '');
+                            handleFormOpen(tableRows[i].form, null);
                           }}
                           role="presentation"
                           className={styles.formName}
@@ -80,7 +80,7 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                         </Link>
                       </TableCell>
                       <TableCell className={styles.editCell}>
-                        <label>{row.cells[1].value ?? t('never', 'Never')}</label>
+                        <span>{row.cells[1].value ?? t('never', 'Never')}</span>
                       </TableCell>
                     </TableRow>
                   ))}

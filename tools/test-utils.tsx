@@ -44,7 +44,7 @@ export function getByTextWithMarkup(text: RegExp | string) {
   }
 }
 
-export const mockPatient = {
+export const mockPatient: fhir.Patient = {
   resourceType: 'Patient',
   id: '8673ee4f-e2ab-4077-ba55-4980f408773e',
   extension: [

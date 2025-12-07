@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
@@ -27,11 +27,18 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   render(
     <FlagsList
       closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      promptBeforeClosing={jest.fn()}
-      setTitle={jest.fn()}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceProps={{}}
+      windowProps={{}}
+      workspaceName=""
+      launchChildWorkspace={null}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 
@@ -59,11 +66,18 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
   render(
     <FlagsList
       closeWorkspace={jest.fn()}
-      closeWorkspaceWithSavedChanges={jest.fn()}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      promptBeforeClosing={jest.fn()}
-      setTitle={jest.fn()}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceProps={{}}
+      windowProps={{}}
+      workspaceName=""
+      launchChildWorkspace={null}
+      windowName={''}
+      isRootWorkspace={false}
     />,
   );
 

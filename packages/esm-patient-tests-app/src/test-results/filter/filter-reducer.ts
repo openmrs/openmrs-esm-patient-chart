@@ -131,7 +131,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
 
     case ReducerActionType.TOGGLE_PARENT: {
       const affectedLeaves = state.parents[action.name];
-      const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
+      const checkboxes = { ...state.checkboxes };
 
       if (affectedLeaves && Array.isArray(affectedLeaves)) {
         const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);

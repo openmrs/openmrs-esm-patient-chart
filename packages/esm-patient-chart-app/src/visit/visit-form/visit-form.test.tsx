@@ -12,7 +12,6 @@ import {
   useConfig,
   useEmrConfiguration,
   useLocations,
-  useVisitContextStore,
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -28,10 +27,8 @@ import {
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
-import VisitForm from './visit-form.workspace';
-
-// Fixed reference time used in time-dependent tests
-const FIXED_NOW = new Date('2023-01-01T08:00:00.000Z');
+import VisitForm, { type VisitFormProps } from './visit-form.workspace';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -58,17 +55,23 @@ const visitAttributes = {
 };
 
 const mockCloseWorkspace = jest.fn();
-const mockPromptBeforeClosing = jest.fn();
-const mockSetTitle = jest.fn();
-
-const testProps = {
-  openedFrom: 'test',
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
+const mockMutateVisitContext = jest.fn();
+const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
-  closeWorkspaceWithSavedChanges: mockCloseWorkspace,
-  promptBeforeClosing: mockPromptBeforeClosing,
-  setTitle: mockSetTitle,
+  workspaceProps: {
+    openedFrom: 'test',
+  },
+  windowProps: {},
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: mockMutateVisitContext,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 const mockSaveVisit = jest.mocked(saveVisit);
@@ -156,9 +159,10 @@ jest.mock('../hooks/useDefaultFacilityLocation', () => {
 
   return {
     ...requireActual,
-    useDefaultLoginLocation: jest.fn(() => ({
+    useDefaultFacilityLocation: jest.fn(() => ({
       defaultFacility: null,
       isLoading: false,
+      error: null,
     })),
   };
 });
@@ -183,14 +187,6 @@ mockSaveVisit.mockResolvedValue({
     },
   },
 } as unknown as FetchResponse<Visit>);
-
-jest.mocked(useVisitContextStore).mockReturnValue({
-  manuallySetVisitUuid: null,
-  patientUuid: null,
-  setVisitContext: jest.fn(),
-  mutateVisitCallbacks: {},
-  mutateVisit: jest.fn(),
-});
 
 describe('Visit form', () => {
   beforeEach(() => {
@@ -876,5 +872,12 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
 });
 
 function renderVisitForm(visitToEdit?: Visit) {
-  return render(<VisitForm {...{ ...testProps, visitToEdit }} />);
+  const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+    ...defaultProps,
+    groupProps: {
+      ...defaultProps.groupProps,
+      visitContext: visitToEdit ?? null,
+    },
+  };
+  return render(<VisitForm {...props} />);
 }

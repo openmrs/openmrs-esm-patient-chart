@@ -1,12 +1,14 @@
 import React from 'react';
 import styles from './grid.scss';
 
-export const Grid: React.FC<{
+interface GridProps {
   children?: React.ReactNode;
   style: React.CSSProperties;
   padding?: boolean;
   dataColumns: number;
-}> = ({ dataColumns, style = {}, padding = false, ...props }) => {
+}
+
+export const Grid: React.FC<GridProps> = ({ dataColumns, style = {}, padding = false, ...props }) => {
   return (
     <div
       style={{

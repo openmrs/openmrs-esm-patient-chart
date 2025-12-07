@@ -1,7 +1,7 @@
 import React, { type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
-import { Analytics, ChartLineSmooth, Table } from '@carbon/react/icons';
+import { ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
+import { Analytics, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
@@ -27,7 +27,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
     isValidating,
   } = useObs(patientUuid);
 
-  const hasNumberType = observations.find((obs) => obs.dataType === 'Number');
+  const isNumeric = observations.find((obs) => obs.dataType === 'Numeric');
 
   return (
     <>
@@ -41,7 +41,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
-                {hasNumberType ? (
+                {isNumeric ? (
                   <div className={styles.headerActionItems}>
                     <ContentSwitcher
                       onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
@@ -60,11 +60,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                   </div>
                 ) : null}
               </CardHeader>
-              {chartView && hasNumberType ? (
-                <ObsGraph patientUuid={patientUuid} />
-              ) : (
-                <ObsTable patientUuid={patientUuid} />
-              )}
+              {chartView && isNumeric ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
             </div>
           );
         }

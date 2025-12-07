@@ -2,7 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { chunk } from 'lodash-es';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import type { OrderPost, PatientOrderFetchResponse, TestOrderPost } from '@openmrs/esm-patient-common-lib';
+import type {
+  OrderPost,
+  PatientOrderFetchResponse,
+  TestOrderBasketItem,
+  TestOrderPost,
+} from '@openmrs/esm-patient-common-lib';
 import {
   type FetchResponse,
   openmrsFetch,
@@ -12,7 +17,6 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import type { TestOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
@@ -33,7 +37,12 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
+    () =>
+      mutate(
+        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
+        undefined,
+        { revalidate: true },
+      ),
     [mutate, patientUuid],
   );
 
