@@ -1,4 +1,8 @@
 import { Type } from '@openmrs/esm-framework';
+import VisitDateCell from './visit/visit-history-table/visit-date-cell.component';
+import VisitTypeCell from './visit/visit-history-table/visit-type-cell.component';
+import VisitDiagnosisCell from './visit/visit-history-table/visit-diagnoses-cell.component';
+import VisitActionsCell from './visit/visit-history-table/visit-actions-cell.component';
 
 export const esmPatientChartSchema = {
   defaultFacilityUrl: {
@@ -189,6 +193,37 @@ export const esmPatientChartSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+
+  visitsTableColumns: {
+    _type: Type.Array,
+    _default: [
+      {
+        columns: [
+          {
+            key: 'visitDate',
+            header: 'date',
+            CellComponent: VisitDateCell,
+          },
+          {
+            key: 'visitType',
+            header: 'visitType',
+            CellComponent: VisitTypeCell,
+          },
+          {
+            key: 'diagnoses',
+            header: 'diagnoses',
+            CellComponent: VisitDiagnosisCell,
+          },
+          {
+            key: 'actions',
+            header: '',
+            CellComponent: VisitActionsCell,
+          },
+        ],
+      },
+    ],
+    _description: 'Columns to display in the visits table',
+  },
 };
 
 export interface ChartConfig {
@@ -230,6 +265,15 @@ export interface ChartConfig {
       hasSummary?: boolean;
     }>;
   }>;
+  visitsTableColumns: Array<{
+    title: string;
+    columns: Array<{
+      key: string;
+      header: string;
+      CellComponent: React.ComponentType<any>;
+    }>;
+  }>;
+
   otherConceptUuid: string;
   drugOrderTypeUUID: string;
 }

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
@@ -24,6 +24,7 @@ import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
 import styles from './visit-history-table.scss';
+import { type ChartConfig } from '../../config-schema';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
@@ -41,14 +42,14 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
+  const config = useConfig<ChartConfig>();
+  const { visitsTableColumns } = config;
 
-  // TODO: make this configurable
-  const columns = [
-    { key: 'visitDate', header: t('date', 'Date'), CellComponent: VisitDateCell },
-    { key: 'visitType', header: t('visitType', 'Visit type'), CellComponent: VisitTypeCell },
-    { key: 'diagnoses', header: t('diagnoses', 'Diagnoses'), CellComponent: VisitDiagnosisCell },
-    { key: 'actions', header: '', CellComponent: VisitActionsCell },
-  ];
+  const columns = visitsTableColumns[0].columns.map((column) => ({
+    key: column.key,
+    header: column.header,
+    CellComponent: column.CellComponent,
+  }));
 
   const layout = useLayoutType();
 
