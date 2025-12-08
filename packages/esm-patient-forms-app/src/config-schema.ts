@@ -116,12 +116,6 @@ export const configSchema = {
     },
     _default: [],
   },
-  enableInfiniteScrolling: {
-    _type: Type.Boolean,
-    _default: false,
-    _description:
-      'Whether to enable infinite scrolling for forms with server-side search. When disabled, uses client-side pagination and search.',
-  },
 };
 
 export interface FormsSection {
@@ -135,5 +129,4 @@ export interface FormEntryConfigSchema {
   customFormsUrl: string;
   orderBy: 'name' | 'most-recent';
   showHtmlFormEntryForms: boolean;
-  enableInfiniteScrolling: boolean;
 }

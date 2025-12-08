@@ -68,15 +68,7 @@ export interface EncounterType {
 
 export interface ListResponse<T> {
   results: Array<T>;
-}
-
-export interface PaginatedListResponse<T> {
-  results: Array<T>;
-  totalCount?: number;
-  links?: {
-    next?: string;
-    prev?: string;
-  };
+  totalCount: number;
 }
 
 export interface CompletedFormInfo {

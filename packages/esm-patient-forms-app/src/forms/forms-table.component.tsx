@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  InlineLoading,
   Link,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -17,6 +17,8 @@ import {
 } from '@carbon/react';
 import { type Form } from '../types';
 import styles from './forms-table.scss';
+import { usePagination } from '@openmrs/esm-framework';
+import { useFormsContext } from '../hooks/use-forms-context';
 
 interface FormsTableProps {
   tableHeaders: Array<{
@@ -34,7 +36,7 @@ interface FormsTableProps {
   isTablet: boolean;
   handleSearch: (search: string) => void;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
-  isSearching?: boolean;
+  totalForms?: number;
 }
 
 const FormsTable = ({
@@ -43,9 +45,13 @@ const FormsTable = ({
   isTablet,
   handleSearch,
   handleFormOpen,
-  isSearching,
+  totalForms,
 }: FormsTableProps) => {
   const { t } = useTranslation();
+  const { pageSize, currentPage, setPageSize, setCurrentPage } = useFormsContext();
+  const { goTo } = usePagination(tableRows, pageSize);
+  const pageSizes = [50];
+
   return (
     <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -61,11 +67,6 @@ const FormsTable = ({
                     placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
                   />
-                  {isSearching && (
-                    <div className={styles.searchingIndicator}>
-                      <InlineLoading description={t('searching', 'Searching...')} />
-                    </div>
-                  )}
                 </TableToolbarContent>
               </TableToolbar>
             </div>
@@ -102,6 +103,22 @@ const FormsTable = ({
               </Table>
             )}
           </TableContainer>
+          <Pagination
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
+            page={currentPage}
+            pageSize={pageSize}
+            size="sm"
+            pageSizes={pageSizes}
+            totalItems={totalForms}
+            onChange={({ page, pageSize: newPageSize }) => {
+              if (newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+              setCurrentPage(page);
+              goTo(page);
+            }}
+          />
         </>
       )}
     </DataTable>
