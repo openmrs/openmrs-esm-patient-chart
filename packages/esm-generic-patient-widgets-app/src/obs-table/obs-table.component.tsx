@@ -24,6 +24,7 @@ interface ObsTableProps {
 interface Row {
   id: string;
   date: string;
+  rawDate: string;
   encounter: string;
   [conceptUuid: string]: string | number;
 }
