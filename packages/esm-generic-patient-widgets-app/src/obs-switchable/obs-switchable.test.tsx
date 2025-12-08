@@ -116,17 +116,17 @@ describe('ObsSwitchable', () => {
     expect(headerRow).toHaveTextContent('Chief Complaint');
     expect(headerRow).toHaveTextContent('Power Level');
     const firstRow = screen.getAllByRole('row')[1];
-    expect(firstRow).toHaveTextContent('Jan');
-    expect(firstRow).toHaveTextContent('180');
-    expect(firstRow).toHaveTextContent('70');
-    expect(firstRow).toHaveTextContent('Too strong');
-    expect(firstRow).toHaveTextContent('9001');
+    expect(firstRow).toHaveTextContent('Feb');
+    expect(firstRow).toHaveTextContent('182');
+    expect(firstRow).toHaveTextContent('72');
+    expect(firstRow).toHaveTextContent('--');
+    expect(firstRow).toHaveTextContent('--');
     const secondRow = screen.getAllByRole('row')[2];
-    expect(secondRow).toHaveTextContent('Feb');
-    expect(secondRow).toHaveTextContent('182');
-    expect(secondRow).toHaveTextContent('72');
-    expect(secondRow).toHaveTextContent('--');
-    expect(secondRow).toHaveTextContent('--');
+    expect(secondRow).toHaveTextContent('Jan');
+    expect(secondRow).toHaveTextContent('180');
+    expect(secondRow).toHaveTextContent('70');
+    expect(secondRow).toHaveTextContent('Too strong');
+    expect(secondRow).toHaveTextContent('9001');
 
     const user = userEvent.setup();
     const chartViewButton = screen.getByLabelText('Chart view');
@@ -184,10 +184,11 @@ describe('ObsSwitchable', () => {
 
   it('should sort by date and by obs correctly', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData as Array<ObsResult>,
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -230,10 +231,11 @@ describe('ObsSwitchable', () => {
 
   it('supports table sorting oldest to newest', async () => {
     mockUseObs.mockReturnValue({
-      data: mockObsData as Array<ObsResult>,
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
 
     mockUseConfig.mockReturnValue({
