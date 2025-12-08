@@ -52,3 +52,7 @@ html[dir='rtl'] {
     margin-left: unset;
   }
 }
+
+:global(#omrs-workspaces-container) {
+  z-index: 8000;
+}
