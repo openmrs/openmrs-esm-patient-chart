@@ -218,15 +218,15 @@ describe('ObsSwitchable', () => {
     const dateHeader = screen.getByText('Date and time');
     await user.click(dateHeader);
     const firstRow = screen.getAllByRole('row')[1];
-    expect(firstRow).toHaveTextContent('01 — Feb — 2021');
+    expect(firstRow).toHaveTextContent('01 — Jan — 2021');
     const secondRow = screen.getAllByRole('row')[2];
-    expect(secondRow).toHaveTextContent('01 — Jan — 2021');
+    expect(secondRow).toHaveTextContent('01 — Feb — 2021');
 
     await user.click(dateHeader);
     const firstRow2 = screen.getAllByRole('row')[1];
-    expect(firstRow2).toHaveTextContent('01 — Jan — 2021');
+    expect(firstRow2).toHaveTextContent('01 — Feb — 2021');
     const secondRow2 = screen.getAllByRole('row')[2];
-    expect(secondRow2).toHaveTextContent('01 — Feb — 2021');
+    expect(secondRow2).toHaveTextContent('01 — Jan — 2021');
   });
 
   it('supports table sorting oldest to newest', async () => {
