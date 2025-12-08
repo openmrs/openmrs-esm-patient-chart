@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -9,8 +9,8 @@ import {
   toOmrsIsoString,
   useConfig,
   useSession,
-  useVisit,
 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
@@ -26,8 +26,6 @@ const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
 const mockSetTitle = jest.fn();
 const mockUseConfig = jest.mocked<() => ImmunizationConfigObject>(useConfig);
 const mockUseSession = jest.mocked(useSession);
-const mockUseVisit = jest.mocked(useVisit);
-const mockMutate = jest.fn();
 const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
 const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
 
@@ -67,13 +65,20 @@ jest.mock('./immunizations.resource', () => ({
   savePatientImmunization: jest.fn(),
 }));
 
-const testProps = {
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
+const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   closeWorkspace: mockCloseWorkspace,
-  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-  promptBeforeClosing: mockPromptBeforeClosing,
-  setTitle: mockSetTitle,
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: mockCurrentVisit,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {},
+  windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
 };
 
 mockUseConfig.mockReturnValue({
@@ -95,15 +100,6 @@ mockUseConfig.mockReturnValue({
 });
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
-mockUseVisit.mockReturnValue({
-  activeVisit: mockCurrentVisit,
-  currentVisit: mockCurrentVisit,
-  currentVisitIsRetrospective: false,
-  error: null,
-  isLoading: false,
-  isValidating: false,
-  mutate: mockMutate,
-});
 
 describe('Immunizations Form', () => {
   const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
@@ -114,10 +110,11 @@ describe('Immunizations Form', () => {
     mockToDateObjectStrict.mockImplementation((dateString) => dayjs(dateString, isoFormat).toDate());
   });
 
-  it('should render ImmunizationsForm component', () => {
+  it('should render ImmunizationsForm component', async () => {
     render(<ImmunizationsForm {...testProps} />);
 
-    expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
+    await screen.findByLabelText(/vaccination date/i);
+
     expect(screen.getByRole('combobox', { name: /Immunization/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /note/i })).toBeInTheDocument();
     expect(screen.getByText(/Vaccine Batch Information/i)).toBeInTheDocument();
@@ -230,10 +227,10 @@ describe('Immunizations Form', () => {
     const immunizationToEdit = {
       vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       immunizationId: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-      vaccinationDate: new Date('2024-01-03').toString(),
+      vaccinationDate: new Date('2024-01-03').toISOString(),
       doseNumber: 2,
-      expirationDate: new Date('2024-05-19').toString(),
-      nextDoseDate: new Date('2024-01-03').toString(),
+      expirationDate: new Date('2024-05-19').toISOString(),
+      nextDoseDate: new Date('2024-01-03').toISOString(),
       note: 'Given as part of routine schedule.',
       lotNumber: 'A123456',
       manufacturer: 'Merck & Co., Inc.',
@@ -283,7 +280,7 @@ describe('Immunizations Form', () => {
       expect.objectContaining({
         encounter: { reference: 'Encounter/ce589c9c-2f30-42ec-b289-a153f812ea5e', type: 'Encounter' },
         id: '0a6ca2bb-a317-49d8-bd6b-dabb658840d2',
-        expirationDate: dayjs(new Date('2024-05-19')).startOf('day').toDate().toISOString(),
+        expirationDate: '2024-05-19',
         extension: [
           {
             url: FHIR_NEXT_DOSE_DATE_EXTENSION_URL,
@@ -315,6 +312,150 @@ describe('Immunizations Form', () => {
       kind: 'success',
       title: 'Vaccination saved successfully',
     });
+  });
+
+  it('should save new immunization with expiration date in correct format', async () => {
+    const user = userEvent.setup();
+
+    // Pre-populate form with expiration date using the form subscription (same pattern as edit tests)
+    const immunizationWithExpiration = {
+      vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      vaccinationDate: new Date('2024-06-15').toISOString(),
+      doseNumber: 1,
+      expirationDate: new Date('2025-12-31').toISOString(),
+      manufacturer: 'Pfizer',
+      lotNumber: 'LOT123',
+      note: '',
+      nextDoseDate: null,
+    };
+
+    immunizationFormSub.next(immunizationWithExpiration);
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: {
+        id: 'new-immunization-id',
+      },
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    // Verify the form is populated
+    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
+    expect(expirationDateField).toHaveValue('31/12/2025');
+
+    // Submit without making changes
+    const saveButton = screen.getByRole('button', { name: /Save/i });
+    await user.click(saveButton);
+
+    // Verify that expirationDate is formatted as YYYY-MM-DD without timezone
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expirationDate: '2025-12-31', // Date-only format, not ISO string with time/timezone
+        lotNumber: 'LOT123',
+        manufacturer: { display: 'Pfizer' },
+      }),
+      undefined,
+      expect.any(AbortController),
+    );
+  });
+
+  it('should format expiration date as date-only string without timezone', async () => {
+    const user = userEvent.setup();
+
+    // Regression test for O3-4970:
+    // Previously, expiration dates were converted to ISO strings with timezone (e.g., "2025-12-31T00:00:00.000Z"),
+    // causing a one-day shift for users in timezones ahead of UTC. This test ensures dates are sent as
+    // date-only strings (e.g., "2025-12-31") per FHIR date type specification, preventing timezone conversion.
+
+    // Setup immunization with expiration date
+    const immunizationWithExpiration = {
+      vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      immunizationId: 'test-immunization-with-expiration',
+      vaccinationDate: new Date('2024-12-25').toISOString(),
+      doseNumber: 1,
+      expirationDate: new Date('2025-12-31').toISOString(),
+      manufacturer: 'Test Manufacturer',
+      lotNumber: 'LOT123',
+      note: 'Test note',
+      nextDoseDate: null,
+    };
+
+    immunizationFormSub.next(immunizationWithExpiration);
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: {
+        id: immunizationWithExpiration.immunizationId,
+      },
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    // Verify the expiration date is displayed correctly
+    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
+    expect(expirationDateField).toHaveValue('31/12/2025');
+
+    // Submit the form without changes to verify the date format is preserved
+    const saveButton = screen.getByRole('button', { name: /Save/i });
+    await user.click(saveButton);
+
+    // Verify that expirationDate is formatted as YYYY-MM-DD without timezone (not ISO string)
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expirationDate: '2025-12-31', // Date-only format, not ISO string with time/timezone
+      }),
+      immunizationWithExpiration.immunizationId,
+      expect.any(AbortController),
+    );
+  });
+
+  it('should preserve date format when submitting immunization with different expiration date', async () => {
+    const user = userEvent.setup();
+
+    // Load existing immunization with a different expiration date
+    const immunizationToEdit = {
+      vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      immunizationId: 'existing-immunization-id',
+      vaccinationDate: new Date('2024-06-15').toISOString(),
+      doseNumber: 1,
+      expirationDate: new Date('2026-06-15').toISOString(),
+      manufacturer: 'Moderna',
+      lotNumber: 'ABC123',
+      note: 'Initial note',
+      nextDoseDate: null,
+    };
+
+    immunizationFormSub.next(immunizationToEdit);
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: {
+        id: immunizationToEdit.immunizationId,
+      },
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    // Verify expiration date is displayed
+    const expirationDateField = screen.getByRole('textbox', { name: /Expiration date/i });
+    expect(expirationDateField).toHaveValue('15/06/2026');
+
+    // Submit the form
+    const saveButton = screen.getByRole('button', { name: /Save/i });
+    await user.click(saveButton);
+
+    // Verify the date is sent in correct format (YYYY-MM-DD, not ISO string)
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expirationDate: '2026-06-15', // Date-only format, not ISO string with time/timezone
+      }),
+      immunizationToEdit.immunizationId,
+      expect.any(AbortController),
+    );
   });
 });
 

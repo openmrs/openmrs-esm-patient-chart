@@ -44,10 +44,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   flex-direction: column;
 }
 
-.closeWorkspace {
-  padding-right: 0;
-}
-
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .chartContainer {

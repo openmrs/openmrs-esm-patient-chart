@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Condition } from './conditions.resource';
 import styles from './conditions-action-menu.scss';
 
@@ -16,7 +16,7 @@ export const ConditionsActionMenu = ({ condition, patientUuid }: conditionsActio
 
   const launchEditConditionsForm = useCallback(
     () =>
-      launchWorkspace('conditions-form-workspace', {
+      launchWorkspace2('conditions-form-workspace', {
         workspaceTitle: t('editCondition', 'Edit a Condition'),
         condition,
         formContext: 'editing',

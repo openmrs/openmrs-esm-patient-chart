@@ -38,30 +38,28 @@ interface Header {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObjectSwitchable>();
-  const { data: obss } = useObs(patientUuid, config.showEncounterType);
-  const uniqueEncounterReferences = [...new Set(obss.map((o) => o.encounter.reference))].sort();
+  const {
+    data: { observations, concepts },
+  } = useObs(patientUuid);
+
+  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
   const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
-    obss.filter((o) => o.encounter.reference === reference),
+    observations.filter((o) => o.encounter.reference === reference),
   );
 
-  const tableHeaders: Array<Header> = useMemo(
-    () => [
-      {
-        key: 'date',
-        header: t('dateAndTime', 'Date and time'),
-        isSortable: true,
-        sortFunc: (rowA: Row, rowB: Row) =>
-          new Date(rowA.rawDate).getTime() < new Date(rowB.rawDate).getTime() ? 1 : -1,
-      },
-      ...config.data.map(({ concept, label }) => ({
-        key: concept,
-        header: label || obss.find((o) => o.conceptUuid == concept)?.code.text,
-        isSortable: true,
-        sortFunc: (rowA: Row, rowB: Row) => (rowA[concept] < rowB[concept] ? 1 : -1),
-      })),
-    ],
-    [t, config.data, obss],
-  );
+  const tableHeaders = [
+    {
+      key: 'date',
+      header: t('dateAndTime', 'Date and time'),
+      isSortable: true,
+      sortFunc: (rowA: Row, rowB: Row) =>
+        new Date(rowA.rawDate).getTime() < new Date(rowB.rawDate).getTime() ? 1 : -1,
+    },
+    ...config.data.map(({ concept, label }) => ({
+      key: concept,
+      header: label || concepts.find((c) => c.uuid == concept)?.display,
+    })),
+  ];
 
   if (config.showEncounterType) {
     tableHeaders.splice(1, 0, {
@@ -88,7 +86,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               rowData[obs.conceptUuid] = obs.valueString;
               break;
 
-            case 'Number': {
+            case 'Numeric': {
               const decimalPlaces: number | undefined = config.data.find(
                 (ele: any) => ele.concept === obs.conceptUuid,
               )?.decimalPlaces;

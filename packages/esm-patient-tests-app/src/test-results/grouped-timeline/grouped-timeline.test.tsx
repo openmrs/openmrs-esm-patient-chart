@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { getByTextWithMarkup } from 'tools';
 import { showModal } from '@openmrs/esm-framework';
 import { mockGroupedResults } from '__mocks__';
 import { type FilterContextProps } from '../filter/filter-types';
@@ -61,13 +62,62 @@ describe('GroupedTimeline', () => {
     expect(screen.getByText('Nov 9')).toBeInTheDocument();
     expect(screen.getByText('01:39 AM')).toBeInTheDocument();
     expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
-    expect(screen.getByText('umol/L')).toBeInTheDocument();
+    // Units are now combined with range, so if there's no range, units won't be displayed separately
+    // Total bilirubin doesn't have a range in timelineData, so units are not displayed
     expect(screen.getByText('261.9')).toBeInTheDocument();
     expect(screen.getByText('21.5')).toBeInTheDocument();
     expect(screen.getByText('Serum glutamic-pyruvic transaminase')).toBeInTheDocument();
     expect(screen.getByText('0 – 35 IU/L')).toBeInTheDocument();
     expect(screen.getByText('3.8')).toBeInTheDocument();
     expect(screen.getByText('2.9')).toBeInTheDocument();
+  });
+
+  it('displays most recent observation range when available', () => {
+    const contextWithObservationRanges = {
+      ...mockFilterContext,
+      timelineData: {
+        ...mockFilterContext.timelineData,
+        data: {
+          ...mockFilterContext.timelineData.data,
+          rowData: [
+            {
+              ...mockFilterContext.timelineData.data.rowData[0],
+              range: '0 – 50', // Node-level range
+              units: 'umol/L',
+              entries: [
+                {
+                  obsDatetime: '2024-05-31 01:39:03.0',
+                  value: '261.9',
+                  interpretation: 'NORMAL',
+                  lowNormal: 35,
+                  hiNormal: 50,
+                  range: '35 – 50', // Observation-level range (most recent)
+                  // Note: Units are only at the concept/node level, not observation-level
+                },
+                {
+                  obsDatetime: '2023-11-09 23:15:03.0',
+                  value: '21.5',
+                  interpretation: 'NORMAL',
+                  lowNormal: 20,
+                  hiNormal: 45,
+                  range: '20 – 45', // Older observation-level range
+                  // Note: Units are only at the concept/node level, not observation-level
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
+
+    renderGroupedTimeline(contextWithObservationRanges as FilterContextProps);
+
+    // Should display most recent observation's range (35 – 50) not node-level (0 – 50)
+    // Range and units are displayed separately in the same element
+    const rangeElement = getByTextWithMarkup(/35 – 50/);
+    expect(rangeElement).toBeInTheDocument();
+    // Verify that the same element also contains the units
+    expect(rangeElement).toHaveTextContent('35 – 50 umol/L');
   });
 
   it('correctly filters rows based on checkbox selection when someChecked is true', () => {

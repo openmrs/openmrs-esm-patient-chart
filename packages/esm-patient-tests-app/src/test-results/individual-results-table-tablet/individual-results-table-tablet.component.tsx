@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
 import { CloseIcon, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState/filter-empty-state.component';
-import type { GroupedObservation } from '../../types';
+import FilterContext from '../filter/filter-context';
+import FilterEmptyState from '../ui-elements/reset-filters-empty-state/filter-empty-state.component';
 import LabSetPanel from './lab-set-panel.component';
 import Overlay from '../tablet-overlay/tablet-overlay.component';
-import FilterContext from '../filter/filter-context';
 import TimelineDataGroup from '../grouped-timeline/timeline-data-group.component';
+import type { GroupedObservation } from '../../types';
 import styles from './individual-results-table-tablet.scss';
 
 interface IndividualResultsTableTabletProps {
@@ -233,7 +233,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
           <Form onSubmit={handleSearchTerm} className={styles.flexBaseline}>
             <Search
               autoFocus
-              labelText=""
+              labelText={t('searchByTestName', 'Search by test name')}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               placeholder={t('searchByTestName', 'Search by test name')}
               size="sm"
@@ -263,7 +263,7 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
             <Form onSubmit={handleSearchTerm} className={classNames(styles.flex)}>
               <Search
                 autoFocus
-                labelText=""
+                labelText={t('searchByTestName', 'Search by test name')}
                 onChange={(e) => setLocalSearchTerm(e.target.value)}
                 placeholder={t('searchByTestName', 'Search by test name')}
                 size="lg"

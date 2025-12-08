@@ -1,7 +1,7 @@
 import React, { type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
-import { Analytics, ChartLineSmooth, Table } from '@carbon/react/icons';
+import { ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
+import { Analytics, Table } from '@carbon/react/icons';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
@@ -20,23 +20,28 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const [chartView, setChartView] = React.useState<boolean>(config.showGraphByDefault);
   const isTablet = !isDesktop(useLayoutType());
 
-  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
+  const {
+    data: { observations },
+    error,
+    isLoading,
+    isValidating,
+  } = useObs(patientUuid);
 
-  const hasNumberType = obss.find((obs) => obs.dataType === 'Number');
+  const isNumeric = observations.find((obs) => obs.dataType === 'Numeric');
 
   return (
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" />;
         if (error) return <ErrorState error={error} headerTitle={config.title} />;
-        if (obss?.length) {
+        if (observations?.length) {
           return (
             <div className={styles.widgetContainer}>
               <CardHeader title={t(config.title)}>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
-                {hasNumberType ? (
+                {isNumeric ? (
                   <div className={styles.headerActionItems}>
                     <ContentSwitcher
                       onChange={(evt: ChangeEvent<HTMLButtonElement> & { name: string }) =>
@@ -55,11 +60,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                   </div>
                 ) : null}
               </CardHeader>
-              {chartView && hasNumberType ? (
-                <ObsGraph patientUuid={patientUuid} />
-              ) : (
-                <ObsTable patientUuid={patientUuid} />
-              )}
+              {chartView && isNumeric ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
             </div>
           );
         }

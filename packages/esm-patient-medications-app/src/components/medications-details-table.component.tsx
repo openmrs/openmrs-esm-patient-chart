@@ -21,10 +21,15 @@ import {
 import {
   CardHeader,
   compare,
+  type DrugOrderBasketItem,
   PatientChartPagination,
   type Order,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
+  type PatientWorkspaceGroupProps,
+  invalidateVisitByUuid,
+  invalidateVisitAndEncounterData,
+  type OrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -36,14 +41,16 @@ import {
   useLayoutType,
   usePagination,
   UserIcon,
+  launchWorkspace2,
+  type Encounter,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
-import { type DrugOrderBasketItem } from '../types';
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
+import { useSWRConfig } from 'swr';
+import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 
 export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
@@ -68,15 +75,14 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
 }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
   const config = useConfig<ConfigObject>();
   const showPrintButton = config.showPrintButton;
   const contentToPrintRef = useRef(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>('medications');
+  const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(patient, 'medications');
   const { results, goTo, currentPage } = usePagination(medications, pageSize);
 
   const tableHeaders = [
@@ -251,7 +257,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={launchAddDrugOrder}
+              onClick={() => launchOrderBasket({}, { encounterUuid: '' })}
             >
               {t('add', 'Add')}
             </Button>
@@ -298,14 +304,13 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                       {!isPrinting && (
                         <TableCell className="cds--table-column-menu">
                           <OrderBasketItemActions
+                            patient={patient}
                             showDiscontinueButton={showDiscontinueButton}
                             showModifyButton={showModifyButton}
                             showReorderButton={showReorderButton}
                             medication={medications[rowIndex]}
                             items={orders}
                             setItems={setOrders}
-                            openOrderBasket={launchOrderBasket}
-                            openDrugOrderForm={launchAddDrugOrder}
                           />
                         </TableCell>
                       )}
@@ -337,27 +342,39 @@ function InfoTooltip({ orderer }: { orderer: string }) {
 }
 
 function OrderBasketItemActions({
+  patient,
   showDiscontinueButton,
   showModifyButton,
   showReorderButton,
   medication,
   items,
   setItems,
-  openOrderBasket,
-  openDrugOrderForm,
 }: {
+  patient: fhir.Patient;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
   medication: Order;
   items: Array<DrugOrderBasketItem>;
   setItems: (items: Array<DrugOrderBasketItem>) => void;
-  openOrderBasket: () => void;
-  openDrugOrderForm: (additionalProps?: AddDrugOrderWorkspaceAdditionalProps) => void;
 }) {
+  const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+
+  const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
+    () => ({
+      patient,
+      patientUuid: patient.id,
+      visitContext: medication.encounter.visit,
+      mutateVisitContext: () => {
+        invalidateVisitByUuid(globalMutate, medication.encounter.visit?.uuid);
+        invalidateVisitAndEncounterData(globalMutate, patient.id);
+      },
+    }),
+    [patient, medication, globalMutate],
+  );
   const handleDiscontinueClick = useCallback(() => {
     setItems([
       ...items,
@@ -403,10 +420,17 @@ function OrderBasketItemActions({
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
         },
+        encounterUuid: medication.encounter?.uuid,
+        visit: medication.encounter?.visit,
       },
     ]);
-    openOrderBasket();
-  }, [items, setItems, medication, openOrderBasket]);
+    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
+      'order-basket',
+      {},
+      { encounterUuid: medication.encounter.uuid },
+      workspaceGroupProps,
+    );
+  }, [items, setItems, medication, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
     const newItem: DrugOrderBasketItem = {
@@ -451,10 +475,18 @@ function OrderBasketItemActions({
         value: medication.quantityUnits?.display,
         valueCoded: medication.quantityUnits?.uuid,
       },
+      encounterUuid: medication.encounter?.uuid,
+      visit: medication.encounter?.visit,
     };
     setItems([...items, newItem]);
-    openDrugOrderForm({ order: newItem });
-  }, [items, setItems, medication, openDrugOrderForm]);
+
+    launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
+      'add-drug-order',
+      { order: newItem },
+      { encounterUuid: medication.encounter.uuid },
+      workspaceGroupProps,
+    );
+  }, [items, setItems, medication, workspaceGroupProps]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -501,10 +533,17 @@ function OrderBasketItemActions({
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
         },
+        encounterUuid: medication.encounter?.uuid,
+        visit: medication.encounter?.visit,
       },
     ]);
-    openOrderBasket();
-  }, [items, setItems, medication, openOrderBasket]);
+    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
+      'order-basket',
+      {},
+      { encounterUuid: medication.encounter.uuid },
+      workspaceGroupProps,
+    );
+  }, [items, setItems, medication, workspaceGroupProps]);
 
   return (
     <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>

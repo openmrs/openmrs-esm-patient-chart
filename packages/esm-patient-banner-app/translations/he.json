@@ -9,16 +9,8 @@
   "deceased": "Deceased",
   "district": "מחוז",
   "from_lower": "from",
-  "implementationLogo": "לוגו הטמעה",
-  "patientAge": "גיל:",
-  "patientDateOfBirthWithSeparator": "תאריך לידה:",
-  "patientGenderWithSeparator": "מגדר:",
-  "patientIdentifierSticker": "Patient identifier sticker",
-  "patientNameWithSeparator": "שם המטופל/ת:",
   "postalCode": "מיקוד",
-  "printIdentifierSticker": "הדפסת מדבקת זיהוי",
   "started": "Started",
   "state": "מדינה",
-  "stateProvince": "מדינה",
-  "telephoneNumberWithSeparator": "מספר טלפון:"
+  "stateProvince": "מדינה"
 }

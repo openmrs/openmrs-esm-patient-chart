@@ -2,22 +2,41 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
+import { selectReferenceRange, formatReferenceRange, type ReferenceRanges } from './reference-range-helpers';
 
 export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-interface ObsTreeNode {
+export interface ObsTreeNode {
   flatName?: string;
   display: string;
+  conceptUuid?: string;
   hasData: boolean;
+  hiAbsolute?: number;
+  hiCritical?: number;
   hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
   lowNormal?: number;
+  units?: string;
   range?: string;
   subSets: Array<ObsTreeNode>;
-  obs: Array<{ value: string }>;
+  obs: Array<{
+    value: string;
+    interpretation?: OBSERVATION_INTERPRETATION;
+    obsDatetime?: string;
+    // Observation-level reference ranges (criteria-based)
+    // Note: Units are only at the concept/node level, not observation-level
+    hiAbsolute?: number;
+    hiCritical?: number;
+    hiNormal?: number;
+    lowAbsolute?: number;
+    lowCritical?: number;
+    lowNormal?: number;
+  }>;
 }
 
 const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
@@ -40,20 +59,87 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
     outData.subSets = outData.subSets.map((subNode: ObsTreeNode) => augmentObstreeData(subNode, outData.flatName));
     outData.hasData = outData.subSets.some((subNode: ObsTreeNode) => subNode.hasData);
   }
+  // Format node-level range for display (using lowNormal/hiNormal)
   if (exist(outData?.hiNormal, outData?.lowNormal)) {
-    outData.range = `${outData.lowNormal} – ${outData.hiNormal}`;
+    outData.range = formatReferenceRange(
+      {
+        lowNormal: outData.lowNormal,
+        hiNormal: outData.hiNormal,
+        units: outData.units,
+      },
+      outData.units,
+    );
   }
+
   if (outData?.obs?.length) {
-    const assess = assessValue(outData);
-    outData.obs = outData.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) }));
+    outData.obs = outData.obs.map((ob) => {
+      // Note: Units are only at the concept/node level, not observation-level
+      const observationRanges: ReferenceRanges | undefined =
+        ob.lowNormal !== undefined || ob.hiNormal !== undefined
+          ? {
+              hiAbsolute: ob.hiAbsolute,
+              hiCritical: ob.hiCritical,
+              hiNormal: ob.hiNormal,
+              lowAbsolute: ob.lowAbsolute,
+              lowCritical: ob.lowCritical,
+              lowNormal: ob.lowNormal,
+            }
+          : undefined;
+
+      const nodeRanges: ReferenceRanges | undefined = {
+        hiAbsolute: outData.hiAbsolute,
+        hiCritical: outData.hiCritical,
+        hiNormal: outData.hiNormal,
+        lowAbsolute: outData.lowAbsolute,
+        lowCritical: outData.lowCritical,
+        lowNormal: outData.lowNormal,
+        units: outData.units,
+      };
+
+      const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
+      const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
+      const interpretation = ob.interpretation ?? assess(ob.value);
+
+      // Always use node-level units since observation-level ranges don't have units
+      const displayRange = observationRanges
+        ? formatReferenceRange(observationRanges, outData.units)
+        : outData.range || '--';
+
+      return {
+        ...ob,
+        interpretation,
+        range: displayRange,
+      };
+    });
     outData.hasData = true;
   }
 
   return { ...outData } as ObsTreeNode;
 };
 
-const useGetObstreeData = (conceptUuid: string) => {
-  const { patientUuid } = usePatientChartStore();
+const filterTreesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
+  // If this is a leaf node (has obs array), only keep it if it has data
+  if (node.obs !== undefined) {
+    return node.hasData ? node : null;
+  }
+
+  // This is an intermediate/parent node - always keep it to preserve hierarchy
+  if (node.subSets && node.subSets.length > 0) {
+    // Recursively filter only the leaf children
+    const filteredSubSets = node.subSets
+      .map((subSet) => filterTreesWithData(subSet))
+      .filter((subSet): subSet is ObsTreeNode => subSet !== null);
+
+    // Always keep parent nodes to maintain test hierarchy structure
+    // The UI can choose to grey out parents with no data based on hasData flag
+    return { ...node, subSets: filteredSubSets };
+  }
+
+  // Parent node with empty subSets - keep it to preserve hierarchy
+  return node;
+};
+
+const useGetObstreeData = (patientUuid: string, conceptUuid: string) => {
   const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
     `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
     openmrsFetch,
@@ -74,8 +160,7 @@ const useGetObstreeData = (conceptUuid: string) => {
   return result;
 };
 
-const useGetManyObstreeData = (uuidArray: Array<string>) => {
-  const { patientUuid } = usePatientChartStore();
+const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) => {
   const getObstreeUrl = (index: number) => {
     if (index < uuidArray.length && patientUuid) {
       return `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
@@ -90,10 +175,14 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
 
   const result = useMemo(() => {
     return (
-      data?.map((resp) => {
+      data?.map((resp, index) => {
         if (resp?.data) {
           const { data, ...rest } = resp;
           const newData = augmentObstreeData(data, '');
+          // Tag the root node with the conceptUuid we requested
+          if (index < uuidArray.length && newData) {
+            newData.conceptUuid = uuidArray[index];
+          }
           return { ...rest, loading: false, data: newData };
         } else {
           return {
@@ -110,8 +199,14 @@ const useGetManyObstreeData = (uuidArray: Array<string>) => {
         },
       ]
     );
-  }, [data]);
-  const roots = result.map((item) => item.data);
+  }, [data, uuidArray]);
+
+  const roots = result
+    .map((item) => item.data)
+    .filter((node): node is ObsTreeNode => 'display' in node)
+    .map((data: ObsTreeNode) => filterTreesWithData(data))
+    .filter(Boolean);
+
   const isLoading = result.some((item) => item.loading);
 
   return { roots, isLoading, error };

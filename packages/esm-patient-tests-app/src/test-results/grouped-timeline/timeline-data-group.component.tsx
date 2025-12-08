@@ -9,6 +9,7 @@ import type {
   NewRowStartCellProps,
   TimelineDataGroupProps,
 } from './grouped-timeline-types';
+import { getMostRecentObservationWithRange, formatRangeWithUnits } from './reference-range-helpers';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.scss';
 
@@ -130,6 +131,8 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
     });
   }, [patientUuid, conceptUuid, title]);
 
+  const rangeUnitsDisplay = formatRangeWithUnits(range, units);
+
   return (
     <div
       className={styles.rowStartCell}
@@ -146,9 +149,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
           <span className={styles.trendlineLink}>{title}</span>
         )}
       </span>
-      <span className={styles.rangeUnits}>
-        {range} {units}
-      </span>
+      <span className={styles.rangeUnits}>{rangeUnitsDisplay}</span>
     </div>
   );
 };
@@ -196,14 +197,20 @@ const DataRows: React.FC<DataRowsProps> = ({ patientUuid, timeColumns, rowData, 
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
         const obs = row.entries;
-        const { units = '', range = '', obs: values } = row;
+        const { obs: values } = row;
         const isString = isNaN(parseFloat(values?.[0]?.value));
+
+        // Note: Units are only at the concept/node level, not observation-level
+        const mostRecentObsWithRange = getMostRecentObservationWithRange(row.entries);
+        const displayRange = mostRecentObsWithRange?.range ?? row.range ?? '';
+        const displayUnits = row.units ?? '';
+
         return (
           <React.Fragment key={index}>
             <NewRowStartCell
               {...{
-                units,
-                range,
+                units: displayUnits,
+                range: displayRange,
                 title: row.display,
                 shadow: showShadow,
                 conceptUuid: row.conceptUuid,

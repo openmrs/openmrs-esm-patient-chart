@@ -9,16 +9,8 @@
   "deceased": "Falecido",
   "district": "Estado",
   "from_lower": "de",
-  "implementationLogo": "Logo de implementação",
-  "patientAge": "Idade:",
-  "patientDateOfBirthWithSeparator": "Data de nascimento:",
-  "patientGenderWithSeparator": "Sexo:",
-  "patientIdentifierSticker": "Etiqueta de identificação do Paciente",
-  "patientNameWithSeparator": "Nome do Paciente:",
   "postalCode": "Código postal CEP",
-  "printIdentifierSticker": "Imprimir etiqueta de identificação",
   "started": "Iniciado",
   "state": "Estado",
-  "stateProvince": "Estado",
-  "telephoneNumberWithSeparator": "Número de Telefone:"
+  "stateProvince": "Estado"
 }
