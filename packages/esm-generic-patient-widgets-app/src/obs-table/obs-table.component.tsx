@@ -28,21 +28,11 @@ interface Row {
   [conceptUuid: string]: string | number;
 }
 
-interface BaseHeader {
+interface Header {
   key: string;
   header: string;
-}
-
-type SortableHeader = BaseHeader & {
-  isSortable: true;
   sortFunc: (rowA: Row, rowB: Row) => number;
-};
-
-type UnsortableHeader = BaseHeader & {
-  isSortable: false;
-};
-
-type Header = SortableHeader | UnsortableHeader;
+}
 
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -57,28 +47,41 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   );
 
   const tableHeaders: Array<Header> = useMemo(() => {
-    const headers = [
+    const headers: Array<Header> = [
       {
         key: 'date',
         header: t('dateAndTime', 'Date and time'),
-        isSortable: true,
         sortFunc: (rowA: Row, rowB: Row) =>
           new Date(rowA.rawDate).getTime() < new Date(rowB.rawDate).getTime() ? 1 : -1,
       },
-      ...config.data.map(({ concept, label }) => ({
-        key: concept,
-        header: label || concepts.find((c) => c.uuid == concept)?.display,
-        isSortable: false as const,
-      })),
     ];
     if (config.showEncounterType) {
       headers.splice(1, 0, {
         key: 'encounter',
         header: t('encounterType', 'Encounter type'),
-        isSortable: true,
         sortFunc: (rowA: Row, rowB: Row) => rowA.encounter.localeCompare(rowB.encounter) as 1 | -1,
       });
     }
+    headers.push(
+      ...config.data.map(({ concept, label }) => ({
+        key: concept,
+        header: label || concepts.find((c) => c.uuid == concept)?.display,
+        sortFunc: (rowA: Row, rowB: Row) => {
+          const a = rowA[concept];
+          const b = rowB[concept];
+          if (a === b) {
+            return 0;
+          }
+          if (a == null) {
+            return 1;
+          }
+          if (b == null) {
+            return -1;
+          }
+          return a < b ? 1 : -1;
+        },
+      })),
+    );
     return headers;
   }, [t, config.data, config.showEncounterType, concepts]);
 
@@ -165,7 +168,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       return tableRows;
     }
 
-    const header = tableHeaders.find((header) => header.key === sortParams.key) as SortableHeader;
+    const header = tableHeaders.find((header) => header.key === sortParams.key);
 
     if (!header) {
       return tableRows;
@@ -216,7 +219,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
-        totalItems={tableRows.length}
+        totalItems={sortedData.length}
         currentItems={results.length}
         pageSize={config.table.pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
