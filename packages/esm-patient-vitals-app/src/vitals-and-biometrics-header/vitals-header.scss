@@ -52,15 +52,23 @@
 
 .rowContainer {
   width: 100%;
+  container-type: inline-size;
+  container-name: vitals-header-row-container;
 }
 
 .row {
   justify-content: space-between;
   align-items: center;
   max-width: 100vw;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: layout.$spacing-11;
+  display: flex;
+}
+
+@container vitals-header-row-container (max-width: 64rem) {
+  .row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: layout.$spacing-11;
+  }
 }
 
 .loading {
