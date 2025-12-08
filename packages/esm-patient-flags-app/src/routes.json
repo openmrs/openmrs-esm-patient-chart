@@ -5,16 +5,16 @@
   },
   "extensions": [
     {
-      "name": "patient-flag-tags",
+      "name": "patient-flags-risk-count",
       "slot": "patient-highlights-bar-slot",
-      "component": "flagTags",
+      "component": "flagsRiskCountExtension",
       "order": 0,
       "featureFlag": "patient-flags"
     },
     {
-      "name": "patient-flags-overview",
+      "name": "patient-flags-list",
       "slot": "patient-chart-summary-dashboard-slot",
-      "component": "flagsOverview",
+      "component": "flagsListExtension",
       "order": 0,
       "featureFlag": "patient-flags",
       "meta": {

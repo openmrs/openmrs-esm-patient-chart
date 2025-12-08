@@ -4,8 +4,8 @@ import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
-import { usePatientFlags } from './hooks/usePatientFlags';
-import FlagsHighlightBar from './flags-highlight-bar.component';
+import { usePatientFlags } from '../hooks/usePatientFlags';
+import FlagsRiskCountExtension from './flags-risk-count.extension';
 
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
@@ -30,7 +30,7 @@ it('renders a highlights bar showing a summary of the available flags', async ()
     mutate: jest.fn(),
   } as unknown as ReturnType<typeof usePatientFlags>);
 
-  render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
+  render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
 
   const riskFlag = screen.getByRole('button', { name: /risk flag/i });
   expect(riskFlag).toBeInTheDocument();
@@ -77,7 +77,7 @@ it('suppresses the highlight bar on Patient Summary route', () => {
     mutate: jest.fn(),
   } as unknown as ReturnType<typeof usePatientFlags>);
 
-  const { rerender } = render(<FlagsHighlightBar patientUuid={mockPatient.id} />);
+  const { rerender } = render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
   expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
 
   // No highlight bar should be shown on the patient summary route

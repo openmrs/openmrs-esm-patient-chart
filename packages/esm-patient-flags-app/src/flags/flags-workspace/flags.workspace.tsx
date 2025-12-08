@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, showSnackbar, parseDate, formatDate, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
-import { getFlagType } from './utils';
-import styles from './flags-list.scss';
+import { usePatientFlags, enablePatientFlag, disablePatientFlag } from '../hooks/usePatientFlags';
+import { getFlagType } from '../utils';
+import styles from './flags-workspace.scss';
 
 type SortKey = 'alpha' | 'active' | 'retired';
 
-const FlagsList: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
+const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
   groupProps: { patientUuid },
 }) => {
@@ -231,4 +231,4 @@ const FlagsList: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   );
 };
 
-export default FlagsList;
+export default FlagsWorkspace;

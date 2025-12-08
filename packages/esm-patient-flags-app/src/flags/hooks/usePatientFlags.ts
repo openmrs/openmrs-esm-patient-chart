@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 
-interface FlagFetchResponse {
+export interface FlagFetchResponse {
   uuid: string;
   message: string;
   voided: boolean;
@@ -12,23 +12,23 @@ interface FlagFetchResponse {
   auditInfo: { dateCreated: string };
 }
 
-interface FlagDefinition {
+export interface FlagDefinition {
   uuid: string;
   display: string;
   priority: { uuid: string; name: string };
   tags: Array<{ uuid: string; display: string }>;
 }
 
-interface FlagsFetchResponse {
+export interface FlagsFetchResponse {
   results: Array<FlagFetchResponse>;
 }
 
-interface FlagDefinitionsFetchResponse {
+export interface FlagDefinitionsFetchResponse {
   results: Array<FlagDefinition>;
 }
 
-interface FlagWithPriority extends FlagFetchResponse {
-  flagWithPriority?: FlagDefinition;
+export interface FlagWithPriority extends FlagFetchResponse {
+  flagDefinition: FlagDefinition;
 }
 
 /**
@@ -62,7 +62,7 @@ export function usePatientFlags(patientUuid: string) {
   // Merge patient flags with flag definitions to get priority information
   const flagsWithPriority: FlagWithPriority[] = patientFlags.map((pf) => ({
     ...pf,
-    flagWithPriority: flagDefinitions.find((f) => f.uuid === pf.flag.uuid),
+    flagDefinition: flagDefinitions.find((f) => f.uuid === pf.flag.uuid),
   }));
 
   const result = {

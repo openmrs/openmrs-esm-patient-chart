@@ -1,12 +1,16 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen, render } from '@testing-library/react';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
 import { usePatientFlags } from './hooks/usePatientFlags';
-import FlagsList from './patient-flags.workspace';
+import FlagsList from './flags-list.component';
 
-const mockUsePatientFlags = usePatientFlags as jest.Mock;
+type FlagWithPriority = ReturnType<typeof usePatientFlags>['flags'][0];
+
+const mockUsePatientFlags = jest.mocked(usePatientFlags);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 jest.mock('./hooks/usePatientFlags', () => {
   const originalModule = jest.requireActual('./hooks/usePatientFlags');
@@ -17,77 +21,29 @@ jest.mock('./hooks/usePatientFlags', () => {
   };
 });
 
-it('renders an Edit form that enables users to toggle flags on or off', async () => {
-  mockUsePatientFlags.mockReturnValue({
-    flags: mockPatientFlags,
-    isLoading: false,
-    error: null,
-  });
-
-  render(
-    <FlagsList
-      closeWorkspace={jest.fn()}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
-      workspaceProps={{}}
-      windowProps={{}}
-      workspaceName=""
-      launchChildWorkspace={null}
-      windowName={''}
-      isRootWorkspace={false}
-    />,
-  );
-
-  const searchbox = screen.getByRole('searchbox', { name: /search for a flag/i });
-  const clearSearchInputButton = screen.getByRole('button', { name: /clear search input/i });
-  const discardButton = screen.getByRole('button', { name: /discard/i });
-  const saveButton = screen.getByRole('button', { name: /save & close/i });
-
-  expect(searchbox).toBeInTheDocument();
-  expect(clearSearchInputButton).toBeInTheDocument();
-  expect(discardButton).toBeInTheDocument();
-  expect(saveButton).toBeInTheDocument();
-  expect(screen.getByText(/future appointment/i)).toBeInTheDocument();
-  expect(screen.getByText(/needs follow up/i)).toBeInTheDocument();
-  expect(screen.getByText(/social/i)).toBeInTheDocument();
-});
-
-it('sorts by active and retired correctly via controlled dropdown', async () => {
-  mockUsePatientFlags.mockReturnValue({
-    flags: mockPatientFlags,
-    isLoading: false,
-    error: null,
-  });
-
-  render(
-    <FlagsList
-      closeWorkspace={jest.fn()}
-      groupProps={{
-        patientUuid: mockPatient.id,
-        patient: mockPatient,
-        visitContext: null,
-        mutateVisitContext: null,
-      }}
-      workspaceProps={{}}
-      windowProps={{}}
-      workspaceName=""
-      launchChildWorkspace={null}
-      windowName={''}
-      isRootWorkspace={false}
-    />,
-  );
-
+it('renders flags in the patient flags slot', async () => {
   const user = userEvent.setup();
-  const sortDropdown = screen.getByRole('combobox');
-  expect(sortDropdown).toBeInTheDocument();
 
-  // select "Retired first" then "Active first" to exercise both flows
-  await user.click(sortDropdown);
-  await user.click(screen.getByText(/Retired first/i));
-  await user.click(sortDropdown);
-  await user.click(screen.getByText(/Active first/i));
+  mockUsePatientFlags.mockReturnValue({
+    error: null,
+    flags: mockPatientFlags as FlagWithPriority[],
+    isLoading: false,
+    isValidating: false,
+    mutate: jest.fn(),
+  });
+
+  render(<FlagsList patientUuid={mockPatient.id} />);
+
+  const flags = screen.getAllByRole('button', { name: /flag/i });
+  expect(flags).toHaveLength(3);
+  expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
+  expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
+  expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
+
+  const editButton = screen.getByRole('button', { name: /edit/i });
+  expect(editButton).toBeInTheDocument();
+
+  await user.click(editButton);
+
+  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 });
