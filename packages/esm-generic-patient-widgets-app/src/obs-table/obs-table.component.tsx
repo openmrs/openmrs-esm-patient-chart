@@ -52,8 +52,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       {
         key: 'date',
         header: t('dateAndTime', 'Date and time'),
-        sortFunc: (rowA: Row, rowB: Row) =>
-          new Date(rowA.rawDate).getTime() < new Date(rowB.rawDate).getTime() ? 1 : -1,
+        sortFunc: (rowA: Row, rowB: Row) => new Date(rowB.rawDate).getTime() - new Date(rowA.rawDate).getTime(),
       },
     ];
     if (config.showEncounterType) {
