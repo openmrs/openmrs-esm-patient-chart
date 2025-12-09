@@ -43,13 +43,14 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
   const config = useConfig<ChartConfig>();
-  const { visitsTableColumns } = config;
+  const { visitsTableColumns = [] } = config ?? {};
 
-  const columns = visitsTableColumns[0].columns.map((column) => ({
-    key: column.key,
-    header: column.header,
-    CellComponent: column.CellComponent,
-  }));
+  const columns =
+    visitsTableColumns[0]?.columns?.map((column) => ({
+      key: column.key,
+      header: column.header,
+      CellComponent: column.CellComponent,
+    })) ?? [];
 
   const layout = useLayoutType();
 
