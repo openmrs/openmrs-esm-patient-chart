@@ -34,59 +34,66 @@ beforeEach(() => {
   });
 });
 
-it('renders a highlights bar showing a summary of the available flags', async () => {
-  const user = userEvent.setup();
+describe('flags risk count', () => {
+  it('displays a single clickable tag', async () => {
+    const user = userEvent.setup();
 
-  mockUsePatientFlags.mockReturnValue({
-    flags: mockPatientFlags,
-    error: null,
-    isLoading: false,
-    isValidating: false,
-    mutate: jest.fn(),
-  } as unknown as ReturnType<typeof usePatientFlags>);
+    mockUsePatientFlags.mockReturnValue({
+      flags: mockPatientFlags,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    } as unknown as ReturnType<typeof usePatientFlags>);
 
-  render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
+    render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
 
-  const riskFlag = screen.getByRole('button', { name: /risk flag/i });
-  expect(riskFlag).toBeInTheDocument();
-  expect(screen.getByText('🚩')).toBeInTheDocument();
-  expect(screen.getByText(/risk flag/)).toBeInTheDocument();
+    const riskFlag = screen.getByRole('button', { name: /risk flag/i });
+    expect(riskFlag).toBeInTheDocument();
+    expect(screen.getByText('🚩')).toBeInTheDocument();
+    expect(screen.getByText(/risk flag/)).toBeInTheDocument();
 
-  await user.click(riskFlag);
+    await user.click(riskFlag);
 
-  const flags = screen.getAllByRole('button', { name: /flag/i });
-  expect(flags).toHaveLength(5);
-  expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
-  expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
-  expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
+    const flags = screen.getAllByRole('listitem');
+    expect(flags).toHaveLength(3);
+    expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
+    expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
+    expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
 
-  const editButton = screen.getByRole('button', { name: /edit/i });
-  expect(editButton).toBeInTheDocument();
+    const editButton = screen.getByRole('button', { name: /edit/i });
+    expect(editButton).toBeInTheDocument();
 
-  await user.click(editButton);
+    await user.click(editButton);
 
-  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 
-  const closeButton = screen.getByRole('button', { name: /close flags bar/i });
+    const closeButton = screen.getByRole('button', { name: /close flags bar/i });
 
-  await user.click(closeButton);
+    await user.click(closeButton);
 
-  expect(screen.getAllByRole('button', { name: /flag/i })).not.toEqual(5);
-});
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+  });
 
-it('suppresses the highlight bar on Patient Summary route', () => {
-  mockUseCurrentPath.mockReturnValue('/patient/123/Patient Summary');
+  it('respects the hideOnPages config', () => {
+    mockUseCurrentPath.mockReturnValue('/patient/123/FooBarBaz');
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+      ...getDefaultsFromConfigSchema<FlagsRiskCountExtensionConfig>(riskCountExtensionConfigSchema),
+      hideOnPages: ['FooBarBaz'],
+    });
 
-  mockUsePatientFlags.mockReturnValue({
-    flags: mockPatientFlags,
-    error: null,
-    isLoading: false,
-    isValidating: false,
-    mutate: jest.fn(),
-  } as unknown as ReturnType<typeof usePatientFlags>);
+    mockUsePatientFlags.mockReturnValue({
+      flags: mockPatientFlags,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    } as unknown as ReturnType<typeof usePatientFlags>);
 
-  render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
+    render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
 
-  // No highlight bar should be shown on the patient summary route
-  expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
+    // No flags risk count should be shown on the FooBarBaz route
+    expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
+  });
 });

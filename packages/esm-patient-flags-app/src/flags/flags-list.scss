@@ -10,14 +10,17 @@
   gap: layout.$spacing-03;
 }
 
-.flagsContainer {
+.flagsList {
   display: flex;
   flex-flow: row wrap;
   column-gap: layout.$spacing-02;
   row-gap: layout.$spacing-03;
   align-items: center;
   flex: 1;
+  margin: 0;
   margin-right: auto;
+  padding: 0;
+  list-style: none;
 }
 
 .actionButton {

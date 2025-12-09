@@ -23,51 +23,53 @@ jest.mock('./hooks/usePatientFlags', () => {
   };
 });
 
-it('renders flags in the patient flags slot', async () => {
-  const user = userEvent.setup();
+describe('flags list', () => {
+  it('flags list displays flags and edit button', async () => {
+    const user = userEvent.setup();
 
-  mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
-  mockUsePatientFlags.mockReturnValue({
-    error: null,
-    flags: mockPatientFlags as FlagWithPriority[],
-    isLoading: false,
-    isValidating: false,
-    mutate: jest.fn(),
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUsePatientFlags.mockReturnValue({
+      error: null,
+      flags: mockPatientFlags as FlagWithPriority[],
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<FlagsList patientUuid={mockPatient.id} />);
+
+    const flags = screen.getAllByRole('listitem');
+    expect(flags).toHaveLength(3);
+    expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
+    expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
+    expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
+
+    const editButton = screen.getByRole('button', { name: /edit/i });
+    expect(editButton).toBeInTheDocument();
+
+    await user.click(editButton);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
   });
 
-  render(<FlagsList patientUuid={mockPatient.id} />);
+  it('hides the Edit button when allowFlagDeletion config is false', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      allowFlagDeletion: false,
+    });
+    mockUsePatientFlags.mockReturnValue({
+      error: null,
+      flags: mockPatientFlags as FlagWithPriority[],
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
 
-  const flags = screen.getAllByRole('button', { name: /flag/i });
-  expect(flags).toHaveLength(3);
-  expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
-  expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
-  expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
+    render(<FlagsList patientUuid={mockPatient.id} />);
 
-  const editButton = screen.getByRole('button', { name: /edit/i });
-  expect(editButton).toBeInTheDocument();
+    const flags = screen.getAllByRole('listitem');
+    expect(flags).toHaveLength(3);
 
-  await user.click(editButton);
-
-  expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
-});
-
-it('hides the Edit button when allowFlagDeletion config is false', () => {
-  mockUseConfig.mockReturnValue({
-    ...getDefaultsFromConfigSchema(configSchema),
-    allowFlagDeletion: false,
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
-  mockUsePatientFlags.mockReturnValue({
-    error: null,
-    flags: mockPatientFlags as FlagWithPriority[],
-    isLoading: false,
-    isValidating: false,
-    mutate: jest.fn(),
-  });
-
-  render(<FlagsList patientUuid={mockPatient.id} />);
-
-  const flags = screen.getAllByRole('button', { name: /flag/i });
-  expect(flags).toHaveLength(3);
-
-  expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
 });

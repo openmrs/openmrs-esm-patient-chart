@@ -21,13 +21,11 @@
   "flagDisableError": "Error disabling the flag",
   "flagEnabledSuccessfully": "Flag successfully enabled",
   "flagEnableError": "Error enabling flag",
-  "infoFlag": "Info flag",
   "loading": "Loading",
   "matchesForSearchTerm_one": "{{count}} flag",
   "matchesForSearchTerm_other": "{{count}} flags",
   "noFlagsFound": "Sorry, no flags found matching your search",
   "retiredFirst": "Retired first",
-  "riskFlag": "Risk flag",
   "saveAndClose": "Save & close",
   "searchForAFlag": "Search for a flag",
   "sortBy": "Sort by"

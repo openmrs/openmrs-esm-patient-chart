@@ -20,11 +20,13 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
   if (!isLoading && !error) {
     return (
       <div className={styles.container}>
-        <div className={styles.flagsContainer}>
+        <ul className={styles.flagsList}>
           {filteredFlags.map((flag) => (
-            <Flag key={flag.uuid} flag={flag} />
+            <li key={flag.uuid}>
+              <Flag flag={flag} />
+            </li>
           ))}
-        </div>
+        </ul>
         {config.allowFlagDeletion && filteredFlags.length > 0 ? (
           <Button
             className={styles.actionButton}
@@ -48,30 +50,19 @@ interface FlagProps {
 }
 
 const Flag: React.FC<FlagProps> = ({ flag }) => {
-  const { t } = useTranslation();
-
   const priorityName = flag.flagDefinition?.priority?.name?.toLowerCase() ?? '';
   const isInfoFlag = priorityName === 'info';
   const isRiskFlag = priorityName === 'risk';
 
   return (
-    <Toggletip key={flag.uuid} align="bottom-start">
-      <ToggletipButton label={isRiskFlag ? t('riskFlag', 'Risk flag') : t('infoFlag', 'Info flag')}>
-        <Tag
-          className={isInfoFlag ? styles.infoFlagTag : isRiskFlag ? styles.flagTag : undefined}
-          type={isRiskFlag ? 'high-contrast' : undefined}
-        >
-          {isRiskFlag && <span className={styles.flagIcon}>&#128681;</span>}
-          {flag.flag.display}
-        </Tag>
-      </ToggletipButton>
-      <ToggletipContent>
-        <div className={styles.content}>
-          <p className={styles.title}>{flag.flag.display}</p>
-          <p className={styles.message}>{flag.message}</p>
-        </div>
-      </ToggletipContent>
-    </Toggletip>
+    <Tag
+      key={flag.uuid}
+      className={isInfoFlag ? styles.infoFlagTag : isRiskFlag ? styles.flagTag : undefined}
+      type={isRiskFlag ? 'high-contrast' : undefined}
+    >
+      {isRiskFlag && <span className={styles.flagIcon}>&#128681;</span>}
+      {flag.message}
+    </Tag>
   );
 };
 
