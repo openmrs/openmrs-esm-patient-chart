@@ -8,8 +8,8 @@ import FlagsWorkspace from './flags.workspace';
 
 const mockUsePatientFlags = usePatientFlags as jest.Mock;
 
-jest.mock('./hooks/usePatientFlags', () => {
-  const originalModule = jest.requireActual('./hooks/usePatientFlags');
+jest.mock('../hooks/usePatientFlags', () => {
+  const originalModule = jest.requireActual('../hooks/usePatientFlags');
 
   return {
     ...originalModule,

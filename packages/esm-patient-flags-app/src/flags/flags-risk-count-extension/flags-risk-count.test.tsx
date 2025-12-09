@@ -1,22 +1,37 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace2, useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { mockPatientFlags } from '__mocks__';
-import { usePatientFlags } from '../hooks/usePatientFlags';
+import { configSchema } from '../../config-schema';
+import { riskCountExtensionConfigSchema } from './extension-config-schema';
+import { useCurrentPath, usePatientFlags } from '../hooks/usePatientFlags';
 import FlagsRiskCountExtension from './flags-risk-count.extension';
+import { type ConfigObject } from '../../config-schema';
+import { type FlagsRiskCountExtensionConfig } from './extension-config-schema';
 
 const mockUsePatientFlags = jest.mocked(usePatientFlags);
+const mockUseCurrentPath = jest.mocked(useCurrentPath);
 const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockUseConfig = jest.mocked(useConfig);
 
-jest.mock('./hooks/usePatientFlags', () => {
-  const originalModule = jest.requireActual('./hooks/usePatientFlags');
+jest.mock('../hooks/usePatientFlags', () => {
+  const originalModule = jest.requireActual('../hooks/usePatientFlags');
 
   return {
     ...originalModule,
     usePatientFlags: jest.fn(),
+    useCurrentPath: jest.fn(),
   };
+});
+
+beforeEach(() => {
+  mockUseCurrentPath.mockReturnValue('/patient/123/chart');
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+    ...getDefaultsFromConfigSchema<FlagsRiskCountExtensionConfig>(riskCountExtensionConfigSchema),
+  });
 });
 
 it('renders a highlights bar showing a summary of the available flags', async () => {
@@ -60,25 +75,17 @@ it('renders a highlights bar showing a summary of the available flags', async ()
 });
 
 it('suppresses the highlight bar on Patient Summary route', () => {
-  // Simulate route where last segment is 'Patient Summary'
-  Object.defineProperty(window, 'location', {
-    value: {
-      ...window.location,
-      pathname: '/patient/123/Patient Summary',
-    },
-    writable: true,
-  });
+  mockUseCurrentPath.mockReturnValue('/patient/123/Patient Summary');
 
   mockUsePatientFlags.mockReturnValue({
-    flags: [],
+    flags: mockPatientFlags,
     error: null,
     isLoading: false,
     isValidating: false,
     mutate: jest.fn(),
   } as unknown as ReturnType<typeof usePatientFlags>);
 
-  const { rerender } = render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
-  expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
+  render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
 
   // No highlight bar should be shown on the patient summary route
   expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
