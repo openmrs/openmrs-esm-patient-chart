@@ -69,8 +69,10 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/^OPD Visit$/i).click();
-    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
+    const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
+    await expect(opdVisitRadio).toBeVisible();
+    await opdVisitRadio.click();
+    await expect(opdVisitRadio).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -165,8 +167,10 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/^OPD Visit$/i).click();
-    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
+    const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
+    await expect(opdVisitRadio).toBeVisible();
+    await opdVisitRadio.click();
+    await expect(opdVisitRadio).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
