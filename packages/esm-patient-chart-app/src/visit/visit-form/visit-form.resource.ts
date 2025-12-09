@@ -332,6 +332,23 @@ export function createVisitFormResolver(
       const visitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
       const visitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
+      // Skip overlap check if editing an existing visit and dates haven't changed
+      if (visitToEdit) {
+        const existingStart = visitToEdit.startDatetime ? new Date(visitToEdit.startDatetime) : null;
+        const existingStop = visitToEdit.stopDatetime ? new Date(visitToEdit.stopDatetime) : null;
+
+        const datesUnchanged =
+          existingStart &&
+          visitStartDateTime &&
+          existingStart.getTime() === visitStartDateTime.getTime() &&
+          ((existingStop === null && visitStopDateTime === null) ||
+            (existingStop && visitStopDateTime && existingStop.getTime() === visitStopDateTime.getTime()));
+
+        if (datesUnchanged) {
+          return zodResult;
+        }
+      }
+
       if (visitStartDateTime !== null) {
         try {
           const overlappingVisits = await findOverlappingVisits(
