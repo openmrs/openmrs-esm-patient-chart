@@ -121,12 +121,15 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I should see the newly added order in the active medications list', async () => {
-      const headerRow = page.locator('thead > tr');
-      const dataRow = page.locator('tbody > tr');
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      const headerRow = activeMedicationsTable.locator('thead > tr');
+      const dataRow = activeMedicationsTable.locator('tbody > tr').filter({
+        hasText: /aspirin 325mg — 325mg — tablet/i,
+      });
 
       await expect(headerRow).toContainText(/start date/i);
       await expect(headerRow).toContainText(/details/i);
-      await page.getByText('Aspirin 325mg — 325mg — tablet').isVisible();
+      await expect(dataRow).toContainText(/aspirin 325mg — 325mg — tablet/i);
     });
   });
 
@@ -188,20 +191,21 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I should see the updated order in the list in Active Medications table', async () => {
-      const headerRow = page.locator('thead > tr');
-      const dataRow = page.locator('tbody > tr');
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      const headerRow = activeMedicationsTable.locator('thead > tr');
+      const dataRow = activeMedicationsTable.locator('tbody > tr');
 
-      await expect(headerRow.nth(0)).toContainText(/start date/i);
-      await expect(headerRow.nth(0)).toContainText(/details/i);
-      await expect(dataRow.nth(0)).toContainText(/aspirin 81mg/i);
-      await expect(dataRow.nth(0)).not.toContainText(/oral/i);
-      await expect(dataRow.nth(0)).toContainText(/inhalation/i);
-      await expect(dataRow.nth(0)).not.toContainText(/once daily/i);
-      await expect(dataRow.nth(0)).toContainText(/twice daily/i);
-      await expect(dataRow.nth(0)).not.toContainText(/3 days/i);
-      await expect(dataRow.nth(0)).toContainText(/5 days/i);
-      await expect(dataRow.nth(0)).not.toContainText(/indication headache/i);
-      await expect(dataRow.nth(0)).toContainText(/indication hypertension/i);
+      await expect(headerRow).toContainText(/start date/i);
+      await expect(headerRow).toContainText(/details/i);
+      await expect(dataRow).toContainText(/aspirin 81mg/i);
+      await expect(dataRow).not.toContainText(/oral/i);
+      await expect(dataRow).toContainText(/inhalation/i);
+      await expect(dataRow).not.toContainText(/once daily/i);
+      await expect(dataRow).toContainText(/twice daily/i);
+      await expect(dataRow).not.toContainText(/3 days/i);
+      await expect(dataRow).toContainText(/5 days/i);
+      await expect(dataRow).not.toContainText(/indication headache/i);
+      await expect(dataRow).toContainText(/indication hypertension/i);
     });
   });
 
