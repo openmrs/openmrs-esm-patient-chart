@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { prettyDOM, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LineChart } from '@carbon/charts-react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -217,6 +217,7 @@ describe('ObsSwitchable', () => {
 
     const dateHeader = screen.getByText('Date and time');
     await user.click(dateHeader);
+
     const firstRow = screen.getAllByRole('row')[1];
     expect(firstRow).toHaveTextContent('01 — Feb — 2021');
     const secondRow = screen.getAllByRole('row')[2];
