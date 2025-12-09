@@ -68,7 +68,7 @@ describe('flags risk count', () => {
 
     expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-flags-workspace');
 
-    const closeButton = screen.getByRole('button', { name: /close flags bar/i });
+    const closeButton = screen.getByRole('button', { name: /close flags list/i });
 
     await user.click(closeButton);
 

@@ -65,7 +65,7 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
           <Button
             className={styles.actionButton}
             hasIconOnly
-            iconDescription={t('closeFlagsBar', 'Close flags bar')}
+            iconDescription={t('closeFlagsList', 'Close flags list')}
             kind="ghost"
             size="sm"
             renderIcon={CloseIcon}
