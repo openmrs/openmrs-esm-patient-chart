@@ -111,6 +111,9 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
     // Wait for the tab to be selected
     await expect(endedTab).toHaveAttribute('aria-selected', 'true');
 
+    // Wait for the section title to change indicating the state has updated
+    await expect(chartPage.page.getByText(/visit start and end date/i)).toBeVisible({ timeout: 15000 });
+
     // Wait for the stop date input to be visible after tab switch
     await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible({ timeout: 15000 });
 
