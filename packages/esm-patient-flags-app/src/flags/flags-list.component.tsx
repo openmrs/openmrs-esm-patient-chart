@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { EditIcon, launchWorkspace2 } from '@openmrs/esm-framework';
+import { type ConfigObject, EditIcon, launchWorkspace2, useConfig } from '@openmrs/esm-framework';
 import { type FlagWithPriority, usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags-list.scss';
 
@@ -13,6 +13,7 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((flag) => !flag.voided);
+  const config = useConfig<ConfigObject>();
 
   const handleClickEditFlags = useCallback(() => launchWorkspace2('patient-flags-workspace'), []);
 
@@ -24,7 +25,7 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
             <Flag key={flag.uuid} flag={flag} />
           ))}
         </div>
-        {filteredFlags.length > 0 ? (
+        {config.allowFlagDeletion && filteredFlags.length > 0 ? (
           <Button
             className={styles.actionButton}
             kind="ghost"

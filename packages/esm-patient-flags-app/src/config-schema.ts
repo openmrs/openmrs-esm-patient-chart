@@ -1,6 +1,8 @@
 import { Type } from '@openmrs/esm-framework';
 
-export interface ConfigObject {}
+export interface ConfigObject {
+  allowFlagDeletion: boolean;
+}
 
 export const configSchema = {
   allowFlagDeletion: {
