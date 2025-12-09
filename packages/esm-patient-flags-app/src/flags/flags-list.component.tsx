@@ -28,6 +28,7 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
           <Button
             className={styles.actionButton}
             kind="ghost"
+            size="sm"
             renderIcon={EditIcon}
             onClick={handleClickEditFlags}
             iconDescription={t('editFlags', 'Edit flags')}

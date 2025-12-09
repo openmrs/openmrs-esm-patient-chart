@@ -44,7 +44,7 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
   return (
     <div className={styles.flagSummary}>
       <Tag
-        className={styles.flagsHighlightTag}
+        className={styles.flagsCountTag}
         type={showFlagsList ? 'outline' : 'high-contrast'}
         onClick={() => setShowFlagsList(!showFlagsList)}
       >
@@ -67,6 +67,7 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
             hasIconOnly
             iconDescription={t('closeFlagsBar', 'Close flags bar')}
             kind="ghost"
+            size="sm"
             renderIcon={CloseIcon}
             onClick={() => setShowFlagsList(false)}
           />
