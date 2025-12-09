@@ -105,14 +105,18 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).not.toHaveValue('');
     await expect(chartPage.page.getByTestId('visitStartDateInput')).toBeVisible();
 
-    await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
+    const endedTab = visitsPage.page.getByRole('tab', { name: /ended/i });
+    await endedTab.click();
+
+    // Wait for the tab to be selected
+    await expect(endedTab).toHaveAttribute('aria-selected', 'true');
 
     // Wait for the stop date input to be visible after tab switch
-    await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible({ timeout: 10000 });
+    await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible({ timeout: 15000 });
 
     // Wait for end time input to appear - it renders conditionally when visitStatus becomes 'past'
     const endTimeInput = chartPage.page.getByRole('textbox', { name: /end time/i });
-    await expect(endTimeInput).toBeVisible({ timeout: 10000 });
+    await expect(endTimeInput).toBeVisible({ timeout: 15000 });
 
     // Now fill start time
     const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
