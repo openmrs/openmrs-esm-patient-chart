@@ -44,7 +44,7 @@ describe('flags list', () => {
     expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
     expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
 
-    const editButton = screen.getByRole('button', { name: /edit/i });
+    const editButton = screen.getByRole('button', { name: /edit flags/i });
     expect(editButton).toBeInTheDocument();
 
     await user.click(editButton);
@@ -70,6 +70,6 @@ describe('flags list', () => {
     const flags = screen.getAllByRole('listitem');
     expect(flags).toHaveLength(3);
 
-    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /edit flags/i })).not.toBeInTheDocument();
   });
 });

@@ -61,7 +61,7 @@ describe('flags risk count', () => {
     expect(screen.getByText(/diagnosis for the patient is unknown/i)).toBeInTheDocument();
     expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
 
-    const editButton = screen.getByRole('button', { name: /edit/i });
+    const editButton = screen.getByRole('button', { name: /edit flags/i });
     expect(editButton).toBeInTheDocument();
 
     await user.click(editButton);

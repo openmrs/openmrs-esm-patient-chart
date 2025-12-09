@@ -1,3 +1,4 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
@@ -27,6 +28,9 @@
   max-height: layout.$spacing-08;
   flex-shrink: 0;
   align-self: center;
+  svg {
+    fill: $interactive-01 !important;
+  }
 }
 
 .flagIcon {
@@ -45,13 +49,6 @@
   padding: 0 layout.$spacing-03;
   background-color: colors.$orange-20;
   color: #934412;
-}
-
-.highlightBarContainer {
-  display: flex;
-  align-items: center;
-  padding: layout.$spacing-03;
-  border-bottom: 1px solid colors.$gray-20;
 }
 
 .tooltipPadding {

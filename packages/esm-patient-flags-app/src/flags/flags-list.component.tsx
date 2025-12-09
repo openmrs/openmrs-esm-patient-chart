@@ -30,14 +30,13 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
         {config.allowFlagDeletion && filteredFlags.length > 0 ? (
           <Button
             className={styles.actionButton}
+            hasIconOnly
             kind="ghost"
             size="sm"
             renderIcon={EditIcon}
             onClick={handleClickEditFlags}
             iconDescription={t('editFlags', 'Edit flags')}
-          >
-            {t('edit', 'Edit')}
-          </Button>
+          />
         ) : null}
       </div>
     );
