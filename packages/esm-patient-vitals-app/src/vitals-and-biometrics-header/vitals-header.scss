@@ -59,17 +59,16 @@
 }
 
 .row {
-  justify-content: space-between;
   align-items: center;
-  max-width: 100vw;
+  width: 100%;
   // Wide viewport: 8 columns (default)
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
-  column-gap: layout.$spacing-11;
+  column-gap: layout.$spacing-05;
 }
 
 // Narrow viewport: 4 columns (when workspace is opened or container is reduced)
-@container vitals-header-row-container (max-width: 64rem) {
+@container vitals-header-row-container (max-width: 80rem) {
   .row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
