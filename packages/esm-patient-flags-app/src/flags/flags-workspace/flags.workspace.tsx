@@ -51,13 +51,13 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
     if (sortBy === 'retired') {
       return orderBy(flags, [(item) => Number(item.voided)], ['desc']);
     }
-    return orderBy(flags, [(f) => f.flag.display], ['asc']);
+    return orderBy(flags, [(f) => f.message], ['asc']);
   }, [sortBy, flags]);
 
   const searchResults = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     if (query) {
-      return sortedRows.filter((f) => f.flag.display.toLowerCase().includes(query));
+      return sortedRows.filter((f) => f.message.toLowerCase().includes(query));
     }
     return sortedRows;
   }, [searchTerm, sortedRows]);
@@ -86,7 +86,7 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   const handleSave = useCallback(async () => {
     if (pendingActiveStates.size === 0) {
-      closeWorkspace();
+      closeWorkspace({ discardUnsavedChanges: true });
       return;
     }
 
@@ -111,7 +111,7 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
         title: t('flagsUpdated', 'Flags updated'),
       });
       mutate();
-      closeWorkspace();
+      closeWorkspace({ discardUnsavedChanges: true });
     } else {
       showSnackbar({
         isLowContrast: false,
@@ -185,7 +185,7 @@ const FlagsWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
                       <div className={styles.flagTile} key={result.uuid}>
                         <div className={styles.flagHeader}>
                           <div className={styles.titleAndType}>
-                            <div className={styles.flagTitle}>{result.flag.display}</div>&middot;
+                            <div className={styles.flagTitle}>{result.message}</div>&middot;
                             <span className={styles.type}>
                               {(() => {
                                 const typeLabel = getFlagType(result.tags);

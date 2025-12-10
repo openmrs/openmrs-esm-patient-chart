@@ -44,6 +44,7 @@ export function usePatientFlags(patientUuid: string) {
     data: patientFlagsData,
     error: patientFlagsError,
     isLoading: isLoadingPatientFlags,
+    mutate,
   } = useSWR<FetchResponse<FlagsFetchResponse>, Error>(patientUuid ? patientFlagsUrl : null, openmrsFetch);
 
   const patientFlags = patientFlagsData?.data?.results ?? [];
@@ -70,7 +71,7 @@ export function usePatientFlags(patientUuid: string) {
     error: patientFlagsError || flagDefinitionsError,
     isLoading: isLoadingPatientFlags || isLoadingFlagDefinitions,
     isValidating: false,
-    mutate: () => {},
+    mutate,
   };
 
   return result;
