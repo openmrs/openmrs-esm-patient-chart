@@ -51,8 +51,8 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
   expect(clearSearchInputButton).toBeInTheDocument();
   expect(discardButton).toBeInTheDocument();
   expect(saveButton).toBeInTheDocument();
-  expect(screen.getByText(/future appointment/i)).toBeInTheDocument();
-  expect(screen.getByText(/needs follow up/i)).toBeInTheDocument();
+  expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
+  expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
   expect(screen.getByText(/social/i)).toBeInTheDocument();
 });
 
