@@ -27,7 +27,7 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid }) => {
             </li>
           ))}
         </ul>
-        {config.allowFlagDeletion && filteredFlags.length > 0 ? (
+        {config.allowFlagDeletion ? (
           <Button
             className={styles.actionButton}
             hasIconOnly

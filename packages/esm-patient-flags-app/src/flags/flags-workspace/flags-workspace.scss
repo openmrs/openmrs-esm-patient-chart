@@ -89,14 +89,6 @@
   @include type.type-style('label-01');
 }
 
-.button {
-  height: layout.$spacing-10;
-  display: flex;
-  align-content: flex-start;
-  align-items: baseline;
-  min-width: 50%;
-}
-
 .formWrapper {
   display: flex;
   flex-direction: column;
