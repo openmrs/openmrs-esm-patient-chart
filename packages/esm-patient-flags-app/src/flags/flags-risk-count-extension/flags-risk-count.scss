@@ -2,7 +2,7 @@
 @use '@carbon/layout';
 
 .flagSummary {
-  padding: layout.$spacing-03;
+  padding: layout.$spacing-01;
   display: flex;
   flex-direction: row; /* needed if attaching extension outside highlights bar */
   align-items: center;
@@ -18,13 +18,20 @@
 }
 
 .flagsCountTag {
+  margin: layout.$spacing-02 0;
   padding: 0 layout.$spacing-03;
   border: none;
+  cursor: pointer;
   span {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+}
+
+.arrowInTag {
+  margin-left: layout.$spacing-03;
+  fill: currentColor;
 }
 
 .flagsListContainer {

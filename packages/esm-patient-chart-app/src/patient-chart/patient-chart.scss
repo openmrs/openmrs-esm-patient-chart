@@ -7,7 +7,7 @@ $actionPanelOffset: 256px;
 $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
 
 .patientInfoSlot {
-  :not(:last-child) {
+  > div:not(:last-child) {
     border-bottom: 1px solid colors.$gray-20;
   }
 }

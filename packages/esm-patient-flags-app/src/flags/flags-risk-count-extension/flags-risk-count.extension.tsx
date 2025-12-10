@@ -47,14 +47,18 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
         className={styles.flagsCountTag}
         type={showFlagsList ? 'outline' : 'high-contrast'}
         onClick={() => setShowFlagsList(!showFlagsList)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setShowFlagsList(!showFlagsList);
+          }
+        }}
       >
         <span className={styles.flagIcon}>&#128681;</span>
-        <span className={styles.flagText}>
-          {t('flagCount', '{{count}} risk flags', {
-            count: riskFlags.length,
-          })}
-        </span>
-        {!showFlagsList && <ArrowRightIcon className={styles.arrow} size={16} />}
+        {t('flagCount', '{{count}} risk flags', { count: riskFlags.length })}
+        {!showFlagsList && <ArrowRightIcon className={styles.arrowInTag} size={16} />}
       </Tag>
       {showFlagsList && (
         <>
