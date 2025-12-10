@@ -8,7 +8,6 @@ import {
   useLayoutType,
   isDesktop,
   useSession,
-  userHasAccess,
 } from '@openmrs/esm-framework';
 import ObsTableHorizontal from './obs-table-horizontal.component';
 import { useObs, type ObsResult } from '../resources/useObs';
@@ -145,8 +144,14 @@ describe('ObsTableHorizontal', () => {
     mockIsDesktop.mockReturnValue(true);
     mockUseEncounterTypes.mockReturnValue({
       encounterTypes: [
-        { uuid: 'encounter-type-uuid-1', editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1' } },
-        { uuid: 'encounter-type-uuid-2', editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2' } },
+        {
+          uuid: 'encounter-type-uuid-1',
+          editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1', name: 'Edit Privilege 1' },
+        },
+        {
+          uuid: 'encounter-type-uuid-2',
+          editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2', name: 'Edit Privilege 2' },
+        },
       ],
       error: null,
       isLoading: false,
@@ -193,8 +198,14 @@ describe('ObsTableHorizontal editable mode', () => {
     } as any);
     mockUseEncounterTypes.mockReturnValue({
       encounterTypes: [
-        { uuid: 'encounter-type-uuid-1', editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1' } },
-        { uuid: 'encounter-type-uuid-2', editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2' } },
+        {
+          uuid: 'encounter-type-uuid-1',
+          editPrivilege: { uuid: 'privilege-1', display: 'Edit Privilege 1', name: 'Edit Privilege 1' },
+        },
+        {
+          uuid: 'encounter-type-uuid-2',
+          editPrivilege: { uuid: 'privilege-2', display: 'Edit Privilege 2', name: 'Edit Privilege 2' },
+        },
       ],
       error: null,
       isLoading: false,

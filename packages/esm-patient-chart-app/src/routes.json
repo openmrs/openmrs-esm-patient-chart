@@ -235,6 +235,11 @@
       "name": "start-visit-workspace-form",
       "component": "startVisitWorkspace",
       "window": "start-visit"
+    },
+    {
+      "name": "patient-chart-appointments-form-workspace",
+      "component": "@openmrs/esm-appointments-app#exportedAppointmentsFormWorkspace",
+      "window": "patient-chart-appointment-form"
     }
   ],
   "workspaceWindows2": [
@@ -244,6 +249,10 @@
     },
     {
       "name": "mark-patient-deceased",
+      "group": "patient-chart"
+    },
+    {
+      "name": "patient-chart-appointment-form",
       "group": "patient-chart"
     }
   ],
