@@ -1,9 +1,16 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
 $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
+
+.patientInfoSlot {
+  :not(:last-child) {
+    border-bottom: 1px solid colors.$gray-20;
+  }
+}
 
 .grid {
   display: grid;

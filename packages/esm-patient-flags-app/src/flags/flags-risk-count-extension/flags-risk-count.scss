@@ -3,7 +3,6 @@
 
 .flagSummary {
   padding: layout.$spacing-03;
-  border-bottom: 1px solid colors.$gray-20;
   display: flex;
   flex-direction: row; /* needed if attaching extension outside highlights bar */
   align-items: center;

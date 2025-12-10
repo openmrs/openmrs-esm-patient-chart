@@ -6,10 +6,13 @@
   "extensions": [
     {
       "name": "patient-flags-risk-count",
-      "slot": "patient-highlights-bar-slot",
+      "slot": "patient-info-slot",
       "component": "flagsRiskCountExtension",
       "order": 0,
-      "featureFlag": "patient-flags"
+      "featureFlag": "patient-flags",
+      "meta": {
+        "fullWidth": true
+      }
     },
     {
       "name": "patient-flags-list",
