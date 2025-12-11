@@ -22,6 +22,8 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
     flags: mockPatientFlags,
     isLoading: false,
     error: null,
+    isValidating: false,
+    mutate: jest.fn(),
   });
 
   render(
