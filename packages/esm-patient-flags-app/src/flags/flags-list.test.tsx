@@ -99,24 +99,6 @@ describe('flags list', () => {
     expect(screen.getByText(/patient has a future appointment scheduled/i)).toBeInTheDocument();
   });
 
-  it('filters flags by tag uuid when filterByTags is provided', () => {
-    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
-    mockUsePatientFlags.mockReturnValue({
-      error: null,
-      flags: mockPatientFlags as FlagWithPriority[],
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
-    // Filter by the uuid of 'flag tag - risk' which only belongs to 'Needs Follow Up'
-    render(<FlagsList patientUuid={mockPatient.id} filterByTags={['some-uuid']} />);
-
-    const flags = screen.getAllByRole('listitem');
-    expect(flags).toHaveLength(1);
-    expect(screen.getByText(/patient needs to be followed up/i)).toBeInTheDocument();
-  });
-
   it('launches workspace when flag with configured flagAction is clicked', async () => {
     const user = userEvent.setup();
 
@@ -148,7 +130,7 @@ describe('flags list', () => {
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      flagActions: [{ flagName: 'Needs Follow Up', url: '/patient/${patientUuid}/follow-up' }],
+      flagActions: [{ flagName: 'Needs Follow Up', url: '${openmrsSpaBase}/patient/${patientUuid}/follow-up' }],
     });
     mockUsePatientFlags.mockReturnValue({
       error: null,
@@ -164,7 +146,7 @@ describe('flags list', () => {
     await user.click(clickableFlag);
 
     expect(mockNavigate).toHaveBeenCalledWith({
-      to: '/patient/${patientUuid}/follow-up',
+      to: '${openmrsSpaBase}/patient/${patientUuid}/follow-up',
       templateParams: { patientUuid: mockPatient.id },
     });
   });
@@ -244,33 +226,10 @@ describe('flags list', () => {
     expect(flagIcons).toHaveLength(2);
   });
 
-  it('uses custom priority color from config', () => {
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
-      priorities: [
-        { priority: 'risk', color: 'red', isRiskPriority: true },
-        { priority: 'info', color: 'blue', isRiskPriority: false },
-      ],
-    });
-    mockUsePatientFlags.mockReturnValue({
-      error: null,
-      flags: mockPatientFlags as FlagWithPriority[],
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
-    render(<FlagsList patientUuid={mockPatient.id} />);
-
-    // Check that flags are rendered (the actual color is applied via Carbon's type prop)
-    const flags = screen.getAllByRole('listitem');
-    expect(flags).toHaveLength(3);
-  });
-
   it('falls back to default priority config when flag priority is not configured', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
-      priorities: [], // No priorities configured
+      priorities: [{ priority: 'info', color: 'orange', isRiskPriority: false }], // No risk priority configured
     });
     mockUsePatientFlags.mockReturnValue({
       error: null,
@@ -282,10 +241,10 @@ describe('flags list', () => {
 
     render(<FlagsList patientUuid={mockPatient.id} />);
 
-    // Should still render without crashing, using default orange/non-risk
+    // Should still render all three flags
     const flags = screen.getAllByRole('listitem');
     expect(flags).toHaveLength(3);
-    // No flag icons should appear since default isRiskPriority is false
+    // No flag icons should appear since no risk priority is configured
     expect(screen.queryByText('🚩')).not.toBeInTheDocument();
   });
 });

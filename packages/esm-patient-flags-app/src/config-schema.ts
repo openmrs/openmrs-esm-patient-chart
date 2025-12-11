@@ -91,6 +91,7 @@ export const configSchema = {
         _description:
           'URL to navigate to when the flag is clicked. Supports template variables: ${patientUuid}, ${openmrsSpaBase}.',
         _default: null,
+        _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
       },
       workspace: {
         _type: Type.String,
@@ -110,7 +111,7 @@ export const configSchema = {
     _elements: {
       priority: {
         _type: Type.String,
-        _description: 'The name of the priority (case-insensitive match against the flag priority name).',
+        _description: 'The name of the priority, as configured in the backend (case-insensitive).',
       },
       color: {
         _type: Type.String,

@@ -5,7 +5,7 @@ export const flagsListExtensionConfigSchema = {
     _type: Type.Array,
     _default: [],
     _description:
-      'Filter flags to only show those with at least one of the specified tags. If empty, all flags are shown. Tags can be specified by UUID or display name.',
+      'Filter flags to only show those with at least one of the specified tag names. If empty, all flags are shown.',
     _elements: {
       _type: Type.String,
     },

@@ -24,7 +24,7 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid, filterByTags = [] })
       return true;
     }
     // Check if flag has at least one of the specified tags (by uuid or display name)
-    return flag.tags?.some((tag) => filterByTags.includes(tag.uuid) || filterByTags.includes(tag.display));
+    return flag.tags?.some((tag) => filterByTags.includes(tag.display));
   });
 
   const handleClickEditFlags = useCallback(() => launchWorkspace2('patient-flags-workspace'), []);
