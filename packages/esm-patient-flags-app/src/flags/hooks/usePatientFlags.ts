@@ -28,7 +28,7 @@ export interface FlagDefinitionsFetchResponse {
 }
 
 export interface FlagWithPriority extends FlagFetchResponse {
-  flagDefinition: FlagDefinition;
+  flagDefinition?: FlagDefinition;
 }
 
 /**
@@ -61,10 +61,17 @@ export function usePatientFlags(patientUuid: string) {
   const flagDefinitions = flagDefinitionsData?.data?.results ?? [];
 
   // Merge patient flags with flag definitions to get priority information
-  const flagsWithPriority: FlagWithPriority[] = patientFlags.map((pf) => ({
-    ...pf,
-    flagDefinition: flagDefinitions.find((f) => f.uuid === pf.flag.uuid),
-  }));
+  const flagsWithPriority: FlagWithPriority[] = patientFlags.map((pf) => {
+    const flagDefinition = flagDefinitions.find((f) => f.uuid === pf.flag.uuid);
+    if (!flagDefinition) {
+      console.warn(`Flag definition not found for flag ${pf.flag.display}. Tag will be missing priority information.`);
+      return pf;
+    }
+    return {
+      ...pf,
+      flagDefinition,
+    };
+  });
 
   const result = {
     flags: flagsWithPriority,
