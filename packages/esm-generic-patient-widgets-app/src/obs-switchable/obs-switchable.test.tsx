@@ -86,7 +86,7 @@ beforeEach(() => {
 });
 
 afterEach(async () => {
-  // Flush any pending microtasks from queueMicrotask in handleSorting
+  // Flush any pending setTimeout callbacks from handleSorting
   await new Promise((resolve) => setTimeout(resolve, 0));
 });
 
