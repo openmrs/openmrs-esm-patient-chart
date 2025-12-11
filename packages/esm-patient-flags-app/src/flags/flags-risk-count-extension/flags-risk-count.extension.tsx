@@ -25,7 +25,7 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
   const [showFlagsList, setShowFlagsList] = useState(false);
 
   const lastSegment = decodeURI(path).split('/').filter(Boolean).pop();
-  if (config.hideOnPages.includes(lastSegment)) {
+  if (lastSegment && config.hideOnPages.includes(lastSegment)) {
     return null;
   }
 
