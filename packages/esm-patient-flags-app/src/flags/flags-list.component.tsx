@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { Button, Tag } from '@carbon/react';
 import { type ConfigObject, EditIcon, launchWorkspace2, useConfig } from '@openmrs/esm-framework';
 import { type FlagWithPriority, usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags-list.scss';
