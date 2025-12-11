@@ -17,14 +17,14 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
   const { t } = useTranslation();
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
-  const extensionConfig = useConfig<FlagsRiskCountExtensionConfig & ConfigObject>();
+  const config = useConfig<FlagsRiskCountExtensionConfig & ConfigObject>();
 
   // Get all priority names that are marked as risk priorities
   const riskPriorityNames = useMemo(() => {
-    return (extensionConfig.priorities ?? [])
+    return (config.priorities ?? [])
       .filter((style) => style.isRiskPriority)
       .map((style) => style.priority.toLowerCase());
-  }, [extensionConfig.priorities]);
+  }, [config.priorities]);
 
   const riskFlags = useMemo(() => {
     return filteredFlags.filter((f) => {
@@ -36,7 +36,7 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
   const [showFlagsList, setShowFlagsList] = useState(false);
 
   const lastSegment = decodeURI(path).split('/').filter(Boolean).pop();
-  if (lastSegment && extensionConfig.hideOnPages.includes(lastSegment)) {
+  if (lastSegment && config.hideOnPages.includes(lastSegment)) {
     return null;
   }
 
