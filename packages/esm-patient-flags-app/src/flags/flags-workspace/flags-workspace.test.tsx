@@ -63,6 +63,8 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
     flags: mockPatientFlags,
     isLoading: false,
     error: null,
+    isValidating: false,
+    mutate: jest.fn(),
   });
 
   render(
