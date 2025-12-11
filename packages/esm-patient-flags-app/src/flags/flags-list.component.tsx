@@ -16,16 +16,26 @@ const FlagsList: React.FC<FlagsListProps> = ({ patientUuid, filterByTags = [] })
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const config = useConfig<ConfigObject>();
 
-  const filteredFlags = flags.filter((flag) => {
-    if (flag.voided) {
-      return false;
-    }
-    if (filterByTags.length === 0) {
-      return true;
-    }
-    // Check if flag has at least one of the specified tags (by uuid or display name)
-    return flag.tags?.some((tag) => filterByTags.includes(tag.display));
-  });
+  const filteredFlags = useMemo(() => {
+    const filtered = flags.filter((flag) => {
+      if (flag.voided) {
+        return false;
+      }
+      if (filterByTags.length === 0) {
+        return true;
+      }
+      // Check if flag has at least one of the specified tags (by uuid or display name)
+      return flag.tags?.some((tag) => filterByTags.includes(tag.display));
+    });
+
+    // Sort by priority rank (lower numbers = higher priority)
+    // Flags without a rank are sorted to the end
+    return filtered.sort((a, b) => {
+      const rankA = a.flagDefinition?.priority?.rank ?? Number.MAX_SAFE_INTEGER;
+      const rankB = b.flagDefinition?.priority?.rank ?? Number.MAX_SAFE_INTEGER;
+      return rankA - rankB;
+    });
+  }, [flags, filterByTags]);
 
   const handleClickEditFlags = useCallback(() => launchWorkspace2('patient-flags-workspace'), []);
 

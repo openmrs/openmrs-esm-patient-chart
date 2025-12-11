@@ -247,4 +247,27 @@ describe('flags list', () => {
     // No flag icons should appear since no risk priority is configured
     expect(screen.queryByText('🚩')).not.toBeInTheDocument();
   });
+
+  it('sorts flags by priority rank (lower numbers = higher priority)', () => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+    mockUsePatientFlags.mockReturnValue({
+      error: null,
+      flags: mockPatientFlags as FlagWithPriority[],
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    render(<FlagsList patientUuid={mockPatient.id} />);
+
+    const flags = screen.getAllByRole('listitem');
+    expect(flags).toHaveLength(3);
+
+    // Mock data has: Needs Follow Up (rank 1), Unknown Diagnosis (rank 1), Future Appointment (rank 2)
+    // Needs Follow Up preceeds Unknown Diagnosis in the mock data, and since they have the same rank,
+    // sorting does not change their order.
+    expect(flags[0]).toHaveTextContent(/patient needs to be followed up/i);
+    expect(flags[1]).toHaveTextContent(/diagnosis for the patient is unknown/i);
+    expect(flags[2]).toHaveTextContent(/patient has a future appointment scheduled/i);
+  });
 });
