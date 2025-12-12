@@ -45,8 +45,7 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
               <>
                 <aside>
                   <ExtensionSlot name="patient-header-slot" state={state} />
-                  <ExtensionSlot name="patient-highlights-bar-slot" state={state} />
-                  <ExtensionSlot name="patient-info-slot" state={state} />
+                  <ExtensionSlot name="patient-info-slot" state={state} className={styles.patientInfoSlot} />
                 </aside>
                 <div className={styles.grid}>
                   <div
