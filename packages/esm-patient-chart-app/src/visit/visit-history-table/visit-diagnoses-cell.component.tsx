@@ -3,6 +3,7 @@ import React from 'react';
 
 interface Props {
   visit: Visit;
+  patient: fhir.Patient;
 }
 
 const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {

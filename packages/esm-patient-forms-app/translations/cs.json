@@ -1,0 +1,22 @@
+{
+  "clinicalForm": "Clinical Form",
+  "clinicalForms": "Clinical forms",
+  "formName": "Form Name (A-Z)",
+  "forms": "Forms",
+  "homeOverviewCardView": "View",
+  "lastCompleted": "Last completed",
+  "never": "Never",
+  "noFormsToDisplay": "There are no forms to display.",
+  "off": "Off",
+  "offlineForms": "Offline forms",
+  "offlineForms__lower": "offline forms",
+  "offlineFormsOverviewCardAvailableOffline": "Available offline",
+  "offlineFormsTableFormAvailableOffline": "Offline",
+  "offlineFormsTableFormNameHeader": "Form name",
+  "offlineFormsTitle": "Offline forms",
+  "offlinePatientsTableSearchLabel": "Search this list",
+  "offlinePatientsTableSearchPlaceholder": "Search this list",
+  "offlineToggle": "Offline toggle",
+  "on": "On",
+  "searchThisList": "Search this list"
+}

@@ -9,7 +9,7 @@ import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
 
 export type FormsListProps = {
-  completedForms?: Array<CompletedFormInfo>;
+  forms?: Array<CompletedFormInfo>;
   error?: any;
   sectionName?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
@@ -20,32 +20,23 @@ export type FormsListProps = {
  * t('forms', 'Forms')
  */
 
-const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionName = 'forms', handleFormOpen }) => {
+const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handleFormOpen }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
-  const [locale, setLocale] = useState(window.i18next.language ?? navigator.language);
-
-  useEffect(() => {
-    if (window.i18next?.on) {
-      const languageChanged = (lng: string) => setLocale(lng);
-      window.i18next.on('languageChanged', languageChanged);
-      return () => window.i18next.off('languageChanged', languageChanged);
-    }
-  }, []);
 
   const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
-      return completedForms;
+      return forms;
     }
 
     return fuzzy
-      .filter(searchTerm, completedForms, { extract: (formInfo) => formInfo.form.display ?? formInfo.form.name })
+      .filter(searchTerm, forms, { extract: (formInfo) => formInfo.form.display ?? formInfo.form.name })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [completedForms, searchTerm]);
+  }, [forms, searchTerm]);
 
   const tableHeaders = useMemo(() => {
     return [
@@ -75,42 +66,30 @@ const FormsList: React.FC<FormsListProps> = ({ completedForms, error, sectionNam
     [filteredForms],
   );
 
-  if (!completedForms && !error) {
+  if (!forms && !error) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (completedForms?.length === 0) {
+  if (forms?.length === 0) {
     return <></>;
   }
 
-  if (sectionName === 'forms') {
-    return (
-      <ResponsiveWrapper>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-        />
-      </ResponsiveWrapper>
-    );
-  } else {
-    return (
-      <ResponsiveWrapper>
+  return (
+    <ResponsiveWrapper>
+      {sectionName && (
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
           <h4>{t(sectionName)}</h4>
         </div>
-        <FormsTable
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          isTablet={isTablet}
-          handleSearch={handleSearch}
-          handleFormOpen={handleFormOpen}
-        />
-      </ResponsiveWrapper>
-    );
-  }
+      )}
+      <FormsTable
+        tableHeaders={tableHeaders}
+        tableRows={tableRows}
+        isTablet={isTablet}
+        handleSearch={handleSearch}
+        handleFormOpen={handleFormOpen}
+      />
+    </ResponsiveWrapper>
+  );
 };
 
 export default FormsList;

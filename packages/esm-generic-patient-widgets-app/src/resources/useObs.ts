@@ -9,11 +9,13 @@ type CommonConfig = ConfigObjectSwitchable | ConfigObjectHorizontal;
 export interface UseObsResult {
   data: {
     observations: Array<ObsResult>;
-    concepts: Array<{ uuid: string; display: string }>;
+    concepts: Array<{ uuid: string; display: string; dataType: string }>;
+    encounters: Array<{ reference: string; display: string; encounterTypeUuid: string }>;
   };
   error: Error;
   isLoading: boolean;
   isValidating: boolean;
+  mutate: () => Promise<any>;
 }
 
 export type ObsResult = fhir.Observation & {
@@ -26,6 +28,7 @@ export type ObsResult = fhir.Observation & {
      * Reference to the encounter resource, in the format `Encounter/{uuid}`
      */
     reference: string;
+    encounterTypeUuid?: string;
   };
 };
 
@@ -37,52 +40,41 @@ export const pageSize = 100;
  * get the label.
  */
 export function useObs(patientUuid: string): UseObsResult {
-  const { encounterTypes, data, showEncounterType } = useConfig<CommonConfig>();
+  const { encounterTypes, data } = useConfig<CommonConfig>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   // TODO: Make sorting respect oldestFirst/graphOldestFirst
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
-    .join(',')}&_summary=data&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
+    .join(',')}&_summary=data&_include=Observation:encounter&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
 
-  if (showEncounterType) {
-    url += '&_include=Observation:encounter';
-  }
+  const {
+    data: result,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
 
-  const { data: result, error, isLoading, isValidating } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
+  const { concepts } = useConcepts(data.map((d) => d.concept));
 
-  const obsForConcept = Object.fromEntries(
-    data.map((d) => [
-      d.concept,
-      result?.data?.entry?.find((e) => (e.resource as fhir.Observation).code.coding.find((c) => d.concept === c.code)),
-    ]),
-  );
-
-  const conceptsNeedingLabel = data.filter((d) => result && !d.label && !obsForConcept[d.concept]);
-
-  const { concepts: conceptsForLabels } = useConcepts(conceptsNeedingLabel.map((d) => d.concept));
-  const concepts = data.map((d) => ({
-    uuid: d.concept,
-    display:
-      d.label ||
-      obsForConcept[d.concept]?.resource?.code?.text ||
-      conceptsForLabels.find((c) => c.uuid === d.concept)?.display,
-  }));
-
-  const encounters = showEncounterType ? getEncountersByResources(result?.data?.entry) : [];
-  const observations = filterAndMapObservations(result?.data?.entry, encounters);
+  const encounters = getEncountersFromResources(result?.data?.entry);
+  const observations = filterAndMapObservations(result?.data?.entry, encounters, concepts);
   return {
-    data: { observations, concepts },
+    data: { observations, concepts, encounters },
     error: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 
 function filterAndMapObservations(
   entries: Array<fhir.BundleEntry>,
-  encounters: Array<{ reference: string; display: string }>,
+  encounters: Array<{ reference: string; display: string; encounterTypeUuid: string }>,
+  concepts: Array<{ uuid: string; display: string; dataType: string }>,
 ): ObsResult[] {
+  const conceptByUuid = Object.fromEntries(concepts.map((c) => [c.uuid, c]));
   return (
     entries
       ?.filter((entry) => entry?.resource?.resourceType === 'Observation')
@@ -91,39 +83,29 @@ function filterAndMapObservations(
         const observation: ObsResult = {
           ...resource,
           conceptUuid: resource.code.coding.find((c) => isUuid(c.code))?.code,
+          dataType: conceptByUuid[resource.code.coding.find((c) => isUuid(c.code))?.code]?.dataType,
         };
-        if (resource.hasOwnProperty('valueDateTime')) {
-          observation.dataType = 'DateTime';
-        }
 
-        if (entry.resource.hasOwnProperty('valueString')) {
-          observation.dataType = 'Text';
-        }
-
-        if (entry.resource.hasOwnProperty('valueQuantity')) {
-          observation.dataType = 'Number';
-        }
-
-        if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
-          observation.dataType = 'Coded';
-        }
-
-        observation.encounter.name = encounters.find(
+        const encounter = encounters.find(
           (e) =>
             e.reference === (resource as fhir.Observation & { encounter: { reference?: string } }).encounter.reference,
-        )?.display;
+        );
+
+        observation.encounter.name = encounter?.display;
+        observation.encounter.encounterTypeUuid = encounter?.encounterTypeUuid;
 
         return observation;
       }) || []
   );
 }
 
-function getEncountersByResources(resources: Array<fhir.BundleEntry>) {
+function getEncountersFromResources(resources: Array<fhir.BundleEntry>) {
   return resources
     ?.filter((entry) => entry?.resource?.resourceType === 'Encounter')
     .map((entry: fhir.BundleEntry) => ({
       reference: `Encounter/${entry.resource.id}`,
       display: (entry.resource as fhir.Encounter).type?.[0]?.coding?.[0]?.display || '--',
+      encounterTypeUuid: (entry.resource as fhir.Encounter).type?.[0]?.coding?.[0]?.code,
     }));
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { type PatientData } from '@openmrs/esm-patient-common-lib';
 import loadPatientData from './loadPatientData';
 
@@ -14,18 +14,29 @@ const usePatientResultsData = (patientUuid: string): LoadingState => {
     loaded: false,
     error: undefined,
   });
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    let unmounted = false;
+    isMountedRef.current = true;
     if (patientUuid) {
       const [data, reloadedDataPromise] = loadPatientData(patientUuid);
-      if (!!data) setState({ sortedObs: data, loaded: true, error: undefined });
-      reloadedDataPromise.then((reloadedData) => {
-        if (reloadedData !== data && !unmounted) setState({ sortedObs: reloadedData, loaded: true, error: undefined });
-      });
+      if (!!data && isMountedRef.current) {
+        setState({ sortedObs: data, loaded: true, error: undefined });
+      }
+      reloadedDataPromise
+        .then((reloadedData) => {
+          if (reloadedData !== data && isMountedRef.current) {
+            setState({ sortedObs: reloadedData, loaded: true, error: undefined });
+          }
+        })
+        .catch((error) => {
+          if (isMountedRef.current) {
+            setState({ sortedObs: {}, loaded: true, error });
+          }
+        });
     }
     return () => {
-      unmounted = true;
+      isMountedRef.current = false;
     };
   }, [patientUuid]);
 

@@ -2,29 +2,28 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useVisit } from '@openmrs/esm-framework';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import {
   formattedVitals,
   mockConceptUnits,
-  mockCurrentVisit,
+  mockOngoingVisitWithEncounters,
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
-import VitalsHeader from './vitals-header.component';
+import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
+  visitContext: mockOngoingVisitWithEncounters,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockUseWorkspaces = jest.mocked(useWorkspaces);
 
-mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
@@ -35,7 +34,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });

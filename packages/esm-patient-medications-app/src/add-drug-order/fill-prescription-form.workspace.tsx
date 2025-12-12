@@ -1,15 +1,13 @@
 import React, { useCallback } from 'react';
-import { type DrugOrderBasketItem } from '../types';
 import {
   type ConfigObject,
   type DefaultWorkspaceProps,
-  Encounter,
   showSnackbar,
   useConfig,
   useSession,
   useVisit,
 } from '@openmrs/esm-framework';
-import { type EncounterPost, postEncounter } from '@openmrs/esm-patient-common-lib';
+import { type DrugOrderBasketItem, type EncounterPost, postEncounter } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api';
 import DrugOrderForm from './drug-order-form.component';
 import { useTranslation } from 'react-i18next';
@@ -101,9 +99,10 @@ const FillPrescriptionForm: React.FC<FillPrescriptionFormProps> = ({
       onSave={submitDrugOrder}
       saveButtonText={t('fillPrescription', 'Fill prescription')}
       onCancel={closeWorkspace}
-      promptBeforeClosing={promptBeforeClosing}
       allowSelectingPrescribingClinician={true}
+      visitContext={activeVisit}
       allowSelectingDrug={true}
+      workspaceTitle={t('fillPrescription', 'Fill prescription')}
     />
   );
 };

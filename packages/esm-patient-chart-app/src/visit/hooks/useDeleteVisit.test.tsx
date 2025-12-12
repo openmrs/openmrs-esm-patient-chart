@@ -1,7 +1,7 @@
 import { useSWRConfig } from 'swr';
 import { renderHook, act } from '@testing-library/react';
-import { showSnackbar, useVisit, type Visit, type VisitType } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { showSnackbar, type Visit } from '@openmrs/esm-framework';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
@@ -20,17 +20,19 @@ jest.mock('../visits-widget/visit.resource', () => {
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   invalidateVisitAndEncounterData: jest.fn(),
+  usePatientChartStore: jest.fn(),
 }));
 
 const mockDeleteVisit = jest.mocked(deleteVisit);
 const mockRestoreVisit = jest.mocked(restoreVisit);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseSWRConfig = jest.mocked(useSWRConfig);
-const mockUseVisit = jest.mocked(useVisit);
+const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 const mockInvalidateVisitAndEncounterData = jest.mocked(invalidateVisitAndEncounterData);
 
-const mockMutateCurrentVisit = jest.fn();
+const mockMutateActiveVisit = jest.fn();
 const mockGlobalMutate = jest.fn();
+const mockSetVisitContext = jest.fn();
 
 const mockVisitType = {
   uuid: 'visit-type-123',
@@ -54,16 +56,13 @@ const mockVisit = {
 
 describe('useDeleteVisit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockUseVisit.mockReturnValue({
-      mutate: mockMutateCurrentVisit,
-      currentVisit: null,
-      activeVisit: null,
-      currentVisitIsRetrospective: false,
-      error: null,
-      isLoading: false,
-      isValidating: false,
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: 'patient-123',
+      patient: null,
+      visitContext: null,
+      mutateVisitContext: jest.fn(),
+      setPatient: jest.fn(),
+      setVisitContext: mockSetVisitContext,
     });
 
     mockUseSWRConfig.mockReturnValue({
@@ -76,14 +75,14 @@ describe('useDeleteVisit', () => {
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
     const onVisitDelete = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, onVisitDelete));
 
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
     expect(mockDeleteVisit).toHaveBeenCalledWith('visit-123');
-    expect(mockMutateCurrentVisit).toHaveBeenCalledTimes(1);
+    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(
@@ -103,13 +102,13 @@ describe('useDeleteVisit', () => {
     mockDeleteVisit.mockRejectedValue(new Error('Delete failed'));
     const onVisitDelete = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, onVisitDelete));
 
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
-    expect(mockMutateCurrentVisit).toHaveBeenCalledTimes(1);
+    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -125,7 +124,7 @@ describe('useDeleteVisit', () => {
     mockRestoreVisit.mockResolvedValue({ data: {} } as any);
     const onVisitRestore = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, undefined, onVisitRestore));
 
     // First delete to get the restore function
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
@@ -138,14 +137,13 @@ describe('useDeleteVisit', () => {
 
     // Clear mocks to test restore independently
     jest.clearAllMocks();
-    mockUseVisit.mockReturnValue({
-      mutate: mockMutateCurrentVisit,
-      currentVisit: null,
-      activeVisit: null,
-      currentVisitIsRetrospective: false,
-      error: null,
-      isLoading: false,
-      isValidating: false,
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: 'patient-123',
+      patient: null,
+      visitContext: null,
+      mutateVisitContext: jest.fn(),
+      setPatient: jest.fn(),
+      setVisitContext: mockSetVisitContext,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,
@@ -158,7 +156,7 @@ describe('useDeleteVisit', () => {
     });
 
     expect(mockRestoreVisit).toHaveBeenCalledWith('visit-123');
-    expect(mockMutateCurrentVisit).toHaveBeenCalledTimes(1);
+    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -174,7 +172,7 @@ describe('useDeleteVisit', () => {
     mockRestoreVisit.mockRejectedValue(new Error('Restore failed'));
     const onVisitRestore = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, undefined, onVisitRestore));
 
     // First delete to get the restore function
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
@@ -186,14 +184,13 @@ describe('useDeleteVisit', () => {
 
     // Clear mocks to test restore independently
     jest.clearAllMocks();
-    mockUseVisit.mockReturnValue({
-      mutate: mockMutateCurrentVisit,
-      currentVisit: null,
-      activeVisit: null,
-      currentVisitIsRetrospective: false,
-      error: null,
-      isLoading: false,
-      isValidating: false,
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: 'patient-123',
+      patient: null,
+      visitContext: null,
+      mutateVisitContext: jest.fn(),
+      setPatient: jest.fn(),
+      setVisitContext: mockSetVisitContext,
     });
     mockUseSWRConfig.mockReturnValue({
       mutate: mockGlobalMutate,
@@ -205,7 +202,7 @@ describe('useDeleteVisit', () => {
       restoreFunction();
     });
 
-    expect(mockMutateCurrentVisit).toHaveBeenCalledTimes(1);
+    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -220,7 +217,7 @@ describe('useDeleteVisit', () => {
   it('should manage loading state correctly', async () => {
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, () => {}));
 
     // Initially not deleting
     expect(result.current.isDeletingVisit).toBe(false);
@@ -238,7 +235,7 @@ describe('useDeleteVisit', () => {
     const visitWithoutPatient = { ...mockVisit, patient: null };
 
     expect(() => {
-      renderHook(() => useDeleteVisit(visitWithoutPatient));
+      renderHook(() => useDeleteVisit(visitWithoutPatient, mockMutateActiveVisit, () => {}));
     }).not.toThrow();
   });
 
@@ -246,7 +243,7 @@ describe('useDeleteVisit', () => {
     const visitWithEmptyPatient = { ...mockVisit, patient: { uuid: '' } };
 
     expect(() => {
-      renderHook(() => useDeleteVisit(visitWithEmptyPatient));
+      renderHook(() => useDeleteVisit(visitWithEmptyPatient, mockMutateActiveVisit, () => {}));
     }).not.toThrow();
   });
 
@@ -257,7 +254,7 @@ describe('useDeleteVisit', () => {
     };
 
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
-    const { result } = renderHook(() => useDeleteVisit(visitWithoutDisplay));
+    const { result } = renderHook(() => useDeleteVisit(visitWithoutDisplay, mockMutateActiveVisit, () => {}));
 
     await act(async () => {
       result.current.initiateDeletingVisit();

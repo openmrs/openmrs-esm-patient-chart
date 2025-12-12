@@ -202,12 +202,3 @@ export interface GroupedObservation {
   flatName: string;
   entries: MappedObservation[];
 }
-
-export interface TestOrderBasketItem extends OrderBasketItem {
-  testType: {
-    label: string;
-    conceptUuid: string;
-  };
-  orderReason?: string;
-  specimenSource?: string;
-}

@@ -1,22 +1,35 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
-import { type Visit, showSnackbar, useVisit } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { type Visit, showSnackbar } from '@openmrs/esm-framework';
+import {
+  invalidateVisitAndEncounterData,
+  invalidateVisitByUuid,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
-export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
+export function useDeleteVisit(
+  activeVisit: Visit,
+  mutateActiveVisit: () => void,
+  onVisitDelete = () => {},
+  onVisitRestore = () => {},
+) {
   const { t } = useTranslation();
   const { mutate: globalMutate } = useSWRConfig();
-  const { mutate: mutateCurrentVisit } = useVisit(visit?.patient?.uuid || '');
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
-  const patientUuid = visit?.patient?.uuid || '';
+  const patientUuid = activeVisit?.patient?.uuid || '';
+  const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
 
   const restoreDeletedVisit = () => {
-    restoreVisit(visit?.uuid)
-      .then(() => {
+    restoreVisit(activeVisit?.uuid)
+      .then(({ data: updatedVisit }) => {
         // Update current visit data for critical components (useVisit hook)
-        mutateCurrentVisit();
+        mutateActiveVisit();
+        if (!updatedVisit.stopDatetime) {
+          const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, updatedVisit.uuid);
+          setVisitContext(updatedVisit, mutateSavedOrUpdatedVisit);
+        }
 
         // Use targeted SWR invalidation instead of global mutateVisit
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
@@ -24,7 +37,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
         showSnackbar({
           title: t('visitRestored', 'Visit restored'),
           subtitle: t('visitRestoredSuccessfully', '{{visit}} restored successfully', {
-            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            visit: activeVisit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'success',
         });
@@ -32,12 +45,12 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
       })
       .catch(() => {
         // On error, revalidate to get correct state
-        mutateCurrentVisit();
+        mutateActiveVisit();
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
           subtitle: t('errorWhenRestoringVisit', 'Error occurred when restoring {{visit}}', {
-            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            visit: activeVisit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'error',
         });
@@ -47,20 +60,23 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
   const initiateDeletingVisit = () => {
     setIsDeletingVisit(true);
 
-    deleteVisit(visit?.uuid)
+    deleteVisit(activeVisit?.uuid)
       .then(() => {
-        // Update current visit data for critical components (useVisit hook)
-        mutateCurrentVisit();
+        // Update active visit data
+        mutateActiveVisit();
+        if (activeVisit.uuid == visitContext?.uuid) {
+          setVisitContext(null, null);
+        }
 
         // Use targeted SWR invalidation instead of global mutateVisit
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
           title: t('visitDeleted', '{{visit}} deleted', {
-            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            visit: activeVisit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           subtitle: t('visitDeletedSuccessfully', '{{visit}} deleted successfully', {
-            visit: visit?.visitType?.display ?? t('visit', 'Visit'),
+            visit: activeVisit?.visitType?.display ?? t('visit', 'Visit'),
           }),
           kind: 'success',
           actionButtonLabel: t('undo', 'Undo'),
@@ -70,7 +86,7 @@ export function useDeleteVisit(visit: Visit, onVisitDelete = () => {}, onVisitRe
       })
       .catch(() => {
         // On error, revalidate to get correct state
-        mutateCurrentVisit();
+        mutateActiveVisit();
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({

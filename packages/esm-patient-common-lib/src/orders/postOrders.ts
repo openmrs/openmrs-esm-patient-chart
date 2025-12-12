@@ -120,7 +120,7 @@ export async function postOrders(patientUuid: string, encounterUuid: string, abo
   return erroredItems;
 }
 
-function postOrder(body: OrderPost, abortController?: AbortController) {
+export function postOrder(body: OrderPost, abortController?: AbortController) {
   return openmrsFetch(`${restBaseUrl}/order`, {
     method: 'POST',
     signal: abortController?.signal,

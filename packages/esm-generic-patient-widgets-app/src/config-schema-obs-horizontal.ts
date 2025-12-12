@@ -6,6 +6,11 @@ export const configSchemaHorizontal = {
     _description: 'Displayed at the top of the widget.',
     _default: 'Vitals',
   },
+  editable: {
+    _type: Type.Boolean,
+    _description: 'Observations can be edited and encounters can be created',
+    _default: true,
+  },
   oldestFirst: {
     _type: Type.Boolean,
     _description: 'Sort columns from oldest to newest',
@@ -56,11 +61,17 @@ export const configSchemaHorizontal = {
     _description: 'Display Encounter type row',
     _default: false,
   },
+  encounterTypeToCreateUuid: {
+    _description: 'Encounter type UUID to use when creating a new encounter. Defaults to "Consultation".',
+    _type: Type.String,
+    _default: 'dd528487-82a5-4082-9c72-ed246bd49591',
+  },
 };
 
 export interface ConfigObjectHorizontal {
   title: string;
   oldestFirst: boolean;
+  editable: boolean;
   data: Array<{
     concept: string;
     label: string;
@@ -69,4 +80,5 @@ export interface ConfigObjectHorizontal {
   maxColumns: number;
   encounterTypes: Array<string>;
   showEncounterType: boolean;
+  encounterTypeToCreateUuid: string;
 }

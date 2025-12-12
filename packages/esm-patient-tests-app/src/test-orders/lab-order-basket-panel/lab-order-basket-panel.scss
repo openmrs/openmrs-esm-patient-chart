@@ -3,21 +3,44 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.desktopContainer {
+  background-color: colors.$gray-10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.tabletContainer {
+  @extend .desktopContainer;
+  background-color: colors.$white-0;
+}
+
 .tile:not(:first-child) {
   margin-top: 2rem;
 }
 
 .desktopTile {
+  position: relative;
   border-left: layout.$spacing-02 solid colors.$purple-70;
-  background-color: $ui-02;
-  border-top: 1px solid colors.$purple-20;
+  background-color: colors.$white-0;
   border-right: none;
   padding: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: colors.$purple-20;
+  }
 }
 
 .tabletTile {
   @extend .desktopTile;
-  border-top: 1px solid #612ebd;
+  border-top: 1px solid colors.$purple-20;
 }
 
 .collapsedTile {
@@ -31,14 +54,6 @@
 
 .tabletTile.collapsedTile {
   border-bottom: 1px solid $grey-2;
-}
-
-.container {
-  background-color: $ui-02;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
 }
 
 .desktopTile .container {

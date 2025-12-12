@@ -2,16 +2,20 @@ import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, useOpenmrsFetchAll, type FetchResponse } from '@openmrs/esm-framework';
-import type { DrugOrderPost, PatientOrderFetchResponse, Order } from '@openmrs/esm-patient-common-lib';
+import type {
+  DrugOrderBasketItem,
+  DrugOrderPost,
+  PatientOrderFetchResponse,
+  Order,
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { type DrugOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
 const customRepresentation =
   'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
   'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
-  'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+  'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,fulfillerStatus,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
@@ -45,7 +49,12 @@ export function usePatientOrders(patientUuid: string) {
   );
 
   const mutateOrders = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`)),
+    () =>
+      mutate(
+        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
+        undefined,
+        { revalidate: true },
+      ),
     [mutate, patientUuid],
   );
 
