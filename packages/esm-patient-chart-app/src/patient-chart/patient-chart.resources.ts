@@ -1,7 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
-import { openmrsFetch, restBaseUrl, usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  closeWorkspaceGroup2,
+  launchWorkspaceGroup2,
+  openmrsFetch,
+  restBaseUrl,
+  usePatient,
+  useVisit,
+  type Visit,
+} from '@openmrs/esm-framework';
+import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -32,7 +40,7 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  * in‑app navigation. On a full page reload, visitContext is rehydrated by refetching
  * (via useVisit/useVisitByUuId) rather than restored from storage.
  * When we enter the chart, we want to update the visit context as follows:
- * does the stored visitContext exist and belong to the patient?
+ * does the the stored visitContext exist and belong to the patient?
  * 1. If so, the visitContext should be valid but possibly stale; fetch the visit again
  *    and update the context
  * 2. If not, fetch the active visit of the patient, If it exists, set it as the
@@ -50,7 +58,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     setVisitContext,
   } = usePatientChartStore(patientUuid);
 
-  const isVisitContextValid = visitContext && visitContext.patient?.uuid === patientUuid;
+  const isVisitContextValid = visitContext && visitContext.patient.uuid === patientUuid;
   const {
     visit: newVisitContext,
     mutate: newMutateVisitContext,
@@ -62,14 +70,39 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     mutate: mutateActiveVisit,
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
+  const isWorkspaceGroupLaunched = useRef(false);
+
   useEffect(() => {
-    if (!isValidatingVisitContext && !isValidatingActiveVisit && storePatientUuid) {
+    if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
+      let groupProps: PatientWorkspaceGroupProps = null;
       if (activeVisit) {
-        setVisitContext(activeVisit, mutateActiveVisit);
+        groupProps = {
+          patientUuid: patient.id,
+          patient,
+          visitContext: activeVisit,
+          mutateVisitContext: mutateActiveVisit,
+        };
       } else if (newVisitContext) {
-        setVisitContext(newVisitContext, newMutateVisitContext);
+        groupProps = {
+          patientUuid: patient.id,
+          patient,
+          visitContext: newVisitContext,
+          mutateVisitContext: newMutateVisitContext,
+        };
       } else {
-        setVisitContext(null, null);
+        groupProps = {
+          patientUuid: patient.id,
+          patient,
+          visitContext: null,
+          mutateVisitContext: null,
+        };
+      }
+
+      setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
+
+      if (!isWorkspaceGroupLaunched.current) {
+        launchWorkspaceGroup2('patient-chart', groupProps);
+        isWorkspaceGroupLaunched.current = true;
       }
     }
   }, [
@@ -81,6 +114,8 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     isValidatingActiveVisit,
     storePatientUuid,
     mutateActiveVisit,
+    isWorkspaceGroupLaunched,
+    patient,
   ]);
 
   useEffect(() => {
@@ -93,6 +128,12 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     };
   }, [patient, setPatient, isLoadingPatient]);
 
+  useEffect(() => {
+    return () => {
+      closeWorkspaceGroup2();
+    };
+  }, []);
+
   const state = useMemo(
     () => ({
       patientUuid,
@@ -100,8 +141,9 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
       visitContext,
       mutateVisitContext,
       isLoadingPatient,
+      setPatient,
     }),
-    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient],
+    [patient, patientUuid, visitContext, mutateVisitContext, isLoadingPatient, setPatient],
   );
 
   return state;

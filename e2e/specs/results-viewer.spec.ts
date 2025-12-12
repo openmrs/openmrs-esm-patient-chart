@@ -223,7 +223,7 @@ test('Record and edit test results', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
-    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /laboratory test results/i })).toBeVisible();
   });
 
   await test.step('When I fill the "Complete Blood Count" section', async () => {
@@ -263,15 +263,13 @@ test('Record and edit test results', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
-    await test.step('Then I should see the newly entered test results reflect in the results viewer', async () => {
-      for (const { resultsPageReference, value } of completeBloodCountData) {
-        await test.step(resultsPageReference, async () => {
-          const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
-          const valueCell = row.locator('td:nth-child(2)');
-          await expect(valueCell).toContainText(value);
-        });
-      }
-    });
+    for (const { resultsPageReference, value } of completeBloodCountData) {
+      await test.step(resultsPageReference, async () => {
+        const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
+        const valueCell = row.locator('td:nth-child(2)');
+        await expect(valueCell).toContainText(value);
+      });
+    }
 
     for (const { resultsPageReference, value } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {

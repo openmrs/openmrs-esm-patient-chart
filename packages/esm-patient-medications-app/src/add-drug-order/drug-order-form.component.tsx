@@ -1,4 +1,5 @@
-import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
   Button,
@@ -21,8 +22,6 @@ import {
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
-import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
 import {
   AddIcon,
   age,
@@ -36,36 +35,39 @@ import {
   useFeatureFlag,
   useLayoutType,
   useSession,
+  Workspace2,
+  type Visit,
 } from '@openmrs/esm-framework';
-import { type Drug } from '@openmrs/esm-patient-common-lib';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
+import {
+  type Drug,
+  type CommonMedicationValueCoded,
+  type DosingUnit,
+  type DrugOrderBasketItem,
+  type DurationUnit,
+  type MedicationFrequency,
+  type MedicationRoute,
+  type QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import type {
-  CommonMedicationValueCoded,
-  DosingUnit,
-  DrugOrderBasketItem,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  QuantityUnit,
-} from '../types';
 import { type Provider, useActivePatientOrders, useProviders } from '../api';
+import styles from './drug-order-form.scss';
 import {
   drugOrderBasketItemToFormValue,
   type MedicationOrderFormData,
   useDrugOrderForm,
 } from './drug-order-form.resource';
 import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
-import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
-  patientUuid: string;
   initialOrderBasketItem: DrugOrderBasketItem;
   patient: fhir.Patient;
+  visitContext: Visit;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
   saveButtonText: string;
   onCancel: () => void;
-  promptBeforeClosing: (testFcn: () => boolean) => void;
+  workspaceTitle: string;
 
   /**
    * If true, allows user to select the prescribing provider when ordering medications from the order basket.
@@ -128,9 +130,10 @@ export function DrugOrderForm({
   onSave,
   saveButtonText,
   onCancel,
-  promptBeforeClosing,
   allowSelectingPrescribingClinician,
   allowSelectingDrug,
+  visitContext,
+  workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
@@ -162,10 +165,6 @@ export function DrugOrderForm({
     setValue,
     watch,
   } = drugOrderForm;
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   // reset the dosage information if set to free text dosage
   const handleIsFreeTextDosageAfterChange = useCallback(
@@ -331,410 +330,413 @@ export function DrugOrderForm({
   );
 
   return (
-    <div className={styles.container}>
-      {showStickyMedicationHeader && (
-        <div className={styles.stickyMedicationInfo}>
-          <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
-        </div>
-      )}
-      <div className={styles.patientHeader}>
-        <span className={styles.bodyShort02}>{patientName}</span>
-        <span className={classNames(styles.text02, styles.bodyShort01)}>
-          {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-          <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-        </span>
-      </div>
-      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
-      <Form
-        className={styles.orderForm}
-        onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
-        id="drugOrderForm"
-      >
-        <div>
-          {errorFetchingOrderConfig && (
-            <InlineNotification
-              kind="error"
-              lowContrast
-              className={styles.inlineNotification}
-              title={t('errorFetchingOrderConfig', 'Error occurred when fetching Order config')}
-              subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-            />
-          )}
-          <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
-          {(allowSelectingDrug || allowSelectingPrescribingClinician) && (
-            <section className={styles.formSection}>
-              <h3 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h3>
-              <Stack gap={5}>
-                {allowSelectingDrug && (
-                  <InputWrapper>
-                    <DrugSearchComboBox
-                      setSelectedDrugItem={(item) => {
-                        // when selecting a new drug, it can have its own order template that populates many fields
-                        // we should just reset the entire form
-                        reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
-                      }}
-                    />
-                    {drugAlreadyPrescribedForNewOrder && (
-                      <FormLabel className={styles.errorLabel}>
-                        {t('activePrescriptionExists', 'Active prescription exists for this drug')}
-                      </FormLabel>
-                    )}
-                    <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
-                  </InputWrapper>
-                )}
-                {allowAndSupportSelectingPrescribingClinician &&
-                  !isLoadingProviders &&
-                  (providers?.length > 0 ? (
-                    <ControlledFieldInput
-                      control={control}
-                      name="orderer"
-                      type="comboBox"
-                      getValues={getValues}
-                      id="orderer"
-                      shouldFilterItem={filterItemsByProviderName}
-                      placeholder={t('prescribingClinician', 'Prescribing Clinician')}
-                      titleText={t('prescribingClinician', 'Prescribing Clinician')}
-                      items={providers}
-                      itemToString={(item: Provider) => item?.person?.display}
-                    />
-                  ) : errorLoadingProviders ? (
-                    <InlineNotification
-                      kind="warning"
-                      lowContrast
-                      className={styles.inlineNotification}
-                      title={t('errorLoadingClinicians', 'Error loading clinicians')}
-                      subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-                    />
-                  ) : (
-                    <InlineNotification
-                      kind="warning"
-                      lowContrast
-                      className={styles.inlineNotification}
-                      title={t('noCliniciansFound', 'No clinicians found')}
-                      subtitle={t(
-                        'noCliniciansFoundDescription',
-                        'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
-                      )}
-                    />
-                  ))}
-              </Stack>
-            </section>
-          )}
-          <div ref={medicationInfoHeaderRef}>
+    <Workspace2 title={workspaceTitle} hasUnsavedChanges={isDirty}>
+      <div className={styles.container}>
+        {showStickyMedicationHeader && (
+          <div className={styles.stickyMedicationInfo}>
             <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
           </div>
-          <section className={styles.formSection}>
-            <Grid className={styles.gridRow}>
-              <Column lg={12} md={6} sm={4}>
-                <h3 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h3>
-              </Column>
-              <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
-                <ControlledFieldInput
-                  name="isFreeTextDosage"
-                  type="toggle"
-                  control={control}
-                  size="sm"
-                  id="freeTextDosageToggle"
-                  aria-label={t('freeTextDosage', 'Free text dosage')}
-                  labelText={t('freeTextDosage', 'Free text dosage')}
-                  handleAfterChange={handleIsFreeTextDosageAfterChange}
-                />
-              </Column>
-            </Grid>
-            {watch('isFreeTextDosage') ? (
+        )}
+        <div className={styles.patientHeader}>
+          <span className={styles.bodyShort02}>{patientName}</span>
+          <span className={classNames(styles.text02, styles.bodyShort01)}>
+            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+          </span>
+        </div>
+        <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+        <Form
+          className={styles.orderForm}
+          onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
+          id="drugOrderForm"
+        >
+          <div>
+            {errorFetchingOrderConfig && (
+              <InlineNotification
+                kind="error"
+                lowContrast
+                className={styles.inlineNotification}
+                title={t('errorFetchingOrderConfig', 'Error occurred when fetching Order config')}
+                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+              />
+            )}
+            <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
+            {(allowSelectingDrug || allowSelectingPrescribingClinician) && (
+              <section className={styles.formSection}>
+                <h3 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h3>
+                <Stack gap={5}>
+                  {allowSelectingDrug && (
+                    <InputWrapper>
+                      <DrugSearchComboBox
+                        setSelectedDrugItem={(item) => {
+                          // when selecting a new drug, it can have its own order template that populates many fields
+                          // we should just reset the entire form
+                          reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
+                        }}
+                        visit={visitContext}
+                      />
+                      {drugAlreadyPrescribedForNewOrder && (
+                        <FormLabel className={styles.errorLabel}>
+                          {t('activePrescriptionExists', 'Active prescription exists for this drug')}
+                        </FormLabel>
+                      )}
+                      <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
+                    </InputWrapper>
+                  )}
+                  {allowAndSupportSelectingPrescribingClinician &&
+                    !isLoadingProviders &&
+                    (providers?.length > 0 ? (
+                      <ControlledFieldInput
+                        control={control}
+                        name="orderer"
+                        type="comboBox"
+                        getValues={getValues}
+                        id="orderer"
+                        shouldFilterItem={filterItemsByProviderName}
+                        placeholder={t('prescribingClinician', 'Prescribing Clinician')}
+                        titleText={t('prescribingClinician', 'Prescribing Clinician')}
+                        items={providers}
+                        itemToString={(item: Provider) => item?.person?.display}
+                      />
+                    ) : errorLoadingProviders ? (
+                      <InlineNotification
+                        kind="warning"
+                        lowContrast
+                        className={styles.inlineNotification}
+                        title={t('errorLoadingClinicians', 'Error loading clinicians')}
+                        subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+                      />
+                    ) : (
+                      <InlineNotification
+                        kind="warning"
+                        lowContrast
+                        className={styles.inlineNotification}
+                        title={t('noCliniciansFound', 'No clinicians found')}
+                        subtitle={t(
+                          'noCliniciansFoundDescription',
+                          'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
+                        )}
+                      />
+                    ))}
+                </Stack>
+              </section>
+            )}
+            <div ref={medicationInfoHeaderRef}>
+              <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
+            </div>
+            <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
-                <Column md={8}>
+                <Column lg={12} md={6} sm={4}>
+                  <h3 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h3>
+                </Column>
+                <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
                   <ControlledFieldInput
+                    name="isFreeTextDosage"
+                    type="toggle"
                     control={control}
-                    name="freeTextDosage"
-                    type="textArea"
+                    size="sm"
+                    id="freeTextDosageToggle"
+                    aria-label={t('freeTextDosage', 'Free text dosage')}
                     labelText={t('freeTextDosage', 'Free text dosage')}
-                    placeholder={t('freeTextDosage', 'Free text dosage')}
-                    maxLength={65535}
+                    handleAfterChange={handleIsFreeTextDosageAfterChange}
                   />
                 </Column>
               </Grid>
-            ) : (
-              <>
+              {watch('isFreeTextDosage') ? (
                 <Grid className={styles.gridRow}>
-                  <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
-                    <InputWrapper>
-                      <div className={styles.numberInput}>
-                        <ControlledFieldInput
-                          control={control}
-                          type="number"
-                          name="dosage"
-                          id="doseSelection"
-                          placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                          label={t('editDoseComboBoxTitle', 'Dose')}
-                          min={0}
-                          hideSteppers={true}
-                          step={0.01}
-                        />
-                      </div>
-                    </InputWrapper>
-                  </Column>
-                  <Column lg={8} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="unit"
-                        type="comboBox"
-                        getValues={getValues}
-                        id="dosingUnits"
-                        shouldFilterItem={filterItemsByName}
-                        placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
-                        titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                        items={drugDosingUnits}
-                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
-                        handleAfterChange={handleUnitAfterChange}
-                      />
-                    </InputWrapper>
+                  <Column md={8}>
+                    <ControlledFieldInput
+                      control={control}
+                      name="freeTextDosage"
+                      type="textArea"
+                      labelText={t('freeTextDosage', 'Free text dosage')}
+                      placeholder={t('freeTextDosage', 'Free text dosage')}
+                      maxLength={65535}
+                    />
                   </Column>
                 </Grid>
-                <Grid className={styles.gridRow}>
-                  <Column lg={16} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        id="editRoute"
-                        items={drugRoutes}
-                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
-                        name="route"
-                        placeholder={t('editRouteComboBoxTitle', 'Route')}
-                        shouldFilterItem={filterItemsByName}
-                        titleText={t('editRouteComboBoxTitle', 'Route')}
-                        type="comboBox"
-                      />
-                    </InputWrapper>
-                  </Column>
-                  <Column lg={16} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="frequency"
-                        type="comboBox"
-                        id="editFrequency"
-                        items={orderFrequencies}
-                        shouldFilterItem={filterItemsBySynonymNames}
-                        placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
-                        titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                        itemToString={(item: CommonMedicationValueCoded) => item?.value}
-                      />
-                    </InputWrapper>
-                  </Column>
-                </Grid>
-
-                <Grid className={styles.gridRow}>
-                  <Column lg={16} md={4} sm={4}>
-                    <InputWrapper>
-                      <ControlledFieldInput
-                        control={control}
-                        name="patientInstructions"
-                        type="textArea"
-                        labelText={t('patientInstructions', 'Patient instructions')}
-                        placeholder={t(
-                          'patientInstructionsPlaceholder',
-                          'Additional dosing instructions (e.g. "Take after eating")',
-                        )}
-                        maxLength={65535}
-                        rows={isTablet ? 6 : 4}
-                      />
-                    </InputWrapper>
-                  </Column>
-                  <Column className={styles.prn} lg={16} md={4} sm={4}>
-                    <Grid className={styles.gridRow}>
-                      <Column lg={6} md={8} sm={4}>
-                        <InputWrapper>
-                          <FormGroup legendText={t('prn', 'P.R.N.')}>
-                            <ControlledFieldInput
-                              control={control}
-                              name="asNeeded"
-                              type="checkbox"
-                              id="prn"
-                              labelText={t('takeAsNeeded', 'Take as needed')}
-                            />
-                          </FormGroup>
-                        </InputWrapper>
-                      </Column>
-
-                      <Column lg={10} md={8} sm={4}>
-                        <InputWrapper>
+              ) : (
+                <>
+                  <Grid className={styles.gridRow}>
+                    <Column lg={8} md={4} sm={4} className={styles.linkedInput}>
+                      <InputWrapper>
+                        <div className={styles.numberInput}>
                           <ControlledFieldInput
                             control={control}
-                            name="asNeededCondition"
-                            type="textArea"
-                            labelText={t('prnReason', 'P.R.N. reason')}
-                            placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
-                            rows={3}
-                            maxLength={255}
-                            disabled={!watch('asNeeded')}
+                            type="number"
+                            name="dosage"
+                            id="doseSelection"
+                            placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                            label={t('editDoseComboBoxTitle', 'Dose')}
+                            min={0}
+                            hideSteppers={true}
+                            step={0.01}
                           />
-                        </InputWrapper>
-                      </Column>
-                    </Grid>
-                  </Column>
-                </Grid>
-              </>
-            )}
-          </section>
-          <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
-            <Grid className={styles.gridRow}>
-              {/* TODO: This input does nothing */}
-              <Column lg={16} md={4} sm={4}>
-                <div className={styles.fullWidthDatePickerContainer}>
-                  <InputWrapper>
-                    <Controller
-                      name="startDate"
-                      control={control}
-                      render={({ field, fieldState }) => (
-                        <OpenmrsDatePicker
-                          {...field}
-                          maxDate={new Date()}
-                          id="startDatePicker"
-                          labelText={t('startDate', 'Start date')}
-                          size={isTablet ? 'lg' : 'sm'}
-                          invalid={Boolean(fieldState?.error?.message)}
-                          invalidText={fieldState?.error?.message}
+                        </div>
+                      </InputWrapper>
+                    </Column>
+                    <Column lg={8} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="unit"
+                          type="comboBox"
+                          getValues={getValues}
+                          id="dosingUnits"
+                          shouldFilterItem={filterItemsByName}
+                          placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                          titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                          items={drugDosingUnits}
+                          itemToString={(item: CommonMedicationValueCoded) => item?.value}
+                          handleAfterChange={handleUnitAfterChange}
                         />
-                      )}
+                      </InputWrapper>
+                    </Column>
+                  </Grid>
+                  <Grid className={styles.gridRow}>
+                    <Column lg={16} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          id="editRoute"
+                          items={drugRoutes}
+                          itemToString={(item: CommonMedicationValueCoded) => item?.value}
+                          name="route"
+                          placeholder={t('editRouteComboBoxTitle', 'Route')}
+                          shouldFilterItem={filterItemsByName}
+                          titleText={t('editRouteComboBoxTitle', 'Route')}
+                          type="comboBox"
+                        />
+                      </InputWrapper>
+                    </Column>
+                    <Column lg={16} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="frequency"
+                          type="comboBox"
+                          id="editFrequency"
+                          items={orderFrequencies}
+                          shouldFilterItem={filterItemsBySynonymNames}
+                          placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
+                          titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
+                          itemToString={(item: CommonMedicationValueCoded) => item?.value}
+                        />
+                      </InputWrapper>
+                    </Column>
+                  </Grid>
+
+                  <Grid className={styles.gridRow}>
+                    <Column lg={16} md={4} sm={4}>
+                      <InputWrapper>
+                        <ControlledFieldInput
+                          control={control}
+                          name="patientInstructions"
+                          type="textArea"
+                          labelText={t('patientInstructions', 'Patient instructions')}
+                          placeholder={t(
+                            'patientInstructionsPlaceholder',
+                            'Additional dosing instructions (e.g. "Take after eating")',
+                          )}
+                          maxLength={65535}
+                          rows={isTablet ? 6 : 4}
+                        />
+                      </InputWrapper>
+                    </Column>
+                    <Column className={styles.prn} lg={16} md={4} sm={4}>
+                      <Grid className={styles.gridRow}>
+                        <Column lg={6} md={8} sm={4}>
+                          <InputWrapper>
+                            <FormGroup legendText={t('prn', 'P.R.N.')}>
+                              <ControlledFieldInput
+                                control={control}
+                                name="asNeeded"
+                                type="checkbox"
+                                id="prn"
+                                labelText={t('takeAsNeeded', 'Take as needed')}
+                              />
+                            </FormGroup>
+                          </InputWrapper>
+                        </Column>
+
+                        <Column lg={10} md={8} sm={4}>
+                          <InputWrapper>
+                            <ControlledFieldInput
+                              control={control}
+                              name="asNeededCondition"
+                              type="textArea"
+                              labelText={t('prnReason', 'P.R.N. reason')}
+                              placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
+                              rows={3}
+                              maxLength={255}
+                              disabled={!watch('asNeeded')}
+                            />
+                          </InputWrapper>
+                        </Column>
+                      </Grid>
+                    </Column>
+                  </Grid>
+                </>
+              )}
+            </section>
+            <section className={styles.formSection}>
+              <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
+              <Grid className={styles.gridRow}>
+                {/* TODO: This input does nothing */}
+                <Column lg={16} md={4} sm={4}>
+                  <div className={styles.fullWidthDatePickerContainer}>
+                    <InputWrapper>
+                      <Controller
+                        name="startDate"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <OpenmrsDatePicker
+                            {...field}
+                            maxDate={new Date()}
+                            id="startDatePicker"
+                            labelText={t('startDate', 'Start date')}
+                            size={isTablet ? 'lg' : 'sm'}
+                            invalid={Boolean(fieldState?.error?.message)}
+                            invalidText={fieldState?.error?.message}
+                          />
+                        )}
+                      />
+                    </InputWrapper>
+                  </div>
+                </Column>
+                <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
+                  <InputWrapper>
+                    {!isTablet ? (
+                      <ControlledFieldInput
+                        control={control}
+                        name="duration"
+                        type="number"
+                        id="durationInput"
+                        label={t('duration', 'Duration')}
+                        min={0}
+                        step={1}
+                        allowEmpty
+                      />
+                    ) : (
+                      <CustomNumberInput
+                        control={control}
+                        isTablet={isTablet}
+                        setValue={setValue}
+                        name="duration"
+                        labelText={t('duration', 'Duration')}
+                      />
+                    )}
+                  </InputWrapper>
+                </Column>
+                <Column className={styles.durationUnit} lg={8} md={2} sm={4}>
+                  <InputWrapper>
+                    <ControlledFieldInput
+                      control={control}
+                      name="durationUnit"
+                      type="comboBox"
+                      id="durationUnitPlaceholder"
+                      titleText={t('durationUnit', 'Duration unit')}
+                      items={durationUnits}
+                      itemToString={(item: CommonMedicationValueCoded) => item?.value}
+                      placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                      shouldFilterItem={filterItemsByName}
                     />
                   </InputWrapper>
-                </div>
-              </Column>
-              <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
-                <InputWrapper>
-                  {!isTablet ? (
+                </Column>
+              </Grid>
+            </section>
+            <section className={styles.formSection}>
+              <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
+              <Grid className={styles.gridRow}>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
                     <ControlledFieldInput
                       control={control}
-                      name="duration"
+                      name="pillsDispensed"
                       type="number"
-                      id="durationInput"
-                      label={t('duration', 'Duration')}
+                      id="quantityDispensed"
+                      label={t('quantityToDispense', 'Quantity to dispense')}
                       min={0}
-                      step={1}
+                      hideSteppers
                       allowEmpty
                     />
-                  ) : (
-                    <CustomNumberInput
-                      control={control}
-                      isTablet={isTablet}
-                      setValue={setValue}
-                      name="duration"
-                      labelText={t('duration', 'Duration')}
-                    />
-                  )}
-                </InputWrapper>
-              </Column>
-              <Column className={styles.durationUnit} lg={8} md={2} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="durationUnit"
-                    type="comboBox"
-                    id="durationUnitPlaceholder"
-                    titleText={t('durationUnit', 'Duration unit')}
-                    items={durationUnits}
-                    itemToString={(item: CommonMedicationValueCoded) => item?.value}
-                    placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                    shouldFilterItem={filterItemsByName}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          </section>
-          <section className={styles.formSection}>
-            <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
-            <Grid className={styles.gridRow}>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="pillsDispensed"
-                    type="number"
-                    id="quantityDispensed"
-                    label={t('quantityToDispense', 'Quantity to dispense')}
-                    min={0}
-                    hideSteppers
-                    allowEmpty
-                  />
-                </InputWrapper>
-              </Column>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    id="dispensingUnits"
-                    items={drugDispensingUnits}
-                    itemToString={(item: CommonMedicationValueCoded) => item?.value}
-                    name="quantityUnits"
-                    placeholder={t('editDispensingUnit', 'Quantity unit')}
-                    shouldFilterItem={filterItemsByName}
-                    titleText={t('editDispensingUnit', 'Quantity unit')}
-                    type="comboBox"
-                  />
-                </InputWrapper>
-              </Column>
-              <Column lg={8} md={3} sm={4}>
-                <InputWrapper>
-                  {!isTablet ? (
+                  </InputWrapper>
+                </Column>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
                     <ControlledFieldInput
                       control={control}
-                      name="numRefills"
-                      type="number"
-                      id="prescriptionRefills"
-                      min={0}
-                      label={t('prescriptionRefills', 'Prescription refills')}
-                      max={99}
-                      allowEmpty
+                      id="dispensingUnits"
+                      items={drugDispensingUnits}
+                      itemToString={(item: CommonMedicationValueCoded) => item?.value}
+                      name="quantityUnits"
+                      placeholder={t('editDispensingUnit', 'Quantity unit')}
+                      shouldFilterItem={filterItemsByName}
+                      titleText={t('editDispensingUnit', 'Quantity unit')}
+                      type="comboBox"
                     />
-                  ) : (
-                    <CustomNumberInput
+                  </InputWrapper>
+                </Column>
+                <Column lg={8} md={3} sm={4}>
+                  <InputWrapper>
+                    {!isTablet ? (
+                      <ControlledFieldInput
+                        control={control}
+                        name="numRefills"
+                        type="number"
+                        id="prescriptionRefills"
+                        min={0}
+                        label={t('prescriptionRefills', 'Prescription refills')}
+                        max={99}
+                        allowEmpty
+                      />
+                    ) : (
+                      <CustomNumberInput
+                        control={control}
+                        isTablet={isTablet}
+                        setValue={setValue}
+                        name="numRefills"
+                        labelText={t('prescriptionRefills', 'Prescription refills')}
+                      />
+                    )}
+                  </InputWrapper>
+                </Column>
+              </Grid>
+              <Grid className={styles.gridRow}>
+                <Column lg={16} md={6} sm={4}>
+                  <InputWrapper>
+                    <ControlledFieldInput
                       control={control}
-                      isTablet={isTablet}
-                      setValue={setValue}
-                      name="numRefills"
-                      labelText={t('prescriptionRefills', 'Prescription refills')}
+                      name="indication"
+                      type="textInput"
+                      id="indication"
+                      labelText={t('indication', 'Indication')}
+                      placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                      maxLength={150}
                     />
-                  )}
-                </InputWrapper>
-              </Column>
-            </Grid>
-            <Grid className={styles.gridRow}>
-              <Column lg={16} md={6} sm={4}>
-                <InputWrapper>
-                  <ControlledFieldInput
-                    control={control}
-                    name="indication"
-                    type="textInput"
-                    id="indication"
-                    labelText={t('indication', 'Indication')}
-                    placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                    maxLength={150}
-                  />
-                </InputWrapper>
-              </Column>
-            </Grid>
-          </section>
-        </div>
+                  </InputWrapper>
+                </Column>
+              </Grid>
+            </section>
+          </div>
 
-        <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
-            {t('discard', 'Discard')}
-          </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            size="xl"
-            disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
-          >
-            {saveButtonText}
-          </Button>
-        </ButtonSet>
-      </Form>
-    </div>
+          <ButtonSet className={styles.buttonSet}>
+            <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+              {t('discard', 'Discard')}
+            </Button>
+            <Button
+              className={styles.button}
+              kind="primary"
+              type="submit"
+              size="xl"
+              disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
+            >
+              {saveButtonText}
+            </Button>
+          </ButtonSet>
+        </Form>
+      </div>
+    </Workspace2>
   );
 }
 

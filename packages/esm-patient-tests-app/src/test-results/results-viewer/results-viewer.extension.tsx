@@ -2,17 +2,17 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { ContentSwitcher, Switch, Button } from '@carbon/react';
+import { ContentSwitcher, Switch, Button, DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
+import { type Roots } from '../filter/filter-context';
 import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTableTablet from '../individual-results-table-tablet/individual-results-table-tablet.component';
 import TreeView from '../tree-view/tree-view.component';
 import styles from './results-viewer.scss';
-import { type Roots } from '../filter/filter-context';
 
 type panelOpts = 'tree' | 'panel';
 
@@ -36,9 +36,13 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
 
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
   if (roots?.length) {
     return (
-      <FilterProvider roots={!isLoading ? (roots as Roots) : []} isLoading={isLoading}>
+      <FilterProvider roots={roots as Roots} isLoading={isLoading}>
         <ResultsViewer patientUuid={patientUuid} basePath={basePath} />
       </FilterProvider>
     );
@@ -47,7 +51,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
   return (
     <EmptyState
       headerTitle={t('testResults_title', 'Test Results')}
-      displayText={t('testResultsData', 'Test results data')}
+      displayText={t('testResultsData', 'test results data')}
     />
   );
 };

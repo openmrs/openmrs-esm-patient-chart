@@ -2,37 +2,26 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, useLayoutType, useConfig, MaybeIcon } from '@openmrs/esm-framework';
 import {
-  AddIcon,
-  closeWorkspace,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  useLayoutType,
-  useConfig,
-  MaybeIcon,
-  launchWorkspace,
-  useWorkspaces,
-  type Visit,
-} from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
+  type TestOrderBasketItem,
+  useOrderBasket,
+  useOrderType,
+  type OrderBasketExtensionProps,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../../config-schema';
-import type { TestOrderBasketItem } from '../../types';
 import { LabOrderBasketItemTile } from './lab-order-basket-item-tile.component';
 import { prepTestOrderPostData } from '../api';
+import LabIcon from './lab-icon.component';
 import styles from './lab-order-basket-panel.scss';
 
-interface OrderBasketSlotProps {
-  patientUuid: string;
-  patient: fhir.Patient;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
-}
-
 /**
+ * The extension is slotted into order-basket-slot in the main Order Basket workspace by default.
+ * It renders the "Add +" button for lab orders, and lists pending lab orders in the order basket.
+ *
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
- * Slotted into order-basket-slot by default
  */
-const LabOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient }) => {
+export function LabOrderBasketPanelExtension({ patient, launchLabOrderForm }: OrderBasketExtensionProps) {
   const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
@@ -48,33 +37,30 @@ const LabOrderBasketPanelExtension: React.FC<OrderBasketSlotProps> = ({ patient 
   return (
     <>
       {allOrderTypes.map((orderTypeConfig) => (
-        <LabOrderBasketPanel patient={patient} key={orderTypeConfig.orderTypeUuid} {...orderTypeConfig} />
+        <LabOrderBasketPanel
+          key={orderTypeConfig.orderTypeUuid}
+          patient={patient}
+          {...orderTypeConfig}
+          launchLabOrderForm={launchLabOrderForm}
+        />
       ))}
     </>
   );
-};
-
-export const WORKSPACES = {
-  TEST_RESULTS_FORM: 'test-results-form-workspace',
-  ORDER_BASKET: 'order-basket',
-};
+}
 
 type OrderTypeConfig = ConfigObject['additionalTestOrderTypes'][0];
 
 interface LabOrderBasketPanelProps extends OrderTypeConfig {
   patient: fhir.Patient;
+  launchLabOrderForm(orderTypeUuid: string, order?: TestOrderBasketItem): void;
 }
 
-function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBasketPanelProps) {
+function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrderForm }: LabOrderBasketPanelProps) {
   const { t } = useTranslation();
-  type WorkSpaceType = (typeof WORKSPACES)[keyof typeof WORKSPACES];
   const isTablet = useLayoutType() === 'tablet';
+  const responsiveSize = isTablet ? 'md' : 'sm';
+  const isDefaultLabOrder = icon === 'omrs-icon-lab-order';
   const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const { workspaces = [{ name: WORKSPACES.ORDER_BASKET, additionalProps: {} }] } = useWorkspaces();
-  const [prevWorkSpace, setPrevWorkSpace] = useState(workspaces[0]?.name);
-  const [prevOrder, setPrevOrder] = useState(
-    workspaces[0]?.name === WORKSPACES.TEST_RESULTS_FORM ? workspaces[0].additionalProps['order'] : null,
-  );
   const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
@@ -112,41 +98,6 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
       discontinuedOrderBasketItems,
     };
   }, [orders]);
-  const isWorkSpaceType = useCallback((value: string): value is WorkSpaceType => {
-    return Object.values(WORKSPACES).includes(value as WorkSpaceType);
-  }, []);
-
-  const openNewLabForm = useCallback(() => {
-    closeWorkspace(isWorkSpaceType(prevWorkSpace) ? prevWorkSpace : WORKSPACES.ORDER_BASKET, {
-      ignoreChanges: true,
-      onWorkspaceClose: () =>
-        launchWorkspace('add-lab-order', {
-          orderTypeUuid: orderTypeUuid,
-          prevWorkSpace: prevWorkSpace,
-          isWorkSpaceType: isWorkSpaceType,
-          prevOrder: prevOrder,
-        }),
-      closeWorkspaceGroup: false,
-    });
-  }, [orderTypeUuid, isWorkSpaceType, prevOrder, prevWorkSpace]);
-
-  const openEditLabForm = useCallback(
-    (order: OrderBasketItem) => {
-      closeWorkspace(isWorkSpaceType(prevWorkSpace) ? prevWorkSpace : WORKSPACES.ORDER_BASKET, {
-        ignoreChanges: true,
-        onWorkspaceClose: () =>
-          launchWorkspace('add-lab-order', {
-            order,
-            orderTypeUuid: orderTypeUuid,
-            prevWorkSpace: prevWorkSpace,
-            isWorkSpaceType: isWorkSpaceType,
-            prevOrder: prevOrder,
-          }),
-        closeWorkspaceGroup: false,
-      });
-    },
-    [orderTypeUuid, isWorkSpaceType, prevOrder, prevWorkSpace],
-  );
 
   const removeLabOrder = useCallback(
     (order: TestOrderBasketItem) => {
@@ -171,25 +122,23 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
         [styles.collapsedTile]: !isExpanded,
       })}
     >
-      <div className={styles.container}>
+      <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
-          <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
-          <h4 className={styles.heading}>{`${
-            isWorkSpaceType(prevWorkSpace) && prevWorkSpace === WORKSPACES.ORDER_BASKET
-              ? label
-                ? t(label)
-                : orderType?.display
-              : t('tests', 'Tests')
-          } (${orders.length})`}</h4>
+          {isDefaultLabOrder ? (
+            <LabIcon isTablet={isTablet} />
+          ) : (
+            <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
+          )}
+          <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
         </div>
         <div className={styles.buttonContainer}>
           <Button
             className={styles.addButton}
             iconDescription="Add lab order"
             kind="ghost"
-            onClick={openNewLabForm}
+            onClick={() => launchLabOrderForm(orderTypeUuid)}
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            size={isTablet ? 'md' : 'sm'}
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -203,6 +152,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
               isExpanded ? <ChevronUpIcon size={16} {...props} /> : <ChevronDownIcon size={16} {...props} />
             }
+            size={responsiveSize}
           >
             {t('add', 'Add')}
           </Button>
@@ -217,7 +167,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
                   {incompleteOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => launchLabOrderForm(orderTypeUuid, order)}
                       onRemoveClick={() => removeLabOrder(order)}
                       orderBasketItem={order}
                     />
@@ -229,7 +179,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
                   {newOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => launchLabOrderForm(orderTypeUuid, order)}
                       onRemoveClick={() => removeLabOrder(order)}
                       orderBasketItem={order}
                     />
@@ -242,7 +192,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
                   {renewedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => launchLabOrderForm(orderTypeUuid, order)}
                       onRemoveClick={() => removeLabOrder(order)}
                       orderBasketItem={order}
                     />
@@ -255,7 +205,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
                   {revisedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => launchLabOrderForm(orderTypeUuid, order)}
                       onRemoveClick={() => removeLabOrder(order)}
                       orderBasketItem={order}
                     />
@@ -268,7 +218,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient }: LabOrderBa
                   {discontinuedOrderBasketItems.map((order) => (
                     <LabOrderBasketItemTile
                       key={order.uuid}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => launchLabOrderForm(orderTypeUuid, order)}
                       onRemoveClick={() => removeLabOrder(order)}
                       orderBasketItem={order}
                     />

@@ -55,7 +55,11 @@ test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => 
     await chartPage.page.getByRole('button', { name: /clear selected item/i }).click();
     await chartPage.page.getByRole('combobox', { name: /select a location/i }).click();
     await chartPage.page.getByRole('combobox', { name: /select a location/i }).clear();
-    await chartPage.page.getByRole('option', { name: /inpatient ward/i }).click();
+
+    const inpatientOption = chartPage.page.getByRole('option', { name: /inpatient ward/i });
+    await expect(inpatientOption).toBeVisible();
+    await inpatientOption.click();
+
     await chartPage.page.getByText(/home visit/i).click();
     await expect(chartPage.page.getByLabel(/home visit/i)).toBeChecked();
     await chartPage.page.getByRole('button', { name: /update visit/i }).click();
@@ -98,19 +102,31 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   });
 
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
-    // Wait for default location to load to ensure form is stable before interaction
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).not.toHaveValue('');
+    await expect(chartPage.page.getByTestId('visitStartDateInput')).toBeVisible();
 
-    await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
+    const endedTab = visitsPage.page.getByRole('tab', { name: /ended/i });
+    await endedTab.click();
 
-    // Wait for end date field to appear (confirms form has updated after status change)
-    await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible();
+    // Wait for the tab to be selected
+    await expect(endedTab).toHaveAttribute('aria-selected', 'true');
 
-    await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');
+    // Wait for the section title to change indicating the state has updated
+    await expect(chartPage.page.getByText(/visit start and end date/i)).toBeVisible({ timeout: 15000 });
+
+    // Wait for the stop date input to be visible after tab switch
+    await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible({ timeout: 15000 });
+
+    // Wait for end time input to appear - it renders conditionally when visitStatus becomes 'past'
+    const endTimeInput = chartPage.page.getByRole('textbox', { name: /end time/i });
+    await expect(endTimeInput).toBeVisible({ timeout: 15000 });
+
+    // Now fill start time
+    const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
+    await startTimeInput.fill('12:00');
     await chartPage.page.getByLabel(/start time format/i).selectOption('AM');
 
-    const endTimeInput = chartPage.page.getByRole('textbox', { name: /end time/i });
-    await expect(endTimeInput).toBeVisible();
+    // Fill end time
     await endTimeInput.fill('12:10');
     await chartPage.page.getByLabel(/end time format/i).selectOption('AM');
   });

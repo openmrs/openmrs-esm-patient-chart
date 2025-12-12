@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { EncounterList } from './encounter-list.component';
 import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-builder';
 import styles from './encounter-list-tabs.scss';
 import { filter } from '../utils/helpers';
 import { type Encounter } from '../types';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface EncounterListTabsComponentProps {
   patientUuid: string;
@@ -31,7 +31,7 @@ const EncounterListTabsExtension: React.FC<EncounterListTabsComponentProps> = ({
     otherConceptUuid: config.otherConceptUuid,
   };
 
-  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions, configConcepts);
+  const tabsConfig = getMenuItemTabsConfiguration(tabDefinitions, configConcepts, t);
 
   const tabFilters = useMemo(() => {
     return tabsConfig.reduce((result, tab) => {

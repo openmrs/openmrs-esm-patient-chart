@@ -1,6 +1,5 @@
 {
   "actions": "ქმედებები",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "დაემატება სად:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "ვიზიტის დამატება",
@@ -99,6 +98,7 @@
   "nextPage": "შემდეგი გვერდი",
   "no": "არა",
   "noActiveVisit": "აქტიური ვიზიტების გარეშე",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "You can't add data to the patient chart without an active visit. Would you like to start a new visit?",
   "noDiagnosesFound": "დიაგნოზები აღმოჩენილი არაა",
   "noEncountersToDisplay": "საჩვენებელი კონსულტაციების გარეშე",

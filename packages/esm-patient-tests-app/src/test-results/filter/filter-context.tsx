@@ -195,7 +195,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
     if (roots.length && !Object.keys(state.parents).length) {
       actions.initialize(roots);
     }
-  }, [actions, state, roots]);
+  }, [actions, state.parents, roots]);
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;

@@ -75,17 +75,17 @@
   ],
   "workspaces": [
     {
-      "name": "add-drug-order",
-      "title": "addDrugOrderWorkspaceTitle",
-      "component": "addDrugOrderWorkspace",
-      "type": "order"
-    },
-    {
       "name": "fill-prescription-form",
       "title": "fillPrescription",
       "component": "fillPrescriptionFormWorkspace",
       "type": "order"
     }
-    
+  ],
+  "workspaces2": [
+    {
+      "name": "add-drug-order",
+      "component": "addDrugOrderWorkspace",
+      "window": "patient-chart-order-basket"
+    }
   ]
 }
