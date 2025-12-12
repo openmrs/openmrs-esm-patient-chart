@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import {
   DataTable,
   Table,
@@ -148,10 +148,22 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     sortDirection: config.tableSortOldestFirst ? 'ASC' : 'DESC',
   });
 
+  // Track whether the component is still mounted to avoid state updates after unmount
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const handleSorting = useCallback(
     (cellA: any, cellB: any, { key, sortDirection }: { key: string; sortDirection: DataTableSortState }) => {
-      // Use setTimeout to avoid setState during render
+      // Use setTimeout to defer setState until after render completes.
+      // This avoids setState during render (which Carbon DataTable's sortRow triggers).
+      // The isMountedRef check prevents state updates after unmount.
       setTimeout(() => {
+        if (!isMountedRef.current) return;
         if (sortDirection === 'NONE') {
           setSortParams({ key: '', sortDirection });
         } else {
