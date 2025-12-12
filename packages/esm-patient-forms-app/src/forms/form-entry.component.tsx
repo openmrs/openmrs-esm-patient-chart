@@ -6,6 +6,7 @@ import {
   useConnectivity,
   Workspace2,
   type Workspace2DefinitionProps,
+  type Encounter,
 } from '@openmrs/esm-framework';
 import { type Form, type FormRendererProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,7 @@ export interface FormEntryProps {
   visitContext;
   mutateVisitContext;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  handlePostResponse?: (encounter: Encounter) => void;
 }
 
 const FormEntry: React.FC<FormEntryProps> = ({
@@ -31,6 +33,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   visitContext,
   mutateVisitContext,
   closeWorkspace,
+  handlePostResponse,
 }) => {
   const formUuid = form.uuid;
   const visitStartDatetime = visitContext?.startDatetime;
@@ -57,6 +60,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? null,
+      handlePostResponse,
       closeWorkspace: () => {
         return closeWorkspace();
       },
@@ -80,6 +84,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       encounterUuid,
       formUuid,
       globalMutate,
+      handlePostResponse,
       isOnline,
       mutateVisitContext,
       patient,
