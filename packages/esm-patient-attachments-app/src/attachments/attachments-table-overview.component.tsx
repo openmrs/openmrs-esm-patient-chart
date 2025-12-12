@@ -4,8 +4,7 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
-  OverflowMenu,
-  OverflowMenuItem,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -15,7 +14,13 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { type Attachment, ResponsiveWrapper, useLayoutType } from '@openmrs/esm-framework';
+import {
+  type Attachment,
+  getCoreTranslation,
+  ResponsiveWrapper,
+  TrashCanIcon,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { compare, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { type AttachmentTableData } from '../utils';
 import styles from './attachments-table-overview.scss';
@@ -37,7 +42,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
-  const responsiveSize = isTablet ? 'lg' : 'sm';
+  const responsiveSize = isTablet ? 'lg' : 'md';
 
   const rows = useMemo(
     () =>
@@ -58,8 +63,19 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
           content: attachment.dateTime,
           sortKey: new Date(attachment.dateTimeValue).getTime(),
         },
+        actions: (
+          <IconButton
+            align="top-end"
+            kind="ghost"
+            label={getCoreTranslation('delete')}
+            onClick={() => onDeleteAttachment(attachment)}
+            size={responsiveSize}
+          >
+            <TrashCanIcon size={16} />
+          </IconButton>
+        ),
       })),
-    [attachments, onOpenAttachment, responsiveSize],
+    [attachments, onDeleteAttachment, onOpenAttachment, responsiveSize],
   );
 
   const headers = useMemo(
@@ -67,29 +83,42 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
       {
         key: 'fileName',
         header: t('fileName', 'File name'),
-        colSpan: 1,
       },
       {
         key: 'type',
         header: t('type', 'Type'),
-        colSpan: 1,
       },
       {
         key: 'dateUploaded',
         header: t('dateUploaded', 'Date uploaded'),
-        colSpan: 2,
         isSortable: true,
+      },
+      {
+        key: 'actions',
+        header: '',
       },
     ],
     [t],
   );
 
-  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
+  const sortRow = (
+    cellA: { sortKey?: number },
+    cellB: { sortKey?: number },
+    { sortDirection, sortStates }: { sortDirection: string; sortStates: { DESC: string } },
+  ) => {
     if (sortDirection === sortStates.DESC) {
       return compare(cellA?.sortKey, cellB?.sortKey);
     }
     return compare(cellB?.sortKey, cellA?.sortKey);
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.attachmentTable}>
+        <DataTableSkeleton className={styles.dataTableSkeleton} compact={isDesktop} zebra />
+      </div>
+    );
+  }
 
   if (!rows.length) {
     return (
@@ -104,30 +133,16 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className={styles.attachmentTable}>
-        <DataTableSkeleton className={styles.dataTableSkeleton} compact={isDesktop} zebra />
-      </div>
-    );
-  }
-
   return (
-    <TableContainer>
-      <DataTable
-        rows={rows}
-        headers={headers}
-        overflowMenuOnHover={isDesktop}
-        // `xs` on desktop to account for the overflow menu
-        size={isTablet ? 'lg' : 'xs'}
-        sortRow={sortRow}
-      >
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+    <DataTable rows={rows} headers={headers} overflowMenuOnHover={isDesktop} size={responsiveSize} sortRow={sortRow}>
+      {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+        <TableContainer>
           <Table {...getTableProps()} useZebraStyles>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
                   <TableHeader
+                    key={header.key}
                     {...getHeaderProps({
                       header,
                     })}
@@ -138,28 +153,18 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row, indx) => (
-                <TableRow key={row.id}>
+              {rows.map((row) => (
+                <TableRow key={row.id} {...getRowProps({ row })}>
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
-                  <TableCell className="cds--table-column-menu">
-                    <OverflowMenu flipped size={responsiveSize}>
-                      <OverflowMenuItem
-                        className={styles.menuItem}
-                        itemText={t('delete', 'Delete')}
-                        isDelete
-                        onClick={() => onDeleteAttachment(attachments[indx])}
-                      />
-                    </OverflowMenu>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        )}
-      </DataTable>
-    </TableContainer>
+        </TableContainer>
+      )}
+    </DataTable>
   );
 };
 
