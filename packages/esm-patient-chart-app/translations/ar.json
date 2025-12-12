@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "تعديل هذا اللقاء",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Edit visit details",
   "emptyStateText": "لا يوجد {{displayText}} لعرضه لهذا المريض",
   "enable": "Enable",
@@ -98,6 +98,7 @@
   "nextPage": "Next page",
   "no": "لا",
   "noActiveVisit": "لا يوجد زيارة نشطة",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "لا يمكنك إضافة بيانات إلى السجل الطبي للمريض بدون زيارة نشطة. هل ترغب في بدء زيارة جديدة؟",
   "noDiagnosesFound": "لم يتم العثور على تشخيصات",
   "noEncountersToDisplay": "لا يوجد لقاءات لعرضها",

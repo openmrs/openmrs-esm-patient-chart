@@ -37,7 +37,7 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(page.getByText(/soap note template/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /soap note template/i })).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` question', async () => {
@@ -57,15 +57,15 @@ test('Fill a clinical form', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
+    await page.getByRole('button', { name: /order basket/i }).click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
-    await page.getByRole('button', { name: /add/i }).nth(1).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).first().click();
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
-    await page.getByLabel(/clinical forms/i, { exact: true }).click();
+    await page.getByRole('button', { name: /clinical forms/i }).click();
   });
 
   await test.step('Then I should see retained inputs in `Soap note template` form', async () => {
@@ -131,7 +131,7 @@ test('Fill a form with a browser slightly ahead of time', async ({ page, patient
   });
 
   await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
-    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /laboratory test results/i })).toBeVisible();
   });
 
   await test.step('When I fill the `White Blood Cells (WBC)` result as `5000', async () => {
@@ -179,7 +179,7 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('Then I should see the `Soap note template` form launch in the workspace', async () => {
-    await expect(page.getByText(/soap note template/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /soap note template/i })).toBeVisible();
   });
 
   await test.step('When I fill the `Subjective findings` and `Objective findings` questions', async () => {
@@ -188,11 +188,11 @@ test('Form state is retained when moving between forms in the workspace', async 
   });
 
   await test.step('And I click the `Order basket` button on the siderail', async () => {
-    await page.locator('[data-extension-id="order-basket-action-menu"] button').click();
+    await page.getByRole('button', { name: /order basket/i }).click();
   });
 
   await test.step('And I click the `Add +` button to order drugs', async () => {
-    await page.getByRole('button', { name: /add/i }).nth(1).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).first().click();
   });
 
   await test.step('And I click the `Clinical forms` button on the siderail', async () => {
@@ -226,11 +226,15 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I should see the `Laboratory Test Results` form launch in the workspace', async () => {
-    await expect(page.getByText(/laboratory test results/i)).toBeVisible();
+    await expect(page.locator('header').filter({ hasText: /laboratory test results/i })).toBeVisible();
   });
 
   await test.step('And I maximize the form', async () => {
-    await page.getByRole('button', { name: /maximize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /maximize/i })
+      .click();
   });
 
   await test.step('And I fill in values for the `White Blood Cells (WBC)`, `Platelets`, and `Neutrophils` questions', async () => {
@@ -241,11 +245,19 @@ test('Form state is retained when minimizing a form in the workspace', async ({ 
   });
 
   await test.step('Then I minimize the form in the workspace', async () => {
-    await page.getByRole('button', { name: /minimize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /minimize/i })
+      .click();
   });
 
   await test.step('And then I maximize the form in the workspace', async () => {
-    await page.getByRole('button', { name: /maximize/i }).click();
+    await page
+      .locator('header')
+      .filter({ hasText: /laboratory test results/i })
+      .getByRole('button', { name: /maximize/i })
+      .click();
   });
 
   await test.step('And I should see the original form state retained', async () => {

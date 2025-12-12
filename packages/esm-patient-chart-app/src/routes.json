@@ -2,7 +2,7 @@
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "optionalBackendDependencies": {
     "emrapi": {
-      "version": "^2.0.0",
+      "version": ">=2.0.0 <4.0.0",
       "feature": {
         "flagName": "emrapi-module",
         "label": "EMR API Module",
@@ -225,18 +225,38 @@
       "offline": true
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "mark-patient-deceased-workspace-form",
       "component": "markPatientDeceasedForm",
-      "title": "Mark patient deceased",
-      "type": "form"
+      "window": "mark-patient-deceased"
     },
     {
       "name": "start-visit-workspace-form",
       "component": "startVisitWorkspace",
-      "title": "startVisitWorkspaceTitle",
-      "type": "start-visit"
+      "window": "start-visit"
+    },
+    {
+      "name": "patient-chart-appointments-form-workspace",
+      "component": "@openmrs/esm-appointments-app#exportedAppointmentsFormWorkspace",
+      "window": "patient-chart-appointment-form"
     }
-  ]
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "start-visit",
+      "group": "patient-chart"
+    },
+    {
+      "name": "mark-patient-deceased",
+      "group": "patient-chart"
+    },
+    {
+      "name": "patient-chart-appointment-form",
+      "group": "patient-chart"
+    }
+  ],
+  "workspaceGroups2": [{
+    "name":"patient-chart"
+  }]
 }

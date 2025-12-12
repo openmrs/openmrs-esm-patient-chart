@@ -1,7 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  type Encounter,
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -12,22 +19,32 @@ import {
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import VisitNotesForm from './visit-notes-form.workspace';
+import VisitNotesForm, { type VisitNotesFormProps } from './visit-notes-form.workspace';
 
-const defaultProps = {
+const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = {
   closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  formContext: 'creating' as const,
-  patient: mockPatient,
-  patientUuid: mockPatient.id,
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  visitContext: null,
-  mutateVisitContext: null,
+  workspaceProps: {
+    formContext: 'creating' as const,
+  },
+  groupProps: {
+    patient: mockPatient,
+    patientUuid: mockPatient.id,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  launchChildWorkspace: jest.fn(),
+  windowProps: {},
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
 };
 
-function renderVisitNotesForm(props = {}) {
-  render(<VisitNotesForm {...defaultProps} {...props} />);
+function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {}) {
+  const props = {
+    ...defaultProps,
+    workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
+  };
+  render(<VisitNotesForm {...props} />);
 }
 
 const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
@@ -111,7 +128,7 @@ test('renders an error message when no matching diagnoses are found', async () =
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'COVID-21');
 
-  const errorMessage = await screen.findByText(/No diagnoses found/i);
+  await screen.findByText(/No diagnoses found/i);
   expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
 });
 
@@ -247,7 +264,7 @@ test('initializes form with existing encounter data when in edit mode', () => {
 
   renderVisitNotesForm({
     formContext: 'editing',
-    encounter: mockEncounter,
+    encounter: mockEncounter as any as Encounter, // TODO: fix
   });
 
   // Verify date is pre-filled
@@ -313,7 +330,7 @@ test('updates existing visit note when in edit mode', async () => {
 
   renderVisitNotesForm({
     formContext: 'editing',
-    encounter: mockEncounter,
+    encounter: mockEncounter as any as Encounter, // TODO: fix
   });
 
   // Update clinical note
@@ -377,4 +394,95 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
 
   // Verify new diagnosis is displayed
   expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+});
+
+test('allows saving visit note without primary diagnosis when isPrimaryDiagnosisRequired is false', async () => {
+  const user = userEvent.setup();
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+
+  const successPayload = {
+    encounterProviders: expect.arrayContaining([
+      {
+        encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
+        provider: mockSessionDataResponse.data.currentProvider.uuid,
+      },
+    ]),
+    encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
+    form: ConfigMock.visitNoteConfig.formConceptUuid,
+    location: mockSessionDataResponse.data.sessionLocation.uuid,
+    obs: expect.arrayContaining([
+      {
+        concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        value: 'Clinical note without diagnosis',
+      },
+    ]),
+    patient: mockPatient.id,
+    encounterDatetime: undefined,
+  };
+
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as ReturnType<
+    typeof saveVisitNote
+  >);
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Clinical note without diagnosis');
+  expect(clinicalNote).toHaveValue('Clinical note without diagnosis');
+
+  const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  await user.click(submitButton);
+
+  // Should not show validation error for missing primary diagnosis
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+
+  // Should successfully save the visit note
+  expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+  expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
+
+  // Reset mock for other tests
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+  });
+});
+
+test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async () => {
+  const user = userEvent.setup();
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: true,
+  });
+
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.clear(clinicalNote);
+  await user.type(clinicalNote, 'Clinical note without diagnosis');
+
+  const submitButton = screen.getByRole('button', { name: /save and close/i });
+  await user.click(submitButton);
+
+  // Should show validation error for missing primary diagnosis
+  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+
+  // Should not attempt to save
+  expect(mockSaveVisitNote).not.toHaveBeenCalled();
+
+  // Reset mock for other tests
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+  });
 });

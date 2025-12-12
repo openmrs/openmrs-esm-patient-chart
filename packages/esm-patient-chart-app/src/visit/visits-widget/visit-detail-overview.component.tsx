@@ -9,9 +9,10 @@ import styles from './visit-detail-overview.scss';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
+  patient: fhir.Patient;
 }
 
-function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
+function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
@@ -33,7 +34,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitHistoryTable patientUuid={patientUuid} />
+            <VisitHistoryTable patientUuid={patientUuid} patient={patient} />
           </TabPanel>
           {showAllEncountersTab && (
             <TabPanel>

@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "កែសម្រួលការជួបប្រទះលើកនេះ",
+  "editVisit": "Edit visit",
   "editVisitDetails": "កែសម្រួលព័ត៌មានលម្អិតនៃការពិនិត្យជំងឺ",
   "emptyStateText": "មិនមាន {{displayText}} បង្ហាញអំពីអ្នកជំងឺនេះទេ",
   "enable": "Enable",
@@ -98,6 +98,7 @@
   "nextPage": "Next page",
   "no": "ទេ",
   "noActiveVisit": "មិនមានការមកពិនិត្យជំងឺសកម្មទេ",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "អ្នកមិនអាចបន្ថែមទិន្នន័យទៅក្នុងតារាងអ្នកជំងឺដោយគ្មានការពិនិត្យជំងឺសកម្មបានទេ។ តើអ្នកចង់ចាប់ផ្តើមពិនិត្យជំងឺថ្មីទេ?",
   "noDiagnosesFound": "រកមិនឃើញរោគវិនិច្ឆ័យទេ",
   "noEncountersToDisplay": "ពុំមានព័ត៌មានការពិនិត្យបង្ហាញទេ",

@@ -19,30 +19,35 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
-  type DefaultPatientWorkspaceProps,
   type OrderUrgency,
   priorityOptions,
   useOrderBasket,
   useOrderType,
+  type TestOrderBasketItem,
+  postOrder,
+  useMutatePatientOrders,
+  showOrderSuccessToast,
 } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
-  launchWorkspace,
   OpenmrsDatePicker,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useSession,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import { ordersEqual } from './test-order';
 import { type ConfigObject } from '../../config-schema';
-import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
+export interface LabOrderFormProps {
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   initialOrder: TestOrderBasketItem;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
   patient: fhir.Patient;
 }
 
@@ -52,22 +57,22 @@ export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
 export function LabOrderForm({
   initialOrder,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
   orderTypeUuid,
-  orderableConceptSets,
-  patientUuid,
+  setHasUnsavedChanges,
   patient,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(patient, orderTypeUuid, prepTestOrderPostData);
+  const { orders, setOrders, clearOrders } = useOrderBasket<TestOrderBasketItem>(
+    patient,
+    orderTypeUuid,
+    prepTestOrderPostData,
+  );
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
-  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-
+  const { orderType } = useOrderType(orderTypeUuid);
+  const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
   const orderReasonRequired = useMemo(
     () =>
       (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})
@@ -139,7 +144,7 @@ export function LabOrderForm({
     return itemDisplay?.includes(inputValue);
   }, []);
 
-  const handleFormSubmission = useCallback(
+  const saveLabOrderToBasket = useCallback(
     (data: TestOrderBasketItem) => {
       const finalizedOrder: TestOrderBasketItem = {
         ...initialOrder,
@@ -162,21 +167,59 @@ export function LabOrderForm({
 
       setOrders(newOrders);
 
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-        closeWorkspaceGroup: false,
-      });
+      closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspace, initialOrder],
+  );
+
+  const submitLabOrderToServer = useCallback(
+    (data: TestOrderBasketItem) => {
+      const finalizedOrder: TestOrderBasketItem = {
+        ...initialOrder,
+        ...data,
+      };
+      finalizedOrder.orderer = session.currentProvider.uuid;
+      postOrder(prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid))
+        .then(() => {
+          clearOrders();
+          mutateOrders();
+
+          /* Translation keys used by showOrderSuccessToast:
+           * t('ordersCompleted', 'Orders completed')
+           * t('orderPlaced', 'Order placed')
+           * t('ordersPlaced', 'Orders placed')
+           * t('orderUpdated', 'Order updated')
+           * t('ordersUpdated', 'Orders updated')
+           * t('orderDiscontinued', 'Order discontinued')
+           * t('ordersDiscontinued', 'Orders discontinued')
+           * t('orderedFor', 'Placed order for')
+           * t('updated', 'Updated')
+           * t('discontinued', 'Discontinued')
+           */
+          showOrderSuccessToast('@openmrs/esm-patient-tests-app', [finalizedOrder]);
+          closeWorkspace({ discardUnsavedChanges: true });
+        })
+        .catch((error) => {
+          showSnackbar({
+            isLowContrast: false,
+            kind: 'error',
+            title: t('errorSavingLabOrder', 'Error saving lab order'),
+            subtitle: error.message,
+          });
+        });
+    },
+    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, session.currentProvider.uuid, t],
   );
 
   const cancelOrder = useCallback(() => {
     setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
+    closeWorkspace();
   }, [closeWorkspace, orders, setOrders, defaultValues]);
+
+  const closeModifyOrderWorkspace = useCallback(() => {
+    clearOrders();
+    closeWorkspace();
+  }, [clearOrders, closeWorkspace]);
 
   const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
     if (errors) {
@@ -198,19 +241,23 @@ export function LabOrderForm({
   );
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   return (
-    <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+    <Form
+      className={styles.orderForm}
+      onSubmit={handleSubmit(initialOrder?.action == 'REVISE' ? submitLabOrderToServer : saveLabOrderToBasket, onError)}
+      id="drugOrderForm"
+    >
       <div className={styles.form}>
         <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
         <Grid className={styles.gridRow}>
           <Column lg={16} md={8} sm={4}>
             <InputWrapper>
-              <span className={styles.testTypeLabel}>{t('testType', 'Test type')}</span>
+              <label className={styles.testTypeLabel}>{t('testType', 'Test type')}</label>
               <p className={styles.testType}>{initialOrder?.testType?.label}</p>
             </InputWrapper>
           </Column>
@@ -354,7 +401,12 @@ export function LabOrderForm({
         <ButtonSet
           className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
         >
-          <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
+          <Button
+            className={styles.button}
+            kind="secondary"
+            onClick={initialOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : cancelOrder}
+            size="xl"
+          >
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} kind="primary" size="xl" type="submit">

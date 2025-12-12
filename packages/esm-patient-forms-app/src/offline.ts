@@ -1,5 +1,6 @@
 import { escapeRegExp } from 'lodash-es';
 import {
+  launchWorkspace2,
   makeUrl,
   messageOmrsServiceWorker,
   omrsOfflineCachingStrategyHttpHeaderName,
@@ -10,7 +11,6 @@ import {
   type SyncProcessOptions,
   type Visit,
 } from '@openmrs/esm-framework';
-import { launchFormEntry } from '@openmrs/esm-patient-common-lib';
 import { formEncounterUrl, formEncounterUrlPoc } from './constants';
 import { type Form } from './types';
 
@@ -33,12 +33,10 @@ const patientFormSyncItem = 'patient-form';
 export async function setupPatientFormSync() {
   setupOfflineSync<PatientFormSyncItemContent>(patientFormSyncItem, ['visit'], syncPatientForm, {
     onBeginEditSyncItem(syncItem) {
-      launchFormEntry(
-        syncItem.content.formSchemaUuid,
-        syncItem.descriptor.patientUuid,
-        syncItem.content._id,
-        'Form Entry',
-      );
+      launchWorkspace2('patient-form-entry-workspace', {
+        form: syncItem.content.form,
+        encounterUuid: syncItem.content._id,
+      });
     },
   });
 }

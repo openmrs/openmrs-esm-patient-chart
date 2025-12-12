@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "Edit this encounter",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Edit visit details",
   "emptyStateText": "There are no {{displayText}} to display for this patient",
   "enable": "Enable",
@@ -98,6 +98,7 @@
   "nextPage": "Next page",
   "no": "No",
   "noActiveVisit": "No active visit",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "You can't add data to the patient chart without an active visit. Would you like to start a new visit?",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersToDisplay": "No encounters to display",

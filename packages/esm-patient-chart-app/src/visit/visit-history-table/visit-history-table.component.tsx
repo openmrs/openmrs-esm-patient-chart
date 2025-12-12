@@ -27,12 +27,13 @@ import styles from './visit-history-table.scss';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
+  patient: fhir.Patient;
 }
 
 /**
  * This show a list of visit histories in the visit tab in patient chart
  */
-const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) => {
+const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
@@ -54,7 +55,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const rowData = visits?.map((visit) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} />;
+      row[key] = <CellComponent key={key} visit={visit} patient={patient} />;
     }
     return row;
   });

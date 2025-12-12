@@ -2,6 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
 import {
@@ -12,7 +13,7 @@ import {
   updatePatientAllergy,
 } from './allergy-form.resource';
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
-import AllergyForm from './allergy-form.workspace';
+import AllergyForm, { type AllergyFormWorkspaceProps } from './allergy-form.workspace';
 
 const mockSaveAllergy = jest.mocked(saveAllergy);
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -197,21 +198,35 @@ describe('AllergyForm', () => {
   });
 });
 
-function renderAllergyForm(props = {}) {
-  const defaultProps = {
-    allergy: null,
-    closeWorkspace: () => {},
-    closeWorkspaceWithSavedChanges: () => {},
-    formContext: 'creating' as 'creating' | 'editing',
-    patient: mockPatient,
-    patientUuid: mockPatient.id,
-    promptBeforeClosing: () => {},
-    setTitle: jest.fn(),
-    visitContext: null,
-    mutateVisitContext: null,
+function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = {}) {
+  const defaultProps: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}> = {
+    workspaceProps: {
+      allergy: null,
+      formContext: 'creating' as 'creating' | 'editing',
+    },
+    groupProps: {
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      visitContext: null,
+      mutateVisitContext: null,
+    },
+    closeWorkspace: jest.fn(),
+    launchChildWorkspace: jest.fn(),
+    windowProps: {},
+    workspaceName: '',
+    windowName: '',
+    isRootWorkspace: false,
   };
 
-  render(<AllergyForm {...defaultProps} {...props} />);
+  const props = {
+    ...defaultProps,
+    workspaceProps: {
+      ...defaultProps.workspaceProps,
+      ...workspaceProps,
+    },
+  };
+
+  render(<AllergyForm {...props} />);
 }
 
 function buildExpectedPayload(allergen, reaction, severity, comment) {

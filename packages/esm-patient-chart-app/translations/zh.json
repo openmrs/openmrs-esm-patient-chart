@@ -1,6 +1,5 @@
 {
   "actions": "Actions",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
   "addVisit": "Add visit",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "编辑这次问诊",
+  "editVisit": "Edit visit",
   "editVisitDetails": "编辑就诊详情",
   "emptyStateText": "该患者没有可显示的{{displayText}}",
   "enable": "Enable",
@@ -98,6 +98,7 @@
   "nextPage": "Next page",
   "no": "否",
   "noActiveVisit": "当前没有活动的就诊",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "您不能在没有活动就诊的情况下向患者病历添加数据。您想开始一个新的就诊吗？",
   "noDiagnosesFound": "未找到诊断",
   "noEncountersToDisplay": "没有可显示的问诊记录",

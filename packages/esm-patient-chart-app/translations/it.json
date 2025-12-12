@@ -1,6 +1,5 @@
 {
   "actions": "Azioni",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Aggiungendo a:",
   "additionalVisitInformationUpdatedSuccessfully": "Informazioni aggiuntive sulla visita aggiornate con successo",
   "addVisit": "Aggiungere visita",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Istruzioni per il dosaggio",
   "editEncounter": "Modifica",
   "editThisEncounter": "Modifica questo incontro",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Modifica dettagli della visita",
   "emptyStateText": "Non ci sono {{displayText}} da visualizzare per questo paziente",
   "enable": "Abilita",
@@ -98,6 +98,7 @@
   "nextPage": "Pagina successiva",
   "no": "No",
   "noActiveVisit": "Nessuna visita attiva",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "Non puoi aggiungere dati alla cartella del paziente senza una visita attiva. Vuoi iniziare una nuova visita?",
   "noDiagnosesFound": "Nessuna diagnosi trovata",
   "noEncountersToDisplay": "Nessun incontro da visualizzare",

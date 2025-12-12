@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { rangeAlreadyHasUnits } from '../grouped-timeline/reference-range-helpers';
+import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   DataTableSkeleton,
@@ -98,12 +98,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
         const displayUnits = row.units ?? '';
         const isString = isNaN(parseFloat(row.value));
 
-        // Check if range already includes units to avoid duplication
-        // formatReferenceRange includes units, so if range has units, don't append again
-        const hasUnits = rangeAlreadyHasUnits(displayRange, displayUnits);
-        const referenceRangeDisplay = hasUnits
-          ? displayRange
-          : `${displayRange || '--'} ${displayUnits || ''}`.trim() || '--';
+        const referenceRangeDisplay = formatRangeWithUnits(displayRange, displayUnits);
 
         return {
           ...row,

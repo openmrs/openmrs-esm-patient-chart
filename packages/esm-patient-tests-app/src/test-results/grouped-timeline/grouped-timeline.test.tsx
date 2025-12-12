@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { getByTextWithMarkup } from 'tools';
 import { showModal } from '@openmrs/esm-framework';
 import { mockGroupedResults } from '__mocks__';
@@ -62,7 +62,8 @@ describe('GroupedTimeline', () => {
     expect(screen.getByText('Nov 9')).toBeInTheDocument();
     expect(screen.getByText('01:39 AM')).toBeInTheDocument();
     expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
-    expect(screen.getByText('umol/L')).toBeInTheDocument();
+    // Units are now combined with range, so if there's no range, units won't be displayed separately
+    // Total bilirubin doesn't have a range in timelineData, so units are not displayed
     expect(screen.getByText('261.9')).toBeInTheDocument();
     expect(screen.getByText('21.5')).toBeInTheDocument();
     expect(screen.getByText('Serum glutamic-pyruvic transaminase')).toBeInTheDocument();

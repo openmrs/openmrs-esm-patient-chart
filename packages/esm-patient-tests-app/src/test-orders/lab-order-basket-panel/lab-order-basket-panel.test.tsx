@@ -3,10 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { useOrderType } from '@openmrs/esm-patient-common-lib';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import type { OrderBasketExtensionProps, TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import type { TestOrderBasketItem } from '../../types';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 import { mockPatient } from 'tools';
+import { mockVisit } from '__mocks__';
 
 const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -37,11 +38,11 @@ mockUseOrderType.mockReturnValue({
   errorFetchingOrderType: undefined,
 });
 
-const testProps = {
-  patientUuid: mockPatient.id,
+const testProps: OrderBasketExtensionProps = {
   patient: mockPatient,
-  visitContext: null,
-  mutateVisitContext: null,
+  launchDrugOrderForm: jest.fn(),
+  launchLabOrderForm: jest.fn(),
+  launchGeneralOrderForm: jest.fn(),
 };
 
 describe('LabOrderBasketPanel', () => {
@@ -64,6 +65,7 @@ describe('LabOrderBasketPanel', () => {
         display: 'HIV VIRAL LOAD',
         urgency: 'ROUTINE',
         uuid: 'order-uuid-1',
+        visit: mockVisit,
       },
       {
         action: 'NEW',
@@ -74,6 +76,7 @@ describe('LabOrderBasketPanel', () => {
         display: 'CD4 COUNT',
         urgency: 'STAT',
         uuid: 'order-uuid-2',
+        visit: mockVisit,
       },
     ];
     let orders = [...labs];

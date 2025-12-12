@@ -1,6 +1,5 @@
 {
   "actions": "Tindakan",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Menambahkan ke:",
   "additionalVisitInformationUpdatedSuccessfully": "Informasi kunjungan tambahan berhasil diperbarui",
   "addVisit": "Tambahkan kunjungan",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Edit",
   "editThisEncounter": "Edit pertemuan ini",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Edit detail kunjungan",
   "emptyStateText": "Tidak ada {{displayText}} untuk ditampilkan untuk pasien ini",
   "enable": "Enable",
@@ -98,6 +98,7 @@
   "nextPage": "Halaman berikutnya",
   "no": "Tidak",
   "noActiveVisit": "Tidak Ada Kunjungan Aktif",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "Anda tidak dapat menambahkan data ke bagan pasien tanpa kunjungan aktif. Apakah Anda ingin memulai kunjungan baru?",
   "noDiagnosesFound": "Tidak ada diagnosis ditemukan",
   "noEncountersToDisplay": "Tidak ada pertemuan untuk ditampilkan",

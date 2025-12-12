@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { prettyDOM, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LineChart } from '@carbon/charts-react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -20,7 +20,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 182 },
     encounter: { reference: 'Encounter/234' },
@@ -28,7 +28,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 72 },
     encounter: { reference: 'Encounter/234' },
@@ -36,7 +36,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 180 },
     encounter: { reference: 'Encounter/123' },
@@ -44,7 +44,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 70 },
     encounter: { reference: 'Encounter/123' },
@@ -60,7 +60,7 @@ const mockObsData = [
   {
     code: { text: 'Power Level' },
     conceptUuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 9001 },
     encounter: { reference: 'Encounter/123' },
@@ -68,10 +68,15 @@ const mockObsData = [
 ];
 
 const mockConceptData = [
-  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height' },
-  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight' },
-  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint' },
-  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level' },
+  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height', dataType: 'Numeric' },
+  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight', dataType: 'Numeric' },
+  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint', dataType: 'Text' },
+  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level', dataType: 'Numeric' },
+];
+
+const mockEncounters = [
+  { reference: 'Encounter/123', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
+  { reference: 'Encounter/234', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
 ];
 
 const mockUseObs = jest.mocked(useObs);
@@ -79,10 +84,11 @@ const mockUseObs = jest.mocked(useObs);
 describe('ObsSwitchable', () => {
   it('should render all obs in table and numeric obs in graph', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -110,17 +116,17 @@ describe('ObsSwitchable', () => {
     expect(headerRow).toHaveTextContent('Chief Complaint');
     expect(headerRow).toHaveTextContent('Power Level');
     const firstRow = screen.getAllByRole('row')[1];
-    expect(firstRow).toHaveTextContent('Jan');
-    expect(firstRow).toHaveTextContent('180');
-    expect(firstRow).toHaveTextContent('70');
-    expect(firstRow).toHaveTextContent('Too strong');
-    expect(firstRow).toHaveTextContent('9001');
+    expect(firstRow).toHaveTextContent('Feb');
+    expect(firstRow).toHaveTextContent('182');
+    expect(firstRow).toHaveTextContent('72');
+    expect(firstRow).toHaveTextContent('--');
+    expect(firstRow).toHaveTextContent('--');
     const secondRow = screen.getAllByRole('row')[2];
-    expect(secondRow).toHaveTextContent('Feb');
-    expect(secondRow).toHaveTextContent('182');
-    expect(secondRow).toHaveTextContent('72');
-    expect(secondRow).toHaveTextContent('--');
-    expect(secondRow).toHaveTextContent('--');
+    expect(secondRow).toHaveTextContent('Jan');
+    expect(secondRow).toHaveTextContent('180');
+    expect(secondRow).toHaveTextContent('70');
+    expect(secondRow).toHaveTextContent('Too strong');
+    expect(secondRow).toHaveTextContent('9001');
 
     const user = userEvent.setup();
     const chartViewButton = screen.getByLabelText('Chart view');
@@ -176,12 +182,90 @@ describe('ObsSwitchable', () => {
     );
   });
 
-  it('should support showing graph tab by default', async () => {
+  it('should sort by date and by obs correctly', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      title: 'My Stats',
+      data: [
+        {
+          concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          label: 'Tallitude',
+        },
+        {
+          concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+        { concept: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        { concept: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+      ],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    const user = userEvent.setup();
+
+    const firstRowInitial = screen.getAllByRole('row')[1];
+    expect(firstRowInitial).toHaveTextContent('01 — Feb — 2021');
+    const secondRowInitial = screen.getAllByRole('row')[2];
+    expect(secondRowInitial).toHaveTextContent('01 — Jan — 2021');
+
+    const dateHeader = screen.getByText('Date and time');
+    await user.click(dateHeader);
+
+    const firstRow = screen.getAllByRole('row')[1];
+    expect(firstRow).toHaveTextContent('01 — Feb — 2021');
+    const secondRow = screen.getAllByRole('row')[2];
+    expect(secondRow).toHaveTextContent('01 — Jan — 2021');
+
+    await user.click(dateHeader);
+    const firstRow2 = screen.getAllByRole('row')[1];
+    expect(firstRow2).toHaveTextContent('01 — Jan — 2021');
+    const secondRow2 = screen.getAllByRole('row')[2];
+    expect(secondRow2).toHaveTextContent('01 — Feb — 2021');
+  });
+
+  it('supports table sorting oldest to newest', async () => {
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      title: 'My Stats',
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+      tableSortOldestFirst: true,
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    const user = userEvent.setup();
+
+    const dateHeader = screen.getByText('Date and time');
+    await user.click(dateHeader);
+
+    const firstRow = screen.getAllByRole('row')[1];
+    expect(firstRow).toHaveTextContent('01 — Jan — 2021');
+    const secondRow = screen.getAllByRole('row')[2];
+    expect(secondRow).toHaveTextContent('01 — Feb — 2021');
+  });
+
+  it('should support showing graph tab by default', async () => {
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -211,10 +295,11 @@ describe('ObsSwitchable', () => {
 
   it('should support grouping into multiline graphs', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -264,10 +349,12 @@ describe('ObsSwitchable', () => {
           (o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         ) as Array<ObsResult>,
         concepts: mockConceptData,
+        encounters: mockEncounters,
       },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),

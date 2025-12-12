@@ -6,6 +6,13 @@ export interface ConceptReferenceResponse {
   [key: string]: {
     uuid: string;
     display: string;
+    datatype: {
+      name: string;
+    };
+    answers: Array<{
+      uuid: string;
+      display: string;
+    }>;
   };
 }
 
@@ -15,11 +22,13 @@ export function useConcepts(conceptUuids: Array<string>) {
     (key: Array<string>) => Promise.all(key.map((url) => openmrsFetch<ConceptReferenceResponse>(url))),
   );
 
-  const ob: ConceptReferenceResponse = data?.reduce((acc, response) => ({ ...acc, ...response.data }), {});
-  const concepts = ob
-    ? Object.values(ob).map((value) => ({
+  const res: ConceptReferenceResponse = data?.reduce((acc, response) => ({ ...acc, ...response.data }), {});
+  const concepts = res
+    ? Object.values(res).map((value) => ({
         uuid: value.uuid,
         display: value.display,
+        dataType: value.datatype.name,
+        answers: value.answers,
       }))
     : [];
 
@@ -36,6 +45,7 @@ export function useConcepts(conceptUuids: Array<string>) {
 
 function getConceptReferenceUrls(conceptUuids: Array<string>) {
   return chunk(conceptUuids, 10).map(
-    (partition) => `${restBaseUrl}/conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`,
+    (partition) =>
+      `${restBaseUrl}/conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display,datatype,answers)`,
   );
 }

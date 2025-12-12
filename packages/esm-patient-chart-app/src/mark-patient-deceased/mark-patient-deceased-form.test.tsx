@@ -6,6 +6,7 @@ import { esmPatientChartSchema, type ChartConfig } from '../config-schema';
 import { mockPatient } from 'tools';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
 const mockReload = jest.fn();
 
@@ -20,7 +21,7 @@ const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockCloseWorkspace = jest.fn();
 
-jest.mock('../data.resource.ts', () => ({
+jest.mock('../data.resource', () => ({
   markPatientDeceased: jest.fn().mockResolvedValue({}),
   useCausesOfDeath: jest.fn(),
 }));
@@ -28,15 +29,20 @@ jest.mock('../data.resource.ts', () => ({
 describe('MarkPatientDeceasedForm', () => {
   const freeTextFieldConceptUuid = '1234e218-6c8a-4ca3-8edb-9f6d9c8c8c7f';
 
-  const defaultProps = {
-    patientUuid: mockPatient.id,
-    patient: mockPatient,
+  const defaultProps: PatientWorkspace2DefinitionProps<{}, {}> = {
     closeWorkspace: mockCloseWorkspace,
-    closeWorkspaceWithSavedChanges: jest.fn(),
-    promptBeforeClosing: jest.fn(),
-    setTitle: jest.fn(),
-    visitContext: null,
-    mutateVisitContext: null,
+    workspaceName: null,
+    launchChildWorkspace: jest.fn(),
+    windowProps: {},
+    workspaceProps: {},
+    groupProps: {
+      patientUuid: mockPatient.id,
+      patient: mockPatient,
+      visitContext: null,
+      mutateVisitContext: null,
+    },
+    windowName: '',
+    isRootWorkspace: false,
   };
 
   const codedCausesOfDeath = [

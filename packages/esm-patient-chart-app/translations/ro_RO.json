@@ -1,6 +1,5 @@
 {
   "actions": "Actiuni",
-  "activeVisits__lower": "active visits",
   "addingToVisit": "Adaugare la:",
   "additionalVisitInformationUpdatedSuccessfully": "Informatiile suplimentare ale vizitei au fost actualizate cu succes",
   "addVisit": "Adauga vizita",
@@ -39,6 +38,7 @@
   "dosingInstructions": "Dosing Instructions",
   "editEncounter": "Editeaza",
   "editThisEncounter": "Editeaza interactiunea",
+  "editVisit": "Edit visit",
   "editVisitDetails": "Editeaza detalii vizita",
   "emptyStateText": "Nu exista {{displayText}} pentru acest pacient",
   "enable": "Activeaza",
@@ -98,6 +98,7 @@
   "nextPage": "Pagina urmatoare",
   "no": "Nu",
   "noActiveVisit": "Nicio vizita activa",
+  "noActiveVisitMessage": "active visit",
   "noActiveVisitNoRDEText": "Nu poti adauga date fara o vizita activa. Vrei sa incepi o vizita noua?",
   "noDiagnosesFound": "Niciun diagnostic gasit",
   "noEncountersToDisplay": "Nicio interactiune de afisat",

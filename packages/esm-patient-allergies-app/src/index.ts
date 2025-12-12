@@ -51,7 +51,6 @@ export const allergiesDashboardLink = getSyncLifecycle(
   options,
 );
 
-// t('recordNewAllergy', "Record a new allergy")
 export const allergyFormWorkspace = getAsyncLifecycle(
   () => import('./allergies/allergies-form/allergy-form.workspace'),
   options,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { type OrderBasketExtensionProps, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getByTextWithMarkup } from 'tools';
-import { type DrugOrderBasketItem } from '../types';
 import { mockDrugSearchResultApiData, mockFhirPatient, mockPatientDrugOrdersApiData } from '__mocks__';
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
@@ -14,11 +14,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useOrderBasket: () => mockUseOrderBasket(),
 }));
 
-const testProps = {
+const testProps: OrderBasketExtensionProps = {
   patient: mockFhirPatient,
-  patientUuid: mockFhirPatient.id,
-  visitContext: null,
-  mutateVisitContext: null,
+  launchDrugOrderForm: jest.fn(),
+  launchLabOrderForm: jest.fn(),
+  launchGeneralOrderForm: jest.fn(),
 };
 
 describe('OrderBasketPanel', () => {
@@ -32,7 +32,7 @@ describe('OrderBasketPanel', () => {
   test('renders a tile-based layout of orders, including new, renewing, modifying, and discontinuing', async () => {
     const user = userEvent.setup();
     const medications = [
-      getTemplateOrderBasketItem(mockDrugSearchResultApiData[0]),
+      getTemplateOrderBasketItem(mockDrugSearchResultApiData[0], null),
       ...mockPatientDrugOrdersApiData.slice(0, 3),
     ] as Array<DrugOrderBasketItem>;
     medications[1].action = 'REVISE';
