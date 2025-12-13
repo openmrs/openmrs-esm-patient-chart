@@ -15,6 +15,10 @@ type EditLabResultModalProps = {
   workspaceName?: string;
 };
 
+/**
+ * This modal is meant for use outside the patient chart (e.g., Laboratory app).
+ * The props passed to launchWorkspace2 are only compatible with the exported test results form.
+ */
 const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
   orders,
   closeModal,
