@@ -59,7 +59,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       isOffline: !isOnline,
       patientUuid: patientUuid ?? null,
       patient,
-      encounterUuid: encounterUuid ?? null,
+      encounterUuid: encounterUuid ?? '',
       handlePostResponse,
       closeWorkspace: () => {
         return closeWorkspace();
