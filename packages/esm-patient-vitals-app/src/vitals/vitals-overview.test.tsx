@@ -107,12 +107,16 @@ describe('VitalsOverview', () => {
     );
 
     const expectedTableRows = [
-      /19 — May — 2021, 04:26 AM 37 121 \/ 89 76 12 --/,
-      /10 — May — 2021, 06:41 AM 37 120 \/ 90 66 45 90/,
-      /07 — May — 2021, 09:04 AM -- 120 \/ 80 -- -- --/,
-      /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
+      // allow the time portion to vary across environments by using a permissive matcher
+      /19 — May — 2021, .*? 37\s+121\s*\/\s*89\s+76\s+12\s+--/i,
+      /10 — May — 2021, .*? 37\s+120\s*\/\s*90\s+66\s+45\s+90/i,
+      /07 — May — 2021, .*? --\s+120\s*\/\s*80\s+--\s+--\s+--/i,
+      /08 — Apr — 2021, .*? 36\.5\s+--\s*\/\s*--\s+78\s+65\s+--/i,
     ];
-    expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+
+    expectedTableRows.forEach((row) =>
+      expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
+    );
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { generatePlaceholder } from '../common';
 import { type VitalsBiometricsFormData } from './schema';
+import { validateClinicalNotes } from './notes-validation';
 import styles from './vitals-biometrics-input.scss';
 
 type fieldId =
@@ -48,6 +49,7 @@ interface VitalsAndBiometricsInputProps {
   showErrorMessage?: boolean;
   unitSymbol?: string;
   useMuacColors?: boolean;
+  notesError?: string;
 }
 
 const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
@@ -64,12 +66,14 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   showErrorMessage,
   unitSymbol,
   useMuacColors,
+  notesError,
 }) => {
   const { t } = useTranslation();
   const fieldId = useId();
   const isTablet = useLayoutType() === 'tablet';
   const [invalid, setInvalid] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [notesValidationError, setNotesValidationError] = useState<string | null>(null);
 
   const abnormalValues: Array<AbnormalValue> = ['critically_low', 'critically_high', 'high', 'low'];
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
@@ -79,6 +83,22 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
 
     if (!invalid) {
       onChange(value === '' ? undefined : Number(value));
+    }
+  }
+
+  function handleNotesChange(value: string, onChange) {
+    onChange(value);
+
+    // Validate clinical notes in real-time
+    if (value && value.trim().length > 0) {
+      const validation = validateClinicalNotes(value);
+      if (!validation.isValid) {
+        setNotesValidationError(validation.errorMessage || 'notes.invalidCharacters');
+      } else {
+        setNotesValidationError(null);
+      }
+    } else {
+      setNotesValidationError(null);
     }
   }
 
@@ -177,21 +197,24 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                       control={control}
                       render={({ field: { onChange, ref, value } }) => (
                         <TextArea
-                          className={styles.textarea}
+                          className={classNames(styles.textarea, {
+                            [styles.invalidTextarea]: notesValidationError,
+                          })}
                           id={`${fieldId}-${fieldProperty.id}`}
                           labelText={''}
                           aria-labelledby={`${fieldId}-label`}
                           maxCount={100}
                           name={fieldProperty.name}
                           onBlur={() => handleFocusChange(false)}
-                          onChange={onChange}
+                          onChange={(e) => handleNotesChange(e.target.value, onChange)}
                           onFocus={() => handleFocusChange(true)}
                           placeholder={placeholder}
                           ref={ref}
                           rows={2}
                           style={{ ...fieldStyles }}
                           title={fieldProperty.name}
-                          value={value}
+                          value={value || ''}
+                          invalid={Boolean(notesValidationError)}
                         />
                       )}
                     />
@@ -209,6 +232,20 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
           {t('validationInputError', `Value must be between {{min}} and {{max}}`, {
             min: fieldProperties[0].min,
             max: fieldProperties[0].max,
+          })}
+        </FormLabel>
+      )}
+
+      {notesValidationError && (
+        <FormLabel className={styles.invalidInputError}>
+          {t(notesValidationError, {
+            'notes.emojiNotAllowed':
+              'Emoji characters are not allowed in clinical notes. Please use only standard characters.',
+            'notes.controlCharactersNotAllowed':
+              'Control characters are not allowed in clinical notes. Please use only standard characters.',
+            'notes.hiddenCharactersNotAllowed': 'Hidden characters detected. Please ensure all characters are visible.',
+            'notes.invalidCharacters':
+              'Invalid characters detected. Please use only standard characters and common punctuation.',
           })}
         </FormLabel>
       )}

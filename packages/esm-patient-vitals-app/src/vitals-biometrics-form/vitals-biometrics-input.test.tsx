@@ -1,10 +1,12 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { assessValue, getReferenceRangesForConcept } from '../common';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockConceptUnits } from '__mocks__';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
+import { validateClinicalNotes, containsEmoji } from './notes-validation';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
@@ -180,6 +182,93 @@ describe('VitalsAndBiometricsInput', () => {
     const abnormalValueFlag = screen.getByTitle(/abnormal value/i);
     expect(abnormalValueFlag).toBeInTheDocument();
     expect(abnormalValueFlag).toHaveClass('critically-high');
+  });
+
+  describe('Clinical Notes Validation Integration', () => {
+    it('should reject notes containing emoji characters', () => {
+      expect(containsEmoji('Patient 😊 doing well')).toBe(true);
+      const validation = validateClinicalNotes('Patient 😊 doing well');
+      expect(validation.isValid).toBe(false);
+      expect(validation.errorMessage).toBe('notes.emojiNotAllowed');
+    });
+
+    it('should accept valid clinical notes without emoji', () => {
+      const validation = validateClinicalNotes('Patient is stable and doing well. No complaints at this time.');
+      expect(validation.isValid).toBe(true);
+      expect(validation.errorMessage).toBeUndefined();
+    });
+
+    it('should accept notes with common medical notation', () => {
+      const validation = validateClinicalNotes('BP: 120/80 mmHg, Temp: 37.5°C ± 0.2, HR: 72 bpm. Patient well.');
+      expect(validation.isValid).toBe(true);
+    });
+
+    it('should accept notes with special punctuation used in clinical documentation', () => {
+      const validation = validateClinicalNotes(
+        'Follow-up: [Scheduled for 2024-12-20]. (Normal results). Patient alert and oriented.',
+      );
+      expect(validation.isValid).toBe(true);
+    });
+
+    it('should reject notes with heart emoji', () => {
+      const validation = validateClinicalNotes('Patient ❤️ is doing great');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with fire emoji', () => {
+      const validation = validateClinicalNotes('Response was excellent 🔥');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with warning emoji', () => {
+      const validation = validateClinicalNotes('Alert ⚠️ patient about medication');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with emoji variation selectors', () => {
+      // Testing with emoji that have variation selectors
+      const validation = validateClinicalNotes('Patient improving ❤️‍🔥');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with flag emoji', () => {
+      const validation = validateClinicalNotes('Visit location 🇺🇸 was good');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with keycap emoji', () => {
+      const validation = validateClinicalNotes('Priority 1️⃣ follow-up needed');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should reject notes with zero-width joiners', () => {
+      const validation = validateClinicalNotes('Healthcare 👨‍⚕️ provider assessment');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should accept multiline clinical notes', () => {
+      const multilineNote = `Vital Signs:
+- BP: 120/80 mmHg
+- Temp: 37.5°C
+- HR: 72 bpm
+
+Observations:
+Patient appears well, alert and oriented.`;
+
+      const validation = validateClinicalNotes(multilineNote);
+      expect(validation.isValid).toBe(true);
+    });
+
+    it('should reject notes with mixed valid and invalid content', () => {
+      const validation = validateClinicalNotes('Patient is stable 😊 and vitals are normal. Follow-up scheduled.');
+      expect(validation.isValid).toBe(false);
+    });
+
+    it('should handle empty or null notes gracefully', () => {
+      expect(validateClinicalNotes('').isValid).toBe(true);
+      expect(validateClinicalNotes(null as any).isValid).toBe(true);
+      expect(validateClinicalNotes(undefined as any).isValid).toBe(true);
+    });
   });
 });
 

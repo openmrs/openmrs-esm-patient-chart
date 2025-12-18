@@ -136,6 +136,17 @@
       outline: none;
     }
   }
+
+  &.invalidTextarea {
+    textarea {
+      border: 2px solid colors.$red-60;
+      background-color: colors.$red-05;
+
+      &:focus {
+        border: 2px solid colors.$red-60;
+      }
+    }
+  }
 }
 
 .centered {

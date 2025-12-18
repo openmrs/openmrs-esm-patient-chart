@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { validateClinicalNotes } from './notes-validation';
 
 export const VitalsAndBiometricsFormSchema = z
   .object({
@@ -8,7 +9,15 @@ export const VitalsAndBiometricsFormSchema = z
     oxygenSaturation: z.number(),
     pulse: z.number(),
     temperature: z.number(),
-    generalPatientNote: z.string(),
+    generalPatientNote: z.string().refine(
+      (value) => !value || validateClinicalNotes(value).isValid,
+      (value) => {
+        const validation = validateClinicalNotes(value);
+        return {
+          message: validation.errorMessage || 'notes.invalidCharacters',
+        };
+      },
+    ),
     weight: z.number(),
     height: z.number(),
     midUpperArmCircumference: z.number(),
