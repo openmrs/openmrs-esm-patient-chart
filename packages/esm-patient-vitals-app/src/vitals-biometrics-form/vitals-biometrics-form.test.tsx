@@ -65,7 +65,11 @@ jest.mock('../common', () => ({
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
-});
+  biometrics: {
+    ...getDefaultsFromConfigSchema(configSchema).biometrics,
+    ...mockVitalsConfig.biometrics,
+  },
+} as ConfigObject);
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({

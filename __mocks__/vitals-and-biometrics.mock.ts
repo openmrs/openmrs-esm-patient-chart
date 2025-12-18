@@ -5059,7 +5059,13 @@ export const mockBiometricsConfig = {
 };
 
 export const mockVitalsConfig = {
-  biometrics: { bmiUnit: 'kg / m²', heightUnit: 'm', weightUnit: 'kg' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    heightUnit: 'm',
+    weightUnit: 'kg',
+    restrictBmiForMinors: false,
+    bmiRestrictionMinAge: 18,
+  },
   concepts: {
     diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',

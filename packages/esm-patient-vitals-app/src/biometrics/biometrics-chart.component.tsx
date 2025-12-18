@@ -14,6 +14,7 @@ interface BiometricsChartProps {
   conceptUnits: Map<string, string>;
   config: ConfigObject;
   patientBiometrics: Array<PatientVitalsAndBiometrics>;
+  showBmi: boolean;
 }
 
 interface BiometricChartData {
@@ -22,7 +23,7 @@ interface BiometricChartData {
   value: number | string;
 }
 
-const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config }) => {
+const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config, showBmi }) => {
   const { t } = useTranslation();
   const { bmiUnit } = config.biometrics;
   const [selectedBiometrics, setSelectedBiometrics] = useState<BiometricChartData>({
@@ -31,7 +32,11 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     groupName: 'weight',
   });
 
-  const biometrics: { id: BiometricType; title: string; value: BiometricType }[] = [
+  const biometrics: {
+    id: BiometricType;
+    title: string;
+    value: BiometricType;
+  }[] = [
     {
       id: 'weight',
       title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
@@ -42,8 +47,16 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       title: `${t('height', 'Height')} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})`,
       value: 'height',
     },
-    { id: 'bmi', title: `${t('bmi', 'BMI')} (${bmiUnit})`, value: 'bmi' },
-  ];
+    showBmi && {
+      id: 'bmi',
+      title: `${t('bmi', 'BMI')} (${bmiUnit})`,
+      value: 'bmi',
+    },
+  ].filter(Boolean) as Array<{
+    id: BiometricType;
+    title: string;
+    value: BiometricType;
+  }>;
 
   const chartData = useMemo(
     () =>

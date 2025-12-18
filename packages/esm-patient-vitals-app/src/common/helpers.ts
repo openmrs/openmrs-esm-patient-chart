@@ -1,8 +1,9 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { age, type OpenmrsResource } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from '../common';
 import type { FHIRInterpretation, ObsReferenceRanges, ObservationInterpretation } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
+import { type BiometricsConfigObject } from '../config-schema';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
   if (weight > 0 && height > 0) {
@@ -177,3 +178,40 @@ export function prepareObsForSubmission(
     },
   );
 }
+
+/**
+ * Returns the patient's age as a whole number.
+ * Uses OpenMRS `age()` utility and extracts the numeric portion.
+ * If birth date is missing or unparsable, returns null.
+ */
+export const getPatientAge = (patient: fhir.Patient): number | null => {
+  if (!patient.birthDate) {
+    return null;
+  }
+
+  const AGE_REGEX = /\d+/;
+  const ageString = age(patient.birthDate);
+  const numericAge = Number(ageString.match(AGE_REGEX)?.[0]);
+
+  return Number.isFinite(numericAge) ? numericAge : null;
+};
+
+/**
+ * Determines whether BMI should be shown for the given patient,
+ * based on the biometrics configuration and patient's age.
+ */
+export const shouldShowBmi = (patient: fhir.Patient, biometricsConfig: BiometricsConfigObject): boolean => {
+  if (!biometricsConfig.restrictBmiForMinors) {
+    return true;
+  }
+
+  const age = getPatientAge(patient);
+
+  if (age === null) {
+    return true;
+  }
+
+  const minAge = Math.max(0, biometricsConfig.bmiRestrictionMinAge ?? 18);
+
+  return age >= minAge;
+};

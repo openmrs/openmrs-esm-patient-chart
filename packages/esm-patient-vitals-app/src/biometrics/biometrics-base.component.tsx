@@ -6,6 +6,7 @@ import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/es
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useConceptUnits, useVitalsAndBiometrics, withUnit } from '../common';
+import { shouldShowBmi } from '../common/helpers';
 import { type ConfigObject } from '../config-schema';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import BiometricsChart from './biometrics-chart.component';
@@ -32,6 +33,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { conceptUnits } = useConceptUnits();
   const launchBiometricsForm = useLaunchVitalsAndBiometricsForm(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const tableHeaders: Array<BiometricsTableHeader> = [
     {
@@ -52,7 +54,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
     },
-    {
+    showBmi && {
       key: 'bmiRender',
       header: `${t('bmi', 'BMI')} (${bmiUnit})`,
       isSortable: true,
@@ -74,11 +76,11 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
           weightRender: biometricsData.weight ?? '--',
           heightRender: biometricsData.height ?? '--',
-          bmiRender: biometricsData.bmi ?? '--',
+          bmiRender: showBmi ? biometricsData.bmi ?? '--' : '--',
           muacRender: biometricsData.muac ?? '--',
         };
       }),
-    [biometrics],
+    [biometrics, showBmi],
   );
 
   if (isLoading) {
@@ -123,7 +125,12 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           </div>
         </CardHeader>
         {chartView ? (
-          <BiometricsChart patientBiometrics={biometrics} conceptUnits={conceptUnits} config={config} />
+          <BiometricsChart
+            patientBiometrics={biometrics}
+            conceptUnits={conceptUnits}
+            config={config}
+            showBmi={showBmi}
+          />
         ) : (
           <PaginatedBiometrics
             tableRows={tableRows}
