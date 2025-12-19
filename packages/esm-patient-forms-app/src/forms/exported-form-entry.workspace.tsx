@@ -16,7 +16,7 @@ interface FormEntryWorkspaceProps {
  * @see form-entry.workspace.tsx
  */
 const ExportedFormEntryWorkspace: React.FC<
-  Workspace2DefinitionProps<FormEntryWorkspaceProps, ExportedClinicalFormsWindowProps, {}>
+  Workspace2DefinitionProps<FormEntryWorkspaceProps, ExportedClinicalFormsWindowProps, object>
 > = ({
   closeWorkspace,
   workspaceProps: { form, encounterUuid, handlePostResponse },
