@@ -298,7 +298,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
-          vitalSign.value &&
+          if (vitalSign.value) {
             vitalsHashTable.set(encounterId, {
               date:
                 typeof vitalSign.recordedDate === 'string'
@@ -307,6 +307,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
+          }
         }
         return vitalsHashTable;
       }, new Map<string, Partial<PatientVitalsAndBiometrics>>());

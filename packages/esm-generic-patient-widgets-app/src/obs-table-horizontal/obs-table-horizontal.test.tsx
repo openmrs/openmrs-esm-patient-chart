@@ -169,7 +169,7 @@ describe('ObsTableHorizontal', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: false,
       data: [
@@ -229,7 +229,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -259,7 +259,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: false,
       data: [
@@ -285,7 +285,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
     });
@@ -306,7 +306,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -341,7 +341,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -397,7 +397,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -455,7 +455,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -505,7 +505,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -546,7 +546,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -589,7 +589,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [{ concept: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Chief Complaint' }],
@@ -632,7 +632,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Diagnosis',
       editable: true,
       data: [{ concept: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Diagnosis' }],
@@ -683,7 +683,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -732,7 +732,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [
@@ -788,7 +788,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       encounterTypeToCreateUuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
@@ -884,7 +884,7 @@ describe('ObsTableHorizontal editable mode', () => {
       mutate: mockMutate,
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
       title: 'Vitals',
       editable: true,
       data: [

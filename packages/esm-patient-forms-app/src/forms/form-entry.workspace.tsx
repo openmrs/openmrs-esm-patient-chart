@@ -13,7 +13,7 @@ interface FormEntryWorkspaceProps {
  * This workspace must only be used within the patient chart.
  * @see exported-form-entry.workspace.tsx
  */
-const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, {}>> = ({
+const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, object>> = ({
   closeWorkspace,
   workspaceProps: { form, encounterUuid },
   groupProps: { patientUuid, patient, visitContext, mutateVisitContext },

@@ -10,7 +10,7 @@ type AttachmentThumbnailProps = {
 type ImageProps = {
   src: string;
   title: string;
-  style: Object;
+  style: object;
   onClick?: () => void;
 };
 

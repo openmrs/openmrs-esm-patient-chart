@@ -58,7 +58,9 @@ export function usePaginatedEncounters(patientUuid: string, encounterType: strin
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);
   url.searchParams.set('order', 'desc');
-  encounterType && url.searchParams.set('encounterType', encounterType);
+  if (encounterType) {
+    url.searchParams.set('encounterType', encounterType);
+  }
   return useOpenmrsPagination<Encounter>(patientUuid ? url : null, pageSize);
 }
 
