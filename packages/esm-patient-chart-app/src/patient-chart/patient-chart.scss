@@ -14,10 +14,36 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr min-content;
+  /* Main content + right workspace panel.
+      When workspace is closed: second column collapses to 0, first column uses 100% width.
+      When workspace is open: first column shrinks, second column expands up to min(40rem, 50vw).
+      Use auto for second column to allow it to collapse to 0 when empty. */
+  grid-template-columns: 1fr auto;
   grid-template-rows: 1fr;
   align-items: stretch;
-  width: inherit;
+  width: 100%;
+  /* Establish stacking context for proper z-index behavior */
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ensure grid children can shrink instead of forcing overflow.
+   This prevents the right workspace from pushing header action buttons
+   off-screen when it opens. */
+.grid > * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Constrain the workspace panel when it is rendered into the second grid column.
+   Use max-width to limit expansion to 50% of viewport or 40rem, whichever is smaller.
+   When workspace is closed (empty), this column will collapse to 0 due to grid-template-columns: auto.
+   This ensures main content keeps space for action buttons and nothing gets clipped. */
+.grid > :nth-child(2) {
+  min-width: 0;
+  max-width: min(40rem, 50vw);
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .chartReview {
@@ -26,8 +52,15 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   align-self: start;
   height: 90%;
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding-bottom: layout.$spacing-10;
+  /* Allow the chartReview to shrink properly inside the grid. Without
+     this, flex/grid children can overflow their container and push
+     sibling content (like header action buttons) off-screen. */
+  min-width: 0;
+  /* Prevent child content from overflowing the grid column */
+  overflow-x: auto;
 }
 
 .widthContained {
@@ -49,6 +82,8 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   display: flex;
   width: 100%;
   flex-direction: column;
+  /* safeguard for nested content */
+  min-width: 0;
 }
 
 // Overriding styles for RTL support
