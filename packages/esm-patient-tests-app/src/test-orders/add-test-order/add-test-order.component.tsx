@@ -23,6 +23,11 @@ import styles from './add-test-order.scss';
 
 export interface AddLabOrderProps {
   initialOrder?: OrderBasketItem;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid: string;
   orderTypeUuid: string;
   patient: fhir.Patient;
   visitContext: Visit;
@@ -31,6 +36,7 @@ export interface AddLabOrderProps {
 
 const AddLabOrder: React.FC<AddLabOrderProps> = ({
   patient,
+  orderToEditOrdererUuid,
   visitContext,
   initialOrder,
   orderTypeUuid,
@@ -101,6 +107,7 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
         {currentLabOrder ? (
           <LabOrderForm
             initialOrder={currentLabOrder}
+            orderToEditOrdererUuid={orderToEditOrdererUuid}
             closeWorkspace={closeWorkspace}
             setHasUnsavedChanges={setHasUnsavedChanges}
             orderTypeUuid={orderTypeUuid}

@@ -43,6 +43,7 @@ import {
   UserIcon,
   launchWorkspace2,
   type Encounter,
+  showModal,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
@@ -51,6 +52,7 @@ import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
 import { useSWRConfig } from 'swr';
 import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
+import { buildMedicationOrder } from '../api';
 
 export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
@@ -414,8 +416,6 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
         quantityUnits: {
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,
@@ -433,60 +433,16 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
-    const newItem: DrugOrderBasketItem = {
-      uuid: medication.uuid,
-      display: medication.drug?.display,
-      previousOrder: medication.uuid,
-      startDate: new Date(),
-      action: 'REVISE',
-      drug: medication.drug,
-      dosage: medication.dose,
-      unit: {
-        value: medication.doseUnits?.display,
-        valueCoded: medication.doseUnits?.uuid,
-      },
-      frequency: {
-        valueCoded: medication.frequency?.uuid,
-        value: medication.frequency?.display,
-      },
-      route: {
-        valueCoded: medication.route?.uuid,
-        value: medication.route?.display,
-      },
-      commonMedicationName: medication.drug?.display,
-      isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-      freeTextDosage:
-        medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-      patientInstructions:
-        medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-      asNeeded: medication.asNeeded,
-      asNeededCondition: medication.asNeededCondition,
-      duration: medication.duration,
-      durationUnit: {
-        valueCoded: medication.durationUnits?.uuid,
-        value: medication.durationUnits?.display,
-      },
-      pillsDispensed: medication.quantity,
-      numRefills: medication.numRefills,
-      indication: medication.orderReasonNonCoded,
-      orderer: medication.orderer?.uuid,
-      careSetting: medication.careSetting?.uuid,
-      quantityUnits: {
-        value: medication.quantityUnits?.display,
-        valueCoded: medication.quantityUnits?.uuid,
-      },
-      encounterUuid: medication.encounter?.uuid,
-      visit: medication.encounter?.visit,
-    };
-    setItems([...items, newItem]);
-
     launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'add-drug-order',
-      { order: newItem },
+      {
+        order: buildMedicationOrder(medication, 'REVISE'),
+        orderToEditOrdererUuid: medication.orderer.uuid,
+      },
       { encounterUuid: medication.encounter.uuid },
       workspaceGroupProps,
     );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  }, [medication, workspaceGroupProps]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -527,8 +483,6 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer?.uuid,
-        careSetting: medication.careSetting?.uuid,
         quantityUnits: {
           value: medication.quantityUnits?.display,
           valueCoded: medication.quantityUnits?.uuid,

@@ -45,6 +45,11 @@ import styles from './test-order-form.scss';
 export interface LabOrderFormProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   initialOrder: TestOrderBasketItem;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid: string;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
@@ -56,6 +61,7 @@ export interface LabOrderFormProps {
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
 export function LabOrderForm({
   initialOrder,
+  orderToEditOrdererUuid,
   closeWorkspace,
   orderTypeUuid,
   setHasUnsavedChanges,
@@ -150,7 +156,6 @@ export function LabOrderForm({
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -169,7 +174,7 @@ export function LabOrderForm({
 
       closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspace, initialOrder],
+    [orders, setOrders, closeWorkspace, initialOrder],
   );
 
   const submitLabOrderToServer = useCallback(
@@ -178,8 +183,9 @@ export function LabOrderForm({
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
-      postOrder(prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid))
+      postOrder(
+        prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
+      )
         .then(() => {
           clearOrders();
           mutateOrders();
@@ -208,7 +214,7 @@ export function LabOrderForm({
           });
         });
     },
-    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, session.currentProvider.uuid, t],
+    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
   const cancelOrder = useCallback(() => {
