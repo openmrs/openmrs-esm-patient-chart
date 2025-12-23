@@ -4,6 +4,10 @@
 .widgetCard {
   border: 1px solid $ui-03;
   background-color: $ui-02;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
 }
 
 .biometricsHeaderActionItems {
@@ -11,13 +15,27 @@
   display: flex;
   flex: 1 1 0%;
   justify-content: end;
+  flex-wrap: wrap;
+  gap: layout.$spacing-02;
+  /* Allow this container to shrink when workspace opens */
+  min-width: 0;
+  overflow: visible;
 
   & :global(.cds--content-switcher) {
     max-width: max-content;
+    /* Allow content switcher to shrink if absolutely necessary */
+    flex-shrink: 1;
 
     :global(.cds--content-switcher__label) {
       height: layout.$spacing-05;
     }
+  }
+
+  & button {
+    /* Allow buttons to shrink if needed, but try to keep them visible */
+    flex-shrink: 1;
+    white-space: nowrap;
+    min-width: max-content;
   }
 }
 
@@ -26,6 +44,7 @@
   height: layout.$spacing-05;
   color: $ui-05;
   margin: 0 layout.$spacing-05;
+  flex-shrink: 0;
 }
 
 .backgroundDataFetchingIndicator {

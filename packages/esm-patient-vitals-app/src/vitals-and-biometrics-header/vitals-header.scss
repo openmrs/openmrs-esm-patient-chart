@@ -18,6 +18,8 @@
   min-height: layout.$spacing-07;
   outline: none;
   pointer-events: visibleFill;
+  position: relative;
+  overflow: visible;
 }
 
 .emptyStateVitalsHeader {
@@ -45,6 +47,9 @@
   align-items: baseline;
   flex-flow: row wrap;
   gap: layout.$spacing-02 layout.$spacing-04;
+  /* Allow items to wrap naturally without fixed padding.
+     Button container will use flexbox to position itself. */
+  flex: 1;
 }
 
 .heading {
@@ -67,10 +72,24 @@
   column-gap: layout.$spacing-05;
 }
 
-// Narrow viewport: 4 columns (when workspace is opened or container is reduced)
+// Medium viewport: 4 columns (when workspace is opened or container is reduced to ~80rem)
 @container vitals-header-row-container (max-width: 80rem) {
   .row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+// Small viewport: 3 columns (when width shrinks further to ~68rem - accommodates sidebar)
+@container vitals-header-row-container (max-width: 68rem) {
+  .row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// Extra small viewport: 2 columns (for very narrow screens or workspace taking more space)
+@container vitals-header-row-container (max-width: 55rem) {
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -99,11 +118,17 @@
 .buttonContainer {
   display: flex;
   align-items: center;
-  justify-content: right;
+  gap: layout.$spacing-03;
+  /* Use flexbox positioning instead of absolute - prevents overlap and jumping */
+  margin-left: auto;
+  flex-shrink: 0;
+  min-width: max-content;
 }
 
 .recordVitalsButton {
   @include type.type-style('body-compact-01');
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:not([disabled]) svg {
     fill: $color-blue-60-2;
