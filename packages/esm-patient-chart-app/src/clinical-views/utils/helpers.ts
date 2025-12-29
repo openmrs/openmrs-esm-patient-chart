@@ -28,6 +28,8 @@ export function launchEncounterForm(
   } else
     launchWorkspace2('patient-form-entry-workspace', {
       workspaceTitle: form?.display ?? form?.name,
+      form,
+      encounterUuid,
       mutateForm: onFormSave,
       formInfo: {
         encounterUuid,
