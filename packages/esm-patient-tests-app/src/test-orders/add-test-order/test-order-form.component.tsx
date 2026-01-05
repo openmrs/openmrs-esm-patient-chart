@@ -49,7 +49,7 @@ export interface LabOrderFormProps {
   /**
    * This field should only be supplied for an existing order saved to the backend
    */
-  orderToEditOrdererUuid: string;
+  orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;

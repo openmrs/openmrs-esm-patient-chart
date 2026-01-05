@@ -141,28 +141,36 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         );
       }
     } else {
-      const { postedOrders, erroredItems } = await postOrders(
-        patientUuid,
-        orderEncounterUuid,
-        abortController,
-        orderer.uuid,
-      );
-      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      await mutateOrders();
-      invalidateVisitAndEncounterData(mutate, patientUuid);
+      try {
+        const { postedOrders, erroredItems } = await postOrders(
+          patientUuid,
+          orderEncounterUuid,
+          abortController,
+          orderer.uuid,
+        );
+        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        await mutateOrders();
+        invalidateVisitAndEncounterData(mutate, patientUuid);
 
-      if (erroredItems.length == 0) {
-        await closeWorkspace({ discardUnsavedChanges: true });
-        showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
-      } else {
-        setOrdersWithErrors(erroredItems);
+        if (erroredItems.length == 0) {
+          await closeWorkspace({ discardUnsavedChanges: true });
+          showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
+        } else {
+          setOrdersWithErrors(erroredItems);
+        }
+        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        // Only revalidate current visit since orders create new encounters
+        mutateVisitContext?.();
+        await mutateOrders();
+        invalidateVisitAndEncounterData(mutate, patientUuid);
+        onOrderBasketSubmitted?.(orderEncounterUuid, postedOrders);
+      } catch (e) {
+        console.error(e);
+        setCreatingEncounterError(
+          e.responseBody?.error?.message ||
+            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+        );
       }
-      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      // Only revalidate current visit since orders create new encounters
-      mutateVisitContext?.();
-      await mutateOrders();
-      invalidateVisitAndEncounterData(mutate, patientUuid);
-      onOrderBasketSubmitted?.(orderEncounterUuid, postedOrders);
     }
     setIsSavingOrders(false);
     return () => abortController.abort();

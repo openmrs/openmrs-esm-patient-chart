@@ -29,12 +29,12 @@ export interface AddDrugOrderProps {
    * The order basket item to edit. Note that this can either be an existing order that has
    * already been saved to the backend, or a new pending order in the frontend order basket.
    */
-  initialOrder: DrugOrderBasketItem;
+  initialOrder?: DrugOrderBasketItem;
 
   /**
    * This field should only be supplied for an existing order saved to the backend
    */
-  orderToEditOrdererUuid: string;
+  orderToEditOrdererUuid?: string;
 
   patient: fhir.Patient;
   patientUuid: string;

@@ -13,7 +13,7 @@ export interface AddTestOrderWorkspaceProps {
   /**
    * This field should only be supplied for an existing order saved to the backend
    */
-  orderToEditOrdererUuid: string;
+  orderToEditOrdererUuid?: string;
 }
 
 /**
