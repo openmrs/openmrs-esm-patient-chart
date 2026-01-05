@@ -170,7 +170,9 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       setShowErrorMessage(true);
       setShowErrorNotification(false);
 
-      data?.computedBodyMassIndex && delete data.computedBodyMassIndex;
+      if (data?.computedBodyMassIndex) {
+        delete data.computedBodyMassIndex;
+      }
 
       const allFieldsAreValid = Object.entries(formData)
         .filter(([, value]) => Boolean(value))

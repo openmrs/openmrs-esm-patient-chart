@@ -118,7 +118,7 @@ export interface DrugOrderPost extends OrderPost {
   dosingInstructions?: string;
 }
 
-export interface TestOrderPost extends OrderPost {}
+export type TestOrderPost = OrderPost;
 
 export interface PatientOrderFetchResponse {
   results: Array<Order>;

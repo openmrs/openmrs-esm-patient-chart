@@ -23,7 +23,7 @@ import { launchWorkspace, useLayoutType, Workspace2 } from '@openmrs/esm-framewo
 import { usePatientLists } from '../patient-lists.resource';
 import styles from './patient-lists.scss';
 
-function PatientListsWorkspace({ launchChildWorkspace }: PatientWorkspace2DefinitionProps<{}, {}>) {
+function PatientListsWorkspace({ launchChildWorkspace }: PatientWorkspace2DefinitionProps<object, object>) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
