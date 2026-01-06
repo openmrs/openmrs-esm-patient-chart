@@ -291,7 +291,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (visitRequired && !visitContext) ||
-                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
+                !orderer ||
+                !orderLocationUuid
               }
             >
               {isSavingOrders ? (
