@@ -67,13 +67,10 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
-    await expect(opdVisitRadio).toBeVisible();
-    // Wait for the radio button to be enabled before interacting
-    await expect(opdVisitRadio).toBeEnabled();
-    // Click the radio button directly (without force) after ensuring it's actionable
-    await opdVisitRadio.click();
-    await expect(opdVisitRadio).toBeChecked();
+    const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
+    await expect(opdVisitLabel).toBeVisible();
+    await opdVisitLabel.click();
+    await expect(chartPage.page.getByRole('radio', { name: /^OPD Visit$/i })).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -165,13 +162,10 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
-    await expect(opdVisitRadio).toBeVisible();
-    // Wait for the radio button to be enabled before interacting
-    await expect(opdVisitRadio).toBeEnabled();
-    // Click the radio button directly (without force) after ensuring it's actionable
-    await opdVisitRadio.click();
-    await expect(opdVisitRadio).toBeChecked();
+    const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
+    await expect(opdVisitLabel).toBeVisible();
+    await opdVisitLabel.click();
+    await expect(chartPage.page.getByRole('radio', { name: /^OPD Visit$/i })).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
