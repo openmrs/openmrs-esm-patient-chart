@@ -1,16 +1,11 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage } from '../pages';
+import { ensureNoActiveVisits } from '../commands/visit-operations';
 
 test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('Ensure no active visits for the patient', async () => {
-    const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
-    const data = await res.json();
-    const { results: visits = [] } = data;
-
-    for (const visit of visits) {
-      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
-    }
+    await ensureNoActiveVisits(api, patient.uuid);
   });
 
   const chartPage = new ChartPage(page);
@@ -65,13 +60,19 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('When I select visit status: new', async () => {
-    await chartPage.page.getByRole('tab', { name: /new/i }).click();
+    const newTab = chartPage.page.getByRole('tab', { name: /new/i });
+    await newTab.click();
+    // Wait for the tab to be selected to ensure form state has updated
+    await expect(newTab).toHaveAttribute('aria-selected', 'true');
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
     const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
     await expect(opdVisitRadio).toBeVisible();
-    await opdVisitRadio.check({ force: true });
+    // Wait for the radio button to be enabled before interacting
+    await expect(opdVisitRadio).toBeEnabled();
+    // Click the radio button directly (without force) after ensuring it's actionable
+    await opdVisitRadio.click();
     await expect(opdVisitRadio).toBeChecked();
   });
 
@@ -114,13 +115,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   api,
 }) => {
   await test.step('Ensure no active visits for the patient', async () => {
-    const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
-    const data = await res.json();
-    const { results: visits = [] } = data;
-
-    for (const visit of visits) {
-      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
-    }
+    await ensureNoActiveVisits(api, patient.uuid);
   });
 
   const chartPage = new ChartPage(page);
@@ -163,13 +158,19 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
   await test.step('When I select visit status: new', async () => {
-    await chartPage.page.getByRole('tab', { name: /new/i }).click();
+    const newTab = chartPage.page.getByRole('tab', { name: /new/i });
+    await newTab.click();
+    // Wait for the tab to be selected to ensure form state has updated
+    await expect(newTab).toHaveAttribute('aria-selected', 'true');
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
     const opdVisitRadio = chartPage.page.getByLabel(/^OPD Visit$/i);
     await expect(opdVisitRadio).toBeVisible();
-    await opdVisitRadio.check({ force: true });
+    // Wait for the radio button to be enabled before interacting
+    await expect(opdVisitRadio).toBeEnabled();
+    // Click the radio button directly (without force) after ensuring it's actionable
+    await opdVisitRadio.click();
     await expect(opdVisitRadio).toBeChecked();
   });
 
