@@ -62,13 +62,10 @@ describe('Service : ProviderResourceService Unit Tests', () => {
       done();
     });
 
-    // Wait for debounce timer (500ms)
-    setTimeout(() => {
-      const req = httpMock.expectOne((request) => {
-        return request.url.includes('provider') && request.params.get('q') === searchText;
-      });
-      expect(req.request.method).toBe('GET');
-      req.flush(results);
-    }, 500);
+    const req = httpMock.expectOne((request) => {
+      return request.url.includes('provider') && request.params.get('q') === searchText;
+    });
+    expect(req.request.method).toBe('GET');
+    req.flush(results);
   });
 });
