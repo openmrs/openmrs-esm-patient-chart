@@ -3,6 +3,15 @@ import { test } from '../core';
 import { ChartPage } from '../pages';
 import { ensureNoActiveVisits } from '../commands/visit-operations';
 
+async function waitForVisitLocationValue(page) {
+  const locationInput = page.getByRole('combobox', { name: /select a location/i });
+  await expect
+    .poll(async () => (await locationInput.inputValue()).trim(), {
+      message: 'Waiting for visit location to resolve',
+    })
+    .not.toBe('');
+}
+
 test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('Ensure no active visits for the patient', async () => {
     await ensureNoActiveVisits(api, patient.uuid);
@@ -64,6 +73,10 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     await newTab.click();
     // Wait for the tab to be selected to ensure form state has updated
     await expect(newTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  await test.step('And the visit location should be resolved', async () => {
+    await waitForVisitLocationValue(chartPage.page);
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
@@ -159,6 +172,10 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await newTab.click();
     // Wait for the tab to be selected to ensure form state has updated
     await expect(newTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  await test.step('And the visit location should be resolved', async () => {
+    await waitForVisitLocationValue(chartPage.page);
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
