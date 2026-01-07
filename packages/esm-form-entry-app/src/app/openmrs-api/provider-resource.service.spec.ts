@@ -45,24 +45,30 @@ describe('Service : ProviderResourceService Unit Tests', () => {
     const results = {
       results: [
         {
-          uuid: 'uuid',
-          display: 'test',
+          uuid: 'uuid-1',
+          display: 'test provider',
         },
         {
-          uuid: 'uuid',
-          display: 'other',
+          uuid: 'uuid-2',
+          display: 'another test provider',
         },
       ],
     };
 
     providerResourceService.searchProvider(searchText).subscribe((providers) => {
-      for (const provider of providers) {
-        expect(provider.display).toContain('test');
-      }
+      expect(providers.length).toBe(2);
+      expect(providers[0].display).toBe('test provider');
+      expect(providers[1].display).toBe('another test provider');
       done();
     });
 
-    const req = httpMock.expectOne(providerResourceService.getUrl());
-    req.flush(results);
+    // Wait for debounce timer (500ms)
+    setTimeout(() => {
+      const req = httpMock.expectOne((request) => {
+        return request.url.includes('provider') && request.params.get('q') === searchText;
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(results);
+    }, 500);
   });
 });

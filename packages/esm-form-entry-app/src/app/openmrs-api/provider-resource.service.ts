@@ -11,6 +11,7 @@ import { Provider, ListResult } from '../types';
 @Injectable()
 export class ProviderResourceService {
   private static readonly v = 'custom:(uuid,display,person:(uuid))';
+  private searchDebounceTimer: any;
 
   constructor(
     protected http: HttpClient,
@@ -19,11 +20,27 @@ export class ProviderResourceService {
   ) {}
 
   public searchProvider(searchText: string): Observable<Array<Provider>> {
-    return this.getAllProviders().pipe(
-      map((providers) =>
-        providers.filter((provider) => provider.display.toLowerCase().includes(searchText.toLowerCase())),
-      ),
-    );
+    return new Observable((observer) => {
+      if (this.searchDebounceTimer) {
+        clearTimeout(this.searchDebounceTimer);
+      }
+      this.searchDebounceTimer = setTimeout(() => {
+        const params = new HttpParams().set('q', searchText);
+        const url = this.windowRef.openmrsRestBase + 'provider?v=' + ProviderResourceService.v;
+        this.http
+          .get<ListResult<Provider>>(url, { params })
+          .pipe(map((r) => (r as ListResult<Provider>).results))
+          .subscribe({
+            next: (results) => {
+              observer.next(results);
+              observer.complete();
+            },
+            error: (err) => {
+              observer.error(err);
+            },
+          });
+      }, 500);
+    });
   }
 
   public getProviderByUuid(uuid: string): Observable<Provider | undefined> {
@@ -36,13 +53,13 @@ export class ProviderResourceService {
   }
 
   private getAllProviders(): Observable<Array<Provider>> {
-    const url = this.windowRef.openmrsRestBase + 'provider?q=&v=' + ProviderResourceService.v;
+    const url = this.windowRef.openmrsRestBase + 'provider?v=' + ProviderResourceService.v;
     return this.http.get<ListResult<Provider>>(url).pipe(map((r) => r.results));
   }
 
   public getUrl(uuid?: string) {
     return uuid
       ? this.windowRef.openmrsRestBase + 'provider/' + uuid + '?v=' + ProviderResourceService.v
-      : this.windowRef.openmrsRestBase + 'provider?q=&v=' + ProviderResourceService.v;
+      : this.windowRef.openmrsRestBase + 'provider?v=' + ProviderResourceService.v;
   }
 }
