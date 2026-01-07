@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { type Patient, generateRandomPatient, deletePatient } from '../commands';
-import { startVisit } from '../commands/visit-operations';
+import { startVisit, ensureNoActiveVisits } from '../commands/visit-operations';
 import { ChartPage } from '../pages';
 
 test('Visit context updates correctly when navigating between patients with active visits', async ({ page, api }) => {
@@ -62,12 +62,7 @@ test('Visit context clears when navigating from patient with visit to patient wi
     patientWithoutVisit = await generateRandomPatient(api);
 
     await startVisit(api, patientWithVisit.uuid);
-
-    const res = await api.get(`visit?patient=${patientWithoutVisit.uuid}&active=true`);
-    const data = await res.json();
-    for (const visit of data.results) {
-      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
-    }
+    await ensureNoActiveVisits(api, patientWithoutVisit.uuid);
   });
 
   await test.step('When I visit the chart of the patient with an active visit', async () => {

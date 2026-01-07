@@ -170,8 +170,8 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                 e.preventDefault();
                 if (column.link.handleNavigate) {
                   column.link.handleNavigate(encounter);
-                } else {
-                  column.link?.getUrl && navigate({ to: column.link.getUrl(encounter) });
+                } else if (column.link?.getUrl) {
+                  navigate({ to: column.link.getUrl(encounter) });
                 }
               }}
             >
@@ -198,18 +198,20 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                   itemText={t(actionItem.label)}
                   onClick={(e) => {
                     e.preventDefault();
-                    actionItem.mode === 'delete'
-                      ? handleDeleteEncounter(encounter.uuid, encounter.encounterType.name)
-                      : launchEncounterForm(
-                          formsJson,
-                          visit,
-                          actionItem.mode,
-                          onFormSave,
-                          encounter.uuid,
-                          actionItem.intent,
-                          patientUuid,
-                          requireActiveVisitForEncounterTile,
-                        );
+                    if (actionItem.mode === 'delete') {
+                      handleDeleteEncounter(encounter.uuid, encounter.encounterType.name);
+                    } else {
+                      launchEncounterForm(
+                        formsJson,
+                        visit,
+                        actionItem.mode,
+                        onFormSave,
+                        encounter.uuid,
+                        actionItem.intent,
+                        patientUuid,
+                        requireActiveVisitForEncounterTile,
+                      );
+                    }
                   }}
                 />
               )

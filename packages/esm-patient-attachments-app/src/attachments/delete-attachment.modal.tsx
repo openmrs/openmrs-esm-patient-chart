@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
-import { type Attachment } from '@openmrs/esm-framework';
+import { getCoreTranslation, type Attachment } from '@openmrs/esm-framework';
 import styles from './delete-attachment.scss';
 
 interface DeleteAttachmentConfirmationProps {
@@ -20,25 +20,25 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
   return (
     <>
       <ModalHeader closeModal={close} className={styles.modalHeader}>
-        {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()}?
+        {t('deleteAttachment', 'Delete attachment')}
       </ModalHeader>
       <ModalBody>
         <p className={styles.bodyText}>
           {t(
             'deleteAttachmentConfirmationText',
-            `Are you sure you want to delete this {{attachmentType}}? This action can't be undone.`,
+            'Are you sure you want to delete the attachment "{{fileName}}"? This action can\'t be undone.',
             {
-              attachmentType: attachment.bytesContentFamily.toLowerCase(),
+              fileName: attachment.filename,
             },
           )}
         </p>
       </ModalBody>
       <ModalFooter>
         <Button size="lg" kind="secondary" onClick={() => close()}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button autoFocus kind="danger" onClick={() => onConfirmation?.(attachment)} size="lg">
-          {t('delete', 'Delete')}
+          {getCoreTranslation('delete')}
         </Button>
       </ModalFooter>
     </>

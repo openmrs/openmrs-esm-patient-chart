@@ -9,10 +9,10 @@ import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, {}> = {
+const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
   closeWorkspace: jest.fn(),
   groupProps: {
     patientUuid: mockPatient.id,

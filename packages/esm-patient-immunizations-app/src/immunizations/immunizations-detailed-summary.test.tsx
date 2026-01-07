@@ -1,40 +1,49 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, launchWorkspace2, useVisit, type VisitReturnType } from '@openmrs/esm-framework';
-import { configSchema } from '../config-schema';
+import {
+  getDefaultsFromConfigSchema,
+  launchWorkspace2,
+  useConfig,
+  useVisit,
+  type VisitReturnType,
+} from '@openmrs/esm-framework';
+import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit } from '__mocks__';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useImmunizations } from '../hooks/useImmunizations';
+import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
 
 jest.mock('../hooks/useImmunizations', () => ({
   useImmunizations: jest.fn(),
 }));
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(),
-}));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 
-const mockUseImmunizations = jest.mocked(require('../hooks/useImmunizations').useImmunizations);
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  usePatientChartStore: jest.fn(),
+}));
+
+const mockUseImmunizations = jest.mocked(useImmunizations);
 const mockLaunchWorkspace = launchWorkspace2 as jest.Mock;
 const mockUseVisit = jest.mocked(useVisit);
-const mockUseConfig = jest.mocked(require('@openmrs/esm-framework').useConfig);
+const mockUseConfig = jest.mocked(useConfig<ImmunizationConfigObject>);
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
 mockUseConfig.mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
-});
+  immunizationsConfig: getDefaultsFromConfigSchema(configSchema) as ImmunizationConfigObject,
+} as any);
 
 mockLaunchWorkspace.mockImplementation(jest.fn());
 
 mockUseConfig.mockReturnValue({
   immunizationsConfig: {
+    immunizationConceptSet: 'CIEL:984',
     sequenceDefinitions: [
       {
         vaccineConceptUuid: 'polio-uuid',
@@ -47,7 +56,7 @@ mockUseConfig.mockReturnValue({
       },
     ],
   },
-});
+} as any);
 
 const mockImmunizationData = [
   {
@@ -73,6 +82,7 @@ describe('ImmunizationsDetailedSummary', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
       immunizationsConfig: {
+        immunizationConceptSet: 'CIEL:984',
         sequenceDefinitions: [
           {
             vaccineConceptUuid: 'polio-uuid',
@@ -85,7 +95,7 @@ describe('ImmunizationsDetailedSummary', () => {
           },
         ],
       },
-    });
+    } as any);
     mockUseVisit.mockReturnValue({ currentVisit: null } as VisitReturnType);
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
