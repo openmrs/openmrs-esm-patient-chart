@@ -20,27 +20,10 @@ export class ProviderResourceService {
   ) {}
 
   public searchProvider(searchText: string): Observable<Array<Provider>> {
-    return new Observable((observer) => {
-      if (this.searchDebounceTimer) {
-        clearTimeout(this.searchDebounceTimer);
-      }
-      this.searchDebounceTimer = setTimeout(() => {
-        const params = new HttpParams().set('q', searchText);
-        const url = this.windowRef.openmrsRestBase + 'provider?v=' + ProviderResourceService.v;
-        this.http
-          .get<ListResult<Provider>>(url, { params })
-          .pipe(map((r) => (r as ListResult<Provider>).results))
-          .subscribe({
-            next: (results) => {
-              observer.next(results);
-              observer.complete();
-            },
-            error: (err) => {
-              observer.error(err);
-            },
-          });
-      }, 500);
-    });
+    const params = new HttpParams().set('q', searchText);
+    const url = this.windowRef.openmrsRestBase + 'provider?v=' + ProviderResourceService.v;
+
+    return this.http.get<ListResult<Provider>>(url, { params }).pipe(map((r) => r.results));
   }
 
   public getProviderByUuid(uuid: string): Observable<Provider | undefined> {
