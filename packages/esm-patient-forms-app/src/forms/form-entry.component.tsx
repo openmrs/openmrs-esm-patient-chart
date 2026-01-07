@@ -21,6 +21,7 @@ export interface FormEntryProps {
   patient;
   visitContext;
   mutateVisitContext;
+  additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
 }
@@ -34,6 +35,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
+  additionalProps,
 }) => {
   const formUuid = form.uuid;
   const visitStartDatetime = visitContext?.startDatetime;
@@ -60,6 +62,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? '',
+      visit: visitContext ?? null,
+      additionalProps: additionalProps ?? {},
       handlePostResponse,
       closeWorkspace: () => {
         return closeWorkspace();
@@ -77,10 +81,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
     }),
     [
       closeWorkspace,
-      visitContext?.startDatetime,
-      visitContext?.stopDatetime,
-      visitContext?.uuid,
-      visitContext?.visitType?.uuid,
       encounterUuid,
       formUuid,
       globalMutate,
@@ -94,6 +94,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
       visitStopDatetime,
       visitTypeUuid,
       visitUuid,
+      additionalProps,
+      visitContext,
     ],
   ) satisfies FormRendererProps;
 
