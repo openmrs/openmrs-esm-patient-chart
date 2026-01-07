@@ -28,7 +28,19 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      const range = formatReferenceRange(nodeRanges, subTreeNode.units);
+      const obsWithRange = subTreeNode.obs.find((ob) => ob.lowNormal !== undefined || ob.hiNormal !== undefined);
+      const observationRanges: ReferenceRanges | undefined = obsWithRange
+        ? {
+            hiAbsolute: obsWithRange.hiAbsolute,
+            hiCritical: obsWithRange.hiCritical,
+            hiNormal: obsWithRange.hiNormal,
+            lowAbsolute: obsWithRange.lowAbsolute,
+            lowCritical: obsWithRange.lowCritical,
+            lowNormal: obsWithRange.lowNormal,
+          }
+        : undefined;
+      const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
+      const range = formatReferenceRange(selectedRanges ?? nodeRanges, subTreeNode.units);
 
       const processedObs = subTreeNode.obs.map((ob) => {
         // Note: Units are only at the concept/node level, not observation-level
