@@ -630,6 +630,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
 function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
+  const isDeclined = orderItem.fulfillerStatus === 'DECLINED';
 
   // Use the appropriate grouping key and postDataPrepFunction based on order type
   const getOrderBasketConfig = useCallback(() => {
@@ -706,12 +707,12 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
       <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} flipped selectorPrimaryFocus={'#modify'} size={'md'}>
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || isDeclined}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
           onClick={handleModifyOrder}
         />
-        {orderItem?.type === ORDER_TYPES.TEST_ORDER && (
+        {orderItem?.type === ORDER_TYPES.TEST_ORDER && !isDeclined && (
           <OverflowMenuItem
             className={styles.menuItem}
             disabled={alreadyInBasket}
@@ -726,7 +727,7 @@ function OrderBasketItemActions({ orderItem, openOrderBasket, launchOrderForm, p
         )}
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE'}
+          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE' || isDeclined}
           hasDivider
           id="discontinue"
           isDelete
