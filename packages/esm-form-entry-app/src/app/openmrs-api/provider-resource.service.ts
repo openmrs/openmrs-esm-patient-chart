@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpParams, HttpClient } from '@angular/common/http';
 
-import { Observable, ReplaySubject, of } from 'rxjs';
-import { take, map, catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 import { PersonResourceService } from './person-resource.service';
 import { WindowRef } from '../window-ref';
@@ -11,7 +11,6 @@ import { Provider, ListResult } from '../types';
 @Injectable()
 export class ProviderResourceService {
   private static readonly v = 'custom:(uuid,display,person:(uuid))';
-  private searchDebounceTimer: any;
 
   constructor(
     protected http: HttpClient,

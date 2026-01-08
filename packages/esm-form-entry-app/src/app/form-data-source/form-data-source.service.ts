@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { take, map, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { take, map, tap, switchMap } from 'rxjs/operators';
+import { Observable, Subject, timer } from 'rxjs';
 
 import { FetchResponse, fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
 
@@ -137,11 +137,15 @@ export class FormDataSourceService {
   }
 
   public findProvider(searchText): Observable<any[]> {
-    return this.providerResourceService.searchProvider(searchText).pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      map((providers) => providers.filter((p) => !!p.person).map(this.mapProvider)),
-      tap((result) => this.setCachedProviderSearchResults(result)),
+    const trimmedSearchText = searchText?.trim() ?? '';
+
+    return timer(300).pipe(
+      switchMap(() =>
+        this.providerResourceService.searchProvider(trimmedSearchText).pipe(
+          map((providers) => providers.filter((p) => !!p.person).map(this.mapProvider)),
+          tap((result) => this.setCachedProviderSearchResults(result)),
+        ),
+      ),
     );
   }
 

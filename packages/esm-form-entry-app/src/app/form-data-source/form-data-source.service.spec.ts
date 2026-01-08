@@ -36,17 +36,35 @@ describe('Service: FormDataSourceService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should find for provider by search text', (done) => {
+  it('should find providers by search text', fakeAsync(() => {
     const service: FormDataSourceService = TestBed.get(FormDataSourceService);
-    const result = service.findProvider('text');
+    let actualResults: any[];
 
-    result.subscribe((results) => {
-      expect(results).toBeTruthy();
-      expect(results.length).toBeGreaterThan(0);
-      expect(results[0].value).toEqual('uuid');
-      done();
+    service.findProvider('text').subscribe((results) => {
+      actualResults = results;
     });
-  });
+
+    tick(300); // advance past the debounce
+
+    expect(actualResults).toBeTruthy();
+    expect(actualResults.length).toBeGreaterThan(0);
+    expect(actualResults[0].value).toEqual('uuid');
+  }));
+
+  it('should emit once per provider search', fakeAsync(() => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+    const firstSpy = jasmine.createSpy('first');
+    const secondSpy = jasmine.createSpy('second');
+
+    service.findProvider('first').subscribe(firstSpy);
+    tick(300);
+    expect(firstSpy).toHaveBeenCalledTimes(1);
+
+    service.findProvider('second').subscribe(secondSpy);
+    tick(300);
+    expect(secondSpy).toHaveBeenCalledTimes(1);
+    expect(firstSpy).toHaveBeenCalledTimes(1);
+  }));
 
   it(
     'should find provider when getProviderByProviderUuid is called' + ' with a provider uuid',
