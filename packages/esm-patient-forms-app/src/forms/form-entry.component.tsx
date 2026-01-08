@@ -16,7 +16,7 @@ import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.compo
 
 export interface FormEntryProps {
   form: Form;
-  encounterUuid: string;
+  encounterUuid?: string;
   patientUuid;
   patient;
   visitContext;
@@ -40,7 +40,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const formUuid = form.uuid;
   const visitStartDatetime = visitContext?.startDatetime;
   const visitStopDatetime = visitContext?.stopDatetime;
-  const visitTypeUuid = visitContext?.visitType.uuid;
+  const visitTypeUuid = visitContext?.visitType?.uuid;
   const visitUuid = visitContext?.uuid;
   const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
   const htmlForm = toHtmlForm(form, htmlFormEntryForms);
