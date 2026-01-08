@@ -4,7 +4,8 @@ import FormEntry from './form-entry.component';
 
 interface FormEntryWorkspaceProps {
   form: Form;
-  encounterUuid: string;
+  encounterUuid?: string;
+  additionalProps?: Record<string, any>;
 }
 
 /**
@@ -15,13 +16,14 @@ interface FormEntryWorkspaceProps {
  */
 const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, object>> = ({
   closeWorkspace,
-  workspaceProps: { form, encounterUuid },
+  workspaceProps: { form, encounterUuid, additionalProps },
   groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
 }) => {
   return (
     <FormEntry
       form={form}
       encounterUuid={encounterUuid}
+      additionalProps={additionalProps}
       patient={patient}
       patientUuid={patientUuid}
       visitContext={visitContext}
