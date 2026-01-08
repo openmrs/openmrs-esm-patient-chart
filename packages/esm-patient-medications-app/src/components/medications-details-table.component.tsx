@@ -103,7 +103,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   ];
 
   const tableRows = results?.map((medication, id) => ({
-    id: `${id}`,
+    id: medication.uuid,
     details: {
       sortKey: medication.drug?.display,
       content: (
@@ -296,28 +296,33 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, rowIndex) => (
-                    <TableRow className={styles.row} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell className={styles.tableCell} key={cell.id}>
-                          {cell.value?.content ?? cell.value}
-                        </TableCell>
-                      ))}
-                      {!isPrinting && (
-                        <TableCell className="cds--table-column-menu">
-                          <OrderBasketItemActions
-                            patient={patient}
-                            showDiscontinueButton={showDiscontinueButton}
-                            showModifyButton={showModifyButton}
-                            showReorderButton={showReorderButton}
-                            medication={medications[rowIndex]}
-                            items={orders}
-                            setItems={setOrders}
-                          />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
+                  {rows.map((row) => {
+                    const medication = medications.find((med) => med.uuid === row.id);
+
+                    return (
+                      <TableRow className={styles.row} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell className={styles.tableCell} key={cell.id}>
+                            {cell.value?.content ?? cell.value}
+                          </TableCell>
+                        ))}
+
+                        {!isPrinting && medication && (
+                          <TableCell className="cds--table-column-menu">
+                            <OrderBasketItemActions
+                              patient={patient}
+                              showDiscontinueButton={showDiscontinueButton}
+                              showModifyButton={showModifyButton}
+                              showReorderButton={showReorderButton}
+                              medication={medication}
+                              items={orders}
+                              setItems={setOrders}
+                            />
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
