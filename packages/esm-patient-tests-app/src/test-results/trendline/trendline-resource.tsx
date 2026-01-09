@@ -9,7 +9,13 @@ import {
   type ReferenceRanges,
 } from '../grouped-timeline/reference-range-helpers';
 
-function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
+function getMostRecentObservationWithRange(obs: any[]) {
+  return obs
+    .filter((ob) => ob.lowNormal !== undefined || ob.hiNormal !== undefined)
+    .sort((a, b) => new Date(b.obsDatetime).getTime() - new Date(a.obsDatetime).getTime())[0];
+}
+
+export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];
   if (!treeNode) {
     return tests;
@@ -28,7 +34,7 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      const obsWithRange = subTreeNode.obs.find((ob) => ob.lowNormal !== undefined || ob.hiNormal !== undefined);
+      const obsWithRange = getMostRecentObservationWithRange(subTreeNode.obs);
       const observationRanges: ReferenceRanges | undefined = obsWithRange
         ? {
             hiAbsolute: obsWithRange.hiAbsolute,
@@ -72,6 +78,12 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         ...subTreeNode,
         range,
         obs: processedObs,
+        lowNormal: selectedRanges?.lowNormal ?? subTreeNode.lowNormal,
+        hiNormal: selectedRanges?.hiNormal ?? subTreeNode.hiNormal,
+        lowCritical: selectedRanges?.lowCritical ?? subTreeNode.lowCritical,
+        hiCritical: selectedRanges?.hiCritical ?? subTreeNode.hiCritical,
+        lowAbsolute: selectedRanges?.lowAbsolute ?? subTreeNode.lowAbsolute,
+        hiAbsolute: selectedRanges?.hiAbsolute ?? subTreeNode.hiAbsolute,
       });
     } else if (subNode?.subSets) {
       const subTreesTests = computeTrendlineData(subNode as TreeNode); // recursion
