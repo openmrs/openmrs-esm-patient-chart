@@ -21,8 +21,10 @@ export interface PatientChartWorkspaceActionButtonProps {
   groupProps: PatientWorkspaceGroupProps;
 }
 
-export interface PatientWorkspace2DefinitionProps<WorkspaceProps extends Object, WindowProps extends Object>
-  extends Workspace2DefinitionProps<WorkspaceProps, WindowProps, PatientWorkspaceGroupProps> {}
+export type PatientWorkspace2DefinitionProps<
+  WorkspaceProps extends object,
+  WindowProps extends object,
+> = Workspace2DefinitionProps<WorkspaceProps, WindowProps, PatientWorkspaceGroupProps>;
 
 export function launchPatientChartWithWorkspaceOpen({
   patientUuid,

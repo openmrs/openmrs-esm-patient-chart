@@ -100,7 +100,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [
         {
@@ -200,7 +200,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [
         {
@@ -256,7 +256,7 @@ describe('ObsSwitchable', () => {
     });
 
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
       tableSortOldestFirst: true,
@@ -280,7 +280,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
       showGraphByDefault: true,
@@ -314,7 +314,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       showGraphByDefault: true,
       data: [
@@ -369,7 +369,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       showGraphByDefault: true,
       data: [{ concept: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
