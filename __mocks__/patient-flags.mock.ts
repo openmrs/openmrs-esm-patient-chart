@@ -13,7 +13,7 @@ export const mockPatientFlags = [
     ],
     uuid: '8ca6c08f-66d9-4a18-a233-4f658b1755bf',
     voided: false,
-    flagWithPriority: {
+    flagDefinition: {
       uuid: '98ca6c08f-66d9-4a18-a233-4f658b1755bf',
       display: 'Needs Follow Up',
       priority: {
@@ -36,7 +36,7 @@ export const mockPatientFlags = [
     ],
     uuid: '5fs6c08f-66d9-4a18-a233-5f658b1755bf',
     voided: false,
-    flagWithPriority: {
+    flagDefinition: {
       uuid: 'a4a4c08f-66d9-4a18-a233-5f658b1755bf',
       display: 'Unknown Diagnosis',
       priority: {
@@ -59,7 +59,7 @@ export const mockPatientFlags = [
     ],
     uuid: '4da4c08f-66d9-4a18-a233-5f658b1755bf',
     voided: false,
-    flagWithPriority: {
+    flagDefinition: {
       uuid: 'cc6c08f-66d9-4a18-a233-5f658b1755bf',
       display: 'Future Appointment',
       priority: {

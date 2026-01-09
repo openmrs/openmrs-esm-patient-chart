@@ -6,7 +6,7 @@ import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-comm
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, {}> = {
+const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object> = {
   groupProps: {
     patientUuid: '',
     patient: undefined,

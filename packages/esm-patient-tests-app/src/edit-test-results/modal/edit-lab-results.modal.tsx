@@ -10,9 +10,21 @@ type EditLabResultModalProps = {
   orders: Array<Order>;
   closeModal: () => void;
   patient: fhir.Patient;
+  /** The workspace name to launch. Defaults to 'test-results-form-workspace' for patient chart context.
+   * Use 'lab-app-test-results-form-workspace' when opening from outside the patient chart (e.g., Laboratory app). */
+  workspaceName?: string;
 };
 
-const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeModal, patient }) => {
+/**
+ * This modal is meant for use outside the patient chart (e.g., Laboratory app).
+ * The props passed to launchWorkspace2 are only compatible with the exported test results form.
+ */
+const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
+  orders,
+  closeModal,
+  patient,
+  workspaceName = 'test-results-form-workspace',
+}) => {
   const { t } = useTranslation();
   const [selectedOrder, setSelectedOrder] = useState<Order>(orders?.[0]);
   const { sessionLocation } = useSession();
@@ -27,7 +39,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({ orders, closeMo
 
   const handleLaunchWorkspace = () => {
     if (selectedOrder) {
-      launchWorkspace2('test-results-form-workspace', { order: selectedOrder, patient });
+      launchWorkspace2(workspaceName, { order: selectedOrder, patient });
       closeModal();
     }
   };

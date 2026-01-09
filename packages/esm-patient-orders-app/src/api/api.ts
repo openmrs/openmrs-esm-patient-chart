@@ -36,7 +36,7 @@ export function useOrderEncounter(
   isLoading: boolean;
   error: Error;
   encounterUuid: string;
-  mutate: Function;
+  mutate: (...args: unknown[]) => unknown;
 } {
   const { systemVisitEnabled, isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting } = useSystemVisitSetting();
 

@@ -46,12 +46,10 @@ test('Edit start date and time of a past visit', async ({ page, api, patient, vi
     await startTimeInput.fill('12:00');
     await visitsPage.page.getByLabel(/start time format/i).selectOption('AM');
 
-    const dayText = await startDateDayInput.textContent();
-    const monthText = await startDateMonthInput.textContent();
-    const yearText = await startDateYearInput.textContent();
-    expect(dayText).toBe(targetStartDate.format('DD'));
-    expect(monthText).toBe(targetStartDate.format('MM'));
-    expect(yearText).toBe(targetStartDate.format('YYYY'));
+    // Wait for the date picker inputs to reflect the filled values
+    await expect(startDateDayInput).toHaveText(targetStartDate.format('DD'));
+    await expect(startDateMonthInput).toHaveText(targetStartDate.format('MM'));
+    await expect(startDateYearInput).toHaveText(targetStartDate.format('YYYY'));
 
     const updateVisitButton = visitsPage.page.locator('form').getByRole('button', { name: /update visit/i });
     await expect(updateVisitButton).toBeVisible();
