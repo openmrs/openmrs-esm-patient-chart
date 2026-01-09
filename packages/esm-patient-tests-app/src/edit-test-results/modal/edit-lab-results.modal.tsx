@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
-import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
+import { launchWorkspace2, useSession, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './edit-lab-results.scss';
 
@@ -86,7 +86,9 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
                     </p>
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('dateOrdered', 'Date ordered')}:</span>
-                      <span className={styles.labelValue}>{selectedOrder.dateActivated}</span>
+                      <span className={styles.labelValue}>
+                        {formatDatetime(parseDate(selectedOrder.dateActivated), { mode: 'standard' })}
+                      </span>
                     </p>
                   </div>
                 </div>
