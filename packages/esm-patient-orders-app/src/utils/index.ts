@@ -29,6 +29,7 @@ export function compare<T>(x?: T, y?: T) {
 
 /**
  * Builds medication order object from the given order object
+ * See also same function in esm-patient-medications-app/src/api/api.ts
  */
 export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOrderBasketItem {
   return {
@@ -64,8 +65,6 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
     pillsDispensed: order.quantity,
     numRefills: order.numRefills,
     indication: order.orderReasonNonCoded,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     quantityUnits: {
       value: order.quantityUnits?.display,
       valueCoded: order.quantityUnits?.uuid,
@@ -83,8 +82,6 @@ export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBask
     action: action,
     display: order.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     instructions: order.instructions,
     urgency: order.urgency,
     accessionNumber: order.accessionNumber,
@@ -110,8 +107,6 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     action: action,
     display: order.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     instructions: order.instructions,
     urgency: order.urgency,
     accessionNumber: order.accessionNumber,

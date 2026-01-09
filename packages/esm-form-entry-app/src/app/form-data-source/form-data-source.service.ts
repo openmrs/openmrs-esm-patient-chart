@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { take, map, tap } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { take, map, tap, switchMap } from 'rxjs/operators';
+import { Observable, Subject, of, timer } from 'rxjs';
 
 import { FetchResponse, fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
 
@@ -136,10 +136,23 @@ export class FormDataSourceService {
     }
   }
 
-  public findProvider(searchText): Observable<any[]> {
-    return this.providerResourceService.searchProvider(searchText).pipe(
-      map((providers) => providers.filter((p) => !!p.person).map(this.mapProvider)),
-      tap((result) => this.setCachedProviderSearchResults(result)),
+  public findProvider(searchText: string): Observable<any[]> {
+    const trimmedSearchText = searchText?.trim() ?? '';
+
+    if (!trimmedSearchText) {
+      return of([]);
+    }
+
+    // Return a cold observable with 300ms delay
+    // Each call gets its own independent observable
+    // The component's switchMap cancels previous subscriptions for true debouncing
+    return timer(300).pipe(
+      switchMap(() =>
+        this.providerResourceService.searchProvider(trimmedSearchText).pipe(
+          map((providers) => providers.filter((provider) => !!provider.person).map(this.mapProvider)),
+          tap((result) => this.setCachedProviderSearchResults(result)),
+        ),
+      ),
     );
   }
 

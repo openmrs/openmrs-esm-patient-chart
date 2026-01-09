@@ -36,17 +36,58 @@ describe('Service: FormDataSourceService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should find for provider by search text', (done) => {
+  it('should find providers by search text after 300ms delay', fakeAsync(() => {
     const service: FormDataSourceService = TestBed.get(FormDataSourceService);
-    const result = service.findProvider('text');
+    let actualResults: any[];
 
-    result.subscribe((results) => {
-      expect(results).toBeTruthy();
-      expect(results.length).toBeGreaterThan(0);
-      expect(results[0].value).toEqual('uuid');
+    service.findProvider('text').subscribe((results) => {
+      actualResults = results;
+    });
+
+    tick(300); // advance past the timer delay
+
+    expect(actualResults).toBeTruthy();
+    expect(actualResults.length).toBeGreaterThan(0);
+    expect(actualResults[0].value).toEqual('uuid');
+  }));
+
+  it('should return empty array for empty or whitespace search text', (done) => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+
+    service.findProvider('').subscribe((results) => {
+      expect(results).toEqual([]);
       done();
     });
   });
+
+  it('should return independent observables for each search', fakeAsync(() => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+    const providerResourceService = TestBed.get(ProviderResourceService);
+    const searchSpy = spyOn(providerResourceService, 'searchProvider').and.callThrough();
+
+    let firstResults: any[];
+    let secondResults: any[];
+
+    // Two independent searches - each gets its own observable
+    service.findProvider('first').subscribe((results) => {
+      firstResults = results;
+    });
+
+    service.findProvider('second').subscribe((results) => {
+      secondResults = results;
+    });
+
+    tick(300);
+
+    // Each call triggers its own API request (isolation maintained)
+    expect(searchSpy).toHaveBeenCalledTimes(2);
+    expect(searchSpy).toHaveBeenCalledWith('first');
+    expect(searchSpy).toHaveBeenCalledWith('second');
+
+    // Both should have results
+    expect(firstResults).toBeTruthy();
+    expect(secondResults).toBeTruthy();
+  }));
 
   it(
     'should find provider when getProviderByProviderUuid is called' + ' with a provider uuid',
