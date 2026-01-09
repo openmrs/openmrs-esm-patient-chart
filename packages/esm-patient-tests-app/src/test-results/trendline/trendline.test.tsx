@@ -29,7 +29,7 @@ describe('Trendline', () => {
       isValidating: false,
     });
 
-    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
+    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} />);
 
     expect(screen.getAllByRole('paragraph')).toHaveLength(8);
   });
@@ -48,7 +48,7 @@ describe('Trendline', () => {
       isValidating: false,
     });
 
-    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
+    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} />);
 
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no observations to display for this patient/i)).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('Trendline', () => {
       isValidating: false,
     });
 
-    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
+    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} />);
 
     const showResultsTableButton = screen.getByRole('button', { name: /show results table/i });
 
@@ -114,7 +114,7 @@ describe('Trendline', () => {
       isValidating: false,
     });
 
-    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} basePath="" />);
+    render(<Trendline patientUuid={patientUuid} conceptUuid={conceptUuid} />);
 
     const toggleButton = screen.getByRole('button', { name: /show results table/i });
 
