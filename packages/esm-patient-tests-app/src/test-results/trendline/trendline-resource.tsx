@@ -8,12 +8,7 @@ import {
   formatReferenceRange,
   type ReferenceRanges,
 } from '../grouped-timeline/reference-range-helpers';
-
-function getMostRecentObservationWithRange(obs: any[]) {
-  return obs
-    .filter((ob) => ob.lowNormal !== undefined || ob.hiNormal !== undefined)
-    .sort((a, b) => new Date(b.obsDatetime).getTime() - new Date(a.obsDatetime).getTime())[0];
-}
+import { getMostRecentObservationWithRange } from '../grouped-timeline/reference-range-helpers';
 
 export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];
