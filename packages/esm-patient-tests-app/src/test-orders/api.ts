@@ -2,11 +2,13 @@ import { useCallback, useMemo } from 'react';
 import { chunk } from 'lodash-es';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import type {
-  OrderPost,
-  PatientOrderFetchResponse,
-  TestOrderBasketItem,
-  TestOrderPost,
+import {
+  careSettingUuid,
+  type PostDataPrepFunction,
+  type OrderPost,
+  type PatientOrderFetchResponse,
+  type TestOrderBasketItem,
+  type TestOrderPost,
 } from '@openmrs/esm-patient-common-lib';
 import {
   type FetchResponse,
@@ -17,8 +19,6 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-
-export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
 /**
  * SWR-based data fetcher for patient orders.
@@ -94,18 +94,19 @@ function getConceptReferenceUrls(conceptUuids: Array<string>) {
   );
 }
 
-export function prepTestOrderPostData(
+export const prepTestOrderPostData: PostDataPrepFunction = (
   order: TestOrderBasketItem,
-  patientUuid: string,
-  encounterUuid: string | null,
-): TestOrderPost {
+  patientUuid,
+  encounterUuid,
+  orderingProviderUuid,
+): TestOrderPost => {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
       type: 'testorder',
       patient: patientUuid,
       careSetting: careSettingUuid,
-      orderer: order.orderer,
+      orderer: orderingProviderUuid,
       encounter: encounterUuid,
       concept: order.testType.conceptUuid,
       instructions: order.instructions,
@@ -119,8 +120,8 @@ export function prepTestOrderPostData(
       action: 'REVISE',
       type: 'testorder',
       patient: patientUuid,
-      careSetting: order.careSetting,
-      orderer: order.orderer,
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
       encounter: encounterUuid,
       concept: order.testType.conceptUuid,
       instructions: order.instructions,
@@ -135,8 +136,8 @@ export function prepTestOrderPostData(
       action: 'DISCONTINUE',
       type: 'testorder',
       patient: patientUuid,
-      careSetting: order.careSetting,
-      orderer: order.orderer,
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
       encounter: encounterUuid,
       concept: order.testType.conceptUuid,
       orderReason: order.orderReason,
@@ -148,7 +149,7 @@ export function prepTestOrderPostData(
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);
   }
-}
+};
 
 export type PostDataPrepLabOrderFunction = (
   order: TestOrderBasketItem,
