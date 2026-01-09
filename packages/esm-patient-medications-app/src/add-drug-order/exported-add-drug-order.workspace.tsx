@@ -4,7 +4,8 @@ import { type ExportedOrderBasketWindowProps, type DrugOrderBasketItem } from '@
 import AddDrugOrder from './add-drug-order.component';
 
 export interface AddDrugOrderWorkspaceAdditionalProps {
-  order: DrugOrderBasketItem;
+  order?: DrugOrderBasketItem;
+  orderToEditOrdererUuid?: string;
 }
 
 /**
@@ -12,13 +13,14 @@ export interface AddDrugOrderWorkspaceAdditionalProps {
  * @see add-drug-order.workspace.tsx
  */
 export default function ExportedAddDrugOrderWorkspace({
-  workspaceProps: { order: initialOrder },
+  workspaceProps: { order, orderToEditOrdererUuid },
   windowProps: { patient, patientUuid, visitContext },
   closeWorkspace,
-}: Workspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, ExportedOrderBasketWindowProps, {}>) {
+}: Workspace2DefinitionProps<AddDrugOrderWorkspaceAdditionalProps, ExportedOrderBasketWindowProps>) {
   return (
     <AddDrugOrder
-      initialOrder={initialOrder}
+      initialOrder={order}
+      orderToEditOrdererUuid={orderToEditOrdererUuid}
       patient={patient}
       patientUuid={patientUuid}
       visitContext={visitContext}

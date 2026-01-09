@@ -47,7 +47,7 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: 
     (workspaceProps?: T, windowProps?: any, groupProps?: any) => {
       startVisitIfNeeded().then((didStartVisit) => {
         if (didStartVisit) {
-          launchWorkspace2(workspaceName, workspaceProps, windowProps);
+          launchWorkspace2(workspaceName, workspaceProps, windowProps, groupProps);
         }
       });
     },

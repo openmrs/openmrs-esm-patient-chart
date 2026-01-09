@@ -180,8 +180,6 @@ export function getTemplateOrderBasketItem(
         freeTextDosage: '',
         indication: '',
         template: template.template,
-        orderer: null,
-        careSetting: null,
         quantityUnits:
           getDefault(template.template, 'quantityUnits') ?? drug?.dosageForm
             ? {
@@ -221,8 +219,6 @@ export function getTemplateOrderBasketItem(
         numRefills: null,
         freeTextDosage: '',
         indication: '',
-        orderer: null,
-        careSetting: null,
         quantityUnits: drug?.dosageForm
           ? {
               value: drug?.dosageForm?.display,
