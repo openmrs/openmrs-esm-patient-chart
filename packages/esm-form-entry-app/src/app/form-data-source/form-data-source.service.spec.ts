@@ -36,7 +36,7 @@ describe('Service: FormDataSourceService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should find providers by search text', fakeAsync(() => {
+  it('should find providers by search text after 300ms delay', fakeAsync(() => {
     const service: FormDataSourceService = TestBed.get(FormDataSourceService);
     let actualResults: any[];
 
@@ -44,26 +44,49 @@ describe('Service: FormDataSourceService', () => {
       actualResults = results;
     });
 
-    tick(300); // advance past the debounce
+    tick(300); // advance past the timer delay
 
     expect(actualResults).toBeTruthy();
     expect(actualResults.length).toBeGreaterThan(0);
     expect(actualResults[0].value).toEqual('uuid');
   }));
 
-  it('should emit once per provider search', fakeAsync(() => {
+  it('should return empty array for empty or whitespace search text', (done) => {
     const service: FormDataSourceService = TestBed.get(FormDataSourceService);
-    const firstSpy = jasmine.createSpy('first');
-    const secondSpy = jasmine.createSpy('second');
 
-    service.findProvider('first').subscribe(firstSpy);
-    tick(300);
-    expect(firstSpy).toHaveBeenCalledTimes(1);
+    service.findProvider('').subscribe((results) => {
+      expect(results).toEqual([]);
+      done();
+    });
+  });
 
-    service.findProvider('second').subscribe(secondSpy);
+  it('should return independent observables for each search', fakeAsync(() => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+    const providerResourceService = TestBed.get(ProviderResourceService);
+    const searchSpy = spyOn(providerResourceService, 'searchProvider').and.callThrough();
+
+    let firstResults: any[];
+    let secondResults: any[];
+
+    // Two independent searches - each gets its own observable
+    service.findProvider('first').subscribe((results) => {
+      firstResults = results;
+    });
+
+    service.findProvider('second').subscribe((results) => {
+      secondResults = results;
+    });
+
     tick(300);
-    expect(secondSpy).toHaveBeenCalledTimes(1);
-    expect(firstSpy).toHaveBeenCalledTimes(1);
+
+    // Each call triggers its own API request (isolation maintained)
+    expect(searchSpy).toHaveBeenCalledTimes(2);
+    expect(searchSpy).toHaveBeenCalledWith('first');
+    expect(searchSpy).toHaveBeenCalledWith('second');
+
+    // Both should have results
+    expect(firstResults).toBeTruthy();
+    expect(secondResults).toBeTruthy();
   }));
 
   it(
