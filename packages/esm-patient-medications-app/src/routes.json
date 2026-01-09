@@ -73,14 +73,6 @@
       "component": "drugSearchComboBox"
     }
   ],
-  "workspaces": [
-    {
-      "name": "fill-prescription-form",
-      "title": "fillPrescription",
-      "component": "fillPrescriptionFormWorkspace",
-      "type": "order"
-    }
-  ],
   "workspaces2": [
     {
       "name": "add-drug-order",

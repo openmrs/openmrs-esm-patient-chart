@@ -1,16 +1,17 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, useOpenmrsFetchAll, type FetchResponse } from '@openmrs/esm-framework';
-import type {
-  DrugOrderBasketItem,
-  DrugOrderPost,
-  PatientOrderFetchResponse,
-  Order,
+import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import {
+  type DrugOrderBasketItem,
+  type DrugOrderPost,
+  type PatientOrderFetchResponse,
+  type Order,
+  type PostDataPrepFunction,
+  careSettingUuid,
+  type OrderAction,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-
-export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 
 const customRepresentation =
   'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
@@ -18,7 +19,7 @@ const customRepresentation =
   'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,fulfillerStatus,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
-  'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+  'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
 /**
  * Sorts orders by date activated in descending order.
@@ -130,18 +131,22 @@ export function usePastPatientOrders(patientUuid: string) {
   };
 }
 
-export function prepMedicationOrderPostData(
+/**
+ * Converts a DrugOrderBasketItem into an Order POST payload
+ */
+export const prepMedicationOrderPostData: PostDataPrepFunction = (
   order: DrugOrderBasketItem,
-  patientUuid: string,
-  encounterUuid: string | null,
-): DrugOrderPost {
+  patientUuid,
+  encounterUuid,
+  orderingProviderUuid,
+): DrugOrderPost => {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
       patient: patientUuid,
       type: 'drugorder',
-      careSetting: order.careSetting,
-      orderer: order.orderer,
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
       encounter: encounterUuid,
       drug: order.drug.uuid,
       dose: order.dosage,
@@ -168,8 +173,8 @@ export function prepMedicationOrderPostData(
       patient: patientUuid,
       type: 'drugorder',
       previousOrder: order.previousOrder,
-      careSetting: order.careSetting,
-      orderer: order.orderer,
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
       encounter: encounterUuid,
       drug: order.drug.uuid,
       dose: order.dosage,
@@ -196,9 +201,9 @@ export function prepMedicationOrderPostData(
       type: 'drugorder',
       previousOrder: order.previousOrder,
       patient: patientUuid,
-      careSetting: order.careSetting,
+      careSetting: careSettingUuid,
       encounter: encounterUuid,
-      orderer: order.orderer,
+      orderer: orderingProviderUuid,
       concept: order.drug.concept.uuid,
       drug: order.drug.uuid,
       orderReasonNonCoded: null,
@@ -206,6 +211,53 @@ export function prepMedicationOrderPostData(
   } else {
     throw new Error(`Unknown order action ${order.action}. This is a development error.`);
   }
+};
+
+/**
+ * The inverse of prepMedicationOrderPostData - converts an Order into a DrugOrderBasketItem
+ * See also the same function defined in esm-patient-orders-app/src/utils/index.ts
+ */
+export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrderBasketItem {
+  return {
+    display: order.drug?.display,
+    previousOrder: action !== 'NEW' ? order.uuid : null,
+    action: action,
+    drug: order.drug,
+    dosage: order.dose,
+    unit: {
+      value: order.doseUnits?.display,
+      valueCoded: order.doseUnits?.uuid,
+    },
+    frequency: {
+      valueCoded: order.frequency?.uuid,
+      value: order.frequency?.display,
+    },
+    route: {
+      valueCoded: order.route?.uuid,
+      value: order.route?.display,
+    },
+    commonMedicationName: order.drug?.display,
+    isFreeTextDosage: order.dosingType === 'org.openmrs.FreeTextDosingInstructions',
+    freeTextDosage: order.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
+    patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
+    asNeeded: order.asNeeded,
+    asNeededCondition: order.asNeededCondition,
+    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    duration: order.duration,
+    durationUnit: {
+      valueCoded: order.durationUnits?.uuid,
+      value: order.durationUnits?.display,
+    },
+    pillsDispensed: order.quantity,
+    numRefills: order.numRefills,
+    indication: order.orderReasonNonCoded,
+    quantityUnits: {
+      value: order.quantityUnits?.display,
+      valueCoded: order.quantityUnits?.uuid,
+    },
+    encounterUuid: order.encounter?.uuid,
+    visit: order.encounter.visit,
+  };
 }
 
 /**
@@ -237,21 +289,4 @@ export function useRequireOutpatientQuantity(): {
   );
 
   return results;
-}
-
-export interface Provider {
-  uuid: string;
-  person: {
-    display?: string;
-  };
-}
-
-export function useProviders(providerRoles: Array<string>) {
-  const rep = 'custom:(uuid,person:(display)';
-  const ret = useOpenmrsFetchAll<Provider>(
-    providerRoles != null ? `${restBaseUrl}/provider?providerRoles=${providerRoles.join(',')}&v=${rep})` : null,
-  );
-
-  ret.data?.sort((a, b) => (a.person?.display ?? '').localeCompare(b.person?.display ?? ''));
-  return ret;
 }
