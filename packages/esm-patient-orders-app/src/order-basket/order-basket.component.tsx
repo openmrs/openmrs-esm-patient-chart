@@ -82,6 +82,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const [orderLocationUuid, setOrderLocationUuid] = useState(sessionLocation.uuid);
 
   const allowSelectingOrderer = ordererProviderRoles?.length > 0;
+  const canPlaceOrders = Boolean(currentProvider) || allowSelectingOrderer;
   const {
     providers,
     isLoading: isLoadingProviders,
@@ -228,17 +229,28 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           </div>
         )}
         <div className={styles.orderBasketContainer}>
-          {!currentProvider && (
+          {!canPlaceOrders ? (
             <InlineNotification
               kind="error"
               lowContrast
               className={styles.inlineNotification}
-              title={t('noProviderError', 'Current user is not a provider')}
+              title={t('cannotPlaceOrders', 'Cannot place orders')}
               subtitle={t(
-                'noProviderErrorSubtitle',
-                'A provider account is required to place orders. Please contact your system administrator.',
+                'notAProviderError',
+                'Your account is not associated with a provider. Contact your administrator.',
               )}
             />
+          ) : (
+            allowSelectingOrderer &&
+            !orderer && (
+              <InlineNotification
+                kind="info"
+                lowContrast
+                className={styles.inlineNotification}
+                title={t('selectOrderer', 'Select an orderer')}
+                subtitle={t('selectOrdererHint', 'Please select a prescribing clinician from the dropdown.')}
+              />
+            )
           )}
           {!isLoadingProviders &&
             allowSelectingOrderer &&
@@ -331,7 +343,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
                 !orderer ||
                 !orderLocationUuid ||
-                !currentProvider
+                !canPlaceOrders
               }
             >
               {isSavingOrders ? (
