@@ -1,9 +1,8 @@
 import React, { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { capitalize } from 'lodash-es';
 import {
-  DataTable,
   Button,
+  DataTable,
   IconButton,
   InlineLoading,
   OverflowMenu,
@@ -18,41 +17,40 @@ import {
   Tag,
   Tooltip,
 } from '@carbon/react';
+import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
+import { useSWRConfig } from 'swr';
 import {
   CardHeader,
   compare,
-  type DrugOrderBasketItem,
+  invalidateVisitAndEncounterData,
+  invalidateVisitByUuid,
   PatientChartPagination,
+  type DrugOrderBasketItem,
   type Order,
+  type OrderBasketWindowProps,
+  type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
-  type PatientWorkspaceGroupProps,
-  invalidateVisitByUuid,
-  invalidateVisitAndEncounterData,
-  type OrderBasketWindowProps,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   age,
-  getPatientName,
   formatDate,
+  getPatientName,
+  launchWorkspace2,
   PrinterIcon,
   useConfig,
   useLayoutType,
   usePagination,
   UserIcon,
-  launchWorkspace2,
-  type Encounter,
-  showModal,
 } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
+import { buildMedicationOrder } from '../api';
+import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 import { type ConfigObject } from '../config-schema';
 import PrintComponent from '../print/print.component';
 import styles from './medications-details-table.scss';
-import { useSWRConfig } from 'swr';
-import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
-import { buildMedicationOrder } from '../api';
 
 export interface MedicationsDetailsTableProps {
   isValidating?: boolean;
@@ -102,8 +100,13 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
     },
   ];
 
-  const tableRows = results?.map((medication, id) => ({
-    id: `${id}`,
+  const medicationsByUuid = useMemo(
+    () => new Map(results?.map((medication) => [medication.uuid, medication]) ?? []),
+    [results],
+  );
+
+  const tableRows = results?.map((medication) => ({
+    id: medication.uuid,
     details: {
       sortKey: medication.drug?.display,
       content: (
@@ -247,7 +250,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
             <Button
               kind="ghost"
               renderIcon={PrinterIcon}
-              iconDescription="Add vitals"
+              iconDescription={t('printMedications', 'Print medications')}
               className={styles.printButton}
               onClick={handlePrint}
             >
@@ -258,7 +261,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-              iconDescription="Launch order basket"
+              iconDescription={t('launchOrderBasket', 'Launch order basket')}
               onClick={() => launchOrderBasket({}, { encounterUuid: '' })}
             >
               {t('add', 'Add')}
@@ -292,32 +295,37 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                         {header.header}
                       </TableHeader>
                     ))}
-                    <TableHeader aria-label={t('actions', 'Actions')} />
+                    {!isPrinting && <TableHeader aria-label={t('actions', 'Actions')} />}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, rowIndex) => (
-                    <TableRow className={styles.row} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell className={styles.tableCell} key={cell.id}>
-                          {cell.value?.content ?? cell.value}
-                        </TableCell>
-                      ))}
-                      {!isPrinting && (
-                        <TableCell className="cds--table-column-menu">
-                          <OrderBasketItemActions
-                            patient={patient}
-                            showDiscontinueButton={showDiscontinueButton}
-                            showModifyButton={showModifyButton}
-                            showReorderButton={showReorderButton}
-                            medication={medications[rowIndex]}
-                            items={orders}
-                            setItems={setOrders}
-                          />
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
+                  {rows.map((row) => {
+                    const medication = medicationsByUuid.get(row.id);
+
+                    return (
+                      <TableRow className={styles.row} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell className={styles.tableCell} key={cell.id}>
+                            {cell.value?.content ?? cell.value}
+                          </TableCell>
+                        ))}
+
+                        {!isPrinting && medication && (
+                          <TableCell className="cds--table-column-menu">
+                            <OrderBasketItemActions
+                              patient={patient}
+                              showDiscontinueButton={showDiscontinueButton}
+                              showModifyButton={showModifyButton}
+                              showReorderButton={showReorderButton}
+                              medication={medication}
+                              items={orders}
+                              setItems={setOrders}
+                            />
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -325,7 +333,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
         </DataTable>
         <PatientChartPagination
           pageNumber={currentPage}
-          totalItems={medications.length}
+          totalItems={medications?.length ?? 0}
           currentItems={results.length}
           pageSize={pageSize}
           onPageNumberChange={({ page }) => goTo(page)}
@@ -500,7 +508,13 @@ function OrderBasketItemActions({
   }, [items, setItems, medication, workspaceGroupProps]);
 
   return (
-    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped size={isTablet ? 'lg' : 'md'}>
+    <OverflowMenu
+      aria-label={t('actionsMenu', 'Actions menu')}
+      align="left"
+      selectorPrimaryFocus={'#modify'}
+      flipped
+      size={isTablet ? 'lg' : 'md'}
+    >
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}
@@ -513,21 +527,21 @@ function OrderBasketItemActions({
       {showReorderButton && (
         <OverflowMenuItem
           className={styles.menuItem}
+          disabled={alreadyInBasket}
           id="reorder"
           itemText={t('reorder', 'Reorder')}
           onClick={handleReorderClick}
-          disabled={alreadyInBasket}
         />
       )}
       {showDiscontinueButton && (
         <OverflowMenuItem
           className={styles.menuItem}
+          disabled={alreadyInBasket}
+          hasDivider
           id="discontinue"
+          isDelete
           itemText={t('discontinue', 'Discontinue')}
           onClick={handleDiscontinueClick}
-          disabled={alreadyInBasket}
-          isDelete={true}
-          hasDivider
         />
       )}
     </OverflowMenu>
