@@ -8,8 +8,9 @@ import {
   formatReferenceRange,
   type ReferenceRanges,
 } from '../grouped-timeline/reference-range-helpers';
+import { getMostRecentObservationWithRange } from '../grouped-timeline/reference-range-helpers';
 
-function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
+export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];
   if (!treeNode) {
     return tests;
@@ -28,8 +29,7 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      const range = formatReferenceRange(nodeRanges, subTreeNode.units);
-
+      const range = subTreeNode.range ?? formatReferenceRange(nodeRanges, nodeRanges?.units);
       const processedObs = subTreeNode.obs.map((ob) => {
         // Note: Units are only at the concept/node level, not observation-level
         const observationRanges: ReferenceRanges | undefined =
@@ -45,14 +45,19 @@ function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
             : undefined;
 
         const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
-        const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
+        const resolvedRanges = selectedRanges ?? nodeRanges;
+        const assess = assessValue(resolvedRanges);
         const interpretation = ob.interpretation ?? assess(ob.value);
 
         return {
           ...ob,
           interpretation,
-          lowNormal: ob.lowNormal,
-          hiNormal: ob.hiNormal,
+          lowNormal: resolvedRanges?.lowNormal,
+          hiNormal: resolvedRanges?.hiNormal,
+          lowCritical: resolvedRanges?.lowCritical,
+          hiCritical: resolvedRanges?.hiCritical,
+          lowAbsolute: resolvedRanges?.lowAbsolute,
+          hiAbsolute: resolvedRanges?.hiAbsolute,
         };
       });
 
