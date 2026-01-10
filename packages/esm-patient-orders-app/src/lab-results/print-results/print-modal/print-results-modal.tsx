@@ -4,7 +4,7 @@ import { capitalize } from 'lodash-es';
 import { Button, ModalBody, ModalFooter, Checkbox } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
-import { useSession } from '@openmrs/esm-framework';
+import { useSession, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import PrintableReport from '../print-preview/print-preview.component';
 import styles from './print-results-modal.scss';
@@ -104,7 +104,9 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
 
                     <div className={styles.facilityDetails}>
                       <p className={styles.itemLabel}>{capitalize(location)}</p>
-                      <p className={styles.itemLabel}>{firstOrder.dateActivated}</p>
+                      <span className={styles.itemLabel}>
+                        {formatDatetime(parseDate(firstOrder.dateActivated), { mode: 'standard' })}
+                      </span>
                     </div>
                   </div>
                   <p className={styles.testDoneHeader}>{capitalize(t('testDone', 'Test done'))}</p>
