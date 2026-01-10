@@ -129,3 +129,23 @@ export const getObservationDisplayValue = (value: ObservationValue): string => {
   if (value && typeof value === 'object' && 'display' in value) return value.display;
   return '--';
 };
+
+/**
+ * Extracts effective ranges, prioritizing referenceRanges over legacy fields
+ */
+export const getEffectiveRanges = (
+  concept: any,
+  referenceRangesMap?: Map<string, { lowNormal?: number; hiNormal?: number }>,
+) => {
+  const patientSpecificRange = referenceRangesMap?.get(concept?.uuid);
+  if (patientSpecificRange) {
+    return {
+      lowNormal: patientSpecificRange.lowNormal,
+      hiNormal: patientSpecificRange.hiNormal,
+    };
+  }
+  return {
+    lowNormal: concept?.lowNormal,
+    hiNormal: concept?.hiNormal,
+  };
+};
