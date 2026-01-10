@@ -56,7 +56,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     sessionLocation,
     user: { person },
   } = useSession();
-  const currentProvider: Provider = useMemo(() => ({ ..._currentProvider, person }), [_currentProvider, person]);
+  const currentProvider: Provider = useMemo(
+    () => (_currentProvider ? { ..._currentProvider, person } : null),
+    [_currentProvider, person],
+  );
   const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -85,7 +88,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const [orderer, setOrderer] = useState<Provider>(allowSelectingOrderer ? null : currentProvider);
 
   useEffect(() => {
-    if (allowSelectingOrderer && providers?.length > 0) {
+    if (allowSelectingOrderer && providers?.length > 0 && currentProvider) {
       // default orderer to current user if they have the right provider roles
       if (providers.some((p) => p.uuid === currentProvider.uuid)) {
         setOrderer(currentProvider);
@@ -209,6 +212,18 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
       <div id="order-basket" className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.orderBasketContainer}>
+          {!currentProvider && (
+            <InlineNotification
+              kind="error"
+              lowContrast
+              className={styles.inlineNotification}
+              title={t('noProviderError', 'Current user is not a provider')}
+              subtitle={t(
+                'noProviderErrorSubtitle',
+                'A provider account is required to place orders. Please contact your system administrator.',
+              )}
+            />
+          )}
           {!isLoadingProviders &&
             allowSelectingOrderer &&
             (errorLoadingProviders ? (
@@ -293,7 +308,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 (visitRequired && !visitContext) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
                 !orderer ||
-                !orderLocationUuid
+                !orderLocationUuid ||
+                !currentProvider
               }
             >
               {isSavingOrders ? (
