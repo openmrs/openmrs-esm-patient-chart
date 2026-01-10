@@ -29,20 +29,7 @@ export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      const obsWithRange = getMostRecentObservationWithRange(subTreeNode.obs);
-      const observationRanges: ReferenceRanges | undefined = obsWithRange
-        ? {
-            hiAbsolute: obsWithRange.hiAbsolute,
-            hiCritical: obsWithRange.hiCritical,
-            hiNormal: obsWithRange.hiNormal,
-            lowAbsolute: obsWithRange.lowAbsolute,
-            lowCritical: obsWithRange.lowCritical,
-            lowNormal: obsWithRange.lowNormal,
-          }
-        : undefined;
-      const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
-      const range = formatReferenceRange(selectedRanges ?? nodeRanges, subTreeNode.units);
-
+      const range = subTreeNode.range ?? formatReferenceRange(nodeRanges, nodeRanges?.units);
       const processedObs = subTreeNode.obs.map((ob) => {
         // Note: Units are only at the concept/node level, not observation-level
         const observationRanges: ReferenceRanges | undefined =
@@ -58,14 +45,19 @@ export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
             : undefined;
 
         const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
-        const assess = selectedRanges ? assessValue(selectedRanges) : assessValue(nodeRanges);
+        const resolvedRanges = selectedRanges ?? nodeRanges;
+        const assess = assessValue(resolvedRanges);
         const interpretation = ob.interpretation ?? assess(ob.value);
 
         return {
           ...ob,
           interpretation,
-          lowNormal: ob.lowNormal,
-          hiNormal: ob.hiNormal,
+          lowNormal: resolvedRanges?.lowNormal,
+          hiNormal: resolvedRanges?.hiNormal,
+          lowCritical: resolvedRanges?.lowCritical,
+          hiCritical: resolvedRanges?.hiCritical,
+          lowAbsolute: resolvedRanges?.lowAbsolute,
+          hiAbsolute: resolvedRanges?.hiAbsolute,
         };
       });
 
@@ -73,12 +65,6 @@ export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         ...subTreeNode,
         range,
         obs: processedObs,
-        lowNormal: selectedRanges?.lowNormal ?? subTreeNode.lowNormal,
-        hiNormal: selectedRanges?.hiNormal ?? subTreeNode.hiNormal,
-        lowCritical: selectedRanges?.lowCritical ?? subTreeNode.lowCritical,
-        hiCritical: selectedRanges?.hiCritical ?? subTreeNode.hiCritical,
-        lowAbsolute: selectedRanges?.lowAbsolute ?? subTreeNode.lowAbsolute,
-        hiAbsolute: selectedRanges?.hiAbsolute ?? subTreeNode.hiAbsolute,
       });
     } else if (subNode?.subSets) {
       const subTreesTests = computeTrendlineData(subNode as TreeNode); // recursion
