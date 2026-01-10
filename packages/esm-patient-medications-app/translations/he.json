@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "תרופות פעילות",
@@ -47,6 +48,7 @@
   "indication": "רמז",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "לדוגמה: \"היפרטנזיה\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "זָכָר",
   "medicationDurationAndUnit": "למשך {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "לאורך זמן בלתי מוגבל",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "משיבות במרשם",
   "print": "הדפס",
   "printedBy": "נדפס על ידי",
+  "printMedications": "Print medications",
   "prn": "P.R.N.",
   "prnReason": "סיבה P.R.N.",
   "prnReasonPlaceholder": "סיבה לקחת את התרופה",

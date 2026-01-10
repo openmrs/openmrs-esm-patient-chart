@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "កំពង់ប្រើប្រាស់ឱសថ",
@@ -47,6 +48,7 @@
   "indication": "ការចង្អុលបង្ហាញ",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "ឧ. \"សម្ពាធឈាម\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "ប្រុស",
   "medicationDurationAndUnit": "សម្រាប់ {រយៈពេល} {ឯកតារយៈពេល}",
   "medicationIndefiniteDuration": "រយៈពេលមិនកំណត់",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "ការបំពេញវេជ្ជបញ្ជា",
   "print": "បោះពុម្ព",
   "printedBy": "បោះពុម្ពដោយ",
+  "printMedications": "Print medications",
   "prn": "P.R.N.",
   "prnReason": "P.R.N. ហេតុផល",
   "prnReasonPlaceholder": "ហេតុផលដែលត្រូវយកថ្នាំ",
