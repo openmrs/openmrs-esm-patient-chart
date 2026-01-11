@@ -56,7 +56,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     sessionLocation,
     user: { person },
   } = useSession();
-  const currentProvider: Provider = useMemo(
+  const currentProvider: Provider | null = useMemo(
     () => (_currentProvider ? { ..._currentProvider, person } : null),
     [_currentProvider, person],
   );
