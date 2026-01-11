@@ -5,6 +5,9 @@ import { Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/re
 import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
+  getPatientName,
+  PatientBannerPatientInfo,
+  PatientPhoto,
   useConfig,
   useLayoutType,
   useSession,
@@ -34,6 +37,7 @@ interface OrderBasketProps {
   mutateVisitContext: () => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   orderBasketExtensionProps: OrderBasketExtensionProps;
+  showPatientBanner?: boolean;
 }
 
 const OrderBasket: React.FC<OrderBasketProps> = ({
@@ -43,6 +47,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   mutateVisitContext,
   closeWorkspace,
   orderBasketExtensionProps,
+  showPatientBanner,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -152,10 +157,22 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     });
   }, [clearOrders, closeWorkspace]);
 
+  const patientName = getPatientName(patient);
+
   return (
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
       <div id="order-basket" className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        {showPatientBanner && (
+          <div className={styles.patientBannerContainer}>
+            <div className={styles.patientBanner}>
+              <div className={styles.patientAvatar}>
+                <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+              </div>
+              <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>
+            </div>
+          </div>
+        )}
         <div className={styles.orderBasketContainer}>
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
