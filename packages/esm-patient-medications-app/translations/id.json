@@ -1,5 +1,6 @@
 {
   "actions": "Tindakan",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "Obat Aktif",
@@ -47,6 +48,7 @@
   "indication": "Indikasi",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "mis. \"Hipertensi\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "Laki-laki",
   "medicationDurationAndUnit": "selama {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Durasi tidak terbatas",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "Isi ulang resep",
   "print": "Cetak",
   "printedBy": "Dicetak oleh",
+  "printMedications": "Print medications",
   "prn": "P.R.N.",
   "prnReason": "Alasan P.R.N.",
   "prnReasonPlaceholder": "Alasan minum obat",
