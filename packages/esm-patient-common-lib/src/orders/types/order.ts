@@ -47,8 +47,6 @@ export interface OrderBasketItem {
   action: OrderAction;
   display: string;
   uuid?: string;
-  orderer?: string;
-  careSetting?: string;
   orderError?: Error & {
     responseBody?: {
       error?: {
@@ -211,10 +209,15 @@ export interface OrderType {
 
 export type FulfillerStatus = 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED';
 
+/**
+ * A function type that converts a OrderBasketItem into
+ * a POST order payload
+ */
 export type PostDataPrepFunction = (
   order: OrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
+  orderingProviderUuid: string,
 ) => OrderPost;
 
 export interface OrderBasketExtensionProps {
@@ -308,6 +311,7 @@ export interface TestOrderBasketItem extends OrderBasketItem {
 
 export interface OrderBasketWindowProps {
   encounterUuid: string;
+  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
 export interface ExportedOrderBasketWindowProps {
@@ -319,4 +323,5 @@ export interface ExportedOrderBasketWindowProps {
   patientUuid: string;
   visitContext: Visit;
   mutateVisitContext: () => void;
+  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }

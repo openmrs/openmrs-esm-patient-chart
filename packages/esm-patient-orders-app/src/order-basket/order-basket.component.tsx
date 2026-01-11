@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, InlineLoading, InlineNotification } from '@carbon/react';
+import { Button, ButtonSet, ComboBox, FormLabel, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
+  LocationPicker,
   useConfig,
   useLayoutType,
   useSession,
@@ -14,6 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   invalidateVisitAndEncounterData,
+  type Order,
   type OrderBasketExtensionProps,
   type OrderBasketItem,
   postOrders,
@@ -23,7 +25,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { useOrderEncounter } from '../api/api';
+import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
 import styles from './order-basket.scss';
 
@@ -34,6 +36,7 @@ interface OrderBasketProps {
   mutateVisitContext: () => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   orderBasketExtensionProps: OrderBasketExtensionProps;
+  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
 const OrderBasket: React.FC<OrderBasketProps> = ({
@@ -43,38 +46,69 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   mutateVisitContext,
   closeWorkspace,
   orderBasketExtensionProps,
+  onOrderBasketSubmitted,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const config = useConfig<ConfigObject>();
-  const session = useSession();
+  const { orderTypes, orderEncounterType, ordererProviderRoles } = useConfig<ConfigObject>();
+  const {
+    currentProvider: _currentProvider,
+    sessionLocation,
+    user: { person },
+  } = useSession();
+  const currentProvider: Provider = useMemo(() => ({ ..._currentProvider, person }), [_currentProvider, person]);
   const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
     visitRequired,
     isLoading: isLoadingEncounterUuid,
-    encounterUuid,
+    encounterUuid: orderEncounterUuid,
     error: errorFetchingEncounterUuid,
     mutate: mutateEncounterUuid,
-  } = useOrderEncounter(patientUuid, visitContext, mutateVisitContext, config.orderEncounterType);
+  } = useOrderEncounterForSystemWithVisitDisabled(patientUuid);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const [creatingEncounterError, setCreatingEncounterError] = useState('');
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
   const { mutate } = useSWRConfig();
 
+  const [orderLocationUuid, setOrderLocationUuid] = useState(sessionLocation.uuid);
+
+  const allowSelectingOrderer = ordererProviderRoles?.length > 0;
+  const {
+    providers,
+    isLoading: isLoadingProviders,
+    error: errorLoadingProviders,
+  } = useProviders(allowSelectingOrderer ? ordererProviderRoles : null);
+
+  // If configured to allow selecting providers, we wait till we fetched the allowable providers
+  // before setting the orderer. If not configured, we assume the current user is the orderer.
+  const [orderer, setOrderer] = useState<Provider>(allowSelectingOrderer ? null : currentProvider);
+
+  useEffect(() => {
+    if (allowSelectingOrderer && providers?.length > 0) {
+      // default orderer to current user if they have the right provider roles
+      if (providers.some((p) => p.uuid === currentProvider.uuid)) {
+        setOrderer(currentProvider);
+      }
+    }
+  }, [allowSelectingOrderer, providers, currentProvider]);
+
   const handleSave = useCallback(async () => {
     const abortController = new AbortController();
     setCreatingEncounterError('');
-    let orderEncounterUuid = encounterUuid;
+
     setIsSavingOrders(true);
-    // If there's no encounter present, create an encounter along with the orders.
+    // orderEncounterUuid should only be preset if the system does not support visits, and the user has an order encounter today.
+    // If orderEncounterUuid is not present, then create an encounter along with the orders.
+    // If orderEncounterUuid is present, then just post the orders to that encounter.
     if (!orderEncounterUuid) {
       try {
-        await postOrdersOnNewEncounter(
+        const postedEncounter = await postOrdersOnNewEncounter(
           patientUuid,
-          config?.orderEncounterType,
-          visitRequired ? visitContext : null,
-          session?.sessionLocation?.uuid,
+          orderEncounterType,
+          visitContext,
+          orderLocationUuid,
+          orderer.uuid,
           abortController,
         );
         await closeWorkspace({ discardUnsavedChanges: true });
@@ -84,6 +118,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
+        onOrderBasketSubmitted?.(postedEncounter.uuid, postedEncounter.orders);
 
         /* Translation keys used by showOrderSuccessToast:
          * t('discontinued', 'Discontinued')
@@ -106,42 +141,55 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         );
       }
     } else {
-      const erroredItems = await postOrders(patientUuid, orderEncounterUuid, abortController);
-      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      // Only revalidate current visit since orders create new encounters
-      mutateVisitContext?.();
-      await mutateOrders();
-      invalidateVisitAndEncounterData(mutate, patientUuid);
+      try {
+        const { postedOrders, erroredItems } = await postOrders(
+          patientUuid,
+          orderEncounterUuid,
+          abortController,
+          orderer.uuid,
+        );
+        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        await mutateOrders();
+        invalidateVisitAndEncounterData(mutate, patientUuid);
 
-      if (erroredItems.length == 0) {
-        await closeWorkspace({ discardUnsavedChanges: true });
-        showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
-      } else {
-        setOrdersWithErrors(erroredItems);
+        if (erroredItems.length == 0) {
+          await closeWorkspace({ discardUnsavedChanges: true });
+          showOrderSuccessToast('@openmrs/esm-patient-orders-app', orders);
+        } else {
+          setOrdersWithErrors(erroredItems);
+        }
+        clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
+        // Only revalidate current visit since orders create new encounters
+        mutateVisitContext?.();
+        await mutateOrders();
+        invalidateVisitAndEncounterData(mutate, patientUuid);
+        onOrderBasketSubmitted?.(orderEncounterUuid, postedOrders);
+      } catch (e) {
+        console.error(e);
+        setCreatingEncounterError(
+          e.responseBody?.error?.message ||
+            t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again'),
+        );
       }
-      clearOrders({ exceptThoseMatching: (item) => erroredItems.map((e) => e.display).includes(item.display) });
-      // Only revalidate current visit since orders create new encounters
-      mutateVisitContext?.();
-      await mutateOrders();
-      invalidateVisitAndEncounterData(mutate, patientUuid);
     }
     setIsSavingOrders(false);
     return () => abortController.abort();
   }, [
     visitContext,
-    visitRequired,
     clearOrders,
     closeWorkspace,
-    config,
-    encounterUuid,
+    orderEncounterType,
+    orderEncounterUuid,
     mutateEncounterUuid,
     mutateOrders,
     mutateVisitContext,
     orders,
     patientUuid,
-    session,
     t,
     mutate,
+    orderer,
+    orderLocationUuid,
+    onOrderBasketSubmitted,
   ]);
 
   const handleCancel = useCallback(() => {
@@ -152,11 +200,47 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     });
   }, [clearOrders, closeWorkspace]);
 
+  const filterItemsByProviderName = useCallback((menu) => {
+    return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
+  }, []);
+
   return (
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
       <div id="order-basket" className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
         <div className={styles.orderBasketContainer}>
+          {!isLoadingProviders &&
+            allowSelectingOrderer &&
+            (errorLoadingProviders ? (
+              <InlineNotification
+                kind="warning"
+                lowContrast
+                className={styles.inlineNotification}
+                title={t('errorLoadingClinicians', 'Error loading clinicians')}
+                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+              />
+            ) : (
+              <>
+                <ComboBox
+                  id="orderer-combobox"
+                  items={providers ?? []}
+                  onChange={({ selectedItem }) => {
+                    setOrderer(selectedItem);
+                  }}
+                  initialSelectedItem={orderer}
+                  shouldFilterItem={filterItemsByProviderName}
+                  itemToString={(item: Provider) => item?.person.display ?? ''}
+                  placeholder={t('searchFieldPlaceholder', 'Search for a Provider')}
+                  titleText={t('orderer', 'Orderer')}
+                />
+                <div className={styles.orderLocationOuterContainer}>
+                  <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
+                  <div className={styles.orderLocationContainer}>
+                    <LocationPicker selectedLocationUuid={orderLocationUuid} onChange={setOrderLocationUuid} />
+                  </div>
+                </div>
+              </>
+            ))}
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
               [styles.orderBasketSlotTablet]: isTablet,
@@ -164,8 +248,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
             name="order-basket-slot"
             state={orderBasketExtensionProps as any}
           />
-          {config?.orderTypes?.length > 0 &&
-            config.orderTypes.map((orderType) => (
+          {orderTypes?.length > 0 &&
+            orderTypes.map((orderType) => (
               <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
                 <GeneralOrderPanel
                   {...orderType}
@@ -207,7 +291,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 !orders?.length ||
                 isLoadingEncounterUuid ||
                 (visitRequired && !visitContext) ||
-                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete)
+                orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
+                !orderer ||
+                !orderLocationUuid
               }
             >
               {isSavingOrders ? (

@@ -86,6 +86,11 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     [paginatedEncounters],
   );
 
+  const encountersByUuid = useMemo(
+    () => new Map(paginatedMappedEncounters?.map((encounter) => [encounter.id, encounter]) ?? []),
+    [paginatedMappedEncounters],
+  );
+
   const tableHeaders = [
     {
       header: t('dateAndTime', 'Date & time'),
@@ -176,7 +181,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getTableProps,
         }: {
           headers: Array<{ header: React.ReactNode; key: string }>;
-          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
+          rows: Array<{ id: string; isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
           [key: string]: any;
         }) => (
           <>
@@ -213,8 +218,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows?.map((row, i) => {
-                    const encounter = paginatedMappedEncounters[i];
+                  {rows?.map((row) => {
+                    const encounter = encountersByUuid.get(row.id);
 
                     if (!encounter) return null;
 

@@ -5,6 +5,11 @@ import AddLabOrder from './add-test-order.component';
 
 export interface AddTestOrderWorkspaceProps {
   order?: OrderBasketItem;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
 }
 
@@ -15,7 +20,7 @@ export interface AddTestOrderWorkspaceProps {
  */
 export default function ExportedAddTestOrderWorkspace({
   windowProps: { patient, visitContext },
-  workspaceProps: { order: initialOrder, orderTypeUuid },
+  workspaceProps: { order: initialOrder, orderTypeUuid, orderToEditOrdererUuid },
   closeWorkspace,
 }: Workspace2DefinitionProps<AddTestOrderWorkspaceProps, ExportedOrderBasketWindowProps, {}>) {
   return (
@@ -25,6 +30,7 @@ export default function ExportedAddTestOrderWorkspace({
       initialOrder={initialOrder}
       orderTypeUuid={orderTypeUuid}
       closeWorkspace={closeWorkspace}
+      orderToEditOrdererUuid={orderToEditOrdererUuid}
     />
   );
 }

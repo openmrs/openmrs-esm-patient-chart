@@ -7,26 +7,41 @@ import {
 import AddDrugOrder from './add-drug-order.component';
 
 export interface AddDrugOrderWorkspaceProps {
-  order: DrugOrderBasketItem;
+  /**
+   * Optional. If provided, the form edits this order. Note that this order could either
+   * be an already submitted order that the user wants to modify, or a NEW pending order in
+   * the order basket. To distinguish the two, check order.action.
+   */
+  order?: DrugOrderBasketItem;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid?: string;
 }
 
 /**
- * This workspace displays the drug order form for adding or editing a drug order.
- * On form submission, it saves the drug order to the (frontend) order basket.
- * For a form that submits the drug order directly on submit,
- * see fill-prescription-form.workspace.tsx
+ * This workspace displays the drug order form for:
+ * 1. adding a new drug order
+ * 2. editing a pending (un-submitted) drug order in the order basket
+ * 3. editing an existing (submitted) order
+ *
+ * On form save, it either saves the order in the order basket (case 1 and 2)
+ * or directly submits the modified order to the server (case 3).
+ *
  *
  * This workspace must only be used within the patient chart.
  * @see exported-add-drug-order.workspace.tsx
  */
 export default function AddDrugOrderWorkspace({
-  workspaceProps: { order: initialOrder },
+  workspaceProps: { order, orderToEditOrdererUuid },
   groupProps: { patient, patientUuid, visitContext },
   closeWorkspace,
 }: PatientWorkspace2DefinitionProps<AddDrugOrderWorkspaceProps, OrderBasketWindowProps>) {
   return (
     <AddDrugOrder
-      initialOrder={initialOrder}
+      initialOrder={order}
+      orderToEditOrdererUuid={orderToEditOrdererUuid}
       patient={patient}
       patientUuid={patientUuid}
       visitContext={visitContext}

@@ -9,7 +9,6 @@ export function createEmptyLabOrder(testType: TestType, orderer: string, visit):
     urgency: priorityOptions[0].value as OrderUrgency,
     display: testType.label,
     testType,
-    orderer,
     visit,
   };
 }
