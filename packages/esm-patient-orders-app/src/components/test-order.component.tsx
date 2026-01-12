@@ -36,7 +36,9 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const patientUuid = encounter?.patient?.uuid;
 
   const conceptUuids = useMemo(() => {
-    if (!concept) return [];
+    if (!concept) {
+      return [];
+	}
     const uuids = [concept.uuid];
     if (concept.setMembers) {
       concept.setMembers.forEach((member) => uuids.push(member.uuid));
