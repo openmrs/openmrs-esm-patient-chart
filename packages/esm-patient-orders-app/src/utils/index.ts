@@ -6,6 +6,7 @@ import {
   type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
+import { type LabOrderConcept } from '../lab-results/lab-results.resource';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
