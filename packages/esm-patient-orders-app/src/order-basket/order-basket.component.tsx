@@ -31,6 +31,7 @@ import { type ConfigObject } from '../config-schema';
 import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
 import styles from './order-basket.scss';
+import LocationSelector from './location-selector.component';
 
 interface OrderBasketProps {
   patientUuid: string;
@@ -252,7 +253,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 <div className={styles.orderLocationOuterContainer}>
                   <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
                   <div className={styles.orderLocationContainer}>
-                    <LocationPicker selectedLocationUuid={orderLocationUuid} onChange={setOrderLocationUuid} />
+                    <LocationSelector
+                      name={'order-location'}
+                      ancestorLocation={visitContext?.location}
+                      onChange={setOrderLocationUuid}
+                      paginationSize={10}
+                    />
                   </div>
                 </div>
               </>
