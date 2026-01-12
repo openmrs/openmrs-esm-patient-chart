@@ -121,7 +121,34 @@
 }
 
 .table {
+  table-layout: fixed;
+  width: 100%;
+
   td {
     border-bottom: none !important;
+  }
+}
+
+.colgroupWithRange {
+  col:nth-child(1) {
+    width: 50%;
+  }
+
+  col:nth-child(2) {
+    width: 25%;
+  }
+
+  col:nth-child(3) {
+    width: 25%;
+  }
+}
+
+.colgroupWithoutRange {
+  col:nth-child(1) {
+    width: 60%;
+  }
+
+  col:nth-child(2) {
+    width: 40%;
   }
 }

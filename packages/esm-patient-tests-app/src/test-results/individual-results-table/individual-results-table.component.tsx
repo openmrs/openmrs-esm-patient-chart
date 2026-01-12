@@ -145,6 +145,11 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
               </div>
             </div>
             <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
+              <colgroup className={styles.colgroup}>
+                <col />
+                <col />
+                <col />
+              </colgroup>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

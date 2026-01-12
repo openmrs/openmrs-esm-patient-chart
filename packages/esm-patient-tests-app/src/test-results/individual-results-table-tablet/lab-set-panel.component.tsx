@@ -117,6 +117,11 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
+                <colgroup className={hasRange ? styles.colgroupWithRange : styles.colgroupWithoutRange}>
+                  <col />
+                  <col />
+                  {hasRange && <col />}
+                </colgroup>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
