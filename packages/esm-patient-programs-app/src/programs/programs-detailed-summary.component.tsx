@@ -91,6 +91,11 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [enrollments, t],
   );
 
+  const enrollmentsByUuid = useMemo(
+    () => new Map(enrollments?.map((enrollment) => [enrollment.uuid, enrollment]) ?? []),
+    [enrollments],
+  );
+
   const launchProgramsForm = useCallback(() => launchWorkspace2('programs-form-workspace'), []);
 
   const isEnrolledInAllPrograms = useMemo(() => {
@@ -155,16 +160,22 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, i) => (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                      ))}
-                      <TableCell className="cds--table-column-menu">
-                        <ProgramsActionMenu patientUuid={patientUuid} programEnrollmentId={enrollments[i]?.uuid} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {rows.map((row) => {
+                    const enrollment = enrollmentsByUuid.get(row.id);
+
+                    return (
+                      <TableRow key={row.id} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        {enrollment && (
+                          <TableCell className="cds--table-column-menu">
+                            <ProgramsActionMenu patientUuid={patientUuid} programEnrollmentId={enrollment.uuid} />
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

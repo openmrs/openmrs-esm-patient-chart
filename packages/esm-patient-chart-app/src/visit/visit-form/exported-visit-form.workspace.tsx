@@ -154,7 +154,12 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
   // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
   useEffect(() => {
-    reset(defaultValues);
+    reset(defaultValues, {
+      keepDirty: true,
+      keepDirtyValues: true,
+      keepErrors: true,
+      keepTouched: true,
+    });
   }, [defaultValues, reset]);
 
   const isValidVisitAttributesArray = useCallback((attributes: unknown): boolean => {

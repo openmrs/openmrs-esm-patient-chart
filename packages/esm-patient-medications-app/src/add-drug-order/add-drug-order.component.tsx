@@ -5,7 +5,6 @@ import {
   ArrowLeftIcon,
   showSnackbar,
   useLayoutType,
-  useSession,
   type Visit,
   Workspace2,
   type Workspace2DefinitionProps,
@@ -17,7 +16,7 @@ import {
   useMutatePatientOrders,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
-import { careSettingUuid, prepMedicationOrderPostData } from '../api/api';
+import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import { DrugOrderForm } from './drug-order-form.component';
 import DrugSearch from './drug-search/drug-search.component';
@@ -26,7 +25,17 @@ import styles from './add-drug-order.scss';
 export interface AddDrugOrderWorkspaceAdditionalProps {}
 
 export interface AddDrugOrderProps {
-  initialOrder: DrugOrderBasketItem;
+  /**
+   * The order basket item to edit. Note that this can either be an existing order that has
+   * already been saved to the backend, or a new pending order in the frontend order basket.
+   */
+  initialOrder?: DrugOrderBasketItem;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid?: string;
+
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
@@ -41,6 +50,7 @@ export interface AddDrugOrderProps {
  */
 const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   initialOrder,
+  orderToEditOrdererUuid,
   patient,
   patientUuid,
   visitContext,
@@ -54,7 +64,6 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     prepMedicationOrderPostData,
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
-  const session = useSession();
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   const openOrderForm = useCallback(
@@ -71,8 +80,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
 
   const saveDrugOrderToBasket = useCallback(
     async (finalizedOrder: DrugOrderBasketItem) => {
-      finalizedOrder.careSetting = careSettingUuid;
-      finalizedOrder.orderer = session.currentProvider.uuid;
+      finalizedOrder.action ??= 'NEW';
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
       if (existingOrder) {
@@ -87,12 +95,16 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
       setOrders(newOrders);
       closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, closeWorkspace, session.currentProvider.uuid],
+    [orders, setOrders, closeWorkspace],
   );
 
+  // If editing an existing order, on save, we directly submit the modified order to the server
+  // and do not save it to the order basket.
   const submitDrugOrderToServer = useCallback(
     async (finalizedOrder: DrugOrderBasketItem) => {
-      postOrder(prepMedicationOrderPostData(finalizedOrder, patientUuid, finalizedOrder?.encounterUuid))
+      postOrder(
+        prepMedicationOrderPostData(finalizedOrder, patientUuid, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
+      )
         .then(() => {
           clearOrders();
           mutateOrders();
@@ -121,16 +133,11 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
           });
         });
     },
-    [clearOrders, closeWorkspace, mutateOrders, patientUuid, t],
+    [clearOrders, closeWorkspace, mutateOrders, patientUuid, t, orderToEditOrdererUuid],
   );
 
-  const closeModifyOrderWorkspace = useCallback(() => {
-    clearOrders();
-    closeWorkspace();
-  }, [clearOrders, closeWorkspace]);
-
   const workspaceTitle =
-    currentOrder?.action == 'REVISE'
+    initialOrder?.action == 'REVISE'
       ? t('editDrugOrderWorkspaceTitle', 'Edit drug order')
       : t('addDrugOrderWorkspaceTitle', 'Add drug order');
 
@@ -163,12 +170,10 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
       <DrugOrderForm
         initialOrderBasketItem={currentOrder}
         onSave={currentOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
-        onCancel={currentOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : closeWorkspace}
+        onCancel={closeWorkspace}
         patient={patient}
         visitContext={visitContext}
         saveButtonText={t('saveOrder', 'Save order')}
-        allowSelectingPrescribingClinician={false}
-        allowSelectingDrug={false}
         workspaceTitle={workspaceTitle}
       />
     );

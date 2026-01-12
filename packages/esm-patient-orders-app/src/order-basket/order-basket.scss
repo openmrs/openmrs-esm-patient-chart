@@ -18,6 +18,21 @@
   height: layout.$spacing-10;
 }
 
+.orderLocationOuterContainer {
+  margin-top: layout.$spacing-05;
+}
+
+.orderLocationContainer {
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+  > div {
+    height: unset;
+  }
+}
+
 .orderBasketSlot {
   display: flex;
   flex-direction: column;
