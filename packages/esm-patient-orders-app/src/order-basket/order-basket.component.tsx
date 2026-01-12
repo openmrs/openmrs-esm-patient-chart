@@ -55,7 +55,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orderTypes, orderEncounterType, ordererProviderRoles } = useConfig<ConfigObject>();
+  const { orderTypes, orderEncounterType, ordererProviderRoles, orderLocationTagName } = useConfig<ConfigObject>();
   const {
     currentProvider: _currentProvider,
     sessionLocation,
@@ -236,7 +236,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
               />
             ) : (
-              <>
+              <div className={styles.providerSelectorContainer}>
                 <ComboBox
                   id="orderer-combobox"
                   items={providers ?? []}
@@ -249,14 +249,20 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                   placeholder={t('searchFieldPlaceholder', 'Search for a Provider')}
                   titleText={t('orderer', 'Orderer')}
                 />
-                <div className={styles.orderLocationOuterContainer}>
-                  <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
-                  <div className={styles.orderLocationContainer}>
-                    <LocationPicker selectedLocationUuid={orderLocationUuid} onChange={setOrderLocationUuid} />
-                  </div>
-                </div>
-              </>
+              </div>
             ))}
+          {orderLocationTagName && (
+            <div className={styles.orderLocationOuterContainer}>
+              <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
+              <div className={styles.orderLocationContainer}>
+                <LocationPicker
+                  selectedLocationUuid={orderLocationUuid}
+                  onChange={setOrderLocationUuid}
+                  locationTag={orderLocationTagName}
+                />
+              </div>
+            </div>
+          )}
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
               [styles.orderBasketSlotTablet]: isTablet,

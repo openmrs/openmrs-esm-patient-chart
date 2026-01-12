@@ -18,8 +18,9 @@
   height: layout.$spacing-10;
 }
 
-.orderLocationOuterContainer {
-  margin-top: layout.$spacing-05;
+.orderLocationOuterContainer,
+.providerSelectorContainer {
+  margin-bottom: layout.$spacing-05;
 }
 
 .orderLocationContainer {
