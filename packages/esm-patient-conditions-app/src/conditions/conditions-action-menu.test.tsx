@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Condition } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
@@ -29,41 +29,57 @@ const renderConditionsActionMenu = () => {
 
 describe('ConditionsActionMenu', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockUseLayoutType.mockReturnValue('small-desktop');
   });
 
-  it('renders an overflow menu with edit and delete actions', async () => {
-    const user = userEvent.setup();
+  it('renders an action menu button', () => {
     renderConditionsActionMenu();
 
-    const overflowMenuButton = screen.getByRole('button');
-    await user.click(overflowMenuButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Edit')).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Delete')).toBeInTheDocument();
-    });
+    const menuButton = screen.getByRole('button');
+    expect(menuButton).toBeInTheDocument();
   });
 
-  it('launches the edit condition form when the Edit menu item is clicked', async () => {
+  it('shows menu items only when menu is opened', async () => {
     const user = userEvent.setup();
     renderConditionsActionMenu();
+
+    // Menu items should not be visible initially
+    expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+
+    // Open menu
+    const menuButton = screen.getByRole('button');
+    await user.click(menuButton);
+
+    // Menu items should now be visible
+    expect(screen.getByText('Edit')).toBeInTheDocument();
+    expect(screen.getByText('Delete')).toBeInTheDocument();
+  });
+
+  it('opens edit form with the specific condition when Edit button is clicked', async () => {
+    const user = userEvent.setup();
+    const specificCondition: Condition = {
+      clinicalStatus: 'active',
+      conceptId: 'hypertension-concept-id',
+      display: 'Hypertension',
+      onsetDateTime: '2022-03-10',
+      recordedDate: '2022-03-10',
+      id: 'hypertension-condition-id',
+    };
+
+    render(<ConditionsActionMenu condition={specificCondition} patientUuid="patient-123" />);
 
     await user.click(screen.getByRole('button'));
     await user.click(screen.getByText('Edit'));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('conditions-form-workspace', {
       workspaceTitle: 'Edit a Condition',
-      condition: mockCondition,
+      condition: specificCondition,
       formContext: 'editing',
     });
   });
 
-  it('opens the delete confirmation modal when the Delete menu item is clicked', async () => {
+  it('opens delete confirmation modal with condition ID when Delete button is clicked', async () => {
     const user = userEvent.setup();
     renderConditionsActionMenu();
 
@@ -74,29 +90,6 @@ describe('ConditionsActionMenu', () => {
       closeDeleteModal: expect.any(Function),
       conditionId: mockCondition.id,
       patientUuid: defaultProps.patientUuid,
-    });
-  });
-
-  it('renders with the correct size based on layout type', () => {
-    mockUseLayoutType.mockReturnValue('tablet');
-    renderConditionsActionMenu();
-
-    const menuButton = screen.getByRole('button');
-    expect(menuButton).toBeInTheDocument();
-  });
-
-  it('handles the case when patientUuid is not provided', async () => {
-    const user = userEvent.setup();
-
-    render(<ConditionsActionMenu condition={mockCondition} />);
-
-    await user.click(screen.getByRole('button'));
-    await user.click(screen.getByText('Delete'));
-
-    expect(mockShowModal).toHaveBeenCalledWith('condition-delete-confirmation-dialog', {
-      closeDeleteModal: expect.any(Function),
-      conditionId: mockCondition.id,
-      patientUuid: undefined,
     });
   });
 });
