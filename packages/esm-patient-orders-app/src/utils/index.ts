@@ -134,7 +134,7 @@ export const getObservationDisplayValue = (value: ObservationValue): string => {
  * Extracts effective ranges, prioritizing referenceRanges over legacy fields
  */
 export const getEffectiveRanges = (
-  concept: any,
+  concept: LabOrderConcept,
   referenceRangesMap?: Map<string, { lowNormal?: number; hiNormal?: number }>,
 ) => {
   const patientSpecificRange = referenceRangesMap?.get(concept?.uuid);
