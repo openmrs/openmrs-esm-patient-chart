@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "当前用药",
@@ -47,6 +48,7 @@
   "indication": "适应症",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "例如 \"高血压\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "男性",
   "medicationDurationAndUnit": "持续 {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "无限期",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "处方补充",
   "print": "打印",
   "printedBy": "打印者 ",
+  "printMedications": "Print medications",
   "prn": "P.R.N.",
   "prnReason": "P.R.N.原因",
   "prnReasonPlaceholder": "用药的原因",

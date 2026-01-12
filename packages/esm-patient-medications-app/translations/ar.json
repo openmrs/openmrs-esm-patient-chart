@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "الأدوية النشطة",
@@ -47,6 +48,7 @@
   "indication": "الدلالة",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "مثل \"ارتفاع ضغط الدم\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "ذكر",
   "medicationDurationAndUnit": "لمدة {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "مدة غير محددة",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "إعادة الوصفة",
   "print": "طباعة",
   "printedBy": "طبع بواسطة",
+  "printMedications": "Print medications",
   "prn": "حسب الحاجة",
   "prnReason": "سبب حسب الحاجة",
   "prnReasonPlaceholder": "السبب لأخذ الدواء",

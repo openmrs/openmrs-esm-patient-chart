@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "traitement en cours",
   "activeMedicationsHeaderTitle": "Traitement en cours",
   "activeMedicationsTableTitle": "Traitements en cours",
@@ -47,6 +48,7 @@
   "indication": "Indication",
   "indicationErrorMessage": "L'indication est requise",
   "indicationPlaceholder": "Ex. « Hypertension »",
+  "launchOrderBasket": "Launch order basket",
   "male": "Homme",
   "medicationDurationAndUnit": "pour {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Durée illimitée",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "Renouvellements",
   "print": "Imprimer",
   "printedBy": "Imprimé par",
+  "printMedications": "Print medications",
   "prn": "Au besoin",
   "prnReason": "Consignes de prise",
   "prnReasonPlaceholder": "Cause de la prise de médicaments",

@@ -1,5 +1,6 @@
 {
   "actions": "ქმედებები",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "აქტიური წამლები",
@@ -47,6 +48,7 @@
   "indication": "სიმპტომი",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "მაგ: \"ჰიპერტენზია\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "მამრი",
   "medicationDurationAndUnit": "{{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "გაურკვეველი ხანგრძლივობა",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "გამოწერის შევსებები",
   "print": "დაბეჭდვა",
   "printedBy": "ბეჭდვის ავტორია",
+  "printMedications": "Print medications",
   "prn": "საჭიროებისამებრ",
   "prnReason": "საჭიროების მიზეზი",
   "prnReasonPlaceholder": "წამლის მიღების მიზეზი",
