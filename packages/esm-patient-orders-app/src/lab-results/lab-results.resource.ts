@@ -174,7 +174,7 @@ export function useConceptReferenceRanges(patientUuid: string, conceptUuids: Arr
       ? `${restBaseUrl}/conceptreferencerange/?patient=${patientUuid}&concept=${conceptList}&v=full`
       : null;
 
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<any> }>, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<ConceptReferenceRange> }>, Error>(apiUrl, openmrsFetch);
 
   const rangesMap = useMemo(() => {
     const map = new Map<string, { lowNormal?: number; hiNormal?: number }>();
