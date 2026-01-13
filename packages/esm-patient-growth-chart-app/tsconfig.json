@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "src/**/*",
+    "../../tools/setup-tests.ts"
+  ],
+  "compilerOptions": {
+    "moduleResolution": "bundler"
+  }
+}
