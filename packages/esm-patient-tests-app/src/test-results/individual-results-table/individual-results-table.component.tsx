@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import {
@@ -15,6 +14,7 @@ import {
 } from '@carbon/react';
 import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-framework';
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { NumericObservation } from '@openmrs/esm-styleguide';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
 
@@ -25,32 +25,6 @@ interface IndividualResultsTableProps {
   index: number;
   title: string;
 }
-
-const getClasses = (interpretation: OBSERVATION_INTERPRETATION) => {
-  switch (interpretation) {
-    case 'OFF_SCALE_HIGH':
-      return styles['off-scale-high'];
-
-    case 'CRITICALLY_HIGH':
-      return styles['critically-high'];
-
-    case 'HIGH':
-      return styles['high'];
-
-    case 'OFF_SCALE_LOW':
-      return styles['off-scale-low'];
-
-    case 'CRITICALLY_LOW':
-      return styles['critically-low'];
-
-    case 'LOW':
-      return styles['low'];
-
-    case 'NORMAL':
-    default:
-      return '';
-  }
-};
 
 const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
   patientUuid,
@@ -117,10 +91,13 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
               )}
             </span>
           ),
-          value: {
-            value: `${row.value} ${displayUnits}`,
-            interpretation: row?.interpretation,
-          },
+          value: row?.interpretation
+            ? {
+                value: row.value,
+                unit: displayUnits,
+                interpretation: row.interpretation,
+              }
+            : `${row.value} ${displayUnits}`,
           referenceRange: referenceRangeDisplay,
         };
       }),
@@ -158,8 +135,13 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
                     <TableRow key={row.id}>
                       {row.cells.map((cell) =>
                         cell?.value?.interpretation ? (
-                          <TableCell className={classNames(getClasses(cell?.value?.interpretation))} key={cell.id}>
-                            <p>{cell?.value?.value ?? cell?.value}</p>
+                          <TableCell key={cell.id}>
+                            <NumericObservation
+                              value={cell.value.value}
+                              unit={cell.value.unit}
+                              interpretation={cell.value.interpretation}
+                              variant="cell"
+                            />
                           </TableCell>
                         ) : (
                           <TableCell key={cell.id}>
