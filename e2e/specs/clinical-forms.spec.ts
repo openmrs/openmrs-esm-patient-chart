@@ -75,8 +75,8 @@ test('Fill a clinical form', async ({ page, patient }) => {
     await expect(page.getByText(plan)).toBeVisible();
   });
 
-  await test.step('And I click on the `Save and close` button', async () => {
-    await page.getByRole('button', { name: /save/i }).click();
+  await test.step('And I click on the `Save` button', async () => {
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {

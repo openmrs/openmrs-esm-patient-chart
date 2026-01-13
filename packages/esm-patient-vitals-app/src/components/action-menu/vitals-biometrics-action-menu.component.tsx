@@ -35,6 +35,7 @@ export const VitalsAndBiometricsActionMenu = ({ encounterUuid, patient }: Vitals
     <Layer className={styles.layer}>
       <OverflowMenu
         aria-label={t('editOrDeleteVitalsAndBiometrics', 'Edit or delete Vitals and Biometrics')}
+        align="left"
         size={isTablet ? 'lg' : 'sm'}
         flipped
         id={encounterUuid}

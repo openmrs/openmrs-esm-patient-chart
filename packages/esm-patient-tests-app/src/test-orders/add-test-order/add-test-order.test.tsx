@@ -62,6 +62,7 @@ function renderAddLabOrderWorkspace() {
       closeWorkspace={mockCloseWorkspace}
       workspaceProps={{
         orderTypeUuid: 'test-lab-order-type-uuid',
+        orderToEditOrdererUuid: '',
       }}
       groupProps={{
         patientUuid: mockPatient.id,
@@ -152,7 +153,6 @@ describe('AddLabOrder', () => {
           instructions: 'plz do it thx',
           accessionNumber: 'lba-000124',
           testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
-          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]);
     });
