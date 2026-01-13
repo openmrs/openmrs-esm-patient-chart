@@ -48,6 +48,15 @@ export const configSchema = {
       'The encounter type of the encounter for the Fill Prescription form. Defaults to the "Order" encounter type.',
     _default: '39da3525-afe4-45ff-8977-c53b7b359158',
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "List" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -61,4 +70,5 @@ export interface ConfigObject {
   requireIndication: boolean;
   prescriberProviderRoles: Array<string>;
   drugOrderEncounterType: string;
+  drugCategoryConceptSets: Array<string>;
 }
