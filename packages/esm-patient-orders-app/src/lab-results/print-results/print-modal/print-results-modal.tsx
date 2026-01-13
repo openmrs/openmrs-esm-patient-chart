@@ -105,7 +105,7 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
                     <div className={styles.facilityDetails}>
                       <p className={styles.itemLabel}>{capitalize(location)}</p>
                       <span className={styles.itemLabel}>
-                        {formatDatetime(parseDate(firstOrder.dateActivated), { mode: 'standard' })}
+                        {formatDatetime(parseDate(firstOrder.dateActivated), { mode: 'standard', noToday: true })}
                       </span>
                     </div>
                   </div>

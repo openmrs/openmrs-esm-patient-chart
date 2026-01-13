@@ -87,7 +87,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
                     <p className={styles.itemLabel}>
                       <span className={styles.labelKey}>{t('dateOrdered', 'Date ordered')}:</span>
                       <span className={styles.labelValue}>
-                        {formatDatetime(parseDate(selectedOrder.dateActivated), { mode: 'standard' })}
+                        {formatDatetime(parseDate(selectedOrder.dateActivated), { mode: 'standard', noToday: true })}
                       </span>
                     </p>
                   </div>
