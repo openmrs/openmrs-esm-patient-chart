@@ -40,7 +40,10 @@
     "@carbon/react": "^1.83.0",
     "@openmrs/esm-form-engine-lib": "next",
     "lodash-es": "^4.17.21",
-    "react-error-boundary": "^4.0.13"
+    "lodash.findlast": "^4.6.0",
+    "react-error-boundary": "^4.0.13",
+    "tabbable": "^6.2.0",
+    "use-resize-observer": "^9.1.0"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
