@@ -1,5 +1,6 @@
 {
   "actions": "Actiuni",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "medicamente active",
   "activeMedicationsHeaderTitle": "Medicamente active",
   "activeMedicationsTableTitle": "Medicamente active",
@@ -47,6 +48,7 @@
   "indication": "Indicatie",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "ex. \"Hipertensiune\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "Barbat",
   "medicationDurationAndUnit": "pentru {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Durata nedeterminata",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "Reumpleri",
   "print": "Tipareste",
   "printedBy": "Tiparit de",
+  "printMedications": "Print medications",
   "prn": "P.R.N.",
   "prnReason": "Motiv P.R.N.",
   "prnReasonPlaceholder": "Motiv administrare medicament",

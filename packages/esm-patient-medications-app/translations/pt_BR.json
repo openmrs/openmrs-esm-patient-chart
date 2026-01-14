@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "actionsMenu": "Actions menu",
   "activeMedicationsDisplayText": "active medications",
   "activeMedicationsHeaderTitle": "Active medications",
   "activeMedicationsTableTitle": "Medicamentos ativos",
@@ -47,6 +48,7 @@
   "indication": "Indicação",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "ex.: \"Hipertensão\"",
+  "launchOrderBasket": "Launch order basket",
   "male": "Masculino",
   "medicationDurationAndUnit": "para {{duration}} {{durationUnit}}",
   "medicationIndefiniteDuration": "Duração indefinida",
@@ -83,6 +85,7 @@
   "prescriptionRefills": "Recargas de prescrição",
   "print": "Imprimir",
   "printedBy": "Impresso por",
+  "printMedications": "Print medications",
   "prn": "S/N",
   "prnReason": "Razão do S/N",
   "prnReasonPlaceholder": "Motivo para tomar o medicamento",

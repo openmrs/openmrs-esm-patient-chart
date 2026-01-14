@@ -18,8 +18,9 @@
   height: layout.$spacing-10;
 }
 
-.orderLocationOuterContainer {
-  margin-top: layout.$spacing-05;
+.orderLocationOuterContainer,
+.providerSelectorContainer {
+  margin-bottom: layout.$spacing-05;
 }
 
 .orderLocationContainer {
@@ -83,4 +84,23 @@
 
 .orderPanel {
   margin: layout.$spacing-07 0;
+}
+
+.patientBannerContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $ui-01;
+  border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+
+  .patientBanner {
+    display: flex;
+  }
+
+  .patientAvatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: layout.$spacing-05;
+    border-radius: 1px;
+  }
 }

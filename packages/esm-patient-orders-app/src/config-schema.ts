@@ -59,6 +59,12 @@ export const configSchema = {
       'Array of provider roles uuids. If specified, the order basket shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit orders form may still do so with themselves as the prescriber.',
     _default: [],
   },
+  orderLocationTagName: {
+    _type: Type.UUID,
+    _description:
+      'The name of the ordering location tag. If specified, the order baskets shows the order locations dropdown listing locations with the specified tag. The dropdown is hidden if this config value is not specified, and the order location defaults to the login location of the user.',
+    _default: '',
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -75,4 +81,5 @@ export interface ConfigObject {
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
   ordererProviderRoles: Array<string>;
+  orderLocationTagName: string;
 }

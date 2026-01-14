@@ -177,7 +177,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         Array.isArray(tableRow.actions) && tableRow.actions.length > 0 ? tableRow.actions : defaultActions;
 
       tableRow['actions'] = (
-        <OverflowMenu flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
+        <OverflowMenu align="left" flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
           {actions.map((actionItem: Action, index: number) => {
             const form = formsJson && actionItem?.form?.name ? formsJson.name === actionItem.form.name : null;
 
