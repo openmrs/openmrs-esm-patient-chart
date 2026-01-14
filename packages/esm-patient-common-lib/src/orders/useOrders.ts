@@ -16,7 +16,7 @@ export const drugCustomRepresentation =
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
 export const orderCustomRepresentation =
-  'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller)';
+  'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,fulfillerStatus)';
 
 export function usePatientOrders(
   patientUuid: string,
@@ -51,8 +51,8 @@ export function usePatientOrders(
     () =>
       data?.data?.results
         ? [...data.data.results]?.sort(
-            (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
-          )
+          (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+        )
         : null,
     [data],
   );
