@@ -77,8 +77,6 @@ const Trendline: React.FC<TrendlineProps> = ({
   const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
   const [showResultsTable, setShowResultsTable] = useState(false);
-  const firstObservationDate = obs[0]?.obsDatetime;
-  const lastObservationDate = obs[obs.length - 1]?.obsDatetime;
 
   const [upperRange, lowerRange] = useMemo(() => {
     if (obs.length === 0) {
@@ -106,7 +104,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   useEffect(() => {
     setRange(undefined);
-  }, [conceptUuid, firstObservationDate, lastObservationDate, obs.length]);
+  }, [conceptUuid]);
 
   const { data, tableData } = useMemo(() => {
     const chartData: Array<{
