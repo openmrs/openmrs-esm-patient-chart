@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
+  useFeatureFlag,
+  type Visit,
+} from '@openmrs/esm-framework';
 import {
   type Drug,
   type DrugOrderBasketItem,
@@ -21,6 +28,25 @@ export interface DrugSearchResult {
     display: string;
     uuid: string;
   };
+}
+
+interface ConceptSetMembersResponse {
+  uuid: string;
+  setMembers?: Array<{
+    uuid: string;
+    name: {
+      display: string;
+    };
+  }>;
+}
+
+export interface ConceptSet {
+  uuid: string;
+  display: string;
+}
+
+interface ConceptFetchResponse {
+  [uuid: string]: ConceptSet;
 }
 
 interface OrderTemplateResource {
@@ -52,6 +78,74 @@ export function useDrugSearch(query: string) {
   );
 
   return results;
+}
+
+export function useConceptSets(conceptSetUuids: string[] = []) {
+  const url =
+    conceptSetUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptSetUuids.join(',')}&v=custom:(uuid,display)`
+      : null;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }, Error>(url, openmrsFetch);
+
+  const conceptSets: ConceptSet[] = data?.data
+    ? Object.values(data.data).map((concept) => ({
+        uuid: concept.uuid,
+        display: concept.display,
+      }))
+    : [];
+
+  if (error) {
+    showSnackbar({
+      title: error.name,
+      subtitle: error.message,
+      kind: 'error',
+    });
+  }
+
+  return {
+    conceptSets,
+    isLoading,
+  };
+}
+
+export function useDrugListByConceptSet(serviceTypeConceptSetUuid: string) {
+  const conceptSetUrl = serviceTypeConceptSetUuid
+    ? `${restBaseUrl}/concept/${serviceTypeConceptSetUuid}?v=custom:(uuid,setMembers:(uuid,name))`
+    : null;
+
+  const {
+    data: conceptSetResp,
+    error: conceptSetError,
+    isLoading: isLoadingConceptSet,
+  } = useSWRImmutable<FetchResponse<ConceptSetMembersResponse>, Error>(conceptSetUrl, openmrsFetch);
+
+  const memberConceptNames = useMemo(
+    () => conceptSetResp?.data?.setMembers?.map((m) => m.name.display)?.filter(Boolean) ?? [],
+    [conceptSetResp?.data?.setMembers],
+  );
+
+  const {
+    data: drugsResponse,
+    error: drugError,
+    isLoading: isLoadingDrugs,
+  } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }> | undefined, Error>(
+    serviceTypeConceptSetUuid && memberConceptNames.length
+      ? `${restBaseUrl}/drug?q=${memberConceptNames.join(
+          ',',
+        )}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
+      : null,
+    openmrsFetch,
+  );
+
+  const drugs = useMemo(() => drugsResponse?.data?.results ?? [], [drugsResponse?.data?.results]);
+
+  return {
+    drugs,
+    isLoading: isLoadingConceptSet || isLoadingDrugs,
+    error: conceptSetError ?? drugError,
+    memberConceptNames,
+  };
 }
 
 /**
