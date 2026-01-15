@@ -70,6 +70,7 @@
   .orderForm {
     height: calc(100vh - layout.$spacing-12 - var(--workspace-header-height));
     background-color: #ededed;
+    justify-content: flex-start;
   }
 
   .buttonSet {
