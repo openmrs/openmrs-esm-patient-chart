@@ -31,7 +31,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   const displayText = t('immunizations__lower', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/immunizations';
+
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Immunizations`;
 
   const { data: immunizations, error, isLoading, isValidating } = useImmunizations(patientUuid);
   const { results: paginatedImmunizations, goTo, currentPage } = usePagination(immunizations ?? [], immunizationsCount);
@@ -55,7 +56,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       id: `${index}`,
       vaccineName: immunization.vaccineName,
       vaccinationDate: `${formatDate(parseDate(immunization.existingDoses[0].occurrenceDateTime), {
-        day: false,
+        mode: 'standard',
+        noToday: true,
         time: false,
       })}`,
     }));
