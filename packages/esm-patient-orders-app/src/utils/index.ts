@@ -6,6 +6,7 @@ import {
   type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
+import { type LabOrderConcept } from '../lab-results/lab-results.resource';
 
 /**
  * Enables a comparison of arbitrary values with support for undefined/null.
@@ -128,4 +129,24 @@ export const getObservationDisplayValue = (value: ObservationValue): string => {
   if (typeof value === 'number') return value.toString();
   if (value && typeof value === 'object' && 'display' in value) return value.display;
   return '--';
+};
+
+/**
+ * Extracts effective ranges, prioritizing referenceRanges over legacy fields
+ */
+export const getEffectiveRanges = (
+  concept: LabOrderConcept,
+  referenceRangesMap?: Map<string, { lowNormal?: number; hiNormal?: number }>,
+) => {
+  const patientSpecificRange = referenceRangesMap?.get(concept?.uuid);
+  if (patientSpecificRange) {
+    return {
+      lowNormal: patientSpecificRange.lowNormal,
+      hiNormal: patientSpecificRange.hiNormal,
+    };
+  }
+  return {
+    lowNormal: concept?.lowNormal,
+    hiNormal: concept?.hiNormal,
+  };
 };
