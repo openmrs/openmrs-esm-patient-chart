@@ -116,12 +116,11 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
         <DataTable rows={rowsData} headers={headers}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
-                <colgroup className={hasRange ? styles.colgroupWithRange : styles.colgroupWithoutRange}>
-                  <col />
-                  <col />
-                  {hasRange && <col />}
-                </colgroup>
+              <Table
+                className={classNames(styles.table, hasRange ? styles.tableWithRange : styles.tableWithoutRange)}
+                {...getTableProps()}
+                size={isDesktop(layout) ? 'sm' : 'md'}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
