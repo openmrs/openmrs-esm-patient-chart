@@ -121,7 +121,40 @@
 }
 
 .table {
+  table-layout: fixed;
+  width: 100%;
+
   td {
     border-bottom: none !important;
+  }
+}
+
+.tableWithRange {
+  th,
+  td {
+    &:nth-child(1) {
+      width: 50%;
+    }
+
+    &:nth-child(2) {
+      width: 25%;
+    }
+
+    &:nth-child(3) {
+      width: 25%;
+    }
+  }
+}
+
+.tableWithoutRange {
+  th,
+  td {
+    &:nth-child(1) {
+      width: 60%;
+    }
+
+    &:nth-child(2) {
+      width: 40%;
+    }
   }
 }

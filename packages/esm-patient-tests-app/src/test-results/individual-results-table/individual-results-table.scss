@@ -136,3 +136,23 @@ p {
     margin-bottom: layout.$spacing-02;
   }
 }
+
+.table {
+  table-layout: fixed;
+  width: 100%;
+
+  th,
+  td {
+    &:nth-child(1) {
+      width: 50%;
+    }
+
+    &:nth-child(2) {
+      width: 25%;
+    }
+
+    &:nth-child(3) {
+      width: 25%;
+    }
+  }
+}
