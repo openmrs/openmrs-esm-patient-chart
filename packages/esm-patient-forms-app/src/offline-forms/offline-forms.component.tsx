@@ -30,7 +30,7 @@ import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.scss';
 
-export interface OfflineFormsProps {}
+export type OfflineFormsProps = object;
 
 const OfflineForms: React.FC<OfflineFormsProps> = () => {
   const { t } = useTranslation();

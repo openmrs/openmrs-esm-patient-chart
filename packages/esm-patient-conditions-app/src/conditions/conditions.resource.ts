@@ -2,7 +2,60 @@ import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { type DataTableSortState } from '@carbon/react';
 import { fhirBaseUrl, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { type FHIRCondition, type FHIRConditionResponse } from '../types';
+
+export interface FHIRConditionResponse {
+  entry: Array<{
+    resource: FHIRCondition;
+  }>;
+  id: string;
+  meta: {
+    lastUpdated: string;
+  };
+  resourceType: string;
+  total: number;
+  type: string;
+}
+
+export interface FHIRCondition {
+  clinicalStatus: {
+    coding: Array<CodingData>;
+    display: string;
+  };
+  code: {
+    coding: Array<CodingData>;
+  };
+  id: string;
+  onsetDateTime: string;
+  recordedDate: string;
+  recorder: {
+    display: string;
+    reference: string;
+    type: string;
+  };
+  resourceType: string;
+  subject: {
+    display: string;
+    reference: string;
+    type: string;
+  };
+  text: {
+    div: string;
+    status: string;
+  };
+  abatementDateTime?: string;
+}
+
+interface CodingData {
+  code: string;
+  display: string;
+  extension?: Array<ExtensionData>;
+  system?: string;
+}
+
+interface ExtensionData {
+  extension: [];
+  url: string;
+}
 
 export type Condition = {
   clinicalStatus: string;

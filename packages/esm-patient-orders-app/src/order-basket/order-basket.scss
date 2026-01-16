@@ -18,6 +18,22 @@
   height: layout.$spacing-10;
 }
 
+.orderLocationOuterContainer,
+.providerSelectorContainer {
+  margin-bottom: layout.$spacing-05;
+}
+
+.orderLocationContainer {
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+  > div {
+    height: unset;
+  }
+}
+
 .orderBasketSlot {
   display: flex;
   flex-direction: column;
@@ -68,4 +84,23 @@
 
 .orderPanel {
   margin: layout.$spacing-07 0;
+}
+
+.patientBannerContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $ui-01;
+  border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+
+  .patientBanner {
+    display: flex;
+  }
+
+  .patientAvatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: layout.$spacing-05;
+    border-radius: 1px;
+  }
 }

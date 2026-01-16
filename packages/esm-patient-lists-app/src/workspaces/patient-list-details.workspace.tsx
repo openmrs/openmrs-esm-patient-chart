@@ -11,10 +11,9 @@ export interface PatientListDetailsWorkspaceProps {
   list: MappedList;
 }
 
-const PatientListDetailsWorkspace: React.FC<PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, {}>> = ({
-  workspaceProps: { list },
-  closeWorkspace,
-}) => {
+const PatientListDetailsWorkspace: React.FC<
+  PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object>
+> = ({ workspaceProps: { list }, closeWorkspace }) => {
   const { t } = useTranslation();
   const { listMembers, isLoading } = usePatientListMembers(list.id);
 

@@ -6,7 +6,7 @@
   "optionalBackendDependencies": {
     "fhirproxy": "^1.0.0-SNAPSHOT",
     "stockmanagement": "^1.4.0 || ^2.0.0 || >=3.0.0-0",
-    "billing": "^1.2.0-SNAPSHOT"
+    "billing": "^1.2.0-SNAPSHOT || >=2.0.0-0"
   },
   "extensions": [
     {
