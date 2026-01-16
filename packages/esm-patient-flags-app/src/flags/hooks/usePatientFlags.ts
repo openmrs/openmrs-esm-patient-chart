@@ -15,7 +15,7 @@ export interface FlagFetchResponse {
 export interface FlagDefinition {
   uuid: string;
   display: string;
-  priority: { uuid: string; name: string };
+  priority: { uuid: string; name: string; rank: number };
   tags: Array<{ uuid: string; display: string }>;
 }
 

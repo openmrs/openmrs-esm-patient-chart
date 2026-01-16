@@ -1,6 +1,7 @@
 import { defineConfigSchema, defineExtensionConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { riskCountExtensionConfigSchema } from './flags/flags-risk-count-extension/extension-config-schema';
+import { flagsListExtensionConfigSchema } from './flags/flags-list-extension/extension-config-schema';
 
 const moduleName = '@openmrs/esm-patient-flags-app';
 
@@ -9,6 +10,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
   defineExtensionConfigSchema('patient-flags-risk-count', riskCountExtensionConfigSchema);
+  defineExtensionConfigSchema('patient-flags-list', flagsListExtensionConfigSchema);
 }
 
 export const flagsRiskCountExtension = getAsyncLifecycle(
