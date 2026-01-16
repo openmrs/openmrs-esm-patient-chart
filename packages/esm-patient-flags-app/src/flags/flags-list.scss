@@ -39,9 +39,18 @@
 
 .flagTag {
   padding: 0 layout.$spacing-03;
+  max-width: none;
+
   span {
     display: flex;
     align-items: center;
+  }
+
+  // Prevent Carbon's auto-tooltip by disabling text truncation
+  :global(.cds--tag__label) {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 }
 

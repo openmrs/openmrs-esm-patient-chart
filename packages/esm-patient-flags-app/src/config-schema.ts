@@ -31,7 +31,7 @@ export const carbonTagColors = [
 ] as const;
 export type CarbonTagColor = (typeof carbonTagColors)[number];
 
-export const tagColors = [...carbonTagColors, 'orange'] as const;
+export const tagColors = [...carbonTagColors, 'orange', 'yellow'] as const;
 export type TagColor = (typeof tagColors)[number];
 
 export interface PriorityConfig {

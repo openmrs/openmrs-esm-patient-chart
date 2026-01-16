@@ -113,7 +113,9 @@ const Flag: React.FC<FlagProps> = ({ flag, patientUuid }) => {
   const customStyle = useMemo(() => {
     switch (priorityConfig.color) {
       case 'orange':
-        return { backgroundColor: '#ffd9be', color: '#8b3901' };
+        return { backgroundColor: '#ffd9be', color: '#8b3901', borderColor: '#ff832b' };
+      case 'yellow':
+        return { backgroundColor: '#fddc69', color: '#684e00', borderColor: '#d2a106' };
       case 'high-contrast':
         if (action) {
           // OperationalTag for whatever reason doesn't provide the `high-contrast` color type
