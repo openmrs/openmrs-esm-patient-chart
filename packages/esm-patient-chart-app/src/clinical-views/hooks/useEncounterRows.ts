@@ -44,7 +44,9 @@ export function useEncounterRows(
 
   const onFormSave = useCallback(() => {
     mutate();
-    afterFormSaveAction && afterFormSaveAction();
+    if (afterFormSaveAction) {
+      afterFormSaveAction();
+    }
   }, [afterFormSaveAction, mutate]);
 
   return {

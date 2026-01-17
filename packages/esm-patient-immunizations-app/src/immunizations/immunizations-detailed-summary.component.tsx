@@ -153,6 +153,11 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
   const { results: paginatedImmunizations, currentPage, goTo } = usePagination(tableRows, 10);
 
+  const immunizationsByVaccineUuid = useMemo(
+    () => new Map(sortedImmunizations?.map((immunization) => [immunization.vaccineUuid, immunization]) ?? []),
+    [sortedImmunizations],
+  );
+
   if (isLoading || !sortedImmunizations) {
     return <DataTableSkeleton role="progressbar" />;
   }
@@ -198,26 +203,32 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, index) => (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                          <SequenceTable
-                            immunizationsByVaccine={sortedImmunizations[index]}
-                            launchPatientImmunizationForm={launchImmunizationsForm}
-                            patientUuid={patientUuid}
-                          />
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  ))}
+                  {rows.map((row) => {
+                    const immunization = immunizationsByVaccineUuid.get(row.id);
+
+                    return (
+                      <React.Fragment key={row.id}>
+                        <TableExpandRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableExpandRow>
+                        {row.isExpanded ? (
+                          <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
+                            {immunization && (
+                              <SequenceTable
+                                immunizationsByVaccine={immunization}
+                                launchPatientImmunizationForm={launchImmunizationsForm}
+                                patientUuid={patientUuid}
+                              />
+                            )}
+                          </TableExpandedRow>
+                        ) : (
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

@@ -128,12 +128,6 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     };
   }, [patient, setPatient, isLoadingPatient]);
 
-  useEffect(() => {
-    return () => {
-      closeWorkspaceGroup2();
-    };
-  }, []);
-
   const state = useMemo(
     () => ({
       patientUuid,

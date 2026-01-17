@@ -18,7 +18,7 @@ export interface ExportedClinicalFormsWindowProps {
  * @see forms-dashboard.workspace.tsx
  */
 const ExportedFormsDashboardWorkspace: React.FC<
-  Workspace2DefinitionProps<{}, ExportedClinicalFormsWindowProps, {}>
+  Workspace2DefinitionProps<object, ExportedClinicalFormsWindowProps, object>
 > = ({ launchChildWorkspace, windowProps: { formEntryWorkspaceName, patient, visitContext } }) => {
   const { t } = useTranslation();
   const handleFormOpen = useCallback(

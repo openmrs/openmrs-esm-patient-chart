@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { LineChart, ScaleTypes, TickRotations } from '@carbon/charts-react';
@@ -11,7 +11,6 @@ import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
 
 interface TrendlineProps {
-  basePath: string;
   conceptUuid: string;
   patientUuid: string;
   hideTrendlineHeader?: boolean;
@@ -103,6 +102,10 @@ const Trendline: React.FC<TrendlineProps> = ({
     }
   }, [obs]);
 
+  useEffect(() => {
+    setRange(undefined);
+  }, [conceptUuid]);
+
   const { data, tableData } = useMemo(() => {
     const chartData: Array<{
       date: Date;
@@ -122,13 +125,15 @@ const Trendline: React.FC<TrendlineProps> = ({
     }> = [];
 
     obs.forEach((observation, idx) => {
-      const normalRange =
-        hiNormal && lowNormal
-          ? {
-              max: hiNormal,
-              min: lowNormal,
-            }
-          : {};
+      const resolvedLow = observation.lowNormal ?? lowNormal;
+      const resolvedHigh = observation.hiNormal ?? hiNormal;
+      const hasRange = resolvedLow !== undefined && resolvedHigh !== undefined;
+      const normalRange = hasRange
+        ? {
+            max: resolvedHigh,
+            min: resolvedLow,
+          }
+        : {};
 
       chartData.push({
         date: new Date(Date.parse(observation.obsDatetime)),
@@ -187,9 +192,14 @@ const Trendline: React.FC<TrendlineProps> = ({
         enabled: false,
       },
       tooltip: {
-        customHTML: ([{ date, value }]) =>
-          `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
-          <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${formatDate(date)}</span></div>`,
+        customHTML: ([{ date, value }]) => {
+          const valueLabel = t('trendlineTooltipValue', 'Value');
+          const dateLabel = t('trendlineTooltipDate', 'Date');
+          return `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
+            <div style="font-size:1rem; line-height:1.4">${valueLabel}: <span>${value} ${leftAxisTitle}</span></div>
+            <div style="color:#6F6F6F; font-size:0.875rem; font-weight:500; margin-top:0.125rem">${dateLabel}: ${formatDate(date)}</div>
+          </div>`;
+        },
       },
       toolbar: {
         enabled: true,
@@ -221,7 +231,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         },
       },
     }),
-    [bottomAxisTitle, leftAxisTitle, range, chartTitle],
+    [bottomAxisTitle, leftAxisTitle, range, chartTitle, t],
   );
 
   const tableHeaderData = useMemo(
@@ -231,7 +241,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         key: 'dateTime',
       },
       {
-        header: `${t('value', 'Value')} (${leftAxisTitle})`,
+        header: leftAxisTitle ? `${t('value', 'Value')} (${leftAxisTitle})` : t('value', 'Value'),
         key: 'value',
       },
     ],
