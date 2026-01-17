@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { ContentSwitcher, Switch, Button, DataTableSkeleton } from '@carbon/react';
+import { ContentSwitcher, Button, DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { AccessibleSwitch } from './accessible-switch.component';
 import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
@@ -109,8 +110,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
               size={responsiveSize}
             >
-              <Switch name="panel" text={t('individualTests', 'Individual tests')} />
-              <Switch name="tree" text={t('overTime', 'Over time')} />
+              <AccessibleSwitch name="panel" text={t('individualTests', 'Individual tests')} />
+              <AccessibleSwitch name="tree" text={t('overTime', 'Over time')} />
             </ContentSwitcher>
           </div>
         </div>
@@ -147,8 +148,12 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
                 selectedIndex={isExpanded ? 1 : 0}
                 size={responsiveSize}
               >
-                <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={isLoading} />
-                <Switch name="over-time" text={t('overTime', 'Over time')} disabled={isLoading} />
+                <AccessibleSwitch
+                  name="individual-test"
+                  text={t('individualTests', 'Individual tests')}
+                  disabled={isLoading}
+                />
+                <AccessibleSwitch name="over-time" text={t('overTime', 'Over time')} disabled={isLoading} />
               </ContentSwitcher>
             </div>
           </div>
