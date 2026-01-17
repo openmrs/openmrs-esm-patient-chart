@@ -12,7 +12,6 @@ export interface TableRowData {
 export function transformGrowthChartData(heights: Observation[], weights: Observation[]): TableRowData[] {
   const groupedMap = new Map<string, { height?: string; weight?: string; id: string }>();
 
-  // Helper to process observations
   const processObs = (obsList: Observation[], type: 'height' | 'weight') => {
     obsList.forEach((obs) => {
       const dateKey = obs.effectiveDateTime;
