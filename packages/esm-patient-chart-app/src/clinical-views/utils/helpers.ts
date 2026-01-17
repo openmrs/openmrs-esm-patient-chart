@@ -15,34 +15,26 @@ export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
   form: Form,
-  visit: Visit,
   action: LaunchAction = 'add',
-  onFormSave: () => void,
-  encounterUuid?: string,
   intent: string = '*',
-  patientUuid?: string,
   requireActiveVisitForEncounterTile: boolean = true,
+  visit?: Visit,
+  encounterUuid?: string,
 ) {
   if (!visit && requireActiveVisitForEncounterTile) {
     launchStartVisitPrompt();
-  } else
+  } else {
     launchWorkspace2('patient-form-entry-workspace', {
       workspaceTitle: form?.display ?? form?.name,
       form,
       encounterUuid,
-      mutateForm: onFormSave,
-      formInfo: {
-        encounterUuid,
-        formUuid: form?.uuid,
-        patientUuid: patientUuid,
-        visit: visit,
-        additionalProps: {
-          mode: action === 'add' ? 'enter' : action,
-          formSessionIntent: intent,
-          openClinicalFormsWorkspaceOnFormClose: false,
-        },
+      additionalProps: {
+        mode: action === 'add' ? 'enter' : action,
+        formSessionIntent: intent,
+        openClinicalFormsWorkspaceOnFormClose: false,
       },
     });
+  }
 }
 
 export function getEncounterValues(encounter: Encounter, param: string, isDate?: boolean) {

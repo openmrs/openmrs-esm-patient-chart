@@ -53,6 +53,18 @@ export const configSchema = {
     _description:
       'Whether to display the "Reference number" field in the Order form. This field maps to the accession_number property in the Order data model',
   },
+  ordererProviderRoles: {
+    _type: Type.Array,
+    _description:
+      'Array of provider roles uuids. If specified, the order basket shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit orders form may still do so with themselves as the prescriber.',
+    _default: [],
+  },
+  orderLocationTagName: {
+    _type: Type.UUID,
+    _description:
+      'The name of the ordering location tag. If specified, the order baskets shows the order locations dropdown listing locations with the specified tag. The dropdown is hidden if this config value is not specified, and the order location defaults to the login location of the user.',
+    _default: '',
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -68,4 +80,6 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
+  ordererProviderRoles: Array<string>;
+  orderLocationTagName: string;
 }

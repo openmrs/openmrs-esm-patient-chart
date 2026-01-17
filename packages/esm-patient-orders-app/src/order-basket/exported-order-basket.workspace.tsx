@@ -21,6 +21,7 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
     drugOrderWorkspaceName,
     labOrderWorkspaceName,
     generalOrderWorkspaceName,
+    onOrderBasketSubmitted,
   },
   closeWorkspace,
   launchChildWorkspace,
@@ -52,6 +53,8 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
       mutateVisitContext={mutateVisitContext}
       closeWorkspace={closeWorkspace}
       orderBasketExtensionProps={orderBasketExtensionProps}
+      showPatientBanner
+      onOrderBasketSubmitted={onOrderBasketSubmitted}
     />
   );
 };
