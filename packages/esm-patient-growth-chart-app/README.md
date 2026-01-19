@@ -30,4 +30,5 @@ The Growth Chart is designed for the OpenMRS 3.x Patient Chart. Its primary purp
 - **WHO Dataset**
 1.Integrated the data set for girls and boys of weight to age who standards. (Birth-5 years).
 2.Converted original WHO .xlsx data to JSON format.
-2.JSON includes L, M, S parameters for Z-score calculation and P-values for graphing.
+3.JSON includes L, M, S parameters for Z-score calculation and P-values for graphing.
+4.Link to the WHO data - https://www.who.int/tools/child-growth-standards/standards/weight-for-age
