@@ -192,3 +192,28 @@ export interface ObsPayload {
     value: string;
   }>;
 }
+
+export interface Reference {
+  reference: string;
+  display?: string;
+  type?: string;
+}
+
+export interface Code {
+  system?: string;
+  code: string;
+  display?: string;
+}
+
+export interface FHIRNoteObservation {
+  resourceType: 'Observation';
+  status: 'final';
+  id?: string;
+  code: { coding: Array<Code> };
+  subject: Reference;
+  effectiveDateTime: string;
+  issued?: string;
+  performer?: Array<Reference>;
+  valueString?: string;
+  note?: Array<{ text: string }>;
+}
