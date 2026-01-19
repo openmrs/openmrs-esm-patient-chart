@@ -24,5 +24,10 @@ The Growth Chart is designed for the OpenMRS 3.x Patient Chart. Its primary purp
 4.Confirmed the skeleton component loads successfully.
 
 - **Data Integration**
-1. Patient's Height and Weight observations are fetched from the OpenMRS API.
-2. Displayed in a table format.
+1.Patient's Height and Weight observations are fetched from the OpenMRS API.
+2.Displayed in a table format.
+
+- **WHO Dataset**
+1.Integrated the data set for girls and boys of weight to age who standards. (Birth-5 years).
+2.Converted original WHO .xlsx data to JSON format.
+2.JSON includes L, M, S parameters for Z-score calculation and P-values for graphing.
