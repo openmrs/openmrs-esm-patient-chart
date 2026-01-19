@@ -1,0 +1,55 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.stickyNoteContainer {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  z-index: 99;
+  width: 24rem;
+  box-shadow:
+    0 2px 10px 1px rgba(0, 0, 0, 0.12),
+    0 2px 6px 1px rgba(171, 198, 213, 0.12);
+  background-color: $ui-background;
+  border-radius: 10px;
+  border-color: black;
+}
+
+.noteContent {
+  padding: layout.$spacing-05;
+  min-height: 8rem;
+  @include type.type-style('body-long-01');
+  white-space: pre-wrap;
+}
+
+.noteFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.noteMetadata {
+  @include type.type-style('caption-01');
+  color: var(--cds-text-02);
+}
+
+.noteActions {
+  display: flex;
+  gap: layout.$spacing-02;
+}
+
+.editContainer {
+  padding: layout.$spacing-04;
+}
+
+.buttonSet {
+  display: flex;
+  width: 100%;
+  :global(.cds--btn) {
+    width: 50%;
+  }
+}

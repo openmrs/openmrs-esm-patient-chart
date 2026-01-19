@@ -32,3 +32,9 @@ export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExt
 
 // t('visitNoteWorkspaceTitle', 'Visit Note')
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
+export const stickyNotesButton = getAsyncLifecycle(() => import('./sticky-notes/sticky-note-header-button'), options);
+
+export const deleteStickyNoteModal = getAsyncLifecycle(
+  () => import('./sticky-notes/delete-sticky-note-modal'),
+  options,
+);
