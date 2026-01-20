@@ -68,6 +68,7 @@ export const configSchema = {
         _description:
           'URL to navigate to when the flag is clicked. Supports template variables: ${patientUuid}, ${openmrsSpaBase}.',
         _default: null,
+        _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
       },
       workspace: {
         _type: Type.String,
