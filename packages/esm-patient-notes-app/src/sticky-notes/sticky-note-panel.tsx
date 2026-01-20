@@ -1,35 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText, TextArea } from '@carbon/react';
-import { formatDate, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { formatDate, getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import AddStickyNote from './add-sticky-note-button';
 import DeleteStickyNote from './delete-sticky-note-button';
 import EditStickyNote from './edit-sticky-note-button';
-import { createStickyNote, updateStickyNote } from './resources';
+import { createStickyNote, updateStickyNote, useStickyNotes } from './resources';
 import styles from './sticky-note-panel.scss';
 
 interface StickyNotePanelProps {
-  stickyNote: fhir.Observation;
   patientUuid: string;
-  isNewStickyNote: boolean;
-  isLoading: boolean;
-  onAddNote?: () => void;
   onClose: () => void;
-  mutate: () => void;
 }
 
-const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
-  stickyNote,
-  patientUuid,
-  isNewStickyNote,
-  isLoading,
-  onAddNote,
-  onClose,
-  mutate,
-}) => {
+const StickyNotePanel: React.FC<StickyNotePanelProps> = ({ patientUuid, onClose }) => {
+  const { notes: stickyNotes, isLoading, mutate } = useStickyNotes(patientUuid);
+  const stickyNote = useMemo(() => {
+    return stickyNotes[0] as fhir.Observation;
+  }, [stickyNotes]);
+
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(isNewStickyNote);
+  const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
   const [noteText, setNoteText] = useState(stickyNote?.valueString || '');
   const [isSaving, setIsSaving] = useState(false);
   const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
@@ -40,14 +32,13 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
 
     setIsSaving(true);
     try {
-      if (isNewStickyNote) {
+      if (mode === 'create') {
         await createStickyNote(patientUuid, noteText, stickyNoteConceptUuid);
         showSnackbar({
           kind: 'success',
           title: t('stickyNoteCreated', 'Sticky note created'),
           subtitle: t('stickyNoteCreatedSuccessfully', 'The sticky note has been created successfully'),
         });
-        mutate();
       } else {
         await updateStickyNote(stickyNote.id, noteText, stickyNoteConceptUuid, patientUuid);
         showSnackbar({
@@ -55,9 +46,8 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
           title: t('stickyNoteUpdated', 'Sticky note updated'),
           subtitle: t('stickyNoteUpdatedSuccessfully', 'The sticky note has been updated successfully'),
         });
-        mutate();
       }
-      setIsEditing(false);
+      setMode('view');
     } catch (error) {
       showSnackbar({
         kind: 'error',
@@ -66,22 +56,35 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
       });
       console.error(error);
     } finally {
+      mutate();
       setIsSaving(false);
     }
   };
 
+  const handleAddNotes = useCallback(() => {
+    setMode('create');
+    setNoteText('');
+  }, []);
+
   const handleCancel = () => {
-    setIsEditing(false);
-    setNoteText(stickyNote?.valueString || '');
-    onClose();
+    if (stickyNotes.length === 0) {
+      onClose();
+    } else {
+      setMode('view');
+      setNoteText(stickyNote?.valueString || '');
+    }
   };
 
   useEffect(() => {
     if (!isLoading) {
-      setIsEditing(isNewStickyNote);
-      setNoteText(stickyNote?.valueString || '');
+      if (stickyNotes.length === 0) {
+        setMode('create');
+      } else if (mode !== 'create') {
+        setNoteText(stickyNote?.valueString || '');
+      }
     }
-  }, [isLoading, isNewStickyNote, stickyNote]);
+    // eslint-disable-next-line
+  }, [isLoading, stickyNotes.length]);
 
   if (isLoading) {
     return (
@@ -98,7 +101,7 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
 
   return (
     <div className={styles.stickyNoteContainer}>
-      {!isEditing ? (
+      {mode === 'view' ? (
         <>
           <div className={styles.noteContent}>
             <p>{stickyNote?.valueString}</p>
@@ -111,11 +114,11 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
             <div className={styles.noteActions}>
               {stickyNote?.id && (
                 <>
-                  <AddStickyNote onAddNote={onAddNote} />
+                  <AddStickyNote onAddNote={handleAddNotes} />
                   <EditStickyNote
                     toggleEditingStickyNote={() => {
                       setNoteText(stickyNote?.valueString || '');
-                      setIsEditing(true);
+                      setMode('edit');
                     }}
                   />
                   <DeleteStickyNote noteUuid={stickyNote.id} mutate={mutate} onClose={onClose} />
@@ -138,10 +141,10 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({
           />
           <div className={styles.buttonSet}>
             <Button kind="ghost" onClick={handleCancel} disabled={isSaving} size="sm">
-              {t('cancel', 'Cancel')}
+              {getCoreTranslation('cancel')}
             </Button>
             <Button kind="primary" type="submit" disabled={!noteText.trim() || isSaving} size="sm">
-              {isSaving ? <InlineLoading description={t('saving', 'Saving...')} /> : t('save', 'Save')}
+              {isSaving ? <InlineLoading description={t('saving', 'Saving') + '...'} /> : getCoreTranslation('save')}
             </Button>
           </div>
         </form>

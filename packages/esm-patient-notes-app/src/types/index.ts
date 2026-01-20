@@ -207,7 +207,7 @@ export interface Code {
 
 export interface FHIRNoteObservation {
   resourceType: 'Observation';
-  status: 'final';
+  status: 'final' | 'amended' | 'cancelled' | 'entered-in-error' | 'preliminary' | 'unknown';
   id?: string;
   code: { coding: Array<Code> };
   subject: Reference;
