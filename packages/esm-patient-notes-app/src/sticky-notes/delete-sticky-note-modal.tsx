@@ -1,7 +1,7 @@
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { deleteStickyNote } from './resources';
 
 interface DeleteStickyNoteModalProps {
@@ -13,8 +13,10 @@ interface DeleteStickyNoteModalProps {
 
 const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStickyNoteModalProps) => {
   const { t } = useTranslation();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const confirmDelete = useCallback(async () => {
+    setIsDeleting(true);
     try {
       await deleteStickyNote(noteUuid);
       showSnackbar({
@@ -31,6 +33,8 @@ const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStick
         title: t('errorDeletingStickyNote', 'Error deleting sticky note'),
         subtitle: t('errorDeletingStickyNoteMessage', 'An error occurred while deleting the sticky note'),
       });
+    } finally {
+      setIsDeleting(false);
     }
   }, [noteUuid, mutate, close, onClose, t]);
   return (
@@ -41,10 +45,14 @@ const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStick
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={close}>
-          {t('cancel', 'Cancel')}
+          {getCoreTranslation('cancel')}
         </Button>
         <Button kind="danger" onClick={confirmDelete}>
-          {t('delete', 'Delete')}
+          {isDeleting ? (
+            <InlineLoading description={t('deleting', 'Deleting') + '...'} />
+          ) : (
+            getCoreTranslation('delete')
+          )}
         </Button>
       </ModalFooter>
     </>
