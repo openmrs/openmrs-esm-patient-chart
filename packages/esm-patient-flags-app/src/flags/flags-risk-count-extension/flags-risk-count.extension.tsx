@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRightIcon, CloseIcon, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
 import { useCurrentPath, usePatientFlags } from '../hooks/usePatientFlags';
 import FlagsList from '../flags-list.component';
 import styles from './flags-risk-count.scss';
@@ -16,11 +17,21 @@ const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patie
   const { t } = useTranslation();
   const { flags, isLoading, error } = usePatientFlags(patientUuid);
   const filteredFlags = flags.filter((f) => !f.voided);
-  const config = useConfig<FlagsRiskCountExtensionConfig>();
+  const config = useConfig<FlagsRiskCountExtensionConfig & ConfigObject>();
+
+  // Get all priority names that are marked as risk priorities
+  const riskPriorityNames = useMemo(() => {
+    return (config.priorities ?? [])
+      .filter((style) => style.isRiskPriority)
+      .map((style) => style.priority.toLowerCase());
+  }, [config.priorities]);
 
   const riskFlags = useMemo(() => {
-    return filteredFlags.filter((f) => f.flagDefinition?.priority?.name?.toLowerCase() === 'risk');
-  }, [filteredFlags]);
+    return filteredFlags.filter((f) => {
+      const priorityName = f.flagDefinition?.priority?.name?.toLowerCase() ?? '';
+      return riskPriorityNames.includes(priorityName);
+    });
+  }, [filteredFlags, riskPriorityNames]);
 
   const [showFlagsList, setShowFlagsList] = useState(false);
 
