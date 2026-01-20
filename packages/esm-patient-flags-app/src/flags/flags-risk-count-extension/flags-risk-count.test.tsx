@@ -96,4 +96,79 @@ describe('flags risk count', () => {
     // No flags risk count should be shown on the FooBarBaz route
     expect(screen.queryByText(/risk flags/i)).not.toBeInTheDocument();
   });
+
+  it('counts risk flags based on custom priority configuration', () => {
+    // Configure 'Info' as the risk priority instead of 'Risk'
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+      ...getDefaultsFromConfigSchema<FlagsRiskCountExtensionConfig>(riskCountExtensionConfigSchema),
+      priorities: [
+        { priority: 'risk', color: 'high-contrast', isRiskPriority: false },
+        { priority: 'info', color: 'orange', isRiskPriority: true },
+      ],
+    });
+
+    mockUsePatientFlags.mockReturnValue({
+      flags: mockPatientFlags,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    } as unknown as ReturnType<typeof usePatientFlags>);
+
+    render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
+
+    // Only 'Future Appointment' has 'Info' priority, so count should be 1
+    expect(screen.getByText(/1 risk flag/i)).toBeInTheDocument();
+  });
+
+  it('does not render when no flags match configured risk priorities', () => {
+    // Configure no priorities as risk
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+      ...getDefaultsFromConfigSchema<FlagsRiskCountExtensionConfig>(riskCountExtensionConfigSchema),
+      priorities: [
+        { priority: 'risk', color: 'high-contrast', isRiskPriority: false },
+        { priority: 'info', color: 'orange', isRiskPriority: false },
+      ],
+    });
+
+    mockUsePatientFlags.mockReturnValue({
+      flags: mockPatientFlags,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    } as unknown as ReturnType<typeof usePatientFlags>);
+
+    render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
+
+    // Should not render anything since no flags are marked as risk
+    expect(screen.queryByText(/risk flag/i)).not.toBeInTheDocument();
+  });
+
+  it('supports multiple priorities configured as risk', () => {
+    // Configure both 'Risk' and 'Info' as risk priorities
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema<ConfigObject>(configSchema),
+      ...getDefaultsFromConfigSchema<FlagsRiskCountExtensionConfig>(riskCountExtensionConfigSchema),
+      priorities: [
+        { priority: 'risk', color: 'high-contrast', isRiskPriority: true },
+        { priority: 'info', color: 'orange', isRiskPriority: true },
+      ],
+    });
+
+    mockUsePatientFlags.mockReturnValue({
+      flags: mockPatientFlags,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    } as unknown as ReturnType<typeof usePatientFlags>);
+
+    render(<FlagsRiskCountExtension patientUuid={mockPatient.id} />);
+
+    // All 3 flags should be counted (2 'Risk' + 1 'Info')
+    expect(screen.getByText(/3 risk flags/i)).toBeInTheDocument();
+  });
 });
