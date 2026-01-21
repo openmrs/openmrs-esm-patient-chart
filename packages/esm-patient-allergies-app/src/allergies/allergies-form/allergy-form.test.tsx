@@ -216,6 +216,7 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
     workspaceName: '',
     windowName: '',
     isRootWorkspace: false,
+    showActionMenu: true,
   };
 
   const props = {
