@@ -49,6 +49,22 @@
   padding: layout.$spacing-04 0;
 }
 
+.loadingHeader {
+  padding: layout.$spacing-04 layout.$spacing-05 0;
+}
+
+.loadingTabs {
+  padding: layout.$spacing-04 layout.$spacing-05;
+}
+
+.loadingChart {
+  height: 400px;
+  margin: 0 layout.$spacing-05 layout.$spacing-03;
+  background: white;
+  border-radius: 4px;
+  width: auto;
+}
+
 .backButton {
   align-items: center;
   display: flex;
