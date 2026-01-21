@@ -247,6 +247,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
  */
 export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrderBasketItem {
   return {
+    uuid: order.uuid,
     display: order.drug?.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
     action: action,
