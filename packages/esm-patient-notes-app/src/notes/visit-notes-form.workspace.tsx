@@ -101,7 +101,7 @@ export interface VisitNotesFormProps {
 const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}>> = ({
   closeWorkspace,
   workspaceProps: { formContext, encounter },
-  groupProps: { patientUuid },
+  groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
   const searchTimeoutInMs = 500;
@@ -109,7 +109,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
-  const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
