@@ -26,9 +26,10 @@ export function usePatientOrders(
   endDate?: string,
 ) {
   const { mutate } = useSWRConfig();
+  const activeStatusParams = status === 'ACTIVE' ? '&excludeCanceledAndExpired=true' : '';
   const baseOrdersUrl =
     startDate && endDate
-      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${orderCustomRepresentation}&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}&excludeDiscontinueOrders=true`
+      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${orderCustomRepresentation}&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}&excludeDiscontinueOrders=true${activeStatusParams}`
       : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${orderCustomRepresentation}&status=${status}&excludeDiscontinueOrders=true`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderTypes=${orderType}` : baseOrdersUrl;
 
