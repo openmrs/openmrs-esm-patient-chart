@@ -113,7 +113,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   // Derived API filter dates (ISO strings)
   const [startDate, endDate] = dateRange;
   const selectedFromDate = useMemo(() => (startDate ? dayjs(startDate).format('YYYY-MM-DD') : null), [startDate]);
-  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).endOf('day').toISOString() : null), [endDate]);
+  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).format('YYYY-MM-DD') : null), [endDate]);
 
   const selectedOrderType = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid);
 
