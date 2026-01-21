@@ -3,12 +3,7 @@ import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { assessValue } from '../loadPatientTestData/helpers';
 import { type TreeNode } from '../filter/filter-types';
-import {
-  selectReferenceRange,
-  formatReferenceRange,
-  type ReferenceRanges,
-} from '../grouped-timeline/reference-range-helpers';
-import { getMostRecentObservationWithRange } from '../grouped-timeline/reference-range-helpers';
+import { selectReferenceRange, type ReferenceRanges } from '../grouped-timeline/reference-range-helpers';
 
 export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];
@@ -29,20 +24,25 @@ export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
         units: subTreeNode.units,
       };
 
-      const range = subTreeNode.range ?? formatReferenceRange(nodeRanges, nodeRanges?.units);
       const processedObs = subTreeNode.obs.map((ob) => {
         // Note: Units are only at the concept/node level, not observation-level
-        const observationRanges: ReferenceRanges | undefined =
-          ob.lowNormal !== undefined || ob.hiNormal !== undefined
-            ? {
-                hiAbsolute: ob.hiAbsolute,
-                hiCritical: ob.hiCritical,
-                hiNormal: ob.hiNormal,
-                lowAbsolute: ob.lowAbsolute,
-                lowCritical: ob.lowCritical,
-                lowNormal: ob.lowNormal,
-              }
-            : undefined;
+        const hasObservationRanges =
+          ob.lowNormal !== undefined ||
+          ob.hiNormal !== undefined ||
+          ob.lowCritical !== undefined ||
+          ob.hiCritical !== undefined ||
+          ob.lowAbsolute !== undefined ||
+          ob.hiAbsolute !== undefined;
+        const observationRanges: ReferenceRanges | undefined = hasObservationRanges
+          ? {
+              hiAbsolute: ob.hiAbsolute,
+              hiCritical: ob.hiCritical,
+              hiNormal: ob.hiNormal,
+              lowAbsolute: ob.lowAbsolute,
+              lowCritical: ob.lowCritical,
+              lowNormal: ob.lowNormal,
+            }
+          : undefined;
 
         const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
         const resolvedRanges = selectedRanges ?? nodeRanges;
@@ -63,7 +63,6 @@ export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
 
       tests.push({
         ...subTreeNode,
-        range,
         obs: processedObs,
       });
     } else if (subNode?.subSets) {
@@ -106,7 +105,6 @@ export function useObstreeData(
           hiNormal: 0,
           lowNormal: 0,
           units: '',
-          range: '',
         } as TreeNode),
       isValidating,
     }),
