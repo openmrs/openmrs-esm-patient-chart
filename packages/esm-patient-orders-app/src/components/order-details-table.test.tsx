@@ -358,7 +358,8 @@ describe('OrderDetailsTable', () => {
     const dateRangeLabel = screen.getByText(/date range/i);
     expect(dateRangeLabel).toBeInTheDocument();
 
-    const dateRangeInput = screen.getByDisplayValue(/dd\/mm\/yyyy–dd\/mm\/yyyy/);
+    // Default value is today's date (format: dd/mm/yyyy–dd/mm/yyyy)
+    const dateRangeInput = screen.getByDisplayValue(/\d{2}\/\d{2}\/\d{4}–\d{2}\/\d{2}\/\d{4}/);
     expect(dateRangeInput).toBeInTheDocument();
   });
 
