@@ -52,8 +52,8 @@ export function usePatientOrders(
     () =>
       data?.data?.results
         ? [...data.data.results]?.sort(
-          (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
-        )
+            (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+          )
         : null,
     [data],
   );
