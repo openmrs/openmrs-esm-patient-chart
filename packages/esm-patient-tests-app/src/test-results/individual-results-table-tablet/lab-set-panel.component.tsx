@@ -29,6 +29,8 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
   const date = new Date(panel.date);
   const layout = useLayoutType();
 
+  const getColumnClass = (columnKey: string) => styles[`col-${columnKey}`];
+
   const hasRange = panel.entries.some((entry) => entry.range);
 
   const headers = useMemo(
@@ -123,21 +125,29 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
               >
                 <TableHead>
                   <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
+                    {headers.map((header) => {
+                      const headerProps = getHeaderProps({ header });
+                      return (
+                        <TableHeader
+                          {...headerProps}
+                          className={classNames(headerProps.className, getColumnClass(header.key))}
+                        >
+                          {header.header}
+                        </TableHeader>
+                      );
+                    })}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, indx) => {
-                    return (
-                      <TableRow key={row.id} className={classNames(getClass(rowsData[indx]?.interpretation), 'check')}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell?.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
+                  {rows.map((row, indx) => (
+                    <TableRow key={row.id} className={classNames(getClass(rowsData[indx]?.interpretation), 'check')}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id} className={getColumnClass(cell.info.header)}>
+                          {cell?.value?.content ?? cell.value}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
