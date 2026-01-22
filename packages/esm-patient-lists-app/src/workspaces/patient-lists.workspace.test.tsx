@@ -91,6 +91,7 @@ function renderPatientListWorkspace() {
       }}
       windowName={''}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { fireEvent, render, renderHook, screen } from '@testing-library/react';
+import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
@@ -22,6 +22,7 @@ import {
   convertToDateTimeFields,
   createVisitAttribute,
   deleteVisitAttribute,
+  type VisitFormData,
   updateVisitAttribute,
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
@@ -71,7 +72,14 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
   launchChildWorkspace: jest.fn(),
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
+
+const defaultVisitLocation = {
+  display: 'Outpatient Clinic',
+  uuid: 'location-a',
+};
+const mockUseDefaultVisitLocation = jest.fn().mockReturnValue(defaultVisitLocation);
 
 const mockSaveVisit = jest.mocked(saveVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
@@ -164,6 +172,15 @@ jest.mock('../hooks/useDefaultFacilityLocation', () => {
   };
 });
 
+jest.mock('../hooks/useDefaultVisitLocation', () => {
+  const requireActual = jest.requireActual('../hooks/useDefaultVisitLocation');
+
+  return {
+    ...requireActual,
+    useDefaultVisitLocation: jest.fn((...args) => mockUseDefaultVisitLocation(...args)),
+  };
+});
+
 jest.mock('./visit-form.resource', () => {
   const requireActual = jest.requireActual('./visit-form.resource');
   return {
@@ -212,6 +229,8 @@ describe('Visit form', () => {
       errorFetchingEmrConfiguration: null,
       mutateEmrConfiguration: null,
     });
+    mockUseDefaultVisitLocation.mockReset();
+    mockUseDefaultVisitLocation.mockReturnValue(defaultVisitLocation);
   });
 
   it('renders the Start Visit form with all the relevant fields and values', async () => {
@@ -307,6 +326,34 @@ describe('Visit form', () => {
     expect(screen.getByText(/please select a visit type/i)).toBeInTheDocument();
 
     await user.click(screen.getByLabelText(/Outpatient visit/i));
+  });
+
+  it('keeps user selections when default values update', async () => {
+    const user = userEvent.setup();
+    mockUseDefaultVisitLocation.mockReturnValueOnce({}).mockReturnValue({
+      display: 'Inpatient Ward',
+      uuid: 'location-b',
+    });
+
+    const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        visitContext: null,
+      },
+    };
+    const { rerender } = render(<VisitForm {...props} />);
+
+    const visitStatusOngoing = screen.getByRole('tab', { name: /ongoing/i });
+    await user.click(visitStatusOngoing);
+    const outpatientVisitRadio = screen.getByRole('radio', { name: /^Outpatient Visit$/i });
+    await user.click(outpatientVisitRadio);
+
+    expect(outpatientVisitRadio).toBeChecked();
+
+    rerender(<VisitForm {...props} />);
+
+    await waitFor(() => expect(screen.getByRole('radio', { name: /^Outpatient Visit$/i })).toBeChecked());
   });
 
   it('displays an error message when the visit start time is in the future', async () => {

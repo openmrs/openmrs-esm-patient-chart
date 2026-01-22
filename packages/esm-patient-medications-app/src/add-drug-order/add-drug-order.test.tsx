@@ -177,8 +177,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
           ),
           startDate: expect.any(Date),
           indication: 'Hypertension',
-          careSetting: '6f0c9a92-6f24-11e3-af88-005056821db0',
-          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]),
     );
@@ -189,7 +187,8 @@ function renderAddDrugOrderWorkspace() {
   render(
     <AddDrugOrderWorkspace
       workspaceProps={{
-        order: undefined as any,
+        order: null,
+        orderToEditOrdererUuid: null,
       }}
       groupProps={{
         patientUuid: mockPatient.id,
@@ -205,6 +204,7 @@ function renderAddDrugOrderWorkspace() {
       }}
       windowName={''}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 }
