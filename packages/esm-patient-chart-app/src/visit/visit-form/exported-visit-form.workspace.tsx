@@ -463,8 +463,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ name }) => onChange(name)}
                           size="md"
                         >
-                          <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
-                          <Switch name="past" text={t('ended', 'Ended')} />
+                          <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                          <Switch name="past">{t('ended', 'Ended')}</Switch>
                         </ContentSwitcher>
                       ) : (
                         <ContentSwitcher
@@ -472,9 +472,9 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ name }) => onChange(name)}
                           size="md"
                         >
-                          <Switch name="new" text={t('new', 'New')} />
-                          <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
-                          <Switch name="past" text={t('inThePast', 'In the past')} />
+                          <Switch name="new">{t('new', 'New')}</Switch>
+                          <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                          <Switch name="past">{t('inThePast', 'In the past')}</Switch>
                         </ContentSwitcher>
                       );
                     }}
@@ -544,8 +544,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
                           size="md"
                         >
-                          <Switch name="recommended" text={t('recommended', 'Recommended')} />
-                          <Switch name="all" text={t('all', 'All')} />
+                          <Switch name="recommended">{t('recommended', 'Recommended')}</Switch>
+                          <Switch name="all">{t('all', 'All')}</Switch>
                         </ContentSwitcher>
                         {visitTypeContentSwitcherIndex === 0 && !isLoading && (
                           <MemoizedRecommendedVisitType
