@@ -63,6 +63,8 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
   const layout = useLayoutType();
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
+  const getColumnClass = (columnKey: string) => styles[`col-${columnKey}`];
+
   const headerTitle = t(title);
 
   const launchResultsDialog = useCallback(
@@ -147,29 +149,41 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
             <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
               <TableHead>
                 <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
+                  {headers.map((header) => {
+                    const headerProps = getHeaderProps({ header });
+                    return (
+                      <TableHeader
+                        {...headerProps}
+                        className={classNames(headerProps.className, getColumnClass(header.key))}
+                      >
+                        {header.header}
+                      </TableHeader>
+                    );
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => {
-                  return (
-                    <TableRow key={row.id}>
-                      {row.cells.map((cell) =>
-                        cell?.value?.interpretation ? (
-                          <TableCell className={classNames(getClasses(cell?.value?.interpretation))} key={cell.id}>
-                            <p>{cell?.value?.value ?? cell?.value}</p>
-                          </TableCell>
-                        ) : (
-                          <TableCell key={cell.id}>
-                            <p>{cell?.value}</p>
-                          </TableCell>
-                        ),
-                      )}
-                    </TableRow>
-                  );
-                })}
+                {rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.cells.map((cell) =>
+                      cell?.value?.interpretation ? (
+                        <TableCell
+                          key={cell.id}
+                          className={classNames(
+                            getClasses(cell?.value?.interpretation),
+                            getColumnClass(cell.info.header),
+                          )}
+                        >
+                          <p>{cell?.value?.value ?? cell?.value}</p>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={cell.id} className={getColumnClass(cell.info.header)}>
+                          <p>{cell?.value}</p>
+                        </TableCell>
+                      ),
+                    )}
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

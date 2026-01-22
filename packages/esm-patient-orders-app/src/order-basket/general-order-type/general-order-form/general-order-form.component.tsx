@@ -41,6 +41,7 @@ import styles from './general-order-form.scss';
 
 export interface OrderFormProps {
   initialOrder: OrderBasketItem;
+  orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
@@ -53,6 +54,7 @@ export interface OrderFormProps {
 export function OrderForm({
   patient,
   initialOrder,
+  orderToEditOrdererUuid,
   orderTypeUuid,
   closeWorkspace,
   setHasUnsavedChanges,
@@ -117,7 +119,6 @@ export function OrderForm({
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -136,7 +137,7 @@ export function OrderForm({
 
       closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, initialOrder, closeWorkspace],
+    [orders, setOrders, initialOrder, closeWorkspace],
   );
 
   const submitDrugOrderToServer = useCallback(
@@ -145,9 +146,8 @@ export function OrderForm({
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
 
-      postOrder(prepOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid))
+      postOrder(prepOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid))
         .then(() => {
           clearOrders();
           mutateOrders();
@@ -167,7 +167,7 @@ export function OrderForm({
           });
         });
     },
-    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, session.currentProvider.uuid, t],
+    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
   const cancelOrder = useCallback(() => {

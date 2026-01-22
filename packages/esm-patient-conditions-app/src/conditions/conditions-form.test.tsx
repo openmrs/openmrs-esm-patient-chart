@@ -29,6 +29,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
   windowProps: {},
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 function renderConditionsForm(workspaceProps?: ConditionFormProps) {
