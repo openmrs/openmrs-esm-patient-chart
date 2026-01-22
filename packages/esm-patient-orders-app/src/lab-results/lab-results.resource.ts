@@ -13,6 +13,18 @@ const labConceptRepresentation =
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
 type NullableNumber = number | null | undefined;
+
+export interface ConceptReferenceRange {
+  uuid: string;
+  concept: string;
+  lowNormal?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  hiAbsolute?: number;
+  lowCritical?: number;
+  hiCritical?: number;
+}
+
 export interface LabOrderConcept {
   uuid: string;
   display: string;
@@ -164,6 +176,38 @@ export function useLabEncounter(encounterUuid: string) {
     error: error,
     isValidating,
     mutate,
+  };
+}
+
+export function useConceptReferenceRanges(patientUuid: string, conceptUuids: Array<string>) {
+  const conceptList = conceptUuids.filter(Boolean).join(',');
+  const apiUrl =
+    patientUuid && conceptList
+      ? `${restBaseUrl}/conceptreferencerange/?patient=${patientUuid}&concept=${conceptList}&v=full`
+      : null;
+
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<ConceptReferenceRange> }>, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  const rangesMap = useMemo(() => {
+    const map = new Map<string, { lowNormal?: number; hiNormal?: number }>();
+    data?.data?.results?.forEach((range) => {
+      if (range.concept) {
+        map.set(range.concept, {
+          lowNormal: range.lowNormal,
+          hiNormal: range.hiNormal,
+        });
+      }
+    });
+    return map;
+  }, [data]);
+
+  return {
+    ranges: rangesMap,
+    isLoading,
+    error,
   };
 }
 

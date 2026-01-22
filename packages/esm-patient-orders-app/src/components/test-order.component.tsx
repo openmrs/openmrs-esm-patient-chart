@@ -14,8 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { useLabEncounter, useOrderConceptByUuid, useOrderConceptsByUuids } from '../lab-results/lab-results.resource';
-import { getObservationDisplayValue } from '../utils';
+import {
+  useLabEncounter,
+  useOrderConceptByUuid,
+  useOrderConceptsByUuids,
+  useConceptReferenceRanges,
+} from '../lab-results/lab-results.resource';
+import { getObservationDisplayValue, getEffectiveRanges } from '../utils';
 import styles from './test-order.scss';
 
 interface TestOrderProps {
@@ -28,8 +33,24 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder?.concept?.uuid);
   const { encounter, isLoading: isLoadingResult } = useLabEncounter(testOrder?.encounter?.uuid);
 
-  const tableHeaders = useMemo(
-    () => [
+  const patientUuid = encounter?.patient?.uuid;
+
+  const conceptUuids = useMemo(() => {
+    if (!concept) {
+      return [];
+    }
+    const uuids = [concept.uuid];
+    if (concept.setMembers) {
+      concept.setMembers.forEach((member) => uuids.push(member.uuid));
+    }
+    return uuids;
+  }, [concept]);
+
+  // Fetch reference ranges from the API
+  const { ranges: referenceRanges, isLoading: isLoadingRanges } = useConceptReferenceRanges(patientUuid, conceptUuids);
+
+  const tableHeaders = useMemo(() => {
+    return [
       {
         key: 'testType',
         header: testOrder?.orderType?.display || '',
@@ -40,11 +61,10 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
       },
       {
         key: 'normalRange',
-        header: t('normalRange', 'Normal range'),
+        header: t('referenceRange', 'Reference range'),
       },
-    ],
-    [t, testOrder?.orderType?.display],
-  );
+    ];
+  }, [t, testOrder?.orderType?.display]);
 
   const [testResultObs, obsUuids] = useMemo(() => {
     if (!encounter) return [[], []];
@@ -75,13 +95,18 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
             resultValue = '--';
           }
 
+          const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
+            memberConcept,
+            referenceRanges,
+          );
+
           return {
             id: memberConcept.uuid,
             testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
             result: resultValue,
             normalRange:
-              memberConcept.lowNormal != null && memberConcept.hiNormal != null
-                ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
+              effectiveLowNormal != null && effectiveHiNormal != null
+                ? `${effectiveLowNormal} - ${effectiveHiNormal}`
                 : t('notApplicable', 'Not applicable'),
           };
         });
@@ -95,19 +120,24 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         resultValue = getObservationDisplayValue(obs.value ?? obs);
       }
 
+      const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
+        concept,
+        referenceRanges,
+      );
+
       return {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
         result: resultValue,
         normalRange:
-          concept.lowNormal != null && concept.hiNormal != null
-            ? `${concept.lowNormal} - ${concept.hiNormal}`
+          effectiveLowNormal != null && effectiveHiNormal != null
+            ? `${effectiveLowNormal} - ${effectiveHiNormal}`
             : t('notApplicable', 'Not applicable'),
       };
     });
-  }, [isLoadingResult, testResultObs, conceptList, t]);
+  }, [isLoadingResult, testResultObs, conceptList, t, referenceRanges]);
 
-  if (isLoadingResultsConcepts || isLoadingResult) {
+  if (isLoadingResultsConcepts || isLoadingResult || isLoadingRanges) {
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
