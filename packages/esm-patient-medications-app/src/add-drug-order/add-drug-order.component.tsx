@@ -22,7 +22,7 @@ import {
 import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import { DrugOrderForm } from './drug-order-form.component';
-import DrugList from './drug-search/drug-list.component';
+import DrugBrowse from './drug-search/drug-browse.component';
 import DrugSearch from './drug-search/drug-search.component';
 import styles from './add-drug-order.scss';
 
@@ -164,7 +164,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         <Tabs>
           <TabList contained fullWidth>
             <Tab renderIcon={SearchIcon}>{t('search', 'Search')}</Tab>
-            <Tab renderIcon={ListCheckedIcon}>{t('list', 'List')}</Tab>
+            <Tab renderIcon={ListCheckedIcon}>{t('browse', 'Browse')}</Tab>
           </TabList>
           <div className={styles.tabPanelsWrapper}>
             <TabPanels>
@@ -177,7 +177,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
                 />
               </TabPanel>
               <TabPanel>
-                <DrugList
+                <DrugBrowse
                   patient={patient}
                   visit={visitContext}
                   closeWorkspace={closeWorkspace}

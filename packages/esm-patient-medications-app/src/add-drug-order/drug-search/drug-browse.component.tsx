@@ -5,18 +5,19 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type ConfigObject } from '../../config-schema';
-import DrugListResults from './drug-list-results.component';
-import { type ConceptSet, useConceptSets, useDrugListByConceptSet } from './drug-search.resource';
+import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
+import DrugBrowseResults from './drug-browse-results.component';
+import { type ConceptSet, useConceptSets, useDrugBrowseByConceptSet } from './drug-search.resource';
 import styles from './order-basket-search.scss';
 
-interface DrugListProps {
+interface DrugBrowseProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
   visit: Visit;
 }
 
-export default function DrugList({ openOrderForm, closeWorkspace, patient, visit }: DrugListProps) {
+export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, visit }: DrugBrowseProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -24,30 +25,45 @@ export default function DrugList({ openOrderForm, closeWorkspace, patient, visit
   const { conceptSets, isLoading: isLoadingConceptSets } = useConceptSets(drugCategoryConceptSets);
 
   const [selectedConceptSet, setSelectedConceptSet] = useState<ConceptSet | null>(null);
-  const { drugs, isLoading, error } = useDrugListByConceptSet(selectedConceptSet?.uuid);
+  const { drugs, isLoading, hasFailures } = useDrugBrowseByConceptSet(selectedConceptSet?.uuid);
 
   const onConceptSetChange = useCallback(({ selectedItem }: { selectedItem: ConceptSet }) => {
     setSelectedConceptSet(selectedItem ?? null);
   }, []);
 
+  if (conceptSets.length === 0) {
+    return (
+      <DrugBrowseEmptyState
+        title={t('noCategoriesConfigured', 'No drug categories configured')}
+        description={t(
+          'noCategoriesConfiguredDescription',
+          'To browse drugs by category, please configure drugCategoryConceptSets in the medications app config.',
+        )}
+      />
+    );
+  }
+
   return (
     <div className={styles.searchPopupContainer}>
-      <ComboBox
-        id="service-type-concept-set-combobox"
-        size="lg"
-        items={conceptSets}
-        selectedItem={selectedConceptSet}
-        itemToString={(item) => item?.display ?? ''}
-        placeholder={t('selectCategory', 'Search and select a category (e.g. Mental Health)')}
-        aria-label={t('selectCategory', 'Search and select a category (e.g. Mental Health)')}
-        onChange={onConceptSetChange}
-        disabled={isLoadingConceptSets}
-      />
+      <div className={styles.comboBoxWrapper}>
+        <ComboBox
+          id="service-type-concept-set-combobox"
+          size="lg"
+          items={conceptSets}
+          selectedItem={selectedConceptSet}
+          itemToString={(item) => item?.display ?? ''}
+          placeholder={t('selectCategory', 'Search and select a category (e.g. Mental Health)')}
+          aria-label={t('selectCategory', 'Search and select a category (e.g. Mental Health)')}
+          titleText={t('browseDrugsByCategory', 'Browse drugs by category')}
+          onChange={onConceptSetChange}
+          disabled={isLoadingConceptSets}
+        />
+      </div>
 
-      <DrugListResults
+      <DrugBrowseResults
         drugs={drugs}
         isLoading={isLoading}
-        error={error}
+        isError={hasFailures}
         patient={patient}
         visit={visit}
         closeWorkspace={closeWorkspace}

@@ -5,14 +5,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import classNames from 'classnames';
+import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
 import { type DrugSearchResult } from './drug-search.resource';
 import { DrugSearchResultItem } from './order-basket-search-results.component';
 import styles from './order-basket-search-results.scss';
 
-interface DrugListResultsProps {
+interface DrugBrowseResultsProps {
   drugs: DrugSearchResult[];
   isLoading: boolean;
-  error?: Error;
+  isError?: boolean;
   hasSelection: boolean;
   patient: fhir.Patient;
   visit: Visit;
@@ -20,37 +21,39 @@ interface DrugListResultsProps {
   openOrderForm: (item: DrugOrderBasketItem) => void;
 }
 
-export default function DrugListResults({
+export default function DrugBrowseResults({
   drugs,
   isLoading,
-  error,
+  isError = false,
   hasSelection,
   patient,
   visit,
   closeWorkspace,
   openOrderForm,
-}: DrugListResultsProps) {
+}: DrugBrowseResultsProps) {
   const { t } = useTranslation();
 
   if (isLoading) {
-    return <DrugListSkeleton />;
+    return <DrugBrowseSkeleton />;
   }
 
-  if (error) {
-    return <Tile>{t('errorFetchingDrugList', 'Error fetching drugs')}</Tile>;
+  if (isError) {
+    return <Tile>{t('errorFetchingDrugCategory', 'Error fetching drugs')}</Tile>;
   }
 
-  if (!drugs?.length && hasSelection) {
-    return (
-      <Tile className={styles.emptyState}>
-        <div>
-          <h4 className={styles.productiveHeading01}>{t('noResultsForDrugList', 'No results to display')}</h4>
-          <p className={styles.bodyShort01}>
-            <span>{t('tryToSelectOtherOption', 'Try to select another option')}</span>
-          </p>
-        </div>
-      </Tile>
-    );
+  if (!drugs?.length) {
+    const emptyStateTitle = hasSelection
+      ? t('noDrugsInCategory', 'No drugs found in this category')
+      : t('chooseCategoryToGetStarted', 'Choose a category to get started');
+
+    const emptyStateDescription = hasSelection
+      ? t(
+          'noDrugsInCategoryDescription',
+          'The drug category you selected does not contain any drugs. Please select a different category.',
+        )
+      : t('chooseCategoryToGetStartedDescription', 'Select a category to see available drugs.');
+
+    return <DrugBrowseEmptyState title={emptyStateTitle} description={emptyStateDescription} />;
   }
 
   return (
@@ -71,7 +74,7 @@ export default function DrugListResults({
   );
 }
 
-function DrugListSkeleton() {
+function DrugBrowseSkeleton() {
   const isTablet = useLayoutType() === 'tablet';
   const tileClassName = classNames({
     [styles.tabletSearchResultTile]: isTablet,
