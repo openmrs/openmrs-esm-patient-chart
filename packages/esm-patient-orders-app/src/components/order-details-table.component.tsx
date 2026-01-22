@@ -679,6 +679,11 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
   }, [orderItem, patient]);
 
+  // No actions available for declined orders
+  if (isDeclined) {
+    return null;
+  }
+
   return (
     <Layer className={styles.layer}>
       <OverflowMenu
@@ -690,12 +695,12 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       >
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || isDeclined}
+          disabled={alreadyInBasket}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
           onClick={handleModifyOrder}
         />
-        {orderItem?.type === ORDER_TYPES.TEST_ORDER && !isDeclined && (
+        {orderItem?.type === ORDER_TYPES.TEST_ORDER && (
           <OverflowMenuItem
             className={styles.menuItem}
             disabled={alreadyInBasket}
@@ -710,7 +715,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         )}
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE' || isDeclined}
+          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE'}
           hasDivider
           id="discontinue"
           isDelete
