@@ -581,6 +581,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
 function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
+  const isDeclined = orderItem.fulfillerStatus === 'DECLINED';
 
   // Use the appropriate grouping key and postDataPrepFunction based on order type
   const getOrderBasketConfig = useCallback(() => {
@@ -677,6 +678,11 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
   }, [orderItem, patient]);
+
+  // No actions available for declined orders
+  if (isDeclined) {
+    return null;
+  }
 
   return (
     <Layer className={styles.layer}>
