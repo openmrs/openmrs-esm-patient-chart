@@ -50,7 +50,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 medications={activeOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
-                showReorderButton={false}
+                showRenewButton={true}
                 patient={patient}
               />
             );
@@ -77,7 +77,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 showAddButton={false}
                 showDiscontinueButton={false}
                 showModifyButton={false}
-                showReorderButton={true}
+                showRenewButton={true}
                 patient={patient}
               />
             );

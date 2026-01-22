@@ -72,6 +72,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
   launchChildWorkspace: jest.fn(),
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 const defaultVisitLocation = {

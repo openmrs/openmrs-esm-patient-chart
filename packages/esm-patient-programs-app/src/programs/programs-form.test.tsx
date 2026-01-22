@@ -43,6 +43,7 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   windowProps: {},
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 jest.mock('./programs.resource', () => ({
