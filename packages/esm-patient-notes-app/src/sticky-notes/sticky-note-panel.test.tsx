@@ -6,31 +6,17 @@ import StickyNotePanel from './sticky-note-panel';
 import { mockStickyNotesData } from '__mocks__';
 import { createStickyNote, updateStickyNote, useStickyNotes } from './resources';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
-  showSnackbar: jest.fn(),
-  formatDate: jest.fn((date) => date.toDateString()),
-  getCoreTranslation: jest.fn((key) => key),
-}));
-
 jest.mock('./resources', () => ({
   useStickyNotes: jest.fn(),
   createStickyNote: jest.fn(),
   updateStickyNote: jest.fn(),
 }));
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, defaultValue?: string) => defaultValue || key,
-  }),
-}));
-
-const mockUseStickyNotes = useStickyNotes as jest.Mock;
-const mockCreateStickyNote = createStickyNote as jest.Mock;
-const mockUpdateStickyNote = updateStickyNote as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
-const mockShowSnackbar = showSnackbar as jest.Mock;
+const mockUseStickyNotes = jest.mocked(useStickyNotes);
+const mockCreateStickyNote = jest.mocked(createStickyNote);
+const mockUpdateStickyNote = jest.mocked(updateStickyNote);
+const mockUseConfig = jest.mocked(useConfig);
+const mockShowSnackbar = jest.mocked(showSnackbar);
 
 describe('StickyNotePanel', () => {
   const patientUuid = 'patient-uuid';
@@ -47,6 +33,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: [],
       isLoading: true,
+      isError: undefined,
       mutate: jest.fn(),
     });
 
@@ -58,6 +45,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: [],
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
 
@@ -72,6 +60,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: mockStickyNotesData,
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
 
@@ -86,6 +75,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: mockStickyNotesData,
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
 
@@ -104,6 +94,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: mockStickyNotesData,
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
 
@@ -121,16 +112,17 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: [],
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
-    mockCreateStickyNote.mockResolvedValue({});
+    mockCreateStickyNote.mockResolvedValue({} as any);
 
     render(<StickyNotePanel patientUuid={patientUuid} onClose={onClose} />);
 
     const textArea = screen.getByLabelText('Sticky Note');
     await user.type(textArea, 'New note content');
 
-    const saveButton = screen.getByRole('button', { name: 'save' });
+    const saveButton = screen.getByRole('button', { name: /save/i });
     await user.click(saveButton);
 
     expect(mockCreateStickyNote).toHaveBeenCalledWith(patientUuid, 'New note content', 'concept-uuid');
@@ -142,9 +134,10 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: mockStickyNotesData,
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
-    mockUpdateStickyNote.mockResolvedValue({});
+    mockUpdateStickyNote.mockResolvedValue({} as any);
 
     render(<StickyNotePanel patientUuid={patientUuid} onClose={onClose} />);
 
@@ -155,7 +148,7 @@ describe('StickyNotePanel', () => {
     await user.clear(textArea);
     await user.type(textArea, 'Updated note content');
 
-    const saveButton = screen.getByRole('button', { name: 'save' });
+    const saveButton = screen.getByRole('button', { name: /save/i });
     await user.click(saveButton);
 
     expect(mockUpdateStickyNote).toHaveBeenCalledWith(
@@ -172,6 +165,7 @@ describe('StickyNotePanel', () => {
     mockUseStickyNotes.mockReturnValue({
       notes: [],
       isLoading: false,
+      isError: undefined,
       mutate: jest.fn(),
     });
     mockCreateStickyNote.mockRejectedValue(new Error('Failed'));
@@ -181,7 +175,7 @@ describe('StickyNotePanel', () => {
     const textArea = screen.getByLabelText('Sticky Note');
     await user.type(textArea, 'New note content');
 
-    const saveButton = screen.getByRole('button', { name: 'save' });
+    const saveButton = screen.getByRole('button', { name: /save/i });
     await user.click(saveButton);
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
