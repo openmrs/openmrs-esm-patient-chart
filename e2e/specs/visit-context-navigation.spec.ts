@@ -82,7 +82,7 @@ test('Visit context clears when navigating from patient with visit to patient wi
   });
 
   await test.step('And visit-dependent actions should prompt for visit creation', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
     await expect(page.getByText(/no active visit/i)).toBeVisible();
   });
 
