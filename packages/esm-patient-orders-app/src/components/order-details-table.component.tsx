@@ -109,14 +109,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
   // UI-controlled date range
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([new Date(), new Date()]);
   // Derived API filter dates (ISO strings)
   const [startDate, endDate] = dateRange;
-  const selectedFromDate = useMemo(
-    () => (startDate ? dayjs(startDate).startOf('day').toISOString() : null),
-    [startDate],
-  );
-  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).endOf('day').toISOString() : null), [endDate]);
+  const selectedFromDate = useMemo(() => (startDate ? dayjs(startDate).format('YYYY-MM-DD') : null), [startDate]);
+  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).format('YYYY-MM-DD') : null), [endDate]);
 
   const selectedOrderType = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid);
 
@@ -584,6 +581,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
 function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
+  const isDeclined = orderItem.fulfillerStatus === 'DECLINED';
 
   // Use the appropriate grouping key and postDataPrepFunction based on order type
   const getOrderBasketConfig = useCallback(() => {
@@ -680,6 +678,11 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
   }, [orderItem, patient]);
+
+  // No actions available for declined orders
+  if (isDeclined) {
+    return null;
+  }
 
   return (
     <Layer className={styles.layer}>

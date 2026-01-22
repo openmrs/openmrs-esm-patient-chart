@@ -31,6 +31,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
   windowProps: {},
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 const mockPatientListData = [
