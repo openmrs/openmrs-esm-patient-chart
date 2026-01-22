@@ -1,9 +1,9 @@
 {
-  "name": "@openmrs/esm-form-engine-app",
-  "version": "11.3.0",
+  "name": "@openmrs/esm-patient-growth-chart-app",
+  "version": "1.0.0",
   "license": "MPL-2.0",
-  "description": "Wrapper ESM for the O3 React Form Engine",
-  "browser": "dist/openmrs-esm-form-engine-app.js",
+  "description": "patient-growth-chart-app frontend module for O3",
+  "browser": "dist/openmrs-esm-patient-growth-chart-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {
@@ -37,13 +37,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.83.0",
-    "@openmrs/esm-form-engine-lib": "next",
-    "lodash-es": "^4.17.21",
-    "lodash.findlast": "^4.6.0",
-    "react-error-boundary": "^4.0.13",
-    "tabbable": "^6.2.0",
-    "use-resize-observer": "^9.1.0"
+    "@carbon/react": "^1.83.0"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",
@@ -52,10 +46,12 @@
     "react": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
+    "rxjs": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "webpack": "^5.99.9"
-  }
+  },
+  "packageManager": "yarn@4.10.3"
 }
