@@ -5055,7 +5055,11 @@ export const mockFhirVitalsResponse = {
 
 export const mockBiometricsConfig = {
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-  biometrics: { bmiUnit: 'kg / m²' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    restrictBmiForMinors: false,
+    bmiRestrictionMinAge: 18,
+  },
 };
 
 export const mockVitalsConfig = {

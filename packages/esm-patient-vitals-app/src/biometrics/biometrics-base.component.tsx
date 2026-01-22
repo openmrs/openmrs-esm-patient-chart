@@ -54,12 +54,16 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
     },
-    showBmi && {
-      key: 'bmiRender',
-      header: `${t('bmi', 'BMI')} (${bmiUnit})`,
-      isSortable: true,
-      sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
-    },
+    ...(showBmi
+      ? [
+          {
+            key: 'bmiRender' as const,
+            header: `${t('bmi', 'BMI')} (${bmiUnit})`,
+            isSortable: true,
+            sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
+          },
+        ]
+      : []),
     {
       key: 'muacRender',
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),

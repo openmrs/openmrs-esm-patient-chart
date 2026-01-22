@@ -205,13 +205,13 @@ export const shouldShowBmi = (patient: fhir.Patient, biometricsConfig: Biometric
     return true;
   }
 
-  const age = getPatientAge(patient);
+  const patientAge = getPatientAge(patient);
 
-  if (age === null) {
+  if (patientAge === null) {
     return true;
   }
 
   const minAge = Math.max(0, biometricsConfig.bmiRestrictionMinAge ?? 18);
 
-  return age >= minAge;
+  return patientAge >= minAge;
 };

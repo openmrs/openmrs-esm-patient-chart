@@ -414,6 +414,43 @@ describe('VitalsBiometricsForm', () => {
       title: 'Error saving Vitals and Biometrics',
     });
   });
+
+  it('hides BMI field when restrictBmiForMinors is enabled and patient is a minor', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      biometrics: {
+        ...getDefaultsFromConfigSchema(configSchema).biometrics,
+        ...mockVitalsConfig.biometrics,
+        restrictBmiForMinors: true,
+        bmiRestrictionMinAge: 18,
+      },
+    } as ConfigObject);
+
+    const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        patient: minorPatient,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    // BMI field should not be present
+    expect(screen.queryByText(/bmi \(calc.\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other biometrics fields should still be present
+    expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
+  });
 });
 
 function renderVitalsAndBiometricsForm(formContext?: 'creating' | 'editing', editEncounterUuid?: string) {
