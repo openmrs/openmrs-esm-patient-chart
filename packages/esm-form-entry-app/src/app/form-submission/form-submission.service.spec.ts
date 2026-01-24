@@ -5,29 +5,12 @@ import { throwError as observableThrowError, of } from 'rxjs';
 import { FormSubmissionService } from './form-submission.service';
 import { OpenmrsApiModule } from '../openmrs-api/openmrs-api.module';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import { PersonAttribuAdapter, Form, EncounterAdapter, FormEntryModule } from '@openmrs/ngx-formentry';
+import { PersonAttributeAdapter, Form, EncounterAdapter, FormEntryModule } from '@openmrs/ngx-formentry';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 
 describe('Service: FormSubmissionService', () => {
-  // sample field error
-  const sampleFieldError: any = {
-    error: {
-      message: 'Invalid Submission',
-      code: 'webservices.rest.error.invalid.submission',
-      globalErrors: [],
-      fieldErrors: {
-        encounterDatetime: [
-          {
-            code: 'Encounter.datetimeShouldBeInVisitDatesRange',
-            message: 'The encounter datetime should be between the visit start and stop dates.',
-          },
-        ],
-      },
-    },
-  };
-
   // sample payload
   const sampleEncounterPayload: any = {
     encounterType: '8d5b2be0-c2cc-11de-8d13-0010c6dffd0f',
@@ -63,7 +46,7 @@ describe('Service: FormSubmissionService', () => {
       providerUuid: 'providerUuid',
       utcOffset: '+0300',
     },
-    searchNodeByQuestionId: (param) => {
+    searchNodeByQuestionId: (_param) => {
       return [];
     },
   } as Form;
@@ -94,31 +77,31 @@ describe('Service: FormSubmissionService', () => {
   });
 
   it('should submit payload when supplied with a valid form object:: New Form', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
       encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
-        return of(payload);
+      spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // spy personResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
-        return of(payload);
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return sampleEncounterPayload;
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return [
           {
             attributeType: 'attribute-type-uuid',
@@ -134,31 +117,31 @@ describe('Service: FormSubmissionService', () => {
   ));
 
   it('should submit payload when supplied with a valid form object:: Editting Form', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
       encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
-        return of(payload);
+      spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // spy personResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
-        return of(payload);
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return sampleEncounterPayload;
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return [
           {
             attributeType: 'attribute-type-uuid',
@@ -174,25 +157,25 @@ describe('Service: FormSubmissionService', () => {
   ));
 
   it('should not submit personAttribute payload if generated payload is null or empty', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
-      encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      _encounterResourceService: EncounterResourceService,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
-        return of(payload);
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
+        return of({} as any);
       });
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return {}; // setting it to empty
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return []; // setting it to empty
       });
       // renderable form has no obs, no orders, no encounter and no person attribute
@@ -204,30 +187,36 @@ describe('Service: FormSubmissionService', () => {
   it(
     'should not submit encounter payload if generated payload is null or empty' + ' :: Case when creating new form',
     inject(
-      [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+      [
+        FormSubmissionService,
+        EncounterResourceService,
+        PersonAttributeAdapter,
+        EncounterAdapter,
+        PersonResourceService,
+      ],
       (
         formSchemaService: FormSubmissionService,
         encounterResourceService: EncounterResourceService,
-        personAttribuAdapter: PersonAttribuAdapter,
+        personAttributeAdapter: PersonAttributeAdapter,
         encounterAdapter: EncounterAdapter,
-        personResourceService: PersonResourceService,
+        _personResourceService: PersonResourceService,
       ) => {
         // case when creating new encounter
-        spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
-          return of(payload);
+        spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
+          return of({} as any);
         });
 
         // case when creating new encounter
-        spyOn(encounterResourceService, 'updateEncounter').and.callFake((payload) => {
-          return of(payload);
+        spyOn(encounterResourceService, 'updateEncounter').and.callFake((_payload) => {
+          return of({} as any);
         });
         // encounter adaptor
-        spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+        spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
           return {};
         });
 
         // person attributes adaptor
-        spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+        spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
           return [];
         });
         // renderable form has no obs, no orders, no encounter
@@ -242,30 +231,36 @@ describe('Service: FormSubmissionService', () => {
     'should not submit encounter payload if generated payload is null or empty' +
       ' :: Case when editting existing form',
     inject(
-      [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+      [
+        FormSubmissionService,
+        EncounterResourceService,
+        PersonAttributeAdapter,
+        EncounterAdapter,
+        PersonResourceService,
+      ],
       (
         formSchemaService: FormSubmissionService,
         encounterResourceService: EncounterResourceService,
-        personAttribuAdapter: PersonAttribuAdapter,
+        personAttributeAdapter: PersonAttributeAdapter,
         encounterAdapter: EncounterAdapter,
-        personResourceService: PersonResourceService,
+        _personResourceService: PersonResourceService,
       ) => {
         // case when creating new encounter
-        spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
-          return of(payload);
+        spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
+          return of({} as any);
         });
 
         // case when creating new encounter
-        spyOn(encounterResourceService, 'updateEncounter').and.callFake((payload) => {
-          return of(payload);
+        spyOn(encounterResourceService, 'updateEncounter').and.callFake((_payload) => {
+          return of({} as any);
         });
         // encounter adaptor
-        spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+        spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
           return {};
         });
 
         // person attributes adaptor
-        spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+        spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
           return [];
         });
         // renderable form has no obs, no orders, no encounter
@@ -278,32 +273,32 @@ describe('Service: FormSubmissionService', () => {
   );
 
   it('should throw error when encounter payload fails to save', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
       encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
+      spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
         // throw an error
         return observableThrowError(sampleSubmissionError);
       });
 
       // spy personResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
-        return of(payload);
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return sampleEncounterPayload;
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return [
           {
             attributeType: 'attribute-type-uuid',
@@ -316,7 +311,7 @@ describe('Service: FormSubmissionService', () => {
       let formSubmissionSuccesIndicator = false;
       let submissionError: any = null;
       formSchemaService.submitPayload(renderableForm as Form).subscribe(
-        (responses: Array<any>) => {
+        (_response) => {
           formSubmissionSuccesIndicator = true;
           submissionError = null;
           // tslint:disable-next-line:no-unused-expression
@@ -339,32 +334,32 @@ describe('Service: FormSubmissionService', () => {
   ));
 
   it('should throw error when personAttribute payload fails to save', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
       encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
-        return of(payload);
+      spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
+        return of({} as any);
       });
 
       // spy personResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
         // Throw an error
         return observableThrowError(sampleSubmissionError);
       });
 
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return sampleEncounterPayload;
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return [
           {
             attributeType: 'attribute-type-uuid',
@@ -377,7 +372,7 @@ describe('Service: FormSubmissionService', () => {
       let formSubmissionSuccesIndicator = false;
       let submissionError: any = null;
       formSchemaService.submitPayload(renderableForm as Form).subscribe(
-        (responses: Array<any>) => {
+        (_response) => {
           formSubmissionSuccesIndicator = true;
           submissionError = null;
           // tslint:disable-next-line:no-unused-expression
@@ -400,33 +395,33 @@ describe('Service: FormSubmissionService', () => {
   ));
 
   it('should throw error when all payloads fail to save', inject(
-    [FormSubmissionService, EncounterResourceService, PersonAttribuAdapter, EncounterAdapter, PersonResourceService],
+    [FormSubmissionService, EncounterResourceService, PersonAttributeAdapter, EncounterAdapter, PersonResourceService],
     (
       formSchemaService: FormSubmissionService,
       encounterResourceService: EncounterResourceService,
-      personAttribuAdapter: PersonAttribuAdapter,
+      personAttributeAdapter: PersonAttributeAdapter,
       encounterAdapter: EncounterAdapter,
       personResourceService: PersonResourceService,
     ) => {
       // spy encounterResourceService
-      spyOn(encounterResourceService, 'saveEncounter').and.callFake((payload) => {
+      spyOn(encounterResourceService, 'saveEncounter').and.callFake((_payload) => {
         // Throw an error
         return observableThrowError(sampleSubmissionError);
       });
 
       // spy personResourceService
-      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((payload) => {
+      spyOn(personResourceService, 'saveUpdatePerson').and.callFake((_payload) => {
         // Throw an error
         return observableThrowError(sampleSubmissionError);
       });
 
       // encounter adaptor
-      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(encounterAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return sampleEncounterPayload;
       });
 
       // person attributes adaptor
-      spyOn(personAttribuAdapter, 'generateFormPayload').and.callFake((payload) => {
+      spyOn(personAttributeAdapter, 'generateFormPayload').and.callFake((_payload) => {
         return [
           {
             attributeType: 'attribute-type-uuid',
@@ -439,7 +434,7 @@ describe('Service: FormSubmissionService', () => {
       let formSubmissionSuccesIndicator = false;
       let submissionError: any = null;
       formSchemaService.submitPayload(renderableForm as Form).subscribe(
-        (responses: Array<any>) => {
+        (_response) => {
           formSubmissionSuccesIndicator = true;
           submissionError = null;
           // tslint:disable-next-line:no-unused-expression
