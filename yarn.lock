@@ -4912,7 +4912,7 @@ __metadata:
     "@ng-select/ng-select": "npm:^14.0.0"
     "@ngx-translate/core": "npm:^16.0.4"
     "@openmrs/ngx-file-uploader": "npm:^19.0.0"
-    "@openmrs/ngx-formentry": "npm:^19.0.1-pre.497"
+    "@openmrs/ngx-formentry": "npm:next"
     "@schematics/angular": "npm:^19.2.0"
     "@types/jasmine": "npm:^5.1.8"
     "@types/node": "npm:^22.15.30"
@@ -5597,7 +5597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/ngx-formentry@npm:^19.0.1-pre.497":
+"@openmrs/ngx-formentry@npm:next":
   version: 19.0.1-pre.497
   resolution: "@openmrs/ngx-formentry@npm:19.0.1-pre.497"
   dependencies:
