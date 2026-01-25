@@ -1,5 +1,6 @@
 import {
   type Concept,
+  type Encounter,
   openmrsFetch,
   type OpenmrsResource,
   parseDate,
@@ -7,20 +8,28 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { type OrderBasketStore, orderBasketStore } from './store';
-import type {
-  DrugOrderPost,
-  TestOrderPost,
-  ExtractedOrderErrorObject,
-  OrderBasketItem,
-  OrderErrorObject,
-  OrderPost,
-} from './types';
+import type { ExtractedOrderErrorObject, Order, OrderBasketItem, OrderErrorObject, OrderPost } from './types';
+
+function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string) {
+  const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
+  const patientItems = items[patientUuid];
+
+  const orders: Array<OrderPost> = [];
+  Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
+    groupOrders.forEach((order) => {
+      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null, ordererUuid));
+    });
+  });
+
+  return orders;
+}
 
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
   orderEncounterType: string,
   currentVisit: Visit | null,
-  sessionLocationUuid: string,
+  orderLocationUuid: string,
+  ordererUuid: string,
   abortController?: AbortController,
 
   /**
@@ -29,34 +38,19 @@ export async function postOrdersOnNewEncounter(
    */
   encounterDate?: Date,
 ) {
-  const now = new Date();
-  const visitStartDate = parseDate(currentVisit?.startDatetime);
-  const visitEndDate = parseDate(currentVisit?.stopDatetime);
   if (!encounterDate) {
-    if (!currentVisit || (visitStartDate < now && (!visitEndDate || visitEndDate > now))) {
-      encounterDate = now;
+    if (currentVisit?.stopDatetime) {
+      encounterDate = parseDate(currentVisit.startDatetime);
     } else {
-      console.warn(
-        'postOrdersOnNewEncounter received an active visit that is not currently active. This is a programming error. Attempting to place the order using the visit start date.',
-      );
-      encounterDate = visitStartDate;
+      encounterDate = new Date();
     }
   }
 
-  const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
-  const patientItems = items[patientUuid];
-
-  const orders: Array<DrugOrderPost | TestOrderPost> = [];
-
-  Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
-    groupOrders.forEach((order) => {
-      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null));
-    });
-  });
+  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
 
   const encounterPostData: EncounterPost = {
     patient: patientUuid,
-    location: sessionLocationUuid,
+    location: orderLocationUuid,
     encounterType: orderEncounterType,
     encounterDatetime: encounterDate,
     visit: currentVisit?.uuid,
@@ -82,46 +76,63 @@ export interface EncounterPost {
 }
 
 export async function postEncounter(encounterPostData: EncounterPost, abortController?: AbortController) {
-  return openmrsFetch<OpenmrsResource>(`${restBaseUrl}/encounter`, {
+  return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
     body: encounterPostData,
     signal: abortController?.signal,
-  }).then((res) => res?.data?.uuid);
+  }).then((res) => res?.data);
 }
 
-export async function postOrders(patientUuid: string, encounterUuid: string, abortController: AbortController) {
+export async function postOrders(
+  patientUuid: string,
+  encounterUuid: string,
+  abortController: AbortController,
+  ordererUuid: string,
+) {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
   const erroredItems: Array<OrderBasketItem> = [];
-  for (let grouping in patientItems) {
+  const postedOrders: Array<Order> = [];
+  const promises: Array<Promise<void>> = [];
+
+  for (const grouping in patientItems) {
     const orders = patientItems[grouping];
+    const dataPrepFn = postDataPrepFunctions[grouping];
+
+    if (typeof dataPrepFn !== 'function') {
+      console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
+      continue;
+    }
+
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      const dataPrepFn = postDataPrepFunctions[grouping];
 
-      if (typeof dataPrepFn !== 'function') {
-        console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
-        continue;
-      }
-
-      await postOrder(dataPrepFn(order, patientUuid, encounterUuid), abortController).catch((error) => {
-        erroredItems.push({
-          ...order,
-          orderError: error,
-          extractedOrderError: extractErrorDetails(error),
+      const promise = postOrder(dataPrepFn(order, patientUuid, encounterUuid, ordererUuid), abortController)
+        .then((response) => {
+          postedOrders.push(response.data);
+        })
+        .catch((error) => {
+          erroredItems.push({
+            ...order,
+            orderError: error,
+            extractedOrderError: extractErrorDetails(error),
+          });
         });
-      });
+
+      promises.push(promise);
     }
   }
-  return erroredItems;
+  await Promise.allSettled(promises);
+
+  return { postedOrders, erroredItems };
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/order`, {
+  return openmrsFetch<Order>(`${restBaseUrl}/order`, {
     method: 'POST',
     signal: abortController?.signal,
     headers: { 'Content-Type': 'application/json' },

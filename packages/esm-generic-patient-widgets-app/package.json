@@ -13,7 +13,7 @@
     "build": "webpack --mode production --color",
     "analyze": "webpack --mode=production --env analyze=true",
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
+    "test": "cross-env TZ=UTC DEBUG_PRINT_LIMIT=100000 jest --config jest.config.js --verbose false --passWithNoTests --color",
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
@@ -39,7 +39,7 @@
   "dependencies": {
     "@carbon/charts-react": "^1.27.0",
     "@carbon/react": "^1.83.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.23"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "8.x",

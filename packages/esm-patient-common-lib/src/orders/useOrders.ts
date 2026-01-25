@@ -15,6 +15,9 @@ export const drugCustomRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
+export const orderCustomRepresentation =
+  'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,fulfillerStatus)';
+
 export function usePatientOrders(
   patientUuid: string,
   status?: Status,
@@ -23,10 +26,11 @@ export function usePatientOrders(
   endDate?: string,
 ) {
   const { mutate } = useSWRConfig();
+  const activeStatusParams = status === 'ACTIVE' ? '&excludeCanceledAndExpired=true' : '';
   const baseOrdersUrl =
     startDate && endDate
-      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=default&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}&excludeDiscontinueOrders=true`
-      : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=default&status=${status}&excludeDiscontinueOrders=true`;
+      ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${orderCustomRepresentation}&activatedOnOrAfterDate=${startDate}&activatedOnOrBeforeDate=${endDate}&excludeDiscontinueOrders=true${activeStatusParams}`
+      : `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${orderCustomRepresentation}&status=${status}&excludeDiscontinueOrders=true`;
   const ordersUrl = orderType ? `${baseOrdersUrl}&orderTypes=${orderType}` : baseOrdersUrl;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(

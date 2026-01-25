@@ -81,6 +81,15 @@ const mockEncounters = [
 
 const mockUseObs = jest.mocked(useObs);
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+afterEach(async () => {
+  // Flush any pending setTimeout callbacks from handleSorting
+  await new Promise((resolve) => setTimeout(resolve, 0));
+});
+
 describe('ObsSwitchable', () => {
   it('should render all obs in table and numeric obs in graph', async () => {
     mockUseObs.mockReturnValue({
@@ -91,7 +100,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [
         {
@@ -116,17 +125,17 @@ describe('ObsSwitchable', () => {
     expect(headerRow).toHaveTextContent('Chief Complaint');
     expect(headerRow).toHaveTextContent('Power Level');
     const firstRow = screen.getAllByRole('row')[1];
-    expect(firstRow).toHaveTextContent('Jan');
-    expect(firstRow).toHaveTextContent('180');
-    expect(firstRow).toHaveTextContent('70');
-    expect(firstRow).toHaveTextContent('Too strong');
-    expect(firstRow).toHaveTextContent('9001');
+    expect(firstRow).toHaveTextContent('Feb');
+    expect(firstRow).toHaveTextContent('182');
+    expect(firstRow).toHaveTextContent('72');
+    expect(firstRow).toHaveTextContent('--');
+    expect(firstRow).toHaveTextContent('--');
     const secondRow = screen.getAllByRole('row')[2];
-    expect(secondRow).toHaveTextContent('Feb');
-    expect(secondRow).toHaveTextContent('182');
-    expect(secondRow).toHaveTextContent('72');
-    expect(secondRow).toHaveTextContent('--');
-    expect(secondRow).toHaveTextContent('--');
+    expect(secondRow).toHaveTextContent('Jan');
+    expect(secondRow).toHaveTextContent('180');
+    expect(secondRow).toHaveTextContent('70');
+    expect(secondRow).toHaveTextContent('Too strong');
+    expect(secondRow).toHaveTextContent('9001');
 
     const user = userEvent.setup();
     const chartViewButton = screen.getByLabelText('Chart view');
@@ -182,6 +191,86 @@ describe('ObsSwitchable', () => {
     );
   });
 
+  it('should sort by date and by obs correctly', async () => {
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      data: [
+        {
+          concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          label: 'Tallitude',
+        },
+        {
+          concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+        { concept: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+        { concept: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+      ],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    const user = userEvent.setup();
+
+    // Initial state: newest first (Feb before Jan)
+    const firstRowInitial = screen.getAllByRole('row')[1];
+    expect(firstRowInitial).toHaveTextContent('01 — Feb — 2021');
+    const secondRowInitial = screen.getAllByRole('row')[2];
+    expect(secondRowInitial).toHaveTextContent('01 — Jan — 2021');
+
+    const dateHeader = screen.getByText('Date and time');
+
+    // First click: toggles to ASC (oldest first: Jan before Feb)
+    await user.click(dateHeader);
+    await waitFor(() => {
+      const firstRow = screen.getAllByRole('row')[1];
+      expect(firstRow).toHaveTextContent('01 — Jan — 2021');
+    });
+    const secondRow = screen.getAllByRole('row')[2];
+    expect(secondRow).toHaveTextContent('01 — Feb — 2021');
+
+    // Second click: toggles back to DESC (newest first: Feb before Jan)
+    await user.click(dateHeader);
+    await waitFor(() => {
+      const firstRow2 = screen.getAllByRole('row')[1];
+      expect(firstRow2).toHaveTextContent('01 — Feb — 2021');
+    });
+    const secondRow2 = screen.getAllByRole('row')[2];
+    expect(secondRow2).toHaveTextContent('01 — Jan — 2021');
+  });
+
+  it('supports table sorting oldest to newest', async () => {
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+      tableSortOldestFirst: true,
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    // Initial state with tableSortOldestFirst: oldest first (Jan before Feb)
+    const firstRowInitial = screen.getAllByRole('row')[1];
+    expect(firstRowInitial).toHaveTextContent('01 — Jan — 2021');
+    const secondRowInitial = screen.getAllByRole('row')[2];
+    expect(secondRowInitial).toHaveTextContent('01 — Feb — 2021');
+  });
+
   it('should support showing graph tab by default', async () => {
     mockUseObs.mockReturnValue({
       data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
@@ -191,7 +280,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, { concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
       showGraphByDefault: true,
@@ -225,7 +314,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       showGraphByDefault: true,
       data: [
@@ -280,7 +369,7 @@ describe('ObsSwitchable', () => {
       mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
-      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
       title: 'My Stats',
       showGraphByDefault: true,
       data: [{ concept: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],

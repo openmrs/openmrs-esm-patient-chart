@@ -32,9 +32,7 @@ import {
   parseDate,
   showSnackbar,
   useConfig,
-  useFeatureFlag,
   useLayoutType,
-  useSession,
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
@@ -51,31 +49,21 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { type Provider, useActivePatientOrders, useProviders } from '../api';
+import { useActivePatientOrders } from '../api';
 import styles from './drug-order-form.scss';
-import {
-  drugOrderBasketItemToFormValue,
-  type MedicationOrderFormData,
-  useDrugOrderForm,
-} from './drug-order-form.resource';
-import DrugSearchComboBox from './drug-search/drug-search-combobox.component';
+import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
 export interface DrugOrderFormProps {
-  initialOrderBasketItem: DrugOrderBasketItem;
+  /**
+   * This is either an order pending in the order basket, or an existing order saved to the backend for editing.
+   */
+  initialOrderBasketItem: DrugOrderBasketItem | null;
   patient: fhir.Patient;
   visitContext: Visit;
   onSave: (finalizedOrder: DrugOrderBasketItem) => Promise<void>;
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
-
-  /**
-   * If true, allows user to select the prescribing provider when ordering medications from the order basket.
-   * (Otherwise, the prescribing provider always defaults to the current user.)
-   * The `prescriberProviderRoles` config must be set for this to work properly.
-   */
-  allowSelectingPrescribingClinician: boolean;
-  allowSelectingDrug: boolean;
 }
 
 function MedicationInfoHeader({
@@ -125,37 +113,21 @@ function InputWrapper({ children }) {
 }
 
 export function DrugOrderForm({
-  initialOrderBasketItem,
+  initialOrderBasketItem: initialOrderBasketItem,
   patient,
   onSave,
   saveButtonText,
   onCancel,
-  allowSelectingPrescribingClinician,
-  allowSelectingDrug,
   visitContext,
   workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit, prescriberProviderRoles } = useConfig<ConfigObject>();
+  const { daysDurationUnit } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
-  const isProviderManagementModuleInstalled = useFeatureFlag('providermanagement-module');
-  const allowAndSupportSelectingPrescribingClinician =
-    isProviderManagementModuleInstalled && allowSelectingPrescribingClinician;
-
-  const {
-    data: providers,
-    isLoading: isLoadingProviders,
-    error: errorLoadingProviders,
-  } = useProviders(allowAndSupportSelectingPrescribingClinician ? prescriberProviderRoles : null);
   const [isSaving, setIsSaving] = useState(false);
-
-  const { currentProvider } = useSession();
-  const defaultPrescribingProvider = allowAndSupportSelectingPrescribingClinician
-    ? providers?.find((p) => p.uuid === currentProvider.uuid)
-    : currentProvider;
-  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, defaultPrescribingProvider?.uuid);
+  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
   const {
     control,
     formState: { isDirty },
@@ -198,11 +170,9 @@ export function DrugOrderForm({
   const startDate = watch('startDate');
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
-    const newBasketItems = {
+    const newBasketItem = {
       ...initialOrderBasketItem,
       drug: data.drug,
-      orderer: data.orderer.uuid,
-      careSetting: data.careSetting,
       isFreeTextDosage: data.isFreeTextDosage,
       freeTextDosage: data.freeTextDosage,
       dosage: data.dosage,
@@ -219,9 +189,14 @@ export function DrugOrderForm({
       indication: data.indication,
       frequency: data.frequency,
       startDate: data.startDate,
+      action: initialOrderBasketItem?.action ?? 'NEW',
+      commonMedicationName: data.drug.display,
+      display: data.drug.display,
+      visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
+
     setIsSaving(true);
-    await onSave(newBasketItems);
+    await onSave(newBasketItem);
     setIsSaving(false);
   };
 
@@ -281,10 +256,6 @@ export function DrugOrderForm({
     return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
 
-  const filterItemsByProviderName = useCallback((menu) => {
-    return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  }, []);
-
   const filterItemsBySynonymNames = useCallback((menu) => {
     if (menu?.inputValue?.length) {
       return menu.item?.names?.some((abbr: string) => abbr.toLowerCase().includes(menu.inputValue.toLowerCase()));
@@ -325,8 +296,10 @@ export function DrugOrderForm({
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const { data: activeOrders } = useActivePatientOrders(patient.id);
   const drugAlreadyPrescribedForNewOrder = useMemo(
-    () => initialOrderBasketItem.action == 'NEW' && activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem.action],
+    () =>
+      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
+      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, drug, initialOrderBasketItem],
   );
 
   return (
@@ -361,66 +334,6 @@ export function DrugOrderForm({
               />
             )}
             <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
-            {(allowSelectingDrug || allowSelectingPrescribingClinician) && (
-              <section className={styles.formSection}>
-                <h3 className={styles.sectionHeader}>{t('prescriptionInfo', 'Prescription info')}</h3>
-                <Stack gap={5}>
-                  {allowSelectingDrug && (
-                    <InputWrapper>
-                      <DrugSearchComboBox
-                        setSelectedDrugItem={(item) => {
-                          // when selecting a new drug, it can have its own order template that populates many fields
-                          // we should just reset the entire form
-                          reset(drugOrderBasketItemToFormValue(item, startDate, currentProvider.uuid));
-                        }}
-                        visit={visitContext}
-                      />
-                      {drugAlreadyPrescribedForNewOrder && (
-                        <FormLabel className={styles.errorLabel}>
-                          {t('activePrescriptionExists', 'Active prescription exists for this drug')}
-                        </FormLabel>
-                      )}
-                      <FormLabel className={styles.errorLabel}>{drugFieldError?.message}</FormLabel>
-                    </InputWrapper>
-                  )}
-                  {allowAndSupportSelectingPrescribingClinician &&
-                    !isLoadingProviders &&
-                    (providers?.length > 0 ? (
-                      <ControlledFieldInput
-                        control={control}
-                        name="orderer"
-                        type="comboBox"
-                        getValues={getValues}
-                        id="orderer"
-                        shouldFilterItem={filterItemsByProviderName}
-                        placeholder={t('prescribingClinician', 'Prescribing Clinician')}
-                        titleText={t('prescribingClinician', 'Prescribing Clinician')}
-                        items={providers}
-                        itemToString={(item: Provider) => item?.person?.display}
-                      />
-                    ) : errorLoadingProviders ? (
-                      <InlineNotification
-                        kind="warning"
-                        lowContrast
-                        className={styles.inlineNotification}
-                        title={t('errorLoadingClinicians', 'Error loading clinicians')}
-                        subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-                      />
-                    ) : (
-                      <InlineNotification
-                        kind="warning"
-                        lowContrast
-                        className={styles.inlineNotification}
-                        title={t('noCliniciansFound', 'No clinicians found')}
-                        subtitle={t(
-                          'noCliniciansFoundDescription',
-                          'Cannot select prescribing clinician because no clinicians with appropriate roles are found. Check configuration.',
-                        )}
-                      />
-                    ))}
-                </Stack>
-              </section>
-            )}
             <div ref={medicationInfoHeaderRef}>
               <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
             </div>

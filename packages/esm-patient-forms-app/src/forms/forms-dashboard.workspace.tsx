@@ -12,7 +12,7 @@ import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
  * This workspace must only be used within the patient chart.
  * @see exported-forms-dashboard.workspace.tsx
  */
-const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
+const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object, object>> = ({
   launchChildWorkspace,
   groupProps: { patient, patientUuid, visitContext },
 }) => {

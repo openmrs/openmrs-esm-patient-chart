@@ -9,10 +9,6 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import PrintIdentifierStickerOverflowMenuItem from './print-identifier-sticker-action-button.component';
 
 jest.mock('../hooks/useStickerPdfPrinter');
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  UserHasAccess: jest.fn(({ children }) => children),
-}));
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockShowSnackbar = jest.mocked(showSnackbar);

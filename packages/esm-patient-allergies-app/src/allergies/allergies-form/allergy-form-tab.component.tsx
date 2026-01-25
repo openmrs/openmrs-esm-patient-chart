@@ -6,7 +6,7 @@ import styles from './allergy-form-tab.scss';
 interface AllergyFormTabProps {
   allergens: Array<OpenmrsResource>;
   selectedAllergen: string;
-  handleChange: Function;
+  handleChange: (...args: unknown[]) => void;
   name: string;
 }
 
