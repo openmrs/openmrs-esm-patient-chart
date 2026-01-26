@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { age, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 import { type DurationInput } from '@formatjs/intl-durationformat/src/types';
 import { type ConceptMetadata } from '../common';
 import type { FHIRInterpretation, ObsReferenceRanges, ObservationInterpretation } from './types';
