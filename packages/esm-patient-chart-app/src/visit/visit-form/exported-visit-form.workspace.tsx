@@ -37,6 +37,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
@@ -332,6 +333,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             // This will invalidate visit history and encounter tables for this patient
             // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
+            invalidateCurrentVisit(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
@@ -371,6 +373,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           async (visit) => {
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
+            invalidateCurrentVisit(globalMutate, patientUuid);
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
