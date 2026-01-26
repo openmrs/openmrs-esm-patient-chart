@@ -1,4 +1,6 @@
+import dayjs from 'dayjs';
 import { age, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type DurationInput } from '@formatjs/intl-durationformat/src/types';
 import { type ConceptMetadata } from '../common';
 import type { FHIRInterpretation, ObsReferenceRanges, ObservationInterpretation } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
@@ -180,20 +182,63 @@ export function prepareObsForSubmission(
 }
 
 /**
- * Returns the patient's age as a whole number.
- * Uses OpenMRS `age()` utility and extracts the numeric portion.
- * If birth date is missing or unparsable, returns null.
+ * Calculates the duration between a birthDate and a reference date.
+ * Mimics the internal logic of the OpenMRS age() utility but returns
+ * a structured DurationInput object.
  */
-export const getPatientAge = (patient: fhir.Patient): number | null => {
-  if (!patient.birthDate) {
+export function getDurationSince(
+  birthDate: dayjs.ConfigType,
+  currentDate: dayjs.ConfigType = dayjs(),
+): DurationInput | null {
+  if (!birthDate) {
     return null;
   }
 
-  const AGE_REGEX = /\d+/;
-  const ageString = age(patient.birthDate);
-  const numericAge = Number(ageString.match(AGE_REGEX)?.[0]);
+  const to = dayjs(currentDate);
+  const from = dayjs(birthDate);
 
-  return Number.isFinite(numericAge) ? numericAge : null;
+  if (!from.isValid()) {
+    return null;
+  }
+
+  const yearDiff = to.diff(from, 'years');
+  const monthDiff = to.diff(from, 'months');
+  const weekDiff = to.diff(from, 'weeks');
+  const dayDiff = to.diff(from, 'days');
+  const hourDiff = to.diff(from, 'hours');
+
+  const duration: DurationInput = {};
+
+  if (hourDiff < 2) {
+    duration['minutes'] = to.diff(from, 'minutes');
+  } else if (dayDiff < 2) {
+    duration['hours'] = hourDiff;
+  } else if (weekDiff < 4) {
+    duration['days'] = dayDiff;
+  } else if (yearDiff < 1) {
+    duration['weeks'] = weekDiff;
+    duration['days'] = to.subtract(weekDiff, 'weeks').diff(from, 'days');
+  } else if (yearDiff < 2) {
+    duration['months'] = monthDiff;
+    duration['days'] = to.subtract(monthDiff, 'months').diff(from, 'days');
+  } else if (yearDiff < 18) {
+    duration['years'] = yearDiff;
+    duration['months'] = to.subtract(yearDiff, 'years').diff(from, 'months');
+  } else {
+    duration['years'] = yearDiff;
+  }
+
+  return duration;
+}
+
+/**
+ * Uses the patient's birthDate to calculate their age in years.
+ * Returns null if birthDate is missing or invalid.
+ */
+export const getPatientAge = (patient: fhir.Patient): number | null => {
+  const duration = getDurationSince(patient.birthDate);
+
+  return duration ? duration.years ?? 0 : null;
 };
 
 /**
