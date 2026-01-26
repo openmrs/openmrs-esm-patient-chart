@@ -105,16 +105,10 @@ export const configSchema = {
       _type: Type.String,
       _default: 'kg / m²',
     },
-    restrictBmiForMinors: {
-      _type: Type.Boolean,
-      _default: false,
-      _description:
-        'When enabled, BMI is restricted based on patient age. When disabled, BMI is always shown regardless of age.',
-    },
-    bmiRestrictionMinAge: {
+    bmiMinimumAge: {
       _type: Type.Number,
-      _default: 18,
-      _description: 'Minimum age required to show BMI. This setting is ignored unless BMI restriction is enabled.',
+      _default: 0,
+      _description: 'The minimum age (in years) required to display BMI. Set to 0 to show BMI for all patients.',
     },
   },
 };
@@ -123,8 +117,7 @@ export interface BiometricsConfigObject {
   bmiUnit: string;
   heightUnit: string;
   weightUnit: string;
-  restrictBmiForMinors: boolean;
-  bmiRestrictionMinAge: number;
+  bmiMinimumAge: number;
 }
 
 export interface LogoConfigObject {

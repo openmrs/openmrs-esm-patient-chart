@@ -415,7 +415,7 @@ describe('VitalsBiometricsForm', () => {
     });
   });
 
-  it('hides BMI field when restrictBmiForMinors is enabled and patient is a minor', async () => {
+  it('hides BMI field when bmiMinimumAge is set and patient is under the minimum age', async () => {
     const minorPatient = {
       ...mockPatient,
       birthDate: '2020-01-01',
@@ -427,8 +427,7 @@ describe('VitalsBiometricsForm', () => {
       biometrics: {
         ...getDefaultsFromConfigSchema(configSchema).biometrics,
         ...mockVitalsConfig.biometrics,
-        restrictBmiForMinors: true,
-        bmiRestrictionMinAge: 18,
+        bmiMinimumAge: 18,
       },
     } as ConfigObject);
 

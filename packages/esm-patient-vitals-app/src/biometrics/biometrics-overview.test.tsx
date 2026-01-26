@@ -165,7 +165,7 @@ describe('Biometrics Overview', () => {
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
   });
 
-  it('hides BMI column in table view when restrictBmiForMinors is enabled and patient is a minor', async () => {
+  it('hides BMI column in table view when bmiMinimumAge is set and patient is under the minimum age', async () => {
     const minorPatient = {
       ...mockPatient,
       birthDate: '2020-01-01',
@@ -176,8 +176,7 @@ describe('Biometrics Overview', () => {
       ...mockBiometricsConfig,
       biometrics: {
         ...mockBiometricsConfig.biometrics,
-        restrictBmiForMinors: true,
-        bmiRestrictionMinAge: 18,
+        bmiMinimumAge: 18,
       },
     } as ConfigObject);
 

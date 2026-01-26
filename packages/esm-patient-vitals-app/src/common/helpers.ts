@@ -201,17 +201,19 @@ export const getPatientAge = (patient: fhir.Patient): number | null => {
  * based on the biometrics configuration and patient's age.
  */
 export const shouldShowBmi = (patient: fhir.Patient, biometricsConfig: BiometricsConfigObject): boolean => {
-  if (!biometricsConfig.restrictBmiForMinors) {
+  const minAge = biometricsConfig.bmiMinimumAge ?? 0;
+
+  // If the minimum age is 0 or less, we always show BMI (No restriction)
+  if (minAge <= 0) {
     return true;
   }
 
   const patientAge = getPatientAge(patient);
 
+  // Fallback: If birthDate is missing/invalid, show BMI to be safe
   if (patientAge === null) {
     return true;
   }
-
-  const minAge = Math.max(0, biometricsConfig.bmiRestrictionMinAge ?? 18);
 
   return patientAge >= minAge;
 };

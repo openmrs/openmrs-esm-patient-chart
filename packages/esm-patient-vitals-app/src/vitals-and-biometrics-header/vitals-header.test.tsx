@@ -354,7 +354,7 @@ describe('VitalsHeader', () => {
     expect(criticallyHighElements).toHaveLength(1);
   });
 
-  it('hides BMI in vitals header when restrictBmiForMinors is enabled', async () => {
+  it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
     const minorPatient = {
       ...mockPatient,
       // Make patient minor
@@ -365,7 +365,7 @@ describe('VitalsHeader', () => {
       ...getDefaultsFromConfigSchema(configSchema),
       biometrics: {
         ...mockVitalsConfig.biometrics,
-        restrictBmiForMinors: true,
+        bmiMinimumAge: 18,
       },
     } as ConfigObject);
 

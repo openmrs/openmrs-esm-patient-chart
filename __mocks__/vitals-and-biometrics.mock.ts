@@ -5057,8 +5057,7 @@ export const mockBiometricsConfig = {
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
   biometrics: {
     bmiUnit: 'kg / m²',
-    restrictBmiForMinors: false,
-    bmiRestrictionMinAge: 18,
+    bmiMinimumAge: 0,
   },
 };
 
@@ -5067,8 +5066,7 @@ export const mockVitalsConfig = {
     bmiUnit: 'kg / m²',
     heightUnit: 'm',
     weightUnit: 'kg',
-    restrictBmiForMinors: false,
-    bmiRestrictionMinAge: 18,
+    bmiMinimumAge: 0,
   },
   concepts: {
     diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
