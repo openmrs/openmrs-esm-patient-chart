@@ -11,6 +11,7 @@
     "serve": "ng serve --port 4200 --live-reload true",
     "debug": "yarn run serve",
     "build": "ng build --configuration production",
+    "test": "ng test --no-watch --no-progress --browsers=ChromeHeadless",
     "lint": "ng lint"
   },
   "openmrs:develop": {
