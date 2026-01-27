@@ -97,7 +97,7 @@ export interface OrderPost {
   instructions?: string;
   accessionNumber?: string;
   orderType?: string;
-  scheduledDate?: string;
+  scheduledDate?: string | Date;
 }
 
 export interface DrugOrderPost extends OrderPost {

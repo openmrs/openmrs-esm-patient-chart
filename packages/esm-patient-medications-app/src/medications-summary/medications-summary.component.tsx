@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
-import { useActivePatientOrders, usePastPatientOrders } from '../api';
+import { usePatientOrders } from '../api';
 import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 
@@ -18,34 +18,55 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
   );
 
   const {
-    data: activeOrders,
-    error: activeOrdersError,
-    isLoading: isLoadingActiveOrders,
-    isValidating: isValidatingActiveOrders,
-  } = useActivePatientOrders(patient?.id);
-
-  const {
-    data: pastOrders,
-    error: pastOrdersError,
-    isLoading: isLoadingPastOrders,
-    isValidating: isValidatingPastOrders,
-  } = usePastPatientOrders(patient?.id);
+    futureOrders,
+    activeOrders,
+    pastOrders,
+    error: ordersError,
+    isLoading: isLoadingOrders,
+    isValidating: isValidatingOrders,
+  } = usePatientOrders(patient?.id);
 
   return (
     <div>
       <div style={{ marginBottom: '1.5rem' }}>
         {(() => {
+          const headerTitle = t('futureMedicationsHeaderTitle', 'Future medications');
+          const displayText = t('futureMedicationsDisplayText', 'future medications');
+
+          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+
+          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
+
+          if (futureOrders?.length) {
+            return (
+              <MedicationsDetailsTable
+                isValidating={isValidatingOrders}
+                title={t('futureMedicationsTableTitle', 'Future Medications')}
+                medications={futureOrders}
+                showDiscontinueButton={true}
+                showModifyButton={true}
+                showReorderButton={false}
+                patient={patient}
+              />
+            );
+          }
+
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
+        })()}
+      </div>
+      <div style={{ marginBottom: '1.5rem' }}>
+        {(() => {
           const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
           const displayText = t('activeMedicationsDisplayText', 'active medications');
 
-          if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
 
-          if (activeOrdersError) return <ErrorState error={activeOrdersError} headerTitle={headerTitle} />;
+          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
 
           if (activeOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingActiveOrders}
+                isValidating={isValidatingOrders}
                 title={t('activeMedicationsTableTitle', 'Active Medications')}
                 medications={activeOrders}
                 showDiscontinueButton={true}
@@ -64,17 +85,17 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
           const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
           const displayText = t('pastMedicationsDisplayText', 'past medications');
 
-          if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
 
-          if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
+          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
 
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingPastOrders}
+                isValidating={isValidatingOrders}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
-                showAddButton={false}
+                showAddButton={true}
                 showDiscontinueButton={false}
                 showModifyButton={false}
                 showReorderButton={true}
@@ -83,7 +104,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
             );
           }
 
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
       </div>
     </div>

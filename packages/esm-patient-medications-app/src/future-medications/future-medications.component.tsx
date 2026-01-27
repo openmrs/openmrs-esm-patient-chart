@@ -5,16 +5,16 @@ import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openm
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api';
 
-interface ActiveMedicationsProps {
+interface FutureMedicationsProps {
   patient: fhir.Patient;
 }
 
-const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
+const FutureMedications: React.FC<FutureMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
-  const displayText = t('activeMedicationsDisplayText', 'active medications');
+  const headerTitle = t('futureMedicationsHeaderTitle', 'Future medications');
+  const displayText = t('futureMedicationsDisplayText', 'future medications');
 
-  const { activeOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
+  const { futureOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
 
   if (isLoading) {
@@ -25,12 +25,12 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (activeOrders?.length) {
+  if (futureOrders?.length) {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
-        title={t('activeMedicationsTableTitle', 'Active Medications')}
-        medications={activeOrders}
+        title={t('futureMedicationsTableTitle', 'Future Medications')}
+        medications={futureOrders}
         showDiscontinueButton={true}
         showModifyButton={true}
         showReorderButton={false}
@@ -48,4 +48,4 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   );
 };
 
-export default ActiveMedications;
+export default FutureMedications;

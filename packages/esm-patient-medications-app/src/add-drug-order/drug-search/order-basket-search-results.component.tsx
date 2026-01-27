@@ -14,7 +14,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { prepMedicationOrderPostData, useActivePatientOrders } from '../../api/api';
+import { prepMedicationOrderPostData, usePatientOrders } from '../../api';
 import { ordersEqual } from './helpers';
 import {
   type DrugSearchResult,
@@ -142,16 +142,17 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
     prepMedicationOrderPostData,
   );
   const patientUuid = patient.id;
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = useActivePatientOrders(patientUuid);
+  const { activeOrders, futureOrders, isLoading: isLoadingOrders } = usePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug, visit))),
     [orders, drug, visit],
   );
   // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const allOrders = activeOrders.concat(futureOrders);
   const drugAlreadyPrescribed = useMemo(
-    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug?.uuid],
+    () => allOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [allOrders, drug?.uuid],
   );
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
@@ -217,7 +218,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
               )}
             </UserHasAccess>
           </div>
-          {!isLoadingActiveOrders ? (
+          {!isLoadingOrders ? (
             drugAlreadyPrescribed ? (
               <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
             ) : (
