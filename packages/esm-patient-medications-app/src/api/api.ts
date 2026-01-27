@@ -22,112 +22,77 @@ const customRepresentation =
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
 /**
- * Sorts orders by date activated in descending order.
+ * Sorts orders by scheduled in descending order.
+ * With a fallback to dateActivated for backward-compatibility
  *
  * @param orders The orders to sort.
  * @returns The sorted orders.
  */
-function sortOrdersByDateActivated(orders: Order[]) {
+function sortOrdersByScheduledDate(orders: Order[]) {
   return orders?.sort(
-    (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
+    (order1, order2) =>
+      new Date(order2.scheduledDate || order2.dateActivated).getTime() -
+      new Date(order1.scheduledDate || order1.dateActivated).getTime(),
   );
 }
 
 /**
  * SWR-based data fetcher for patient orders.
  *
- * @param patientUuid The UUID of the patient whose orders should be fetched.
+ * @param patientUuid The UUID of the patient whoose orders should be fetched.
  */
 export function usePatientOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
-  const { mutate } = useSWRConfig();
-
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
-
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
-    patientUuid ? ordersUrl : null,
-    openmrsFetch,
-  );
-
-  const mutateOrders = useCallback(
-    () =>
-      mutate(
-        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
-        undefined,
-        { revalidate: true },
-      ),
-    [mutate, patientUuid],
-  );
-
-  const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
-
-  return {
-    data: data ? drugOrders : null,
-    error,
-    isLoading,
-    isValidating,
-    mutate: mutateOrders,
-  };
-}
-
-/**
- * Hook to get active patient orders.
- *
- * @param patientUuid The UUID of the patient whose active orders should be fetched.
- */
-export function useActivePatientOrders(patientUuid: string) {
-  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
-  const { mutate } = useSWRConfig();
-
   const ordersUrl = useMemo(
     () =>
       patientUuid
-        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&excludeCanceledAndExpired=true&v=${customRepresentation}`
+        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}`
         : null,
     [patientUuid, drugOrderTypeUUID],
   );
+
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     ordersUrl,
     openmrsFetch,
   );
 
-  const activeOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
+  const drugOrders = useMemo(() => sortOrdersByScheduledDate(data?.data?.results) ?? null, [data]);
 
-  return {
-    data: activeOrders,
-    error,
-    isLoading,
-    isValidating,
-    mutate,
-  };
-}
+  const { futureOrders, activeOrders, pastOrders } = useMemo(() => {
+    const future: any[] = [];
+    const active: any[] = [];
+    const past: any[] = [];
 
-/**
- * Hook to get past patient orders.
- *
- * @param patientUuid The UUID of the patient whose past orders should be fetched.
- */
-export function usePastPatientOrders(patientUuid: string) {
-  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
-  const { data: activeOrders } = useActivePatientOrders(patientUuid);
-
-  const pastOrders = useMemo(() => {
-    if (!allOrders || !activeOrders) {
-      return [];
+    if (!drugOrders) {
+      return { futureOrders: future, activeOrders: active, pastOrders: past };
     }
 
-    const filteredDrugOrders = allOrders.filter(
-      (order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid),
-    );
-    return sortOrdersByDateActivated(filteredDrugOrders);
-  }, [allOrders, activeOrders]);
+    const time_now = new Date();
+
+    drugOrders.forEach((order) => {
+      const dateStopped = order.dateStopped ? new Date(order.dateStopped) : null;
+      const autoExpireDate = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
+      const dateScheduled = order.scheduledDate ? new Date(order.scheduledDate) : null;
+
+      if (dateScheduled && dateScheduled > time_now && !dateStopped) {
+        future.push(order);
+      } else if ((autoExpireDate && autoExpireDate <= time_now) || (dateStopped && dateStopped <= time_now)) {
+        past.push(order);
+      } else {
+        active.push(order);
+      }
+    });
+
+    return { futureOrders: future, activeOrders: active, pastOrders: past };
+  }, [drugOrders]);
 
   return {
-    data: pastOrders,
+    futureOrders,
+    activeOrders,
+    pastOrders,
     error,
     isLoading,
     isValidating,
-    mutate,
   };
 }
 

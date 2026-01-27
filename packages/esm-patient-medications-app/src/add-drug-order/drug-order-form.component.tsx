@@ -49,7 +49,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useActivePatientOrders } from '../api';
+import { usePatientOrders } from '../api';
 import styles from './drug-order-form.scss';
 import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
@@ -294,12 +294,13 @@ export function DrugOrderForm({
 
   // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const { activeOrders, futureOrders } = usePatientOrders(patient.id);
+  const allOrders = activeOrders.concat(futureOrders);
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
       (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem],
+      allOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+    [allOrders, drug, initialOrderBasketItem],
   );
 
   return (
