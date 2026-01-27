@@ -30,6 +30,8 @@
   "futureDateRestriction": "Future date is not allowed!",
   "hoursAgo": " hours ago",
   "invalidDate": "Provided date is invalid!",
+  "identifierTaken": "This identifier is already assigned to another patient",
+  "identifierError": "An error occurred while validating the identifier",
   "loading": "Loading...",
   "loadingComponent": "Loading Component...",
   "max": "Max value should be {max}",
