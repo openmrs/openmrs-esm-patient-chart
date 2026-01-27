@@ -129,6 +129,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      scheduledDate: order.scheduledDate,
+      urgency: 'ON_SCHEDULED_DATE',
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
     };
@@ -157,6 +159,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      scheduledDate: order.scheduledDate,
+      urgency: 'ON_SCHEDULED_DATE',
       concept: order?.drug?.concept?.uuid,
       orderReasonNonCoded: order.indication,
     };
@@ -207,7 +211,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition,
-    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    scheduledDate: order.scheduledDate || order.dateActivated,
     duration: order.duration,
     durationUnit: {
       valueCoded: order.durationUnits?.uuid,

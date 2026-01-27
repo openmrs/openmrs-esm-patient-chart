@@ -12,12 +12,12 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
   const defaultValues = useMemo(() => {
-    const defaultStartDate =
-      typeof initialOrderBasketItem?.startDate === 'string'
-        ? parseDate(initialOrderBasketItem?.startDate)
-        : (initialOrderBasketItem?.startDate as Date) ?? new Date();
+    const defaultScheduledDate =
+      typeof initialOrderBasketItem?.scheduledDate === 'string'
+        ? parseDate(initialOrderBasketItem?.scheduledDate)
+        : (initialOrderBasketItem?.scheduledDate as Date) ?? new Date();
 
-    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultStartDate);
+    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultScheduledDate);
   }, [initialOrderBasketItem]);
 
   const drugOrderForm: UseFormReturn<MedicationOrderFormData> = useForm<MedicationOrderFormData>({
@@ -29,7 +29,10 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   return drugOrderForm;
 }
 
-export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startDate: Date): MedicationOrderFormData {
+export function drugOrderBasketItemToFormValue(
+  item: DrugOrderBasketItem,
+  scheduledDate: Date,
+): MedicationOrderFormData {
   return {
     drug: item?.drug as Partial<Drug>,
     isFreeTextDosage: item?.isFreeTextDosage ?? false,
@@ -47,7 +50,7 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
     numRefills: item?.numRefills ?? null,
     indication: item?.indication,
     frequency: item?.frequency,
-    startDate,
+    scheduledDate,
   };
 }
 
@@ -115,7 +118,7 @@ function useCreateMedicationOrderFormSchema() {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
         : z.string().nullish(),
-      startDate: z.date(),
+      scheduledDate: z.date(),
       frequency: z.object(
         { ...comboSchema },
         {

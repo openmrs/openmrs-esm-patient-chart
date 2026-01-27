@@ -167,10 +167,10 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
       ),
     },
     startDate: {
-      sortKey: dayjs(medication.dateActivated).toDate(),
+      sortKey: dayjs(medication.scheduledDate || medication.dateActivated).toDate(),
       content: (
         <div className={styles.startDateColumn}>
-          <span>{formatDate(new Date(medication.dateActivated))}</span>
+          <span>{formatDate(new Date(medication.scheduledDate || medication.dateActivated))}</span>
           {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),
@@ -415,7 +415,7 @@ function OrderBasketItemActions({
           medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
-        startDate: medication.dateActivated,
+        scheduledDate: medication.scheduledDate || medication.dateActivated,
         duration: medication.duration,
         durationUnit: {
           valueCoded: medication.durationUnits?.uuid,
@@ -459,7 +459,7 @@ function OrderBasketItemActions({
         uuid: medication.uuid,
         display: medication.drug?.display,
         previousOrder: null,
-        startDate: new Date(),
+        scheduledDate: new Date(),
         action: 'RENEW',
         drug: medication.drug,
         dosage: medication.dose,
