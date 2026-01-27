@@ -1,7 +1,9 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*"
+    "projects/**/*",
+    "src/**/*.mock.js",
+    "src/**/*.mock.ts"
   ],
   "overrides": [
     {
