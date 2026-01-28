@@ -111,7 +111,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
-  test('no buttons to click if the medication is already prescribed', async () => {
+  test('visual cue if the medication is already prescribed', async () => {
     // Override usePatientOrders to simulate an existing active order
     mockUsePatientOrders.mockReturnValue({
       futureOrders: [],
