@@ -7,6 +7,7 @@ import {
   ListCheckedIcon,
   showSnackbar,
   useLayoutType,
+  useConfig,
   type Visit,
   Workspace2,
   type Workspace2DefinitionProps,
@@ -19,8 +20,10 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 
+import { type ConfigObject } from '../config-schema';
 import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
+import { useConceptSets } from './drug-search/drug-search.resource';
 import { DrugOrderForm } from './drug-order-form.component';
 import DrugBrowse from './drug-search/drug-browse.component';
 import DrugSearch from './drug-search/drug-search.component';
@@ -69,6 +72,9 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+
+  const { drugCategoryConceptSets } = useConfig<ConfigObject>();
+  const { conceptSets } = useConceptSets(drugCategoryConceptSets);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -161,32 +167,43 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
             </Button>
           </div>
         )}
-        <Tabs>
-          <TabList contained fullWidth>
-            <Tab renderIcon={SearchIcon}>{t('search', 'Search')}</Tab>
-            <Tab renderIcon={ListCheckedIcon}>{t('browse', 'Browse')}</Tab>
-          </TabList>
+        {conceptSets.length > 0 ? (
+          <Tabs>
+            <TabList contained fullWidth>
+              <Tab renderIcon={SearchIcon}>{t('search', 'Search')}</Tab>
+              <Tab renderIcon={ListCheckedIcon}>{t('browse', 'Browse')}</Tab>
+            </TabList>
+            <div className={styles.tabPanelsWrapper}>
+              <TabPanels>
+                <TabPanel>
+                  <DrugSearch
+                    patient={patient}
+                    visit={visitContext}
+                    closeWorkspace={closeWorkspace}
+                    openOrderForm={openOrderForm}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <DrugBrowse
+                    patient={patient}
+                    visit={visitContext}
+                    closeWorkspace={closeWorkspace}
+                    openOrderForm={openOrderForm}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </div>
+          </Tabs>
+        ) : (
           <div className={styles.tabPanelsWrapper}>
-            <TabPanels>
-              <TabPanel>
-                <DrugSearch
-                  patient={patient}
-                  visit={visitContext}
-                  closeWorkspace={closeWorkspace}
-                  openOrderForm={openOrderForm}
-                />
-              </TabPanel>
-              <TabPanel>
-                <DrugBrowse
-                  patient={patient}
-                  visit={visitContext}
-                  closeWorkspace={closeWorkspace}
-                  openOrderForm={openOrderForm}
-                />
-              </TabPanel>
-            </TabPanels>
+            <DrugSearch
+              patient={patient}
+              visit={visitContext}
+              closeWorkspace={closeWorkspace}
+              openOrderForm={openOrderForm}
+            />
           </div>
-        </Tabs>
+        )}
       </Workspace2>
     );
   } else {

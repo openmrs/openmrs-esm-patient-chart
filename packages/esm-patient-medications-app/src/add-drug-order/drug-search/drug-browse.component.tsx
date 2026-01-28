@@ -5,7 +5,6 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type ConfigObject } from '../../config-schema';
-import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
 import DrugBrowseResults from './drug-browse-results.component';
 import { type ConceptSet, useConceptSets, useDrugBrowseByConceptSet } from './drug-search.resource';
 import styles from './order-basket-search.scss';
@@ -30,18 +29,6 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
   const onConceptSetChange = useCallback(({ selectedItem }: { selectedItem: ConceptSet }) => {
     setSelectedConceptSet(selectedItem ?? null);
   }, []);
-
-  if (conceptSets.length === 0) {
-    return (
-      <DrugBrowseEmptyState
-        title={t('noCategoriesConfigured', 'No drug categories configured')}
-        description={t(
-          'noCategoriesConfiguredDescription',
-          'To browse drugs by category, please configure drugCategoryConceptSets in the medications app config.',
-        )}
-      />
-    );
-  }
 
   return (
     <div className={styles.searchPopupContainer}>
