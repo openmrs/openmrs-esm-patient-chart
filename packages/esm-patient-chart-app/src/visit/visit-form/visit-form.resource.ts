@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import dayjs from 'dayjs';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   openmrsFetch,
   restBaseUrl,
@@ -13,6 +14,7 @@ import {
   useSession,
   useVisitTypes,
   type Visit,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
@@ -114,6 +116,30 @@ export function deleteVisitAttribute(visitUuid: string, visitAttributeUuid: stri
   return openmrsFetch(`${restBaseUrl}/visit/${visitUuid}/attribute/${visitAttributeUuid}`, {
     method: 'DELETE',
   });
+}
+
+export async function findOverlappingVisits(
+  patientUuid: string,
+  visitStartDateTime: Date | null,
+  visitStopDateTime: Date | null,
+  currentVisitUuid?: string,
+): Promise<Array<Visit>> {
+  if (!visitStartDateTime) {
+    return [];
+  }
+
+  const params = new URLSearchParams({
+    patient: patientUuid,
+    v: 'custom:(uuid,startDatetime,stopDatetime,visitType:(uuid,name,display))',
+    toStartDate: (visitStopDateTime || new Date()).toISOString(),
+    fromStopDate: visitStartDateTime.toISOString(),
+  });
+
+  const response: FetchResponse<{ results: Array<Visit> }> = await openmrsFetch(
+    `${restBaseUrl}/visit?${params.toString()}`,
+  );
+
+  return response.data.results.filter((visit) => visit.uuid !== currentVisitUuid);
 }
 
 export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
@@ -277,6 +303,100 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
 
     return { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime };
   }, [t, visitAttributeTypes, visitToEdit, defaultVisitLocation, emrConfiguration]);
+}
+
+export function createVisitFormResolver(
+  visitFormSchema: z.ZodSchema,
+  patientUuid: string | undefined,
+  visitToEdit: Visit | null,
+  t: TFunction,
+) {
+  return async (data, context, options) => {
+    const zodResult = await zodResolver(visitFormSchema)(data, context, options);
+
+    if (zodResult.errors && Object.keys(zodResult.errors).length > 0) {
+      return zodResult;
+    }
+
+    const {
+      visitStatus,
+      visitStartDate,
+      visitStartTime,
+      visitStartTimeFormat,
+      visitStopDate,
+      visitStopTime,
+      visitStopTimeFormat,
+    } = data;
+
+    if (patientUuid && (visitStatus === 'ongoing' || visitStatus === 'past')) {
+      const visitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+      const visitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
+
+      // Skip overlap check if editing an existing visit and dates haven't changed
+      if (visitToEdit) {
+        const existingStart = visitToEdit.startDatetime ? new Date(visitToEdit.startDatetime) : null;
+        const existingStop = visitToEdit.stopDatetime ? new Date(visitToEdit.stopDatetime) : null;
+
+        const datesUnchanged =
+          existingStart &&
+          visitStartDateTime &&
+          existingStart.getTime() === visitStartDateTime.getTime() &&
+          ((existingStop === null && visitStopDateTime === null) ||
+            (existingStop && visitStopDateTime && existingStop.getTime() === visitStopDateTime.getTime()));
+
+        if (datesUnchanged) {
+          return zodResult;
+        }
+      }
+
+      if (visitStartDateTime !== null) {
+        try {
+          const overlappingVisits = await findOverlappingVisits(
+            patientUuid,
+            visitStartDateTime,
+            visitStopDateTime,
+            visitToEdit?.uuid,
+          );
+
+          if (overlappingVisits.length > 0) {
+            const overlappingVisit = overlappingVisits[0];
+            const overlapStart = overlappingVisit.startDatetime
+              ? new Date(overlappingVisit.startDatetime).toLocaleString()
+              : t('unknown', 'Unknown');
+            const overlapEnd = overlappingVisit.stopDatetime
+              ? new Date(overlappingVisit.stopDatetime).toLocaleString()
+              : t('ongoing', 'Ongoing');
+            const visitTypeName = overlappingVisit.visitType?.display || t('visit', 'Visit');
+
+            return {
+              values: {},
+              errors: {
+                visitStartDate: {
+                  type: 'custom',
+                  message: t(
+                    'visitOverlapsWithExisting',
+                    'This visit overlaps with an existing {{visitType}} from {{startDate}} to {{endDate}}',
+                    {
+                      visitType: visitTypeName,
+                      startDate: overlapStart,
+                      endDate: overlapEnd,
+                      interpolation: {
+                        escapeValue: false,
+                      },
+                    },
+                  ),
+                },
+              },
+            };
+          }
+        } catch (error) {
+          console.error('Failed to check for overlapping visits:', error);
+        }
+      }
+    }
+
+    return zodResult;
+  };
 }
 
 // Returns a Date object based on date, time and am/pm inputs from user.
