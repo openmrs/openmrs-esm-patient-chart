@@ -1,6 +1,7 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { ConceptResourceService } from './concept-resource.service';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { OpenmrsApiModule } from './openmrs-api.module';
 // Load the implementations that should be tested
 
@@ -10,13 +11,13 @@ describe('Service : ConceptResourceService Unit Tests', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      imports: [OpenmrsApiModule],
       declarations: [],
-      providers: [],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
-    conceptResourceService = TestBed.get(ConceptResourceService);
-    httpMock = TestBed.get(HttpTestingController);
+    conceptResourceService = TestBed.inject(ConceptResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
   }));
   afterEach(() => {
     httpMock.verify();
@@ -47,13 +48,13 @@ describe('Service : ConceptResourceService Unit Tests', () => {
     conceptResourceService.getConceptByUuid(conceptUuid).subscribe((res) => {
       expect(res).toEqual('concept');
       expect(request.request.urlWithParams).toContain(
-        'concept/' + conceptUuid + '?v=custom:(uuid,name,conceptClass,answers)',
+        'concept/' + conceptUuid + '?v=custom:(uuid,name,conceptClass,setMembers)',
       );
       expect(request.request.method).toBe('GET');
       done();
     });
     const request = httpMock.expectOne(
-      conceptResourceService.getUrl() + '/' + conceptUuid + '?v=custom:(uuid,name,conceptClass,answers)',
+      conceptResourceService.getUrl() + '/' + conceptUuid + '?v=custom:(uuid,name,conceptClass,setMembers)',
     );
     request.flush('concept');
   });
@@ -74,15 +75,15 @@ describe('Service : ConceptResourceService Unit Tests', () => {
         },
       },
     ];
-    conceptResourceService.searchConcept(searchText).subscribe((data) => {
+    conceptResourceService.searchConcept(searchText).subscribe((_data) => {
       expect(res.length).toBeGreaterThan(0);
       expect(req.request.method).toBe('GET');
-      expect(req.request.urlWithParams).toContain('concept?q=test&v=custom:(uuid,name,conceptClass,answers)');
+      expect(req.request.urlWithParams).toContain('concept?q=test&v=custom:(uuid,name,conceptClass,setMembers)');
       done();
     });
 
     const req = httpMock.expectOne(
-      conceptResourceService.getUrl() + '?q=test&v=custom:(uuid,name,conceptClass,answers)',
+      conceptResourceService.getUrl() + '?q=test&v=custom:(uuid,name,conceptClass,setMembers)',
     );
     req.flush(res);
   });
@@ -103,7 +104,7 @@ describe('Service : ConceptResourceService Unit Tests', () => {
         },
       },
     ];
-    conceptResourceService.searchConcept(searchText, false, '9').subscribe((data) => {
+    conceptResourceService.searchConcept(searchText, false, '9').subscribe((_data) => {
       expect(res.length).toBeGreaterThan(0);
       expect(req.request.method).toBe('GET');
       expect(req.request.urlWithParams).toContain('concept?q=test&v=9');
