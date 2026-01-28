@@ -301,16 +301,8 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { activeOrders, futureOrders } = usePatientOrders(patient.id);
-  const allOrders = activeOrders.concat(futureOrders);
-  const drugAlreadyPrescribedForNewOrder = useMemo(
-    () =>
-      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      allOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [allOrders, drug, initialOrderBasketItem],
-  );
 
   return (
     <Workspace2 title={workspaceTitle} hasUnsavedChanges={isDirty}>
@@ -650,7 +642,7 @@ export function DrugOrderForm({
               kind="primary"
               type="submit"
               size="xl"
-              disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
+              disabled={!!errorFetchingOrderConfig || isSaving}
             >
               {saveButtonText}
             </Button>
