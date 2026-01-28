@@ -1,12 +1,19 @@
-import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
+  useFeatureFlag,
+  type Visit,
+} from '@openmrs/esm-framework';
 import {
   type Drug,
   type DrugOrderBasketItem,
   type DrugOrderTemplate,
   type OrderTemplate,
 } from '@openmrs/esm-patient-common-lib';
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -23,12 +30,41 @@ export interface DrugSearchResult {
   };
 }
 
+interface ConceptSetMembersResponse {
+  uuid: string;
+  setMembers?: Array<{
+    uuid: string;
+    name: {
+      display: string;
+    };
+  }>;
+}
+
+export interface ConceptSet {
+  uuid: string;
+  display: string;
+}
+
+interface ConceptFetchResponse {
+  [uuid: string]: ConceptSet;
+}
+
 interface OrderTemplateResource {
   uuid: string;
   drug: Drug;
   name: string;
   template: string;
 }
+
+interface DrugListFetchResult {
+  drugs: Array<DrugSearchResult>;
+  hasFailures: boolean;
+}
+
+// Limit the number of concurrent drug searches when fetching drugs by concept set
+const maxConcurrentDrugSearches = 10;
+// Representation string for drug search results
+const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
 
 /**
  * Search for a list of drugs based on the given query string
@@ -52,6 +88,88 @@ export function useDrugSearch(query: string) {
   );
 
   return results;
+}
+
+export function useConceptSets(conceptSetUuids: string[] = []) {
+  const url =
+    conceptSetUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptSetUuids.join(',')}&v=custom:(uuid,display)`
+      : null;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }, Error>(url, openmrsFetch);
+
+  const conceptSets: ConceptSet[] = data?.data
+    ? Object.values(data.data).map((concept) => ({
+        uuid: concept.uuid,
+        display: concept.display,
+      }))
+    : [];
+
+  if (error) {
+    showSnackbar({
+      title: error.name,
+      subtitle: error.message,
+      kind: 'error',
+    });
+  }
+
+  return {
+    conceptSets,
+    isLoading,
+  };
+}
+
+async function fetchDrugsByConceptSet(conceptSetUuid: string): Promise<DrugListFetchResult> {
+  // First, fetch the concept set members
+  const conceptSetResponse = await openmrsFetch<ConceptSetMembersResponse>(
+    `${restBaseUrl}/concept/${conceptSetUuid}?v=custom:(uuid,setMembers:(uuid,name))`,
+  );
+
+  const memberNames = conceptSetResponse.data?.setMembers?.map((member) => member.name?.display).filter(Boolean) ?? [];
+
+  if (memberNames.length === 0) {
+    return { drugs: [], hasFailures: false };
+  }
+
+  // Fetch drugs for each concept name with a small concurrency cap.
+  const drugs: Array<DrugSearchResult> = [];
+  let hasFailures = false;
+  for (let start = 0; start < memberNames.length; start += maxConcurrentDrugSearches) {
+    const batch = memberNames.slice(start, start + maxConcurrentDrugSearches);
+    const requests = batch.map((name) =>
+      openmrsFetch<{ results: Array<DrugSearchResult> }>(
+        `${restBaseUrl}/drug?q=${encodeURIComponent(name)}&v=${drugSearchRepresentation}`,
+      ),
+    );
+    const settled = await Promise.allSettled(requests);
+    if (settled.some((result) => result.status === 'rejected')) {
+      hasFailures = true;
+    }
+    const batchDrugs = settled
+      .filter(
+        (result): result is PromiseFulfilledResult<FetchResponse<{ results: Array<DrugSearchResult> }>> =>
+          result.status === 'fulfilled',
+      )
+      .flatMap((result) => result.value?.data?.results ?? []);
+    drugs.push(...batchDrugs);
+  }
+
+  // Dedupe by drug uuid
+  const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
+
+  return { drugs: deduped, hasFailures };
+}
+
+export function useDrugBrowseByConceptSet(conceptSetUuid: string) {
+  const { data, isLoading } = useSWRImmutable(conceptSetUuid ? ['drug-browse', conceptSetUuid] : null, () =>
+    fetchDrugsByConceptSet(conceptSetUuid),
+  );
+
+  return {
+    drugs: data?.drugs ?? [],
+    hasFailures: data?.hasFailures ?? false,
+    isLoading,
+  };
 }
 
 /**
