@@ -59,8 +59,6 @@
   "medicationIndefiniteDuration": "Indefinite duration",
   "Medications": "Medications",
   "modify": "Modify",
-  "noCategoriesConfigured": "No drug categories configured",
-  "noCategoriesConfiguredDescription": "To browse drugs by category, please configure drugCategoryConceptSets in the medications app config.",
   "noDrugsInCategory": "No drugs found in this category",
   "noDrugsInCategoryDescription": "The drug category you selected does not contain any drugs. Please select a different category.",
   "noResultsForDrugSearch": "No results to display for \"{{searchTerm}}\"",
