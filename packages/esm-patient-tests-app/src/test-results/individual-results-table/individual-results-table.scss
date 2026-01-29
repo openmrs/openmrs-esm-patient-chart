@@ -15,20 +15,29 @@ p {
 .low {
   p {
     @include type.type-style('heading-compact-01');
-    color: $ui-05;
+    color: var(--cds-text-01);
+    /* Ensure text is readable */
+    font-weight: bold;
   }
 }
 
 .high,
 .low {
-  background-color: colors.$orange-10 !important;
-  border-top: 1px solid colors.$orange-20 !important;
+  background-color: var(--cds-support-warning, #f1c21b) !important;
+  /* Orange */
+  border-top: 1px solid var(--cds-support-warning-inverse, #f1c21b) !important;
 }
 
 .critically-high,
 .critically-low {
-  background-color: colors.$red-20 !important;
-  border-top: 1px solid colors.$red-20-hover !important;
+  background-color: var(--cds-support-error, #da1e28) !important;
+  /* Red */
+  border-top: 1px solid var(--cds-support-error-inverse, #da1e28) !important;
+
+  p {
+    color: var(--cds-text-04) !important;
+    /* White text for red background */
+  }
 }
 
 .off-scale-low {
