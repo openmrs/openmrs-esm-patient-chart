@@ -183,7 +183,7 @@ export function useConceptReferenceRanges(patientUuid: string, conceptUuids: Arr
   const conceptList = conceptUuids.filter(Boolean).join(',');
   const apiUrl =
     patientUuid && conceptList
-      ? `${restBaseUrl}/conceptreferencerange/?patient=${patientUuid}&concept=${conceptList}&v=full`
+      ? `${restBaseUrl}/conceptreferencerange?patient=${patientUuid}&concept=${conceptList}&v=full`
       : null;
 
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<ConceptReferenceRange> }>, Error>(
