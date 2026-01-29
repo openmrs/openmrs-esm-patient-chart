@@ -41,6 +41,16 @@ export type OBSERVATION_INTERPRETATION =
   | 'OFF_SCALE_LOW'
   | '--';
 
+export interface ReferenceRanges {
+  hiAbsolute?: number;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  units?: string;
+}
+
 export interface ExternalOverviewProps {
   patientUuid: string;
   filter: (filterProps: PanelFilterProps) => boolean;
