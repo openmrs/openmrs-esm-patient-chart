@@ -1,8 +1,11 @@
+import dayjs from 'dayjs';
 import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type DurationInput } from '@formatjs/intl-durationformat/src/types';
 import { type ConceptMetadata } from '../common';
 import type { FHIRInterpretation, ObsReferenceRanges, ObservationInterpretation } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
+import { type BiometricsConfigObject } from '../config-schema';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
   if (weight > 0 && height > 0) {
@@ -177,3 +180,85 @@ export function prepareObsForSubmission(
     },
   );
 }
+
+/**
+ * Calculates the duration between a birthDate and a reference date.
+ * Mimics the internal logic of the OpenMRS age() utility but returns
+ * a structured DurationInput object.
+ */
+export function getDurationSince(
+  birthDate: dayjs.ConfigType,
+  currentDate: dayjs.ConfigType = dayjs(),
+): DurationInput | null {
+  if (!birthDate) {
+    return null;
+  }
+
+  const to = dayjs(currentDate);
+  const from = dayjs(birthDate);
+
+  if (!from.isValid()) {
+    return null;
+  }
+
+  const yearDiff = to.diff(from, 'years');
+  const monthDiff = to.diff(from, 'months');
+  const weekDiff = to.diff(from, 'weeks');
+  const dayDiff = to.diff(from, 'days');
+  const hourDiff = to.diff(from, 'hours');
+
+  const duration: DurationInput = {};
+
+  if (hourDiff < 2) {
+    duration['minutes'] = to.diff(from, 'minutes');
+  } else if (dayDiff < 2) {
+    duration['hours'] = hourDiff;
+  } else if (weekDiff < 4) {
+    duration['days'] = dayDiff;
+  } else if (yearDiff < 1) {
+    duration['weeks'] = weekDiff;
+    duration['days'] = to.subtract(weekDiff, 'weeks').diff(from, 'days');
+  } else if (yearDiff < 2) {
+    duration['months'] = monthDiff;
+    duration['days'] = to.subtract(monthDiff, 'months').diff(from, 'days');
+  } else if (yearDiff < 18) {
+    duration['years'] = yearDiff;
+    duration['months'] = to.subtract(yearDiff, 'years').diff(from, 'months');
+  } else {
+    duration['years'] = yearDiff;
+  }
+
+  return duration;
+}
+
+/**
+ * Uses the patient's birthDate to calculate their age in years.
+ * Returns null if birthDate is missing or invalid.
+ */
+export const getPatientAge = (patient: fhir.Patient): number | null => {
+  const duration = getDurationSince(patient.birthDate);
+
+  return duration ? duration.years ?? 0 : null;
+};
+
+/**
+ * Determines whether BMI should be shown for the given patient,
+ * based on the biometrics configuration and patient's age.
+ */
+export const shouldShowBmi = (patient: fhir.Patient, biometricsConfig: BiometricsConfigObject): boolean => {
+  const minAge = biometricsConfig.bmiMinimumAge ?? 0;
+
+  // If the minimum age is 0 or less, we always show BMI (No restriction)
+  if (minAge <= 0) {
+    return true;
+  }
+
+  const patientAge = getPatientAge(patient);
+
+  // Fallback: If birthDate is missing/invalid, show BMI to be safe
+  if (patientAge === null) {
+    return true;
+  }
+
+  return patientAge >= minAge;
+};
