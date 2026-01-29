@@ -97,18 +97,21 @@ export async function postOrders(
 
   const erroredItems: Array<OrderBasketItem> = [];
   const postedOrders: Array<Order> = [];
-  for (let grouping in patientItems) {
+  const promises: Array<Promise<void>> = [];
+
+  for (const grouping in patientItems) {
     const orders = patientItems[grouping];
+    const dataPrepFn = postDataPrepFunctions[grouping];
+
+    if (typeof dataPrepFn !== 'function') {
+      console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
+      continue;
+    }
+
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
-      const dataPrepFn = postDataPrepFunctions[grouping];
 
-      if (typeof dataPrepFn !== 'function') {
-        console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
-        continue;
-      }
-
-      await postOrder(dataPrepFn(order, patientUuid, encounterUuid, ordererUuid), abortController)
+      const promise = postOrder(dataPrepFn(order, patientUuid, encounterUuid, ordererUuid), abortController)
         .then((response) => {
           postedOrders.push(response.data);
         })
@@ -119,8 +122,12 @@ export async function postOrders(
             extractedOrderError: extractErrorDetails(error),
           });
         });
+
+      promises.push(promise);
     }
   }
+  await Promise.allSettled(promises);
+
   return { postedOrders, erroredItems };
 }
 

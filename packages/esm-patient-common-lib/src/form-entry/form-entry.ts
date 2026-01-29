@@ -28,5 +28,6 @@ export interface FormRendererProps {
   preFilledQuestions?: Record<string, string>;
   launchChildWorkspace?: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace?: Workspace2DefinitionProps['closeWorkspace'];
+  closeWorkspaceWithSavedChanges?: () => void;
   setHasUnsavedChanges?(hasUnsavedChanges: boolean);
 }

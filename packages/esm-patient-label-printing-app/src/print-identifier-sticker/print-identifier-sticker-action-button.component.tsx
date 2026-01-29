@@ -8,9 +8,13 @@ import styles from './print-identifier-sticker-action-button.scss';
 
 interface PrintIdentifierStickerOverflowMenuItemProps {
   patient: fhir.Patient;
+  closeMenu?: () => void;
 }
 
-const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({ patient }) => {
+const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOverflowMenuItemProps> = ({
+  patient,
+  closeMenu,
+}) => {
   const { t } = useTranslation();
   const { showPrintIdentifierStickerButton } = useConfig<ConfigObject>();
   const { printPdf, isPrinting } = useStickerPdfPrinter();
@@ -54,7 +58,13 @@ const PrintIdentifierStickerOverflowMenuItem: React.FC<PrintIdentifierStickerOve
 
   return (
     <UserHasAccess privilege="App: Can generate a Patient Identity Sticker">
-      <OverflowMenuItem className={styles.menuitem} itemText={buttonText} onClick={handlePrint} disabled={isPrinting} />
+      <OverflowMenuItem
+        className={styles.menuitem}
+        itemText={buttonText}
+        onClick={handlePrint}
+        closeMenu={closeMenu}
+        disabled={isPrinting}
+      />
     </UserHasAccess>
   );
 };
