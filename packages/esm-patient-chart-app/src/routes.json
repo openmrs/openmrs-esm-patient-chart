@@ -68,14 +68,16 @@
       "slot": "patient-actions-slot",
       "component": "deleteVisitActionMenuButton",
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 10
     },
     {
       "name": "delete-visit-button",
       "slot": "patient-search-actions-slot",
       "component": "deleteVisitActionMenuButton",
       "online": true,
-      "offline": true
+      "offline": true,
+      "order": 10
     },
     {
       "name": "mark-patient-deceased-button",

@@ -30,10 +30,11 @@ const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = 
     activeVisit && (
       <OverflowMenuItem
         className={styles.menuitem}
+        closeMenu={closeMenu}
+        hasDivider
+        isDelete
         itemText={t('deleteActiveVisit', 'Delete active visit')}
         onClick={handleLaunchModal}
-        closeMenu={closeMenu}
-        isDelete
       />
     )
   );
