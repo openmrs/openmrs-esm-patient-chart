@@ -1,7 +1,13 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  type Order,
+  type ReferenceRanges,
+  useReferenceRanges,
+  ReferenceRangeDisplay,
+  ResultValue,
+} from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -14,12 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import {
-  useLabEncounter,
-  useOrderConceptByUuid,
-  useOrderConceptsByUuids,
-  useConceptReferenceRanges,
-} from '../lab-results/lab-results.resource';
+import { useLabEncounter, useOrderConceptByUuid, useOrderConceptsByUuids } from '../lab-results/lab-results.resource';
 import { getObservationDisplayValue, getEffectiveRanges } from '../utils';
 import styles from './test-order.scss';
 
@@ -47,7 +48,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
   }, [concept]);
 
   // Fetch reference ranges from the API
-  const { ranges: referenceRanges, isLoading: isLoadingRanges } = useConceptReferenceRanges(patientUuid, conceptUuids);
+  const { ranges: referenceRanges, isLoading: isLoadingRanges } = useReferenceRanges(patientUuid, conceptUuids);
 
   const tableHeaders = useMemo(() => {
     return [
@@ -86,56 +87,66 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
         return concept.setMembers.map((memberConcept) => {
           const memberObs = obs.groupMembers?.find((gm) => gm.concept.uuid === memberConcept.uuid);
 
-          let resultValue: React.ReactNode;
-          if (isLoadingResult) {
-            resultValue = <SkeletonText />;
-          } else if (memberObs) {
-            resultValue = getObservationDisplayValue(memberObs.value ?? memberObs);
-          } else {
-            resultValue = '--';
-          }
-
           const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
             memberConcept,
             referenceRanges,
           );
 
+          const ranges: ReferenceRanges = {
+            lowNormal: effectiveLowNormal,
+            hiNormal: effectiveHiNormal,
+            units: memberConcept.units,
+          };
+
+          let resultValue: React.ReactNode;
+          if (isLoadingResult) {
+            resultValue = <SkeletonText />;
+          } else if (memberObs) {
+            const displayValue = getObservationDisplayValue(memberObs.value ?? memberObs);
+            const numericValue = typeof memberObs.value === 'number' ? memberObs.value : parseFloat(displayValue);
+            resultValue = <ResultValue value={displayValue} ranges={!isNaN(numericValue) ? ranges : undefined} />;
+          } else {
+            resultValue = '--';
+          }
+
           return {
             id: memberConcept.uuid,
             testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
             result: resultValue,
-            normalRange:
-              effectiveLowNormal != null && effectiveHiNormal != null
-                ? `${effectiveLowNormal} - ${effectiveHiNormal}`
-                : t('notApplicable', 'Not applicable'),
+            normalRange: <ReferenceRangeDisplay ranges={ranges} />,
           };
         });
       }
 
       // Handle single test (no set members)
-      let resultValue: React.ReactNode;
-      if (isLoadingResult) {
-        resultValue = <SkeletonText />;
-      } else {
-        resultValue = getObservationDisplayValue(obs.value ?? obs);
-      }
-
       const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
         concept,
         referenceRanges,
       );
 
+      const ranges: ReferenceRanges = {
+        lowNormal: effectiveLowNormal,
+        hiNormal: effectiveHiNormal,
+        units: concept.units,
+      };
+
+      let resultValue: React.ReactNode;
+      if (isLoadingResult) {
+        resultValue = <SkeletonText />;
+      } else {
+        const displayValue = getObservationDisplayValue(obs.value ?? obs);
+        const numericValue = typeof obs.value === 'number' ? obs.value : parseFloat(displayValue);
+        resultValue = <ResultValue value={displayValue} ranges={!isNaN(numericValue) ? ranges : undefined} />;
+      }
+
       return {
         id: concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
         result: resultValue,
-        normalRange:
-          effectiveLowNormal != null && effectiveHiNormal != null
-            ? `${effectiveLowNormal} - ${effectiveHiNormal}`
-            : t('notApplicable', 'Not applicable'),
+        normalRange: <ReferenceRangeDisplay ranges={ranges} />,
       };
     });
-  }, [isLoadingResult, testResultObs, conceptList, t, referenceRanges]);
+  }, [isLoadingResult, testResultObs, conceptList, referenceRanges]);
 
   if (isLoadingResultsConcepts || isLoadingResult || isLoadingRanges) {
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
