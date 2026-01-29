@@ -13,7 +13,6 @@ const labConceptRepresentation =
 const conceptObsRepresentation = 'custom:(uuid,display,concept:(uuid,display),groupMembers,value)';
 
 type NullableNumber = number | null | undefined;
-
 export interface LabOrderConcept {
   uuid: string;
   display: string;
