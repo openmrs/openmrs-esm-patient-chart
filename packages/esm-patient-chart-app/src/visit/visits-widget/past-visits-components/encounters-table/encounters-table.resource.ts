@@ -30,6 +30,7 @@ export interface EncountersTableProps {
 
 export interface MappedEncounter {
   datetime: string;
+  encounterDatetime: string;
   diagnoses: Array<Diagnosis>;
   editPrivilege: string;
   encounterType: string;
@@ -76,6 +77,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     datetime: formatDatetime(parseDate(encounter.encounterDatetime), {
       noToday: true,
     }),
+    encounterDatetime: encounter.encounterDatetime,
     diagnoses:
       encounter.diagnoses
         ?.filter((diagnosis) => !diagnosis.voided)
