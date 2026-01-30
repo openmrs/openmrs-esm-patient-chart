@@ -427,7 +427,7 @@ describe('OrderDetailsTable', () => {
     expect(statusCells.length).toBeGreaterThan(0);
   });
 
-  it('expands rows to show order details when expand button is clicked', async () => {
+  it('only expands drug orders and does not show expansion for other order types', async () => {
     mockUseOrderTypes.mockReturnValue({
       data: [
         {
@@ -436,6 +436,13 @@ describe('OrderDetailsTable', () => {
           name: 'Drug Order',
           retired: false,
           description: 'Drug Order',
+        },
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
         },
       ],
       isLoading: false,
@@ -455,12 +462,12 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const expandButtons = screen.getAllByRole('button', { name: /expand current row/i });
-    expect(expandButtons.length).toBeGreaterThan(0);
+    const expandButton = screen.getByRole('button', { name: /expand current row/i });
+    expect(expandButton).toBeInTheDocument();
 
-    await user.click(expandButtons[0]);
+    await user.click(expandButton);
 
-    expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /collapse current row/i })).toBeInTheDocument();
   });
 
   it('shows pagination controls when there are multiple pages', async () => {
