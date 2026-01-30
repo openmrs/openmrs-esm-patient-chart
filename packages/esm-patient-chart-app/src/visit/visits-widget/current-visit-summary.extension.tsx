@@ -35,7 +35,7 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
 
   return (
     <div className={styles.container}>
-      <CardHeader title={t('currentVisit', 'Current visit')}>
+      <CardHeader title={t('currentVisit', 'Current visit')} headingLevel="h2">
         <span />
       </CardHeader>
       <div className={styles.visitSummaryCard}>
