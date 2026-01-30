@@ -36,6 +36,15 @@ export const configSchema = {
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "List" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -47,4 +56,5 @@ export interface ConfigObject {
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
+  drugCategoryConceptSets: Array<string>;
 }

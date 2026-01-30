@@ -63,3 +63,10 @@
     height: 100%;
   }
 }
+
+.comboBoxWrapper {
+  :global(.cds--label) {
+    margin: 0;
+    padding: 0.25rem;
+  }
+}
