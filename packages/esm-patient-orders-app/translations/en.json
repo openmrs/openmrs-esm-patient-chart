@@ -93,6 +93,7 @@
   "quantity": "Quantity",
   "referenceNumber": "Reference number",
   "referenceNumberTableHeader": "{{orderType}} reference number",
+  "referenceRange": "Reference range",
   "refills": "Refills",
   "removeFromBasket": "Remove from basket",
   "result": "Result",

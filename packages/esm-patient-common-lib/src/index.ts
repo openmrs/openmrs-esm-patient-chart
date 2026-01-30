@@ -4,6 +4,7 @@ export * from './dashboards/createDashboardLink';
 export * from './empty-state';
 export * from './error-state';
 export * from './form-entry/form-entry';
+export * from './results';
 export * from './launchStartVisitPrompt';
 export * from './offline/visit';
 export * from './orders';
