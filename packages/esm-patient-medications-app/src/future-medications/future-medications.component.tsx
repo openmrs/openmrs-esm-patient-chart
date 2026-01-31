@@ -33,7 +33,7 @@ const FutureMedications: React.FC<FutureMedicationsProps> = ({ patient }) => {
         medications={futureOrders}
         showDiscontinueButton={true}
         showModifyButton={true}
-        showReorderButton={false}
+        showRenewButton={false}
         patient={patient}
       />
     );
