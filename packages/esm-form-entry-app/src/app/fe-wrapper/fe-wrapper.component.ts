@@ -37,6 +37,7 @@ const store = createGlobalStore<Record<string, FormState>>('ampath-form-state', 
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
   styleUrls: ['./fe-wrapper.component.scss'],
+  standalone: false,
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
@@ -95,8 +96,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         map((createFormParams) => from(this.formCreationService.initAndCreateForm(createFormParams))),
         concatAll(),
       )
-      .subscribe(
-        (form) => {
+      .subscribe({
+        next: (form) => {
           this.form = form;
           if (Boolean(form.schema?.conceptReferences)) {
             this.labelMap = Object.entries(
@@ -113,13 +114,13 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           this.changeState('ready');
           this.setupWorkspaceDirtyStateListener();
         },
-        (err) => {
+        error: (err) => {
           // TODO: Improve error handling.
           this.loadingError = this.translateService.instant('errorLoadingForm');
           console.error('Error rendering form', err);
           this.changeState('loadingError');
         },
-      );
+      });
   }
 
   private loadAllFormDependencies(): Observable<CreateFormParams> {
@@ -154,7 +155,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       ),
       catchError((err) =>
         throwError(
-          new Error(this.translateService.instant('errorFetchingFormData').replace('{detail}', JSON.stringify(err))),
+          () =>
+            new Error(this.translateService.instant('errorFetchingFormData').replace('{detail}', JSON.stringify(err))),
         ),
       ),
     );
@@ -212,8 +214,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           isLowContrast: false,
         });
       } else {
-        this.formSubmissionService.submitPayload(this.form).subscribe(
-          ({ encounter }) => {
+        this.formSubmissionService.submitPayload(this.form).subscribe({
+          next: ({ encounter }) => {
             this.onPostResponse(encounter);
             const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
 
@@ -240,7 +242,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
             this.changeState('submitted');
             this.closeFormWithSavedChanges();
           },
-          (error: Error) => {
+          error: (error: Error) => {
             this.changeState('submissionError');
             showSnackbar({
               isLowContrast: true,
@@ -250,7 +252,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
               timeoutInMs: 5000,
             });
           },
-        );
+        });
       }
     });
   }

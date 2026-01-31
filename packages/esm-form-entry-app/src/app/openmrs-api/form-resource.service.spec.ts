@@ -1,6 +1,7 @@
 import { TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { FormResourceService } from './form-resource.service';
-import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { WindowRef } from '../window-ref';
 // Load the implementations that should be tested
@@ -12,14 +13,14 @@ describe('FormResourceService Unit Tests', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [],
       declarations: [],
-      providers: [FormResourceService, LocalStorageService, WindowRef],
+      providers: [provideHttpClient(), provideHttpClientTesting(), FormResourceService, LocalStorageService, WindowRef],
     });
 
-    formsResourceService = TestBed.get(FormResourceService);
-    httpMock = TestBed.get(HttpTestingController);
-    winRef = TestBed.get(WindowRef);
+    formsResourceService = TestBed.inject(FormResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
+    winRef = TestBed.inject(WindowRef);
   }));
 
   afterEach(() => {
