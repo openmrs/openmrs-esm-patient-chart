@@ -58,6 +58,7 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 describe('LabResultsForm', () => {

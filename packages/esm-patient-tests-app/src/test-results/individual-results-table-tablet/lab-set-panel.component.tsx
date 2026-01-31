@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
-import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import {
   DataTable,
   TableContainer,
@@ -13,9 +11,11 @@ import {
   TableCell,
   Layer,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import { getClass } from './helper';
 import type { GroupedObservation } from '../../types';
-import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import styles from './lab-set-panel.scss';
 
 interface LabSetPanelProps {
@@ -28,6 +28,8 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
   const { t } = useTranslation();
   const date = new Date(panel.date);
   const layout = useLayoutType();
+
+  const getColumnClass = (columnKey: string) => styles[`col-${columnKey}`];
 
   const hasRange = panel.entries.some((entry) => entry.range);
 
@@ -46,8 +48,8 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
               header: t('value', 'Value'),
             },
             {
-              id: 'range',
-              key: 'range',
+              id: 'referenceRange',
+              key: 'referenceRange',
               header: t('referenceRange', 'Reference range'),
             },
           ]
@@ -79,7 +81,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
                 content: <span>{`${test.value} ${units}`}</span>,
               },
               interpretation: test.interpretation,
-              range: range,
+              referenceRange: range,
             };
           })
         : panel.entries.map((test) => {
@@ -116,24 +118,36 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
         <DataTable rows={rowsData} headers={headers}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table className={styles.table} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
+              <Table
+                className={classNames(styles.table, hasRange ? styles.tableWithRange : styles.tableWithoutRange)}
+                {...getTableProps()}
+                size={isDesktop(layout) ? 'sm' : 'md'}
+              >
                 <TableHead>
                   <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
+                    {headers.map((header) => {
+                      const headerProps = getHeaderProps({ header });
+                      return (
+                        <TableHeader
+                          {...headerProps}
+                          className={classNames(headerProps.className, getColumnClass(header.key))}
+                        >
+                          {header.header}
+                        </TableHeader>
+                      );
+                    })}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, indx) => {
-                    return (
-                      <TableRow key={row.id} className={classNames(getClass(rowsData[indx]?.interpretation), 'check')}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell?.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
+                  {rows.map((row, indx) => (
+                    <TableRow key={row.id} className={getClass(rowsData[indx]?.interpretation)}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id} className={getColumnClass(cell.info.header)}>
+                          {cell?.value?.content ?? cell.value}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>

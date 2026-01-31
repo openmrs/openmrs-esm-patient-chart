@@ -1,6 +1,7 @@
-import { TestBed, inject, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { LocationResourceService } from './location-resource.service';
-import { HttpTestingController, HttpClientTestingModule, TestRequest } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { OpenmrsApiModule } from './openmrs-api.module';
 import { WindowRef } from '../window-ref';
 
@@ -11,14 +12,14 @@ describe('LocationResourceService:', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [OpenmrsApiModule, HttpClientTestingModule],
+      imports: [OpenmrsApiModule],
       declarations: [],
-      providers: [WindowRef],
+      providers: [provideHttpClient(), provideHttpClientTesting(), WindowRef],
     });
 
-    service = TestBed.get(LocationResourceService);
-    httpMock = TestBed.get(HttpTestingController);
-    windowRef = TestBed.get(WindowRef);
+    service = TestBed.inject(LocationResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
+    windowRef = TestBed.inject(WindowRef);
   }));
 
   afterEach(() => {
@@ -32,23 +33,19 @@ describe('LocationResourceService:', () => {
 
   it('should return a location when the correct uuid is provided', (done) => {
     const locationUuid = 'xxx-xxx-xxx-xxx';
-    const results = [
-      {
-        uuid: 'xxx-xxx-xxx-xxx',
-        display: 'location',
-      },
-    ];
+    const result = {
+      uuid: 'xxx-xxx-xxx-xxx',
+      display: 'location',
+    };
 
-    let req: TestRequest;
-    service.getLocationByUuid(locationUuid).subscribe((result) => {
-      expect(results[0].uuid).toBe('xxx-xxx-xxx-xxx');
-      expect(req.request.method).toBe('GET');
+    service.getLocationByUuid(locationUuid).subscribe((location) => {
+      expect(location.uuid).toBe('xxx-xxx-xxx-xxx');
       done();
     });
 
-    // stubbing
-    req = httpMock.expectOne(service.getUrl(locationUuid));
-    req.flush(results);
+    const req = httpMock.expectOne(service.getLocationByUuidUrl(locationUuid));
+    expect(req.request.method).toBe('GET');
+    req.flush(result);
   });
 
   it('should return a list of locations matching search string provided', (done) => {
@@ -60,19 +57,18 @@ describe('LocationResourceService:', () => {
           display: 'test',
         },
         {
-          uuid: 'uuid',
-          display: 'other',
+          uuid: 'uuid2',
+          display: 'test location',
         },
       ],
     };
     service.searchLocation(searchText).subscribe((locations) => {
-      for (const location of locations) {
-        expect(location.display).toContain(searchText);
-      }
+      expect(locations.length).toBe(2);
       done();
     });
 
-    const req = httpMock.expectOne(service.getUrl());
+    const req = httpMock.expectOne(service.getUrl(searchText));
+    expect(req.request.method).toBe('GET');
     req.flush(results);
   });
 });

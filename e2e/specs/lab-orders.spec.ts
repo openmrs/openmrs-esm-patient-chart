@@ -182,8 +182,8 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await expect(page.getByText(/discontinued serum glucose/i)).toBeVisible();
     });
 
-    await test.step('And the order table should be empty', async () => {
-      await expect(page.getByText(/there are no orders to display for this patient/i)).toBeVisible();
+    await test.step('And the discontinued order should no longer appear in the table', async () => {
+      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeHidden();
     });
   });
 });

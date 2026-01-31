@@ -358,7 +358,8 @@ describe('OrderDetailsTable', () => {
     const dateRangeLabel = screen.getByText(/date range/i);
     expect(dateRangeLabel).toBeInTheDocument();
 
-    const dateRangeInput = screen.getByDisplayValue(/dd\/mm\/yyyy–dd\/mm\/yyyy/);
+    // Default value is today's date (format: dd/mm/yyyy–dd/mm/yyyy)
+    const dateRangeInput = screen.getByDisplayValue(/\d{2}\/\d{2}\/\d{4}–\d{2}\/\d{2}\/\d{4}/);
     expect(dateRangeInput).toBeInTheDocument();
   });
 
@@ -699,6 +700,45 @@ describe('OrderDetailsTable', () => {
 
     const validationIndicator = screen.getByText(/loading/i);
     expect(validationIndicator).toBeInTheDocument();
+  });
+
+  it('does not show an overflow menu for declined orders', async () => {
+    const declinedOrder = {
+      ...mockOrders[0],
+      uuid: 'declined-order-uuid',
+      orderNumber: 'ORD-DECLINED',
+      fulfillerStatus: 'DECLINED',
+    };
+
+    mockUseOrderTypes.mockReturnValue({
+      data: [
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+    });
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [declinedOrder] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+
+    expect(screen.getByText(/ORD-DECLINED/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
   });
 });
 

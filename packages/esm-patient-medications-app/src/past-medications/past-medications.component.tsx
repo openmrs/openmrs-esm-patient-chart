@@ -33,7 +33,7 @@ const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
         medications={pastOrders}
         showDiscontinueButton={false}
         showModifyButton={false}
-        showReorderButton={true}
+        showRenewButton={true}
         patient={patient}
       />
     );

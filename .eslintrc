@@ -17,6 +17,20 @@
         "testing-library/prefer-screen-queries": "off",
       },
     },
+    {
+      "files": [
+        "**/*.config.js",
+        "**/jest.config.js",
+        "**/webpack.config.js",
+        "**/karma.conf.js",
+        "**/protractor.conf.js",
+        "tools/**/*.js",
+        "**/*.cjs"
+      ],
+      "rules": {
+        "@typescript-eslint/no-require-imports": "off"
+      }
+    },
   ],
   "rules": {
     "react-hooks/exhaustive-deps": "warn",

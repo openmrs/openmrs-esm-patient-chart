@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { type FormEntryConfigSchema } from '../config-schema';
 import { toHtmlForm } from './form-entry.resources';
 import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
+import { useForms } from '../hooks/use-forms';
 
 export interface FormEntryProps {
   form: Form;
@@ -50,6 +51,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const { t } = useTranslation();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  const { mutateForms } = useForms(patientUuid, visitUuid);
+
   const state = useMemo(
     () => ({
       view: 'form',
@@ -75,7 +78,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
         // Also invalidate visit history and encounter tables since form submission may create/update encounters
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
-        return closeWorkspace({ discardUnsavedChanges: true, closeWindow: true });
+        mutateForms?.();
+
+        return closeWorkspace({ discardUnsavedChanges: true });
       },
       promptBeforeClosing: (func) => setHasUnsavedChanges(func()),
     }),
@@ -86,6 +91,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
       globalMutate,
       handlePostResponse,
       isOnline,
+      mutateForms,
       mutateVisitContext,
       patient,
       patientUuid,
@@ -132,7 +138,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
           (isHtmlForm ? (
             <HtmlFormEntryWrapper
               src={htmlFormEntryUrl}
-              closeWorkspaceWithSavedChanges={() => closeWorkspace({ discardUnsavedChanges: true })}
+              closeWorkspaceWithSavedChanges={state.closeWorkspaceWithSavedChanges}
             />
           ) : (
             <ExtensionSlot key={state.formUuid} name="form-widget-slot" state={state} />

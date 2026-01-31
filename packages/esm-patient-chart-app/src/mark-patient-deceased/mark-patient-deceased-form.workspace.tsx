@@ -36,11 +36,11 @@ import styles from './mark-patient-deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   closeWorkspace,
-  groupProps: { patientUuid },
+  groupProps: { patientUuid, patient },
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const memoizedPatientUuid = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const [searchTerm, setSearchTerm] = useState('');
   const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
   const { freeTextFieldConceptUuid } = useConfig<ChartConfig>();
@@ -126,7 +126,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
         <div>
           {isTablet && (
             <Row className={styles.headerGridRow}>
-              <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedPatientUuid} />
+              <ExtensionSlot className={styles.dataGridRow} name="visit-form-header-slot" state={memoizedState} />
             </Row>
           )}
           <div className={styles.container}>

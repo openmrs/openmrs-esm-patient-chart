@@ -41,6 +41,7 @@ it('renders an Edit form that enables users to toggle flags on or off', async ()
       launchChildWorkspace={null}
       windowName={''}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 
@@ -82,6 +83,7 @@ it('sorts by active and retired correctly via controlled dropdown', async () => 
       launchChildWorkspace={null}
       windowName={''}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 

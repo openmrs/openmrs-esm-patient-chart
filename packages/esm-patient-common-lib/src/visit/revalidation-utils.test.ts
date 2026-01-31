@@ -2,6 +2,7 @@ import {
   invalidateVisitHistory,
   invalidatePatientEncounters,
   invalidateVisitAndEncounterData,
+  invalidateCurrentVisit,
 } from './revalidation-utils';
 
 const mockMutate = jest.fn();
@@ -93,6 +94,32 @@ describe('revalidation-utils', () => {
 
       // Encounter matcher should work
       expect(encounterMatcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(true);
+    });
+  });
+
+  describe('invalidateCurrentVisit', () => {
+    it('should invalidate only current visit keys', () => {
+      const patientUuid = 'test-patient-123';
+
+      invalidateCurrentVisit(mockMutate, patientUuid);
+
+      expect(mockMutate).toHaveBeenCalledTimes(1);
+      expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
+
+      const matcherFn = mockMutate.mock.calls[0][0];
+
+      // Should match current visit key (includeInactive=false)
+      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=false')).toBe(true);
+
+      // Should not match other visit keys
+      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&includeInactive=true')).toBe(false);
+      expect(
+        matcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&limit=10&startIndex=0&totalCount=true'),
+      ).toBe(false);
+      expect(matcherFn('/ws/rest/v1/visit/test-patient-123')).toBe(false);
+
+      // Should not match encounter keys
+      expect(matcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(false);
     });
   });
 });

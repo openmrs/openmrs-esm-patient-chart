@@ -121,7 +121,34 @@
 }
 
 .table {
+  table-layout: fixed;
+  width: 100%;
+
   td {
     border-bottom: none !important;
+  }
+}
+
+.tableWithRange {
+  .col-testName {
+    width: 50%;
+  }
+
+  .col-value {
+    width: 25%;
+  }
+
+  .col-referenceRange {
+    width: 25%;
+  }
+}
+
+.tableWithoutRange {
+  .col-testName {
+    width: 60%;
+  }
+
+  .col-value {
+    width: 40%;
   }
 }

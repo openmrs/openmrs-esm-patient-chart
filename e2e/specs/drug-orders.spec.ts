@@ -209,6 +209,46 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
+  test('Renew a drug order', async ({ page, patient }) => {
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('And I open the options menu for the created medication', async () => {
+      const row = page.getByRole('row').filter({ hasText: drugOrder.drug.display }).first();
+      await row.getByRole('button', { name: /options/i }).click();
+    });
+
+    await test.step('And I click on the "Renew" action', async () => {
+      await page.getByRole('menuitem', { name: /renew/i }).click();
+    });
+
+    await test.step('Then the order basket should show a Renew item for the medication', async () => {
+      const basketItem = orderBasket.getByRole('listitem').filter({ hasText: drugOrder.drug.display });
+
+      await expect(basketItem).toBeVisible();
+      await expect(basketItem.getByRole('status', { name: /renew/i })).toBeVisible();
+    });
+
+    await test.step('When I click on the "Sign and close" button', async () => {
+      await page.getByRole('button', { name: /sign and close/i }).click();
+    });
+
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(new RegExp(`placed order for.*${drugOrder.drug.display}`, 'i'))).toBeVisible();
+    });
+
+    await test.step('And the renewed medication should appear in the active medications list', async () => {
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      await expect(
+        activeMedicationsTable.getByRole('row').filter({ hasText: drugOrder.drug.display }).first(),
+      ).toBeVisible();
+    });
+  });
+
   test('Discontinue a drug order', async ({ page, patient }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
     const medicationsPage = new MedicationsPage(page);

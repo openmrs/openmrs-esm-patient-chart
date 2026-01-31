@@ -226,6 +226,7 @@ function renderAddDrugOrderWorkspace() {
       }}
       windowName={''}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 }

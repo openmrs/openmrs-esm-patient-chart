@@ -1,11 +1,12 @@
 import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InlineLoading, SkeletonText } from '@carbon/react';
+import { Button, InlineLoading, SkeletonPlaceholder, SkeletonText } from '@carbon/react';
 import { LineChart, ScaleTypes, TickRotations } from '@carbon/charts-react';
 import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { testResultsBasePath } from '../helpers';
 import { useObstreeData } from './trendline-resource';
+import { formatReferenceRange } from '../grouped-timeline/reference-range-helpers';
 import CommonDataTable from '../overview/common-datatable.component';
 import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
@@ -28,7 +29,6 @@ const TrendLineBackground: React.FC<TrendLineBackgroundProps> = ({ ...props }) =
 interface TrendlineHeaderProps {
   isValidating: boolean;
   patientUuid: string;
-  referenceRange: string;
   showBackToTimelineButton: boolean;
   title: string;
 }
@@ -36,7 +36,6 @@ interface TrendlineHeaderProps {
 const TrendlineHeader: React.FC<TrendlineHeaderProps> = ({
   patientUuid,
   title,
-  referenceRange,
   isValidating,
   showBackToTimelineButton,
 }) => {
@@ -58,7 +57,6 @@ const TrendlineHeader: React.FC<TrendlineHeaderProps> = ({
       </div>
       <div className={styles.content}>
         <span className={styles.title}>{title}</span>
-        <span className={styles['reference-range']}>{referenceRange}</span>
       </div>
       <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
@@ -73,7 +71,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 }) => {
   const { t } = useTranslation();
   const { trendlineData, isLoading, isValidating } = useObstreeData(patientUuid, conceptUuid);
-  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
+  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle } = trendlineData;
   const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
   const [showResultsTable, setShowResultsTable] = useState(false);
@@ -113,11 +111,13 @@ const Trendline: React.FC<TrendlineProps> = ({
       group: string;
       min?: number;
       max?: number;
+      rangeLabel?: string;
     }> = [];
 
     const table: Array<{
       id: string;
       dateTime: string;
+      range: string;
       value: {
         value: number;
         interpretation: OBSERVATION_INTERPRETATION;
@@ -134,17 +134,29 @@ const Trendline: React.FC<TrendlineProps> = ({
             min: resolvedLow,
           }
         : {};
+      const rangeLabel = formatReferenceRange(
+        hasRange
+          ? {
+              lowNormal: resolvedLow,
+              hiNormal: resolvedHigh,
+              units: leftAxisTitle,
+            }
+          : null,
+        leftAxisTitle,
+      );
 
       chartData.push({
         date: new Date(Date.parse(observation.obsDatetime)),
         value: parseFloat(observation.value),
         group: chartTitle,
         ...normalRange,
+        rangeLabel,
       });
 
       table.push({
         id: `${idx}`,
         dateTime: observation.obsDatetime,
+        range: rangeLabel,
         value: {
           value: parseFloat(observation.value),
           interpretation: observation.interpretation,
@@ -153,7 +165,7 @@ const Trendline: React.FC<TrendlineProps> = ({
     });
 
     return { data: chartData, tableData: table };
-  }, [obs, chartTitle, hiNormal, lowNormal]);
+  }, [obs, chartTitle, hiNormal, leftAxisTitle, lowNormal]);
 
   const chartOptions = useMemo(
     () => ({
@@ -192,11 +204,15 @@ const Trendline: React.FC<TrendlineProps> = ({
         enabled: false,
       },
       tooltip: {
-        customHTML: ([{ date, value }]) => {
+        customHTML: ([{ date, value, rangeLabel }]) => {
           const valueLabel = t('trendlineTooltipValue', 'Value');
           const dateLabel = t('trendlineTooltipDate', 'Date');
+          const rangeLabelText = t('trendlineTooltipRange', 'Range');
           return `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
             <div style="font-size:1rem; line-height:1.4">${valueLabel}: <span>${value} ${leftAxisTitle}</span></div>
+            <div style="font-size:0.875rem; font-weight:500; margin-top:0.125rem">${rangeLabelText}: ${
+              rangeLabel || '--'
+            }</div>
             <div style="color:#6F6F6F; font-size:0.875rem; font-weight:500; margin-top:0.125rem">${dateLabel}: ${formatDate(date)}</div>
           </div>`;
         },
@@ -244,14 +260,24 @@ const Trendline: React.FC<TrendlineProps> = ({
         header: leftAxisTitle ? `${t('value', 'Value')} (${leftAxisTitle})` : t('value', 'Value'),
         key: 'value',
       },
+      {
+        header: t('referenceRange', 'Reference range'),
+        key: 'range',
+      },
     ],
     [leftAxisTitle, t],
   );
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <SkeletonText paragraph={true} lineCount={8} />
+      <div className={styles.container} data-testid="trendline-loading">
+        <div className={styles.loadingHeader} data-testid="trendline-loading-header">
+          <SkeletonText heading={true} />
+        </div>
+        <div className={styles.loadingTabs} data-testid="trendline-loading-tabs">
+          <SkeletonText paragraph={true} lineCount={1} />
+        </div>
+        <SkeletonPlaceholder className={styles.loadingChart} data-testid="trendline-loading-chart" />
       </div>
     );
   }
@@ -270,7 +296,6 @@ const Trendline: React.FC<TrendlineProps> = ({
         <TrendlineHeader
           isValidating={isValidating}
           patientUuid={patientUuid}
-          referenceRange={referenceRange}
           showBackToTimelineButton={showBackToTimelineButton}
           title={chartTitle}
         />
@@ -302,6 +327,7 @@ interface DrawTableProps {
   tableData: Array<{
     id: string;
     dateTime: string;
+    range: string;
     value: {
       value: number;
       interpretation: OBSERVATION_INTERPRETATION;

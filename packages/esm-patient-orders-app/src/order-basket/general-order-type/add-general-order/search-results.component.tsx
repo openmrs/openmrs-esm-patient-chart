@@ -8,7 +8,6 @@ import {
   ArrowRightIcon,
   ShoppingCartArrowDownIcon,
   useLayoutType,
-  useSession,
   type Visit,
 } from '@openmrs/esm-framework';
 import {

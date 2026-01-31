@@ -105,7 +105,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
-  if (order.action === 'NEW' || order.action === 'RENEW') {
+  if (order.action === 'NEW') {
     return {
       action: 'NEW',
       patient: patientUuid,
@@ -131,6 +131,34 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       scheduledDate: order.scheduledDate,
       urgency: 'ON_SCHEDULED_DATE',
+      concept: order.drug.concept.uuid,
+      orderReasonNonCoded: order.indication,
+    };
+  } else if (order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      previousOrder: order.previousOrder,
+      patient: patientUuid,
+      type: 'drugorder',
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
+      encounter: encounterUuid,
+      drug: order.drug.uuid,
+      dose: order.dosage,
+      doseUnits: order.unit?.valueCoded,
+      route: order.route?.valueCoded,
+      frequency: order.frequency?.valueCoded,
+      asNeeded: order.asNeeded,
+      asNeededCondition: order.asNeededCondition,
+      numRefills: order.numRefills,
+      quantity: order.pillsDispensed,
+      quantityUnits: order.quantityUnits?.valueCoded,
+      duration: order.duration,
+      durationUnits: order.durationUnit?.valueCoded,
+      dosingType: order.isFreeTextDosage
+        ? 'org.openmrs.FreeTextDosingInstructions'
+        : 'org.openmrs.SimpleDosingInstructions',
+      dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
     };
@@ -188,6 +216,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
  */
 export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrderBasketItem {
   return {
+    uuid: order.uuid,
     display: order.drug?.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
     action: action,

@@ -136,3 +136,20 @@ p {
     margin-bottom: layout.$spacing-02;
   }
 }
+
+.table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.col-testName {
+  width: 50%;
+}
+
+.col-value {
+  width: 25%;
+}
+
+.col-referenceRange {
+  width: 25%;
+}
