@@ -45,7 +45,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 medications={futureOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
-                showReorderButton={false}
+                showRenewButton={false}
                 patient={patient}
               />
             );
