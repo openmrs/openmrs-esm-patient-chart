@@ -127,6 +127,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.spo2 && valueB.spo2 ? valueA.spo2 - valueB.spo2 : 0),
     },
+    {
+      key: 'note',
+      header: t('note', 'Note'),
+      isSortable: false,
+      sortFunc: () => 0,
+    },
   ];
 
   const tableRows: Array<VitalsTableRow> = useMemo(
@@ -145,6 +151,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
           temperatureRenderInterpretation: vitalSigns.temperatureRenderInterpretation,
           respiratoryRateRender: vitalSigns.respiratoryRate ?? '--',
           respiratoryRateRenderInterpretation: vitalSigns.respiratoryRateRenderInterpretation,
+          notesRender: vitalSigns?.note ?? '--',
         };
       }),
     [vitals],

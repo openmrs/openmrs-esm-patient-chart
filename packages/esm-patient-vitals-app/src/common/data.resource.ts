@@ -267,6 +267,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           return 'weight';
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
+        case concepts.generalPatientNoteUuid:
+          return 'note';
         default:
           return ''; // or throw an error for unknown conceptUuid
       }
@@ -281,6 +283,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       concepts.respiratoryRateUuid,
       concepts.temperatureUuid,
       concepts.weightUuid,
+      concepts.generalPatientNoteUuid,
     ],
   );
 
@@ -296,6 +299,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
             ...vitalsHashTable.get(encounterId),
             [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
+            // note: vitalSign.note || vitalsHashTable.get(encounterId)?.note,
           });
         } else {
           if (vitalSign.value) {
@@ -306,6 +310,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
                   : vitalSign.recordedDate.toDateString(),
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
+              // note: vitalSign.note || vitalsHashTable.get(encounterId)?.note,
             });
           }
         }
@@ -477,7 +482,7 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
       ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
-    value: resource?.valueQuantity?.value,
+    value: resource?.valueString || resource?.valueQuantity?.value,
   };
 }
 

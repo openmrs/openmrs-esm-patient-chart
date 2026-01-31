@@ -22,8 +22,8 @@ export type MappedVitals = {
   code: string;
   interpretation: ObservationInterpretation;
   recordedDate: string | Date;
-  value: number;
   encounterId: string;
+  value: number | string;
 };
 
 export type FHIRInterpretation = 'Critically Low' | 'Critically High' | 'High' | 'Low' | 'Normal';
@@ -95,6 +95,7 @@ export interface FHIRObservationResource {
 }
 
 export interface PatientVitalsAndBiometrics {
+  note?: string;
   id: string;
   date: string;
   systolic?: number;
