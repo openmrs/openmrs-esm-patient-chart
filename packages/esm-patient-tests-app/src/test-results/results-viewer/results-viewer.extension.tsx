@@ -109,8 +109,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
               onChange={({ name }: { name: panelOpts }) => setSelectedSection(name)}
               size={responsiveSize}
             >
-              <Switch name="panel" text={t('individualTests', 'Individual tests')} />
-              <Switch name="tree" text={t('overTime', 'Over time')} />
+              <Switch name="panel">{t('individualTests', 'Individual tests')}</Switch>
+              <Switch name="tree">{t('overTime', 'Over time')}</Switch>
             </ContentSwitcher>
           </div>
         </div>
@@ -147,8 +147,12 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
                 selectedIndex={isExpanded ? 1 : 0}
                 size={responsiveSize}
               >
-                <Switch name="individual-test" text={t('individualTests', 'Individual tests')} disabled={isLoading} />
-                <Switch name="over-time" text={t('overTime', 'Over time')} disabled={isLoading} />
+                <Switch name="individual-test" disabled={isLoading}>
+                  {t('individualTests', 'Individual tests')}
+                </Switch>
+                <Switch name="over-time" disabled={isLoading}>
+                  {t('overTime', 'Over time')}
+                </Switch>
               </ContentSwitcher>
             </div>
           </div>

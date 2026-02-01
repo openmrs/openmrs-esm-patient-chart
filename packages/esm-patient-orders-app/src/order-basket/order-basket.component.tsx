@@ -5,6 +5,9 @@ import { Button, ButtonSet, ComboBox, FormLabel, InlineLoading, InlineNotificati
 import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
+  getPatientName,
+  PatientBannerPatientInfo,
+  PatientPhoto,
   LocationPicker,
   useConfig,
   useLayoutType,
@@ -36,6 +39,7 @@ interface OrderBasketProps {
   mutateVisitContext: () => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   orderBasketExtensionProps: OrderBasketExtensionProps;
+  showPatientBanner?: boolean;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
@@ -46,11 +50,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   mutateVisitContext,
   closeWorkspace,
   orderBasketExtensionProps,
+  showPatientBanner,
   onOrderBasketSubmitted,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orderTypes, orderEncounterType, ordererProviderRoles } = useConfig<ConfigObject>();
+  const { orderTypes, orderEncounterType, ordererProviderRoles, orderLocationTagName } = useConfig<ConfigObject>();
   const {
     currentProvider: _currentProvider,
     sessionLocation,
@@ -203,6 +208,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     });
   }, [clearOrders, closeWorkspace]);
 
+  const patientName = getPatientName(patient);
   const filterItemsByProviderName = useCallback((menu) => {
     return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
@@ -211,6 +217,16 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
       <div id="order-basket" className={styles.container}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        {showPatientBanner && (
+          <div className={styles.patientBannerContainer}>
+            <div className={styles.patientBanner}>
+              <div className={styles.patientAvatar}>
+                <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+              </div>
+              <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>
+            </div>
+          </div>
+        )}
         <div className={styles.orderBasketContainer}>
           {!currentProvider && (
             <InlineNotification
@@ -235,7 +251,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
               />
             ) : (
-              <>
+              <div className={styles.providerSelectorContainer}>
                 <ComboBox
                   id="orderer-combobox"
                   items={providers ?? []}
@@ -248,14 +264,20 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                   placeholder={t('searchFieldPlaceholder', 'Search for a Provider')}
                   titleText={t('orderer', 'Orderer')}
                 />
-                <div className={styles.orderLocationOuterContainer}>
-                  <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
-                  <div className={styles.orderLocationContainer}>
-                    <LocationPicker selectedLocationUuid={orderLocationUuid} onChange={setOrderLocationUuid} />
-                  </div>
-                </div>
-              </>
+              </div>
             ))}
+          {orderLocationTagName && (
+            <div className={styles.orderLocationOuterContainer}>
+              <FormLabel>{t('orderLocation', 'Order location')}</FormLabel>
+              <div className={styles.orderLocationContainer}>
+                <LocationPicker
+                  selectedLocationUuid={orderLocationUuid}
+                  onChange={setOrderLocationUuid}
+                  locationTag={orderLocationTagName}
+                />
+              </div>
+            </div>
+          )}
           <ExtensionSlot
             className={classNames(styles.orderBasketSlot, {
               [styles.orderBasketSlotTablet]: isTablet,

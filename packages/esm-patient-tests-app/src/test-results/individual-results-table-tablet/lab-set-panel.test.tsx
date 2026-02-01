@@ -38,9 +38,9 @@ describe('LabSetPanel', () => {
     expect(hemoglobinRow).toBeInTheDocument();
     expect(hematocritRow).toBeInTheDocument();
 
-    expect(cbcRow).toHaveClass('check');
-    expect(hemoglobinRow).toHaveClass('low', 'check');
-    expect(hematocritRow).toHaveClass('high', 'check');
+    expect(cbcRow).not.toHaveClass('low', 'high');
+    expect(hemoglobinRow).toHaveClass('low');
+    expect(hematocritRow).toHaveClass('high');
   });
 
   it('clicking on the panel header sets the active panel', async () => {
