@@ -79,6 +79,7 @@ const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   windowProps: {},
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 mockUseConfig.mockReturnValue({

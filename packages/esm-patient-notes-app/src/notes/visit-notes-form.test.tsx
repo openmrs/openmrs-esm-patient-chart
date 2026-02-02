@@ -37,6 +37,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = 
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {}) {
