@@ -1,7 +1,11 @@
 import { useSWRConfig } from 'swr';
 import { renderHook, act } from '@testing-library/react';
 import { showSnackbar, type Visit } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  invalidateCurrentVisit,
+  invalidateVisitAndEncounterData,
+  usePatientChartStore,
+} from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
@@ -19,6 +23,7 @@ jest.mock('../visits-widget/visit.resource', () => {
 });
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  invalidateCurrentVisit: jest.fn(),
   invalidateVisitAndEncounterData: jest.fn(),
   usePatientChartStore: jest.fn(),
 }));

@@ -12,7 +12,7 @@ test('Delete a visit from the visit history table', async ({ page, api, patient,
 
   await test.step('Then I should see the visit in the table', async () => {
     await expect(page.getByRole('table')).toBeVisible();
-    await expect(page.getByText(/facility visit/i)).toBeVisible();
+    await expect(page.getByRole('table').getByText(/facility visit/i)).toBeVisible();
   });
 
   await test.step('When I click the delete button on the visit row', async () => {

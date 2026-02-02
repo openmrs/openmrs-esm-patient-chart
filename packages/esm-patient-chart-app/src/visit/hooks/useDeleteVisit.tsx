@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { type Visit, showSnackbar } from '@openmrs/esm-framework';
 import {
+  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   invalidateVisitByUuid,
   usePatientChartStore,
@@ -25,6 +26,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit
+        invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
@@ -38,6 +40,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
       })
       .catch(() => {
         // On error, revalidate to get correct state
+        invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
@@ -59,6 +62,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         }
 
         // Use targeted SWR invalidation instead of global mutateVisit
+        invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
@@ -76,6 +80,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
       })
       .catch(() => {
         // On error, revalidate to get correct state
+        invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({

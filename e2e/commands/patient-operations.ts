@@ -76,7 +76,7 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
           },
         ],
         attributes: [],
-        birthdate: '2020-2-1',
+        birthdate: new Date(new Date().getFullYear() - 5, 0, 1).toISOString().split('T')[0],
         birthdateEstimated: true,
         dead: false,
         gender: 'M',
