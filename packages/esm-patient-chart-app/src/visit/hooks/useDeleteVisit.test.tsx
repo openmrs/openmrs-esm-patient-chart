@@ -30,7 +30,6 @@ const mockUseSWRConfig = jest.mocked(useSWRConfig);
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 const mockInvalidateVisitAndEncounterData = jest.mocked(invalidateVisitAndEncounterData);
 
-const mockMutateActiveVisit = jest.fn();
 const mockGlobalMutate = jest.fn();
 const mockSetVisitContext = jest.fn();
 
@@ -75,14 +74,13 @@ describe('useDeleteVisit', () => {
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
     const onVisitDelete = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, onVisitDelete));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
 
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
     expect(mockDeleteVisit).toHaveBeenCalledWith('visit-123');
-    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(
@@ -102,13 +100,12 @@ describe('useDeleteVisit', () => {
     mockDeleteVisit.mockRejectedValue(new Error('Delete failed'));
     const onVisitDelete = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, onVisitDelete));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
 
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
-    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -124,7 +121,7 @@ describe('useDeleteVisit', () => {
     mockRestoreVisit.mockResolvedValue({ data: {} } as any);
     const onVisitRestore = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, undefined, onVisitRestore));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
     // First delete to get the restore function
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
@@ -156,7 +153,6 @@ describe('useDeleteVisit', () => {
     });
 
     expect(mockRestoreVisit).toHaveBeenCalledWith('visit-123');
-    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -172,7 +168,7 @@ describe('useDeleteVisit', () => {
     mockRestoreVisit.mockRejectedValue(new Error('Restore failed'));
     const onVisitRestore = jest.fn();
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, undefined, onVisitRestore));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
     // First delete to get the restore function
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
@@ -202,7 +198,6 @@ describe('useDeleteVisit', () => {
       restoreFunction();
     });
 
-    expect(mockMutateActiveVisit).toHaveBeenCalledTimes(1);
     expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
 
     expect(mockShowSnackbar).toHaveBeenCalledWith({
@@ -217,7 +212,7 @@ describe('useDeleteVisit', () => {
   it('should manage loading state correctly', async () => {
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
 
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, mockMutateActiveVisit, () => {}));
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, () => {}));
 
     // Initially not deleting
     expect(result.current.isDeletingVisit).toBe(false);
@@ -235,7 +230,7 @@ describe('useDeleteVisit', () => {
     const visitWithoutPatient = { ...mockVisit, patient: null };
 
     expect(() => {
-      renderHook(() => useDeleteVisit(visitWithoutPatient, mockMutateActiveVisit, () => {}));
+      renderHook(() => useDeleteVisit(visitWithoutPatient, () => {}));
     }).not.toThrow();
   });
 
@@ -243,7 +238,7 @@ describe('useDeleteVisit', () => {
     const visitWithEmptyPatient = { ...mockVisit, patient: { uuid: '' } };
 
     expect(() => {
-      renderHook(() => useDeleteVisit(visitWithEmptyPatient, mockMutateActiveVisit, () => {}));
+      renderHook(() => useDeleteVisit(visitWithEmptyPatient, () => {}));
     }).not.toThrow();
   });
 
@@ -254,7 +249,7 @@ describe('useDeleteVisit', () => {
     };
 
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
-    const { result } = renderHook(() => useDeleteVisit(visitWithoutDisplay, mockMutateActiveVisit, () => {}));
+    const { result } = renderHook(() => useDeleteVisit(visitWithoutDisplay, () => {}));
 
     await act(async () => {
       result.current.initiateDeletingVisit();

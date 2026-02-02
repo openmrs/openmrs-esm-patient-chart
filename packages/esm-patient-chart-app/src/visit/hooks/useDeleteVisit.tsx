@@ -9,12 +9,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
-export function useDeleteVisit(
-  activeVisit: Visit,
-  mutateActiveVisit: () => void,
-  onVisitDelete = () => {},
-  onVisitRestore = () => {},
-) {
+export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onVisitRestore = () => {}) {
   const { t } = useTranslation();
   const { mutate: globalMutate } = useSWRConfig();
   const [isDeletingVisit, setIsDeletingVisit] = useState(false);
@@ -24,8 +19,6 @@ export function useDeleteVisit(
   const restoreDeletedVisit = () => {
     restoreVisit(activeVisit?.uuid)
       .then(({ data: updatedVisit }) => {
-        // Update current visit data for critical components (useVisit hook)
-        mutateActiveVisit();
         if (!updatedVisit.stopDatetime) {
           const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, updatedVisit.uuid);
           setVisitContext(updatedVisit, mutateSavedOrUpdatedVisit);
@@ -45,7 +38,6 @@ export function useDeleteVisit(
       })
       .catch(() => {
         // On error, revalidate to get correct state
-        mutateActiveVisit();
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
           title: t('visitNotRestored', "Visit couldn't be restored"),
@@ -62,8 +54,6 @@ export function useDeleteVisit(
 
     deleteVisit(activeVisit?.uuid)
       .then(() => {
-        // Update active visit data
-        mutateActiveVisit();
         if (activeVisit.uuid == visitContext?.uuid) {
           setVisitContext(null, null);
         }
@@ -86,7 +76,6 @@ export function useDeleteVisit(
       })
       .catch(() => {
         // On error, revalidate to get correct state
-        mutateActiveVisit();
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
         showSnackbar({
