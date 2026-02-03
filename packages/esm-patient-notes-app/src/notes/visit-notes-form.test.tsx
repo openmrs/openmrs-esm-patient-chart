@@ -243,7 +243,8 @@ test('initializes form with existing encounter data when in edit mode', () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -283,7 +284,8 @@ test('updates existing visit note when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -356,7 +358,8 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',

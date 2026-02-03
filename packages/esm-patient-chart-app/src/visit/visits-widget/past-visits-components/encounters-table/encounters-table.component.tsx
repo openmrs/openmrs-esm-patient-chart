@@ -184,135 +184,83 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           rows: Array<{ id: string; isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
           [key: string]: any;
         }) => (
-          <>
-            <TableContainer className={styles.tableContainer}>
-              {showEncounterTypeFilter && (
-                <TableToolbar {...getToolbarProps()}>
-                  <TableToolbarContent>
-                    <div className={styles.filterContainer}>
-                      <ComboBox
-                        aria-label={t('filterByEncounterType', 'Filter by encounter type')}
-                        className={styles.substitutionType}
-                        id="encounterTypeFilter"
-                        items={encounterTypes}
-                        itemToString={(item: EncounterType) => item?.display}
-                        onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
-                        placeholder={t('filterByEncounterType', 'Filter by encounter type')}
-                        selectedItem={encounterTypeToFilter}
-                        size={responsiveSize}
-                      />
-                    </div>
-                  </TableToolbarContent>
-                </TableToolbar>
-              )}
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                    {headers.map((header, i) => (
-                      <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                    <TableHeader aria-label={t('actions', 'Actions')} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows?.map((row) => {
-                    const encounter = encountersByUuid.get(row.id);
+          <TableContainer className={styles.tableContainer}>
+            {showEncounterTypeFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent>
+                  <div className={styles.filterContainer}>
+                    <ComboBox
+                      aria-label={t('filterByEncounterType', 'Filter by encounter type')}
+                      className={styles.substitutionType}
+                      id="encounterTypeFilter"
+                      items={encounterTypes}
+                      itemToString={(item: EncounterType) => item?.display}
+                      onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
+                      placeholder={t('filterByEncounterType', 'Filter by encounter type')}
+                      selectedItem={encounterTypeToFilter}
+                      size={responsiveSize}
+                    />
+                  </div>
+                </TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  {headers.map((header, i) => (
+                    <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                  <TableHeader aria-label={t('actions', 'Actions')} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows?.map((row) => {
+                  const encounter = encountersByUuid.get(row.id);
 
-                    if (!encounter) return null;
+                  if (!encounter) return null;
 
-                    const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                      encounter.encounterType === 'Visit Note' && !encounter.form;
+                  const isVisitNoteEncounter = (encounter: MappedEncounter) =>
+                    encounter.encounterType === 'Visit Note' && !encounter.form;
 
-                    const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
-                      encounter.form?.uuid &&
-                      encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
+                  const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
+                    encounter.form?.uuid &&
+                    encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
-                    const encounterAgeInMinutes = (Date.now() - new Date(encounter.datetime).getTime()) / (1000 * 60);
+                  const encounterAgeInMinutes = (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
 
-                    const canDeleteEncounter =
-                      userHasAccess(encounter.editPrivilege, session?.user) &&
-                      (encounterEditableDuration === 0 ||
-                        (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
-                        encounterEditableDurationOverridePrivileges.some((privilege) =>
-                          userHasAccess(privilege, session?.user),
-                        ));
+                  const canDeleteEncounter =
+                    userHasAccess(encounter.editPrivilege, session?.user) &&
+                    (encounterEditableDuration === 0 ||
+                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                      encounterEditableDurationOverridePrivileges.some((privilege) =>
+                        userHasAccess(privilege, session?.user),
+                      ));
 
-                    const canEditEncounter =
-                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
+                  const canEditEncounter =
+                    canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
 
-                    return (
-                      <React.Fragment key={encounter.id}>
-                        <TableExpandRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                          ))}
-                          <TableCell className="cds--table-column-menu">
-                            <Layer className={styles.layer}>
-                              {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
-                                <OverflowMenu
-                                  aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
-                                  flipped
-                                  size={responsiveSize}
-                                  align="left"
-                                >
-                                  {canEditEncounter && (
-                                    <OverflowMenuItem
-                                      className={styles.menuItem}
-                                      itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace2('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchWorkspace2('patient-form-entry-workspace', {
-                                            form: encounter.form,
-                                            encounterUuid: encounter.id,
-                                          });
-                                        }
-                                      }}
-                                    />
-                                  )}
-                                  {canDeleteEncounter && (
-                                    <OverflowMenuItem
-                                      className={styles.menuItem}
-                                      hasDivider
-                                      isDelete
-                                      itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                                      onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    />
-                                  )}
-                                </OverflowMenu>
-                              )}
-                            </Layer>
-                          </TableCell>
-                        </TableExpandRow>
-                        {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
-                            <>
-                              {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
-                                <ExtensionSlot
-                                  name="form-widget-slot"
-                                  state={{
-                                    additionalProps: { mode: 'embedded-view' },
-                                    patientUuid: patientUuid,
-                                    formUuid: encounter.form.uuid,
-                                    encounterUuid: encounter.id,
-                                    promptBeforeClosing: () => {},
-                                  }}
-                                />
-                              ) : (
-                                <EncounterObservations observations={encounter.obs} />
-                              )}
-                              <>
+                  return (
+                    <React.Fragment key={encounter.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                        <TableCell className="cds--table-column-menu">
+                          <Layer className={styles.layer}>
+                            {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
+                              <OverflowMenu
+                                aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+                                flipped
+                                size={responsiveSize}
+                                align="left"
+                              >
                                 {canEditEncounter && (
-                                  <Button
-                                    kind="ghost"
+                                  <OverflowMenuItem
+                                    className={styles.menuItem}
+                                    itemText={t('editThisEncounter', 'Edit this encounter')}
                                     onClick={() => {
                                       if (isVisitNoteEncounter(encounter)) {
                                         launchWorkspace2('visit-notes-form-workspace', {
@@ -327,47 +275,97 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                         });
                                       }
                                     }}
-                                    renderIcon={(props: ComponentProps<typeof EditIcon>) => (
-                                      <EditIcon size={16} {...props} />
-                                    )}
-                                  >
-                                    {t('editThisEncounter', 'Edit this encounter')}
-                                  </Button>
+                                  />
                                 )}
                                 {canDeleteEncounter && (
-                                  <Button
-                                    kind="danger--ghost"
+                                  <OverflowMenuItem
+                                    className={styles.menuItem}
+                                    hasDivider
+                                    isDelete
+                                    itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
-                                      <TrashCanIcon size={16} {...props} />
-                                    )}
-                                  >
-                                    {t('deleteThisEncounter', 'Delete this encounter')}
-                                  </Button>
+                                  />
                                 )}
-                              </>
+                              </OverflowMenu>
+                            )}
+                          </Layer>
+                        </TableCell>
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
+                          <>
+                            {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
+                              <ExtensionSlot
+                                name="form-widget-slot"
+                                state={{
+                                  additionalProps: { mode: 'embedded-view' },
+                                  patientUuid: patientUuid,
+                                  formUuid: encounter.form.uuid,
+                                  encounterUuid: encounter.id,
+                                  promptBeforeClosing: () => {},
+                                }}
+                              />
+                            ) : (
+                              <EncounterObservations observations={encounter.obs} />
+                            )}
+                            <>
+                              {canEditEncounter && (
+                                <Button
+                                  kind="ghost"
+                                  onClick={() => {
+                                    if (isVisitNoteEncounter(encounter)) {
+                                      launchWorkspace2('visit-notes-form-workspace', {
+                                        encounter,
+                                        formContext: 'editing',
+                                        patientUuid,
+                                      });
+                                    } else {
+                                      launchWorkspace2('patient-form-entry-workspace', {
+                                        form: encounter.form,
+                                        encounterUuid: encounter.id,
+                                      });
+                                    }
+                                  }}
+                                  renderIcon={(props: ComponentProps<typeof EditIcon>) => (
+                                    <EditIcon size={16} {...props} />
+                                  )}
+                                >
+                                  {t('editThisEncounter', 'Edit this encounter')}
+                                </Button>
+                              )}
+                              {canDeleteEncounter && (
+                                <Button
+                                  kind="danger--ghost"
+                                  onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
+                                  renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
+                                    <TrashCanIcon size={16} {...props} />
+                                  )}
+                                >
+                                  {t('deleteThisEncounter', 'Delete this encounter')}
+                                </Button>
+                              )}
                             </>
-                          </TableExpandedRow>
-                        ) : (
-                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              {rows?.length === 0 && (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
-                </div>
-              )}
-            </TableContainer>
-          </>
+                          </>
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {rows?.length === 0 && (
+              <div className={styles.tileContainer}>
+                <Tile className={styles.tile}>
+                  <div className={styles.tileContent}>
+                    <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
+                    <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                  </div>
+                </Tile>
+              </div>
+            )}
+          </TableContainer>
         )}
       </DataTable>
       {
