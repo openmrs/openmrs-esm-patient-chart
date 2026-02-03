@@ -8,7 +8,10 @@
     ],
     "paths": {
       "@openmrs/esm-framework": [
-        "src/openmrs-esm-framework.mock.js"
+        "src/openmrs-esm-framework.mock.ts"
+      ],
+      "@openmrs/esm-patient-common-lib": [
+        "src/openmrs-esm-patient-common-lib.mock.ts"
       ]
     }
   },
