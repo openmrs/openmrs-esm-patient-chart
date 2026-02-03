@@ -160,7 +160,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
-      noteDate: isEditing ? new Date(encounter.datetime) : new Date(),
+      noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
         : '',
