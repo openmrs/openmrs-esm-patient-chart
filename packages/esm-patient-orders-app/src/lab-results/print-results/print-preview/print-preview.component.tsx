@@ -30,14 +30,10 @@ interface PrintableReportProps {
 
 const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
   const { t } = useTranslation();
-
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(order?.concept?.uuid);
   const { encounter, isLoading: isLoadingResult } = useLabEncounter(order?.encounter?.uuid);
-
   const patientUuid = encounter?.patient?.uuid;
-
   const conceptUuids = useMemo(() => getConceptUuids(concept), [concept]);
-
   const { ranges: referenceRanges, isLoading: isLoadingRanges } = useReferenceRanges(patientUuid, conceptUuids);
 
   const tableHeaders = useMemo(
@@ -64,7 +60,9 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
   }, [concept, encounter]);
 
   const testRows = useMemo(() => {
-    if (!concept || !encounter) return [];
+    if (!concept || !encounter) {
+      return [];
+    }
 
     if (concept.setMembers?.length > 0) {
       return concept.setMembers.map((memberConcept) => {
@@ -125,7 +123,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
     <div className={styles.container}>
       <div className={styles.mainContent}>
         <p className={styles.testDoneHeader}>
-          {index + 1}. {order.concept.display}
+          {index + 1}. {order.concept.display} &mdash; {order.orderNumber}
         </p>
         <div className={styles.printResults}>
           <DataTable rows={testRows} headers={tableHeaders} size="sm" useZebraStyles>

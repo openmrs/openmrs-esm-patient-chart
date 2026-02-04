@@ -67,7 +67,7 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
                 id={order.uuid}
                 labelText={
                   <span className={styles.checkboxLabel}>
-                    {capitalize(order.concept.display || order.concept.name?.display || '--')}
+                    {capitalize(order.concept.display || order.concept.name?.display || '--')} ({order.orderNumber})
                   </span>
                 }
                 checked={selectedOrders.has(order.uuid)}
