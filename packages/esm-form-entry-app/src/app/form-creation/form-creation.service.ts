@@ -90,7 +90,7 @@ export class FormCreationService {
    */
   public async initAndCreateForm(createFormParams: CreateFormParams) {
     const { formSchema, encounter, patientIdentifiers } = createFormParams;
-
+    console.log('createFormParams', createFormParams);
     await this.wireDataSources(createFormParams, formSchema);
 
     const form = this.formFactory.createForm(formSchema, this.dataSources.dataSources);
@@ -148,6 +148,7 @@ export class FormCreationService {
     this.dataSources.registerDataSource('userLocation', createFormParams.session.sessionLocation);
     this.dataSources.registerDataSource('services', dataSources.services);
     this.dataSources.registerDataSource('appointmentSummaryService', this.appointmentService);
+    this.dataSources.registerDataSource('concept', dataSources.concept);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
     const config = this.configResourceService.getConfig();

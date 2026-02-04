@@ -59,4 +59,14 @@ export class ConceptResourceService {
     });
     return res;
   }
+
+  public getConceptByClassUuid(conceptClassUuid: string, searchText) {
+    const params = `?searchType=fuzzy&class=${conceptClassUuid}&name=${searchText}&v=full&limit=1`;
+    const url = `${this.getUrl()}${params}`;
+    return this.http.get(url).pipe(
+      map((response: any) => {
+        return response.results;
+      }),
+    );
+  }
 }

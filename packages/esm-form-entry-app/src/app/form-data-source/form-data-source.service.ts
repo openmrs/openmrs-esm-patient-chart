@@ -58,6 +58,10 @@ export class FormDataSourceService {
         resolveSelectedValue: this.resolveAppointmentService.bind(this),
         searchOptions: this.findAppointmentServices.bind(this),
       },
+      concept: {
+        resolveSelectedValue: this.resolveConcept.bind(this),
+        searchOptions: this.findConceptByClass.bind(this),
+      },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
       recentObs: this.getMostRecentObsDataSource(formSchema),
     };
@@ -355,6 +359,7 @@ export class FormDataSourceService {
   }
 
   public mapConceptWithMappings(concept: Concept, conceptSourceUuid: Array<string>) {
+    console.log('Mapping concept with mappings:', concept, conceptSourceUuid);
     if (!conceptSourceUuid) {
       return {
         value: concept.uuid,
@@ -488,5 +493,12 @@ export class FormDataSourceService {
     }
 
     return { obs: observations };
+  }
+
+  public findConceptByClass(searchText: string, dataSourceOptions: Record<string, any>) {
+    const conceptClassUuid = dataSourceOptions?.conceptClassUuid;
+    return this.conceptResourceService
+      .getConceptByClassUuid(conceptClassUuid, searchText)
+      .pipe(map((concepts) => concepts.map(this.mapConcept)));
   }
 }

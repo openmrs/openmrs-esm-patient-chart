@@ -5124,56 +5124,56 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app":
-  version: 18.0.0
-  resolution: "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=169f2d&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
+  version: 19.0.1
+  resolution: "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=b8d43a&locator=%40openmrs%2Fesm-form-entry-app%40workspace%3Apackages%2Fesm-form-entry-app"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^18.2.13
-    "@angular/cdk": ^18.2.13
-    "@angular/common": ^18.2.13
-    "@angular/compiler": ^18.2.13
-    "@angular/compiler-cli": ^18.2.13
-    "@angular/core": ^18.2.13
-    "@angular/forms": ^18.2.13
+    "@angular/animations": ^19.0.0
+    "@angular/cdk": ^19.0.0
+    "@angular/common": ^19.0.0
+    "@angular/compiler": ^19.0.0
+    "@angular/compiler-cli": ^19.0.0
+    "@angular/core": ^19.0.0
+    "@angular/forms": ^19.0.0
     "@carbon/styles": 1.x
-    "@ng-select/ng-select": ^13.9.1
+    "@ng-select/ng-select": ^14.0.0
     "@ngx-translate/core": ^16.0.4
-    "@openmrs/ngx-file-uploader": "*"
+    "@openmrs/ngx-file-uploader": ^19.0.0
     lodash: ^4.17.21
     moment: ^2.29.4
     ngx-webcam: ^0.4.1
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/b5b4ec5c846572e86611c3d19ee06d2a07f52a449fe7deaf3e00396d184e4dff7cf3372f394ec993a8b749c707baf0eb2aa08f78b7d421411bceac30228b5d19
+  checksum: 10/691293e2ba6f08aaa45ea11dd0fd5e5b705841de625fd69c844cfcd869fcfff571d43c5b531614eed84c752b6d4c0e306494eacf474b346a88340d4fa96033d7
   languageName: node
   linkType: hard
 
 "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::locator=%40openmrs%2Fesm-patient-chart%40workspace%3A.":
-  version: 18.0.0
-  resolution: "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=169f2d&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
+  version: 19.0.1
+  resolution: "@openmrs/ngx-formentry@file:/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry#/Users/donaldkibet/openmrs/openmrs-ngx-formentry/dist/ngx-formentry::hash=b8d43a&locator=%40openmrs%2Fesm-patient-chart%40workspace%3A."
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^18.2.13
-    "@angular/cdk": ^18.2.13
-    "@angular/common": ^18.2.13
-    "@angular/compiler": ^18.2.13
-    "@angular/compiler-cli": ^18.2.13
-    "@angular/core": ^18.2.13
-    "@angular/forms": ^18.2.13
+    "@angular/animations": ^19.0.0
+    "@angular/cdk": ^19.0.0
+    "@angular/common": ^19.0.0
+    "@angular/compiler": ^19.0.0
+    "@angular/compiler-cli": ^19.0.0
+    "@angular/core": ^19.0.0
+    "@angular/forms": ^19.0.0
     "@carbon/styles": 1.x
-    "@ng-select/ng-select": ^13.9.1
+    "@ng-select/ng-select": ^14.0.0
     "@ngx-translate/core": ^16.0.4
-    "@openmrs/ngx-file-uploader": "*"
+    "@openmrs/ngx-file-uploader": ^19.0.0
     lodash: ^4.17.21
     moment: ^2.29.4
     ngx-webcam: ^0.4.1
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/b5b4ec5c846572e86611c3d19ee06d2a07f52a449fe7deaf3e00396d184e4dff7cf3372f394ec993a8b749c707baf0eb2aa08f78b7d421411bceac30228b5d19
+  checksum: 10/691293e2ba6f08aaa45ea11dd0fd5e5b705841de625fd69c844cfcd869fcfff571d43c5b531614eed84c752b6d4c0e306494eacf474b346a88340d4fa96033d7
   languageName: node
   linkType: hard
 

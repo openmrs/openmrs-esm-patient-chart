@@ -146,6 +146,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
         : of<Encounter>(null),
       patientIdentifiers: of<Array<Identifier>>(identifiers),
+      patient: of(patient),
     }).pipe(
       mergeMap((result) =>
         this.loadPatientPreviousEncounters(result.formSchema).pipe(
