@@ -217,7 +217,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
       }
 
       if (orderStatus === 'COMPLETED') {
-        // Already approved - just update directly
         try {
           const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
             const obs =

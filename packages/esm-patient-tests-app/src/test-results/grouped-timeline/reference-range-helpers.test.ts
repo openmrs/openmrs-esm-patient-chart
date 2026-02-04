@@ -1,8 +1,9 @@
 import {
-  selectReferenceRange,
+  formatRangeWithUnits,
   formatReferenceRange,
   getMostRecentObservationWithRange,
   rangeAlreadyHasUnits,
+  selectReferenceRange,
   type ReferenceRanges,
 } from './reference-range-helpers';
 
@@ -267,6 +268,41 @@ describe('Reference Range Helpers', () => {
     it('returns false for empty strings', () => {
       expect(rangeAlreadyHasUnits('', 'U/L')).toBe(false);
       expect(rangeAlreadyHasUnits('0 – 50', '')).toBe(false);
+    });
+  });
+
+  describe('formatRangeWithUnits', () => {
+    it('returns "--" when range is undefined', () => {
+      expect(formatRangeWithUnits(undefined, 'U/L')).toBe('--');
+    });
+
+    it('returns "--" when range is empty string', () => {
+      expect(formatRangeWithUnits('', 'U/L')).toBe('--');
+    });
+
+    it('returns range as-is when range already includes units', () => {
+      expect(formatRangeWithUnits('0 – 50 U/L', 'U/L')).toBe('0 – 50 U/L');
+    });
+
+    it('appends units when range does not include units', () => {
+      expect(formatRangeWithUnits('0 – 50', 'U/L')).toBe('0 – 50 U/L');
+    });
+
+    it('returns range without units when units is undefined', () => {
+      expect(formatRangeWithUnits('0 – 50', undefined)).toBe('0 – 50');
+    });
+
+    it('returns range without units when units is empty', () => {
+      expect(formatRangeWithUnits('0 – 50', '')).toBe('0 – 50');
+    });
+
+    it('handles trimmed strings correctly', () => {
+      expect(formatRangeWithUnits('  0 – 50  ', '  U/L  ')).toBe('0 – 50 U/L');
+    });
+
+    it('handles range with units and different units parameter', () => {
+      // If range already has units, don't append different units
+      expect(formatRangeWithUnits('0 – 50 mg/dL', 'U/L')).toBe('0 – 50 mg/dL');
     });
   });
 });

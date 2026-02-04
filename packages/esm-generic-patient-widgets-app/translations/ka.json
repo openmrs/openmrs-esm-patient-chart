@@ -1,5 +1,10 @@
 {
+  "addEncounter": "Add encounter",
   "date": "Date",
   "dateAndTime": "თარიღი და დრო",
-  "encounterType": "კონსულტაციის ტიპი"
+  "editabilityNote": "Tap an observation to edit",
+  "encounterType": "კონსულტაციის ტიპი",
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

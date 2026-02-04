@@ -55,7 +55,11 @@ test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => 
     await chartPage.page.getByRole('button', { name: /clear selected item/i }).click();
     await chartPage.page.getByRole('combobox', { name: /select a location/i }).click();
     await chartPage.page.getByRole('combobox', { name: /select a location/i }).clear();
-    await chartPage.page.getByRole('option', { name: /inpatient ward/i }).click();
+
+    const inpatientOption = chartPage.page.getByRole('option', { name: /inpatient ward/i });
+    await expect(inpatientOption).toBeVisible();
+    await inpatientOption.click();
+
     await chartPage.page.getByText(/home visit/i).click();
     await expect(chartPage.page.getByLabel(/home visit/i)).toBeChecked();
     await chartPage.page.getByRole('button', { name: /update visit/i }).click();
@@ -98,12 +102,11 @@ test('Edit an existing ongoing visit to have an end time', async ({ page, api, p
   });
 
   await test.step('When I click on visit status `Ended` and fill in end date time', async () => {
-    // Wait for default location to load to ensure form is stable before interaction
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).not.toHaveValue('');
+    await expect(chartPage.page.getByTestId('visitStartDateInput')).toBeVisible();
 
     await visitsPage.page.getByRole('tab', { name: /ended/i }).click();
 
-    // Wait for end date field to appear (confirms form has updated after status change)
     await expect(chartPage.page.getByTestId('visitStopDateInput')).toBeVisible();
 
     await chartPage.page.getByRole('textbox', { name: /start time/i }).fill('12:00');

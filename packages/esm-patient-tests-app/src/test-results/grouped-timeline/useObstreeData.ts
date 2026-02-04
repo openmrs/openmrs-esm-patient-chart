@@ -10,9 +10,10 @@ export const getName = (prefix: string | undefined, name: string) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-interface ObsTreeNode {
+export interface ObsTreeNode {
   flatName?: string;
   display: string;
+  conceptUuid?: string;
   hasData: boolean;
   hiAbsolute?: number;
   hiCritical?: number;
@@ -116,6 +117,28 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   return { ...outData } as ObsTreeNode;
 };
 
+const filterTreesWithData = (node: ObsTreeNode): ObsTreeNode | null => {
+  // If this is a leaf node (has obs array), only keep it if it has data
+  if (node.obs !== undefined) {
+    return node.hasData ? node : null;
+  }
+
+  // This is an intermediate/parent node - always keep it to preserve hierarchy
+  if (node.subSets && node.subSets.length > 0) {
+    // Recursively filter only the leaf children
+    const filteredSubSets = node.subSets
+      .map((subSet) => filterTreesWithData(subSet))
+      .filter((subSet): subSet is ObsTreeNode => subSet !== null);
+
+    // Always keep parent nodes to maintain test hierarchy structure
+    // The UI can choose to grey out parents with no data based on hasData flag
+    return { ...node, subSets: filteredSubSets };
+  }
+
+  // Parent node with empty subSets - keep it to preserve hierarchy
+  return node;
+};
+
 const useGetObstreeData = (patientUuid: string, conceptUuid: string) => {
   const response = useSWR<FetchResponse<ObsTreeNode>, Error>(
     `${restBaseUrl}/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
@@ -152,10 +175,14 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
 
   const result = useMemo(() => {
     return (
-      data?.map((resp) => {
+      data?.map((resp, index) => {
         if (resp?.data) {
           const { data, ...rest } = resp;
           const newData = augmentObstreeData(data, '');
+          // Tag the root node with the conceptUuid we requested
+          if (index < uuidArray.length && newData) {
+            newData.conceptUuid = uuidArray[index];
+          }
           return { ...rest, loading: false, data: newData };
         } else {
           return {
@@ -172,8 +199,14 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
         },
       ]
     );
-  }, [data]);
-  const roots = result.map((item) => item.data);
+  }, [data, uuidArray]);
+
+  const roots = result
+    .map((item) => item.data)
+    .filter((node): node is ObsTreeNode => 'display' in node)
+    .map((data: ObsTreeNode) => filterTreesWithData(data))
+    .filter(Boolean);
+
   const isLoading = result.some((item) => item.loading);
 
   return { roots, isLoading, error };

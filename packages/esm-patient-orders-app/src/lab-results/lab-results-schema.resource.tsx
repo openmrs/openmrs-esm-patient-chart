@@ -116,7 +116,6 @@ const createNumericSchema = (
       },
     );
 
-  // Add range validations
   const hasLowerLimit = lowerLimit !== null && lowerLimit !== undefined;
   const hasUpperLimit = upperLimit !== null && upperLimit !== undefined;
 

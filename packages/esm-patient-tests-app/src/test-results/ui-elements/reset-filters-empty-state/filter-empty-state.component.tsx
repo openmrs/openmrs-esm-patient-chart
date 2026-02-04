@@ -1,14 +1,11 @@
 import React from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import type { EmptyStateProps } from '../../filter/filter-types';
 import FilterEmptyDataIllustration from './filter-empty-data-illustration';
-import styles from './index.scss';
+import styles from './filter-empty-state.scss';
 
-export interface EmptyStateProps {
-  clearFilter(): void;
-}
-
-export const FilterEmptyState: React.FC<EmptyStateProps> = (props) => {
+const FilterEmptyState: React.FC<EmptyStateProps> = (props) => {
   const { t } = useTranslation();
 
   return (
@@ -28,3 +25,5 @@ export const FilterEmptyState: React.FC<EmptyStateProps> = (props) => {
     </Layer>
   );
 };
+
+export default FilterEmptyState;

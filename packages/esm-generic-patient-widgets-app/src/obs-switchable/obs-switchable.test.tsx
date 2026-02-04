@@ -20,7 +20,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 182 },
     encounter: { reference: 'Encounter/234' },
@@ -28,7 +28,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-02-01T00:00:00Z',
     valueQuantity: { value: 72 },
     encounter: { reference: 'Encounter/234' },
@@ -36,7 +36,7 @@ const mockObsData = [
   {
     code: { text: 'Height' },
     conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 180 },
     encounter: { reference: 'Encounter/123' },
@@ -44,7 +44,7 @@ const mockObsData = [
   {
     code: { text: 'Weight' },
     conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 70 },
     encounter: { reference: 'Encounter/123' },
@@ -60,7 +60,7 @@ const mockObsData = [
   {
     code: { text: 'Power Level' },
     conceptUuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    dataType: 'Number',
+    dataType: 'Numeric',
     effectiveDateTime: '2021-01-01T00:00:00Z',
     valueQuantity: { value: 9001 },
     encounter: { reference: 'Encounter/123' },
@@ -68,10 +68,15 @@ const mockObsData = [
 ];
 
 const mockConceptData = [
-  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height' },
-  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight' },
-  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint' },
-  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level' },
+  { uuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Height', dataType: 'Numeric' },
+  { uuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Weight', dataType: 'Numeric' },
+  { uuid: '164162AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Chief Complaint', dataType: 'Text' },
+  { uuid: '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Power Level', dataType: 'Numeric' },
+];
+
+const mockEncounters = [
+  { reference: 'Encounter/123', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
+  { reference: 'Encounter/234', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
 ];
 
 const mockUseObs = jest.mocked(useObs);
@@ -79,10 +84,11 @@ const mockUseObs = jest.mocked(useObs);
 describe('ObsSwitchable', () => {
   it('should render all obs in table and numeric obs in graph', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -178,10 +184,11 @@ describe('ObsSwitchable', () => {
 
   it('should support showing graph tab by default', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -211,10 +218,11 @@ describe('ObsSwitchable', () => {
 
   it('should support grouping into multiline graphs', async () => {
     mockUseObs.mockReturnValue({
-      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData },
+      data: { observations: mockObsData as Array<ObsResult>, concepts: mockConceptData, encounters: mockEncounters },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),
@@ -264,10 +272,12 @@ describe('ObsSwitchable', () => {
           (o) => o.conceptUuid === '164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         ) as Array<ObsResult>,
         concepts: mockConceptData,
+        encounters: mockEncounters,
       },
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: jest.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as Object),

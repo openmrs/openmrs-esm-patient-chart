@@ -1,7 +1,7 @@
 import React, { useContext, useState, useMemo } from 'react';
 import classNames from 'classnames';
+import { AccordionSkeleton, Button, DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, DataTableSkeleton, Button, Layer } from '@carbon/react';
 import { useLayoutType, TreeViewAltIcon, useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
@@ -99,11 +99,16 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
 
+  // Don't show empty state while loading - wait for data to finish loading
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
   if (!roots || roots.length === 0) {
     return (
       <EmptyState
         headerTitle={t('testResults_title', 'Test Results')}
-        displayText={t('testResultsData', 'Test results data')}
+        displayText={t('testResultsData', 'test results data')}
       />
     );
   }
@@ -165,13 +170,21 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
         {isLoading ? (
           <DataTableSkeleton />
         ) : view === 'individual-test' ? (
-          <div className={styles.panelViewTimeline}>
+          tableData && tableData.length > 0 ? (
+            <div className={styles.panelViewTimeline}>
+              <GroupedPanelsTables
+                patientUuid={patientUuid}
+                className={styles.groupPanelsTables}
+                loadingPanelData={isLoading}
+              />
+            </div>
+          ) : (
             <GroupedPanelsTables
               patientUuid={patientUuid}
               className={styles.groupPanelsTables}
               loadingPanelData={isLoading}
             />
-          </div>
+          )
         ) : view === 'over-time' ? (
           <GroupedTimeline patientUuid={patientUuid} />
         ) : null}
