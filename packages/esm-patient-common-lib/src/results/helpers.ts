@@ -35,12 +35,29 @@ export function formatReferenceRange(ranges: ReferenceRanges | null, units?: str
  * @returns The interpretation category
  */
 export function assessValue(value: number, ranges: ReferenceRanges): OBSERVATION_INTERPRETATION {
-  if (isNaN(value)) return 'NORMAL';
-  if (exist(ranges.hiAbsolute) && value > ranges.hiAbsolute!) return 'OFF_SCALE_HIGH';
-  if (exist(ranges.hiCritical) && value > ranges.hiCritical!) return 'CRITICALLY_HIGH';
-  if (exist(ranges.hiNormal) && value > ranges.hiNormal!) return 'HIGH';
-  if (exist(ranges.lowAbsolute) && value < ranges.lowAbsolute!) return 'OFF_SCALE_LOW';
-  if (exist(ranges.lowCritical) && value < ranges.lowCritical!) return 'CRITICALLY_LOW';
-  if (exist(ranges.lowNormal) && value < ranges.lowNormal!) return 'LOW';
+  if (isNaN(value)) {
+    return 'NORMAL';
+  }
+  // Critical and absolute thresholds use inclusive (>=, <=) comparisons
+  // because values at those boundaries should be flagged for clinical safety.
+  // Normal thresholds use exclusive (>, <) so values at the boundary are still normal.
+  if (exist(ranges.hiAbsolute) && value >= ranges.hiAbsolute!) {
+    return 'OFF_SCALE_HIGH';
+  }
+  if (exist(ranges.hiCritical) && value >= ranges.hiCritical!) {
+    return 'CRITICALLY_HIGH';
+  }
+  if (exist(ranges.hiNormal) && value > ranges.hiNormal!) {
+    return 'HIGH';
+  }
+  if (exist(ranges.lowAbsolute) && value <= ranges.lowAbsolute!) {
+    return 'OFF_SCALE_LOW';
+  }
+  if (exist(ranges.lowCritical) && value <= ranges.lowCritical!) {
+    return 'CRITICALLY_LOW';
+  }
+  if (exist(ranges.lowNormal) && value < ranges.lowNormal!) {
+    return 'LOW';
+  }
   return 'NORMAL';
 }

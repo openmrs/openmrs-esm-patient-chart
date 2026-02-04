@@ -39,6 +39,7 @@ export type OBSERVATION_INTERPRETATION =
   | 'LOW'
   | 'CRITICALLY_LOW'
   | 'OFF_SCALE_LOW'
+  // Legacy sentinel for "no data"; avoid new usage and prefer undefined instead.
   | '--';
 
 export interface ReferenceRanges {

@@ -12,6 +12,7 @@ interface ReferenceRangeResponse {
   hiAbsolute?: number;
   lowCritical?: number;
   hiCritical?: number;
+  units?: string;
 }
 
 export interface UseReferenceRangesResult {
@@ -25,11 +26,14 @@ export interface UseReferenceRangesResult {
  * Fetches patient-specific reference ranges for given concepts.
  * Uses the /conceptreferencerange REST API endpoint.
  *
- * @param patientUuid - The UUID of the patient
+ * @param patientUuid - The UUID of the patient (optional; when absent, no request is made)
  * @param conceptUuids - Array of concept UUIDs to fetch ranges for
  * @returns Object containing ranges map, loading state, error, and mutate function
  */
-export function useReferenceRanges(patientUuid: string, conceptUuids: Array<string>): UseReferenceRangesResult {
+export function useReferenceRanges(
+  patientUuid: string | undefined,
+  conceptUuids: Array<string>,
+): UseReferenceRangesResult {
   const conceptList = conceptUuids.filter(Boolean).join(',');
   const apiUrl =
     patientUuid && conceptList
@@ -52,6 +56,7 @@ export function useReferenceRanges(patientUuid: string, conceptUuids: Array<stri
           hiAbsolute: range.hiAbsolute,
           lowCritical: range.lowCritical,
           hiCritical: range.hiCritical,
+          units: range.units,
         });
       }
     });

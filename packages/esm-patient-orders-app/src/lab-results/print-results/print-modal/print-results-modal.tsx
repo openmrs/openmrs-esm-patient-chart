@@ -89,15 +89,14 @@ const PrintResultsModal: React.FC<PrintResultsModalProps> = ({ orders, closeModa
 
                   <div className={styles.printableBody}>
                     <div className={styles.testResultDetails}>
-                      <p className={styles.itemHeading}>{capitalize(t('reportSummaryTo', 'Report summary to'))}</p>
                       <p className={styles.itemLabel}>
-                        {capitalize(t('name', 'Name'))}: {capitalize(firstOrder?.patient?.person?.display)}
+                        {capitalize(t('name', 'Name'))}: {firstOrder?.patient?.person?.display}
                       </p>
                       <p className={styles.itemLabel}>
                         {capitalize(t('age', 'Age'))}: {firstOrder?.patient?.person?.age}
                       </p>
                       <p className={styles.itemLabel}>
-                        {capitalize(t('gender', 'Gender'))}:
+                        {capitalize(t('gender', 'Gender'))}:{' '}
                         {capitalize(firstOrder?.patient?.person?.gender === 'M' ? 'Male' : 'Female')}
                       </p>
                     </div>

@@ -1,3 +1,6 @@
+import React, { useMemo } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -10,11 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import upperCase from 'lodash/upperCase';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import {
+  type Order,
+  type OBSERVATION_INTERPRETATION,
+  ReferenceRangeDisplay,
+  useReferenceRanges,
+} from '@openmrs/esm-patient-common-lib';
 import { useLabEncounter, useOrderConceptByUuid } from '../../lab-results.resource';
+import { getConceptUuids, getEffectiveRanges, getInterpretationClass, interpretObservation } from '../../../utils';
 import styles from './print-preview.scss';
 
 interface PrintableReportProps {
@@ -22,21 +28,17 @@ interface PrintableReportProps {
   index: number;
 }
 
-const getObservationValueDisplay = (value: any): string => {
-  if (typeof value === 'object' && value !== null && 'display' in value) {
-    return value.display;
-  }
-  if (typeof value === 'string' || typeof value === 'number') {
-    return String(value);
-  }
-  return '--';
-};
-
 const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
   const { t } = useTranslation();
 
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(order?.concept?.uuid);
   const { encounter, isLoading: isLoadingResult } = useLabEncounter(order?.encounter?.uuid);
+
+  const patientUuid = encounter?.patient?.uuid;
+
+  const conceptUuids = useMemo(() => getConceptUuids(concept), [concept]);
+
+  const { ranges: referenceRanges, isLoading: isLoadingRanges } = useReferenceRanges(patientUuid, conceptUuids);
 
   const tableHeaders = useMemo(
     () => [
@@ -50,7 +52,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
       },
       {
         key: 'normalRange',
-        header: t('normalRange', 'Normal range'),
+        header: t('referenceRange', 'Reference range'),
       },
     ],
     [t, order?.orderType?.display],
@@ -67,36 +69,51 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
     if (concept.setMembers?.length > 0) {
       return concept.setMembers.map((memberConcept) => {
         const memberObs = testResultObs?.groupMembers?.find((obs) => obs?.concept?.uuid === memberConcept?.uuid);
-        const resultValue = getObservationValueDisplay(memberObs?.value);
+
+        const ranges = getEffectiveRanges(memberConcept, referenceRanges);
+
+        let result: { value: string; interpretation: OBSERVATION_INTERPRETATION } | React.ReactNode;
+        if (isLoadingResult) {
+          result = <SkeletonText />;
+        } else if (memberObs) {
+          const { displayValue, interpretation } = interpretObservation(memberObs, ranges);
+          result = { value: displayValue, interpretation };
+        } else {
+          result = '--';
+        }
 
         return {
-          id: memberConcept?.uuid,
+          id: memberObs?.uuid ?? `${testResultObs?.uuid}:${memberConcept?.uuid}`,
           testType: <div className={styles.testType}>{memberConcept?.display || '--'}</div>,
-          result: isLoadingResult ? <SkeletonText /> : resultValue,
-          normalRange:
-            memberConcept?.hiNormal && memberConcept?.lowNormal
-              ? `${memberConcept.lowNormal} - ${memberConcept.hiNormal}`
-              : t('notApplicable', 'Not applicable'),
+          result,
+          normalRange: <ReferenceRangeDisplay ranges={ranges} />,
         };
       });
     }
 
-    const mainResultValue = getObservationValueDisplay(testResultObs?.value) || testResultObs?.display || '--';
+    const ranges = getEffectiveRanges(concept, referenceRanges);
+
+    let result: { value: string; interpretation: OBSERVATION_INTERPRETATION } | React.ReactNode;
+    if (isLoadingResult) {
+      result = <SkeletonText />;
+    } else if (testResultObs) {
+      const { displayValue, interpretation } = interpretObservation(testResultObs, ranges);
+      result = { value: displayValue, interpretation };
+    } else {
+      result = '--';
+    }
 
     return [
       {
-        id: concept.uuid,
+        id: testResultObs?.uuid ?? concept.uuid,
         testType: <div className={styles.testType}>{concept.display || '--'}</div>,
-        result: isLoadingResult ? <SkeletonText /> : mainResultValue,
-        normalRange:
-          concept.hiNormal && concept.lowNormal
-            ? `${concept.lowNormal} - ${concept.hiNormal}`
-            : t('notApplicable', 'Not applicable'),
+        result,
+        normalRange: <ReferenceRangeDisplay ranges={ranges} />,
       },
     ];
-  }, [concept, encounter, isLoadingResult, testResultObs, t]);
+  }, [concept, encounter, isLoadingResult, testResultObs, referenceRanges]);
 
-  if (isLoadingTestConcepts || isLoadingResult) {
+  if (isLoadingTestConcepts || isLoadingResult || isLoadingRanges) {
     return <DataTableSkeleton role="progressbar" zebra />;
   }
 
@@ -108,7 +125,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
     <div className={styles.container}>
       <div className={styles.mainContent}>
         <p className={styles.testDoneHeader}>
-          {index + 1}. {upperCase(order.concept.display)}
+          {index + 1}. {order.concept.display}
         </p>
         <div className={styles.printResults}>
           <DataTable rows={testRows} headers={tableHeaders} size="sm" useZebraStyles>
@@ -127,11 +144,23 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ order, index }) => {
                   <TableBody>
                     {rows.map((row) => (
                       <TableRow {...getRowProps({ row })} key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id} className={styles.testCell}>
-                            {cell.value}
-                          </TableCell>
-                        ))}
+                        {row.cells.map((cell) =>
+                          cell.value?.interpretation ? (
+                            <TableCell
+                              key={cell.id}
+                              className={classNames(
+                                styles.testCell,
+                                getInterpretationClass(styles, cell.value.interpretation),
+                              )}
+                            >
+                              <span>{cell.value.value}</span>
+                            </TableCell>
+                          ) : (
+                            <TableCell key={cell.id} className={styles.testCell}>
+                              {cell.value}
+                            </TableCell>
+                          ),
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

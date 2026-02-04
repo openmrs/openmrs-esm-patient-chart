@@ -9,27 +9,3 @@
 .noRange {
   color: colors.$gray-50;
 }
-
-.resultValue {
-  @include type.type-style('body-compact-01');
-}
-
-.high,
-.low {
-  background-color: colors.$orange-10;
-  padding: 0.125rem 0.25rem;
-  border-radius: 2px;
-}
-
-.criticallyhigh,
-.criticallylow,
-.off_scale_high,
-.off_scale_low {
-  background-color: colors.$red-20;
-  padding: 0.125rem 0.25rem;
-  border-radius: 2px;
-}
-
-.normal {
-  // No special styling for normal values
-}

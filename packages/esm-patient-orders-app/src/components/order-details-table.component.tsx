@@ -522,7 +522,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                         {matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ? (
                                           <MedicationRecord medication={matchingOrder} />
                                         ) : matchingOrder?.type === ORDER_TYPES.TEST_ORDER ? (
-                                          <TestOrder testOrder={matchingOrder} />
+                                          <TestOrder testOrder={matchingOrder} patientUuid={patientUuid} />
                                         ) : matchingOrder?.type === ORDER_TYPES.GENERAL_ORDER ? (
                                           <GeneralOrderTable order={matchingOrder} />
                                         ) : (

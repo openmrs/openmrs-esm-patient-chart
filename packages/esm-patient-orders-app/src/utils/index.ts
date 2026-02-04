@@ -1,11 +1,14 @@
 import {
+  assessValue,
   type DrugOrderBasketItem,
-  type TestOrderBasketItem,
+  type OBSERVATION_INTERPRETATION,
   type Order,
   type OrderAction,
   type OrderBasketItem,
+  type ReferenceRanges,
+  type TestOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { type ObservationValue } from '../types/encounter';
+import { type Observation, type ObservationValue } from '../types/encounter';
 import { type LabOrderConcept } from '../lab-results/lab-results.resource';
 
 /**
@@ -132,21 +135,112 @@ export const getObservationDisplayValue = (value: ObservationValue): string => {
 };
 
 /**
- * Extracts effective ranges, prioritizing API ranges over concept defaults
+ * Maps an OpenMRS REST API Obs.Interpretation enum value to the
+ * OBSERVATION_INTERPRETATION type used in the UI.
+ * Returns undefined for unrecognized or missing values.
+ */
+const validInterpretations = new Set<string>([
+  'NORMAL',
+  'HIGH',
+  'CRITICALLY_HIGH',
+  'OFF_SCALE_HIGH',
+  'LOW',
+  'CRITICALLY_LOW',
+  'OFF_SCALE_LOW',
+]);
+
+export function getObsInterpretation(interpretation?: string): OBSERVATION_INTERPRETATION | undefined {
+  if (interpretation && validInterpretations.has(interpretation)) {
+    return interpretation as OBSERVATION_INTERPRETATION;
+  }
+  return undefined;
+}
+
+/**
+ * Maps an interpretation to a CSS class name from a styles module.
+ */
+export const getInterpretationClass = (
+  styles: Record<string, string>,
+  interpretation: OBSERVATION_INTERPRETATION,
+): string => {
+  switch (interpretation) {
+    case 'OFF_SCALE_HIGH':
+      return styles['off-scale-high'];
+    case 'CRITICALLY_HIGH':
+      return styles['critically-high'];
+    case 'HIGH':
+      return styles['high'];
+    case 'OFF_SCALE_LOW':
+      return styles['off-scale-low'];
+    case 'CRITICALLY_LOW':
+      return styles['critically-low'];
+    case 'LOW':
+      return styles['low'];
+    case 'NORMAL':
+    default:
+      return '';
+  }
+};
+
+/**
+ * Extracts effective ranges, prioritizing API ranges over concept defaults.
+ * Returns all threshold fields (normal, critical, absolute) so that
+ * assessValue can flag CRITICALLY_HIGH / OFF_SCALE_LOW / etc.
  */
 export const getEffectiveRanges = (
   concept: LabOrderConcept,
-  referenceRangesMap?: Map<string, { lowNormal?: number; hiNormal?: number }>,
-) => {
+  referenceRangesMap?: Map<string, ReferenceRanges>,
+): ReferenceRanges => {
   const apiRange = referenceRangesMap?.get(concept?.uuid);
   if (apiRange) {
     return {
-      lowNormal: apiRange.lowNormal,
-      hiNormal: apiRange.hiNormal,
+      ...apiRange,
+      units: apiRange.units ?? concept?.units ?? undefined,
     };
   }
   return {
-    lowNormal: concept?.lowNormal,
-    hiNormal: concept?.hiNormal,
+    lowNormal: concept?.lowNormal ?? undefined,
+    hiNormal: concept?.hiNormal ?? undefined,
+    lowCritical: concept?.lowCritical ?? undefined,
+    hiCritical: concept?.hiCritical ?? undefined,
+    lowAbsolute: concept?.lowAbsolute ?? undefined,
+    hiAbsolute: concept?.hiAbsolute ?? undefined,
+    units: concept?.units ?? undefined,
   };
 };
+
+/**
+ * Collects concept UUIDs for a concept and its set members,
+ * for use with useReferenceRanges.
+ */
+export function getConceptUuids(concept: LabOrderConcept | undefined): Array<string> {
+  if (!concept) {
+    return [];
+  }
+  const uuids = [concept.uuid];
+  if (concept.setMembers) {
+    concept.setMembers.forEach((member) => uuids.push(member.uuid));
+  }
+  return uuids;
+}
+
+export interface InterpretedResult {
+  displayValue: string;
+  interpretation: OBSERVATION_INTERPRETATION;
+}
+
+/**
+ * Computes the display value and interpretation for an observation.
+ * Prefers the server-assigned interpretation; falls back to client-side
+ * assessValue when unavailable.
+ */
+export function interpretObservation(obs: Observation, ranges: ReferenceRanges): InterpretedResult {
+  const displayValue = getObservationDisplayValue(obs.value ?? obs);
+  const numericValue = typeof obs.value === 'number' ? obs.value : parseFloat(displayValue);
+  const obsInterpretation = getObsInterpretation(obs.interpretation);
+  const interpretation = obsInterpretation ?? (!isNaN(numericValue) ? assessValue(numericValue, ranges) : 'NORMAL');
+  const units = ranges.units ?? '';
+  const valueIsNumeric = typeof obs.value === 'number';
+  const valueWithUnits = valueIsNumeric && units ? `${displayValue} ${units}` : displayValue;
+  return { displayValue: valueWithUnits, interpretation };
+}

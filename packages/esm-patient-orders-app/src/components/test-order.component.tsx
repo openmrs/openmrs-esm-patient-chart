@@ -1,13 +1,6 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
-import {
-  type Order,
-  type ReferenceRanges,
-  useReferenceRanges,
-  ReferenceRangeDisplay,
-  ResultValue,
-} from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -20,32 +13,32 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+import { useLayoutType } from '@openmrs/esm-framework';
+import {
+  type Order,
+  type OBSERVATION_INTERPRETATION,
+  useReferenceRanges,
+  ReferenceRangeDisplay,
+} from '@openmrs/esm-patient-common-lib';
 import { useLabEncounter, useOrderConceptByUuid, useOrderConceptsByUuids } from '../lab-results/lab-results.resource';
-import { getObservationDisplayValue, getEffectiveRanges } from '../utils';
+import { getConceptUuids, getEffectiveRanges, getInterpretationClass, interpretObservation } from '../utils';
 import styles from './test-order.scss';
 
 interface TestOrderProps {
   testOrder: Order;
+  /** When provided, reference ranges fetch starts immediately instead of waiting for encounter. Pass from parent when available (e.g. OrderDetailsTable) to avoid request waterfall. */
+  patientUuid?: string;
 }
 
-const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
+const TestOrder: React.FC<TestOrderProps> = ({ testOrder, patientUuid: patientUuidProp }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { concept, isLoading: isLoadingTestConcepts } = useOrderConceptByUuid(testOrder?.concept?.uuid);
   const { encounter, isLoading: isLoadingResult } = useLabEncounter(testOrder?.encounter?.uuid);
 
-  const patientUuid = encounter?.patient?.uuid;
+  const patientUuid = patientUuidProp ?? encounter?.patient?.uuid;
 
-  const conceptUuids = useMemo(() => {
-    if (!concept) {
-      return [];
-    }
-    const uuids = [concept.uuid];
-    if (concept.setMembers) {
-      concept.setMembers.forEach((member) => uuids.push(member.uuid));
-    }
-    return uuids;
-  }, [concept]);
+  const conceptUuids = useMemo(() => getConceptUuids(concept), [concept]);
 
   // Fetch reference ranges from the API
   const { ranges: referenceRanges, isLoading: isLoadingRanges } = useReferenceRanges(patientUuid, conceptUuids);
@@ -80,75 +73,57 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
 
     return testResultObs.flatMap((obs) => {
       const concept = conceptList.find((c) => c.uuid === obs.concept.uuid);
-      if (!concept) return [];
+      if (!concept) {
+        return [];
+      }
 
       // Handle panel tests (with set members / groupMembers)
       if (concept.setMembers && concept.setMembers.length > 0) {
         return concept.setMembers.map((memberConcept) => {
           const memberObs = obs.groupMembers?.find((gm) => gm.concept.uuid === memberConcept.uuid);
 
-          const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
-            memberConcept,
-            referenceRanges,
-          );
+          const ranges = getEffectiveRanges(memberConcept, referenceRanges);
 
-          const ranges: ReferenceRanges = {
-            lowNormal: effectiveLowNormal,
-            hiNormal: effectiveHiNormal,
-            units: memberConcept.units,
-          };
-
-          let resultValue: React.ReactNode;
+          let result: { value: string; interpretation: OBSERVATION_INTERPRETATION } | React.ReactNode;
           if (isLoadingResult) {
-            resultValue = <SkeletonText />;
+            result = <SkeletonText />;
           } else if (memberObs) {
-            const displayValue = getObservationDisplayValue(memberObs.value ?? memberObs);
-            const numericValue = typeof memberObs.value === 'number' ? memberObs.value : parseFloat(displayValue);
-            resultValue = <ResultValue value={displayValue} ranges={!isNaN(numericValue) ? ranges : undefined} />;
+            const { displayValue, interpretation } = interpretObservation(memberObs, ranges);
+            result = { value: displayValue, interpretation };
           } else {
-            resultValue = '--';
+            result = '--';
           }
 
           return {
-            id: memberConcept.uuid,
-            testType: <div className={styles.testType}>{memberConcept.display || '--'}</div>,
-            result: resultValue,
+            id: memberObs?.uuid ?? `${obs.uuid}:${memberConcept.uuid}`,
+            testType: memberConcept.display || '--',
+            result,
             normalRange: <ReferenceRangeDisplay ranges={ranges} />,
           };
         });
       }
 
       // Handle single test (no set members)
-      const { lowNormal: effectiveLowNormal, hiNormal: effectiveHiNormal } = getEffectiveRanges(
-        concept,
-        referenceRanges,
-      );
+      const ranges = getEffectiveRanges(concept, referenceRanges);
 
-      const ranges: ReferenceRanges = {
-        lowNormal: effectiveLowNormal,
-        hiNormal: effectiveHiNormal,
-        units: concept.units,
-      };
-
-      let resultValue: React.ReactNode;
+      let result: { value: string; interpretation: OBSERVATION_INTERPRETATION } | React.ReactNode;
       if (isLoadingResult) {
-        resultValue = <SkeletonText />;
+        result = <SkeletonText />;
       } else {
-        const displayValue = getObservationDisplayValue(obs.value ?? obs);
-        const numericValue = typeof obs.value === 'number' ? obs.value : parseFloat(displayValue);
-        resultValue = <ResultValue value={displayValue} ranges={!isNaN(numericValue) ? ranges : undefined} />;
+        const { displayValue, interpretation } = interpretObservation(obs, ranges);
+        result = { value: displayValue, interpretation };
       }
 
       return {
-        id: concept.uuid,
-        testType: <div className={styles.testType}>{concept.display || '--'}</div>,
-        result: resultValue,
+        id: obs.uuid,
+        testType: concept.display || '--',
+        result,
         normalRange: <ReferenceRangeDisplay ranges={ranges} />,
       };
     });
   }, [isLoadingResult, testResultObs, conceptList, referenceRanges]);
 
-  if (isLoadingResultsConcepts || isLoadingResult || isLoadingRanges) {
+  if (isLoadingTestConcepts || isLoadingResultsConcepts || isLoadingResult || isLoadingRanges) {
     return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   }
 
@@ -161,22 +136,34 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder }) => {
       <DataTable rows={testRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label={t('testOrders', 'Test orders')}>
+            <Table {...getTableProps()} className={styles.table} aria-label={t('testOrders', 'Test orders')}>
               <TableHead>
                 <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
+                  {headers.map((header) => {
+                    const headerProps = getHeaderProps({ header });
+                    return (
+                      <TableHeader
+                        {...headerProps}
+                        className={classNames(headerProps.className, styles[`col-${header.key}`])}
+                      >
+                        {header.header}
+                      </TableHeader>
+                    );
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
                   <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id} className={styles.testCell}>
-                        {cell.value}
-                      </TableCell>
-                    ))}
+                    {row.cells.map((cell) =>
+                      cell.value?.interpretation ? (
+                        <TableCell key={cell.id} className={getInterpretationClass(styles, cell.value.interpretation)}>
+                          <span>{cell.value.value}</span>
+                        </TableCell>
+                      ) : (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ),
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
