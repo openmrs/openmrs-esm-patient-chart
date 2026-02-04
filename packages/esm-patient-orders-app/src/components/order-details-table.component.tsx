@@ -239,11 +239,13 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         orderType: capitalize(order.orderType?.display ?? '-'),
         dosage:
           order.type === ORDER_TYPES.DRUG_ORDER ? (
-            <div className={styles.singleLineText}>{`${t('indication', 'Indication').toUpperCase()}
-            ${order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')} ${'-'} ${t(
-              'quantity',
-              'Quantity',
-            ).toUpperCase()} ${order.quantity} ${order?.quantityUnits?.display} `}</div>
+            <div className={styles.singleLineText}>
+              {`${t('indication', 'Indication').toUpperCase()} ${
+                order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')
+              } - ${t('quantity', 'Quantity').toUpperCase()} ${
+                order.quantity != null ? `${order.quantity} ${order?.quantityUnits?.display ?? ''}`.trim() : '--'
+              }`}
+            </div>
           ) : (
             '--'
           ),
