@@ -19,6 +19,7 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
     labOrderWorkspaceName,
     generalOrderWorkspaceName,
     onOrderBasketSubmitted,
+    visibleOrderPanels,
   },
   closeWorkspace,
   launchChildWorkspace,
@@ -45,6 +46,7 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
       orderBasketExtensionProps={orderBasketExtensionProps}
       showPatientBanner
       onOrderBasketSubmitted={onOrderBasketSubmitted}
+      visibleOrderPanels={visibleOrderPanels}
     />
   );
 };

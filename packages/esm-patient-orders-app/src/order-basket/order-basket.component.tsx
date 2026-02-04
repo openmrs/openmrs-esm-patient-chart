@@ -41,6 +41,10 @@ interface OrderBasketProps {
   orderBasketExtensionProps: OrderBasketExtensionProps;
   showPatientBanner?: boolean;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+  /**
+   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
+   */
+  visibleOrderPanels?: Array<string>;
 }
 
 const OrderBasket: React.FC<OrderBasketProps> = ({
@@ -52,6 +56,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   orderBasketExtensionProps,
   showPatientBanner,
   onOrderBasketSubmitted,
+  visibleOrderPanels,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -273,15 +278,21 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           />
           {orderTypes?.length > 0 &&
             orderBasketExtensionProps.launchGeneralOrderForm &&
-            orderTypes.map((orderType) => (
-              <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                <GeneralOrderPanel
-                  {...orderType}
-                  launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
-                  patient={patient}
-                />
-              </div>
-            ))}
+            orderTypes
+              .filter(
+                (orderType) =>
+                  !orderBasketExtensionProps.visibleOrderPanels ||
+                  orderBasketExtensionProps.visibleOrderPanels.includes(orderType.orderTypeUuid),
+              )
+              .map((orderType) => (
+                <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
+                  <GeneralOrderPanel
+                    {...orderType}
+                    launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
+                    patient={patient}
+                  />
+                </div>
+              ))}
         </div>
         <div>
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
