@@ -1,16 +1,20 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage } from '../pages';
+import { ensureNoActiveVisits } from '../commands/visit-operations';
+
+async function waitForVisitLocationValue(page) {
+  const locationInput = page.getByRole('combobox', { name: /select a location/i });
+  await expect
+    .poll(async () => (await locationInput.inputValue()).trim(), {
+      message: 'Waiting for visit location to resolve',
+    })
+    .not.toBe('');
+}
 
 test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('Ensure no active visits for the patient', async () => {
-    const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
-    const data = await res.json();
-    const { results: visits = [] } = data;
-
-    for (const visit of visits) {
-      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
-    }
+    await ensureNoActiveVisits(api, patient.uuid);
   });
 
   const chartPage = new ChartPage(page);
@@ -65,12 +69,21 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('When I select visit status: new', async () => {
-    await chartPage.page.getByRole('tab', { name: /new/i }).click();
+    const newTab = chartPage.page.getByRole('tab', { name: /new/i });
+    await newTab.click();
+    // Wait for the tab to be selected to ensure form state has updated
+    await expect(newTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  await test.step('And the visit location should be resolved', async () => {
+    await waitForVisitLocationValue(chartPage.page);
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/^OPD Visit$/i).click();
-    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
+    const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
+    await expect(opdVisitLabel).toBeVisible();
+    await opdVisitLabel.click();
+    await expect(chartPage.page.getByRole('radio', { name: /^OPD Visit$/i })).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -112,13 +125,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   api,
 }) => {
   await test.step('Ensure no active visits for the patient', async () => {
-    const res = await api.get(`visit?patient=${patient.uuid}&active=true`);
-    const data = await res.json();
-    const { results: visits = [] } = data;
-
-    for (const visit of visits) {
-      await api.post(`visit/${visit.uuid}`, { data: { voided: true } });
-    }
+    await ensureNoActiveVisits(api, patient.uuid);
   });
 
   const chartPage = new ChartPage(page);
@@ -160,14 +167,22 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
-
   await test.step('When I select visit status: new', async () => {
-    await chartPage.page.getByRole('tab', { name: /new/i }).click();
+    const newTab = chartPage.page.getByRole('tab', { name: /new/i });
+    await newTab.click();
+    // Wait for the tab to be selected to ensure form state has updated
+    await expect(newTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  await test.step('And the visit location should be resolved', async () => {
+    await waitForVisitLocationValue(chartPage.page);
   });
 
   await test.step('And I select the visit type: `OPD Visit`', async () => {
-    await chartPage.page.getByText(/^OPD Visit$/i).click();
-    await expect(chartPage.page.getByLabel(/OPD Visit/i)).toBeChecked();
+    const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
+    await expect(opdVisitLabel).toBeVisible();
+    await opdVisitLabel.click();
+    await expect(chartPage.page.getByRole('radio', { name: /^OPD Visit$/i })).toBeChecked();
   });
 
   await test.step('And I click on the `Start Visit` button', async () => {
@@ -246,3 +261,8 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeVisible();
   });
 });
+
+// TODO: add the following tests:
+// - prompt appears when attempting to add a visit with unsaved changes in workspaces
+// - when editing a previous visit, attempting to add a visit or to edit another visit results in prompt
+// - when filling out the visit form, attempting to edit a previous visit results in prompt

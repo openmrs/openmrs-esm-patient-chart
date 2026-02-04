@@ -16,7 +16,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
 
   const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 
-  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit(patient.id, 'add-drug-order');
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -34,13 +34,19 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
         medications={activePatientOrders}
         showDiscontinueButton={true}
         showModifyButton={true}
-        showReorderButton={false}
+        showRenewButton={true}
         patient={patient}
       />
     );
   }
 
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchAddDrugWorkspace()} />;
+  return (
+    <EmptyState
+      displayText={displayText}
+      headerTitle={headerTitle}
+      launchForm={() => launchOrderBasket({}, { encounterUuid: '' })}
+    />
+  );
 };
 
 export default ActiveMedications;

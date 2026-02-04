@@ -6,26 +6,41 @@ import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-fra
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
-import ConditionsForm from './conditions-form.workspace';
+import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-const defaultProps = {
-  condition: null,
+const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
   closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
-  promptBeforeClosing: jest.fn(),
-  formContext: 'creating' as 'creating' | 'editing',
-  setTitle: jest.fn(),
-  visitContext: null,
-  mutateVisitContext: null,
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {
+    condition: null,
+    formContext: 'creating' as 'creating' | 'editing',
+  },
+  windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
 };
 
-function renderConditionsForm(props = {}) {
-  render(<ConditionsForm {...defaultProps} {...props} />);
+function renderConditionsForm(workspaceProps?: ConditionFormProps) {
+  const props = {
+    ...defaultProps,
+    workspaceProps: {
+      ...defaultProps.workspaceProps,
+      ...workspaceProps,
+    },
+  };
+  render(<ConditionsForm {...props} />);
 }
 
 const mockCreateCondition = jest.mocked(createCondition);

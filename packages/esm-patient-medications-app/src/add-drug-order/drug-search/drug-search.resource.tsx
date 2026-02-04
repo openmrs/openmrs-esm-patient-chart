@@ -1,8 +1,12 @@
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag } from '@openmrs/esm-framework';
-import type { Drug } from '@openmrs/esm-patient-common-lib';
-import { type DrugOrderBasketItem, type DrugOrderTemplate, type OrderTemplate } from '../../types';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
+import {
+  type Drug,
+  type DrugOrderBasketItem,
+  type DrugOrderTemplate,
+  type OrderTemplate,
+} from '@openmrs/esm-patient-common-lib';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -136,6 +140,7 @@ export function getDefault(template: OrderTemplate, prop: string) {
 
 export function getTemplateOrderBasketItem(
   drug: DrugSearchResult,
+  visit: Visit,
   configDefaultDurationConcept?: {
     uuid: string;
     display: string;
@@ -175,8 +180,6 @@ export function getTemplateOrderBasketItem(
         freeTextDosage: '',
         indication: '',
         template: template.template,
-        orderer: null,
-        careSetting: null,
         quantityUnits:
           getDefault(template.template, 'quantityUnits') ?? drug?.dosageForm
             ? {
@@ -184,6 +187,7 @@ export function getTemplateOrderBasketItem(
                 valueCoded: drug?.dosageForm?.uuid,
               }
             : null,
+        visit,
       }
     : {
         action: 'NEW',
@@ -215,13 +219,12 @@ export function getTemplateOrderBasketItem(
         numRefills: null,
         freeTextDosage: '',
         indication: '',
-        orderer: null,
-        careSetting: null,
         quantityUnits: drug?.dosageForm
           ? {
               value: drug?.dosageForm?.display,
               valueCoded: drug?.dosageForm?.uuid,
             }
           : null,
+        visit,
       };
 }

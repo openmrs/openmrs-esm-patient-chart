@@ -1,7 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  type Encounter,
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -12,22 +19,33 @@ import {
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import VisitNotesForm from './visit-notes-form.workspace';
+import VisitNotesForm, { type VisitNotesFormProps } from './visit-notes-form.workspace';
 
-const defaultProps = {
+const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = {
   closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  formContext: 'creating' as const,
-  patient: mockPatient,
-  patientUuid: mockPatient.id,
-  promptBeforeClosing: jest.fn(),
-  setTitle: jest.fn(),
-  visitContext: null,
-  mutateVisitContext: null,
+  workspaceProps: {
+    formContext: 'creating' as const,
+  },
+  groupProps: {
+    patient: mockPatient,
+    patientUuid: mockPatient.id,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  launchChildWorkspace: jest.fn(),
+  windowProps: {},
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
 };
 
-function renderVisitNotesForm(props = {}) {
-  render(<VisitNotesForm {...defaultProps} {...props} />);
+function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {}) {
+  const props = {
+    ...defaultProps,
+    workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
+  };
+  render(<VisitNotesForm {...props} />);
 }
 
 const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
@@ -225,7 +243,8 @@ test('initializes form with existing encounter data when in edit mode', () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -247,7 +266,7 @@ test('initializes form with existing encounter data when in edit mode', () => {
 
   renderVisitNotesForm({
     formContext: 'editing',
-    encounter: mockEncounter,
+    encounter: mockEncounter as any as Encounter, // TODO: fix
   });
 
   // Verify date is pre-filled
@@ -265,7 +284,8 @@ test('updates existing visit note when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -313,7 +333,7 @@ test('updates existing visit note when in edit mode', async () => {
 
   renderVisitNotesForm({
     formContext: 'editing',
-    encounter: mockEncounter,
+    encounter: mockEncounter as any as Encounter, // TODO: fix
   });
 
   // Update clinical note
@@ -338,7 +358,8 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',

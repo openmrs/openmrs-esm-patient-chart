@@ -37,7 +37,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {

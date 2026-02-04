@@ -1,5 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, defineExtensionConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { riskCountExtensionConfigSchema } from './flags/flags-risk-count-extension/extension-config-schema';
+import { flagsListExtensionConfigSchema } from './flags/flags-list-extension/extension-config-schema';
 
 const moduleName = '@openmrs/esm-patient-flags-app';
 
@@ -7,19 +9,24 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('patient-flags-risk-count', riskCountExtensionConfigSchema);
+  defineExtensionConfigSchema('patient-flags-list', flagsListExtensionConfigSchema);
 }
 
-export const flagTags = getAsyncLifecycle(() => import('./flags/flags-highlight-bar.component'), {
-  featureName: 'patient-flag-tags',
-  moduleName,
-});
+export const flagsRiskCountExtension = getAsyncLifecycle(
+  () => import('./flags/flags-risk-count-extension/flags-risk-count.extension'),
+  {
+    featureName: 'patient-flags-risk-count',
+    moduleName,
+  },
+);
 
-export const flagsOverview = getAsyncLifecycle(() => import('./flags/flags.component'), {
+export const flagsListExtension = getAsyncLifecycle(() => import('./flags/flags-list-extension/flags-list.extension'), {
   featureName: 'patient-flags-overview',
   moduleName,
 });
 
-export const patientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/patient-flags.workspace'), {
+export const patientFlagsWorkspace = getAsyncLifecycle(() => import('./flags/flags-workspace/flags.workspace'), {
   featureName: 'patient-flags-workspace',
   moduleName,
 });

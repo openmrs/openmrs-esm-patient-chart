@@ -29,11 +29,12 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
 /**
  * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
  * This function is used to generate the schema for the lab results form.
- * @param labOrderConceptUuid - The UUID of the lab order concept.
+ * @param labOrderConcept - The lab order concept.
+ * @param t - Translation function.
  * @returns A Zod schema object for the lab results form.
  */
-export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t: TFunction) => {
-  if (!labOrderConcepts) {
+export const createLabResultsFormSchema = (labOrderConcept: LabOrderConcept, t: TFunction) => {
+  if (!labOrderConcept) {
     return z.object({
       fulfillerComment: z
         .string()
@@ -42,7 +43,7 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t:
     });
   }
 
-  const conceptSchema = createSchemaForConcept(labOrderConcepts);
+  const conceptSchema = createSchemaForConcept(labOrderConcept);
 
   return z.object(conceptSchema).extend({
     fulfillerComment: z
@@ -53,11 +54,44 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t:
 };
 
 /**
+ * Generate a Zod schema for multiple lab order concepts (composite schema).
+ * This is used when multiple test concepts need to be validated together.
+ * @param labOrderConcepts - Array of lab order concepts.
+ * @param t - Translation function.
+ * @returns A Zod schema object for the composite lab results form.
+ */
+export const createLabResultsFormCompositeSchema = (labOrderConcepts: LabOrderConcept[], t: TFunction) => {
+  if (!labOrderConcepts || labOrderConcepts.length === 0) {
+    return z.object({
+      fulfillerComment: z
+        .string()
+        .max(1024, t('commentsCannotExceed1024Characters', 'Comments cannot exceed 1024 characters'))
+        .optional(),
+    });
+  }
+
+  // Combine schemas from all concepts
+  const compositeSchema = labOrderConcepts.reduce((acc, concept) => {
+    return {
+      ...acc,
+      ...createSchemaForConcept(concept),
+    };
+  }, {} as SchemaRecord);
+
+  return z.object(compositeSchema).extend({
+    fulfillerComment: z
+      .string()
+      .max(1024, t('commentsCannotExceed1024Characters', 'Comments cannot exceed 1024 characters'))
+      .optional(),
+  });
+};
+
+/**
  * Determines and returns the appropriate Zod schema for a given lab order concept.
  * @param labOrderConcept - The lab order concept to create a schema for.
- * @returns A Zod schema type based on the concept's data type.
+ * @returns A Zod schema type based on the concept's data type, or null if unsupported.
  */
-const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType => {
+const createSchema = (labOrderConcept: LabOrderConcept): z.ZodType | null => {
   const {
     hiAbsolute: upperLimit,
     lowAbsolute: lowerLimit,

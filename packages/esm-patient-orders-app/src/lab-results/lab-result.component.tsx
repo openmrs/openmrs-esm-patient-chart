@@ -1,10 +1,10 @@
-import { Tile, InlineLoading , InlineNotification } from '@carbon/react';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
+import { Tile, InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useCompletedLabResults, useOrderConceptByUuid } from './lab-results.resource';
-import styles from './lab-result.scss';
 import TestOrder from '../components/test-order.component';
+import styles from './lab-result.scss';
 
 type LabResultsProps = {
   order: Order;

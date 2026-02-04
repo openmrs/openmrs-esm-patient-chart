@@ -56,6 +56,9 @@ export const mockOrders = [
     encounter: {
       uuid: 'f7aa3e36-9aed-421b-acf4-f3b6af71cca8',
       display: 'Order 11/21/2024',
+      visit: {
+        uuid: 'some-visit-uuid-1',
+      },
       links: [
         {
           rel: 'self',
@@ -713,6 +716,9 @@ export const mockOrders = [
     encounter: {
       uuid: '9468dc74-3b4c-4db9-b782-2a05df88e099',
       display: 'Order 11/20/2022',
+      visit: {
+        uuid: 'some-visit-uuid-2',
+      },
       links: [
         {
           rel: 'self',
@@ -850,6 +856,9 @@ export const mockOrders = [
     encounter: {
       uuid: '9468dc74-3b4c-4db9-b782-2a05df88e099',
       display: 'Order 11/20/2022',
+      visit: {
+        uuid: 'some-visit-uuid-2',
+      },
       links: [
         {
           rel: 'self',
@@ -987,6 +996,9 @@ export const mockOrders = [
     encounter: {
       uuid: '9468dc74-3b4c-4db9-b782-2a05df88e099',
       display: 'Order 11/20/2022',
+      visit: {
+        uuid: 'some-visit-uuid-2',
+      },
       links: [
         {
           rel: 'self',
@@ -1124,6 +1136,9 @@ export const mockOrders = [
     encounter: {
       uuid: '9468dc74-3b4c-4db9-b782-2a05df88e099',
       display: 'Order 11/20/2022',
+      visit: {
+        uuid: 'some-visit-uuid-2',
+      },
       links: [
         {
           rel: 'self',

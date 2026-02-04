@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { parseDate, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, useRequireOutpatientQuantity } from '../api';
+import { type Drug, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { useRequireOutpatientQuantity } from '../api';
 import { type ConfigObject } from '../config-schema';
-import { type DrugOrderBasketItem } from '../types';
-import { type Drug } from '@openmrs/esm-patient-common-lib';
 
-export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, defaultPrescribingProviderUuid: string) {
+export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
   const defaultValues = useMemo(() => {
@@ -18,8 +17,8 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, de
         ? parseDate(initialOrderBasketItem?.startDate)
         : (initialOrderBasketItem?.startDate as Date) ?? new Date();
 
-    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultStartDate, defaultPrescribingProviderUuid);
-  }, [initialOrderBasketItem, defaultPrescribingProviderUuid]);
+    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultStartDate);
+  }, [initialOrderBasketItem]);
 
   const drugOrderForm: UseFormReturn<MedicationOrderFormData> = useForm<MedicationOrderFormData>({
     mode: 'all',
@@ -30,17 +29,9 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, de
   return drugOrderForm;
 }
 
-export function drugOrderBasketItemToFormValue(
-  item: DrugOrderBasketItem,
-  startDate: Date,
-  providerUuid: string,
-): MedicationOrderFormData {
+export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startDate: Date): MedicationOrderFormData {
   return {
-    orderer: {
-      uuid: providerUuid,
-    },
     drug: item?.drug as Partial<Drug>,
-    careSetting: careSettingUuid,
     isFreeTextDosage: item?.isFreeTextDosage ?? false,
     freeTextDosage: item?.freeTextDosage,
     dosage: item?.dosage ?? null,
@@ -96,15 +87,6 @@ function useCreateMedicationOrderFormSchema() {
           },
         )
         .passthrough(),
-      orderer: z.object(
-        {
-          uuid: z.string(),
-        },
-        {
-          message: t('prescribingClinicianRequiredErrorMessage', 'Prescribing clinician is required'),
-        },
-      ),
-      careSetting: z.string(),
       freeTextDosage: z.string().refine((value) => !!value, {
         message: t('freeDosageErrorMessage', 'Add free dosage note'),
       }),

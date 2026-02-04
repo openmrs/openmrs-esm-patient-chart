@@ -52,5 +52,7 @@ describe('DrugSearchComboBox', () => {
 });
 
 function renderDrugSearchComboBox() {
-  render(<DrugSearchComboBox setSelectedDrugItem={mockSetSelectedDrugItem} />);
+  render(
+    <DrugSearchComboBox initialOrderBasketItem={null} setSelectedDrugItem={mockSetSelectedDrugItem} visit={null} />,
+  );
 }

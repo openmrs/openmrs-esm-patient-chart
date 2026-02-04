@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback } from 'react';
+import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,7 +21,7 @@ import {
   type ConfigObject,
   formatDate,
   formatDatetime,
-  launchWorkspace,
+  launchWorkspace2,
   useConfig,
   useLayoutType,
   usePagination,
@@ -41,7 +41,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const programsCount = 5;
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const displayText = t('programs', 'Program enrollments');
+  const displayText = t('programEnrollmentsLower', 'program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
@@ -54,7 +54,12 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
 
   const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
-  const launchProgramsForm = useCallback(() => launchWorkspace('programs-form-workspace'), []);
+  const enrollmentsByUuid = useMemo(
+    () => new Map(paginatedEnrollments?.map((enrollment) => [enrollment.uuid, enrollment]) ?? []),
+    [paginatedEnrollments],
+  );
+
+  const launchProgramsForm = useCallback(() => launchWorkspace2('programs-form-workspace'), []);
 
   const tableHeaders = [
     {
@@ -83,7 +88,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     },
   ];
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => {
       const state = enrollment ? findLastState(enrollment.states) : null;
       return {
@@ -107,7 +112,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (activeEnrollments?.length) {
+  if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -152,19 +157,22 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, i) => (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                      ))}
-                      <TableCell className="cds--table-column-menu">
-                        <ProgramsActionMenu
-                          patientUuid={patientUuid}
-                          programEnrollmentId={activeEnrollments[i]?.uuid}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {rows.map((row) => {
+                    const enrollment = enrollmentsByUuid.get(row.id);
+
+                    return (
+                      <TableRow key={row.id} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        {enrollment && (
+                          <TableCell className="cds--table-column-menu">
+                            <ProgramsActionMenu patientUuid={patientUuid} programEnrollmentId={enrollment.uuid} />
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -182,6 +190,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 

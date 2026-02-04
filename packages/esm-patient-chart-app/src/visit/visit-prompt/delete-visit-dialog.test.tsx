@@ -3,13 +3,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
-import { mockPatient } from 'tools';
-import DeleteVisitDialog from './delete-visit-dialog.component';
+
+import DeleteVisitDialog from './delete-visit-dialog.modal';
 
 const mockCloseModal = jest.fn();
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockActiveVisit = jest.fn();
 
 describe('Delete visit', () => {
   it('voids the visit and voids its associated encounters', async () => {
@@ -22,14 +21,7 @@ describe('Delete visit', () => {
 
     mockOpenmrsFetch.mockResolvedValue(response as FetchResponse);
 
-    render(
-      <DeleteVisitDialog
-        activeVisit={mockCurrentVisit}
-        mutateActiveVisit={mockActiveVisit}
-        closeModal={mockCloseModal}
-        patientUuid={mockPatient.id}
-      />,
-    );
+    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const deleteVisitButton = screen.getByRole('button', { name: /delete visit$/i });
@@ -54,7 +46,6 @@ describe('Delete visit', () => {
         subtitle: 'Facility Visit deleted successfully',
       }),
     );
-    expect(mockActiveVisit).toHaveBeenCalledTimes(1);
   });
 
   it('displays an error notification if there was problem with deleting a visit', async () => {
@@ -62,14 +53,7 @@ describe('Delete visit', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
 
-    render(
-      <DeleteVisitDialog
-        activeVisit={mockCurrentVisit}
-        mutateActiveVisit={mockActiveVisit}
-        closeModal={mockCloseModal}
-        patientUuid={mockPatient.id}
-      />,
-    );
+    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const deleteVisitButton = screen.getByRole('button', { name: /delete visit$/i });
@@ -90,7 +74,5 @@ describe('Delete visit', () => {
       kind: 'error',
       title: 'Error deleting visit',
     });
-
-    expect(mockActiveVisit).toHaveBeenCalledTimes(1);
   });
 });

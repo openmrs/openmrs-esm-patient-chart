@@ -1,4 +1,10 @@
-import { type Order, type OrderAction, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import {
+  type DrugOrderBasketItem,
+  type TestOrderBasketItem,
+  type Order,
+  type OrderAction,
+  type OrderBasketItem,
+} from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
 
 /**
@@ -23,8 +29,9 @@ export function compare<T>(x?: T, y?: T) {
 
 /**
  * Builds medication order object from the given order object
+ * See also same function in esm-patient-medications-app/src/api/api.ts
  */
-export function buildMedicationOrder(order: Order, action?: OrderAction) {
+export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOrderBasketItem {
   return {
     display: order.drug?.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
@@ -58,25 +65,23 @@ export function buildMedicationOrder(order: Order, action?: OrderAction) {
     pillsDispensed: order.quantity,
     numRefills: order.numRefills,
     indication: order.orderReasonNonCoded,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     quantityUnits: {
       value: order.quantityUnits?.display,
       valueCoded: order.quantityUnits?.uuid,
     },
+    encounterUuid: order.encounter?.uuid,
+    visit: order.encounter.visit,
   };
 }
 
 /**
  * Builds lab order object from the given order object
  */
-export function buildLabOrder(order: Order, action?: OrderAction) {
+export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBasketItem {
   return {
     action: action,
     display: order.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     instructions: order.instructions,
     urgency: order.urgency,
     accessionNumber: order.accessionNumber,
@@ -89,6 +94,8 @@ export function buildLabOrder(order: Order, action?: OrderAction) {
     orderType: order.orderType.uuid,
     specimenSource: null,
     scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
+    encounterUuid: order.encounter?.uuid,
+    visit: order.encounter.visit,
   };
 }
 
@@ -100,8 +107,6 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     action: action,
     display: order.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
-    orderer: order.orderer.uuid,
-    careSetting: order.careSetting.uuid,
     instructions: order.instructions,
     urgency: order.urgency,
     accessionNumber: order.accessionNumber,
@@ -109,6 +114,8 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     orderNumber: order.orderNumber,
     orderType: order.orderType.uuid,
     scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
+    encounterUuid: order.encounter?.uuid,
+    visit: order.encounter.visit,
   };
 }
 

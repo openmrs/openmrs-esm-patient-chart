@@ -36,18 +36,6 @@ export const configSchema = {
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
   },
-  prescriberProviderRoles: {
-    _type: Type.Array,
-    _description:
-      'Array of provider roles uuids. If specified, the drug order form shows the "Prescribing Clinician" dropdown listing all providers with one of the specified roles. (The dropdown is hidden if no providers match the role criteria.) This feature requires the providermanagement backend module. Note that, in any case, any user who can submit the drug order form may still do so with themselves as the prescriber.',
-    _default: [],
-  },
-  drugOrderEncounterType: {
-    _type: Type.UUID,
-    _description:
-      'The encounter type of the encounter for the Fill Prescription form. Defaults to the "Order" encounter type.',
-    _default: '39da3525-afe4-45ff-8977-c53b7b359158',
-  },
 };
 
 export interface ConfigObject {
@@ -59,6 +47,4 @@ export interface ConfigObject {
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
-  prescriberProviderRoles: Array<string>;
-  drugOrderEncounterType: string;
 }

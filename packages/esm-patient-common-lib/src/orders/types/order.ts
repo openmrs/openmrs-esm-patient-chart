@@ -1,4 +1,4 @@
-import type { OpenmrsResource } from '@openmrs/esm-framework';
+import type { Encounter, OpenmrsResource, Visit, Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 export interface Concept extends OpenmrsResource {
   name?: {
@@ -47,8 +47,6 @@ export interface OrderBasketItem {
   action: OrderAction;
   display: string;
   uuid?: string;
-  orderer?: string;
-  careSetting?: string;
   orderError?: Error & {
     responseBody?: {
       error?: {
@@ -71,6 +69,8 @@ export interface OrderBasketItem {
   orderType?: string;
   orderNumber?: string;
   scheduledDate?: Date;
+  encounterUuid?: string;
+  visit: Visit;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
@@ -116,7 +116,7 @@ export interface DrugOrderPost extends OrderPost {
   dosingInstructions?: string;
 }
 
-export interface TestOrderPost extends OrderPost {}
+export type TestOrderPost = OrderPost;
 
 export interface PatientOrderFetchResponse {
   results: Array<Order>;
@@ -142,7 +142,7 @@ export interface Order {
   drug: Drug;
   duration: number;
   durationUnits: OpenmrsResource;
-  encounter: OpenmrsResource;
+  encounter: Encounter;
   frequency: OpenmrsResource;
   instructions?: string | null;
   numRefills: number;
@@ -207,16 +207,121 @@ export interface OrderType {
   description: string;
 }
 
-export type FulfillerStatus =
-  | 'RECEIVED'
-  | 'IN_PROGRESS'
-  | 'EXCEPTION'
-  | 'ON_HOLD'
-  | 'DECLINED'
-  | 'COMPLETED';
+export type FulfillerStatus = 'RECEIVED' | 'IN_PROGRESS' | 'EXCEPTION' | 'ON_HOLD' | 'DECLINED' | 'COMPLETED';
 
+/**
+ * A function type that converts a OrderBasketItem into
+ * a POST order payload
+ */
 export type PostDataPrepFunction = (
   order: OrderBasketItem,
   patientUuid: string,
   encounterUuid: string | null,
+  orderingProviderUuid: string,
 ) => OrderPost;
+
+export interface OrderBasketExtensionProps {
+  patient: fhir.Patient;
+  launchDrugOrderForm(order?: DrugOrderBasketItem): void;
+  launchLabOrderForm(orderTypeUuid: string, order?: TestOrderBasketItem): void;
+  launchGeneralOrderForm(orderTypeUuid: string, order?: OrderBasketItem): void;
+}
+
+export interface DrugOrderBasketItem extends OrderBasketItem {
+  drug: Drug;
+  unit: DosingUnit;
+  commonMedicationName: string;
+  dosage: number;
+  frequency: MedicationFrequency;
+  route: MedicationRoute;
+  quantityUnits: QuantityUnit;
+  patientInstructions: string;
+  asNeeded: boolean;
+  asNeededCondition: string;
+  startDate: Date | string;
+  durationUnit: DurationUnit;
+  duration: number | null;
+  pillsDispensed: number | null;
+  numRefills: number | null;
+  indication: string;
+  isFreeTextDosage: boolean;
+  freeTextDosage: string;
+  previousOrder?: string;
+  template?: OrderTemplate;
+}
+
+export interface DrugOrderTemplate {
+  uuid: string;
+  name: string;
+  drug: Drug;
+  template: OrderTemplate;
+}
+
+export interface OrderTemplate {
+  type: string;
+  dosingType: string;
+  dosingInstructions: DosingInstructions;
+}
+
+export interface DosingInstructions {
+  dose: Array<MedicationDosage>;
+  units: Array<DosingUnit>;
+  route: Array<MedicationRoute>;
+  frequency: Array<MedicationFrequency>;
+  instructions?: Array<MedicationInstructions>;
+  durationUnits?: Array<DurationUnit>;
+  quantityUnits?: Array<QuantityUnit>;
+  asNeeded?: boolean;
+  asNeededCondition?: string;
+}
+
+export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
+  value: number;
+}
+
+export type MedicationFrequency = CommonMedicationValueCoded;
+
+export type MedicationRoute = CommonMedicationValueCoded;
+
+export type MedicationInstructions = CommonMedicationProps;
+
+export type DosingUnit = CommonMedicationValueCoded;
+
+export type QuantityUnit = CommonMedicationValueCoded;
+
+export type DurationUnit = CommonMedicationValueCoded;
+
+interface CommonMedicationProps {
+  value: string;
+  default?: boolean;
+}
+
+export interface CommonMedicationValueCoded extends CommonMedicationProps {
+  valueCoded: string;
+  names?: string[];
+}
+export interface TestOrderBasketItem extends OrderBasketItem {
+  testType: {
+    label: string;
+    conceptUuid: string;
+  };
+  orderReason?: string;
+  specimenSource?: string;
+}
+
+export interface OrderBasketWindowProps {
+  encounterUuid: string;
+  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+}
+
+export interface ExportedOrderBasketWindowProps {
+  encounterUuid: string;
+  drugOrderWorkspaceName: string;
+  labOrderWorkspaceName: string;
+  generalOrderWorkspaceName: string;
+  patient: fhir.Patient;
+  patientUuid: string;
+  visitContext: Visit;
+  mutateVisitContext: () => void;
+  onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+}

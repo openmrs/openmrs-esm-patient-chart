@@ -1,0 +1,48 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.flagSummary {
+  padding: layout.$spacing-01;
+  display: flex;
+  flex-direction: row; /* needed if attaching extension outside highlights bar */
+  align-items: center;
+}
+
+.flagIcon {
+  margin-right: layout.$spacing-02;
+}
+
+.arrow {
+  margin-left: layout.$spacing-05;
+  fill: currentColor;
+}
+
+.flagsCountTag {
+  margin: layout.$spacing-02 0;
+  padding: 0 layout.$spacing-03;
+  border: none;
+  cursor: pointer;
+  span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.arrowInTag {
+  margin-left: layout.$spacing-03;
+  fill: currentColor;
+}
+
+.flagsListContainer {
+  padding-left: layout.$spacing-03;
+  flex-grow: 1;
+}
+
+.loader {
+  align-items: center;
+  display: flex;
+  min-height: layout.$spacing-05;
+  padding: layout.$spacing-05;
+  width: 100%;
+}

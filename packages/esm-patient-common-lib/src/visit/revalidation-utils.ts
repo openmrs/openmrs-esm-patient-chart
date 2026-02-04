@@ -82,6 +82,24 @@ export function invalidatePatientEncounters(mutate: KeyedMutator<unknown>, patie
 }
 
 /**
+ * Invalidates only the current (active) visit cache for a specific patient.
+ *
+ * This refreshes components using useVisit without triggering the visit revalidation cascade.
+ *
+ * @param mutate - SWR mutate function from useSWRConfig()
+ * @param patientUuid - Patient UUID to target current visit data for
+ */
+export function invalidateCurrentVisit(mutate: KeyedMutator<unknown>, patientUuid: string): void {
+  mutate((key) => {
+    return (
+      typeof key === 'string' &&
+      key.includes(`${restBaseUrl}/visit?patient=${patientUuid}`) &&
+      key.includes('includeInactive=false')
+    );
+  });
+}
+
+/**
  * Combination utility that invalidates both visit history and encounter data.
  *
  * This is commonly needed when operations affect both visit structure and encounter content,

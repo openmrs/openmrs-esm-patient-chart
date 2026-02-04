@@ -73,19 +73,11 @@
       "component": "drugSearchComboBox"
     }
   ],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "add-drug-order",
-      "title": "addDrugOrderWorkspaceTitle",
       "component": "addDrugOrderWorkspace",
-      "type": "order"
-    },
-    {
-      "name": "fill-prescription-form",
-      "title": "fillPrescription",
-      "component": "fillPrescriptionFormWorkspace",
-      "type": "order"
+      "window": "patient-chart-order-basket"
     }
-    
   ]
 }

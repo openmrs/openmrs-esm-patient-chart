@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { useActivePatientOrders, usePastPatientOrders } from '../api';
-import { type AddDrugOrderWorkspaceAdditionalProps } from '../add-drug-order/add-drug-order.workspace';
+import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 
 export interface MedicationsSummaryProps {
@@ -12,7 +12,7 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patient }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit<AddDrugOrderWorkspaceAdditionalProps>(
+  const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit<AddDrugOrderWorkspaceProps>(
     patient.id,
     'add-drug-order',
   );
@@ -50,7 +50,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 medications={activeOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
-                showReorderButton={false}
+                showRenewButton={true}
                 patient={patient}
               />
             );
@@ -77,7 +77,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 showAddButton={false}
                 showDiscontinueButton={false}
                 showModifyButton={false}
-                showReorderButton={true}
+                showRenewButton={true}
                 patient={patient}
               />
             );

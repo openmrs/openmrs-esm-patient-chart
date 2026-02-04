@@ -22,7 +22,8 @@ export function useLaunchVitalsAndBiometricsForm(patientUuid: string) {
     const workspaceProps = useFormEngine
       ? {
           workspaceTitle: formName,
-          formInfo: { formUuid, encounterUuid: '' },
+          form: { uuid: formUuid },
+          encounterUuid: '',
           mutateForm: invalidateCachedVitalsAndBiometrics,
         }
       : {};

@@ -24,8 +24,12 @@ test.describe('Drug Order Tests', () => {
       await medicationsPage.goTo(patient.uuid);
     });
 
-    await test.step('And I click the Add button on the medications details table', async () => {
+    await test.step('And I click the Add button on the medications details table to launch the order basket', async () => {
       await page.getByRole('button', { name: 'Add', exact: true }).click();
+    });
+
+    await test.step('And I click the `Add +` button to order drugs', async () => {
+      await page.locator("[id='order-basket']").getByRole('button', { name: 'Add', exact: true }).first().click();
     });
 
     await test.step('Then the add drug order workspace should be visible in the order basket', async () => {
@@ -117,12 +121,15 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I should see the newly added order in the active medications list', async () => {
-      const headerRow = page.locator('thead > tr');
-      const dataRow = page.locator('tbody > tr');
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      const headerRow = activeMedicationsTable.locator('thead > tr');
+      const dataRow = activeMedicationsTable.locator('tbody > tr').filter({
+        hasText: /aspirin 325mg — 325mg — tablet/i,
+      });
 
       await expect(headerRow).toContainText(/start date/i);
       await expect(headerRow).toContainText(/details/i);
-      await page.getByText('Aspirin 325mg — 325mg — tablet').isVisible();
+      await expect(dataRow).toContainText(/aspirin 325mg — 325mg — tablet/i);
     });
   });
 
@@ -179,9 +186,51 @@ test.describe('Drug Order Tests', () => {
       await page.getByRole('button', { name: /save order/i }).click();
     });
 
-    await test.step('Then the order status should be changed to "Modify"', async () => {
-      await expect(orderBasket.getByText(/new/i)).toBeHidden();
-      await expect(orderBasket.getByText(/modify/i)).toBeVisible();
+    await test.step('Then I should see a success notification', async () => {
+      await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
+    });
+
+    await test.step('And I should see the updated order in the list in Active Medications table', async () => {
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      const headerRow = activeMedicationsTable.locator('thead > tr');
+      const dataRow = activeMedicationsTable.locator('tbody > tr');
+
+      await expect(headerRow).toContainText(/start date/i);
+      await expect(headerRow).toContainText(/details/i);
+      await expect(dataRow).toContainText(/aspirin 81mg/i);
+      await expect(dataRow).not.toContainText(/oral/i);
+      await expect(dataRow).toContainText(/inhalation/i);
+      await expect(dataRow).not.toContainText(/once daily/i);
+      await expect(dataRow).toContainText(/twice daily/i);
+      await expect(dataRow).not.toContainText(/3 days/i);
+      await expect(dataRow).toContainText(/5 days/i);
+      await expect(dataRow).not.toContainText(/indication headache/i);
+      await expect(dataRow).toContainText(/indication hypertension/i);
+    });
+  });
+
+  test('Renew a drug order', async ({ page, patient }) => {
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('And I open the options menu for the created medication', async () => {
+      const row = page.getByRole('row').filter({ hasText: drugOrder.drug.display }).first();
+      await row.getByRole('button', { name: /options/i }).click();
+    });
+
+    await test.step('And I click on the "Renew" action', async () => {
+      await page.getByRole('menuitem', { name: /renew/i }).click();
+    });
+
+    await test.step('Then the order basket should show a Renew item for the medication', async () => {
+      const basketItem = orderBasket.getByRole('listitem').filter({ hasText: drugOrder.drug.display });
+
+      await expect(basketItem).toBeVisible();
+      await expect(basketItem.getByRole('status', { name: /renew/i })).toBeVisible();
     });
 
     await test.step('When I click on the "Sign and close" button', async () => {
@@ -189,24 +238,14 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/updated aspirin 81mg/i)).toBeVisible();
+      await expect(page.getByText(new RegExp(`placed order for.*${drugOrder.drug.display}`, 'i'))).toBeVisible();
     });
 
-    await test.step('And I should see the updated order in the list in Active Medications table', async () => {
-      const headerRow = page.locator('thead > tr');
-      const dataRow = page.locator('tbody > tr');
-
-      await expect(headerRow.nth(0)).toContainText(/start date/i);
-      await expect(headerRow.nth(0)).toContainText(/details/i);
-      await expect(dataRow.nth(0)).toContainText(/aspirin 81mg/i);
-      await expect(dataRow.nth(0)).not.toContainText(/oral/i);
-      await expect(dataRow.nth(0)).toContainText(/inhalation/i);
-      await expect(dataRow.nth(0)).not.toContainText(/once daily/i);
-      await expect(dataRow.nth(0)).toContainText(/twice daily/i);
-      await expect(dataRow.nth(0)).not.toContainText(/3 days/i);
-      await expect(dataRow.nth(0)).toContainText(/5 days/i);
-      await expect(dataRow.nth(0)).not.toContainText(/indication headache/i);
-      await expect(dataRow.nth(0)).toContainText(/indication hypertension/i);
+    await test.step('And the renewed medication should appear in the active medications list', async () => {
+      const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
+      await expect(
+        activeMedicationsTable.getByRole('row').filter({ hasText: drugOrder.drug.display }).first(),
+      ).toBeVisible();
     });
   });
 

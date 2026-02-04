@@ -13,13 +13,7 @@ describe('LabSetPanel', () => {
   const mockSetActivePanel = jest.fn();
 
   it('renders the panel header, columns, and observations when provided', () => {
-    render(
-      <LabSetPanel
-        activePanel={null}
-        panel={mockBasePanel}
-        setActivePanel={mockSetActivePanel}
-      />,
-    );
+    render(<LabSetPanel activePanel={null} panel={mockBasePanel} setActivePanel={mockSetActivePanel} />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hematology/i })).toBeInTheDocument();
@@ -38,19 +32,13 @@ describe('LabSetPanel', () => {
     expect(hemoglobinRow).toBeInTheDocument();
     expect(hematocritRow).toBeInTheDocument();
 
-    expect(cbcRow).toHaveClass('check');
-    expect(hemoglobinRow).toHaveClass('low', 'check');
-    expect(hematocritRow).toHaveClass('high', 'check');
+    expect(cbcRow).not.toHaveClass('low', 'high');
+    expect(hemoglobinRow).toHaveClass('low');
+    expect(hematocritRow).toHaveClass('high');
   });
 
   it('clicking on the panel header sets the active panel', async () => {
-    render(
-      <LabSetPanel
-        activePanel={null}
-        panel={mockBasePanel}
-        setActivePanel={mockSetActivePanel}
-      />,
-    );
+    render(<LabSetPanel activePanel={null} panel={mockBasePanel} setActivePanel={mockSetActivePanel} />);
 
     const buttonElement = screen.getByRole('button', {
       name: /hematology/i,
@@ -66,13 +54,7 @@ describe('LabSetPanel', () => {
       entry.range = undefined;
     });
 
-    render(
-      <LabSetPanel
-        activePanel={null}
-        panel={panelWithoutRange}
-        setActivePanel={mockSetActivePanel}
-      />,
-    );
+    render(<LabSetPanel activePanel={null} panel={panelWithoutRange} setActivePanel={mockSetActivePanel} />);
 
     expect(screen.getByRole('columnheader', { name: /test name/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /value/i })).toBeInTheDocument();
@@ -87,11 +69,7 @@ describe('LabSetPanel', () => {
     mockIsDesktop.mockReturnValue(true);
 
     const { rerender } = render(
-      <LabSetPanel
-        activePanel={null}
-        panel={mockBasePanel}
-        setActivePanel={mockSetActivePanel}
-      />,
+      <LabSetPanel activePanel={null} panel={mockBasePanel} setActivePanel={mockSetActivePanel} />,
     );
 
     expect(screen.getByRole('table')).toHaveClass('cds--data-table--sm');
@@ -99,13 +77,7 @@ describe('LabSetPanel', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     mockIsDesktop.mockReturnValue(false);
 
-    rerender(
-      <LabSetPanel
-        activePanel={null}
-        panel={mockBasePanel}
-        setActivePanel={mockSetActivePanel}
-      />,
-    );
+    rerender(<LabSetPanel activePanel={null} panel={mockBasePanel} setActivePanel={mockSetActivePanel} />);
 
     expect(screen.getByRole('table')).toHaveClass('cds--data-table--md');
   });

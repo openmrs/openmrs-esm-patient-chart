@@ -30,6 +30,7 @@ export interface EncountersTableProps {
 
 export interface MappedEncounter {
   datetime: string;
+  rawDatetime: string;
   diagnoses: Array<Diagnosis>;
   editPrivilege: string;
   encounterType: string;
@@ -58,7 +59,9 @@ export function usePaginatedEncounters(patientUuid: string, encounterType: strin
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);
   url.searchParams.set('order', 'desc');
-  encounterType && url.searchParams.set('encounterType', encounterType);
+  if (encounterType) {
+    url.searchParams.set('encounterType', encounterType);
+  }
   return useOpenmrsPagination<Encounter>(patientUuid ? url : null, pageSize);
 }
 
@@ -74,6 +77,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     datetime: formatDatetime(parseDate(encounter.encounterDatetime), {
       noToday: true,
     }),
+    rawDatetime: encounter.encounterDatetime,
     diagnoses:
       encounter.diagnoses
         ?.filter((diagnosis) => !diagnosis.voided)

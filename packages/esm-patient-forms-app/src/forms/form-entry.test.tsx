@@ -1,39 +1,25 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
-import { ExtensionSlot, useConnectivity, useFeatureFlag } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
-import FormEntry from './form-entry.workspace';
+import FormEntry, { type FormEntryProps } from './form-entry.component';
 
-const mockCurrentVisit = {
-  uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
-  encounters: [],
-  patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
-  visitType: {
-    uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-    display: 'Facility Visit',
+const defaultProps: FormEntryProps = {
+  form: {
+    uuid: 'some-form-uuid',
+    name: '',
+    version: '',
+    published: false,
+    retired: false,
+    resources: [],
   },
-  attributes: [],
-  startDatetime: '2021-03-16T08:16:00.000+0000',
-  stopDatetime: null,
-  location: {
-    uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',
-    name: 'Registration Desk',
-    display: 'Registration Desk',
-  },
-};
-
-const testProps = {
-  closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  promptBeforeClosing: jest.fn(),
+  encounterUuid: 'some-encounter-uuid',
   patientUuid: mockPatient.id,
   patient: mockPatient,
-  formInfo: { formUuid: 'some-form-uuid' },
-  mutateForm: jest.fn(),
-  setTitle: jest.fn(),
-  visitContext: mockCurrentVisit,
+  visitContext: null,
   mutateVisitContext: null,
+  closeWorkspace: jest.fn(),
 };
 
 const mockFormEntrySub = jest.fn();
@@ -49,7 +35,7 @@ describe('FormEntry', () => {
     );
     mockExtensionSlot.mockImplementation((ext) => ext.name as any);
 
-    render(<FormEntry {...testProps} />);
+    render(<FormEntry {...defaultProps} />);
 
     await screen.findByText(/form-widget-slot/);
     expect(screen.getByText(/form-widget-slot/)).toBeInTheDocument();

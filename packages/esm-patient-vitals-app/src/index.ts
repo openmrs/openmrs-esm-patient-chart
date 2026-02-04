@@ -59,9 +59,13 @@ export const vitalsAndBiometricsDashboardLink =
 
 export const weightTile = getAsyncLifecycle(() => import('./components/weight-tile/weight-tile.component'), options);
 
-// t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
 export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(
   () => import('./vitals-biometrics-form/vitals-biometrics-form.workspace'),
+  options,
+);
+
+export const exportedVitalsBiometricsFormWorkspace = getAsyncLifecycle(
+  () => import('./vitals-biometrics-form/exported-vitals-biometrics-form.workspace'),
   options,
 );
 

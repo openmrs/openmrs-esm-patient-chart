@@ -121,9 +121,9 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, expanded, view }) => {
             <GroupedTimeline patientUuid={patientUuid} />
           ) : view === 'individual-test' ? (
             <GroupedPanelsTables
-              patientUuid={patientUuid}
               className={styles.groupPanelsTables}
               loadingPanelData={isLoading}
+              patientUuid={patientUuid}
             />
           ) : (
             <DataTableSkeleton role="progressbar" />

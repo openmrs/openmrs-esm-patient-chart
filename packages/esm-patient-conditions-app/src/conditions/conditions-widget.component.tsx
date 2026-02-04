@@ -18,7 +18,6 @@ import {
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
 import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePicker } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   type CodedCondition,
   type Condition,
@@ -32,7 +31,7 @@ import { type ConditionsFormSchema } from './conditions-form.workspace';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
-  closeWorkspaceWithSavedChanges?: DefaultPatientWorkspaceProps['closeWorkspaceWithSavedChanges'];
+  closeWorkspaceWithSavedChanges?: () => void;
   conditionToEdit?: Condition;
   isEditing?: boolean;
   isSubmittingForm: boolean;
@@ -199,7 +198,11 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         Object.entries(errors).map((key, err) => console.error(`${key}: ${err} `));
         return;
       }
-      isEditing ? handleUpdate() : handleCreate();
+      if (isEditing) {
+        handleUpdate();
+      } else {
+        handleCreate();
+      }
     }
   }, [handleUpdate, isEditing, handleCreate, isSubmittingForm, errors, setIsSubmittingForm]);
 

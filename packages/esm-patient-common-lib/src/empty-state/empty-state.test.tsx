@@ -1,10 +1,10 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { EmptyState } from '.';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 
 describe('EmptyState', () => {
   it('renders an empty state widget card', () => {
@@ -12,7 +12,7 @@ describe('EmptyState', () => {
       <EmptyState
         headerTitle="appointments"
         displayText="appointments"
-        launchForm={() => launchWorkspace('sample-form-workspace')}
+        launchForm={() => launchWorkspace2('sample-form-workspace')}
       />,
     );
 
@@ -28,7 +28,7 @@ describe('EmptyState', () => {
       <EmptyState
         headerTitle="appointments"
         displayText="appointments"
-        launchForm={() => launchWorkspace('sample-form-workspace')}
+        launchForm={() => launchWorkspace2('sample-form-workspace')}
       />,
     );
 

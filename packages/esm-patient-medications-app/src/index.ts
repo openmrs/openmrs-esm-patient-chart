@@ -37,13 +37,12 @@ export const medicationsDashboardLink =
     options,
   );
 
-// t('addDrugOrderWorkspaceTitle', 'Add drug order')
 export const addDrugOrderWorkspace = getAsyncLifecycle(
   () => import('./add-drug-order/add-drug-order.workspace'),
   options,
 );
 
-export const fillPrescriptionFormWorkspace = getAsyncLifecycle(
-  () => import('./add-drug-order/fill-prescription-form.workspace'),
+export const exportedAddDrugOrderWorkspace = getAsyncLifecycle(
+  () => import('./add-drug-order/exported-add-drug-order.workspace'),
   options,
 );

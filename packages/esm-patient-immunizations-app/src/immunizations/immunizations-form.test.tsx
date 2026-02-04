@@ -10,6 +10,7 @@ import {
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
@@ -64,15 +65,21 @@ jest.mock('./immunizations.resource', () => ({
   savePatientImmunization: jest.fn(),
 }));
 
-const testProps = {
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
+const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
   closeWorkspace: mockCloseWorkspace,
-  closeWorkspaceWithSavedChanges: mockCloseWorkspaceWithSavedChanges,
-  promptBeforeClosing: mockPromptBeforeClosing,
-  setTitle: mockSetTitle,
-  visitContext: mockCurrentVisit,
-  mutateVisitContext: null,
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: mockCurrentVisit,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {},
+  windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 mockUseConfig.mockReturnValue({

@@ -1,22 +1,28 @@
 import { ComboBox } from '@carbon/react';
-import { useConfig, useDebounce } from '@openmrs/esm-framework';
+import { useConfig, useDebounce, type Visit } from '@openmrs/esm-framework';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplates } from './drug-search.resource';
-import { type DrugOrderBasketItem } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { useTranslation } from 'react-i18next';
 
 interface DrugSearchComboBoxProps {
-  setSelectedDrugItem(drug: DrugOrderBasketItem);
+  initialOrderBasketItem: DrugOrderBasketItem;
+  setSelectedDrugItem(drug: DrugOrderBasketItem): void;
+  visit: Visit;
 }
 
 /**
  * This component is a ComboBox for searching for drugs. Similar to drug-search.component.tsx,
  * but allows for custom behavior when a drug is selected.
- * This extension is currently not used anywhere in the patient-medications-app, but
- * is used by other apps (ex: dispensing) for selecting drugs.
+ * This component is currently not used anywhere in the patient-medications-app, but can be used
+ * in the future for a drug form with an inlined drug search.
  */
-const DrugSearchComboBox: React.FC<DrugSearchComboBoxProps> = ({ setSelectedDrugItem }) => {
+const DrugSearchComboBox: React.FC<DrugSearchComboBoxProps> = ({
+  initialOrderBasketItem,
+  setSelectedDrugItem,
+  visit,
+}) => {
   const { daysDurationUnit } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const [drugSearchTerm, setDrugSearchTerm] = useState('');
@@ -27,12 +33,12 @@ const DrugSearchComboBox: React.FC<DrugSearchComboBoxProps> = ({ setSelectedDrug
     return drugs?.flatMap((drug) => {
       const templates = templateByDrugUuid.get(drug.uuid);
       if (templates?.length > 0) {
-        return templates.map((template) => getTemplateOrderBasketItem(drug, daysDurationUnit, template));
+        return templates.map((template) => getTemplateOrderBasketItem(drug, visit, daysDurationUnit, template));
       } else {
-        return [getTemplateOrderBasketItem(drug, daysDurationUnit)];
+        return [getTemplateOrderBasketItem(drug, visit, daysDurationUnit)];
       }
     });
-  }, [drugs, templateByDrugUuid, daysDurationUnit]);
+  }, [drugs, templateByDrugUuid, daysDurationUnit, visit]);
 
   return (
     <ComboBox
@@ -41,10 +47,17 @@ const DrugSearchComboBox: React.FC<DrugSearchComboBoxProps> = ({ setSelectedDrug
       onChange={({ selectedItem }) => {
         setSelectedDrugItem(selectedItem);
       }}
+      initialSelectedItem={initialOrderBasketItem}
       onInputChange={(inputText) => {
         setDrugSearchTerm(inputText);
       }}
-      itemToString={(item: DrugOrderBasketItem) => item?.display ?? ''}
+      itemToString={(item: DrugOrderBasketItem) =>
+        item.display +
+        ' — ' +
+        item.drug?.strength?.toLowerCase() +
+        ' — ' +
+        item.drug?.dosageForm?.display?.toLowerCase()
+      }
       placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
       titleText={t('drugName', 'Drug name')}
     />

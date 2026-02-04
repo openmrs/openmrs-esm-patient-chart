@@ -82,7 +82,7 @@ describe('VisitDetailOverview', () => {
     });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -106,7 +106,7 @@ describe('VisitDetailOverview', () => {
       error,
     });
 
-    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -125,7 +125,7 @@ describe('VisitDetailOverview', () => {
     });
     mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
 
-    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -161,7 +161,7 @@ describe('VisitDetailOverview', () => {
     });
     mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
 
-    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} />);
+    renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
