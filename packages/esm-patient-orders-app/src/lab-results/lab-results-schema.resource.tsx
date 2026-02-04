@@ -37,7 +37,7 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t:
     return z.object({
       fulfillerComment: z
         .string()
-        .max(500, t('commentsCannotExceed500Characters', 'Comments cannot exceed 500 characters'))
+        .max(1024, t('commentsCannotExceed1024Characters', 'Comments cannot exceed 1024 characters'))
         .optional(),
     });
   }
@@ -47,7 +47,7 @@ export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept, t:
   return z.object(conceptSchema).extend({
     fulfillerComment: z
       .string()
-      .max(500, t('commentsCannotExceed500Characters', 'Comments cannot exceed 500 characters'))
+      .max(1024, t('commentsCannotExceed1024Characters', 'Comments cannot exceed 1024 characters'))
       .optional(),
   });
 };

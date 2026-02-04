@@ -33,9 +33,7 @@ import styles from './lab-results-form.scss';
 import { type ConfigObject } from '../config-schema';
 
 export interface LabResultsFormProps extends DefaultPatientWorkspaceProps {
-  order: Order & {
-    fulfillerStatus: 'DRAFT' | 'COMPLETED' | Order['fulfillerStatus'];
-  };
+  order: Order;
   promptBeforeClosing: (isDirty: () => boolean) => void;
   closeWorkspaceWithSavedChanges: () => void;
   invalidateLabOrders?: () => void;
@@ -86,19 +84,17 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
     formState: { errors, isDirty, isSubmitting },
     setValue,
     handleSubmit,
-    watch,
   } = useForm<FormData>({
     defaultValues: {} as FormData,
     resolver: zodResolver(schema),
     mode: 'all',
   });
 
-  const commentValue = watch('fulfillerComment') || '';
-
   useEffect(() => {
     const validStatuses = enableReviewingLabResultsBeforeApproval ? ['COMPLETED', 'DRAFT'] : ['COMPLETED'];
+    const orderStatus = order?.fulfillerStatus as string;
 
-    if (concept && completeLabResult && validStatuses.includes(order?.fulfillerStatus)) {
+    if (concept && completeLabResult && validStatuses.includes(orderStatus)) {
       if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
         setValue(concept.uuid, completeLabResult.value.uuid);
       } else if (isNumeric(concept) && completeLabResult?.value) {
@@ -168,8 +164,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
     const commentText = fulfillerComment?.trim() || '';
 
+    const orderStatus = order.fulfillerStatus as string;
+
     if (enableReviewingLabResultsBeforeApproval) {
-      if (['COMPLETED', 'DRAFT'].includes(order.fulfillerStatus)) {
+      if (orderStatus === 'DRAFT') {
         try {
           const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
             const obs =
@@ -187,7 +185,57 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }, []);
 
           if (failedObsconceptUuids.length) {
-            const errorMessage = t('couldNotSaveObsWithConceptUuids', 'Could not save obs {{failedObsconceptUuids}} ', {
+            const errorMessage = t('couldNotSaveObsWithConceptUuids', 'Could not save obs {{failedObsconceptUuids}}', {
+              failedObsconceptUuids: failedObsconceptUuids.join(', '),
+            });
+            showNotification('error', errorMessage);
+            return;
+          }
+
+          const resultsStatusPayload = {
+            fulfillerComment: commentText,
+          };
+
+          await updateOrderResult(order.uuid, order.encounter.uuid, null, resultsStatusPayload, null, abortController);
+
+          await Promise.all([mutateResults(), mutateOrderData()]);
+
+          if (invalidateLabOrders) {
+            invalidateLabOrders();
+          }
+
+          launchApprovalModal();
+        } catch (err) {
+          showNotification(
+            'error',
+            err?.message || t('errorUpdatingLabResults', 'An error occurred while updating lab results'),
+          );
+        } finally {
+          setShowEmptyFormErrorNotification(false);
+        }
+        return;
+      }
+
+      if (orderStatus === 'COMPLETED') {
+        // Already approved - just update directly
+        try {
+          const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
+            const obs =
+              completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
+            return updateObservation(obs?.uuid, { value });
+          });
+
+          const updateResults = await Promise.allSettled(updateTasks);
+
+          const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
+            if (curr.status === 'rejected') {
+              return [...prev, Object.keys(labValues).at(index)];
+            }
+            return prev;
+          }, []);
+
+          if (failedObsconceptUuids.length) {
+            const errorMessage = t('couldNotSaveObsWithConceptUuids', 'Could not save obs {{failedObsconceptUuids}}', {
               failedObsconceptUuids: failedObsconceptUuids.join(', '),
             });
             showNotification('error', errorMessage);
@@ -206,7 +254,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           if (invalidateLabOrders) {
             invalidateLabOrders();
           }
-          launchApprovalModal();
 
           closeWorkspaceWithSavedChanges();
           showNotification(
@@ -216,7 +263,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
             }),
           );
         } catch (err) {
-          showNotification('error', err?.message || 'An error occurred while updating lab results');
+          showNotification(
+            'error',
+            err?.message || t('errorUpdatingLabResults', 'An error occurred while updating lab results'),
+          );
         } finally {
           setShowEmptyFormErrorNotification(false);
         }
@@ -225,16 +275,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
       try {
         const obsPayload = createObservationPayload(concept, order, labValues, 'FINAL');
-        const orderDiscontinuationPayload = {
-          previousOrder: order.uuid,
-          type: 'testorder',
-          action: 'DISCONTINUE',
-          careSetting: order.careSetting.uuid,
-          encounter: order.encounter.uuid,
-          patient: order.patient.uuid,
-          concept: order.concept.uuid,
-          orderer: order.orderer,
-        };
         const resultsStatusPayload = {
           fulfillerStatus: 'DRAFT',
           fulfillerComment: commentText,
@@ -245,7 +285,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           order.encounter.uuid,
           obsPayload,
           resultsStatusPayload,
-          orderDiscontinuationPayload,
+          null,
           abortController,
         );
 
@@ -264,12 +304,15 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }),
         );
       } catch (err) {
-        showNotification('error', err?.message || 'An error occurred while saving lab results');
+        showNotification(
+          'error',
+          err?.message || t('errorSavingLabResults', 'An error occurred while saving lab results'),
+        );
       } finally {
         setShowEmptyFormErrorNotification(false);
       }
     } else {
-      if (order.fulfillerStatus === 'COMPLETED') {
+      if (orderStatus === 'COMPLETED') {
         try {
           const updateTasks = Object.entries(labValues).map(([conceptUuid, value]) => {
             const obs =
@@ -286,7 +329,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }, []);
 
           if (failedObsconceptUuids.length) {
-            showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+            const errorMessage = t('couldNotSaveObsWithConceptUuids', 'Could not save obs {{failedObsconceptUuids}}', {
+              failedObsconceptUuids: failedObsconceptUuids.join(', '),
+            });
+            showNotification('error', errorMessage);
             return;
           }
 
@@ -311,7 +357,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
             }),
           );
         } catch (err) {
-          showNotification('error', err?.message || 'An error occurred while updating lab results');
+          showNotification(
+            'error',
+            err?.message || t('errorUpdatingLabResults', 'An error occurred while updating lab results'),
+          );
         } finally {
           setShowEmptyFormErrorNotification(false);
         }
@@ -320,16 +369,6 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
 
       try {
         const obsPayload = createObservationPayload(concept, order, labValues, 'FINAL');
-        const orderDiscontinuationPayload = {
-          previousOrder: order.uuid,
-          type: 'testorder',
-          action: 'DISCONTINUE',
-          careSetting: order.careSetting.uuid,
-          encounter: order.encounter.uuid,
-          patient: order.patient.uuid,
-          concept: order.concept.uuid,
-          orderer: order.orderer,
-        };
         const resultsStatusPayload = {
           fulfillerStatus: 'COMPLETED',
           fulfillerComment: commentText || 'Test Results Entered',
@@ -340,7 +379,7 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           order.encounter.uuid,
           obsPayload,
           resultsStatusPayload,
-          orderDiscontinuationPayload,
+          null,
           abortController,
         );
 
@@ -359,7 +398,10 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
           }),
         );
       } catch (err) {
-        showNotification('error', err?.message || 'An error occurred while saving lab results');
+        showNotification(
+          'error',
+          err?.message || t('errorSavingLabResults', 'An error occurred while saving lab results'),
+        );
       } finally {
         setShowEmptyFormErrorNotification(false);
       }
@@ -385,18 +427,20 @@ const LabResultsForm: React.FC<LabResultsFormProps> = ({
                 <Controller
                   control={control}
                   name="fulfillerComment"
-                  render={({ field, fieldState: { error } }) => (
+                  render={({ field }) => (
                     <TextArea
                       {...field}
                       id="fulfillerComment"
-                      labelText={t('comments', 'Comments')}
-                      placeholder={t('addCommentsOptional', 'Add comments (optional)...')}
-                      helperText={`${t(
-                        'commentsHelperText',
-                        'Enter any additional notes or observations about the test results',
-                      )} (${commentValue.length}/500)`}
-                      invalid={Boolean(error?.message)}
-                      invalidText={error?.message}
+                      labelText={t('fulfillmentComments', 'Fulfillment comments (optional)')}
+                      placeholder={t('addFulfillmentNotes', 'Add fulfillment notes')}
+                      helperText={t(
+                        'fulfillmentNotesHelper',
+                        'Enter notes about the order fulfillment process (e.g., sample received, test completed, exceptions)',
+                      )}
+                      enableCounter
+                      maxCount={1024}
+                      invalid={Boolean(errors.fulfillerComment)}
+                      invalidText={errors.fulfillerComment?.message}
                       rows={3}
                     />
                   )}
