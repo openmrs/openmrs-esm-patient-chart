@@ -125,19 +125,28 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               )}
             </p>
             <p className={styles.bodyLong01}>
-              <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-              <span className={styles.dosage}>
-                {medication.dose} {medication.doseUnits?.display.toLowerCase()}
-              </span>{' '}
+              {medication.dose != null && (
+                <>
+                  <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                  <span className={styles.dosage}>
+                    {medication.dose} {medication.doseUnits?.display?.toLowerCase()}
+                  </span>{' '}
+                </>
+              )}
               {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
-              {!medication.duration
-                ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-                : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>}{' '}
+              {medication.duration != null ? (
+                <>
+                  &mdash;{' '}
+                  {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                     duration: medication.duration,
-                    durationUnit: medication.durationUnits?.display.toLowerCase(),
+                    durationUnit: medication.durationUnits?.display?.toLowerCase(),
                   })}{' '}
-              {medication.numRefills !== 0 && (
+                </>
+              ) : (
+                <> &mdash; {t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()} </>
+              )}
+              {medication.numRefills != null && medication.numRefills !== 0 && (
                 <span>
                   <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
                   {medication.numRefills}
@@ -155,8 +164,8 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                 {medication.orderReasonNonCoded}
               </span>
             )}{' '}
-            {medication.orderReasonNonCoded && medication.quantity && <>&mdash;</>}
-            {medication.quantity && (
+            {medication.orderReasonNonCoded && medication.quantity != null && <>&mdash;</>}
+            {medication.quantity != null && (
               <span>
                 <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span> {medication.quantity}{' '}
                 {medication?.quantityUnits?.display}

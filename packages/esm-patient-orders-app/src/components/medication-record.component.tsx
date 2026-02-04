@@ -1,80 +1,96 @@
 import React from 'react';
 import { capitalize } from 'lodash-es';
-import { Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { InlineLoading, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, UserIcon } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import { type Order, useDrugOrderByUuid } from '@openmrs/esm-patient-common-lib';
 import styles from './medication-record.scss';
 
 interface MedicationRecordProps {
   medication: Order;
 }
 
-const MedicationRecord: React.FC<MedicationRecordProps> = ({ medication }) => {
+export default function MedicationRecord({ medication }: MedicationRecordProps) {
   const { t } = useTranslation();
+  const { data: drugOrder, isLoading } = useDrugOrderByUuid(medication.uuid);
+
+  if (isLoading) {
+    return <InlineLoading description={t('loading', 'Loading') + '...'} />;
+  }
+
+  const order = drugOrder ?? medication;
+
   return (
     <div className={styles.medicationContainer}>
       <div className={styles.startDateColumn}>
-        <span>{formatDate(new Date(medication.dateActivated))}</span>
-        <InfoTooltip orderer={medication.orderer?.display ?? '--'} />
+        <span>{formatDate(new Date(order.dateActivated))}</span>
+        <InfoTooltip orderer={order.orderer?.display ?? '--'} />
       </div>
       <div className={styles.medicationRecord}>
         <p className={styles.bodyLong01}>
-          <strong>{capitalize(medication.drug?.display)}</strong>{' '}
-          {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
-          {medication.drug?.dosageForm?.display && <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>}
+          <strong>{capitalize(order.drug?.display)}</strong>{' '}
+          {order.drug?.strength && <>&mdash; {order.drug.strength.toLowerCase()}</>}{' '}
+          {order.drug?.dosageForm?.display && <>&mdash; {order.drug.dosageForm.display.toLowerCase()}</>}
         </p>
         <p className={styles.bodyLong01}>
-          <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <span className={styles.dosage}>
-            {medication.dose} {medication.doseUnits?.display.toLowerCase()}
-          </span>{' '}
-          {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-          {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
-          {!medication.duration
-            ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-            : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
-                duration: medication.duration,
-                durationUnit: medication.durationUnits?.display.toLowerCase(),
-              })}{' '}
-          {medication.numRefills !== 0 && (
+          {order.dose != null && (
+            <>
+              <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+              <span className={styles.dosage}>
+                {order.dose} {order.doseUnits?.display?.toLowerCase()}
+              </span>{' '}
+            </>
+          )}
+          {order.route?.display && <>&mdash; {order.route.display.toLowerCase()}</>}{' '}
+          {order.frequency?.display && <>&mdash; {order.frequency.display.toLowerCase()}</>}
+          {order.duration != null ? (
+            <>
+              {' '}
+              &mdash;{' '}
+              {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                duration: order.duration,
+                durationUnit: order.durationUnits?.display?.toLowerCase(),
+              })}
+            </>
+          ) : null}{' '}
+          {order.numRefills != null && order.numRefills !== 0 && (
             <span>
               <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-              {medication.numRefills}
+              {order.numRefills}
             </span>
           )}
-          {medication.dosingInstructions && <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>}
+          {order.dosingInstructions && <span> &mdash; {order.dosingInstructions.toLowerCase()}</span>}
         </p>
         <p className={styles.bodyLong01}>
-          {medication.orderReasonNonCoded ? (
+          {order.orderReasonNonCoded ? (
             <span>
               <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-              {medication.orderReasonNonCoded}
+              {order.orderReasonNonCoded}
             </span>
           ) : null}
-          {medication.orderReasonNonCoded && medication.quantity && <>&mdash;</>}
-          {medication.quantity ? (
+          {order.orderReasonNonCoded && order.quantity != null ? <> &mdash;</> : null}
+          {order.quantity != null ? (
             <span>
-              <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span> {medication.quantity}{' '}
-              {medication?.quantityUnits?.display}
+              <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span> {order.quantity}{' '}
+              {order.quantityUnits?.display}
             </span>
           ) : null}
-          {medication.dateStopped ? (
+          {order.dateStopped ? (
             <span>
               <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
-              {formatDate(new Date(medication.dateStopped))}
+              {formatDate(new Date(order.dateStopped))}
             </span>
           ) : null}
         </p>
       </div>
     </div>
   );
-};
+}
 
 function InfoTooltip({ orderer }: { orderer: string }) {
   const { t } = useTranslation();
   return (
-    <Toggletip align="top-left">
+    <Toggletip align="top-start">
       <ToggletipButton label={t('ordererInformation', 'Orderer information')}>
         <UserIcon size={16} />
       </ToggletipButton>
@@ -84,5 +100,3 @@ function InfoTooltip({ orderer }: { orderer: string }) {
     </Toggletip>
   );
 }
-
-export default MedicationRecord;
