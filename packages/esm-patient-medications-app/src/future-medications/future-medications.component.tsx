@@ -5,17 +5,17 @@ import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openm
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api';
 
-interface PastMedicationsProps {
+interface FutureMedicationsProps {
   patient: fhir.Patient;
 }
 
-const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
+const FutureMedications: React.FC<FutureMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
-  const displayText = t('pastMedicationsDisplayText', 'past medications');
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
+  const headerTitle = t('futureMedicationsHeaderTitle', 'Future medications');
+  const displayText = t('futureMedicationsDisplayText', 'future medications');
 
-  const { pastOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
+  const { futureOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
+  const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -25,15 +25,15 @@ const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (pastOrders?.length) {
+  if (futureOrders?.length) {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
-        title={t('pastMedicationsTableTitle', 'Past Medications')}
-        medications={pastOrders}
-        showDiscontinueButton={false}
-        showModifyButton={false}
-        showRenewButton={true}
+        title={t('futureMedicationsTableTitle', 'Future Medications')}
+        medications={futureOrders}
+        showDiscontinueButton={true}
+        showModifyButton={true}
+        showRenewButton={false}
         patient={patient}
       />
     );
@@ -48,4 +48,4 @@ const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
   );
 };
 
-export default PastMedications;
+export default FutureMedications;
