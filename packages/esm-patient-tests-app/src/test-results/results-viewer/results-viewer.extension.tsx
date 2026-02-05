@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { ContentSwitcher, Switch, Button, DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { RenewIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { RenewIcon, restBaseUrl, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useSWRConfig } from 'swr';
 import { type ConfigObject } from '../../config-schema';
 import { type viewOpts } from '../../types';
 import { type Roots } from '../filter/filter-context';
@@ -18,6 +19,7 @@ type panelOpts = 'tree' | 'panel';
 
 interface RefreshDataButtonProps {
   isTablet: boolean;
+  patientUuid: string;
   t: TFunction;
 }
 
@@ -102,7 +104,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
             filteredResultsCount ? `(${filteredResultsCount})` : ''
           }`}</h4>
           <div className={styles.leftHeaderActions}>
-            <RefreshDataButton isTablet={isTablet} t={t} />
+            <RefreshDataButton isTablet={isTablet} patientUuid={patientUuid} t={t} />
             <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
             <ContentSwitcher
               selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
@@ -139,7 +141,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
               filteredResultsCount ? `(${filteredResultsCount})` : ''
             }`}</h4>
             <div className={styles.buttonsContainer}>
-              <RefreshDataButton isTablet={isTablet} t={t} />
+              <RefreshDataButton isTablet={isTablet} patientUuid={patientUuid} t={t} />
               <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
               <ContentSwitcher
                 className={styles.viewOptionsSwitcher}
@@ -165,12 +167,27 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
   );
 };
 
-function RefreshDataButton({ isTablet, t }: RefreshDataButtonProps) {
+function RefreshDataButton({ isTablet, patientUuid, t }: RefreshDataButtonProps) {
+  const { cache, mutate } = useSWRConfig();
+
+  const handleRefresh = useCallback(() => {
+    // The data-fetching hooks use useSWRInfinite, which stores cache keys prefixed
+    // with "$inf$". SWR's mutate() with a filter function explicitly skips $inf$ keys,
+    // so we iterate over cache keys directly and mutate matching keys by exact string.
+    for (const key of cache.keys()) {
+      const isPatientKey = key.includes(`patient=${patientUuid}`);
+
+      if (isPatientKey && (key.includes(`${restBaseUrl}/obstree`) || key.includes('/ws/fhir2/R4/Observation'))) {
+        mutate(key);
+      }
+    }
+  }, [cache, mutate, patientUuid]);
+
   return (
     <Button
       className={styles.button}
       kind="ghost"
-      onClick={() => window.location.reload()}
+      onClick={handleRefresh}
       renderIcon={RenewIcon}
       size={isTablet ? 'md' : 'sm'}
     >
