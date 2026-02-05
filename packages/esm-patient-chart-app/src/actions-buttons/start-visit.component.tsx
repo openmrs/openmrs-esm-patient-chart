@@ -2,15 +2,16 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
-import styles from './action-button.scss';
-import { type VisitFormProps } from '../visit/visit-form/visit-form.workspace';
 import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
+import { type VisitFormProps } from '../visit/visit-form/visit-form.workspace';
+import styles from './action-button.scss';
 
 interface StartVisitOverflowMenuItemProps {
   patient: fhir.Patient;
+  closeMenu?: () => void;
 }
 
-const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({ patient }) => {
+const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({ patient, closeMenu }) => {
   const { t } = useTranslation();
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
@@ -27,7 +28,12 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
 
   return (
     !isDeceased && (
-      <OverflowMenuItem className={styles.menuitem} itemText={t('addVisit', 'Add visit')} onClick={handleLaunchModal} />
+      <OverflowMenuItem
+        className={styles.menuitem}
+        itemText={t('addVisit', 'Add visit')}
+        onClick={handleLaunchModal}
+        closeMenu={closeMenu}
+      />
     )
   );
 };
