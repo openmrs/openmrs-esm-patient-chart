@@ -70,21 +70,16 @@ export function useFavoriteForm({
   });
 
   const computedName = useMemo(() => {
-    const isSpecific = attributes.selectedAttributes.strength || attributes.hasSelectedStrength;
     if (attributes.selectedStrengthDrug) return attributes.selectedStrengthDrug.display || '';
+
+    const isSpecific = attributes.selectedAttributes.strength;
     if (isSpecific) return effectiveDrug?.display || '';
 
-    return effectiveDrug?.concept?.display || conceptName || effectiveDrug?.display || '';
-  }, [
-    attributes.selectedAttributes.strength,
-    attributes.hasSelectedStrength,
-    attributes.selectedStrengthDrug,
-    effectiveDrug,
-    conceptName,
-  ]);
+    return effectiveDrug?.concept?.display || conceptName || '';
+  }, [attributes.selectedAttributes.strength, attributes.selectedStrengthDrug, effectiveDrug, conceptName]);
 
   const handleSave = useCallback(async () => {
-    const isSpecificFavorite = attributes.selectedAttributes.strength || attributes.hasSelectedStrength;
+    const isSpecificFavorite = Boolean(attributes.selectedStrengthDrug || attributes.selectedAttributes.strength);
     const drugForSave = attributes.selectedStrengthDrug || effectiveDrug;
 
     // Validation
