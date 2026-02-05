@@ -8,7 +8,6 @@ import {
   openmrsFetch,
   useConfig,
   useSession,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { type Order, useOrderTypes, usePatientOrders, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
@@ -23,11 +22,9 @@ const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseReactToPrint = jest.mocked(useReactToPrint);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(jest.fn());
-mockLaunchWorkspace.mockImplementation(jest.fn());
 
 jest.mock('react-to-print', () => ({
   ...jest.requireActual('react-to-print'),
@@ -45,6 +42,27 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useOrderBasket: jest.fn(),
   };
 });
+
+jest.mock('./medication-record.component', () => ({
+  __esModule: true,
+  default: function MockMedicationRecord() {
+    return 'Medication details';
+  },
+}));
+
+jest.mock('./test-order.component', () => ({
+  __esModule: true,
+  default: function MockTestOrder() {
+    return 'Test order details';
+  },
+}));
+
+jest.mock('./general-order-table.component', () => ({
+  __esModule: true,
+  default: function MockGeneralOrderTable() {
+    return 'General order details';
+  },
+}));
 
 describe('OrderDetailsTable', () => {
   const user = userEvent.setup();
@@ -227,58 +245,6 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 
-  it('filters the table to show only drug orders or test orders based on the dropdown filter', async () => {
-    const allOrders = mockOrders;
-    const testOrders = mockOrders.filter((order) => order.orderType.uuid === testOrderTypeUuid);
-
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
-    mockUsePatientOrders.mockImplementation((_patientUuid, _status, orderType) => ({
-      data: orderType ? (testOrders as unknown as Array<Order>) : (allOrders as unknown as Array<Order>),
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    }));
-
-    renderOrderDetailsTable();
-
-    await screen.findByRole('table');
-
-    const orderTypeSelector = screen.getByRole('combobox', {
-      name: /select order type/i,
-    });
-
-    await user.click(orderTypeSelector);
-    await user.click(screen.getByRole('option', { name: /test order/i }));
-
-    expect(
-      screen.queryByRole('cell', {
-        name: /drug order/i,
-      }),
-    ).not.toBeInTheDocument();
-  });
-
   it('prints the orders in the list when the print button is clicked', async () => {
     const mockHandlePrint = jest.fn();
 
@@ -326,44 +292,7 @@ describe('OrderDetailsTable', () => {
     expect(mockHandlePrint).toHaveBeenCalledTimes(1);
   });
 
-  it('filters orders by date range when date picker is used', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
-    const mockMutate = jest.fn();
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: mockMutate,
-    });
-
-    renderOrderDetailsTable();
-
-    await screen.findByRole('table');
-
-    const dateRangeLabel = screen.getByText(/date range/i);
-    expect(dateRangeLabel).toBeInTheDocument();
-
-    // Default value is today's date (format: dd/mm/yyyy–dd/mm/yyyy)
-    const dateRangeInput = screen.getByDisplayValue(/\d{2}\/\d{2}\/\d{4}–\d{2}\/\d{2}\/\d{4}/);
-    expect(dateRangeInput).toBeInTheDocument();
-  });
-
-  it('displays order priority pills with correct styling', async () => {
+  it('renders a date range picker with a default value of today', async () => {
     mockUseOrderTypes.mockReturnValue({
       data: [
         {
@@ -391,11 +320,17 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const priorityCells = screen.getAllByText(/routine|urgent|stat/i);
-    expect(priorityCells.length).toBeGreaterThan(0);
+    expect(screen.getByText(/date range/i)).toBeInTheDocument();
+    expect(screen.getByDisplayValue(/\d{2}\/\d{2}\/\d{4}–\d{2}\/\d{2}\/\d{4}/)).toBeInTheDocument();
   });
 
-  it('displays order status pills with correct styling', async () => {
+  it('renders priority tags for each urgency level', async () => {
+    const ordersWithPriorities = [
+      { ...mockOrders[0], uuid: 'routine-order', orderNumber: 'ORD-R', urgency: 'ROUTINE' },
+      { ...mockOrders[0], uuid: 'stat-order', orderNumber: 'ORD-S', urgency: 'STAT' },
+      { ...mockOrders[0], uuid: 'scheduled-order', orderNumber: 'ORD-D', urgency: 'ON_SCHEDULED_DATE' },
+    ];
+
     mockUseOrderTypes.mockReturnValue({
       data: [
         {
@@ -412,7 +347,7 @@ describe('OrderDetailsTable', () => {
     });
 
     mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
+      data: ordersWithPriorities as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -423,11 +358,53 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const statusCells = screen.getAllByText('--');
-    expect(statusCells.length).toBeGreaterThan(0);
+    expect(screen.getByText('Routine')).toBeInTheDocument();
+    expect(screen.getByText('Stat')).toBeInTheDocument();
+    expect(screen.getByText('On scheduled date')).toBeInTheDocument();
   });
 
-  it('expands rows to show order details when expand button is clicked', async () => {
+  it('renders status tags for orders with fulfiller statuses and a dash for orders without', async () => {
+    const ordersWithStatuses = [
+      { ...mockOrders[1], uuid: 'received-order', orderNumber: 'ORD-RCV', fulfillerStatus: 'RECEIVED' },
+      { ...mockOrders[1], uuid: 'in-progress-order', orderNumber: 'ORD-PRG', fulfillerStatus: 'IN_PROGRESS' },
+      { ...mockOrders[1], uuid: 'completed-order', orderNumber: 'ORD-CMP', fulfillerStatus: 'COMPLETED' },
+      { ...mockOrders[1], uuid: 'no-status-order', orderNumber: 'ORD-NUL', fulfillerStatus: null },
+    ];
+
+    mockUseOrderTypes.mockReturnValue({
+      data: [
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+    });
+
+    mockUsePatientOrders.mockReturnValue({
+      data: ordersWithStatuses as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+
+    expect(screen.getByText('Received')).toBeInTheDocument();
+    expect(screen.getByText('In progress')).toBeInTheDocument();
+    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('--')).toBeInTheDocument();
+  });
+
+  it('shows medication details when expanding a drug order row', async () => {
     mockUseOrderTypes.mockReturnValue({
       data: [
         {
@@ -444,7 +421,7 @@ describe('OrderDetailsTable', () => {
     });
 
     mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
+      data: [mockOrders[0]] as unknown as Array<Order>,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -455,12 +432,44 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const expandButtons = screen.getAllByRole('button', { name: /expand current row/i });
-    expect(expandButtons.length).toBeGreaterThan(0);
+    const expandButton = screen.getByRole('button', { name: /expand current row/i });
+    await user.click(expandButton);
 
-    await user.click(expandButtons[0]);
+    expect(screen.getByText('Medication details')).toBeInTheDocument();
+  });
 
-    expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toBeGreaterThan(0);
+  it('shows test order details when expanding a test order row', async () => {
+    mockUseOrderTypes.mockReturnValue({
+      data: [
+        {
+          uuid: testOrderTypeUuid,
+          display: 'Test Order',
+          name: 'Test Order',
+          retired: false,
+          description: 'Test Order',
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+    });
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [mockOrders[1]] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+
+    const expandButton = screen.getByRole('button', { name: /expand current row/i });
+    await user.click(expandButton);
+
+    expect(screen.getByText('Test order details')).toBeInTheDocument();
   });
 
   it('shows pagination controls when there are multiple pages', async () => {
@@ -531,14 +540,12 @@ describe('OrderDetailsTable', () => {
     });
 
     mockUsePatientOrders.mockImplementation((_patientUuid, _status, orderType) => {
-      let filteredOrders;
-      if (orderType === drugOrderTypeUuid) {
-        filteredOrders = allOrders.filter((order) => order.orderType.uuid === drugOrderTypeUuid);
-      } else if (orderType === testOrderTypeUuid) {
-        filteredOrders = testOrders;
-      } else {
-        filteredOrders = allOrders;
-      }
+      const filteredOrders =
+        orderType === drugOrderTypeUuid
+          ? allOrders.filter((order) => order.orderType.uuid === drugOrderTypeUuid)
+          : orderType === testOrderTypeUuid
+            ? testOrders
+            : allOrders;
 
       return {
         data: filteredOrders as unknown as Array<Order>,
@@ -738,7 +745,70 @@ describe('OrderDetailsTable', () => {
     await screen.findByRole('table');
 
     expect(screen.getByText(/ORD-DECLINED/i)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
+  });
+
+  it('renders an empty state when there are order types but no orders', async () => {
+    mockUseOrderTypes.mockReturnValue({
+      data: [
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+    });
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [],
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('combobox', { name: /select order type/i });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText(/there are no.*to display/i)).toBeInTheDocument();
+  });
+
+  it('shows an overflow menu for active orders', async () => {
+    mockUseOrderTypes.mockReturnValue({
+      data: [
+        {
+          uuid: drugOrderTypeUuid,
+          display: 'Drug Order',
+          name: 'Drug Order',
+          retired: false,
+          description: 'Drug Order',
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+    });
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [mockOrders[0]] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+
+    expect(screen.getByRole('button', { name: /options/i })).toBeInTheDocument();
   });
 });
 
