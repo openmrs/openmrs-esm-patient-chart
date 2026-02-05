@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import {
+  ExtensionSlot,
   useConfig,
   useDebounce,
   ResponsiveWrapper,
@@ -53,6 +54,7 @@ export default function DrugSearch({ closeWorkspace, openOrderForm, patient, vis
           value={searchTerm}
         />
       </ResponsiveWrapper>
+      <ExtensionSlot name="drug-search-slot" state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm) }} />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
         closeWorkspace={closeWorkspace}

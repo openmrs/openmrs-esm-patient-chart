@@ -1,0 +1,114 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 layout.$spacing-05;
+  background-color: $ui-03;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.chevronButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-03;
+  border-radius: 0;
+
+  &:hover {
+    background-color: colors.$gray-10-hover;
+  }
+}
+
+.headerTitle {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-left: auto;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.favoriteItem {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  cursor: pointer;
+  border-bottom: 1px solid $ui-03;
+
+  &:hover {
+    background-color: $ui-02;
+  }
+}
+
+.pinButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pinIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  fill: $text-02;
+}
+
+.pinIconSelected {
+  @extend .pinIcon;
+  fill: $danger;
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  @include type.type-style('body-compact-01');
+  font-weight: 600;
+  margin: 0;
+  color: colors.$gray-100;
+}
+
+.itemDetails {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  margin: layout.$spacing-01 0 0 0;
+}
+
+.menuLayer {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.favoriteItem :global(.cds--overflow-menu-options__btn) {
+  max-width: none;
+}
+
+.skeletonCards {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+}

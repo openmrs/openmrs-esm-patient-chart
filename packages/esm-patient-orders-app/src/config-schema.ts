@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   orderEncounterType: {
@@ -65,6 +65,12 @@ export const configSchema = {
       'The name of the ordering location tag. If specified, the order baskets shows the order locations dropdown listing locations with the specified tag. The dropdown is hidden if this config value is not specified, and the order location defaults to the login location of the user.',
     _default: '',
   },
+  maxPinnedDrugOrders: {
+    _type: Type.Number,
+    _default: 10,
+    _description: 'Maximum number of pinned drug orders per user',
+    _validators: [validators.inRange(1, 50)],
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -82,4 +88,5 @@ export interface ConfigObject {
   showReferenceNumberField: boolean;
   ordererProviderRoles: Array<string>;
   orderLocationTagName: string;
+  maxPinnedDrugOrders: number;
 }

@@ -53,6 +53,21 @@
       "meta": {
         "fullWidth": false
       }
+    },
+    {
+      "name": "drug-favorites-list",
+      "component": "drugFavoritesListExtension",
+      "slot": "drug-search-slot"
+    },
+    {
+      "name": "drug-pin-button",
+      "component": "drugPinButton",
+      "slot": "drug-search-result-actions-slot"
+    },
+    {
+      "name": "drug-pin-button-order-form",
+      "component": "drugPinButton",
+      "slot": "medication-info-slot"
     }
   ],
   "workspaces2": [
@@ -88,6 +103,18 @@
     {
       "component": "printLabResultModal",
       "name": "print-lab-results-modal"
+    },
+    {
+      "name": "drug-favorites-modal",
+      "component": "drugFavoritesModal"
+    },
+    {
+      "name": "strength-picker-modal",
+      "component": "strengthPickerModal"
+    },
+    {
+      "name": "delete-favorites-modal",
+      "component": "deleteFavoritesModal"
     }
   ]
 }

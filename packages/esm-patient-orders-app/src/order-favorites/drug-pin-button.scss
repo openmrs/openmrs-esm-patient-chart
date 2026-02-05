@@ -1,0 +1,16 @@
+@use '@carbon/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.pinButton {
+  min-height: unset;
+  min-width: unset;
+  padding: 0;
+
+  svg {
+    fill: $text-02;
+  }
+
+  &:hover svg {
+    fill: colors.$gray-90;
+  }
+}
