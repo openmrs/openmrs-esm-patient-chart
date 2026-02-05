@@ -30,14 +30,11 @@ export interface DrugSearchResult {
   };
 }
 
-interface ConceptSetMembersResponse {
+export interface ConceptTreeNode {
   uuid: string;
-  setMembers?: Array<{
-    uuid: string;
-    name: {
-      display: string;
-    };
-  }>;
+  display: string;
+  isSet: boolean;
+  setMembers?: Array<ConceptTreeNode>;
 }
 
 export interface ConceptSet {
@@ -61,21 +58,20 @@ interface DrugListFetchResult {
   hasFailures: boolean;
 }
 
-// Limit the number of concurrent drug searches when fetching drugs by concept set
-const maxConcurrentDrugSearches = 10;
-// Representation string for drug search results
+const maxConceptsPerRequest = 20;
 const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
 
 /**
- * Search for a list of drugs based on the given query string
+ * Search for a list of drugs based on the given query string or concepts (uuid/name/mapping)
  * @param query
  * @returns
  */
-export function useDrugSearch(query: string) {
+export function useDrugSearch(query: string, searchBy: 'name' | 'concepts' = 'name') {
+  const param = searchBy === 'concepts' ? 'concepts' : 'q';
+  const url = query ? `${restBaseUrl}/drug?${param}=${query}&v=${drugSearchRepresentation}` : null;
+
   const { data, ...rest } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
-    query
-      ? `${restBaseUrl}/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
-      : null,
+    url,
     openmrsFetch,
   );
 
@@ -88,6 +84,60 @@ export function useDrugSearch(query: string) {
   );
 
   return results;
+}
+
+export function useConceptTree(conceptUuid: string) {
+  const fetcher = (url: string) => openmrsFetch<ConceptTreeNode>(url).then((res) => res.data);
+
+  const { data, error, isLoading } = useSWRImmutable<ConceptTreeNode, Error>(
+    conceptUuid ? `${restBaseUrl}/concepttree?concept=${conceptUuid}` : null,
+    fetcher,
+  );
+
+  return {
+    tree: data,
+    isLoading,
+    isError: error,
+  };
+}
+
+export function useDrugsByConcepts(concepts: string[]) {
+  const shouldFetch = concepts && concepts.length > 0;
+  const cacheKey = shouldFetch ? ['drugs-by-uuids', ...concepts.sort()] : null;
+
+  const { data, error, isLoading } = useSWRImmutable<DrugListFetchResult, Error>(cacheKey, async () => {
+    if (!concepts.length) return { drugs: [], hasFailures: false };
+
+    const drugs: Array<DrugSearchResult> = [];
+    let hasFailures = false;
+
+    for (let start = 0; start < concepts.length; start += maxConceptsPerRequest) {
+      const batch = concepts.slice(start, start + maxConceptsPerRequest);
+      const conceptsParam = batch.join(',');
+      try {
+        const response = await openmrsFetch<{ results: Array<DrugSearchResult> }>(
+          `${restBaseUrl}/drug?concepts=${conceptsParam}&v=${drugSearchRepresentation}`,
+        );
+        if (response.data?.results) {
+          drugs.push(...response.data.results);
+        }
+      } catch (e) {
+        console.error(e);
+        hasFailures = true;
+      }
+    }
+
+    const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
+
+    return { drugs: deduped, hasFailures };
+  });
+
+  return {
+    drugs: data?.drugs ?? [],
+    hasFailures: data?.hasFailures ?? false,
+    isLoading,
+    error,
+  };
 }
 
 export function useConceptSets(conceptSetUuids: string[] = []) {
@@ -115,59 +165,6 @@ export function useConceptSets(conceptSetUuids: string[] = []) {
 
   return {
     conceptSets,
-    isLoading,
-  };
-}
-
-async function fetchDrugsByConceptSet(conceptSetUuid: string): Promise<DrugListFetchResult> {
-  // First, fetch the concept set members
-  const conceptSetResponse = await openmrsFetch<ConceptSetMembersResponse>(
-    `${restBaseUrl}/concept/${conceptSetUuid}?v=custom:(uuid,setMembers:(uuid,name))`,
-  );
-
-  const memberNames = conceptSetResponse.data?.setMembers?.map((member) => member.name?.display).filter(Boolean) ?? [];
-
-  if (memberNames.length === 0) {
-    return { drugs: [], hasFailures: false };
-  }
-
-  // Fetch drugs for each concept name with a small concurrency cap.
-  const drugs: Array<DrugSearchResult> = [];
-  let hasFailures = false;
-  for (let start = 0; start < memberNames.length; start += maxConcurrentDrugSearches) {
-    const batch = memberNames.slice(start, start + maxConcurrentDrugSearches);
-    const requests = batch.map((name) =>
-      openmrsFetch<{ results: Array<DrugSearchResult> }>(
-        `${restBaseUrl}/drug?q=${encodeURIComponent(name)}&v=${drugSearchRepresentation}`,
-      ),
-    );
-    const settled = await Promise.allSettled(requests);
-    if (settled.some((result) => result.status === 'rejected')) {
-      hasFailures = true;
-    }
-    const batchDrugs = settled
-      .filter(
-        (result): result is PromiseFulfilledResult<FetchResponse<{ results: Array<DrugSearchResult> }>> =>
-          result.status === 'fulfilled',
-      )
-      .flatMap((result) => result.value?.data?.results ?? []);
-    drugs.push(...batchDrugs);
-  }
-
-  // Dedupe by drug uuid
-  const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
-
-  return { drugs: deduped, hasFailures };
-}
-
-export function useDrugBrowseByConceptSet(conceptSetUuid: string) {
-  const { data, isLoading } = useSWRImmutable(conceptSetUuid ? ['drug-browse', conceptSetUuid] : null, () =>
-    fetchDrugsByConceptSet(conceptSetUuid),
-  );
-
-  return {
-    drugs: data?.drugs ?? [],
-    hasFailures: data?.hasFailures ?? false,
     isLoading,
   };
 }
