@@ -15,16 +15,14 @@ interface DeleteVisitOverflowMenuItemProps {
  */
 const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid, closeMenu }) => {
   const { t } = useTranslation();
-  const { activeVisit, mutate: mutateActiveVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patientUuid);
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('delete-visit-dialog', {
       closeModal: () => dispose(),
-      patientUuid,
-      activeVisit,
-      mutateActiveVisit,
+      visit: activeVisit,
     });
-  }, [patientUuid, activeVisit, mutateActiveVisit]);
+  }, [activeVisit]);
 
   return (
     activeVisit && (
