@@ -41,25 +41,40 @@ export default function MedicationRecord({ medication }: MedicationRecordProps) 
               </span>{' '}
             </>
           )}
-          {order.route?.display && <>&mdash; {order.route.display.toLowerCase()}</>}{' '}
-          {order.frequency?.display && <>&mdash; {order.frequency.display.toLowerCase()}</>}
-          {order.duration != null ? (
+          {order.route?.display && (
             <>
-              {' '}
-              &mdash;{' '}
+              {order.dose != null && <>&mdash; </>}
+              {order.route.display.toLowerCase()}{' '}
+            </>
+          )}
+          {order.frequency?.display && <>&mdash; {order.frequency.display.toLowerCase()}</>}
+          {order.duration != null && (
+            <>
+              {(order.dose != null || order.route?.display || order.frequency?.display) && <> &mdash; </>}
               {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                 duration: order.duration,
                 durationUnit: order.durationUnits?.display?.toLowerCase(),
               })}
             </>
-          ) : null}{' '}
+          )}{' '}
           {order.numRefills != null && order.numRefills !== 0 && (
             <span>
-              <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
-              {order.numRefills}
+              {(order.dose != null || order.route?.display || order.frequency?.display || order.duration != null) && (
+                <> &mdash; </>
+              )}
+              <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {order.numRefills}
             </span>
           )}
-          {order.dosingInstructions && <span> &mdash; {order.dosingInstructions.toLowerCase()}</span>}
+          {order.dosingInstructions && (
+            <span>
+              {(order.dose != null ||
+                order.route?.display ||
+                order.frequency?.display ||
+                order.duration != null ||
+                (order.numRefills != null && order.numRefills !== 0)) && <> &mdash; </>}
+              {order.dosingInstructions.toLowerCase()}
+            </span>
+          )}
         </p>
         <p className={styles.bodyLong01}>
           {order.orderReasonNonCoded ? (

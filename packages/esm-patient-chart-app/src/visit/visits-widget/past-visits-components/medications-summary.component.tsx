@@ -70,22 +70,30 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                           {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
                         </span>{' '}
                         {medication.order?.route?.display && (
-                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
+                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} </span>
                         )}
-                        {medication?.order?.frequency?.display ? (
-                          <>{medication?.order?.frequency?.display?.toLowerCase()} &mdash; </>
-                        ) : null}
-                        {medication?.order?.duration != null
-                          ? t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                        {medication?.order?.frequency?.display && (
+                          <>
+                            {medication.order?.route?.display ? <>&mdash; </> : null}
+                            {medication?.order?.frequency?.display?.toLowerCase()}{' '}
+                          </>
+                        )}
+                        {medication?.order?.duration != null && (
+                          <>
+                            &mdash;{' '}
+                            {t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                               duration: medication?.order?.duration,
                               durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
-                            })
-                          : t('orderIndefiniteDuration', 'Indefinite duration')}
+                            })}
+                          </>
+                        )}
+                        {medication?.order?.duration == null && (
+                          <>&mdash; {t('orderIndefiniteDuration', 'Indefinite duration')}</>
+                        )}
                         {medication?.order?.numRefills != null && medication?.order?.numRefills !== 0 && (
                           <span>
                             <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
                             {medication?.order?.numRefills}
-                            {''}
                           </span>
                         )}
                         {medication?.order?.dosingInstructions && (

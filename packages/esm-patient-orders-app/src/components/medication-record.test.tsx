@@ -175,6 +175,143 @@ describe('MedicationRecord', () => {
     expect(screen.queryByText('END DATE')).not.toBeInTheDocument();
   });
 
+  it('renders a free text dosing order without orphaned em-dashes', () => {
+    const freeTextOrder: Order = {
+      ...baseMedication,
+      drug: {
+        uuid: '5360f695-a3e2-4593-9426-69ef43781877',
+        display: 'Losartan Co 5mg',
+        strength: '5mg',
+        dosageForm: {
+          display: 'Tablet',
+          uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+        concept: {
+          uuid: '502a66e9-2eb3-4e13-926f-57fe9d393a94',
+          display: 'Losartan',
+        },
+      },
+      dose: null,
+      doseUnits: null,
+      frequency: null,
+      route: null,
+      duration: null,
+      durationUnits: null,
+      quantity: 1,
+      quantityUnits: { uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Tablet' },
+      numRefills: 1,
+      dosingInstructions: '50mg',
+      orderReasonNonCoded: null,
+      dateStopped: null,
+      dispenseAsWritten: false,
+    } as unknown as Order;
+
+    mockUseDrugOrderByUuid.mockReturnValue({
+      data: freeTextOrder,
+      error: undefined,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MedicationRecord medication={baseMedication} />);
+
+    expect(screen.getByText(/losartan co 5mg/i)).toBeInTheDocument();
+    expect(screen.getByText('REFILLS')).toBeInTheDocument();
+    expect(screen.getByText(/50mg/)).toBeInTheDocument();
+
+    // Verify no orphaned em-dashes: DOSE, route, frequency, and duration should not render
+    expect(screen.queryByText('DOSE')).not.toBeInTheDocument();
+    expect(screen.queryByText(/indefinite duration/i)).not.toBeInTheDocument();
+  });
+
+  it('renders a free text dosing order with a duration but without a leading em-dash', () => {
+    const freeTextOrderWithDuration: Order = {
+      ...baseMedication,
+      drug: {
+        uuid: '5360f695-a3e2-4593-9426-69ef43781877',
+        display: 'Losartan Co 5mg',
+        strength: '5mg',
+        dosageForm: {
+          display: 'Tablet',
+          uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+        concept: {
+          uuid: '502a66e9-2eb3-4e13-926f-57fe9d393a94',
+          display: 'Losartan',
+        },
+      },
+      dose: null,
+      doseUnits: null,
+      frequency: null,
+      route: null,
+      duration: 5,
+      durationUnits: { uuid: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Days' },
+      quantity: null,
+      quantityUnits: null,
+      numRefills: 0,
+      dosingInstructions: '50mg',
+      orderReasonNonCoded: null,
+      dateStopped: null,
+      dispenseAsWritten: false,
+    } as unknown as Order;
+
+    mockUseDrugOrderByUuid.mockReturnValue({
+      data: freeTextOrderWithDuration,
+      error: undefined,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MedicationRecord medication={baseMedication} />);
+
+    expect(screen.getByText(/for 5 days/i)).toBeInTheDocument();
+    expect(screen.getByText(/50mg/)).toBeInTheDocument();
+    expect(screen.queryByText('DOSE')).not.toBeInTheDocument();
+  });
+
+  it('renders only dosing instructions without any em-dashes when no other fields are set', () => {
+    const freeTextOnlyOrder: Order = {
+      ...baseMedication,
+      drug: {
+        uuid: '5360f695-a3e2-4593-9426-69ef43781877',
+        display: 'Losartan Co 5mg',
+        strength: '5mg',
+        dosageForm: {
+          display: 'Tablet',
+          uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+        concept: {
+          uuid: '502a66e9-2eb3-4e13-926f-57fe9d393a94',
+          display: 'Losartan',
+        },
+      },
+      dose: null,
+      doseUnits: null,
+      frequency: null,
+      route: null,
+      duration: null,
+      durationUnits: null,
+      quantity: null,
+      quantityUnits: null,
+      numRefills: 0,
+      dosingInstructions: 'Take 50mg once daily',
+      orderReasonNonCoded: null,
+      dateStopped: null,
+      dispenseAsWritten: false,
+    } as unknown as Order;
+
+    mockUseDrugOrderByUuid.mockReturnValue({
+      data: freeTextOnlyOrder,
+      error: undefined,
+      isLoading: false,
+    });
+
+    renderWithSwr(<MedicationRecord medication={baseMedication} />);
+
+    expect(screen.getByText(/take 50mg once daily/i)).toBeInTheDocument();
+    expect(screen.queryByText('DOSE')).not.toBeInTheDocument();
+    expect(screen.queryByText('REFILLS')).not.toBeInTheDocument();
+    expect(screen.queryByText('QUANTITY')).not.toBeInTheDocument();
+  });
+
   it('falls back to the medication prop when the fetch returns null', () => {
     const medicationWithDrug = {
       ...baseMedication,
