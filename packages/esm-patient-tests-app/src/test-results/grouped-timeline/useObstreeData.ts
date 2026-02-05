@@ -168,9 +168,9 @@ const useGetManyObstreeData = (patientUuid: string, uuidArray: Array<string>) =>
   };
   const { data, error } = useSWRInfinite(getObstreeUrl, openmrsFetch, {
     initialSize: uuidArray.length,
-    revalidateIfStale: false,
+    revalidateIfStale: true,
     revalidateOnFocus: false,
-    revalidateOnReconnect: false,
+    revalidateOnReconnect: true,
   });
 
   const result = useMemo(() => {
