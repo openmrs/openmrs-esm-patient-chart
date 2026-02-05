@@ -42,7 +42,7 @@ export async function postOrdersOnNewEncounter(
     if (currentVisit?.stopDatetime) {
       encounterDate = parseDate(currentVisit.startDatetime);
     } else {
-      encounterDate = new Date();
+      encounterDate = null;
     }
   }
 
@@ -52,7 +52,9 @@ export async function postOrdersOnNewEncounter(
     patient: patientUuid,
     location: orderLocationUuid,
     encounterType: orderEncounterType,
-    encounterDatetime: encounterDate,
+    // only specify the encounterDatetime if it's given, otherwise
+    // don't specify that let the server default it to `now`
+    ...(encounterDate ? { encounterDatetime: encounterDate } : {}),
     visit: currentVisit?.uuid,
     obs: [],
     orders,
@@ -69,7 +71,7 @@ export interface EncounterPost {
   patient: string;
   location: string;
   encounterType: string;
-  encounterDatetime: Date;
+  encounterDatetime?: Date;
   visit?: string;
   obs: ObsPayload[];
   orders: OrderPost[];
