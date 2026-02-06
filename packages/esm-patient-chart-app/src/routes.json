@@ -261,7 +261,7 @@
   "workspaceGroups2": [
     {
       "name": "patient-chart",
-      "scopePattern": "^/patient/([^/]+)/chart"
+      "scopePattern": "/patient/([^/]+)/chart"
     }
   ]
 }
