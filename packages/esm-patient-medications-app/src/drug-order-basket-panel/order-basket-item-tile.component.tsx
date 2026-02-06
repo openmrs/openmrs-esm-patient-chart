@@ -56,7 +56,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
           <span className={styles.label01}>
             <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
             <span className={styles.dosageLabel}>
-              {orderBasketItem.dosage} {orderBasketItem.unit?.value}
+              {orderBasketItem.dosage != null ? orderBasketItem.dosage : '--'} {orderBasketItem.unit?.value ?? ''}
             </span>{' '}
             <span className={styles.dosageInfo}>
               &mdash; {orderBasketItem.route?.value ? <>{orderBasketItem.route.value} &mdash; </> : null}

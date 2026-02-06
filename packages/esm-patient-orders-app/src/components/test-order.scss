@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '../lab-results/interpretation';
 
 .testOrder {
   display: flex;
@@ -8,14 +9,31 @@
   border: 1px solid colors.$gray-20;
   border-bottom: none;
   border-top: none;
+
   :global(.cds--data-table th) {
     padding: layout.$spacing-03 !important;
   }
 }
-.testCell {
-  padding-left: layout.$spacing-06 !important;
+
+.table {
+  table-layout: fixed;
+  width: 100%;
+
+  td {
+    padding-left: layout.$spacing-03 !important;
+  }
 }
 
-.testType {
-  color: colors.$blue-60;
+.col-testType {
+  width: 50%;
 }
+
+.col-result {
+  width: 25%;
+}
+
+.col-normalRange {
+  width: 25%;
+}
+
+@include interpretation.styles;

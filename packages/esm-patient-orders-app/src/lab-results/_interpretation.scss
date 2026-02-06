@@ -1,0 +1,67 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+@mixin styles {
+  .off-scale-high,
+  .off-scale-low,
+  .critically-high,
+  .critically-low,
+  .high,
+  .low {
+    span {
+      @include type.type-style('heading-compact-01');
+      color: $ui-05;
+    }
+  }
+
+  .high,
+  .low {
+    background-color: colors.$orange-10 !important;
+    border-top: 1px solid colors.$orange-20 !important;
+  }
+
+  .off-scale-high,
+  .off-scale-low,
+  .critically-high,
+  .critically-low {
+    background-color: colors.$red-20 !important;
+    border-top: 1px solid colors.$red-20-hover !important;
+  }
+
+  .off-scale-low {
+    span::after {
+      content: ' ↓↓↓';
+    }
+  }
+
+  .off-scale-high {
+    span::after {
+      content: ' ↑↑↑';
+    }
+  }
+
+  .critically-low {
+    span::after {
+      content: ' ↓↓';
+    }
+  }
+
+  .critically-high {
+    span::after {
+      content: ' ↑↑';
+    }
+  }
+
+  .low {
+    span::after {
+      content: ' ↓';
+    }
+  }
+
+  .high {
+    span::after {
+      content: ' ↑';
+    }
+  }
+}

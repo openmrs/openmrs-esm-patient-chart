@@ -127,7 +127,7 @@ export interface Order {
   action: OrderAction;
   asNeeded: boolean;
   asNeededCondition?: string;
-  autoExpireDate: string;
+  autoExpireDate?: string | null;
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
@@ -135,17 +135,17 @@ export interface Order {
   dateActivated: string;
   dateStopped?: string | null;
   dispenseAsWritten: boolean;
-  dose: number;
-  doseUnits: OpenmrsResource;
+  dose: number | null;
+  doseUnits: OpenmrsResource | null;
   dosingInstructions: string | null;
   dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
-  drug: Drug;
-  duration: number;
-  durationUnits: OpenmrsResource;
+  drug: Drug | null;
+  duration: number | null;
+  durationUnits: OpenmrsResource | null;
   encounter: Encounter;
-  frequency: OpenmrsResource;
+  frequency: OpenmrsResource | null;
   instructions?: string | null;
-  numRefills: number;
+  numRefills: number | null;
   orderNumber: string;
   orderReason: string | null;
   orderReasonNonCoded: string | null;
@@ -167,9 +167,9 @@ export interface Order {
   };
   patient: OpenmrsResource;
   previousOrder: { uuid: string; type: string; display: string } | null;
-  quantity: number;
-  quantityUnits: OpenmrsResource;
-  route: OpenmrsResource;
+  quantity: number | null;
+  quantityUnits: OpenmrsResource | null;
+  route: OpenmrsResource | null;
   scheduleDate: null;
   urgency: OrderUrgency;
 
@@ -229,21 +229,21 @@ export interface OrderBasketExtensionProps {
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
   drug: Drug;
-  unit: DosingUnit;
+  unit: DosingUnit | null;
   commonMedicationName: string;
-  dosage: number;
-  frequency: MedicationFrequency;
-  route: MedicationRoute;
-  quantityUnits: QuantityUnit;
-  patientInstructions: string;
+  dosage: number | null;
+  frequency: MedicationFrequency | null;
+  route: MedicationRoute | null;
+  quantityUnits: QuantityUnit | null;
+  patientInstructions: string | null;
   asNeeded: boolean;
-  asNeededCondition: string;
+  asNeededCondition: string | null;
   startDate: Date | string;
-  durationUnit: DurationUnit;
+  durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
   numRefills: number | null;
-  indication: string;
+  indication: string | null;
   isFreeTextDosage: boolean;
   freeTextDosage: string;
   previousOrder?: string;
