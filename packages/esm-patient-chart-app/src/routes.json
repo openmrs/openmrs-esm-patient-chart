@@ -258,7 +258,10 @@
       "group": "patient-chart"
     }
   ],
-  "workspaceGroups2": [{
-    "name":"patient-chart"
-  }]
+  "workspaceGroups2": [
+    {
+      "name": "patient-chart",
+      "scopePattern": "^/patient/([^/]+)/chart"
+    }
+  ]
 }
