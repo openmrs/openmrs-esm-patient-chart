@@ -147,14 +147,16 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
 
   if (isLoadingResultConcepts) {
     return (
-      <div className={styles.loaderContainer}>
-        <InlineLoading
-          className={styles.loader}
-          description={t('loadingTestDetails', 'Loading test details') + '...'}
-          iconDescription={t('loading', 'Loading')}
-          status="active"
-        />
-      </div>
+      <Workspace2 title={t('enterTestResults', 'Enter test results')}>
+        <div className={styles.loaderContainer}>
+          <InlineLoading
+            className={styles.loader}
+            description={t('loadingTestDetails', 'Loading test details') + '...'}
+            iconDescription={t('loading', 'Loading')}
+            status="active"
+          />
+        </div>
+      </Workspace2>
     );
   }
 
@@ -271,6 +273,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 {!isLoading ? (
                   conceptArray.map((c) => (
                     <ResultFormField
+                      key={c.uuid}
                       defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
                       concept={c}
                       control={control as unknown as Control<Record<string, unknown>>}
