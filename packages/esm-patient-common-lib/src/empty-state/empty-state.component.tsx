@@ -19,7 +19,7 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
     <Layer className={styles.layer}>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{props.headerTitle}</h4>
+          <h2>{props.headerTitle}</h2>
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
