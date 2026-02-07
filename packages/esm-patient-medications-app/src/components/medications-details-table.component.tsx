@@ -133,27 +133,47 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                   </span>{' '}
                 </>
               )}
-              {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>}{' '}
-              {medication.duration != null ? (
+              {medication.route?.display && (
                 <>
-                  &mdash;{' '}
+                  {medication.dose != null && <>&mdash; </>}
+                  {medication.route?.display.toLowerCase()}{' '}
+                </>
+              )}
+              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()} </>}
+              {medication.duration != null && (
+                <>
+                  {(medication.dose != null || medication.route?.display || medication.frequency?.display) && (
+                    <>&mdash; </>
+                  )}
                   {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                     duration: medication.duration,
                     durationUnit: medication.durationUnits?.display?.toLowerCase(),
                   })}{' '}
                 </>
-              ) : (
-                <> &mdash; {t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()} </>
               )}
+              {medication.duration == null &&
+                (medication.dose != null || medication.route?.display || medication.frequency?.display) && (
+                  <>&mdash; {t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()} </>
+                )}
               {medication.numRefills != null && medication.numRefills !== 0 && (
                 <span>
-                  <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                  {(medication.dose != null ||
+                    medication.route?.display ||
+                    medication.frequency?.display ||
+                    medication.duration != null) && <> &mdash; </>}
+                  <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span>{' '}
                   {medication.numRefills}
                 </span>
               )}
               {medication.dosingInstructions && (
-                <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>
+                <span>
+                  {(medication.dose != null ||
+                    medication.route?.display ||
+                    medication.frequency?.display ||
+                    medication.duration != null ||
+                    (medication.numRefills != null && medication.numRefills !== 0)) && <> &mdash; </>}
+                  {medication.dosingInstructions.toLocaleLowerCase()}
+                </span>
               )}
             </p>
           </div>
