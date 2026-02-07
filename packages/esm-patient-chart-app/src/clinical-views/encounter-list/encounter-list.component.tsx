@@ -261,7 +261,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
-              <h4 className={classNames(styles.productiveHeading03)}>{t(headerTitle)}</h4>
+              <h2 className={classNames(styles.productiveHeading03)}>{t(headerTitle)}</h2>
               {!(hideFormLauncher ?? deathStatus) && <div className={styles.toggleButtons}>{formLauncher}</div>}
             </div>
             <EncounterListDataTable tableHeaders={headers} tableRows={tableRows} />
