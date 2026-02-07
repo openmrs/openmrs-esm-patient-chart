@@ -27,7 +27,6 @@ import type {
 
 const pageSize = 100;
 
-/** We use this as the first value to the SWR key to be able to invalidate all relevant cached entries */
 const swrKeyNeedle = Symbol('vitalsAndBiometrics');
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
@@ -82,7 +81,6 @@ interface PartialEncounter extends OpenmrsResource {
 }
 
 function getInterpretationKey(header: string) {
-  // Reason for `Render` string is to match the column header in the table
   return `${header}RenderInterpretation`;
 }
 
@@ -105,13 +103,13 @@ export function useVitalsConceptMetadata(patientUuid: string) {
   const conceptMetadata = data?.data?.results;
 
   const conceptUnits = conceptMetadata?.length
-    ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
+    ? new Map<string, string>(conceptMetadata.map((concept: any) => [concept.uuid, concept.units]))
     : new Map<string, string>([]);
 
   const conceptRanges = useMemo(
     () =>
       conceptMetadata?.length
-        ? conceptMetadata.map((concept) => ({
+        ? conceptMetadata.map((concept: any) => ({
             uuid: concept.concept,
             display: concept.display,
             hiNormal: concept.hiNormal ?? null,
@@ -127,7 +125,7 @@ export function useVitalsConceptMetadata(patientUuid: string) {
   );
 
   const conceptRangeMap = useMemo(
-    () => new Map<string, ConceptRange>(conceptRanges.map((range) => [range.uuid, range])),
+    () => new Map<string, ConceptRange>(conceptRanges.map((range: any) => [range.uuid, range])),
     [conceptRanges],
   );
 
@@ -171,16 +169,9 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
   return `${label} ${unit ? `(${unit})` : ''}`;
 };
 
-// We need to track a bound mutator for basically every hook, because there does not appear to be
-// a way to invalidate an SWRInfinite key that works other than using the bound mutator
-// Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
-// hook is unmounted.
 let vitalsHooksCounter = 0;
 const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
 
-/**
- * Hook to get concepts for vitals, biometrics or both
- */
 export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   const { concepts } = useConfig<ConfigObject>();
 
@@ -208,13 +199,6 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   return conceptUuids;
 }
 
-/**
- * Hook to get the vitals and / or biometrics for a patient
- *
- * @param patientUuid The uuid of the patient to get the vitals for
- * @param mode Either 'vitals', to load only vitals, 'biometrics', to load only biometrics or 'both' to load both
- * @returns An SWR-like structure that includes the cleaned-up vitals
- */
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
   const conceptUuids = useVitalsOrBiometricsConcepts(mode);
   const { concepts } = useConfig<ConfigObject>();
@@ -237,7 +221,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     handleFetch,
   );
 
-  // see the comments above for why this is here
   useEffect(() => {
     const index = ++vitalsHooksCounter;
     vitalsHooksMutates.set(index, mutate);
@@ -268,20 +251,10 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
         default:
-          return ''; // or throw an error for unknown conceptUuid
+          return '';
       }
     },
-    [
-      concepts.heightUuid,
-      concepts.midUpperArmCircumferenceUuid,
-      concepts.systolicBloodPressureUuid,
-      concepts.oxygenSaturationUuid,
-      concepts.diastolicBloodPressureUuid,
-      concepts.pulseUuid,
-      concepts.respiratoryRateUuid,
-      concepts.temperatureUuid,
-      concepts.weightUuid,
-    ],
+    [concepts],
   );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
@@ -289,31 +262,33 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       ?.map((entry) => entry.resource)
       .filter(Boolean)
       .map(mapVitalsAndBiometrics)
-      ?.reduce((vitalsHashTable, vitalSign) => {
+      ?.reduce((hashTable: any, vitalSign: any) => {
         const encounterId = vitalSign.encounterId;
-        if (vitalsHashTable.has(encounterId) && vitalsHashTable.get(encounterId)) {
-          vitalsHashTable.set(encounterId, {
-            ...vitalsHashTable.get(encounterId),
-            [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-            [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
+        const key = getVitalsMapKey(vitalSign.code);
+        if (hashTable.has(encounterId)) {
+          const existing = hashTable.get(encounterId);
+          hashTable.set(encounterId, {
+            ...existing,
+            [key]: vitalSign.value,
+            [getInterpretationKey(key)]: vitalSign.interpretation,
+            [`${key}ReferenceRanges`]: vitalSign.referenceRanges,
           });
         } else {
-          if (vitalSign.value) {
-            vitalsHashTable.set(encounterId, {
-              date:
-                typeof vitalSign.recordedDate === 'string'
-                  ? vitalSign.recordedDate
-                  : vitalSign.recordedDate.toDateString(),
-              [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
-              [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
-            });
-          }
+          hashTable.set(encounterId, {
+            date:
+              typeof vitalSign.recordedDate === 'string'
+                ? vitalSign.recordedDate
+                : (vitalSign.recordedDate as any)?.toDateString?.() || vitalSign.recordedDate,
+            [key]: vitalSign.value,
+            [getInterpretationKey(key)]: vitalSign.interpretation,
+            [`${key}ReferenceRanges`]: vitalSign.referenceRanges,
+          });
         }
-        return vitalsHashTable;
-      }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
+        return hashTable;
+      }, new Map<string, any>());
 
-    return Array.from(vitalsHashTable ?? []).map(([encounterId, vitalSigns]) => {
-      const result = {
+    return Array.from(vitalsHashTable ?? []).map(([encounterId, vitalSigns]: [string, any]) => {
+      const result: any = {
         id: encounterId,
         date: vitalSigns.date,
         ...vitalSigns,
@@ -332,10 +307,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalSigns.systolicRenderInterpretation,
           vitalSigns.diastolicRenderInterpretation,
         );
-        result.pulseRenderInterpretation = vitalSigns.pulseRenderInterpretation;
-        result.temperatureRenderInterpretation = vitalSigns.temperatureRenderInterpretation;
-        result.spo2RenderInterpretation = vitalSigns.spo2RenderInterpretation;
-        result.respiratoryRateRenderInterpretation = vitalSigns.respiratoryRateRenderInterpretation;
       }
 
       return result;
@@ -343,12 +314,10 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   }, [conceptRanges, concepts, data, getVitalsMapKey, mode]);
 
   return {
-    data: data ? formattedObs : undefined,
+    data: data ? (formattedObs as any) : undefined,
     isLoading,
     error,
-    hasMore: data?.length
-      ? !!data[data.length - 1].data?.link?.some((link: { relation?: string }) => link.relation === 'next')
-      : false,
+    hasMore: data?.length ? !!data[data.length - 1].data?.link?.some((link: any) => link.relation === 'next') : false,
     isValidating,
     loadingNewData: isValidating,
     setPage: setSize,
@@ -358,9 +327,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   };
 }
 
-/**
- * Hook to get the vitals and biometrics for a patient associated with a specific encounter
- */
 export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
   const { concepts } = useConfig<ConfigObject>();
   const fieldNameSuffix = 'Uuid';
@@ -370,161 +336,60 @@ export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
 
   const vitalsAndBiometrics: VitalsAndBiometricsFieldValuesMap = useMemo(() => {
     if (!isLoading && data && concepts) {
-      return data.data.obs.reduce((vitalsAndBiometrics, obs) => {
+      return data.data.obs.reduce((map, obs) => {
         let fieldName = Object.entries(concepts).find(([, value]) => value === obs.concept.uuid)?.[0];
-
         if (fieldName) {
           fieldName = fieldName.endsWith(fieldNameSuffix) ? fieldName.replace(fieldNameSuffix, '') : fieldName;
-          vitalsAndBiometrics.set(fieldName, {
-            value: obs.value,
-            obs,
-          });
+          map.set(fieldName, { value: obs.value, obs });
         }
-        return vitalsAndBiometrics;
-      }, new Map<string, { value: string; obs: OpenmrsResource }>());
+        return map;
+      }, new Map<string, any>());
     }
     return null;
   }, [isLoading, data, concepts]);
 
-  const getRefinedInitialValues = useCallback(() => {
-    const initialValues: Record<string, string | number> = {};
-    if (vitalsAndBiometrics) {
-      vitalsAndBiometrics.forEach((value, key) => {
-        initialValues[key] = value.value;
-      });
-    }
-    return initialValues;
-  }, [vitalsAndBiometrics]);
-
-  return {
-    isLoading,
-    vitalsAndBiometrics,
-    encounter: data?.data,
-    error,
-    mutate,
-    getRefinedInitialValues,
-  };
+  return { isLoading, vitalsAndBiometrics, encounter: data?.data, error, mutate };
 }
 
-/**
- * Fetcher for the useVitalsAndBiometricsHook
- * @internal
- */
 function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAndBiometricsSwrKey) {
-  if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
-    return null;
-  }
-
-  let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&`;
-  let urlSearchParams = new URLSearchParams();
-
-  urlSearchParams.append('code', conceptUuids);
-  urlSearchParams.append('_summary', 'data');
-  urlSearchParams.append('_sort', '-date');
-  urlSearchParams.append('_count', pageSize.toString());
-
-  if (page) {
-    urlSearchParams.append('_getpagesoffset', (page * pageSize).toString());
-  }
-
-  return openmrsFetch<VitalsResponse>(url + urlSearchParams.toString());
+  if (prevPageData && !prevPageData?.data?.link.some((link: any) => link.relation === 'next')) return null;
+  let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${conceptUuids}&_summary=data&_sort=-date&_count=${pageSize}`;
+  if (page) url += `&_getpagesoffset=${page * pageSize}`;
+  return openmrsFetch<VitalsResponse>(url);
 }
 
-/**
- * Mapper that converts a FHIR Observation resource into a MappedVitals object.
- * @internal
- */
 function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals {
-  const referenceRanges = {
+  const referenceRanges: any = {
     uuid: resource?.code?.coding?.[0]?.code,
     display: resource?.code?.text,
-    hiNormal: null,
-    hiAbsolute: null,
-    hiCritical: null,
-    lowNormal: null,
-    lowAbsolute: null,
-    lowCritical: null,
     units: resource.valueQuantity?.unit ?? null,
   };
 
-  resource?.referenceRange?.forEach((range) => {
-    const rangeType = range.type?.coding?.[0]?.code;
-    const rangeSystem = range.type?.coding?.[0]?.system;
-
-    if (rangeSystem === 'http://terminology.hl7.org/CodeSystem/referencerange-meaning') {
-      if (rangeType === 'normal') {
-        referenceRanges.hiNormal = range.high?.value ?? null;
-        referenceRanges.lowNormal = range.low?.value ?? null;
-      } else if (rangeType === 'treatment') {
-        referenceRanges.hiCritical = range.high?.value ?? null;
-        referenceRanges.lowCritical = range.low?.value ?? null;
-      }
-    } else if (rangeSystem === 'http://fhir.openmrs.org/ext/obs/reference-range' && rangeType === 'absolute') {
-      referenceRanges.hiAbsolute = range.high?.value ?? null;
-      referenceRanges.lowAbsolute = range.low?.value ?? null;
+  resource?.referenceRange?.forEach((range: any) => {
+    const type = range.type?.coding?.[0]?.code;
+    if (type === 'normal') {
+      referenceRanges.hiNormal = range.high?.value;
+      referenceRanges.lowNormal = range.low?.value;
     }
   });
 
   return {
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
-    // Use Observation.interpretation from FHIR when available (preferred).
-    // Fallback to calculation for backward compatibility: existing observations may not have
-    // interpretation set if they were created before interpretation was added, or if reference
-    // ranges weren't available at creation time (OpenMRS core only sets interpretation when
-    // ObsReferenceRange is present).
     interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
-      ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
+      ? mapFhirInterpretationToObservationInterpretation(resource.interpretation[0].coding[0].display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
-  };
+    referenceRanges,
+  } as MappedVitals;
 }
 
-export function createOrUpdateVitalsAndBiometrics(
-  patientUuid: string,
-  encounterTypeUuid: string,
-  encounterUuid: string | null,
-  location: string,
-  vitalsAndBiometricsObs: Array<OpenmrsResource>,
-  abortController: AbortController,
-) {
-  const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}` : `${restBaseUrl}/encounter`;
-
-  const encounter = {
-    patient: patientUuid,
-    obs: vitalsAndBiometricsObs,
-  };
-  if (!encounterUuid) {
-    encounter['location'] = location;
-    encounter['encounterType'] = encounterTypeUuid;
-  }
-  return openmrsFetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: encounter,
-  });
-}
-
-export function deleteEncounter(encounterUuid: string) {
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    method: 'DELETE',
-  });
-}
-
-function extractEncounterUuid(encounter: FHIRResource['resource']['encounter']): string {
-  if (!encounter || !encounter.reference) {
-    return '';
-  }
+function extractEncounterUuid(encounter: any): string {
+  if (!encounter || !encounter.reference) return '';
   return encounter.reference.split('/')[1];
 }
 
-/**
- * Invalidate all useVitalsAndBiometrics hooks data, to force them to reload
- */
 export async function invalidateCachedVitalsAndBiometrics() {
   vitalsHooksMutates.forEach((mutate) => mutate());
 }
