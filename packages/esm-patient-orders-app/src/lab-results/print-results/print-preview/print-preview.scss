@@ -1,6 +1,7 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '../../interpretation';
 
 .testResultDetails {
   display: flex;
@@ -18,7 +19,14 @@
   font-weight: bold;
   color: colors.$cool-gray-90;
 }
+
 .testCell {
   @include type.type-style('label-02');
-  text-transform: uppercase;
 }
+
+.error {
+  @include type.type-style('body-01');
+  color: colors.$red-60;
+}
+
+@include interpretation.styles;

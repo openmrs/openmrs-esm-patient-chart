@@ -1,12 +1,12 @@
 import React from 'react';
 import { capitalize } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Tag, Tooltip } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
-import type { OrderItem } from '../visit.resource';
-import styles from '../visit-detail-overview.scss';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { type OrderItem } from '../visit.resource';
 import { type ChartConfig } from '../../../config-schema';
+import styles from '../visit-detail-overview.scss';
 
 interface MedicationSummaryProps {
   medications: Array<OrderItem>;
@@ -42,7 +42,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
     <div className={styles.medicationRecord}>
       {drugOrders.map(
         (medication, index) =>
-          (medication?.order?.dose || medication?.order?.dosingInstructions) && (
+          (medication?.order?.dose != null || medication?.order?.dosingInstructions) && (
             <React.Fragment key={index}>
               <div className={styles.medicationContainer}>
                 <div>
@@ -63,27 +63,37 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     )}
                   </p>
                   <p className={styles.bodyLong01}>
-                    {medication?.order?.dose ? (
+                    {medication?.order?.dose != null ? (
                       <>
                         <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
                         <span className={styles.dosage}>
                           {medication?.order?.dose} {medication?.order?.doseUnits?.display?.toLowerCase()}
                         </span>{' '}
                         {medication.order?.route?.display && (
-                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} &mdash; </span>
+                          <span>&mdash; {medication?.order?.route?.display?.toLowerCase()} </span>
                         )}
-                        {medication?.order?.frequency?.display?.toLowerCase()} &mdash;{' '}
-                        {!medication?.order?.duration
-                          ? t('orderIndefiniteDuration', 'Indefinite duration')
-                          : t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+                        {medication?.order?.frequency?.display && (
+                          <>
+                            {medication.order?.route?.display ? <>&mdash; </> : null}
+                            {medication?.order?.frequency?.display?.toLowerCase()}{' '}
+                          </>
+                        )}
+                        {medication?.order?.duration != null && (
+                          <>
+                            &mdash;{' '}
+                            {t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                               duration: medication?.order?.duration,
                               durationUnit: medication?.order?.durationUnits?.display?.toLowerCase(),
                             })}
-                        {medication?.order?.numRefills !== 0 && (
+                          </>
+                        )}
+                        {medication?.order?.duration == null && (
+                          <>&mdash; {t('orderIndefiniteDuration', 'Indefinite duration')}</>
+                        )}
+                        {medication?.order?.numRefills != null && medication?.order?.numRefills !== 0 && (
                           <span>
                             <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
                             {medication?.order?.numRefills}
-                            {''}
                           </span>
                         )}
                         {medication?.order?.dosingInstructions && (
@@ -96,7 +106,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                           {t('dosingInstructions', 'Dosing Instructions').toUpperCase()}{' '}
                         </span>
                         <span className={styles.dosage}>{medication?.order?.dosingInstructions}</span>
-                        {medication?.order?.duration && (
+                        {medication?.order?.duration != null && (
                           <span>
                             {' '}
                             &mdash;{' '}
@@ -106,7 +116,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                             })}
                           </span>
                         )}
-                        {medication?.order?.numRefills !== 0 && (
+                        {medication?.order?.numRefills != null && medication?.order?.numRefills !== 0 && (
                           <span>
                             <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
                             {medication?.order?.numRefills}
@@ -122,8 +132,8 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         {medication?.order?.orderReasonNonCoded}
                       </span>
                     ) : null}
-                    {medication?.order?.orderReasonNonCoded && medication?.order?.quantity && <>&mdash;</>}
-                    {medication?.order?.quantity ? (
+                    {medication?.order?.orderReasonNonCoded && medication?.order?.quantity != null && <>&mdash;</>}
+                    {medication?.order?.quantity != null ? (
                       <span>
                         <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                         {medication?.order?.quantity}
@@ -132,7 +142,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     {medication?.order?.dateStopped ? (
                       <span className={styles.bodyShort01}>
                         <span className={styles.label01}>
-                          {medication?.order?.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
+                          {medication?.order?.quantity != null ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
                         </span>{' '}
                         {formatDate(new Date(medication?.order?.dateStopped))}
                       </span>
