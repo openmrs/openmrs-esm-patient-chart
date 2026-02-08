@@ -50,19 +50,6 @@ jest.mock('./medication-record.component', () => ({
   },
 }));
 
-jest.mock('./test-order.component', () => ({
-  __esModule: true,
-  default: function MockTestOrder() {
-    return 'Test order details';
-  },
-}));
-
-jest.mock('./general-order-table.component', () => ({
-  __esModule: true,
-  default: function MockGeneralOrderTable() {
-    return 'General order details';
-  },
-}));
 
 describe('OrderDetailsTable', () => {
   const user = userEvent.setup();
@@ -438,7 +425,7 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText('Medication details')).toBeInTheDocument();
   });
 
-  it('shows test order details when expanding a test order row', async () => {
+  it('does not show an expand button for test orders since only drug orders are expandable', async () => {
     mockUseOrderTypes.mockReturnValue({
       data: [
         {
@@ -466,10 +453,8 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const expandButton = screen.getByRole('button', { name: /expand current row/i });
-    await user.click(expandButton);
-
-    expect(screen.getByText('Test order details')).toBeInTheDocument();
+    // Test orders should not have an expand button since only drug orders are expandable
+    expect(screen.queryByRole('button', { name: /expand current row/i })).not.toBeInTheDocument();
   });
 
   it('shows pagination controls when there are multiple pages', async () => {
