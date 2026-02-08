@@ -1,8 +1,9 @@
 .layer {
   height: 100%;
 
-  :global(.cds--overflow-menu) {
-    min-height: unset;
+  :global(.cds--overflow-menu__item-content) {
+    min-height: unset; //remove default carbon height
+    padding: 0.25rem 0.5rem;
   }
 }
 
