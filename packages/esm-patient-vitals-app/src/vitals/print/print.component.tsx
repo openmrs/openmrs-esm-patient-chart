@@ -53,7 +53,7 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
       </header>
 
       <div className={styles.subheader}>
-        <h4>{subheader}</h4>
+        <h1>{subheader}</h1>
       </div>
     </div>
   );

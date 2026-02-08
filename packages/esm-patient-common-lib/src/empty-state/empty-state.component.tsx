@@ -9,17 +9,19 @@ export interface EmptyStateProps {
   displayText: string;
   headerTitle: string;
   launchForm?(): void;
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = (props) => {
   const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const isTablet = useLayoutType() === 'tablet';
+  const HeadingTag = props.headingLevel || 'h4';
 
   return (
     <Layer className={styles.layer}>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{props.headerTitle}</h4>
+          <HeadingTag>{props.headerTitle}</HeadingTag>
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
