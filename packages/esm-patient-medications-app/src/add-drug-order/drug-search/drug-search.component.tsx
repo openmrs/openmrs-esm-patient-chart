@@ -26,7 +26,7 @@ export default function DrugSearch({ closeWorkspace, openOrderForm, patient, vis
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
-  const { debounceDelayInMs } = useConfig<ConfigObject>();
+  const { debounceDelayInMs, daysDurationUnit } = useConfig<ConfigObject>();
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
@@ -54,7 +54,10 @@ export default function DrugSearch({ closeWorkspace, openOrderForm, patient, vis
           value={searchTerm}
         />
       </ResponsiveWrapper>
-      <ExtensionSlot name="drug-search-slot" state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm) }} />
+      <ExtensionSlot
+        name="drug-search-slot"
+        state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm), visit, daysDurationUnit }}
+      />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
         closeWorkspace={closeWorkspace}

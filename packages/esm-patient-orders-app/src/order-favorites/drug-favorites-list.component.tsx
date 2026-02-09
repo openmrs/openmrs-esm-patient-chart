@@ -1,90 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InlineNotification, Layer, OverflowMenu, OverflowMenuItem, SkeletonText } from '@carbon/react';
+import { Button, IconButton, InlineNotification, SkeletonText } from '@carbon/react';
 import { ChevronDown, ChevronUp, Pin, TrashCan } from '@carbon/react/icons';
-import { showModal, useLayoutType } from '@openmrs/esm-framework';
+import { EditIcon, showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
+import type { ConfigObject } from '../config-schema';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getFavoriteKey } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { MODAL_NAMES } from './constants';
+import { formatDrugInfo, createDrugFromFavorite, buildBasketItem } from './helpers';
 import type { DrugFavoriteOrder } from './types';
 import styles from './drug-favorites-list.scss';
 
 interface DrugFavoritesListExtensionProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   isSearching?: boolean;
+  visit: Visit;
+  daysDurationUnit?: { uuid: string; display: string };
 }
-
-const formatDrugInfo = (favorite: DrugFavoriteOrder, anyStrengthLabel: string): string => {
-  const parts: string[] = [];
-
-  if (favorite.drugUuid && favorite.attributes.strength) {
-    parts.push(favorite.attributes.strength);
-  } else if (favorite.conceptUuid) {
-    parts.push(anyStrengthLabel);
-  }
-
-  if (favorite.attributes.dose && favorite.attributes.unit) {
-    parts.push(`${favorite.attributes.dose} ${favorite.attributes.unit}`);
-  } else if (favorite.attributes.unit) {
-    parts.push(favorite.attributes.unit);
-  }
-
-  if (favorite.attributes.route) parts.push(favorite.attributes.route);
-  if (favorite.attributes.frequency) parts.push(favorite.attributes.frequency);
-
-  return parts.join(' — ');
-};
-
-const createDrugFromFavorite = (favorite: DrugFavoriteOrder): Drug => {
-  if (!favorite.drugUuid) {
-    throw new Error('Cannot create drug from a concept-based favorite.');
-  }
-  const attrs = favorite.attributes;
-
-  return {
-    uuid: favorite.drugUuid,
-    display: favorite.displayName,
-    strength: attrs.strength,
-    dosageForm:
-      attrs.dosageFormDisplay && attrs.dosageFormUuid
-        ? { display: attrs.dosageFormDisplay, uuid: attrs.dosageFormUuid }
-        : undefined,
-    concept: favorite.conceptUuid
-      ? { uuid: favorite.conceptUuid, display: favorite.conceptName || favorite.displayName }
-      : undefined,
-  } as Drug;
-};
-
-const buildBasketItem = (drug: Drug, favorite: DrugFavoriteOrder): DrugOrderBasketItem => {
-  const attrs = favorite.attributes;
-
-  return {
-    action: 'NEW',
-    display: drug.display,
-    drug,
-    commonMedicationName: favorite.displayName,
-    // Pre-fill from favorite attributes
-    dosage: attrs.dose ? parseFloat(attrs.dose) : null,
-    unit: attrs.unit && attrs.unitUuid ? { value: attrs.unit, valueCoded: attrs.unitUuid } : null,
-    route: attrs.route && attrs.routeUuid ? { value: attrs.route, valueCoded: attrs.routeUuid } : null,
-    frequency:
-      attrs.frequency && attrs.frequencyUuid ? { value: attrs.frequency, valueCoded: attrs.frequencyUuid } : null,
-    quantityUnits: drug.dosageForm ? { value: drug.dosageForm.display, valueCoded: drug.dosageForm.uuid } : null,
-    // Default values for fields not saved in favorites
-    isFreeTextDosage: false,
-    patientInstructions: '',
-    asNeeded: false,
-    asNeededCondition: null,
-    startDate: new Date(),
-    duration: null,
-    durationUnit: null,
-    pillsDispensed: null,
-    numRefills: null,
-    freeTextDosage: '',
-    indication: '',
-  } as DrugOrderBasketItem;
-};
 
 interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
@@ -97,7 +30,6 @@ interface FavoriteListItemProps {
   onUnpin: (favorite: DrugFavoriteOrder) => void;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onEdit: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
-  onDelete: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
@@ -112,7 +44,6 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
     onUnpin,
     onClick,
     onEdit,
-    onDelete,
   }) => {
     const { t } = useTranslation();
 
@@ -150,28 +81,15 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
           <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
         </div>
         {!isEditMode && (
-          <Layer className={styles.menuLayer}>
-            <OverflowMenu
-              aria-label={t('editOrDeletePinnedOrder', 'Edit or delete pinned order')}
-              align="left"
-              size={isTablet ? 'lg' : 'sm'}
-              flipped
-              onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            >
-              <OverflowMenuItem
-                id="editPinnedOrder"
-                onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
-                itemText={t('edit', 'Edit')}
-              />
-              <OverflowMenuItem
-                id="deletePinnedOrder"
-                itemText={t('delete', 'Delete')}
-                onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
-                isDelete
-                hasDivider
-              />
-            </OverflowMenu>
-          </Layer>
+          <IconButton
+            kind="ghost"
+            size={isTablet ? 'md' : 'sm'}
+            label={t('editPinnedOrder', 'Edit pinned order')}
+            onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
+            className={styles.editButton}
+          >
+            <EditIcon />
+          </IconButton>
         )}
       </div>
     );
@@ -181,18 +99,21 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
 const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   openOrderForm,
   isSearching = false,
+  visit,
+  daysDurationUnit,
 }) => {
   const { t } = useTranslation();
+  const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
 
-  const [isCollapsed, setIsCollapsed] = useState(isSearching);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     setIsCollapsed(isSearching);
   }, [isSearching]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const toggleCollapsed = () => setIsCollapsed((prev) => !prev);
 
@@ -217,7 +138,9 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     (favorite: DrugFavoriteOrder) => {
       if (favorite.drugUuid) {
         const drug = createDrugFromFavorite(favorite);
-        openOrderForm(buildBasketItem(drug, favorite));
+        if (drug) {
+          openOrderForm(buildBasketItem(drug, favorite, visit, daysDurationUnit));
+        }
         return;
       }
 
@@ -227,13 +150,12 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
           conceptUuid: favorite.conceptUuid,
           conceptName: favorite.conceptName,
           onSelectDrug: (selectedDrug: Drug) => {
-            const basketItem = buildBasketItem(selectedDrug, favorite);
-            openOrderForm(basketItem);
+            openOrderForm(buildBasketItem(selectedDrug, favorite, visit, daysDurationUnit));
           },
         });
       }
     },
-    [openOrderForm],
+    [openOrderForm, visit, daysDurationUnit],
   );
 
   const handleEditItem = useCallback((e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
@@ -255,14 +177,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
       existingFavorite: favorite,
     });
   }, []);
-
-  const handleDeleteItem = useCallback(
-    (e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
-      e.stopPropagation();
-      deleteMultipleFavorites([favorite]);
-    },
-    [deleteMultipleFavorites],
-  );
 
   const handleToggleSelection = useCallback(
     (e: React.MouseEvent, favoriteKey: string) => {
@@ -290,6 +204,10 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   );
 
   const anyStrengthLabel = t('anyStrength', 'Any strength');
+
+  if (!enableDrugOrderFavorites) {
+    return null;
+  }
 
   if (isLoading) {
     return (
@@ -383,7 +301,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
                 onUnpin={handleUnpin}
                 onClick={handleFavoriteClick}
                 onEdit={handleEditItem}
-                onDelete={handleDeleteItem}
               />
             );
           })}

@@ -34,7 +34,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
 
     return (
       <div key={key} className={styles.attributeRow}>
-        <span className={styles.attributeLabel}>{label.toUpperCase()}</span>
+        <span className={styles.attributeLabel}>{label}</span>
         {form.selectedAttributes[key] ? (
           <Tag
             type="blue"
@@ -60,7 +60,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
 
   const renderAddButton = (key: ManualInputKey, label: string) => (
     <div key={key} className={styles.attributeRow}>
-      <span className={styles.attributeLabel}>{label.toUpperCase()}</span>
+      <span className={styles.attributeLabel}>{label}</span>
       <Button
         kind="ghost"
         size="sm"
@@ -110,7 +110,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
 
     return (
       <div key={`${key}-input`} className={styles.attributeRow}>
-        <span className={styles.attributeLabel}>{label.toUpperCase()}</span>
+        <span className={styles.attributeLabel}>{label}</span>
         <div className={styles.manualInputContainer}>
           {inputContent}
           <IconButton
@@ -158,7 +158,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
             <div className={styles.attributesSection}>
               {form.isConceptBasedFavorite && form.availableStrengths.length > 0 && (
                 <div className={styles.attributeRow}>
-                  <span className={styles.attributeLabel}>{t('strength', 'Strength').toUpperCase()}</span>
+                  <span className={styles.attributeLabel}>{t('strength', 'Strength')}</span>
                   <Dropdown
                     id="strength-dropdown"
                     titleText=""

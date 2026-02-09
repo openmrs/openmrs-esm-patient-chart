@@ -98,13 +98,9 @@
   margin: layout.$spacing-01 0 0 0;
 }
 
-.menuLayer {
+.editButton {
   flex-shrink: 0;
   margin-left: auto;
-}
-
-:global(.cds--overflow-menu-options__btn) {
-  max-width: none;
 }
 
 .skeletonCards {

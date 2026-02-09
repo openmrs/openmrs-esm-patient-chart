@@ -104,7 +104,7 @@ function MedicationInfoHeader({
         name="medication-info-slot"
         state={{
           drug,
-          orderItem: { dosage, unit: { value: unitValue }, route: { value: routeValue } } as DrugOrderBasketItem,
+          orderItem: { dosage, unit: { value: unitValue }, route: { value: routeValue } },
         }}
       />
     </div>

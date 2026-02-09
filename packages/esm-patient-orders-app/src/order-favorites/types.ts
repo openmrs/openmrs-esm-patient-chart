@@ -1,4 +1,13 @@
-import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { Drug } from '@openmrs/esm-patient-common-lib';
+
+type MedicationValue = { value: string; valueCoded?: string };
+
+export interface DrugOrderSlotState {
+  dosage?: number;
+  unit?: MedicationValue;
+  route?: MedicationValue;
+  frequency?: MedicationValue;
+}
 
 export type DrugFavoriteOrder =
   | {
@@ -35,7 +44,7 @@ export interface StoredDrugFavorites {
 
 export interface DrugPinButtonProps {
   drug: Drug;
-  orderItem?: DrugOrderBasketItem;
+  orderItem?: DrugOrderSlotState;
 }
 
 export interface DrugFavoritesModalProps {

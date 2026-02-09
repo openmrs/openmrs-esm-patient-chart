@@ -24,6 +24,7 @@
   @include type.type-style('label-01');
   color: $text-02;
   min-width: 5rem;
+  text-transform: uppercase;
 }
 
 .attributesHint {

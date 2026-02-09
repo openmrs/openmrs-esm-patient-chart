@@ -65,6 +65,11 @@ export const configSchema = {
       'The name of the ordering location tag. If specified, the order baskets shows the order locations dropdown listing locations with the specified tag. The dropdown is hidden if this config value is not specified, and the order location defaults to the login location of the user.',
     _default: '',
   },
+  enableDrugOrderFavorites: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to enable the drug order favorites (pinned orders) feature',
+  },
   maxPinnedDrugOrders: {
     _type: Type.Number,
     _default: 10,
@@ -88,5 +93,6 @@ export interface ConfigObject {
   showReferenceNumberField: boolean;
   ordererProviderRoles: Array<string>;
   orderLocationTagName: string;
+  enableDrugOrderFavorites: boolean;
   maxPinnedDrugOrders: number;
 }

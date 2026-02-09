@@ -12,7 +12,7 @@ import {
   isConvertingFavoriteType,
   validateDrugAvailable,
   validateConceptAvailable,
-} from './favorite-form.helpers';
+} from './helpers';
 import type { DrugFavoritesModalProps } from './types';
 import type { ConfigObject } from '../config-schema';
 

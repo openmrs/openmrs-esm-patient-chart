@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { FAVORITES_PROPERTY_KEYS } from './constants';
 import type {
   DrugFavoriteOrder,
   DrugFavoriteAttributes,
+  DrugOrderSlotState,
   StoredDrugFavorites,
   UserResponse,
   OrderConfig,
@@ -132,7 +133,7 @@ export function getDrugFavorite(
 
 export function extractDrugOrderAttributes(
   drug: Drug | undefined,
-  orderItem: DrugOrderBasketItem | undefined,
+  orderItem: DrugOrderSlotState | undefined,
 ): DrugFavoriteAttributes {
   const attributes: DrugFavoriteAttributes = {};
 

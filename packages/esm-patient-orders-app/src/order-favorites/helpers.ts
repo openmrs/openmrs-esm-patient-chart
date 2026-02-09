@@ -1,5 +1,85 @@
-import type { Drug } from '@openmrs/esm-patient-common-lib';
+import type { Visit } from '@openmrs/esm-framework';
+import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import type { AttributeKey, DrugFavoriteAttributes, DrugFavoriteOrder } from './types';
+
+// List helpers
+
+export function formatDrugInfo(favorite: DrugFavoriteOrder, anyStrengthLabel: string): string {
+  const parts: string[] = [];
+
+  if (favorite.drugUuid && favorite.attributes.strength) {
+    parts.push(favorite.attributes.strength);
+  } else if (favorite.conceptUuid) {
+    parts.push(anyStrengthLabel);
+  }
+
+  if (favorite.attributes.dose && favorite.attributes.unit) {
+    parts.push(`${favorite.attributes.dose} ${favorite.attributes.unit}`);
+  } else if (favorite.attributes.unit) {
+    parts.push(favorite.attributes.unit);
+  }
+
+  if (favorite.attributes.route) parts.push(favorite.attributes.route);
+  if (favorite.attributes.frequency) parts.push(favorite.attributes.frequency);
+
+  return parts.join(' — ');
+}
+
+export function createDrugFromFavorite(favorite: DrugFavoriteOrder): Drug | null {
+  if (!favorite.drugUuid) {
+    return null;
+  }
+  const attrs = favorite.attributes;
+
+  return {
+    uuid: favorite.drugUuid,
+    display: favorite.displayName,
+    strength: attrs.strength,
+    dosageForm:
+      attrs.dosageFormDisplay && attrs.dosageFormUuid
+        ? { display: attrs.dosageFormDisplay, uuid: attrs.dosageFormUuid }
+        : undefined,
+    concept: favorite.conceptUuid
+      ? { uuid: favorite.conceptUuid, display: favorite.conceptName || favorite.displayName }
+      : undefined,
+  } as Drug;
+}
+
+export function buildBasketItem(
+  drug: Drug,
+  favorite: DrugFavoriteOrder,
+  visit: Visit,
+  daysDurationUnit?: { uuid: string; display: string },
+): DrugOrderBasketItem {
+  const attrs = favorite.attributes;
+
+  return {
+    action: 'NEW',
+    display: drug.display,
+    drug,
+    commonMedicationName: favorite.displayName,
+    dosage: attrs.dose ? parseFloat(attrs.dose) : null,
+    unit: attrs.unit && attrs.unitUuid ? { value: attrs.unit, valueCoded: attrs.unitUuid } : null,
+    route: attrs.route && attrs.routeUuid ? { value: attrs.route, valueCoded: attrs.routeUuid } : null,
+    frequency:
+      attrs.frequency && attrs.frequencyUuid ? { value: attrs.frequency, valueCoded: attrs.frequencyUuid } : null,
+    quantityUnits: drug.dosageForm ? { value: drug.dosageForm.display, valueCoded: drug.dosageForm.uuid } : null,
+    isFreeTextDosage: false,
+    patientInstructions: '',
+    asNeeded: false,
+    asNeededCondition: null,
+    startDate: new Date(),
+    duration: null,
+    durationUnit: daysDurationUnit ? { value: daysDurationUnit.display, valueCoded: daysDurationUnit.uuid } : null,
+    pillsDispensed: null,
+    numRefills: null,
+    freeTextDosage: '',
+    indication: '',
+    visit,
+  };
+}
+
+// Form helpers
 
 /**
  * Builds the DrugFavoriteAttributes object from selected attributes and resolved values.
