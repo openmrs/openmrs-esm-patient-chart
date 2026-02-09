@@ -43,8 +43,16 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
       launchDrugOrderForm,
       launchLabOrderForm,
       launchGeneralOrderForm,
+      visibleOrderPanels,
     } satisfies OrderBasketExtensionProps;
-  }, [launchChildWorkspace, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName, patient]);
+  }, [
+    launchChildWorkspace,
+    drugOrderWorkspaceName,
+    labOrderWorkspaceName,
+    generalOrderWorkspaceName,
+    patient,
+    visibleOrderPanels,
+  ]);
 
   return (
     <OrderBasket
@@ -56,7 +64,6 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
       orderBasketExtensionProps={orderBasketExtensionProps}
       showPatientBanner
       onOrderBasketSubmitted={onOrderBasketSubmitted}
-      visibleOrderPanels={visibleOrderPanels}
     />
   );
 };
