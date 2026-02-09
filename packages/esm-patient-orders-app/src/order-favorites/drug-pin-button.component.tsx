@@ -42,18 +42,10 @@ const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
           });
           return;
         }
-        const attributes = extractDrugOrderAttributes(drug, orderItem);
         const dispose = showModal(MODAL_NAMES.DRUG_FAVORITES, {
           closeModal: () => dispose(),
           drug,
-          strength: attributes.strength,
-          dose: attributes.dose,
-          unit: attributes.unit,
-          unitUuid: attributes.unitUuid,
-          route: attributes.route,
-          routeUuid: attributes.routeUuid,
-          frequency: attributes.frequency,
-          frequencyUuid: attributes.frequencyUuid,
+          initialAttributes: extractDrugOrderAttributes(drug, orderItem),
         });
       }
     },

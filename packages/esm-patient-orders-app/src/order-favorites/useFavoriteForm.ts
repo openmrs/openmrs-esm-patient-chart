@@ -18,17 +18,7 @@ import type { ConfigObject } from '../config-schema';
 
 export function useFavoriteForm({
   drug,
-  drugUuid,
-  conceptUuid,
-  conceptName,
-  strength,
-  dose,
-  unit,
-  unitUuid,
-  route,
-  routeUuid,
-  frequency,
-  frequencyUuid,
+  initialAttributes: initialAttrs,
   existingFavorite,
   closeModal,
 }: DrugFavoritesModalProps) {
@@ -37,10 +27,14 @@ export function useFavoriteForm({
   const { favorites, persistFavorites } = useFavoritesActions();
   const [isSaving, setIsSaving] = useState(false);
 
+  const drugUuid = drug?.uuid || existingFavorite?.drugUuid;
+  const conceptUuid = drug?.concept?.uuid || existingFavorite?.conceptUuid;
+  const conceptName = drug?.concept?.display || existingFavorite?.conceptName;
+  const prefilled = initialAttrs || existingFavorite?.attributes;
+
   // Determine edit mode and favorite type
   const isEditingFromList = Boolean(existingFavorite);
-  const existing =
-    existingFavorite || getDrugFavorite(favorites, drug?.uuid || drugUuid, drug?.concept?.uuid || conceptUuid);
+  const existing = existingFavorite || getDrugFavorite(favorites, drugUuid, conceptUuid);
   const isEditing = Boolean(existing);
   const isConceptBasedFavorite = existingFavorite
     ? Boolean(existingFavorite.conceptUuid && !existingFavorite.drugUuid)
@@ -57,16 +51,16 @@ export function useFavoriteForm({
   const effectiveDrug = fetchedDrugData?.data || drug;
 
   const attributes = useFormAttributes({
-    conceptName: existingFavorite?.conceptName || conceptName,
-    conceptUuid: existingFavorite?.conceptUuid || conceptUuid,
+    conceptName,
+    conceptUuid,
     isConceptBased: isConceptBasedFavorite,
     initialAttributes: existing?.attributes,
     effectiveDrug,
-    strength,
-    dose,
-    unit,
-    route,
-    frequency,
+    strength: prefilled?.strength,
+    dose: prefilled?.dose,
+    unit: prefilled?.unit,
+    route: prefilled?.route,
+    frequency: prefilled?.frequency,
   });
 
   const computedName = useMemo(() => {
@@ -164,48 +158,12 @@ export function useFavoriteForm({
   ]);
 
   return {
-    // Loading
     isLoadingDrug,
-    isLoadingStrengths: attributes.isLoadingStrengths,
-    isLoadingOrderConfig: attributes.isLoadingOrderConfig,
     isSaving,
-
-    // Derived
     isEditing,
     isConceptBasedFavorite,
     computedName,
-    resolvedValues: attributes.resolvedValues,
-    hasPrefilledDose: attributes.hasPrefilledDose,
-    hasPrefilledRoute: attributes.hasPrefilledRoute,
-    hasPrefilledFrequency: attributes.hasPrefilledFrequency,
-
-    // Attribute selection
-    selectedAttributes: attributes.selectedAttributes,
-    showManualInputs: attributes.showManualInputs,
-
-    // Strength
-    availableStrengths: attributes.availableStrengths,
-    strengthOptions: attributes.strengthOptions,
-    selectedStrengthId: attributes.selectedStrengthId,
-
-    // Order config data
-    routes: attributes.routes,
-    frequencies: attributes.frequencies,
-
-    // Manual input values
-    manualDose: attributes.manualDose,
-    manualRoute: attributes.manualRoute,
-    manualFrequency: attributes.manualFrequency,
-
-    // Handlers
-    handleRemoveAttribute: attributes.handleRemoveAttribute,
-    handleAddAttribute: attributes.handleAddAttribute,
-    handleShowManualInput: attributes.handleShowManualInput,
-    handleHideManualInput: attributes.handleHideManualInput,
-    handleStrengthChange: attributes.handleStrengthChange,
     handleSave,
-    setManualDose: attributes.setManualDose,
-    setManualRoute: attributes.setManualRoute,
-    setManualFrequency: attributes.setManualFrequency,
+    attributes,
   };
 }

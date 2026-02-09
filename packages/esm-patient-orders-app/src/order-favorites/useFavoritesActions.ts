@@ -39,11 +39,10 @@ export function useFavoritesActions() {
     async (updatedFavorites: DrugFavoriteOrder[], messages: SnackbarMessages): Promise<boolean> => {
       if (!user?.uuid) return false;
 
-      const abortController = new AbortController();
       mutate(createOptimisticData(updatedFavorites), false);
 
       try {
-        await saveDrugFavorites(user.uuid, updatedFavorites, abortController);
+        await saveDrugFavorites(user.uuid, updatedFavorites);
         mutate();
         showSnackbar({
           isLowContrast: true,
@@ -53,15 +52,13 @@ export function useFavoritesActions() {
         });
         return true;
       } catch (error: unknown) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          mutate();
-          showSnackbar({
-            isLowContrast: false,
-            kind: 'error',
-            title: messages.errorTitle,
-            subtitle: error.message,
-          });
-        }
+        mutate();
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: messages.errorTitle,
+          subtitle: error instanceof Error ? error.message : '',
+        });
         return false;
       }
     },

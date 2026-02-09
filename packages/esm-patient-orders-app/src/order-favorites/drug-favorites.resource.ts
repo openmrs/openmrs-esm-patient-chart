@@ -11,7 +11,6 @@ import type {
   StoredDrugFavorites,
   UserResponse,
   OrderConfig,
-  DrugSearchResponse,
 } from './types';
 
 export function uuidsEqual(a: string | undefined, b: string | undefined): boolean {
@@ -44,18 +43,13 @@ export function useDrugFavorites(userUuid: string | undefined) {
   return { favorites, error, isLoading, mutate };
 }
 
-export async function saveDrugFavorites(
-  userUuid: string,
-  favorites: DrugFavoriteOrder[],
-  abortController: AbortController,
-) {
+export async function saveDrugFavorites(userUuid: string, favorites: DrugFavoriteOrder[]) {
   const stored: StoredDrugFavorites = { favorites };
 
   return openmrsFetch(`${restBaseUrl}/user/${userUuid}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: { userProperties: { [FAVORITES_PROPERTY_KEYS.DRUG]: JSON.stringify(stored) } },
-    signal: abortController.signal,
   });
 }
 
@@ -175,7 +169,7 @@ export function useOrderConfig(enabled: boolean = true) {
 }
 
 export function useDrugsByConceptName(conceptName: string | undefined, conceptUuid: string | undefined) {
-  const { data, isLoading, error } = useSWRImmutable<{ data: DrugSearchResponse }>(
+  const { data, isLoading, error } = useSWRImmutable<{ data: { results: Drug[] } }>(
     conceptName
       ? `${restBaseUrl}/drug?q=${encodeURIComponent(conceptName)}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,

@@ -163,17 +163,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
     const dispose = showModal(MODAL_NAMES.DRUG_FAVORITES, {
       closeModal: () => dispose(),
-      drugUuid: favorite.drugUuid,
-      conceptUuid: favorite.conceptUuid,
-      conceptName: favorite.conceptName,
-      strength: favorite.attributes.strength,
-      dose: favorite.attributes.dose,
-      unit: favorite.attributes.unit,
-      unitUuid: favorite.attributes.unitUuid,
-      route: favorite.attributes.route,
-      routeUuid: favorite.attributes.routeUuid,
-      frequency: favorite.attributes.frequency,
-      frequencyUuid: favorite.attributes.frequencyUuid,
       existingFavorite: favorite,
     });
   }, []);

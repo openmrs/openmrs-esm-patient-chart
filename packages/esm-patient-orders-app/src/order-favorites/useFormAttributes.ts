@@ -22,16 +22,7 @@ interface UseFormAttributesProps {
   frequency?: string;
 }
 
-/**
- * Attribute management hook for drug favorites form.
- * Manages all drug order attributes: strength, dose, unit, route, frequency.
- *
- * Handles:
- * - Strength selection for concept-based favorites
- * - Manual input for dose/route/frequency
- * - Attribute toggles (which attributes to include)
- * - Data fetching (order config, available strengths)
- */
+/** Manages drug order attribute state (strength, dose, unit, route, frequency) for the favorites form. */
 export function useFormAttributes({
   conceptName,
   conceptUuid,
@@ -73,8 +64,6 @@ export function useFormAttributes({
     () => (selectedStrengthId === 'any' ? undefined : availableStrengths.find((d) => d.uuid === selectedStrengthId)),
     [selectedStrengthId, availableStrengths],
   );
-
-  const hasSelectedStrength = selectedStrengthId !== 'any';
 
   // Manual Inputs (dose, route, frequency)
   const [manualDose, setManualDose] = useState<number | null>(null);
@@ -173,7 +162,6 @@ export function useFormAttributes({
     // Strength selection
     selectedStrengthId,
     selectedStrengthDrug,
-    hasSelectedStrength,
     availableStrengths,
     strengthOptions,
 

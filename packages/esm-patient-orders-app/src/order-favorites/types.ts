@@ -50,17 +50,7 @@ export interface DrugPinButtonProps {
 export interface DrugFavoritesModalProps {
   closeModal: () => void;
   drug?: Drug;
-  drugUuid?: string;
-  conceptUuid?: string;
-  conceptName?: string;
-  strength?: string;
-  dose?: string;
-  unit?: string;
-  unitUuid?: string;
-  route?: string;
-  routeUuid?: string;
-  frequency?: string;
-  frequencyUuid?: string;
+  initialAttributes?: DrugFavoriteAttributes;
   existingFavorite?: DrugFavoriteOrder;
 }
 
@@ -78,10 +68,6 @@ export interface OrderConfig {
   drugRoutes: Array<OrderConfigItem>;
   drugDosingUnits: Array<OrderConfigItem>;
   orderFrequencies: Array<OrderConfigItem>;
-}
-
-export interface DrugSearchResponse {
-  results: Array<Drug>;
 }
 
 export interface StrengthOption {
