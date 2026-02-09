@@ -140,9 +140,37 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
-  if (order.action === 'NEW' || order.action === 'RENEW') {
+  if (order.action === 'NEW') {
     return {
       action: 'NEW',
+      patient: patientUuid,
+      type: 'drugorder',
+      careSetting: careSettingUuid,
+      orderer: orderingProviderUuid,
+      encounter: encounterUuid,
+      drug: order.drug.uuid,
+      dose: order.dosage,
+      doseUnits: order.unit?.valueCoded,
+      route: order.route?.valueCoded,
+      frequency: order.frequency?.valueCoded,
+      asNeeded: order.asNeeded,
+      asNeededCondition: order.asNeededCondition,
+      numRefills: order.numRefills,
+      quantity: order.pillsDispensed,
+      quantityUnits: order.quantityUnits?.valueCoded,
+      duration: order.duration,
+      durationUnits: order.durationUnit?.valueCoded,
+      dosingType: order.isFreeTextDosage
+        ? 'org.openmrs.FreeTextDosingInstructions'
+        : 'org.openmrs.SimpleDosingInstructions',
+      dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      concept: order.drug.concept.uuid,
+      orderReasonNonCoded: order.indication,
+    };
+  } else if (order.action === 'RENEW') {
+    return {
+      action: 'NEW',
+      previousOrder: order.previousOrder,
       patient: patientUuid,
       type: 'drugorder',
       careSetting: careSettingUuid,
@@ -218,43 +246,58 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
  * See also the same function defined in esm-patient-orders-app/src/utils/index.ts
  */
 export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrderBasketItem {
+  if (!order.drug) {
+    throw new Error('Drug order is missing drug information.');
+  }
+
   return {
-    display: order.drug?.display,
+    uuid: order.uuid,
+    display: order.drug.display,
     previousOrder: action !== 'NEW' ? order.uuid : null,
     action: action,
     drug: order.drug,
-    dosage: order.dose,
-    unit: {
-      value: order.doseUnits?.display,
-      valueCoded: order.doseUnits?.uuid,
-    },
-    frequency: {
-      valueCoded: order.frequency?.uuid,
-      value: order.frequency?.display,
-    },
-    route: {
-      valueCoded: order.route?.uuid,
-      value: order.route?.display,
-    },
-    commonMedicationName: order.drug?.display,
+    dosage: order.dose ?? null,
+    unit: order.doseUnits
+      ? {
+          value: order.doseUnits.display,
+          valueCoded: order.doseUnits.uuid,
+        }
+      : null,
+    frequency: order.frequency
+      ? {
+          valueCoded: order.frequency.uuid,
+          value: order.frequency.display,
+        }
+      : null,
+    route: order.route
+      ? {
+          valueCoded: order.route.uuid,
+          value: order.route.display,
+        }
+      : null,
+    commonMedicationName: order.drug.display,
     isFreeTextDosage: order.dosingType === 'org.openmrs.FreeTextDosingInstructions',
     freeTextDosage: order.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
-    asNeededCondition: order.asNeededCondition,
+    asNeededCondition: order.asNeededCondition ?? null,
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
     duration: order.duration,
-    durationUnit: {
-      valueCoded: order.durationUnits?.uuid,
-      value: order.durationUnits?.display,
-    },
+    durationUnit: order.durationUnits
+      ? {
+          valueCoded: order.durationUnits.uuid,
+          value: order.durationUnits.display,
+        }
+      : null,
     pillsDispensed: order.quantity,
     numRefills: order.numRefills,
     indication: order.orderReasonNonCoded,
-    quantityUnits: {
-      value: order.quantityUnits?.display,
-      valueCoded: order.quantityUnits?.uuid,
-    },
+    quantityUnits: order.quantityUnits
+      ? {
+          value: order.quantityUnits.display,
+          valueCoded: order.quantityUnits.uuid,
+        }
+      : null,
     encounterUuid: order.encounter?.uuid,
     visit: order.encounter.visit,
   };

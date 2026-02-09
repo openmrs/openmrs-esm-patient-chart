@@ -3,7 +3,7 @@ import { type Order } from '@openmrs/esm-patient-common-lib';
 import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
 import { type Encounter, type Provider } from '../commands/types';
 import { test } from '../core';
-import { OrdersPage } from '../pages';
+import { OrdersPage, ResultsViewerPage } from '../pages';
 
 let testOrder: Order;
 let encounter: Encounter;
@@ -112,6 +112,20 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     await test.step('And a confirmation message should be displayed indicating that the result was saved', async () => {
       await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
     });
+
+    await test.step('When I navigate to the Results Viewer page', async () => {
+      const resultsViewerPage = new ResultsViewerPage(page);
+      await resultsViewerPage.goTo(patient.uuid);
+    });
+
+    await test.step('And I click on the Individual tests tab', async () => {
+      await page.getByRole('tab', { name: /individual tests/i }).click();
+    });
+
+    await test.step('Then I should see the saved lab result in the results viewer', async () => {
+      const row = page.locator('tr:has-text("Serum glucose"):has(td:has-text("55"))').first();
+      await expect(row).toBeVisible();
+    });
   });
 
   test('Modify a lab order', async ({ page, patient }) => {
@@ -182,8 +196,8 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await expect(page.getByText(/discontinued serum glucose/i)).toBeVisible();
     });
 
-    await test.step('And the order table should be empty', async () => {
-      await expect(page.getByText(/there are no orders to display for this patient/i)).toBeVisible();
+    await test.step('And the discontinued order should no longer appear in the table', async () => {
+      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeHidden();
     });
   });
 });

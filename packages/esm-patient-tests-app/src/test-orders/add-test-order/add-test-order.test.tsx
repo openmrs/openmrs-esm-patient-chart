@@ -75,6 +75,7 @@ function renderAddLabOrderWorkspace() {
       windowName={''}
       windowProps={{ encounterUuid: '' }}
       isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
 }

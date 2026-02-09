@@ -59,7 +59,7 @@ export interface MedicationsDetailsTableProps {
   showAddButton?: boolean;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
-  showReorderButton: boolean;
+  showRenewButton: boolean;
   patient: fhir.Patient;
 }
 
@@ -70,7 +70,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   showAddButton,
   showDiscontinueButton,
   showModifyButton,
-  showReorderButton,
+  showRenewButton,
   patient,
 }) => {
   const pageSize = 5;
@@ -125,26 +125,55 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
               )}
             </p>
             <p className={styles.bodyLong01}>
-              <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-              <span className={styles.dosage}>
-                {medication.dose} {medication.doseUnits?.display.toLowerCase()}
-              </span>{' '}
-              {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
-              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
-              {!medication.duration
-                ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
-                : t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
+              {medication.dose != null && (
+                <>
+                  <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                  <span className={styles.dosage}>
+                    {medication.dose} {medication.doseUnits?.display?.toLowerCase()}
+                  </span>{' '}
+                </>
+              )}
+              {medication.route?.display && (
+                <>
+                  {medication.dose != null && <>&mdash; </>}
+                  {medication.route?.display.toLowerCase()}{' '}
+                </>
+              )}
+              {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()} </>}
+              {medication.duration != null && (
+                <>
+                  {(medication.dose != null || medication.route?.display || medication.frequency?.display) && (
+                    <>&mdash; </>
+                  )}
+                  {t('medicationDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                     duration: medication.duration,
-                    durationUnit: medication.durationUnits?.display.toLowerCase(),
+                    durationUnit: medication.durationUnits?.display?.toLowerCase(),
                   })}{' '}
-              {medication.numRefills !== 0 && (
+                </>
+              )}
+              {medication.duration == null &&
+                (medication.dose != null || medication.route?.display || medication.frequency?.display) && (
+                  <>&mdash; {t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()} </>
+                )}
+              {medication.numRefills != null && medication.numRefills !== 0 && (
                 <span>
-                  <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                  {(medication.dose != null ||
+                    medication.route?.display ||
+                    medication.frequency?.display ||
+                    medication.duration != null) && <> &mdash; </>}
+                  <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span>{' '}
                   {medication.numRefills}
                 </span>
               )}
               {medication.dosingInstructions && (
-                <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>
+                <span>
+                  {(medication.dose != null ||
+                    medication.route?.display ||
+                    medication.frequency?.display ||
+                    medication.duration != null ||
+                    (medication.numRefills != null && medication.numRefills !== 0)) && <> &mdash; </>}
+                  {medication.dosingInstructions.toLocaleLowerCase()}
+                </span>
               )}
             </p>
           </div>
@@ -155,8 +184,8 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                 {medication.orderReasonNonCoded}
               </span>
             )}{' '}
-            {medication.orderReasonNonCoded && medication.quantity && <>&mdash;</>}
-            {medication.quantity && (
+            {medication.orderReasonNonCoded && medication.quantity != null && <>&mdash;</>}
+            {medication.quantity != null && (
               <span>
                 <span className={styles.label01}> {t('quantity', 'Quantity').toUpperCase()}</span> {medication.quantity}{' '}
                 {medication?.quantityUnits?.display}
@@ -316,7 +345,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                               patient={patient}
                               showDiscontinueButton={showDiscontinueButton}
                               showModifyButton={showModifyButton}
-                              showReorderButton={showReorderButton}
+                              showRenewButton={showRenewButton}
                               medication={medication}
                               items={orders}
                               setItems={setOrders}
@@ -355,7 +384,7 @@ function OrderBasketItemActions({
   patient,
   showDiscontinueButton,
   showModifyButton,
-  showReorderButton,
+  showRenewButton,
   medication,
   items,
   setItems,
@@ -363,7 +392,7 @@ function OrderBasketItemActions({
   patient: fhir.Patient;
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
-  showReorderButton: boolean;
+  showRenewButton: boolean;
   medication: Order;
   items: Array<DrugOrderBasketItem>;
   setItems: (items: Array<DrugOrderBasketItem>) => void;
@@ -386,52 +415,7 @@ function OrderBasketItemActions({
     [patient, medication, globalMutate],
   );
   const handleDiscontinueClick = useCallback(() => {
-    setItems([
-      ...items,
-      {
-        uuid: medication.uuid,
-        display: medication.drug?.display,
-        previousOrder: null,
-        action: 'DISCONTINUE',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        asNeeded: medication.asNeeded,
-        asNeededCondition: medication.asNeededCondition,
-        startDate: medication.dateActivated,
-        duration: medication.duration,
-        durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
-          value: medication.durationUnits?.display,
-        },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-        quantityUnits: {
-          value: medication.quantityUnits?.display,
-          valueCoded: medication.quantityUnits?.uuid,
-        },
-        encounterUuid: medication.encounter?.uuid,
-        visit: medication.encounter?.visit,
-      },
-    ]);
+    setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
@@ -452,53 +436,8 @@ function OrderBasketItemActions({
     );
   }, [medication, workspaceGroupProps]);
 
-  const handleReorderClick = useCallback(() => {
-    setItems([
-      ...items,
-      {
-        uuid: medication.uuid,
-        display: medication.drug?.display,
-        previousOrder: null,
-        startDate: new Date(),
-        action: 'RENEW',
-        drug: medication.drug,
-        dosage: medication.dose,
-        unit: {
-          value: medication.doseUnits?.display,
-          valueCoded: medication.doseUnits?.uuid,
-        },
-        frequency: {
-          valueCoded: medication.frequency?.uuid,
-          value: medication.frequency?.display,
-        },
-        route: {
-          valueCoded: medication.route?.uuid,
-          value: medication.route?.display,
-        },
-        commonMedicationName: medication.drug?.display,
-        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
-        freeTextDosage:
-          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        patientInstructions:
-          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
-        asNeeded: medication.asNeeded,
-        asNeededCondition: medication.asNeededCondition,
-        duration: medication.duration,
-        durationUnit: {
-          valueCoded: medication.durationUnits?.uuid,
-          value: medication.durationUnits?.display,
-        },
-        pillsDispensed: medication.quantity,
-        numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-        quantityUnits: {
-          value: medication.quantityUnits?.display,
-          valueCoded: medication.quantityUnits?.uuid,
-        },
-        encounterUuid: medication.encounter?.uuid,
-        visit: medication.encounter?.visit,
-      },
-    ]);
+  const handleRenewClick = useCallback(() => {
+    setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
@@ -524,13 +463,13 @@ function OrderBasketItemActions({
           disabled={alreadyInBasket}
         />
       )}
-      {showReorderButton && (
+      {showRenewButton && (
         <OverflowMenuItem
           className={styles.menuItem}
           disabled={alreadyInBasket}
-          id="reorder"
-          itemText={t('reorder', 'Reorder')}
-          onClick={handleReorderClick}
+          id="renew"
+          itemText={t('orderActionRenew', 'Renew')}
+          onClick={handleRenewClick}
         />
       )}
       {showDiscontinueButton && (
