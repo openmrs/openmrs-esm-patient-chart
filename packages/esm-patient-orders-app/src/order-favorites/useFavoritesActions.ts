@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { showSnackbar, useSession, useAbortController } from '@openmrs/esm-framework';
+import { useCallback, useRef } from 'react';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useDrugFavorites, removeDrugFavorite, saveDrugFavorites } from './drug-favorites.resource';
 import { FAVORITES_PROPERTY_KEYS } from './constants';
@@ -32,12 +32,14 @@ export function useFavoritesActions() {
   const { t } = useTranslation();
   const { user } = useSession();
   const { favorites, error, isLoading, mutate } = useDrugFavorites(user?.uuid);
-  const abortController = useAbortController();
+  const favoritesRef = useRef(favorites);
+  favoritesRef.current = favorites;
 
   const persistFavorites = useCallback(
     async (updatedFavorites: DrugFavoriteOrder[], messages: SnackbarMessages): Promise<boolean> => {
       if (!user?.uuid) return false;
 
+      const abortController = new AbortController();
       mutate(createOptimisticData(updatedFavorites), false);
 
       try {
@@ -63,7 +65,7 @@ export function useFavoritesActions() {
         return false;
       }
     },
-    [user?.uuid, mutate, abortController],
+    [user?.uuid, mutate],
   );
 
   const deleteMultipleFavorites = useCallback(
@@ -73,7 +75,7 @@ export function useFavoritesActions() {
       const isSingleDelete = favoritesToDelete.length === 1;
       const itemName = isSingleDelete ? favoritesToDelete[0]?.displayName : '';
 
-      let updatedFavorites = [...favorites];
+      let updatedFavorites = [...favoritesRef.current];
       favoritesToDelete.forEach((favorite) => {
         updatedFavorites = removeDrugFavorite(updatedFavorites, favorite.drugUuid, favorite.conceptUuid);
       });
@@ -92,7 +94,7 @@ export function useFavoritesActions() {
           : t('errorDeletingOrders', 'Error deleting pinned orders'),
       });
     },
-    [favorites, persistFavorites, t],
+    [persistFavorites, t],
   );
 
   return {

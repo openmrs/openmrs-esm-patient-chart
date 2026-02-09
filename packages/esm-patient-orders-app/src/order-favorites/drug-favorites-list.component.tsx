@@ -37,10 +37,13 @@ const formatDrugInfo = (favorite: DrugFavoriteOrder, anyStrengthLabel: string): 
 };
 
 const createDrugFromFavorite = (favorite: DrugFavoriteOrder): Drug => {
+  if (!favorite.drugUuid) {
+    throw new Error('Cannot create drug from a concept-based favorite.');
+  }
   const attrs = favorite.attributes;
 
   return {
-    uuid: favorite.drugUuid!,
+    uuid: favorite.drugUuid,
     display: favorite.displayName,
     strength: attrs.strength,
     dosageForm:
@@ -214,8 +217,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     (favorite: DrugFavoriteOrder) => {
       if (favorite.drugUuid) {
         const drug = createDrugFromFavorite(favorite);
-        const basketItem = buildBasketItem(drug, favorite);
-        openOrderForm(basketItem);
+        openOrderForm(buildBasketItem(drug, favorite));
         return;
       }
 

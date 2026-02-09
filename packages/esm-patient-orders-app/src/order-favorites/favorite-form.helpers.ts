@@ -74,9 +74,12 @@ export function buildFavoriteOrder(
       attributes,
     };
   } else {
+    if (!drugForSave.concept?.uuid) {
+      throw new Error('Cannot create concept-based favorite: drug has no concept.');
+    }
     return {
-      conceptUuid: drugForSave.concept?.uuid,
-      conceptName: drugForSave.concept?.display,
+      conceptUuid: drugForSave.concept.uuid,
+      conceptName: drugForSave.concept.display,
       displayName: computedName,
       attributes,
     };

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, InlineLoading } from '@carbon/react';
 import { Pin, PinFilled } from '@carbon/react/icons';
@@ -12,6 +12,8 @@ import styles from './drug-pin-button.scss';
 const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
   const { t } = useTranslation();
   const { favorites, persistFavorites } = useFavoritesActions();
+  const favoritesRef = useRef(favorites);
+  favoritesRef.current = favorites;
   const [isLoading, setIsLoading] = useState(false);
 
   const isPinned = isDrugFavorite(favorites, drug?.uuid, drug?.concept?.uuid, Boolean(drug?.strength));
@@ -23,7 +25,7 @@ const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
 
       if (isPinned) {
         setIsLoading(true);
-        const updatedFavorites = removeDrugFavorite(favorites, drug.uuid, drug.concept?.uuid);
+        const updatedFavorites = removeDrugFavorite(favoritesRef.current, drug.uuid, drug.concept?.uuid);
         await persistFavorites(updatedFavorites, {
           successTitle: t('orderUnpinned', 'Order unpinned'),
           successSubtitle: t('orderUnpinnedSubtitle', '{{drugName}} has been removed from your pinned orders', {
@@ -48,7 +50,7 @@ const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
         });
       }
     },
-    [drug, isPinned, favorites, persistFavorites, t, orderItem],
+    [drug, isPinned, persistFavorites, t, orderItem],
   );
 
   if (!drug) {

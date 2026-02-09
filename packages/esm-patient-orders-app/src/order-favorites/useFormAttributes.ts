@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { useDrugsByConceptName, useOrderConfig } from './drug-favorites.resource';
@@ -57,9 +57,17 @@ export function useFormAttributes({
     return [anyOption, ...availableStrengths.map((d) => ({ id: d.uuid, label: d.strength || d.display, drug: d }))];
   }, [availableStrengths, t]);
 
-  const [selectedStrengthId, setSelectedStrengthId] = useState<string>(
-    initialAttributes?.strength || strength ? 'specific' : 'any',
-  );
+  const [selectedStrengthId, setSelectedStrengthId] = useState<string>('any');
+
+  const targetStrength = initialAttributes?.strength || strength;
+  useEffect(() => {
+    if (availableStrengths.length > 0 && targetStrength) {
+      const match = availableStrengths.find((d) => d.strength === targetStrength);
+      if (match) {
+        setSelectedStrengthId(match.uuid);
+      }
+    }
+  }, [availableStrengths, targetStrength]);
 
   const selectedStrengthDrug = useMemo(
     () => (selectedStrengthId === 'any' ? undefined : availableStrengths.find((d) => d.uuid === selectedStrengthId)),
