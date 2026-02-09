@@ -23,6 +23,7 @@
   "drugOrders": "用药医嘱",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "编辑结果",
+  "editTestResults": "Edit test results",
   "endDate": "结束日期",
   "enterTestResults": "输入检验结果",
   "error": "错误",
