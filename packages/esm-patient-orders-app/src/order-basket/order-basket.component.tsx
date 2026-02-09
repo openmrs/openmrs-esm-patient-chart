@@ -41,10 +41,6 @@ interface OrderBasketProps {
   orderBasketExtensionProps: OrderBasketExtensionProps;
   showPatientBanner?: boolean;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
-  /**
-   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
-   */
-  visibleOrderPanels?: Array<string>;
 }
 
 const OrderBasket: React.FC<OrderBasketProps> = ({
@@ -56,7 +52,6 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   orderBasketExtensionProps,
   showPatientBanner,
   onOrderBasketSubmitted,
-  visibleOrderPanels,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
