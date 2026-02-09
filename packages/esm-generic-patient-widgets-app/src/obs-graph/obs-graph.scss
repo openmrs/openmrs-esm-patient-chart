@@ -16,15 +16,21 @@
   flex-direction: row;
   justify-content: space-between;
 
-  // This is a hack to override the max-width of the overflow menu button
-  :global(
-      .cds--chart-holder
-        .cds--cc--toolbar
-        .cds--overflow-menu-options
-        .cds--overflow-menu-options__option
-        .cds--overflow-menu-options__btn
-    ) {
-    max-width: none !important;
+  // Carbon charts always left-align the overflow menu; override to align with the trigger.
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options) {
+    inset-inline-start: auto !important;
+    inset-inline-end: 0;
+    width: auto;
+    min-width: 0;
+    margin-top: layout.$spacing-03;
+  }
+
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options .cds--overflow-menu-options__option) {
+    inline-size: auto;
+  }
+
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options .cds--overflow-menu-options__btn) {
+    max-inline-size: none !important;
   }
 
   // Ensures the chart toolbar tooltips are visible
@@ -55,13 +61,13 @@
 
   &[aria-selected='true'] {
     box-shadow: inset 4px 0 0 0 var(--brand-03) !important;
-    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
     line-height: normal !important;
   }
 
   &[aria-selected='false'] {
     border-bottom: none;
-    border-left: layout.$spacing-01 solid $ui-03;
-    margin-left: 0 !important;
+    border-inline-start: layout.$spacing-01 solid $ui-03;
+    margin-inline-start: 0 !important;
   }
 }
