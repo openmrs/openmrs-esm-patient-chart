@@ -39,6 +39,7 @@
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editPinnedOrder": "Edit pinned order",
   "editResults": "Edit results",
+  "editTestResults": "Edit test results",
   "endDate": "End date",
   "enterTestResults": "Enter test results",
   "error": "Error",
