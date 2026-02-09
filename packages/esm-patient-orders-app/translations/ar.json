@@ -23,6 +23,7 @@
   "drugOrders": "drug orders",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "تحرير النتائج",
+  "editTestResults": "Edit test results",
   "endDate": "End date",
   "enterTestResults": "أدخل نتائج الاختبار",
   "error": "Error",
