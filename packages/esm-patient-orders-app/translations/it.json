@@ -23,6 +23,7 @@
   "drugOrders": "ordini farmaci",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "Modifica risultati",
+  "editTestResults": "Edit test results",
   "endDate": "Data di fine",
   "enterTestResults": "Inserisci risultati test",
   "error": "Errore",

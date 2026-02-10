@@ -52,6 +52,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   const { t } = useTranslation();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
+  const isEditMode = order.fulfillerStatus === 'COMPLETED';
   const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
   const { isLoading: isLoadingResultConcepts, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
@@ -120,7 +121,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   useEffect(() => {
     conceptArray.forEach((concept, index) => {
       const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
-      if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+      if (concept && completeLabResult && isEditMode) {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
           setValue(concept.uuid, completeLabResult.value.uuid);
         } else if (isNumeric(concept) && completeLabResult?.value) {
@@ -143,18 +144,22 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         }
       }
     });
-  }, [conceptArray, completeLabResults, order?.fulfillerStatus, setValue]);
+  }, [conceptArray, completeLabResults, isEditMode, setValue]);
 
   if (isLoadingResultConcepts) {
     return (
-      <div className={styles.loaderContainer}>
-        <InlineLoading
-          className={styles.loader}
-          description={t('loadingTestDetails', 'Loading test details') + '...'}
-          iconDescription={t('loading', 'Loading')}
-          status="active"
-        />
-      </div>
+      <Workspace2
+        title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
+      >
+        <div className={styles.loaderContainer}>
+          <InlineLoading
+            className={styles.loader}
+            description={t('loadingTestDetails', 'Loading test details') + '...'}
+            iconDescription={t('loading', 'Loading')}
+            status="active"
+          />
+        </div>
+      </Workspace2>
     );
   }
 
@@ -179,12 +184,19 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     };
 
     // Handle update operation for completed lab order results
-    if (order.fulfillerStatus === 'COMPLETED') {
-      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-        const completeLabResult = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
-        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-        return updateObservation(obs?.uuid, { value });
-      });
+    if (isEditMode) {
+      const updateTasks = Object.entries(formValues)
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([conceptUuid, value]) => {
+          let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
+          if (!obs) {
+            for (const result of completeLabResults) {
+              obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
+              if (obs) break;
+            }
+          }
+          return updateObservation(obs?.uuid, { value });
+        });
       const updateResults = await Promise.allSettled(updateTasks);
       const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
         if (curr.status === 'rejected') {
@@ -262,7 +274,10 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   };
 
   return (
-    <Workspace2 title={t('enterTestResults', 'Enter test results')} hasUnsavedChanges={isDirty}>
+    <Workspace2
+      title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
+      hasUnsavedChanges={isDirty}
+    >
       <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
         <Layer level={isTablet ? 1 : 0}>
           <div className={styles.grid}>
@@ -271,6 +286,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 {!isLoading ? (
                   conceptArray.map((c) => (
                     <ResultFormField
+                      key={c.uuid}
                       defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
                       concept={c}
                       control={control as unknown as Control<Record<string, unknown>>}
@@ -279,7 +295,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 ) : (
                   <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
                 )}
-                {order.fulfillerStatus !== 'COMPLETED' && (
+                {!isEditMode && (
                   <div className={orderStyles.orderBasketContainer}>
                     <div className={styles.heading}>
                       <span>{t('addOrderTests', 'Add Tests to this order')}</span>

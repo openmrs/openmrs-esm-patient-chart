@@ -210,9 +210,7 @@ const Trendline: React.FC<TrendlineProps> = ({
           const rangeLabelText = t('trendlineTooltipRange', 'Range');
           return `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
             <div style="font-size:1rem; line-height:1.4">${valueLabel}: <span>${value} ${leftAxisTitle}</span></div>
-            <div style="font-size:0.875rem; font-weight:500; margin-top:0.125rem">${rangeLabelText}: ${
-              rangeLabel || '--'
-            }</div>
+            <div style="font-size:0.875rem; font-weight:500; margin-top:0.125rem">${rangeLabelText}: ${rangeLabel || '--'}</div>
             <div style="color:#6F6F6F; font-size:0.875rem; font-weight:500; margin-top:0.125rem">${dateLabel}: ${formatDate(date)}</div>
           </div>`;
         },
