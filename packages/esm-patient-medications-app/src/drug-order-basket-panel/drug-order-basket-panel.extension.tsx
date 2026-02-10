@@ -85,7 +85,7 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
       <div className={classNames(isTablet ? styles.tabletContainer : styles.desktopContainer)}>
         <div className={styles.iconAndLabel}>
           <RxIcon isTablet={isTablet} />
-          <h4 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h4>
+          <h2 className={styles.heading}>{`${t('drugOrders', 'Drug orders')} (${orders.length})`}</h2>
         </div>
         <div className={styles.buttonContainer}>
           <Button

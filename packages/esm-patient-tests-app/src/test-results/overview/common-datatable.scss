@@ -10,7 +10,7 @@
     margin: layout.$spacing-02 0;
   }
 
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     max-width: 50%;
   }
@@ -18,7 +18,7 @@
 
 .tableContainer {
   &.desktop {
-    h4 {
+    h2 {
       color: $text-02;
     }
   }

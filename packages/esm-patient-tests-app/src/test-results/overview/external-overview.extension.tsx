@@ -60,7 +60,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
               return (
                 <div className={styles.widgetCard}>
                   <div className={styles.externalOverviewHeader}>
-                    <h4 className={classNames(styles.productiveHeading03, styles.text02)}>{cardTitle}</h4>
+                    <h2 className={classNames(styles.productiveHeading03, styles.text02)}>{cardTitle}</h2>
                     <Button
                       kind="ghost"
                       renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (

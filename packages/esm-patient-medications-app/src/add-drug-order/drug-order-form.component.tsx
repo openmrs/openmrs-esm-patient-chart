@@ -333,7 +333,7 @@ export function DrugOrderForm({
                 subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
               />
             )}
-            <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
+            <h2 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h2>
             <div ref={medicationInfoHeaderRef}>
               <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
             </div>

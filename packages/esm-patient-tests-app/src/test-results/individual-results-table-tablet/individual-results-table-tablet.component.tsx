@@ -205,12 +205,12 @@ const IndividualResultsTableTabletHeader: React.FC<IndividualResultsTableTabletH
         <>
           <div className={styles.flexBaseline}>
             {searchTerm && totalSearchResults > 0 && (
-              <h4 className={styles.heading}>
+              <h3 className={styles.heading}>
                 {t('searchResultsTextFor', '{{count}} search results for {{searchTerm}}', {
                   searchTerm,
                   count: totalSearchResults,
                 })}
-              </h4>
+              </h3>
             )}
             {searchTerm ? (
               <Button className={styles.clearButton} kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>

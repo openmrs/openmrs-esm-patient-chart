@@ -139,7 +139,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <div className={styles.cardTitle}>
-              <h4 className={styles.resultType}>{headerTitle}</h4>
+              <h3 className={styles.resultType}>{headerTitle}</h3>
               <div className={styles.displayFlex}>
                 <span className={styles.date}>
                   {formatDate(parseDate(subRows.date), { mode: 'standard', time: false })}
