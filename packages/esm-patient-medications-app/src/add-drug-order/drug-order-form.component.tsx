@@ -12,6 +12,7 @@ import {
   FormLabel,
   Grid,
   IconButton,
+  InlineLoading,
   InlineNotification,
   Layer,
   NumberInput,
@@ -51,7 +52,12 @@ import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import { useActivePatientOrders } from '../api';
 import styles from './drug-order-form.scss';
-import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
+import {
+  type CodedIndication,
+  type MedicationOrderFormData,
+  useDrugOrderForm,
+  useIndicationSearch,
+} from './drug-order-form.resource';
 
 export interface DrugOrderFormProps {
   /**
@@ -122,7 +128,7 @@ export function DrugOrderForm({
   workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit } = useConfig<ConfigObject>();
+  const { daysDurationUnit, useCodedIndication } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
@@ -168,6 +174,11 @@ export function DrugOrderForm({
   const unitValue = watch('unit')?.value;
   const dosage = watch('dosage');
   const startDate = watch('startDate');
+  const selectedIndicationCoded = watch('indicationCoded');
+
+  const [indicationSearchTerm, setIndicationSearchTerm] = useState('');
+  const { searchResults: codedIndications, isSearching: isSearchingIndications } =
+    useIndicationSearch(indicationSearchTerm);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -187,6 +198,7 @@ export function DrugOrderForm({
       quantityUnits: data.quantityUnits,
       numRefills: data.numRefills,
       indication: data.indication,
+      indicationCoded: data.indicationCoded,
       frequency: data.frequency,
       startDate: data.startDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
@@ -618,15 +630,43 @@ export function DrugOrderForm({
               <Grid className={styles.gridRow}>
                 <Column lg={16} md={6} sm={4}>
                   <InputWrapper>
-                    <ControlledFieldInput
-                      control={control}
-                      name="indication"
-                      type="textInput"
-                      id="indication"
-                      labelText={t('indication', 'Indication')}
-                      placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                      maxLength={150}
-                    />
+                    {useCodedIndication ? (
+                      <>
+                        <ControlledFieldInput
+                          control={control}
+                          name="indicationCoded"
+                          type="comboBox"
+                          id="indicationCoded"
+                          titleText={t('indication', 'Indication')}
+                          placeholder={t('searchForIndication', 'Search for indication e.g "Hypertension"')}
+                          items={codedIndications}
+                          itemToString={(item: CodedIndication) => item?.display ?? ''}
+                          shouldFilterItem={() => true}
+                          onInputChange={(input: string | { inputValue: string }) => {
+                            if (typeof input === 'string') {
+                              setIndicationSearchTerm(input);
+                            } else if (input && typeof input.inputValue === 'string') {
+                              setIndicationSearchTerm(input.inputValue);
+                            }
+                          }}
+                        />
+                        {isSearchingIndications && !selectedIndicationCoded && (
+                          <div className={styles.inlineLoader}>
+                            <InlineLoading description={t('searching', 'Searching') + '...'} />
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <ControlledFieldInput
+                        control={control}
+                        name="indication"
+                        type="textInput"
+                        id="indication"
+                        labelText={t('indication', 'Indication')}
+                        placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                        maxLength={150}
+                      />
+                    )}
                   </InputWrapper>
                 </Column>
               </Grid>

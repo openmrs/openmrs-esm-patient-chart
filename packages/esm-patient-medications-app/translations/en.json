@@ -97,6 +97,8 @@
   "saveOrder": "Save order",
   "searchAgain": "search again",
   "searchFieldPlaceholder": "Search for a drug or orderset (e.g. \"Aspirin\")",
+  "searchForIndication": "Search for indication e.g \"Hypertension\"",
+  "searching": "Searching",
   "searchResultsMatchesForTerm_one": "{{count}} result for \"{{searchTerm}}\"",
   "searchResultsMatchesForTerm_other": "{{count}} results for \"{{searchTerm}}\"",
   "selectFrequencyErrorMessage": "Frequency is required",

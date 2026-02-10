@@ -165,6 +165,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      orderReason: order.indicationCoded?.uuid,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -193,6 +194,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      orderReason: order.indicationCoded?.uuid,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -221,6 +223,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
+      orderReason: order.indicationCoded?.uuid,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -234,6 +237,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       orderer: orderingProviderUuid,
       concept: order.drug.concept.uuid,
       drug: order.drug.uuid,
+      orderReason: order.indicationCoded?.uuid,
       orderReasonNonCoded: null,
     };
   } else {
@@ -292,6 +296,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     pillsDispensed: order.quantity,
     numRefills: order.numRefills,
     indication: order.orderReasonNonCoded,
+    indicationCoded: order.orderReason,
     quantityUnits: order.quantityUnits
       ? {
           value: order.quantityUnits.display,

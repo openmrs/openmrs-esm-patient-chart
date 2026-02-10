@@ -11,15 +11,18 @@ import {
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
 import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
+import * as esmFramework from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
+import { useIndicationSearch } from './drug-order-form.resource';
 
 const mockCloseWorkspace = jest.fn();
 const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 const mockUseSession = jest.mocked(useSession);
 const mockUseDrugSearch = jest.mocked(useDrugSearch);
 const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
+const mockUseIndicationSearch = jest.mocked(useIndicationSearch);
 const usePatientOrdersMock = jest.fn();
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -37,6 +40,11 @@ jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
   useDrugSearch: jest.fn(),
   useDrugTemplate: jest.fn(),
+}));
+
+jest.mock('./drug-order-form.resource', () => ({
+  ...jest.requireActual('./drug-order-form.resource'),
+  useIndicationSearch: jest.fn(),
 }));
 
 jest.mock('../api/api', () => ({
@@ -68,6 +76,12 @@ describe('AddDrugOrderWorkspace drug search', () => {
     usePatientOrdersMock.mockReturnValue({
       isLoading: false,
       data: [],
+    });
+
+    mockUseIndicationSearch.mockReturnValue({
+      searchResults: [],
+      isSearching: false,
+      error: null,
     });
   });
 
@@ -180,6 +194,68 @@ describe('AddDrugOrderWorkspace drug search', () => {
         }),
       ]),
     );
+  });
+
+  test('saves coded indication when configured to use coded indication', async () => {
+    const user = userEvent.setup();
+
+    // Ensure the medications app is configured to use coded indication
+    const useConfigSpy = jest.spyOn(esmFramework, 'useConfig').mockReturnValue({
+      daysDurationUnit: {
+        uuid: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        display: 'Days',
+      },
+      drugOrderTypeUUID: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+      showPrintButton: false,
+      debounceDelayInMs: 300,
+      requireIndication: false,
+      useCodedIndication: true,
+    } as any);
+
+    mockUseIndicationSearch.mockReturnValue({
+      searchResults: [
+        {
+          uuid: 'diagnosis-uuid',
+          display: 'Hypertension',
+        },
+      ],
+      isSearching: false,
+      error: null,
+    });
+
+    renderAddDrugOrderWorkspace();
+
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const openFormButton = within(aspirin81Div).getByText(/Order form/i);
+    await user.click(openFormButton);
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+
+    const indicationCombo = screen.getByRole('combobox', { name: 'Indication' });
+    await user.click(indicationCombo);
+    await user.click(screen.getByText('Hypertension'));
+
+    const saveFormButton = screen.getByText(/Save order/i);
+    await user.click(saveFormButton);
+
+    await waitFor(() =>
+      expect(hookResult.current.orders).toEqual([
+        expect.objectContaining({
+          startDate: expect.any(Date),
+          indicationCoded: {
+            uuid: 'diagnosis-uuid',
+            display: 'Hypertension',
+          },
+        }),
+      ]),
+    );
+
+    useConfigSpy.mockRestore();
   });
 });
 
