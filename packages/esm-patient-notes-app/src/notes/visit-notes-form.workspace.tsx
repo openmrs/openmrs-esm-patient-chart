@@ -151,7 +151,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const {
     clearErrors,
     control,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
     setValue,
     watch,
@@ -497,8 +497,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
 
   const onError = (errors) => console.error(errors);
 
+  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+
   return (
-    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={isDirty}>
+    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
@@ -722,7 +724,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
             className={styles.button}
             kind="primary"
             onClick={() => handleSubmit}
-            disabled={isSubmitting}
+            disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {isSubmitting ? (
