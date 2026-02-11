@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const VitalsAndBiometricsFormSchema = z
   .object({
+    encounterDatetime: z.string().optional(),
     systolicBloodPressure: z.number(),
     diastolicBloodPressure: z.number(),
     respiratoryRate: z.number(),

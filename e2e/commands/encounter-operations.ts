@@ -34,8 +34,9 @@ export const createEncounter = async (
   patientId: string,
   providerId: string,
   visit: Visit,
+  selectedDate?: string,
 ): Promise<Encounter> => {
-  const encounterDatetime = dayjs().format();
+  const encounterDatetime = selectedDate ? dayjs(selectedDate).format() : dayjs().format();
   const encounterRes = await api.post('encounter', {
     data: {
       encounterDatetime,

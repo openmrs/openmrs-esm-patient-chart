@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,11 +14,9 @@ import {
   DatePickerInput,
 } from '@carbon/react';
 import {
-  ExtensionSlot,
   showSnackbar,
   useAbortController,
   useConfig,
-  useLayoutType,
   useSession,
   type Visit,
   Workspace2,
@@ -26,7 +24,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { calculateBodyMassIndex, isValueWithinReferenceRange } from './vitals-biometrics-form.utils';
+import { calculateBodyMassIndex } from './vitals-biometrics-form.utils';
 import {
   createOrUpdateVitalsAndBiometrics,
   invalidateCachedVitalsAndBiometrics,
@@ -55,7 +53,6 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   const config = useConfig<ConfigObject>();
   const session = useSession();
   const { conceptUnits, isLoading: isLoadingConceptUnits } = useConceptUnits();
-  const { conceptRanges } = useVitalsConceptMetadata(patientUuid);
   const {
     getRefinedInitialValues,
     isLoading: isLoadingEncounter,

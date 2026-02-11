@@ -2242,6 +2242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@epic-web/invariant@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@epic-web/invariant@npm:1.0.0"
+  checksum: 10/28b36a7447f60b84f9d6a23571480042170ef4239a577577ad8447f64a2e4f1a4e57e6fe1b592e61534c5ab53ff67776130e6c88a68cbd997eb6e9c9759a5934
+  languageName: node
+  linkType: hard
+
 "@esbuild/aix-ppc64@npm:0.25.11":
   version: 0.25.11
   resolution: "@esbuild/aix-ppc64@npm:0.25.11"
@@ -5441,6 +5448,7 @@ __metadata:
     "@carbon/charts-react": "npm:^1.27.0"
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
+    cross-env: "npm:^10.1.0"
     lodash-es: "npm:^4.17.23"
     webpack: "npm:^5.99.9"
   peerDependencies:
@@ -12143,6 +12151,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cross-env@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "cross-env@npm:10.1.0"
+  dependencies:
+    "@epic-web/invariant": "npm:^1.0.0"
+    cross-spawn: "npm:^7.0.6"
+  bin:
+    cross-env: dist/bin/cross-env.js
+    cross-env-shell: dist/bin/cross-env-shell.js
+  checksum: 10/0e5d8bdefbbcd000460b69755e0eeb22953510abac8375e4f8b638ff7c45406141acfd57b8a4c1d1cf0b5ea42f33451b302062fb9b34408753b4d465e901b845
+  languageName: node
+  linkType: hard
+
 "cross-env@npm:^7.0.3":
   version: 7.0.3
   resolution: "cross-env@npm:7.0.3"
@@ -12174,6 +12195,17 @@ __metadata:
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
   checksum: 10/e1a13869d2f57d974de0d9ef7acbf69dc6937db20b918525a01dacb5032129bd552d290d886d981e99f1b624cb03657084cc87bd40f115c07ecf376821c729ce
+  languageName: node
+  linkType: hard
+
+"cross-spawn@npm:^7.0.6":
+  version: 7.0.6
+  resolution: "cross-spawn@npm:7.0.6"
+  dependencies:
+    path-key: "npm:^3.1.0"
+    shebang-command: "npm:^2.0.0"
+    which: "npm:^2.0.1"
+  checksum: 10/0d52657d7ae36eb130999dffff1168ec348687b48dd38e2ff59992ed916c88d328cf1d07ff4a4a10bc78de5e1c23f04b306d569e42f7a2293915c081e4dfee86
   languageName: node
   linkType: hard
 

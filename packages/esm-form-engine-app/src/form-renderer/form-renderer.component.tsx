@@ -7,7 +7,6 @@ import { type FormRendererProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
-
 /**
  * This component is a thin wrapper to load an O3 form from the server,
  * then display it using the React form engine
