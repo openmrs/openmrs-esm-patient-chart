@@ -10,6 +10,7 @@ import {
 } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
+import dayjs from 'dayjs';
 import { type ConfigObject } from '../config-schema';
 import {
   assessValue,
@@ -27,7 +28,6 @@ import type {
 
 const pageSize = 100;
 
-/** We use this as the first value to the SWR key to be able to invalidate all relevant cached entries */
 const swrKeyNeedle = Symbol('vitalsAndBiometrics');
 const encounterRepresentation =
   'custom:(uuid,encounterDatetime,encounterType:(uuid,display),obs:(uuid,concept:(uuid,display),value,interpretation))';
@@ -82,7 +82,6 @@ interface PartialEncounter extends OpenmrsResource {
 }
 
 function getInterpretationKey(header: string) {
-  // Reason for `Render` string is to match the column header in the table
   return `${header}RenderInterpretation`;
 }
 
@@ -171,16 +170,9 @@ export const withUnit = (label: string, unit: string | null | undefined) => {
   return `${label} ${unit ? `(${unit})` : ''}`;
 };
 
-// We need to track a bound mutator for basically every hook, because there does not appear to be
-// a way to invalidate an SWRInfinite key that works other than using the bound mutator
-// Each mutator is stored in the vitalsHooksMutates map and removed (via a useEffect hook) when the
-// hook is unmounted.
 let vitalsHooksCounter = 0;
 const vitalsHooksMutates = new Map<number, ReturnType<typeof useSWRInfinite<VitalsFetchResponse>>['mutate']>();
 
-/**
- * Hook to get concepts for vitals, biometrics or both
- */
 export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   const { concepts } = useConfig<ConfigObject>();
 
@@ -208,13 +200,6 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   return conceptUuids;
 }
 
-/**
- * Hook to get the vitals and / or biometrics for a patient
- *
- * @param patientUuid The uuid of the patient to get the vitals for
- * @param mode Either 'vitals', to load only vitals, 'biometrics', to load only biometrics or 'both' to load both
- * @returns An SWR-like structure that includes the cleaned-up vitals
- */
 export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiometricsMode = 'vitals') {
   const conceptUuids = useVitalsOrBiometricsConcepts(mode);
   const { concepts } = useConfig<ConfigObject>();
@@ -237,7 +222,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
     handleFetch,
   );
 
-  // see the comments above for why this is here
   useEffect(() => {
     const index = ++vitalsHooksCounter;
     vitalsHooksMutates.set(index, mutate);
@@ -268,7 +252,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
         default:
-          return ''; // or throw an error for unknown conceptUuid
+          return '';
       }
     },
     [
@@ -358,9 +342,6 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   };
 }
 
-/**
- * Hook to get the vitals and biometrics for a patient associated with a specific encounter
- */
 export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
   const { concepts } = useConfig<ConfigObject>();
   const fieldNameSuffix = 'Uuid';
@@ -406,10 +387,6 @@ export function useEncounterVitalsAndBiometrics(encounterUuid: string) {
   };
 }
 
-/**
- * Fetcher for the useVitalsAndBiometricsHook
- * @internal
- */
 function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAndBiometricsSwrKey) {
   if (prevPageData && !prevPageData?.data?.link.some((link) => link.relation === 'next')) {
     return null;
@@ -430,10 +407,6 @@ function handleFetch({ patientUuid, conceptUuids, page, prevPageData }: VitalsAn
   return openmrsFetch<VitalsResponse>(url + urlSearchParams.toString());
 }
 
-/**
- * Mapper that converts a FHIR Observation resource into a MappedVitals object.
- * @internal
- */
 function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals {
   const referenceRanges = {
     uuid: resource?.code?.coding?.[0]?.code,
@@ -468,11 +441,6 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   return {
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
-    // Use Observation.interpretation from FHIR when available (preferred).
-    // Fallback to calculation for backward compatibility: existing observations may not have
-    // interpretation set if they were created before interpretation was added, or if reference
-    // ranges weren't available at creation time (OpenMRS core only sets interpretation when
-    // ObsReferenceRange is present).
     interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
       ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
@@ -488,12 +456,16 @@ export function createOrUpdateVitalsAndBiometrics(
   location: string,
   vitalsAndBiometricsObs: Array<OpenmrsResource>,
   abortController: AbortController,
+  encounterDatetime?: string,
 ) {
   const url = encounterUuid ? `${restBaseUrl}/encounter/${encounterUuid}` : `${restBaseUrl}/encounter`;
+
+  const formattedDate = encounterDatetime ? dayjs(encounterDatetime).format() : undefined;
 
   const encounter = {
     patient: patientUuid,
     obs: vitalsAndBiometricsObs,
+    ...(formattedDate && { encounterDatetime: formattedDate }),
   };
   if (!encounterUuid) {
     encounter['location'] = location;
@@ -522,9 +494,6 @@ function extractEncounterUuid(encounter: FHIRResource['resource']['encounter']):
   return encounter.reference.split('/')[1];
 }
 
-/**
- * Invalidate all useVitalsAndBiometrics hooks data, to force them to reload
- */
 export async function invalidateCachedVitalsAndBiometrics() {
   vitalsHooksMutates.forEach((mutate) => mutate());
 }
