@@ -23,6 +23,7 @@
   "drugOrders": "drug orders",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "Edit hasil",
+  "editTestResults": "Edit test results",
   "endDate": "Tanggal berakhir",
   "enterTestResults": "Masukkan hasil tes",
   "error": "Kesalahan",
