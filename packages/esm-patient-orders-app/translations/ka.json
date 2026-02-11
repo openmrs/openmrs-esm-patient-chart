@@ -23,6 +23,7 @@
   "drugOrders": "drug orders",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "შედეგების ჩასწორება",
+  "editTestResults": "Edit test results",
   "endDate": "დასრულების თარიღი",
   "enterTestResults": "შეიყვანეთ ტესტის შედეგები",
   "error": "შეცდომა",
