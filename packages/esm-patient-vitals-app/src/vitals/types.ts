@@ -22,7 +22,8 @@ export interface VitalsTableHeader {
     | 'bloodPressureRender'
     | 'pulseRender'
     | 'respiratoryRateRender'
-    | 'spo2Render';
+    | 'spo2Render'
+    | 'note';
   header: string;
   isSortable?: boolean;
   sortFunc: (valueA: VitalsTableRow, valueB: VitalsTableRow) => number;
