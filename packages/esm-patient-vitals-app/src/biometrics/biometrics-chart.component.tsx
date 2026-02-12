@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type PatientVitalsAndBiometrics } from '../common';
+import { withUnit, type PatientVitalsAndBiometrics } from '../common';
 import styles from './biometrics-chart.scss';
 
 type BiometricType = 'weight' | 'height' | 'bmi';
@@ -19,42 +19,60 @@ interface BiometricsChartProps {
 
 interface BiometricChartData {
   groupName: BiometricType;
+  label: string;
   title: string;
+  unit: string;
   value: number | string;
 }
 
 const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config, showBmi }) => {
   const { t } = useTranslation();
+  const labelId = useId();
   const { bmiUnit } = config.biometrics;
+  const weightUnit = conceptUnits.get(config.concepts.weightUuid) ?? '';
+  const heightUnit = conceptUnits.get(config.concepts.heightUuid) ?? '';
+
   const [selectedBiometrics, setSelectedBiometrics] = useState<BiometricChartData>({
-    title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
+    label: t('weight', 'Weight'),
+    title: withUnit(t('weight', 'Weight'), weightUnit),
+    unit: weightUnit,
     value: 'weight',
     groupName: 'weight',
   });
 
   const biometrics: {
     id: BiometricType;
+    label: string;
     title: string;
+    unit: string;
     value: BiometricType;
   }[] = [
     {
       id: 'weight',
-      title: `${t('weight', 'Weight')} (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
+      label: t('weight', 'Weight'),
+      title: withUnit(t('weight', 'Weight'), weightUnit),
+      unit: weightUnit,
       value: 'weight',
     },
     {
       id: 'height',
-      title: `${t('height', 'Height')} (${conceptUnits.get(config.concepts.heightUuid) ?? ''})`,
+      label: t('height', 'Height'),
+      title: withUnit(t('height', 'Height'), heightUnit),
+      unit: heightUnit,
       value: 'height',
     },
     showBmi && {
       id: 'bmi',
-      title: `${t('bmi', 'BMI')} (${bmiUnit})`,
+      label: t('bmi', 'BMI'),
+      title: withUnit(t('bmi', 'BMI'), bmiUnit),
+      unit: bmiUnit,
       value: 'bmi',
     },
   ].filter(Boolean) as Array<{
     id: BiometricType;
+    label: string;
     title: string;
+    unit: string;
     value: BiometricType;
   }>;
 
@@ -101,12 +119,13 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         },
       },
       tooltip: {
-        customHTML: ([{ value, date }]) =>
-          `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
-            parseDate(date),
-            { year: true },
-          )} -
-          <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
+        customHTML: ([{ value, date }]) => {
+          const dateLabel = t('date', 'Date');
+          return `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
+              <div style="font-size:1rem; line-height:1.4">${selectedBiometrics.label}: <span>${value} ${selectedBiometrics.unit}</span></div>
+              <div style="color:#6F6F6F; font-size:0.875rem; font-weight:500; margin-top:0.125rem">${dateLabel}: ${formatDate(parseDate(date), { year: true })}</div>
+            </div>`;
+        },
       },
       toolbar: {
         enabled: true,
@@ -144,12 +163,12 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
   return (
     <div className={styles.biometricChartContainer}>
       <div className={styles.biometricsArea}>
-        <label className={styles.biometricLabel} htmlFor="biometrics-chart-radio-group">
+        <label className={styles.biometricLabel} id={labelId}>
           {t('biometricDisplayed', 'Biometric displayed')}
         </label>
         <TabsVertical>
-          <TabListVertical aria-label="Biometrics tabs">
-            {biometrics.map(({ id, title, value }) => (
+          <TabListVertical aria-labelledby={labelId}>
+            {biometrics.map(({ id, label, title, unit, value }) => (
               <Tab
                 className={classNames(styles.tab, styles.bodyLong01, {
                   [styles.selectedTab]: selectedBiometrics.title === title,
@@ -158,8 +177,10 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
                 key={id}
                 onClick={() =>
                   setSelectedBiometrics({
-                    title: title,
-                    value: value,
+                    label,
+                    title,
+                    unit,
+                    value,
                     groupName: id,
                   })
                 }

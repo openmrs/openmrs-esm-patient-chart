@@ -169,29 +169,37 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
 
 function RefreshDataButton({ isTablet, patientUuid, t }: RefreshDataButtonProps) {
   const { cache, mutate } = useSWRConfig();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+
     // The data-fetching hooks use useSWRInfinite, which stores cache keys prefixed
     // with "$inf$". SWR's mutate() with a filter function explicitly skips $inf$ keys,
     // so we iterate over cache keys directly and mutate matching keys by exact string.
+    const keys: string[] = [];
     for (const key of cache.keys()) {
       const isPatientKey = key.includes(`patient=${patientUuid}`);
 
       if (isPatientKey && (key.includes(`${restBaseUrl}/obstree`) || key.includes('/ws/fhir2/R4/Observation'))) {
-        mutate(key);
+        keys.push(key);
       }
     }
+
+    await Promise.allSettled(keys.map((key) => mutate(key)));
+    setIsRefreshing(false);
   }, [cache, mutate, patientUuid]);
 
   return (
     <Button
       className={styles.button}
+      disabled={isRefreshing}
       kind="ghost"
       onClick={handleRefresh}
       renderIcon={RenewIcon}
       size={isTablet ? 'md' : 'sm'}
     >
-      <span>{t('refreshData', 'Refresh data')}</span>
+      <span>{isRefreshing ? t('refreshingData', 'Refreshing data') + '...' : t('refreshData', 'Refresh data')}</span>
     </Button>
   );
 }
