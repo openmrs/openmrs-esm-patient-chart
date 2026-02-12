@@ -52,7 +52,7 @@ export const configSchema = {
       _type: Type.Boolean,
       _default: false,
       _description:
-        'Whether to use an Ampath form as the vitals and biometrics form. If set to true, encounterUuid and formUuid must be set as well.',
+        'Whether to use the form engine for vitals and biometrics. If set to true, formUuid must be configured (formName is optional).',
     },
     encounterTypeUuid: {
       _type: Type.UUID,

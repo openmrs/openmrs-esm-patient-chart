@@ -1,4 +1,5 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { EncounterResourceService } from './encounter-resource.service';
@@ -11,12 +12,12 @@ describe('EncounterResourceService', () => {
   let service: EncounterResourceService;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LocalStorageService],
-      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      providers: [provideHttpClient(), provideHttpClientTesting(), LocalStorageService],
+      imports: [OpenmrsApiModule],
     });
 
-    service = TestBed.get(EncounterResourceService);
-    httpMock = TestBed.get(HttpTestingController);
+    service = TestBed.inject(EncounterResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -55,7 +56,6 @@ describe('EncounterResourceService', () => {
     };
 
     it('should return null when PatientUuid not specified', () => {
-      const uuid = '08feb5b6-1352-11df-a1f1-0026b9348838';
       httpMock.expectNone({});
 
       const result = service.getEncountersByPatientUuid(null);
@@ -131,7 +131,7 @@ describe('EncounterResourceService', () => {
         'concept:(uuid,uuid,name:(display)),value:ref,groupMembers))';
 
       service.getEncounterByUuid(patientUuid).subscribe((res) => {
-        expect(res).toEqual(encounterResponse);
+        expect(res).toEqual(encounterResponse as any);
       });
       const request = httpMock.expectOne(service.getUrl() + 'encounter/' + patientUuid + '?v=' + customDefaultRep);
       expect(request.request.method).toBe('GET');
@@ -221,7 +221,7 @@ describe('EncounterResourceService', () => {
     });
     xit('should call the right endpoint', () => {
       service.saveEncounter(newEncounterMock).subscribe((res) => {
-        expect(res).toEqual(newEncounterResponse);
+        expect(res).toEqual(newEncounterResponse as any);
       });
 
       const request = httpMock.expectOne(service.getUrl() + 'encounter');
@@ -270,7 +270,7 @@ describe('EncounterResourceService', () => {
     });
     it('should call the right endpoint', () => {
       service.updateEncounter(uuid, encounterMock).subscribe((res) => {
-        expect(res).toEqual(encounterResponse);
+        expect(res).toEqual(encounterResponse as any);
       });
       const request = httpMock.expectOne(service.getUrl() + 'encounter/' + uuid);
       expect(request.request.method).toBe('POST');
@@ -278,7 +278,7 @@ describe('EncounterResourceService', () => {
     });
   });
 
-  describe('Should Deconste encounters', () => {
+  describe('Should delete encounters', () => {
     const uuid = 'uuid';
     it('should return null when params are not specified', () => {
       httpMock.expectNone(service.getUrl() + 'encounter/' + uuid + '?!purge');
@@ -290,12 +290,12 @@ describe('EncounterResourceService', () => {
 
     it('should call the right endpoint', () => {
       service.voidEncounter(uuid).subscribe((res) => {
-        expect(res).toBe('deconsted');
+        expect(res).toBe('deleted');
       });
 
       const request = httpMock.expectOne(service.getUrl() + 'encounter/' + uuid + '?!purge');
       expect(request.request.method).toBe('DELETE');
-      request.flush('deconsted');
+      request.flush('deleted');
     });
   });
 });
