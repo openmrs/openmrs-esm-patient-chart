@@ -96,12 +96,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
     handleSubmit,
     watch,
     setValue,
-    formState: { isDirty, isSubmitting, dirtyFields },
+    formState: { dirtyFields, isSubmitting },
     reset,
   } = useForm<VitalsBiometricsFormData>({
     mode: 'all',
     resolver: zodResolver(VitalsAndBiometricsFormSchema),
   });
+
+  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
   useEffect(() => {
     if (formContext === 'editing' && !isLoadingInitialValues && initialFieldValuesMap) {
@@ -619,7 +621,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
             className={styles.button}
             kind="primary"
             onClick={handleSubmit(savePatientVitalsAndBiometrics, onError)}
-            disabled={!isDirty || isSubmitting}
+            disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {t('saveAndClose', 'Save and close')}
@@ -635,7 +637,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
             ? t('editVitalsAndBiometrics', 'Edit Vitals and Biometrics')
             : t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
         }
-        hasUnsavedChanges={isDirty}
+        hasUnsavedChanges={hasUserUnsavedChanges}
       >
         {formElement}
       </Workspace2>
