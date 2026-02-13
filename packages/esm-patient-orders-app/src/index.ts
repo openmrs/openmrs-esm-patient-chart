@@ -74,7 +74,7 @@ export const exportedAddGeneralOrderWorkspace = getAsyncLifecycle(
   options,
 );
 
-export const drugPinButton = getAsyncLifecycle(() => import('./order-favorites/drug-pin-button.component'), options);
+export const drugPinButton = getAsyncLifecycle(() => import('./order-favorites/drug-actions-menu.component'), options);
 
 export const drugFavoritesModal = getAsyncLifecycle(() => import('./order-favorites/drug-favorites.modal'), options);
 

@@ -65,11 +65,6 @@
       "name": "drug-pin-button",
       "component": "drugPinButton",
       "slot": "drug-search-result-actions-slot"
-    },
-    {
-      "name": "drug-pin-button-order-form",
-      "component": "drugPinButton",
-      "slot": "medication-info-slot"
     }
   ],
   "workspaces2": [

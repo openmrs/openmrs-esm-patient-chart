@@ -178,21 +178,24 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
                 </div>
               )}
 
-              {renderAttributeTag('strength', t('strength', 'Strength'), attributes.resolvedValues.strength, true)}
+              {renderAttributeTag('strength', t('strength', 'Strength'), attributes.resolvedValues.strength)}
               {renderAttributeTag('unit', t('doseUnit', 'Dose unit'), attributes.resolvedValues.unit)}
-              {renderAttribute('dose', t('dose', 'Dose'), attributes.resolvedValues.dose, attributes.hasPrefilledDose)}
-              {renderAttribute(
-                'route',
-                t('route', 'Route'),
-                attributes.resolvedValues.route,
-                attributes.hasPrefilledRoute,
-              )}
-              {renderAttribute(
-                'frequency',
-                t('frequency', 'Frequency'),
-                attributes.resolvedValues.frequency,
-                attributes.hasPrefilledFrequency,
-              )}
+              {!form.isConceptBasedFavorite &&
+                renderAttribute('dose', t('dose', 'Dose'), attributes.resolvedValues.dose, attributes.hasPrefilledDose)}
+              {!form.isConceptBasedFavorite &&
+                renderAttribute(
+                  'route',
+                  t('route', 'Route'),
+                  attributes.resolvedValues.route,
+                  attributes.hasPrefilledRoute,
+                )}
+              {!form.isConceptBasedFavorite &&
+                renderAttribute(
+                  'frequency',
+                  t('frequency', 'Frequency'),
+                  attributes.resolvedValues.frequency,
+                  attributes.hasPrefilledFrequency,
+                )}
             </div>
 
             <div>

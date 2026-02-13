@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { showSnackbar, useConfig, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
-import { addDrugFavorite, removeDrugFavorite, getDrugFavorite } from './drug-favorites.resource';
+import { addDrugFavorite, removeDrugFavorite } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { useFormAttributes } from './useFormAttributes';
 import {
@@ -33,12 +33,8 @@ export function useFavoriteForm({
   const prefilled = initialAttrs || existingFavorite?.attributes;
 
   // Determine edit mode and favorite type
-  const isEditingFromList = Boolean(existingFavorite);
-  const existing = existingFavorite || getDrugFavorite(favorites, drugUuid, conceptUuid);
-  const isEditing = Boolean(existing);
-  const isConceptBasedFavorite = existingFavorite
-    ? Boolean(existingFavorite.conceptUuid && !existingFavorite.drugUuid)
-    : Boolean(conceptUuid && !drugUuid);
+  const isEditing = Boolean(existingFavorite);
+  const existing = existingFavorite;
 
   // Fetch drug if we only have drugUuid (from edit flow)
   const { data: fetchedDrugData, isLoading: isLoadingDrug } = useSWRImmutable<{ data: Drug }>(
@@ -53,7 +49,9 @@ export function useFavoriteForm({
   const attributes = useFormAttributes({
     conceptName,
     conceptUuid,
-    isConceptBased: isConceptBasedFavorite,
+    isConceptBased: existingFavorite
+      ? Boolean(existingFavorite.conceptUuid && !existingFavorite.drugUuid)
+      : Boolean(conceptUuid && !drugUuid),
     initialAttributes: existing?.attributes,
     effectiveDrug,
     strength: prefilled?.strength,
@@ -62,6 +60,10 @@ export function useFavoriteForm({
     route: prefilled?.route,
     frequency: prefilled?.frequency,
   });
+
+  const isConceptBasedFavorite = useMemo(() => {
+    return !attributes.selectedAttributes.strength;
+  }, [attributes.selectedAttributes.strength]);
 
   const computedName = useMemo(() => {
     if (attributes.selectedStrengthDrug) return attributes.selectedStrengthDrug.display || '';
@@ -114,13 +116,14 @@ export function useFavoriteForm({
       attributes.resolvedValues,
       attributes.resolvedUuids,
       drugForSave,
+      isSpecificFavorite,
     );
 
     const newFavorite = buildFavoriteOrder(isSpecificFavorite, drugForSave, computedName, favoriteAttributes);
 
     // Handle type conversion if editing and switching between concept-based and drug-specific
     let baseFavorites = favorites;
-    if (isEditingFromList && existingFavorite && isConvertingFavoriteType(existingFavorite, isSpecificFavorite)) {
+    if (existingFavorite && isConvertingFavoriteType(existingFavorite, isSpecificFavorite)) {
       baseFavorites = removeDrugFavorite(favorites, existingFavorite.drugUuid, existingFavorite.conceptUuid);
     }
 
@@ -149,7 +152,6 @@ export function useFavoriteForm({
     favorites,
     maxPinnedDrugOrders,
     isEditing,
-    isEditingFromList,
     existingFavorite,
     computedName,
     persistFavorites,

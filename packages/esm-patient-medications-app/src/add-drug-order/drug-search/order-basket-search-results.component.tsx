@@ -195,12 +195,12 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
         >
           <div className={classNames(styles.searchResultTileContent, styles.text02)}>
             <div className={styles.drugNameRow}>
-              <ExtensionSlot name="drug-search-result-actions-slot" state={{ drug, orderItem }} />
               <p className={styles.drugNameText}>
                 <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
                 {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
                 {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
               </p>
+              <ExtensionSlot name="drug-search-result-actions-slot" state={{ drug, orderItem }} />
             </div>
             <UserHasAccess privilege="Manage OrderTemplates">
               {fetchingDrugOrderTemplatesError ? (

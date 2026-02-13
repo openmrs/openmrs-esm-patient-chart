@@ -68,16 +68,16 @@
   flex-shrink: 0;
 }
 
+.checkboxWrapper {
+  flex-shrink: 0;
+  width: 1rem;
+}
+
 .pinIcon {
   flex-shrink: 0;
   width: 1rem;
   height: 1rem;
   fill: $text-02;
-}
-
-.pinIconSelected {
-  @extend .pinIcon;
-  fill: $danger;
 }
 
 .itemContent {
@@ -98,13 +98,12 @@
   margin: layout.$spacing-01 0 0 0;
 }
 
-.editButton {
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
 .skeletonCards {
   display: flex;
   flex-direction: column;
   gap: layout.$spacing-03;
+}
+
+.menuItem {
+  max-width: none;
 }

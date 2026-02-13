@@ -2,8 +2,6 @@ import type { Visit } from '@openmrs/esm-framework';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import type { AttributeKey, DrugFavoriteAttributes, DrugFavoriteOrder } from './types';
 
-// List helpers
-
 export function formatDrugInfo(favorite: DrugFavoriteOrder, anyStrengthLabel: string): string {
   const parts: string[] = [];
 
@@ -52,17 +50,21 @@ export function buildBasketItem(
   daysDurationUnit?: { uuid: string; display: string },
 ): DrugOrderBasketItem {
   const attrs = favorite.attributes;
+  const includeManualAttrs = Boolean(favorite.drugUuid);
 
   return {
     action: 'NEW',
     display: drug.display,
     drug,
     commonMedicationName: favorite.displayName,
-    dosage: attrs.dose ? parseFloat(attrs.dose) : null,
+    dosage: includeManualAttrs && attrs.dose ? parseFloat(attrs.dose) : null,
     unit: attrs.unit && attrs.unitUuid ? { value: attrs.unit, valueCoded: attrs.unitUuid } : null,
-    route: attrs.route && attrs.routeUuid ? { value: attrs.route, valueCoded: attrs.routeUuid } : null,
+    route:
+      includeManualAttrs && attrs.route && attrs.routeUuid ? { value: attrs.route, valueCoded: attrs.routeUuid } : null,
     frequency:
-      attrs.frequency && attrs.frequencyUuid ? { value: attrs.frequency, valueCoded: attrs.frequencyUuid } : null,
+      includeManualAttrs && attrs.frequency && attrs.frequencyUuid
+        ? { value: attrs.frequency, valueCoded: attrs.frequencyUuid }
+        : null,
     quantityUnits: drug.dosageForm ? { value: drug.dosageForm.display, valueCoded: drug.dosageForm.uuid } : null,
     isFreeTextDosage: false,
     patientInstructions: '',
@@ -79,28 +81,29 @@ export function buildBasketItem(
   };
 }
 
-// Form helpers
-
 /**
  * Builds the DrugFavoriteAttributes object from selected attributes and resolved values.
- * Only includes attributes that are selected (toggled on).
  *
- * Note: dosageForm is always stored for concept-based favorites to enable
- * instant reconstruction without additional API calls.
+ * Manual attributes (dose, route, frequency) are ONLY included for drug-specific favorites.
+ * Concept-based favorites can only have strength and unit attributes.
+ *
+ * Note: dosageForm is always stored to enable instant reconstruction without additional API calls.
  */
 export function buildFavoriteAttributes(
   selectedAttributes: Record<AttributeKey, boolean>,
   resolvedValues: Record<AttributeKey, string | undefined>,
   resolvedUuids: { unitUuid?: string; routeUuid?: string; frequencyUuid?: string },
   drugForSave?: Drug,
+  hasDrugUuid: boolean = true,
 ): DrugFavoriteAttributes {
   const attributes: DrugFavoriteAttributes = {};
+  const includeManualAttrs = hasDrugUuid;
 
   if (selectedAttributes.strength && resolvedValues.strength) {
     attributes.strength = resolvedValues.strength;
   }
 
-  if (selectedAttributes.dose && resolvedValues.dose) {
+  if (includeManualAttrs && selectedAttributes.dose && resolvedValues.dose) {
     attributes.dose = resolvedValues.dose;
   }
 
@@ -111,14 +114,14 @@ export function buildFavoriteAttributes(
     }
   }
 
-  if (selectedAttributes.route && resolvedValues.route) {
+  if (includeManualAttrs && selectedAttributes.route && resolvedValues.route) {
     attributes.route = resolvedValues.route;
     if (resolvedUuids.routeUuid) {
       attributes.routeUuid = resolvedUuids.routeUuid;
     }
   }
 
-  if (selectedAttributes.frequency && resolvedValues.frequency) {
+  if (includeManualAttrs && selectedAttributes.frequency && resolvedValues.frequency) {
     attributes.frequency = resolvedValues.frequency;
     if (resolvedUuids.frequencyUuid) {
       attributes.frequencyUuid = resolvedUuids.frequencyUuid;

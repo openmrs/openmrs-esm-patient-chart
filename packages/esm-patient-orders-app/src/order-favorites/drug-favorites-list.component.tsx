@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, IconButton, InlineNotification, SkeletonText } from '@carbon/react';
+import { Button, Checkbox, InlineNotification, SkeletonText, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { ChevronDown, ChevronUp, Pin, TrashCan } from '@carbon/react/icons';
-import { EditIcon, showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
+import { showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getFavoriteKey } from './drug-favorites.resource';
@@ -26,10 +26,10 @@ interface FavoriteListItemProps {
   isSelected: boolean;
   isTablet: boolean;
   anyStrengthLabel: string;
-  onToggleSelection: (e: React.MouseEvent, key: string) => void;
-  onUnpin: (favorite: DrugFavoriteOrder) => void;
+  onToggleSelection: (key: string) => void;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onEdit: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
+  onDelete: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
@@ -41,9 +41,9 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
     isTablet,
     anyStrengthLabel,
     onToggleSelection,
-    onUnpin,
     onClick,
     onEdit,
+    onDelete,
   }) => {
     const { t } = useTranslation();
 
@@ -61,35 +61,44 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
         }}
       >
         {isEditMode ? (
-          <button type="button" className={styles.pinButton} onClick={(e) => onToggleSelection(e, favoriteKey)}>
-            <Pin className={isSelected ? styles.pinIconSelected : styles.pinIcon} />
-          </button>
+          <div className={styles.checkboxWrapper}>
+            <Checkbox
+              id={favoriteKey}
+              labelText=""
+              checked={isSelected}
+              onChange={() => onToggleSelection(favoriteKey)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
         ) : (
-          <button
-            type="button"
-            className={styles.pinButton}
-            onClick={(e) => {
-              e.stopPropagation();
-              onUnpin(favorite);
-            }}
-          >
+          <div className={styles.pinButton}>
             <Pin className={styles.pinIcon} />
-          </button>
+          </div>
         )}
         <div className={styles.itemContent}>
           <p className={styles.itemTitle}>{favorite.displayName}</p>
           <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
         </div>
         {!isEditMode && (
-          <IconButton
-            kind="ghost"
-            size={isTablet ? 'md' : 'sm'}
-            label={t('editPinnedOrder', 'Edit pinned order')}
-            onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
-            className={styles.editButton}
-          >
-            <EditIcon />
-          </IconButton>
+          <div onClick={(e) => e.stopPropagation()}>
+            <OverflowMenu
+              size={isTablet ? 'md' : 'sm'}
+              flipped
+              aria-label={t('pinnedOrderActions', 'Pinned order actions')}
+            >
+              <OverflowMenuItem
+                className={styles.menuItem}
+                itemText={t('edit', 'Edit')}
+                onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
+              />
+              <OverflowMenuItem
+                className={styles.menuItem}
+                itemText={t('delete', 'Delete')}
+                onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
+                isDelete
+              />
+            </OverflowMenu>
+          </div>
         )}
       </div>
     );
@@ -105,7 +114,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   const { t } = useTranslation();
   const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
-  const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
+  const { favorites, error, isLoading } = useFavoritesActions();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -168,8 +177,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   }, []);
 
   const handleToggleSelection = useCallback(
-    (e: React.MouseEvent, favoriteKey: string) => {
-      e.stopPropagation();
+    (favoriteKey: string) => {
       toggleSelection(favoriteKey);
     },
     [toggleSelection],
@@ -185,12 +193,13 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     });
   }, [favorites, selectedKeys]);
 
-  const handleUnpin = useCallback(
-    (favorite: DrugFavoriteOrder) => {
-      deleteMultipleFavorites([favorite]);
-    },
-    [deleteMultipleFavorites],
-  );
+  const handleDelete = useCallback((e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
+    e.stopPropagation();
+    const dispose = showModal(MODAL_NAMES.DELETE_FAVORITES, {
+      closeModal: () => dispose(),
+      favorites: [favorite],
+    });
+  }, []);
 
   const anyStrengthLabel = t('anyStrength', 'Any strength');
 
@@ -287,9 +296,9 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
                 isTablet={isTablet}
                 anyStrengthLabel={anyStrengthLabel}
                 onToggleSelection={handleToggleSelection}
-                onUnpin={handleUnpin}
                 onClick={handleFavoriteClick}
                 onEdit={handleEditItem}
+                onDelete={handleDelete}
               />
             );
           })}
