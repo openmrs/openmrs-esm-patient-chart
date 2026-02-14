@@ -36,11 +36,11 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
     return (
       <div key={key} className={styles.attributeRow}>
         <span className={styles.attributeLabel}>{label}</span>
-        {attributes.selectedAttributes[key] ? (
+        {attributes.selection.selected[key] ? (
           <Tag
             type="blue"
             filter
-            onClose={() => attributes.handleRemoveAttribute(key)}
+            onClose={() => attributes.selection.onRemove(key)}
             title={t('removeAttribute', 'Remove {{attribute}}', { attribute: label })}
           >
             {value}
@@ -48,7 +48,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
         ) : (
           <Tag
             type="gray"
-            onClick={() => attributes.handleAddAttribute(key)}
+            onClick={() => attributes.selection.onAdd(key)}
             className={styles.removedTag}
             title={t('addAttribute', 'Add {{attribute}}', { attribute: label })}
           >
@@ -66,7 +66,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
         kind="ghost"
         size="sm"
         renderIcon={Add}
-        onClick={() => attributes.handleShowManualInput(key)}
+        onClick={() => attributes.manualInputs.onShow(key)}
         className={styles.addButton}
       >
         {t('addAttribute', 'Add {{attribute}}', { attribute: label.toLowerCase() })}
@@ -75,7 +75,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
   );
 
   const renderManualInput = (key: ManualInputKey, label: string) => {
-    if (!attributes.showManualInputs[key]) return null;
+    if (!attributes.manualInputs.show[key]) return null;
 
     const inputContent =
       key === 'dose' ? (
@@ -85,25 +85,25 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
           min={0}
           step={0.01}
           hideSteppers
-          value={attributes.manualDose ?? ''}
-          onChange={(_e, { value }) => attributes.setManualDose(typeof value === 'number' ? value : null)}
+          value={attributes.manualInputs.dose ?? ''}
+          onChange={(_e, { value }) => attributes.manualInputs.setDose(typeof value === 'number' ? value : null)}
           className={styles.manualInput}
           label=""
           hideLabel
         />
-      ) : attributes.isLoadingOrderConfig ? (
+      ) : attributes.loading.isLoadingOrderConfig ? (
         <SkeletonText width="120px" />
       ) : (
         <ComboBox
           id={`manual-${key}`}
           size="sm"
-          items={key === 'route' ? attributes.routes : attributes.frequencies}
+          items={key === 'route' ? attributes.orderConfig.routes : attributes.orderConfig.frequencies}
           itemToString={(item: OrderConfigItem) => item?.display || ''}
-          selectedItem={key === 'route' ? attributes.manualRoute : attributes.manualFrequency}
+          selectedItem={key === 'route' ? attributes.manualInputs.route : attributes.manualInputs.frequency}
           onChange={({ selectedItem }) =>
             key === 'route'
-              ? attributes.setManualRoute(selectedItem || null)
-              : attributes.setManualFrequency(selectedItem || null)
+              ? attributes.manualInputs.setRoute(selectedItem || null)
+              : attributes.manualInputs.setFrequency(selectedItem || null)
           }
           placeholder={key === 'route' ? t('selectRoute', 'Select route') : t('selectFrequency', 'Select frequency')}
           className={styles.manualInput}
@@ -120,7 +120,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
             kind="ghost"
             size="sm"
             label={t('remove', 'Remove')}
-            onClick={() => attributes.handleHideManualInput(key)}
+            onClick={() => attributes.manualInputs.onHide(key)}
             className={styles.removeInputButton}
           >
             <Close />
@@ -132,7 +132,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
 
   const renderAttribute = (key: ManualInputKey, label: string, value: string | undefined, hasPrefilled: boolean) => {
     if (hasPrefilled) return renderAttributeTag(key, label, value);
-    return attributes.showManualInputs[key] ? renderManualInput(key, label) : renderAddButton(key, label);
+    return attributes.manualInputs.show[key] ? renderManualInput(key, label) : renderAddButton(key, label);
   };
 
   return (
@@ -146,7 +146,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
         }
       />
       <ModalBody>
-        {form.isLoadingDrug || attributes.isLoadingStrengths ? (
+        {form.isLoadingDrug || attributes.loading.isLoadingStrengths ? (
           <div className={styles.loadingContainer}>
             <SkeletonText width="60%" />
             <SkeletonText width="80%" />
@@ -159,18 +159,18 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
             </p>
 
             <div className={styles.attributesSection}>
-              {form.isConceptBasedFavorite && attributes.availableStrengths.length > 0 && (
+              {form.isConceptBasedFavorite && attributes.strength.availableStrengths.length > 0 && (
                 <div className={styles.attributeRow}>
                   <span className={styles.attributeLabel}>{t('strength', 'Strength')}</span>
                   <Dropdown
                     id="strength-dropdown"
                     titleText=""
                     size="sm"
-                    items={attributes.strengthOptions}
+                    items={attributes.strength.options}
                     itemToString={(item: StrengthOption) => item?.label || ''}
-                    selectedItem={attributes.strengthOptions.find((o) => o.id === attributes.selectedStrengthId)}
+                    selectedItem={attributes.strength.options.find((o) => o.id === attributes.strength.selectedId)}
                     onChange={({ selectedItem }: { selectedItem: StrengthOption }) =>
-                      attributes.handleStrengthChange(selectedItem)
+                      attributes.strength.onChange(selectedItem)
                     }
                     label={t('selectStrength', 'Select strength')}
                     className={styles.strengthDropdown}
@@ -178,23 +178,28 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
                 </div>
               )}
 
-              {renderAttributeTag('strength', t('strength', 'Strength'), attributes.resolvedValues.strength)}
-              {renderAttributeTag('unit', t('doseUnit', 'Dose unit'), attributes.resolvedValues.unit)}
+              {renderAttributeTag('strength', t('strength', 'Strength'), attributes.resolved.values.strength)}
+              {renderAttributeTag('unit', t('doseUnit', 'Dose unit'), attributes.resolved.values.unit)}
               {!form.isConceptBasedFavorite &&
-                renderAttribute('dose', t('dose', 'Dose'), attributes.resolvedValues.dose, attributes.hasPrefilledDose)}
+                renderAttribute(
+                  'dose',
+                  t('dose', 'Dose'),
+                  attributes.resolved.values.dose,
+                  attributes.prefilled.hasPrefilledDose,
+                )}
               {!form.isConceptBasedFavorite &&
                 renderAttribute(
                   'route',
                   t('route', 'Route'),
-                  attributes.resolvedValues.route,
-                  attributes.hasPrefilledRoute,
+                  attributes.resolved.values.route,
+                  attributes.prefilled.hasPrefilledRoute,
                 )}
               {!form.isConceptBasedFavorite &&
                 renderAttribute(
                   'frequency',
                   t('frequency', 'Frequency'),
-                  attributes.resolvedValues.frequency,
-                  attributes.hasPrefilledFrequency,
+                  attributes.resolved.values.frequency,
+                  attributes.prefilled.hasPrefilledFrequency,
                 )}
             </div>
 

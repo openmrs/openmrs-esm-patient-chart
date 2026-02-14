@@ -43,6 +43,9 @@ export function createDrugFromFavorite(favorite: DrugFavoriteOrder): Drug | null
   } as Drug;
 }
 
+/**
+ * Similar to buildMedicationOrder() but for favorites instead of existing orders.
+ */
 export function buildBasketItem(
   drug: Drug,
   favorite: DrugFavoriteOrder,
@@ -83,9 +86,7 @@ export function buildBasketItem(
 
 /**
  * Builds the DrugFavoriteAttributes object from selected attributes and resolved values.
- *
- * Manual attributes (dose, route, frequency) are ONLY included for drug-specific favorites.
- * Concept-based favorites can only have strength and unit attributes.
+ * Manual attributes are ONLY included for drug-specific favorites.
  *
  * Note: dosageForm is always stored to enable instant reconstruction without additional API calls.
  */

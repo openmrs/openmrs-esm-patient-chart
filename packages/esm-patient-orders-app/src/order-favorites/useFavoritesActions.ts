@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import { showSnackbar, useSession, reportError } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useDrugFavorites, removeDrugFavorite, saveDrugFavorites } from './drug-favorites.resource';
 import { FAVORITES_PROPERTY_KEYS } from './constants';
@@ -53,6 +53,7 @@ export function useFavoritesActions() {
         return true;
       } catch (error: unknown) {
         mutate();
+        reportError(error);
         showSnackbar({
           isLowContrast: false,
           kind: 'error',

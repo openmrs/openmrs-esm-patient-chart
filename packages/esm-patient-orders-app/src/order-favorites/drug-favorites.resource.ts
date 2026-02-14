@@ -13,11 +13,6 @@ import type {
   OrderConfig,
 } from './types';
 
-export function uuidsEqual(a: string | undefined, b: string | undefined): boolean {
-  if (!a || !b) return false;
-  return a.toLowerCase() === b.toLowerCase();
-}
-
 export function getFavoriteKey(favorite: DrugFavoriteOrder): string {
   return favorite.drugUuid ?? favorite.conceptUuid;
 }
@@ -59,10 +54,10 @@ export function addDrugFavorite(
 ): DrugFavoriteOrder[] {
   const existingIndex = currentFavorites.findIndex((f) => {
     if (newFavorite.drugUuid) {
-      return uuidsEqual(f.drugUuid, newFavorite.drugUuid);
+      return f.drugUuid === newFavorite.drugUuid;
     }
     if (newFavorite.conceptUuid) {
-      return uuidsEqual(f.conceptUuid, newFavorite.conceptUuid) && !f.drugUuid;
+      return f.conceptUuid === newFavorite.conceptUuid && !f.drugUuid;
     }
     return false;
   });
@@ -82,10 +77,10 @@ export function removeDrugFavorite(
 ): DrugFavoriteOrder[] {
   return currentFavorites.filter((f) => {
     if (drugUuid) {
-      return !uuidsEqual(f.drugUuid, drugUuid);
+      return f.drugUuid !== drugUuid;
     }
     if (conceptUuid) {
-      return !(uuidsEqual(f.conceptUuid, conceptUuid) && !f.drugUuid);
+      return !(f.conceptUuid === conceptUuid && !f.drugUuid);
     }
     return true;
   });
@@ -100,12 +95,12 @@ export function isDrugFavorite(
   if (!drugUuid && !conceptUuid) return false;
 
   if (drugUuid) {
-    const hasDrugMatch = favorites.some((f) => uuidsEqual(f.drugUuid, drugUuid));
+    const hasDrugMatch = favorites.some((f) => f.drugUuid === drugUuid);
     if (hasDrugMatch) return true;
   }
 
   if (conceptUuid && !hasSpecificStrength) {
-    return favorites.some((f) => uuidsEqual(f.conceptUuid, conceptUuid) && !f.drugUuid);
+    return favorites.some((f) => f.conceptUuid === conceptUuid && !f.drugUuid);
   }
 
   return false;
@@ -117,10 +112,10 @@ export function getDrugFavorite(
   conceptUuid?: string,
 ): DrugFavoriteOrder | undefined {
   if (drugUuid) {
-    return favorites.find((f) => uuidsEqual(f.drugUuid, drugUuid));
+    return favorites.find((f) => f.drugUuid === drugUuid);
   }
   if (conceptUuid) {
-    return favorites.find((f) => uuidsEqual(f.conceptUuid, conceptUuid) && !f.drugUuid);
+    return favorites.find((f) => f.conceptUuid === conceptUuid && !f.drugUuid);
   }
   return undefined;
 }
@@ -178,7 +173,7 @@ export function useDrugsByConceptName(conceptName: string | undefined, conceptUu
 
   const matchingDrugs = useMemo(() => {
     if (!data?.data?.results || !conceptUuid) return [];
-    return data.data.results.filter((d) => uuidsEqual(d.concept?.uuid, conceptUuid));
+    return data.data.results.filter((d) => d.concept?.uuid === conceptUuid);
   }, [data, conceptUuid]);
 
   return { matchingDrugs, isLoading, error };

@@ -1,6 +1,6 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, useConfig, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, openmrsFetch, reportError, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { addDrugFavorite, removeDrugFavorite } from './drug-favorites.resource';
@@ -37,12 +37,22 @@ export function useFavoriteForm({
   const existing = existingFavorite;
 
   // Fetch drug if we only have drugUuid (from edit flow)
-  const { data: fetchedDrugData, isLoading: isLoadingDrug } = useSWRImmutable<{ data: Drug }>(
+  const {
+    data: fetchedDrugData,
+    isLoading: isLoadingDrug,
+    error: drugFetchError,
+  } = useSWRImmutable<{ data: Drug }>(
     drugUuid && !drug
       ? `${restBaseUrl}/drug/${drugUuid}?v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
     openmrsFetch,
   );
+
+  useEffect(() => {
+    if (drugFetchError) {
+      reportError(drugFetchError);
+    }
+  }, [drugFetchError]);
 
   const effectiveDrug = fetchedDrugData?.data || drug;
 
@@ -62,21 +72,21 @@ export function useFavoriteForm({
   });
 
   const isConceptBasedFavorite = useMemo(() => {
-    return !attributes.selectedAttributes.strength;
-  }, [attributes.selectedAttributes.strength]);
+    return !attributes.selection.selected.strength;
+  }, [attributes.selection.selected.strength]);
 
   const computedName = useMemo(() => {
-    if (attributes.selectedStrengthDrug) return attributes.selectedStrengthDrug.display || '';
+    if (attributes.strength.selectedDrug) return attributes.strength.selectedDrug.display || '';
 
-    const isSpecific = attributes.selectedAttributes.strength;
+    const isSpecific = attributes.selection.selected.strength;
     if (isSpecific) return effectiveDrug?.display || '';
 
     return effectiveDrug?.concept?.display || conceptName || '';
-  }, [attributes.selectedAttributes.strength, attributes.selectedStrengthDrug, effectiveDrug, conceptName]);
+  }, [attributes.selection.selected.strength, attributes.strength.selectedDrug, effectiveDrug, conceptName]);
 
   const handleSave = useCallback(async () => {
-    const isSpecificFavorite = Boolean(attributes.selectedStrengthDrug || attributes.selectedAttributes.strength);
-    const drugForSave = attributes.selectedStrengthDrug || effectiveDrug;
+    const isSpecificFavorite = Boolean(attributes.strength.selectedDrug || attributes.selection.selected.strength);
+    const drugForSave = attributes.strength.selectedDrug || effectiveDrug;
 
     // Validation
     if (!validateDrugAvailable(isSpecificFavorite, drugForSave)) {
@@ -112,9 +122,9 @@ export function useFavoriteForm({
     setIsSaving(true);
 
     const favoriteAttributes = buildFavoriteAttributes(
-      attributes.selectedAttributes,
-      attributes.resolvedValues,
-      attributes.resolvedUuids,
+      attributes.selection.selected,
+      attributes.resolved.values,
+      attributes.resolved.uuids,
       drugForSave,
       isSpecificFavorite,
     );

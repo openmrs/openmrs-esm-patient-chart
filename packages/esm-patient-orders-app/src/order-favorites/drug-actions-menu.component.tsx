@@ -6,9 +6,9 @@ import type { ConfigObject } from '../config-schema';
 import { isDrugFavorite, getDrugFavorite, extractDrugOrderAttributes } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { MODAL_NAMES } from './constants';
-import type { DrugPinButtonProps } from './types';
+import type { DrugActionsMenuProps } from './types';
 
-const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
+const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug, orderItem }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { enableDrugOrderFavorites, maxPinnedDrugOrders } = useConfig<ConfigObject>();
@@ -70,4 +70,4 @@ const DrugPinButton: React.FC<DrugPinButtonProps> = ({ drug, orderItem }) => {
   );
 };
 
-export default DrugPinButton;
+export default DrugActionsMenu;

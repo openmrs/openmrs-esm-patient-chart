@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { reportError } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { useDrugsByConceptName, useOrderConfig } from './drug-favorites.resource';
 import type { AttributeKey, DrugFavoriteAttributes, ManualInputKey, OrderConfigItem, StrengthOption } from './types';
@@ -22,7 +23,9 @@ interface UseFormAttributesProps {
   frequency?: string;
 }
 
-/** Manages drug order attribute state (strength, dose, unit, route, frequency) for the favorites form. */
+/**
+ * Manages drug order attribute state for the favorites form.
+ */
 export function useFormAttributes({
   conceptName,
   conceptUuid,
@@ -38,10 +41,11 @@ export function useFormAttributes({
   const { t } = useTranslation();
 
   // Strength Selection
-  const { matchingDrugs: availableStrengths, isLoading: isLoadingStrengths } = useDrugsByConceptName(
-    isConceptBased ? conceptName : undefined,
-    conceptUuid,
-  );
+  const {
+    matchingDrugs: availableStrengths,
+    isLoading: isLoadingStrengths,
+    error: strengthsError,
+  } = useDrugsByConceptName(isConceptBased ? conceptName : undefined, conceptUuid);
 
   const strengthOptions: StrengthOption[] = useMemo(() => {
     const anyOption: StrengthOption = { id: 'any', label: t('anyStrength', 'Any strength') };
@@ -73,7 +77,21 @@ export function useFormAttributes({
 
   // Fetch order config only when needed
   const needsOrderConfig = showManualInputs.route || showManualInputs.frequency;
-  const { routes, frequencies, isLoading: isLoadingOrderConfig } = useOrderConfig(needsOrderConfig);
+  const {
+    routes,
+    frequencies,
+    isLoading: isLoadingOrderConfig,
+    error: orderConfigError,
+  } = useOrderConfig(needsOrderConfig);
+
+  useEffect(() => {
+    if (strengthsError) {
+      reportError(strengthsError);
+    }
+    if (orderConfigError) {
+      reportError(orderConfigError);
+    }
+  }, [strengthsError, orderConfigError]);
 
   // Attribute Toggles
   const hasPrefilledStrength = Boolean(strength || initialAttributes?.strength || effectiveDrug?.strength);
@@ -150,46 +168,51 @@ export function useFormAttributes({
   }, []);
 
   return {
-    // Loading states
-    isLoadingStrengths,
-    isLoadingOrderConfig,
+    loading: {
+      isLoadingStrengths,
+      isLoadingOrderConfig,
+    },
 
-    // Prefilled flags
-    hasPrefilledDose,
-    hasPrefilledRoute,
-    hasPrefilledFrequency,
+    prefilled: {
+      hasPrefilledDose,
+      hasPrefilledRoute,
+      hasPrefilledFrequency,
+    },
 
-    // Strength selection
-    selectedStrengthId,
-    selectedStrengthDrug,
-    availableStrengths,
-    strengthOptions,
+    strength: {
+      selectedId: selectedStrengthId,
+      selectedDrug: selectedStrengthDrug,
+      availableStrengths,
+      options: strengthOptions,
+      onChange: handleStrengthChange,
+    },
 
-    // Attribute toggles
-    selectedAttributes,
+    selection: {
+      selected: selectedAttributes,
+      onAdd: handleAddAttribute,
+      onRemove: handleRemoveAttribute,
+    },
 
-    // Manual inputs
-    showManualInputs,
-    manualDose,
-    manualRoute,
-    manualFrequency,
+    manualInputs: {
+      show: showManualInputs,
+      dose: manualDose,
+      route: manualRoute,
+      frequency: manualFrequency,
+      setDose: setManualDose,
+      setRoute: setManualRoute,
+      setFrequency: setManualFrequency,
+      onShow: handleShowManualInput,
+      onHide: handleHideManualInput,
+    },
 
-    // Order config
-    routes,
-    frequencies,
+    orderConfig: {
+      routes,
+      frequencies,
+    },
 
-    // Resolved values
-    resolvedValues,
-    resolvedUuids,
-
-    // Handlers
-    handleRemoveAttribute,
-    handleAddAttribute,
-    handleStrengthChange,
-    handleShowManualInput,
-    handleHideManualInput,
-    setManualDose,
-    setManualRoute,
-    setManualFrequency,
+    resolved: {
+      values: resolvedValues,
+      uuids: resolvedUuids,
+    },
   };
 }

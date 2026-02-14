@@ -114,7 +114,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   const { t } = useTranslation();
   const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
-  const { favorites, error, isLoading } = useFavoritesActions();
+  const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -193,13 +193,13 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     });
   }, [favorites, selectedKeys]);
 
-  const handleDelete = useCallback((e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
-    e.stopPropagation();
-    const dispose = showModal(MODAL_NAMES.DELETE_FAVORITES, {
-      closeModal: () => dispose(),
-      favorites: [favorite],
-    });
-  }, []);
+  const handleDelete = useCallback(
+    (e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
+      e.stopPropagation();
+      deleteMultipleFavorites([favorite]);
+    },
+    [deleteMultipleFavorites],
+  );
 
   const anyStrengthLabel = t('anyStrength', 'Any strength');
 

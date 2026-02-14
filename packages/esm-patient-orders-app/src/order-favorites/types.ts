@@ -42,7 +42,7 @@ export interface StoredDrugFavorites {
   favorites: DrugFavoriteOrder[];
 }
 
-export interface DrugPinButtonProps {
+export interface DrugActionsMenuProps {
   drug: Drug;
   orderItem?: DrugOrderSlotState;
 }
