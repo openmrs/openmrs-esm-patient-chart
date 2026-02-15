@@ -65,8 +65,20 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
-      nextDoseDate: z.date().nullable().optional(),
-      expirationDate: z.date().nullable().optional(),
+      nextDoseDate: z
+        .date()
+        .nullable()
+        .optional()
+        .refine((date) => !date || date.getFullYear() >= 1000, {
+          message: t('invalidValue', 'Invalid value'),
+        }),
+      expirationDate: z
+        .date()
+        .nullable()
+        .optional()
+        .refine((date) => !date || date.getFullYear() >= 1000, {
+          message: t('invalidValue', 'Invalid value'),
+        }),
       lotNumber: z.string().nullable().optional(),
       manufacturer: z.string().nullable().optional(),
     });
