@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, ComboBox, FormLabel, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import {
+  Extension,
   ExtensionSlot,
   getPatientName,
   PatientBannerPatientInfo,
@@ -268,8 +269,15 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
               [styles.orderBasketSlotTablet]: isTablet,
             })}
             name="order-basket-slot"
-            state={{ ...orderBasketExtensionProps }}
-          />
+          >
+            {(extension) =>
+              (!orderBasketExtensionProps.visibleOrderPanels ||
+                !extension.config?.orderTypeUuid ||
+                orderBasketExtensionProps.visibleOrderPanels.includes(extension.config.orderTypeUuid)) && (
+                <Extension state={{ ...orderBasketExtensionProps }} />
+              )
+            }
+          </ExtensionSlot>
           {orderTypes?.length > 0 &&
             orderTypes
               .filter(

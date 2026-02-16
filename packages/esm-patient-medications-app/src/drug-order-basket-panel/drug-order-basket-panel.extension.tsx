@@ -2,14 +2,13 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
-import { AddIcon, ChevronDownIcon, ChevronUpIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, useLayoutType } from '@openmrs/esm-framework';
 import {
   type OrderBasketExtensionProps,
   useOrderBasket,
   type DrugOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
-import { type ConfigObject } from '../config-schema';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
 import styles from './drug-order-basket-panel.scss';
@@ -20,15 +19,10 @@ import styles from './drug-order-basket-panel.scss';
  *
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/62c6bb9500e7671a618efa56
  */
-function DrugOrderBasketPanelExtension({
-  patient,
-  launchDrugOrderForm,
-  visibleOrderPanels,
-}: OrderBasketExtensionProps) {
+function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBasketExtensionProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'md' : 'sm';
-  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
     'medications',
@@ -83,11 +77,6 @@ function DrugOrderBasketPanelExtension({
   useEffect(() => {
     setIsExpanded(orders.length > 0);
   }, [orders]);
-
-  // If visibleOrderPanels is specified and doesn't include the drug order type UUID, don't render this panel
-  if (visibleOrderPanels && !visibleOrderPanels.includes(drugOrderTypeUUID)) {
-    return null;
-  }
 
   return (
     <Tile
