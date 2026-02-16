@@ -182,7 +182,9 @@ describe('VitalsBiometricsForm', () => {
     expect(screen.getByText(/kg \/ m²/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    expect(saveButton).toBeInTheDocument();
+    expect(saveButton).toBeDisabled();
   });
 
   it("computes a patient's BMI from the given height and weight values", async () => {

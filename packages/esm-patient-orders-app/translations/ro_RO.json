@@ -23,6 +23,7 @@
   "drugOrders": "drug orders",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "Editează rezultatele",
+  "editTestResults": "Edit test results",
   "endDate": "Data de sfârșit",
   "enterTestResults": "Introdu rezultatele testului",
   "error": "Eroare",
