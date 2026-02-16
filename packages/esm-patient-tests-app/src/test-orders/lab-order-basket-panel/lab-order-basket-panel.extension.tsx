@@ -21,11 +21,7 @@ import styles from './lab-order-basket-panel.scss';
  *
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
  */
-export function LabOrderBasketPanelExtension({
-  patient,
-  launchLabOrderForm,
-  visibleOrderPanels,
-}: OrderBasketExtensionProps) {
+export function LabOrderBasketPanelExtension({ patient, launchLabOrderForm }: OrderBasketExtensionProps) {
   const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
@@ -38,13 +34,9 @@ export function LabOrderBasketPanelExtension({
     ...additionalTestOrderTypes,
   ];
 
-  const filteredOrderTypes = visibleOrderPanels
-    ? allOrderTypes.filter((orderType) => visibleOrderPanels.includes(orderType.orderTypeUuid))
-    : allOrderTypes;
-
   return (
     <>
-      {filteredOrderTypes.map((orderTypeConfig) => (
+      {allOrderTypes.map((orderTypeConfig) => (
         <LabOrderBasketPanel
           key={orderTypeConfig.orderTypeUuid}
           patient={patient}
