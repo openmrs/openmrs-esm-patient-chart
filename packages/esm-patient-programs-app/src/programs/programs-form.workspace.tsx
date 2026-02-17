@@ -46,13 +46,23 @@ export interface ProgramsFormProps {
 }
 
 const createProgramsFormSchema = (t: TFunction) =>
-  z.object({
-    selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
-    enrollmentDate: z.date(),
-    completionDate: z.date().optional().nullable(),
-    enrollmentLocation: z.string(),
-    selectedProgramStatus: z.string(),
-  });
+  z
+    .object({
+      selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
+      enrollmentDate: z.date(),
+      completionDate: z.date().optional().nullable(),
+      enrollmentLocation: z.string(),
+      selectedProgramStatus: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.completionDate && data.enrollmentDate && data.completionDate <= data.enrollmentDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('completionDateMustBeAfterEnrollmentDate', 'Completion date cannot be before the enrollment date'),
+          path: ['completionDate'],
+        });
+      }
+    });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 

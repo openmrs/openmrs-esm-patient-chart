@@ -166,6 +166,24 @@ describe('ProgramsForm', () => {
     );
   });
 
+  it('does not submit the form when completion date is before enrollment date', async () => {
+    const user = userEvent.setup();
+
+    renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
+
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.click(completionDateInput);
+    await user.paste('2019-12-01');
+    await user.tab();
+
+    await user.click(saveButton);
+
+    expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
+    expect(mockUpdateProgramEnrollment).not.toHaveBeenCalled();
+  });
+
   it('renders the programs status field if the config property is set to true', async () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
