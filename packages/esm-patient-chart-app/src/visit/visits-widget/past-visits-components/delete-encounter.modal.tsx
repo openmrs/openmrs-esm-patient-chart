@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './delete-encounter.scss';
 
 interface DeleteEncounterConfirmationProps {
@@ -15,11 +16,12 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   encounterTypeName,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const handleCancel = (event: React.MouseEvent<Element, MouseEvent>) => close(event);
   const handleDelete = () => onConfirmation?.();
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={close} className={styles.productiveHeading03}>
         {t('deleteEncounter', 'Delete Encounter')}?
       </ModalHeader>
@@ -40,7 +42,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
           {t('delete', 'Delete')}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

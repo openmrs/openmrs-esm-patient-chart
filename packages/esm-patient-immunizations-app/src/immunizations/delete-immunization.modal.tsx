@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { deletePatientImmunization, useImmunizations } from '../hooks/useImmunizations';
 import { useImmunizationsConceptSet } from '../hooks/useImmunizationsConceptSet';
 import { type ImmunizationConfigObject } from '../config-schema';
@@ -23,6 +24,7 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
   vaccineUuid,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const config = useConfig<ImmunizationConfigObject>();
   const { immunizationsConceptSet } = useImmunizationsConceptSet(config);
   const { mutate } = useImmunizations(patientUuid);
@@ -58,7 +60,7 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
   };
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader
         closeModal={close}
         title={t('deleteImmunization', 'Delete immunization')}
@@ -84,7 +86,7 @@ const DeleteImmunization: React.FC<DeleteConfirmModelProps> = ({
           )}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

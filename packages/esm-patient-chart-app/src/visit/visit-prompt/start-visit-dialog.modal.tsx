@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
-import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
+import { launchPatientChartWithWorkspaceOpen, useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
 
 interface StartVisitDialogProps {
@@ -19,6 +19,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   onVisitStarted,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
 
   const handleStartNewVisit = useCallback(() => {
     if (launchPatientChart) {
@@ -42,7 +43,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   );
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeModal}>
         <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
