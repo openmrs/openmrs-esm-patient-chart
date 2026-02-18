@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
+import FavoriteStar from '../../favorites/FavoriteStar';
 import {
   ArrowRightIcon,
   ResponsiveWrapper,
@@ -240,6 +241,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({
     >
       <div className={classNames(styles.searchResultTileContent, styles.text02)}>
         <p>
+          <FavoriteStar uuid={testType.conceptUuid} />
           <span className={styles.heading}>{testType.label}</span>{' '}
         </p>
       </div>
