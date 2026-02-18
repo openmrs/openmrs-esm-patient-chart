@@ -169,6 +169,7 @@ describe('ProgramsForm', () => {
   it('does not submit the form when completion date is before enrollment date', async () => {
     const user = userEvent.setup();
 
+    // mockEnrolledProgramsResponse[0] has dateEnrolled: '2020-01-16'
     renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
 
     const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });

@@ -58,7 +58,7 @@ const createProgramsFormSchema = (t: TFunction) =>
       if (data.completionDate && data.enrollmentDate && data.completionDate <= data.enrollmentDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: t('completionDateMustBeAfterEnrollmentDate', 'Completion date cannot be before the enrollment date'),
+          message: t('completionDateMustBeAfterEnrollmentDate', 'Completion date must be after the enrollment date'),
           path: ['completionDate'],
         });
       }
