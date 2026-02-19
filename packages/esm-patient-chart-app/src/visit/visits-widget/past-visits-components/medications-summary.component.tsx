@@ -16,15 +16,17 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
   const { t } = useTranslation();
   const { drugOrderTypeUUID } = useConfig<ChartConfig>();
 
-  const isPastMedication = (order: OrderItem['order']) => {
-    if (!order) {
-      return false;
-    }
+  const isOrderedForFuture = (order: OrderItem['order']) => {
+    return order.scheduledDate && order.scheduledDate > order.dateActivated;
+  };
+  const isOrderedInPast = (order: OrderItem['order']) => {
+    return order.scheduledDate && order.scheduledDate < order.dateActivated;
+  };
 
+  const isDiscontinued = (order: OrderItem['order']) => {
     return (
       order.action === 'DISCONTINUE' ||
-      (order.dateStopped && new Date(order.dateStopped) <= new Date()) ||
-      (order.autoExpireDate && new Date(order.autoExpireDate) <= new Date())
+      (order.dateStopped && order.autoExpireDate && new Date(order.dateStopped) <= new Date(order.autoExpireDate))
     );
   };
 
@@ -54,7 +56,39 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     {medication?.order?.doseUnits?.display && (
                       <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
                     )}{' '}
-                    {isPastMedication(medication.order) && (
+                    {isOrderedForFuture(medication.order) && (
+                      <Tooltip
+                        align="right"
+                        label={
+                          <>
+                            {t('fromdate', 'From {{date}}', {
+                              date: formatDate(new Date(medication.order.scheduledDate)),
+                            })}
+                          </>
+                        }
+                      >
+                        <Tag type="green" className={styles.tag}>
+                          {t('scheduledinfuture', 'Scheduled for future')}
+                        </Tag>
+                      </Tooltip>
+                    )}
+                    {isOrderedInPast(medication.order) && (
+                      <Tooltip
+                        align="right"
+                        label={
+                          <>
+                            {t('fromdate', 'From {{date}}', {
+                              date: formatDate(new Date(medication.order.scheduledDate)),
+                            })}
+                          </>
+                        }
+                      >
+                        <Tag type="red" className={styles.tag}>
+                          {t('scheduledinpast', 'Scheduled in past')}
+                        </Tag>
+                      </Tooltip>
+                    )}
+                    {isDiscontinued(medication.order) && (
                       <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
                         <Tag type="gray" className={styles.tag}>
                           {t('discontinued', 'Discontinued')}
