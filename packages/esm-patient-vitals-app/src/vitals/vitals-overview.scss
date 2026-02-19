@@ -5,6 +5,10 @@
 .widgetCard {
   background-color: colors.$white;
   border: 1px solid colors.$gray-20;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
 }
 
 .divider {
@@ -12,6 +16,7 @@
   height: layout.$spacing-05;
   color: $ui-05;
   margin: 0 layout.$spacing-05;
+  flex-shrink: 0;
 }
 
 .vitalsHeaderActionItems {
@@ -19,13 +24,27 @@
   display: flex;
   flex: 1 1 0%;
   justify-content: end;
+  flex-wrap: wrap;
+  gap: layout.$spacing-02;
+  /* Allow this container to shrink when workspace opens */
+  min-width: 0;
+  overflow: visible;
 
   & :global(.cds--content-switcher) {
     max-width: max-content;
+    /* Allow content switcher to shrink if absolutely necessary */
+    flex-shrink: 1;
 
     :global(.cds--content-switcher__label) {
       height: layout.$spacing-05;
     }
+  }
+
+  & button {
+    /* Allow buttons to shrink if needed, but try to keep them visible */
+    flex-shrink: 1;
+    white-space: nowrap;
+    min-width: max-content;
   }
 }
 
