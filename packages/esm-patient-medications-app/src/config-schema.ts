@@ -36,6 +36,12 @@ export const configSchema = {
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
   },
+  useCodedIndication: {
+    _type: Type.Boolean,
+    _description:
+      'When true, use a coded diagnosis indication (orderReason) and hide the non-coded indication text field.',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
@@ -47,4 +53,5 @@ export interface ConfigObject {
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
+  useCodedIndication: boolean;
 }

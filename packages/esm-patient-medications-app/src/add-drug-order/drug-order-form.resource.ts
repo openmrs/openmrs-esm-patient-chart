@@ -3,7 +3,8 @@ import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { parseDate, useConfig } from '@openmrs/esm-framework';
+import { parseDate, useConfig, openmrsFetch, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { type Drug, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { useRequireOutpatientQuantity } from '../api';
 import { type ConfigObject } from '../config-schema';
@@ -46,6 +47,7 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
     quantityUnits: item?.quantityUnits,
     numRefills: item?.numRefills ?? null,
     indication: item?.indication,
+    indicationCoded: item?.indicationCoded ?? null,
     frequency: item?.frequency,
     startDate,
   };
@@ -54,7 +56,7 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
 function useCreateMedicationOrderFormSchema() {
   const { t } = useTranslation();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
-  const { requireIndication } = useConfig<ConfigObject>();
+  const { requireIndication, useCodedIndication } = useConfig<ConfigObject>();
 
   const schema = useMemo(() => {
     const comboSchema = {
@@ -62,6 +64,15 @@ function useCreateMedicationOrderFormSchema() {
       value: z.string(),
       valueCoded: z.string(),
     };
+
+    const indicationBaseSchema = z.string().nullish();
+
+    const indicationSchema =
+      requireIndication && !useCodedIndication
+        ? z.string().refine((value) => value !== '', {
+            message: t('indicationErrorMessage', 'Indication is required'),
+          })
+        : indicationBaseSchema;
 
     const baseSchemaFields = {
       drug: z
@@ -110,11 +121,24 @@ function useCreateMedicationOrderFormSchema() {
       asNeededCondition: z.string().nullable(),
       duration: z.number().nullable(),
       durationUnit: z.object({ ...comboSchema }).nullable(),
-      indication: requireIndication
-        ? z.string().refine((value) => value !== '', {
-            message: t('indicationErrorMessage', 'Indication is required'),
-          })
-        : z.string().nullish(),
+      indication: indicationSchema,
+      indicationCoded:
+        requireIndication && useCodedIndication
+          ? z
+              .object({
+                uuid: z.string(),
+                display: z.string(),
+              })
+              .nullable()
+              .refine((value) => value != null, {
+                message: t('indicationErrorMessage', 'Indication is required'),
+              })
+          : z
+              .object({
+                uuid: z.string(),
+                display: z.string(),
+              })
+              .nullable(),
       startDate: z.date(),
       frequency: z.object(
         { ...comboSchema },
@@ -187,9 +211,33 @@ function useCreateMedicationOrderFormSchema() {
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-  }, [requireIndication, requireOutpatientQuantity, t]);
+  }, [requireIndication, requireOutpatientQuantity, t, useCodedIndication]);
 
   return schema;
 }
 
 export type MedicationOrderFormData = z.infer<ReturnType<typeof useCreateMedicationOrderFormSchema>>;
+
+export interface CodedIndication {
+  uuid: string;
+  display: string;
+}
+
+export function useIndicationSearch(searchTerm: string) {
+  const debouncedSearchTerm = useDebounce(searchTerm);
+
+  const url =
+    debouncedSearchTerm && debouncedSearchTerm.length > 0
+      ? `${restBaseUrl}/concept?name=${encodeURIComponent(
+          debouncedSearchTerm,
+        )}&searchType=fuzzy&class=Diagnosis&v=custom:(uuid,display)`
+      : null;
+
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedIndication> } }, Error>(url, openmrsFetch);
+
+  return {
+    searchResults: data?.data?.results ?? [],
+    isSearching: isLoading,
+    error,
+  };
+}
