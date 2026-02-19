@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { type FormEntryConfigSchema } from '../config-schema';
 import { toHtmlForm } from './form-entry.resources';
 import HtmlFormEntryWrapper from '../htmlformentry/html-form-entry-wrapper.component';
+import { useForms } from '../hooks/use-forms';
 
 export interface FormEntryProps {
   form: Form;
@@ -24,6 +25,9 @@ export interface FormEntryProps {
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
+  hideControls?: boolean;
+  hidePatientBanner?: boolean;
+  preFilledQuestions?: Record<string, string>;
 }
 
 const FormEntry: React.FC<FormEntryProps> = ({
@@ -35,6 +39,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
   mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
+  hideControls,
+  hidePatientBanner,
+  preFilledQuestions,
   additionalProps,
 }) => {
   const formUuid = form.uuid;
@@ -49,6 +56,8 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const { mutateForms } = useForms(patientUuid, visitUuid);
 
   const state = useMemo(
     () => ({
@@ -65,6 +74,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
       visit: visitContext ?? null,
       additionalProps: additionalProps ?? {},
       handlePostResponse,
+      hideControls,
+      hidePatientBanner,
+      preFilledQuestions,
       closeWorkspace: () => {
         return closeWorkspace();
       },
@@ -75,9 +87,12 @@ const FormEntry: React.FC<FormEntryProps> = ({
         // Also invalidate visit history and encounter tables since form submission may create/update encounters
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
-        return closeWorkspace({ discardUnsavedChanges: true, closeWindow: true });
+        mutateForms?.();
+
+        return closeWorkspace({ discardUnsavedChanges: true });
       },
       promptBeforeClosing: (func) => setHasUnsavedChanges(func()),
+      setHasUnsavedChanges,
     }),
     [
       closeWorkspace,
@@ -85,10 +100,14 @@ const FormEntry: React.FC<FormEntryProps> = ({
       formUuid,
       globalMutate,
       handlePostResponse,
+      hideControls,
+      hidePatientBanner,
       isOnline,
+      mutateForms,
       mutateVisitContext,
       patient,
       patientUuid,
+      preFilledQuestions,
       setHasUnsavedChanges,
       visitStartDatetime,
       visitStopDatetime,
@@ -132,7 +151,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
           (isHtmlForm ? (
             <HtmlFormEntryWrapper
               src={htmlFormEntryUrl}
-              closeWorkspaceWithSavedChanges={() => closeWorkspace({ discardUnsavedChanges: true })}
+              closeWorkspaceWithSavedChanges={state.closeWorkspaceWithSavedChanges}
             />
           ) : (
             <ExtensionSlot key={state.formUuid} name="form-widget-slot" state={state} />

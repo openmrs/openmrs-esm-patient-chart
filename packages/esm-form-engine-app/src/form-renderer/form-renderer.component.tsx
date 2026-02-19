@@ -16,6 +16,7 @@ import styles from './form-renderer.scss';
 const FormRenderer: React.FC<FormRendererProps> = ({
   additionalProps,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   encounterUuid,
   formUuid,
   patientUuid,
@@ -62,10 +63,14 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
   const handleOnSubmit = useCallback(
     (encounters?: Array<Encounter>) => {
-      closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
+      if (closeWorkspaceWithSavedChanges) {
+        closeWorkspaceWithSavedChanges();
+      } else {
+        closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
+      }
       handlePostResponse?.(encounters[0]);
     },
-    [closeWorkspace, handlePostResponse],
+    [closeWorkspace, closeWorkspaceWithSavedChanges, handlePostResponse],
   );
 
   if (isLoading) {
@@ -90,17 +95,17 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         <FormEngine
           encounterUUID={encounterUuid}
           formJson={schema}
+          formSessionIntent={formSessionIntent}
           handleClose={handleCloseForm}
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
-          markFormAsDirty={setHasUnsavedChanges}
-          mode={additionalProps?.mode}
-          formSessionIntent={formSessionIntent}
-          onSubmit={handleOnSubmit}
-          patientUUID={patientUuid}
-          visit={visit}
           hideControls={hideControls}
           hidePatientBanner={hidePatientBanner}
+          markFormAsDirty={setHasUnsavedChanges}
+          mode={additionalProps?.mode}
+          onSubmit={handleOnSubmit}
+          patientUUID={patientUuid}
           preFilledQuestions={preFilledQuestions}
+          visit={visit}
         />
       )}
     </>

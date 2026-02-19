@@ -1,9 +1,8 @@
-import { Tile, InlineLoading , InlineNotification } from '@carbon/react';
-import { type Order } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
+import { InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useCompletedLabResults, useOrderConceptByUuid } from './lab-results.resource';
-import styles from './lab-result.scss';
 import TestOrder from '../components/test-order.component';
 
 type LabResultsProps = {
@@ -11,8 +10,8 @@ type LabResultsProps = {
 };
 const LabResults: React.FC<LabResultsProps> = ({ order }) => {
   const { t } = useTranslation();
-  const { concept, isLoading: isLoadingConcepts, error: conceptError } = useOrderConceptByUuid(order.concept.uuid);
-  const { isLoading, error, completeLabResult, mutate } = useCompletedLabResults(order);
+  const { isLoading: isLoadingConcepts, error: conceptError } = useOrderConceptByUuid(order.concept.uuid);
+  const { isLoading, error } = useCompletedLabResults(order);
 
   if (isLoading || isLoadingConcepts)
     return (
@@ -32,11 +31,7 @@ const LabResults: React.FC<LabResultsProps> = ({ order }) => {
       />
     );
 
-  return (
-    <Tile className={styles.resultsCiontainer}>
-      <OrderDetail order={order} />
-    </Tile>
-  );
+  return <OrderDetail order={order} />;
 };
 
 export default LabResults;

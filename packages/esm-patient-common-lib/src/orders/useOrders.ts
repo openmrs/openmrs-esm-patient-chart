@@ -16,7 +16,7 @@ export const drugCustomRepresentation =
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
 export const orderCustomRepresentation =
-  'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller)';
+  'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,fulfillerStatus)';
 
 export function usePatientOrders(
   patientUuid: string,
@@ -69,6 +69,19 @@ export function usePatientOrders(
 
 export function getDrugOrderByUuid(orderUuid: string) {
   return openmrsFetch<Order>(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
+}
+
+export function useDrugOrderByUuid(orderUuid: string) {
+  const { data, error, isLoading } = useSWR<FetchResponse<Order>, Error>(
+    orderUuid ? `${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}` : null,
+    openmrsFetch,
+  );
+
+  return {
+    data: data?.data ?? null,
+    error,
+    isLoading,
+  };
 }
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java

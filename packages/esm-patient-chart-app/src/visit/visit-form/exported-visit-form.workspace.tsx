@@ -37,6 +37,7 @@ import {
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
+  invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
 } from '@openmrs/esm-patient-common-lib';
@@ -123,7 +124,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
     config.showRecommendedVisitTypeTab ? 0 : 1,
   );
-  const visitHeaderSlotState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const visitHeaderSlotState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
 
   const { mutate: globalMutate } = useSWRConfig();
@@ -333,6 +334,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             // This will invalidate visit history and encounter tables for this patient
             // (if visitContext is updated, it should have been invalidated with mutateSavedOrUpdatedVisit)
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
+            invalidateCurrentVisit(globalMutate, patientUuid);
 
             // handleVisitAttributes already has code to show error snackbar when attribute fails to update
             // no need for catch block here
@@ -372,6 +374,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           async (visit) => {
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
+            invalidateCurrentVisit(globalMutate, patientUuid);
             showSnackbar({
               isLowContrast: true,
               kind: 'success',
@@ -469,8 +472,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ name }) => onChange(name)}
                           size="md"
                         >
-                          <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
-                          <Switch name="past" text={t('ended', 'Ended')} />
+                          <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                          <Switch name="past">{t('ended', 'Ended')}</Switch>
                         </ContentSwitcher>
                       ) : (
                         <ContentSwitcher
@@ -478,9 +481,9 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ name }) => onChange(name)}
                           size="md"
                         >
-                          <Switch name="new" text={t('new', 'New')} />
-                          <Switch name="ongoing" text={t('ongoing', 'Ongoing')} />
-                          <Switch name="past" text={t('inThePast', 'In the past')} />
+                          <Switch name="new">{t('new', 'New')}</Switch>
+                          <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                          <Switch name="past">{t('inThePast', 'In the past')}</Switch>
                         </ContentSwitcher>
                       );
                     }}
@@ -550,8 +553,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
                           size="md"
                         >
-                          <Switch name="recommended" text={t('recommended', 'Recommended')} />
-                          <Switch name="all" text={t('all', 'All')} />
+                          <Switch name="recommended">{t('recommended', 'Recommended')}</Switch>
+                          <Switch name="all">{t('all', 'All')}</Switch>
                         </ContentSwitcher>
                         {visitTypeContentSwitcherIndex === 0 && !isLoading && (
                           <MemoizedRecommendedVisitType

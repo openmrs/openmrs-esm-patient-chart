@@ -3,11 +3,11 @@ import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, type Control } from 'react-hook-form';
+import type { TFunction } from 'i18next';
 import {
   Button,
   ButtonSet,
@@ -101,7 +101,7 @@ export interface VisitNotesFormProps {
 const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}>> = ({
   closeWorkspace,
   workspaceProps: { formContext, encounter },
-  groupProps: { patientUuid },
+  groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
   const searchTimeoutInMs = 500;
@@ -109,7 +109,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
-  const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
@@ -151,7 +151,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const {
     clearErrors,
     control,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
     setValue,
     watch,
@@ -160,7 +160,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
-      noteDate: isEditing ? new Date(encounter.datetime) : new Date(),
+      noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
         : '',
@@ -497,8 +497,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
 
   const onError = (errors) => console.error(errors);
 
+  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+
   return (
-    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={isDirty}>
+    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
@@ -722,7 +724,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
             className={styles.button}
             kind="primary"
             onClick={() => handleSubmit}
-            disabled={isSubmitting}
+            disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {isSubmitting ? (
