@@ -25,6 +25,9 @@ export interface FormEntryProps {
   additionalProps?: Record<string, any>;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   handlePostResponse?: (encounter: Encounter) => void;
+  hideControls?: boolean;
+  hidePatientBanner?: boolean;
+  preFilledQuestions?: Record<string, string>;
 }
 
 const FormEntry: React.FC<FormEntryProps> = ({
@@ -36,6 +39,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
   mutateVisitContext,
   closeWorkspace,
   handlePostResponse,
+  hideControls,
+  hidePatientBanner,
+  preFilledQuestions,
   additionalProps,
 }) => {
   const formUuid = form.uuid;
@@ -68,6 +74,9 @@ const FormEntry: React.FC<FormEntryProps> = ({
       visit: visitContext ?? null,
       additionalProps: additionalProps ?? {},
       handlePostResponse,
+      hideControls,
+      hidePatientBanner,
+      preFilledQuestions,
       closeWorkspace: () => {
         return closeWorkspace();
       },
@@ -83,6 +92,7 @@ const FormEntry: React.FC<FormEntryProps> = ({
         return closeWorkspace({ discardUnsavedChanges: true });
       },
       promptBeforeClosing: (func) => setHasUnsavedChanges(func()),
+      setHasUnsavedChanges,
     }),
     [
       closeWorkspace,
@@ -90,11 +100,14 @@ const FormEntry: React.FC<FormEntryProps> = ({
       formUuid,
       globalMutate,
       handlePostResponse,
+      hideControls,
+      hidePatientBanner,
       isOnline,
       mutateForms,
       mutateVisitContext,
       patient,
       patientUuid,
+      preFilledQuestions,
       setHasUnsavedChanges,
       visitStartDatetime,
       visitStopDatetime,

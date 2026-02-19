@@ -5,6 +5,7 @@ import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openm
 import { usePatientOrders } from '../api';
 import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
+import styles from './medications-summary.scss';
 
 export interface MedicationsSummaryProps {
   patient: fhir.Patient;
@@ -28,7 +29,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
 
   return (
     <div>
-      <div style={{ marginBottom: '1.5rem' }}>
+      <section className={styles.medicationsSummaryContainer}>
         {(() => {
           const headerTitle = t('futureMedicationsHeaderTitle', 'Future medications');
           const displayText = t('futureMedicationsDisplayText', 'future medications');
@@ -53,8 +54,8 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
 
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
-      </div>
-      <div style={{ marginBottom: '1.5rem' }}>
+      </section>
+      <section className={styles.medicationsSummaryContainer}>
         {(() => {
           const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
           const displayText = t('activeMedicationsDisplayText', 'active medications');
@@ -79,8 +80,8 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
 
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
-      </div>
-      <div>
+      </section>
+      <section>
         {(() => {
           const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
           const displayText = t('pastMedicationsDisplayText', 'past medications');
@@ -106,7 +107,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
 
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
-      </div>
+      </section>
     </div>
   );
 }

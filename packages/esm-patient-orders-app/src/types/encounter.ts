@@ -48,6 +48,7 @@ export interface Observation {
   obsDatetime: string;
   groupMembers?: Array<Observation>;
   value: ObservationValue;
+  interpretation?: string;
   location: OpenmrsResource;
   order: Order;
   status: string;

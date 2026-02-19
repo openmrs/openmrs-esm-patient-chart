@@ -95,17 +95,17 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         <FormEngine
           encounterUUID={encounterUuid}
           formJson={schema}
+          formSessionIntent={formSessionIntent}
           handleClose={handleCloseForm}
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
-          markFormAsDirty={setHasUnsavedChanges}
-          mode={additionalProps?.mode}
-          formSessionIntent={formSessionIntent}
-          onSubmit={handleOnSubmit}
-          patientUUID={patientUuid}
-          visit={visit}
           hideControls={hideControls}
           hidePatientBanner={hidePatientBanner}
+          markFormAsDirty={setHasUnsavedChanges}
+          mode={additionalProps?.mode}
+          onSubmit={handleOnSubmit}
+          patientUUID={patientUuid}
           preFilledQuestions={preFilledQuestions}
+          visit={visit}
         />
       )}
     </>

@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import {
+  ExtensionSlot,
   useConfig,
   useDebounce,
   ResponsiveWrapper,
@@ -43,13 +44,15 @@ export default function DrugSearch({ closeWorkspace, openOrderForm, patient, vis
 
   return (
     <div className={styles.searchPopupContainer}>
+      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
       <ResponsiveWrapper>
         <Search
-          size="lg"
-          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+          className={styles.searchInput}
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           onChange={handleSearchTermChange}
+          placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           ref={searchInputRef}
+          size="lg"
           value={searchTerm}
         />
       </ResponsiveWrapper>

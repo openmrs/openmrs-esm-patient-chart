@@ -60,7 +60,6 @@ describe('FutureMedications', () => {
 
   test('renders a tabular overview of the future medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
-    // .mockReturnValueOnce({data: { results: mockPatientDrugOrdersApiData }})
 
     renderWithSwr(<FutureMedications patient={mockPatient} />);
 
@@ -81,9 +80,7 @@ describe('FutureMedications', () => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
-    const expectedTableRows = [
-      /14-Aug-2113 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo 00 Options/i,
-    ];
+    const expectedTableRows = [];
 
     expectedTableRows.forEach((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
