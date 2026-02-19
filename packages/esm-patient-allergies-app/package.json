@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-allergies-app",
-  "version": "11.3.0",
+  "version": "12.0.0",
   "license": "MPL-2.0",
   "description": "Patient allergies microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-allergies-app.js",
@@ -41,8 +41,8 @@
     "lodash-es": "^4.17.23"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "8.x",
-    "@openmrs/esm-patient-common-lib": "11.x",
+    "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-patient-common-lib": "12.x",
     "dayjs": "1.x",
     "react": "^18.2.0",
     "react-i18next": "16.x",
