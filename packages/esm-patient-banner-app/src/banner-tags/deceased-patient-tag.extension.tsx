@@ -21,7 +21,7 @@ const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ pat
       align="bottom-left"
       definition={
         <div role="tooltip" className={styles.tooltipPadding}>
-          <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
+          <span className={styles.heading}>{t('deceased', 'Deceased')}</span>
           <span>
             {formatDatetime(parseDate(patient?.deceasedDateTime))}
             {nonCodedCauseOfDeath || causeOfDeath

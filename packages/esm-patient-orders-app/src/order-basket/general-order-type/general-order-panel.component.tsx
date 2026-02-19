@@ -94,7 +94,7 @@ const GeneralOrderPanel: React.FC<GeneralOrderTypeProps> = ({
       <div className={styles.container}>
         <div className={styles.iconAndLabel}>
           <MaybeIcon icon={icon ? icon : 'omrs-icon-generic-order-type'} size={isTablet ? 40 : 24} />
-          <h4 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h4>
+          <h2 className={styles.heading}>{`${label ? t(label) : orderType?.display} (${orders.length})`}</h2>
         </div>
         <div className={styles.buttonContainer}>
           <Button

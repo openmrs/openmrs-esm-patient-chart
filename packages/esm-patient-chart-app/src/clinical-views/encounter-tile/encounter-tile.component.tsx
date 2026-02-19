@@ -16,7 +16,7 @@ export const EncounterTile = memo(({ patientUuid, columns, headerTitle }: Encoun
     <Layer className={styles.layer}>
       <Tile className={styles.tile}>
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4 className={styles.title}>{headerTitle}</h4>
+          <h2 className={styles.title}>{headerTitle}</h2>
         </div>
         <Grid fullWidth>
           {columns.map((column, index) => (
