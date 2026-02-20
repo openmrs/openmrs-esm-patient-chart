@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -21,10 +21,12 @@ import { type ConfigObject } from '../config-schema';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+import { shouldShowBmi } from '../common/helpers';
 
 interface VitalsHeaderProps {
   patientUuid: string;
   visitContext: Visit;
+  patient: fhir.Patient;
 
   /**
    * custom function to launch the vitals form. Use this in places outside of the patient chart
@@ -40,6 +42,7 @@ interface VitalsHeaderProps {
 
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   patientUuid,
+  patient,
   visitContext,
   launchCustomVitalsForm,
   hideLinks = false,
@@ -54,6 +57,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
   const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
   const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -228,11 +232,13 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               unitSymbol={(latestVitals?.height && conceptUnits.get(config.concepts.heightUuid)) ?? ''}
               value={latestVitals?.height ?? '--'}
             />
-            <VitalsHeaderItem
-              unitName={t('bmi', 'BMI')}
-              unitSymbol={(latestVitals?.bmi && config.biometrics['bmiUnit']) ?? ''}
-              value={latestVitals?.bmi ?? '--'}
-            />
+            {showBmi && (
+              <VitalsHeaderItem
+                unitName={t('bmi', 'BMI')}
+                unitSymbol={(latestVitals?.bmi && config.biometrics['bmiUnit']) ?? ''}
+                value={latestVitals?.bmi ?? '--'}
+              />
+            )}
             {latestVitals?.muac && (
               <VitalsHeaderItem
                 unitName={t('muac', 'MUAC')}

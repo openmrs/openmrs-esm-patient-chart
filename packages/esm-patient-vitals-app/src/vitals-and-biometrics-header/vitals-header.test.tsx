@@ -19,6 +19,7 @@ const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
   visitContext: mockOngoingVisitWithEncounters,
+  patient: mockPatient,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -351,5 +352,47 @@ describe('VitalsHeader', () => {
       return element.className === 'critically-high';
     });
     expect(criticallyHighElements).toHaveLength(1);
+  });
+
+  it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      // Make patient minor
+      birthDate: '2020-07-22',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      biometrics: {
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const someVitals: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 89,
+        systolic: 121,
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: someVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    // BMI should be hidden for minors when restriction is enabled
+    expect(screen.queryByText(/BMI/i)).not.toBeInTheDocument();
   });
 });
