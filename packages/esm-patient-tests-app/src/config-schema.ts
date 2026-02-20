@@ -33,6 +33,12 @@ export const configSchema = {
       },
     ],
   },
+  orderTypeUuid: {
+    _type: Type.UUID,
+    _description:
+      'UUID identifying this order basket extension panel order type. Used by the order basket to determine whether to render this panel when filtering by visibleOrderPanels.',
+    _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
+  },
   orders: {
     labOrderTypeUuid: {
       _type: Type.UUID,
@@ -130,6 +136,7 @@ export interface OrderReason {
 }
 
 export interface ConfigObject {
+  orderTypeUuid: string;
   labTestsWithOrderReasons: Array<OrderReason>;
   orders: {
     labOrderTypeUuid: string;
