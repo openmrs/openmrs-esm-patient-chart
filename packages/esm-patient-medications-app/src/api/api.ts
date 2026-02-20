@@ -46,7 +46,7 @@ export function usePatientOrders(patientUuid: string) {
   const ordersUrl = useMemo(
     () =>
       patientUuid
-        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}`
+        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`
         : null,
     [patientUuid, drugOrderTypeUUID],
   );
