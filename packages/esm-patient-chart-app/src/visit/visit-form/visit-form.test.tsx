@@ -1,3 +1,4 @@
+
 import React from 'react';
 import dayjs from 'dayjs';
 import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
@@ -91,10 +92,12 @@ const mockUseEmrConfiguration = jest.mocked(useEmrConfiguration);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = jest.fn();
-jest.mocked(useVisitFormCallbacks).mockReturnValue([
-  new Map([['test-extension-id', { onVisitCreatedOrUpdated: mockOnVisitCreatedOrUpdatedCallback }]]), // visitFormCallbacks
-  jest.fn(), // setVisitFormCallbacks
-]);
+// FIX: tests updated to match the new useVisitFormCallbacks shape (it now returns a ref)
+// The hook previously returned [map, setMap] (useState tuple) — tests used to mock that shape.
+// FIX APPLIED: mock useVisitFormCallbacks to return a ref to the map ref-shaped object { current: Map(...) }.
+jest.mocked(useVisitFormCallbacks).mockReturnValue({
+  current: new Map([['test-extension-id', { onVisitCreatedOrUpdated: mockOnVisitCreatedOrUpdatedCallback }]]), // visitFormCallbacks
+});
 const mockCreateVisitAttribute = jest.mocked(createVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockUpdateVisitAttribute = jest.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockDeleteVisitAttribute = jest.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
