@@ -85,7 +85,12 @@ interface DiagnosisSearchProps {
 
 const createSchema = (t: TFunction) => {
   return z.object({
-    noteDate: z.date(),
+    noteDate: z
+      .date()
+      .refine(
+        (date) => date.getFullYear() >= 1000, 
+        { message: t('invalidValue', 'Invalid value') }
+      ),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
