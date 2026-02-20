@@ -61,14 +61,14 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         align="right"
                         label={
                           <>
-                            {t('fromdate', 'From {{date}}', {
+                            {t('fromDate', 'From {{date}}', {
                               date: formatDate(new Date(medication.order.scheduledDate)),
                             })}
                           </>
                         }
                       >
-                        <Tag type="green" className={styles.tag}>
-                          {t('scheduledinfuture', 'Scheduled for future')}
+                        <Tag type="blue" className={styles.tag}>
+                          {t('scheduledForFuture', 'Scheduled for future')}
                         </Tag>
                       </Tooltip>
                     )}
@@ -77,20 +77,20 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         align="right"
                         label={
                           <>
-                            {t('fromdate', 'From {{date}}', {
+                            {t('fromDate', 'From {{date}}', {
                               date: formatDate(new Date(medication.order.scheduledDate)),
                             })}
                           </>
                         }
                       >
-                        <Tag type="red" className={styles.tag}>
-                          {t('scheduledinpast', 'Scheduled in past')}
+                        <Tag type="blue" className={styles.tag}>
+                          {t('scheduledInPast', 'Scheduled in past')}
                         </Tag>
                       </Tooltip>
                     )}
                     {isDiscontinued(medication.order) && (
                       <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
-                        <Tag type="gray" className={styles.tag}>
+                        <Tag type="red" className={styles.tag}>
                           {t('discontinued', 'Discontinued')}
                         </Tag>
                       </Tooltip>
