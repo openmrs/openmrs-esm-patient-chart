@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "procedures-summary-dashboard",
+      "component": "proceduresDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "online": true,
+      "offline": true,
+      "order": 7,
+      "meta": {
+        "slot": "patient-chart-procedures-dashboard-slot",
+        "path": "procedures"
+      }
+    },
+    {
+      "name": "procedures-details-widget",
+      "component": "proceduresOverview",
+      "slot": "patient-chart-procedures-dashboard-slot",
+      "online": true,
+      "offline": true
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-procedures-form-workspace",
+      "title": "recordProcedure",
+      "component": "proceduresFormWorkspace",
+      "type": "form"
+    }
+  ]
+}
