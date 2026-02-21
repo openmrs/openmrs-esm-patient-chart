@@ -17,20 +17,9 @@ export const configSchema = {
     },
     _default: [
       {
-        // Hematology
-        conceptUuid: 'ae485e65-2e3f-4297-b35e-c818bbefe894',
+        conceptUuid: '1748a953-d12e-4be1-914c-f6b096c6cdef',
         defaultOpen: false,
-      },
-      {
-        // Bloodwork (contains Hematology, above)
-        conceptUuid: '8904fa2b-6a8f-437d-89ec-6fce3cd99093',
-        defaultOpen: false,
-      },
-      {
-        // HIV viral load
-        conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        defaultOpen: false,
-      },
+      }
     ],
   },
   orders: {
