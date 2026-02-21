@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { getCoreTranslation, type Attachment } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './delete-attachment.scss';
 
 interface DeleteAttachmentConfirmationProps {
@@ -16,9 +17,10 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
   onConfirmation,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={close} className={styles.modalHeader}>
         {t('deleteAttachment', 'Delete attachment')}
       </ModalHeader>
@@ -41,7 +43,7 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
           {getCoreTranslation('delete')}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

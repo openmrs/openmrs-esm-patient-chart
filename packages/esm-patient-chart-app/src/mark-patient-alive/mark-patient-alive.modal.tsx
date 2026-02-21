@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { markPatientAlive } from '../data.resource';
 
 interface MarkPatientAliveProps {
@@ -11,6 +12,7 @@ interface MarkPatientAliveProps {
 
 const MarkPatientAlive: React.FC<MarkPatientAliveProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
 
   const handleSubmit = useCallback(() => {
     closeModal();
@@ -34,7 +36,7 @@ const MarkPatientAlive: React.FC<MarkPatientAliveProps> = ({ closeModal, patient
   }, [closeModal, patientUuid, t]);
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeModal} title={t('markPatientAlive', 'Mark patient alive')} />
       <ModalBody>{t('markPatientAliveConfirmation', 'Are you sure you want to mark this patient alive?')}</ModalBody>
       <ModalFooter>

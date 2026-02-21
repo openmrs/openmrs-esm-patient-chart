@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore, useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
@@ -19,6 +19,7 @@ interface EndVisitDialogProps {
  */
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const { activeVisit, mutate } = useVisit(patientUuid);
   const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
 
@@ -57,7 +58,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
   };
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader
         closeModal={closeModal}
         title={t('endActiveVisitConfirmation', 'Are you sure you want to end this active visit?')}

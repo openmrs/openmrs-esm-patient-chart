@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar, getCoreTranslation } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { deleteProgramEnrollment, useEnrollments } from './programs.resource';
 import styles from './delete-program.scss';
 
@@ -13,6 +14,7 @@ interface DeleteProgramProps {
 
 const DeleteProgramModal: React.FC<DeleteProgramProps> = ({ closeDeleteModal, programEnrollmentId, patientUuid }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const { mutateEnrollments } = useEnrollments(patientUuid);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -40,7 +42,7 @@ const DeleteProgramModal: React.FC<DeleteProgramProps> = ({ closeDeleteModal, pr
   }, [closeDeleteModal, programEnrollmentId, t, mutateEnrollments]);
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader
         closeModal={closeDeleteModal}
         title={t('deletePatientProgramEnrollment', 'Delete program enrollment')}

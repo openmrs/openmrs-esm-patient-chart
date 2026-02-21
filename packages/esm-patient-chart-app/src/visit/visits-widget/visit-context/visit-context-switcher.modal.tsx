@@ -11,7 +11,7 @@ import {
   useOnVisible,
   type Visit,
 } from '@openmrs/esm-framework';
-import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitByUuid, usePatientChartStore, useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';
@@ -29,6 +29,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   onAfterVisitSelected,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const [maxStartDate, setMaxStartDate] = useState(new Date());
   const maxStartDateDebounced = useDebounce(maxStartDate);
 
@@ -57,7 +58,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   };
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeModal} title={t('selectAVisit', 'Select a visit')}>
         <OpenmrsDatePicker
           id="visit-context-switcher-date-picker"
@@ -116,7 +117,7 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
           {t('continue', 'Continue')}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

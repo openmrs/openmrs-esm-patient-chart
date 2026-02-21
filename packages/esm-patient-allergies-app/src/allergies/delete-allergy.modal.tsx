@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { deletePatientAllergy, useAllergies } from './allergy-intolerance.resource';
 
 interface DeleteAllergyModalProps {
@@ -12,6 +13,7 @@ interface DeleteAllergyModalProps {
 
 const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModal, allergyId, patientUuid }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const { mutate } = useAllergies(patientUuid);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -43,7 +45,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
   }, [closeDeleteModal, allergyId, mutate, t, patientUuid]);
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeDeleteModal} title={t('deletePatientAllergy', 'Delete allergy')} />
       <ModalBody>
         <p>{t('deleteModalConfirmationText', 'Are you sure you want to delete this allergy?')}</p>
@@ -60,7 +62,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
           )}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

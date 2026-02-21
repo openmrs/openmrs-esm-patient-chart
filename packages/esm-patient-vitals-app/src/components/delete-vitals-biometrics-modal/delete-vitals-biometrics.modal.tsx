@@ -3,6 +3,7 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { deleteEncounter, invalidateCachedVitalsAndBiometrics } from '../../common';
 import { ModalHeader, ModalBody, ModalFooter, Button, InlineLoading } from '@carbon/react';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 
 interface DeleteVitalsAndBiometricsModalProps {
   patientUuid: string;
@@ -15,6 +16,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
   closeDeleteModal,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
@@ -52,7 +54,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
   }, [encounterUuid, t, closeDeleteModal]);
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader
         closeModal={closeDeleteModal}
         title={t('deleteVitalsAndBiometrics', 'Delete vitals and biometrics')}
@@ -77,7 +79,7 @@ const DeleteVitalsAndBiometricsModal: React.FC<DeleteVitalsAndBiometricsModalPro
           )}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

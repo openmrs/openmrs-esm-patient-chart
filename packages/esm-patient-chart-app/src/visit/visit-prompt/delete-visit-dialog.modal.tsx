@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter, InlineLoading } from '@carbon/react';
 import { type Visit } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from '../hooks/useDeleteVisit';
 import styles from './start-visit-dialog.scss';
 
@@ -12,10 +13,11 @@ interface DeleteVisitDialogProps {
 
 const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, visit }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, closeModal);
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader
         closeModal={closeModal}
         title={t('deleteVisitDialogHeader', 'Are you sure you want to delete this visit?')}

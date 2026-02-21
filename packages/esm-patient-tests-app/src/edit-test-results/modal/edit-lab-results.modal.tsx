@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
 import { launchWorkspace2, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
+import { type Order, useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './edit-lab-results.scss';
 
 type EditLabResultModalProps = {
@@ -26,6 +26,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
   workspaceName = 'test-results-form-workspace',
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const [selectedOrder, setSelectedOrder] = useState<Order>(orders?.[0]);
   const getGender = (gender: string): string => {
     switch (gender) {
@@ -66,7 +67,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
       : t('confirmEditResults', 'Do you want to edit test results for the following patient?');
 
   return (
-    <>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeModal} title={t('editLabResults', 'Edit lab results')} />
       <ModalBody>
         <p className={styles.titleHeader}>{confirmationText}</p>
@@ -159,7 +160,7 @@ const EditLabResultModal: React.FC<EditLabResultModalProps> = ({
           {t('editTestResults', 'Edit test results')}
         </Button>
       </ModalFooter>
-    </>
+    </div>
   );
 };
 

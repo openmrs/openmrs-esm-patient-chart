@@ -21,6 +21,7 @@ const mockSetVisitContext = jest.fn();
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   usePatientChartStore: jest.fn(),
+  useFocusTrap: jest.fn().mockReturnValue({ current: null }),
 }));
 
 mockUsePatientChartStore.mockReturnValue({
