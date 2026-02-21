@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import dayjs from 'dayjs';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
@@ -166,6 +167,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
+      dateActivated: order.startDate ? dayjs(order.startDate).format('YYYY-MM-DDTHH:mm:ss.SSSZ') : undefined,
     };
   } else if (order.action === 'RENEW') {
     return {
@@ -194,6 +196,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
+      dateActivated: order.startDate ? dayjs(order.startDate).format('YYYY-MM-DDTHH:mm:ss.SSSZ') : undefined,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -222,6 +225,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
       orderReasonNonCoded: order.indication,
+      dateActivated: order.startDate ? dayjs(order.startDate).format('YYYY-MM-DDTHH:mm:ss.SSSZ') : undefined,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
