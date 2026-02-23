@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import {
@@ -20,6 +20,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
   TableToolbar,
   TableToolbarContent,
   Tile,
@@ -38,6 +40,8 @@ import {
   type EncounterType,
   ExtensionSlot,
   useFeatureFlag,
+  PrinterIcon,
+  openmrsFetch,
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
@@ -70,6 +74,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   showEncounterTypeFilter,
   showVisitType,
   totalCount,
+  isSelectable,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
@@ -81,6 +86,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
+  const [isPrinting, setIsPrinting] = useState(false);
+
   const paginatedMappedEncounters = useMemo(
     () => (paginatedEncounters ?? []).map(mapEncounter).filter(Boolean),
     [paginatedEncounters],
@@ -158,6 +165,111 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     [mutate, mutateVisitContext, patientUuid, t],
   );
 
+  const downloadPdf = async (encounterUuids: string[]) => {
+    if (!encounterUuids || encounterUuids.length === 0) return;
+
+    setIsPrinting(true);
+    let currentJobId = null;
+
+    try {
+      const initResponse = await openmrsFetch('/ws/rest/v1/patientdocuments/encounters', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(encounterUuids),
+      });
+
+      if (!initResponse.ok) {
+        throw new Error('Failed to initiate PDF generation.');
+      }
+
+      const initData = await initResponse.json();
+      currentJobId = initData.uuid;
+
+      showSnackbar({
+        isLowContrast: true,
+        title: t('generatingPdf', 'Generating PDF...'),
+        kind: 'info',
+        subtitle: t('pdfWillDownloadSoon', 'Your document is being generated and will download automatically.'),
+      });
+
+      let isCompleted = false;
+      let isFailed = false;
+      let attempts = 0;
+      const maxAttempts = 60;
+
+      while (!isCompleted && !isFailed && attempts < maxAttempts) {
+        attempts++;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const statusResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/status/${currentJobId}`);
+        if (!statusResponse.ok) {
+          continue;
+        }
+
+        const statusData = await statusResponse.json();
+
+        if (statusData.status === 'COMPLETED') {
+          isCompleted = true;
+        } else if (statusData.status === 'FAILED') {
+          isFailed = true;
+          throw new Error(statusData.error || 'Server failed to generate the report.');
+        }
+      }
+
+      if (!isCompleted) {
+        throw new Error('Report generation timed out. Please try again or select fewer encounters.');
+      }
+
+      const downloadResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/download/${currentJobId}`);
+
+      if (!downloadResponse.ok) {
+        throw new Error('Failed to download the generated PDF.');
+      }
+
+      const blob = await downloadResponse.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+      let fileName = 'EncountersReport.pdf';
+      if (contentDisposition && contentDisposition.includes('filename=')) {
+        fileName = contentDisposition.split('filename=')[1].replace(/"/g, '');
+      }
+
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showSnackbar({
+        isLowContrast: true,
+        title: t('printSuccess', 'Print successful'),
+        kind: 'success',
+        subtitle: t('pdfDownloaded', 'PDF has been downloaded successfully'),
+      });
+    } catch (error) {
+      console.error('Error in async PDF flow:', error);
+      showSnackbar({
+        isLowContrast: false,
+        title: t('error', 'Error'),
+        kind: 'error',
+        subtitle: error.message || t('printError', 'Failed to generate PDF. Please check server logs.'),
+      });
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
+  const handlePrintSelected = (selectedRows: Array<any>) => {
+    const selectedEncounterUuids = selectedRows.map((row) => row.id);
+    downloadPdf(selectedEncounterUuids);
+  };
+
   if (isLoadingEncounterTypes || isLoading) {
     return <DataTableSkeleton role="progressbar" zebra />;
   }
@@ -179,72 +291,90 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getExpandHeaderProps,
           getToolbarProps,
           getTableProps,
+          getSelectionProps,
+          selectedRows,
         }: {
           headers: Array<{ header: React.ReactNode; key: string }>;
           rows: Array<{ id: string; isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
           [key: string]: any;
-        }) => (
-          <TableContainer className={styles.tableContainer}>
-            {showEncounterTypeFilter && (
-              <TableToolbar {...getToolbarProps()}>
-                <TableToolbarContent>
-                  <div className={styles.filterContainer}>
-                    <ComboBox
-                      aria-label={t('filterByEncounterType', 'Filter by encounter type')}
-                      className={styles.substitutionType}
-                      id="encounterTypeFilter"
-                      items={encounterTypes}
-                      itemToString={(item: EncounterType) => item?.display}
-                      onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
-                      placeholder={t('filterByEncounterType', 'Filter by encounter type')}
-                      selectedItem={encounterTypeToFilter}
-                      size={responsiveSize}
-                    />
-                  </div>
-                </TableToolbarContent>
-              </TableToolbar>
-            )}
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                  {headers.map((header, i) => (
-                    <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                  <TableHeader aria-label={t('actions', 'Actions')} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows?.map((row) => {
-                  const encounter = encountersByUuid.get(row.id);
+        }) => {
+          const selectedRowsCount = selectedRows.length;
+          return (
+            <TableContainer className={styles.tableContainer}>
+              {showEncounterTypeFilter && (
+                <TableToolbar {...getToolbarProps()}>
+                  <TableToolbarContent>
+                    <div className={styles.filterContainer}>
+                      <ComboBox
+                        aria-label={t('filterByEncounterType', 'Filter by encounter type')}
+                        className={styles.substitutionType}
+                        id="encounterTypeFilter"
+                        items={encounterTypes}
+                        itemToString={(item: EncounterType) => item?.display}
+                        onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
+                        placeholder={t('filterByEncounterType', 'Filter by encounter type')}
+                        selectedItem={encounterTypeToFilter}
+                        size={responsiveSize}
+                      />
+                    </div>
+                    {isSelectable && (
+                      <Button
+                        kind="ghost"
+                        size={responsiveSize}
+                        renderIcon={PrinterIcon}
+                        disabled={selectedRowsCount === 0 || isPrinting}
+                        onClick={() => handlePrintSelected(selectedRows)}
+                      >
+                        {isPrinting ? t('generating', 'Generating...') : t('printSelected', 'Print selected')}
+                      </Button>
+                    )}
+                  </TableToolbarContent>
+                </TableToolbar>
+              )}
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                    {isSelectable && <TableSelectAll {...getSelectionProps()} />}
+                    {headers.map((header, i) => (
+                      <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                    <TableHeader aria-label={t('actions', 'Actions')} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows?.map((row) => {
+                    const encounter = encountersByUuid.get(row.id);
 
-                  if (!encounter) return null;
+                    if (!encounter) return null;
 
-                  const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                    encounter.encounterType === 'Visit Note' && !encounter.form;
+                    const isVisitNoteEncounter = (encounter: MappedEncounter) =>
+                      encounter.encounterType === 'Visit Note' && !encounter.form;
 
-                  const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
-                    encounter.form?.uuid &&
-                    encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
+                    const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
+                      encounter.form?.uuid &&
+                      encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
-                  const encounterAgeInMinutes = (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
+                    const encounterAgeInMinutes =
+                      (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
 
-                  const canDeleteEncounter =
-                    userHasAccess(encounter.editPrivilege, session?.user) &&
-                    (encounterEditableDuration === 0 ||
-                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
-                      encounterEditableDurationOverridePrivileges.some((privilege) =>
-                        userHasAccess(privilege, session?.user),
-                      ));
+                    const canDeleteEncounter =
+                      userHasAccess(encounter.editPrivilege, session?.user) &&
+                      (encounterEditableDuration === 0 ||
+                        (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                        encounterEditableDurationOverridePrivileges.some((privilege) =>
+                          userHasAccess(privilege, session?.user),
+                        ));
 
-                  const canEditEncounter =
-                    canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
+                    const canEditEncounter =
+                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
 
                   return (
                     <React.Fragment key={encounter.id}>
                       <TableExpandRow {...getRowProps({ row })}>
+                        {isSelectable && <TableSelectRow {...getSelectionProps({ row })} />}
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value}</TableCell>
                         ))}
@@ -286,6 +416,16 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
                                   />
                                 )}
+                                  {supportsEmbeddedFormView(encounter) && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      hasDivider
+                                      isDelete /*  */
+                                      itemText={t('printEncounter', 'Print this encounter')}
+                                      disabled={isPrinting}
+                                      onClick={() => downloadPdf([encounter.id])}
+                                    />
+                                  )}
                               </OverflowMenu>
                             )}
                           </Layer>
@@ -371,7 +511,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
               </div>
             )}
           </TableContainer>
-        )}
+          );
+        }}
       </DataTable>
       {
         <Pagination

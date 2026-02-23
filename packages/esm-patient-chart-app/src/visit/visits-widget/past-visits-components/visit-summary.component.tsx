@@ -22,6 +22,7 @@ import VisitEncountersTable from './encounters-table/visit-encounters-table.comp
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
 import { type ChartConfig } from '../../../config-schema';
 import styles from './visit-summary.scss';
+import VisitCompletedFormsTable from './encounters-table/visit-completed-forms-table.component';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -135,6 +136,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </Tab>
           <Tab
             className={styles.tab}
+            id="completed-forms-tab"
+            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+          >
+            {t('completedForms', 'Completed Forms')}
+          </Tab>
+          <Tab
+            className={styles.tab}
             id="encounters-tab"
             disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
           >
@@ -161,6 +169,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
+          </TabPanel>
+          <TabPanel>
+            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
             <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
