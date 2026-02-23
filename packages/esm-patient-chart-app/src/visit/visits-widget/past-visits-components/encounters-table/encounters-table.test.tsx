@@ -32,6 +32,7 @@ const testProps: EncountersTableProps = {
   showEncounterTypeFilter: false,
   pageSize: 10,
   setPageSize: jest.fn(),
+  isSelectable: true,
 };
 
 const mockShowModal = jest.mocked(showModal);
@@ -367,3 +368,23 @@ describe('Delete Encounter', () => {
 function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
   renderWithSwr(<EncountersTable {...testProps} {...props} />);
 }
+
+describe('EncountersTable print functionality', () => {
+  it('hides print button when isSelectable is false', async () => {
+    mockUserHasAccess.mockReturnValue(false);
+    renderEncountersTable({ isSelectable: false, showEncounterTypeFilter: true });
+
+    await screen.findByRole('table');
+
+    expect(screen.queryByRole('button', { name: /print selected/i })).not.toBeInTheDocument();
+  });
+
+  it('shows print button when isSelectable is true', async () => {
+    mockUserHasAccess.mockReturnValue(true);
+    renderEncountersTable({ isSelectable: true, showEncounterTypeFilter: true });
+
+    await screen.findByRole('table');
+
+    expect(screen.getByRole('button', { name: /print selected/i })).toBeInTheDocument();
+  });
+});
