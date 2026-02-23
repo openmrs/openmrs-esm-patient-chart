@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -22,6 +22,17 @@ import {
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
+import type {
+  CommonMedicationValueCoded,
+  DosingUnit,
+  Drug,
+  DrugOrderBasketItem,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   age,
@@ -36,22 +47,11 @@ import {
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
-import {
-  type Drug,
-  type CommonMedicationValueCoded,
-  type DosingUnit,
-  type DrugOrderBasketItem,
-  type DurationUnit,
-  type MedicationFrequency,
-  type MedicationRoute,
-  type QuantityUnit,
-} from '@openmrs/esm-patient-common-lib';
+import { useActivePatientOrders } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useActivePatientOrders } from '../api';
+import { durationToDays, type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 import styles from './drug-order-form.scss';
-import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
 export interface DrugOrderFormProps {
   /**
@@ -122,7 +122,7 @@ export function DrugOrderForm({
   workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit } = useConfig<ConfigObject>();
+  const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
@@ -165,9 +165,119 @@ export function DrugOrderForm({
 
   const drug = watch('drug') as Drug;
   const routeValue = watch('route')?.value;
-  const unitValue = watch('unit')?.value;
-  const dosage = watch('dosage');
+  const watchedUnit = watch('unit');
+  const watchedUnitValue = watchedUnit?.value;
+  const watchedDosage = watch('dosage');
   const startDate = watch('startDate');
+  const watchedFrequency = watch('frequency');
+  const watchedDuration = watch('duration');
+  const watchedDurationUnit = watch('durationUnit');
+  const watchedIsFreeText = watch('isFreeTextDosage');
+  const watchedAsNeeded = watch('asNeeded');
+  const watchedQuantityUnits = watch('quantityUnits');
+  const watchedPillsDispensed = watch('pillsDispensed');
+
+  const autoCalcDriverKey = useMemo(
+    () =>
+      [
+        watchedIsFreeText ? '1' : '0',
+        watchedDosage ?? '',
+        watchedFrequency?.valueCoded ?? '',
+        watchedFrequency?.frequencyPerDay ?? '',
+        watchedDuration ?? '',
+        watchedDurationUnit?.valueCoded ?? '',
+        watchedUnit?.valueCoded ?? '',
+      ].join('|'),
+    [
+      watchedIsFreeText,
+      watchedDosage,
+      watchedFrequency?.valueCoded,
+      watchedFrequency?.frequencyPerDay,
+      watchedDuration,
+      watchedDurationUnit?.valueCoded,
+      watchedUnit?.valueCoded,
+    ],
+  );
+  const [manualDriverKey, setManualDriverKey] = useState<string | null>(
+    initialOrderBasketItem?.pillsDispensed != null ? autoCalcDriverKey : null,
+  );
+  const isManualMode = manualDriverKey === autoCalcDriverKey;
+
+  useEffect(() => {
+    if (isManualMode) {
+      return;
+    }
+
+    // For existing orders (REVISE/RENEW), frequencyPerDay is unavailable from the Order resource.
+    // Preserve the saved quantity — we can't recalculate, but the existing value may still be valid.
+    const isExistingOrder = initialOrderBasketItem?.action === 'REVISE' || initialOrderBasketItem?.action === 'RENEW';
+    if (watchedFrequency?.frequencyPerDay == null && isExistingOrder) {
+      return;
+    }
+
+    // PRN (as-needed) orders have unpredictable frequency; auto-calc would be misleading
+    if (watchedAsNeeded) {
+      if (getValues('pillsDispensed') != null) {
+        setValue('pillsDispensed', null);
+      }
+      return;
+    }
+
+    const canCalc =
+      !watchedIsFreeText &&
+      watchedDosage != null &&
+      watchedDosage > 0 &&
+      watchedFrequency?.frequencyPerDay != null &&
+      watchedFrequency.frequencyPerDay > 0 &&
+      watchedDuration != null &&
+      watchedDuration > 0 &&
+      (!watchedQuantityUnits || watchedQuantityUnits.valueCoded === watchedUnit?.valueCoded);
+
+    if (!canCalc) {
+      if (getValues('pillsDispensed') != null) {
+        setValue('pillsDispensed', null);
+      }
+      return;
+    }
+
+    const durationDays = durationToDays(watchedDuration, watchedDurationUnit?.valueCoded, durationUnitsDaysMap);
+    if (durationDays == null) {
+      if (getValues('pillsDispensed') != null) {
+        setValue('pillsDispensed', null);
+      }
+      return;
+    }
+
+    const calculated = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
+
+    if (calculated > 0 && isFinite(calculated)) {
+      setValue('pillsDispensed', calculated, { shouldValidate: true });
+      if (!watchedQuantityUnits && watchedUnit) {
+        setValue('quantityUnits', watchedUnit, { shouldValidate: true });
+      }
+    }
+  }, [
+    watchedDosage,
+    isManualMode,
+    watchedAsNeeded,
+    watchedFrequency,
+    watchedDuration,
+    watchedDurationUnit,
+    watchedIsFreeText,
+    watchedUnit,
+    watchedQuantityUnits,
+    initialOrderBasketItem?.action,
+    durationUnitsDaysMap,
+    getValues,
+    setValue,
+  ]);
+
+  const handleQuantityAfterChange = useCallback(
+    (_newValue: number | null, _prevValue: number | null) => {
+      setManualDriverKey(autoCalcDriverKey);
+    },
+    [autoCalcDriverKey],
+  );
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -307,7 +417,12 @@ export function DrugOrderForm({
       <div className={styles.container}>
         {showStickyMedicationHeader && (
           <div className={styles.stickyMedicationInfo}>
-            <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
+            <MedicationInfoHeader
+              dosage={watchedDosage}
+              drug={drug}
+              routeValue={routeValue}
+              unitValue={watchedUnitValue}
+            />
           </div>
         )}
         <div className={styles.patientHeader}>
@@ -335,7 +450,12 @@ export function DrugOrderForm({
             )}
             <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
             <div ref={medicationInfoHeaderRef}>
-              <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
+              <MedicationInfoHeader
+                dosage={watchedDosage}
+                drug={drug}
+                routeValue={routeValue}
+                unitValue={watchedUnitValue}
+              />
             </div>
             <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
@@ -494,7 +614,7 @@ export function DrugOrderForm({
             </section>
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
-              <Grid className={styles.gridRow}>
+              <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 {/* TODO: This input does nothing */}
                 <Column lg={16} md={4} sm={4}>
                   <div className={styles.fullWidthDatePickerContainer}>
@@ -560,7 +680,7 @@ export function DrugOrderForm({
             </section>
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
-              <Grid className={styles.gridRow}>
+              <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
@@ -572,7 +692,21 @@ export function DrugOrderForm({
                       min={0}
                       hideSteppers
                       allowEmpty
+                      getValues={getValues}
+                      handleAfterChange={handleQuantityAfterChange}
                     />
+                    {!isManualMode &&
+                      (watchedFrequency?.frequencyPerDay == null
+                        ? watchedFrequency != null && (
+                            <span className={styles.autoCalcHelper}>
+                              {t('reselectFrequencyHint', 'Re-select frequency to enable auto-calculation')}
+                            </span>
+                          )
+                        : watchedPillsDispensed != null && (
+                            <span className={styles.autoCalcHelper}>
+                              {t('quantityAutoCalculated', 'Auto-calculated')}
+                            </span>
+                          ))}
                   </InputWrapper>
                 </Column>
                 <Column lg={8} md={3} sm={4}>
@@ -863,7 +997,7 @@ const ControlledFieldInput = ({
   return (
     <>
       {component}
-      <FormLabel className={styles.errorLabel}>{error?.message}</FormLabel>
+      {error?.message && <FormLabel className={styles.errorLabel}>{error.message}</FormLabel>}
     </>
   );
 };

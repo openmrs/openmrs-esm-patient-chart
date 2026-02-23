@@ -172,6 +172,10 @@
   align-items: center;
 }
 
+:global(.omrs-breakpoint-lt-desktop) .topAlignedGridRow {
+  align-items: flex-start;
+}
+
 .field {
   margin-bottom: layout.$spacing-05;
 
@@ -285,4 +289,11 @@
 
 .caption01 {
   @include type.type-style('legal-01');
+}
+
+.autoCalcHelper {
+  @include type.type-style('helper-text-01');
+  display: block;
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-02;
 }

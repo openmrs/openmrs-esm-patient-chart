@@ -289,7 +289,7 @@ test.describe('Drug Order Tests', () => {
     await test.step('Then I should see an existing drug order in the list', async () => {
       await expect(page.getByRole('cell', { name: 'ORD-' })).toBeVisible();
       await expect(page.getByRole('cell', { name: 'Drug order' })).toBeVisible();
-      await expect(page.getByRole('cell', { name: '(NEW) Aspirin 81mg: 1.0 Milligram Oral Once daily' })).toBeVisible();
+      await expect(page.getByRole('cell', { name: '(NEW) Aspirin 81mg: 1.0 Tablet Oral Once daily' })).toBeVisible();
     });
 
     await test.step('When I click the overflow menu in the table row with the existing drug order', async () => {
