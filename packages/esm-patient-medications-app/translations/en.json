@@ -48,6 +48,7 @@
   "indication": "Indication",
   "indicationErrorMessage": "Indication is required",
   "indicationPlaceholder": "e.g. \"Hypertension\"",
+  "indicationSearchError": "Error searching for indications",
   "launchOrderBasket": "Launch order basket",
   "male": "Male",
   "medicationDurationAndUnit": "for {{duration}} {{durationUnit}}",

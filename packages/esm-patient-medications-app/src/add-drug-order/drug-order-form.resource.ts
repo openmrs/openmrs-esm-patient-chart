@@ -223,12 +223,14 @@ export interface CodedIndication {
   display: string;
 }
 
-export function useIndicationSearch(searchTerm: string, conceptClassUuid?: string) {
-  const classParam = conceptClassUuid ? `&class=${encodeURIComponent(conceptClassUuid)}` : '';
+export function useIndicationSearch(searchTerm: string, codedIndicationConceptClassUuid?: string) {
+  const classParam = codedIndicationConceptClassUuid
+    ? `&class=${encodeURIComponent(codedIndicationConceptClassUuid)}`
+    : '';
   const url =
-    debouncedSearchTerm && debouncedSearchTerm.length >= 0
+    searchTerm && searchTerm.length >= 0
       ? `${restBaseUrl}/concept?name=${encodeURIComponent(
-          debouncedSearchTerm,
+          searchTerm,
         )}&searchType=fuzzy${classParam}&v=custom:(uuid,display)`
       : null;
 

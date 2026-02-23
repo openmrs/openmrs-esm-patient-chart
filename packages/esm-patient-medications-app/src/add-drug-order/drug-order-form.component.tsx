@@ -33,6 +33,7 @@ import {
   parseDate,
   showSnackbar,
   useConfig,
+  useDebounce,
   useLayoutType,
   Workspace2,
   type Visit,
@@ -128,7 +129,8 @@ export function DrugOrderForm({
   workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit, useCodedIndication } = useConfig<ConfigObject>();
+  const { daysDurationUnit, useCodedIndication, codedIndicationConceptClassUuid, debounceDelayInMs } =
+    useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
@@ -177,8 +179,12 @@ export function DrugOrderForm({
   const selectedIndicationCoded = watch('indicationCoded');
 
   const [indicationSearchTerm, setIndicationSearchTerm] = useState('');
-  const { searchResults: codedIndications, isSearching: isSearchingIndications } =
-    useIndicationSearch(indicationSearchTerm);
+  const useDebounceSearch = useDebounce(indicationSearchTerm, debounceDelayInMs);
+  const {
+    searchResults: codedIndications,
+    isSearching: isSearchingIndications,
+    error: indicationSearchError,
+  } = useIndicationSearch(indicationSearchTerm, codedIndicationConceptClassUuid);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -651,9 +657,17 @@ export function DrugOrderForm({
                           }}
                         />
                         {isSearchingIndications && !selectedIndicationCoded && (
-                          <div className={styles.inlineLoader}>
+                          <>
                             <InlineLoading description={t('searching', 'Searching') + '...'} />
-                          </div>
+                            {indicationSearchError && (
+                              <InlineNotification
+                                kind="error"
+                                lowContrast
+                                title={t('indicationSearchError', 'Error searching for indications')}
+                                hideCloseButton
+                              />
+                            )}
+                          </>
                         )}
                       </>
                     ) : (

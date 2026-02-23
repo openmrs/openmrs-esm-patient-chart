@@ -166,7 +166,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReason: order.indicationCoded?.uuid,
-      orderReasonNonCoded: order.indication,
+      orderReasonNonCoded: order.indicationCoded ? null : order.indication,
     };
   } else if (order.action === 'RENEW') {
     return {
@@ -195,7 +195,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
       orderReason: order.indicationCoded?.uuid,
-      orderReasonNonCoded: order.indication,
+      orderReasonNonCoded: order.indicationCoded ? null : order.indication,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -224,7 +224,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
       orderReason: order.indicationCoded?.uuid,
-      orderReasonNonCoded: order.indication,
+      orderReasonNonCoded: order.indicationCoded ? null : order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -238,7 +238,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       concept: order.drug.concept.uuid,
       drug: order.drug.uuid,
       orderReason: order.indicationCoded?.uuid,
-      orderReasonNonCoded: null,
+      orderReasonNonCoded: order.indicationCoded ? null : order.indication,
     };
   } else {
     throw new Error(`Unknown order action ${order.action}. This is a development error.`);
@@ -295,8 +295,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
       : null,
     pillsDispensed: order.quantity,
     numRefills: order.numRefills,
-    indication: order.orderReasonNonCoded,
-    indicationCoded: order.orderReason,
+    indication: action === 'DISCONTINUE' ? null : order.orderReasonNonCoded,
+    indicationCoded: action === 'DISCONTINUE' ? null : order.orderReason,
     quantityUnits: order.quantityUnits
       ? {
           value: order.quantityUnits.display,

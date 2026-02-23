@@ -42,6 +42,11 @@ export const configSchema = {
       'When true, use a coded diagnosis indication (orderReason) and hide the non-coded indication text field.',
     _default: false,
   },
+  codedIndicationConceptClassUuid: {
+    _type: Type.UUID,
+    _description: 'The UUID of the concept class for the coded indication',
+    _default: '8d4918b0-c2cc-11de-8d13-0010c6dffd0f',
+  },
 };
 
 export interface ConfigObject {
@@ -54,4 +59,5 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   useCodedIndication: boolean;
+  codedIndicationConceptClassUuid: string;
 }
