@@ -223,14 +223,13 @@ export interface CodedIndication {
   display: string;
 }
 
-export function useIndicationSearch(searchTerm: string) {
-  const debouncedSearchTerm = useDebounce(searchTerm);
-
+export function useIndicationSearch(searchTerm: string, conceptClassUuid?: string) {
+  const classParam = conceptClassUuid ? `&class=${encodeURIComponent(conceptClassUuid)}` : '';
   const url =
-    debouncedSearchTerm && debouncedSearchTerm.length > 0
+    debouncedSearchTerm && debouncedSearchTerm.length >= 0
       ? `${restBaseUrl}/concept?name=${encodeURIComponent(
           debouncedSearchTerm,
-        )}&searchType=fuzzy&class=Diagnosis&v=custom:(uuid,display)`
+        )}&searchType=fuzzy${classParam}&v=custom:(uuid,display)`
       : null;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedIndication> } }, Error>(url, openmrsFetch);
