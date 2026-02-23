@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "webpack": "^5.99.9"
+    "webpack": "^5.104.1"
   }
 }
