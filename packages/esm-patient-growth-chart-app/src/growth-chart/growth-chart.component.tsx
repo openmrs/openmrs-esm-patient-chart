@@ -24,9 +24,7 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid }) => {
 
   return (
     <div className={styles.container}>
-      <CardHeader title={t('growthChart', 'Growth Chart')}>
-        <></>
-      </CardHeader>
+      <CardHeader title={t('growthChart', 'Growth Chart')} children={null} />
       <div style={{ marginTop: '1rem' }}>
         <GrowthChartVisualization data={data} />
       </div>

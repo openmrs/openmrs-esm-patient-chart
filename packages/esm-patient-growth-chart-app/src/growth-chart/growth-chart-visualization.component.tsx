@@ -64,8 +64,6 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
   }, [patient, weights, t]);
 
   const options = useMemo(() => {
-    const gender = patient?.gender?.toLowerCase() || 'unknown';
-
     const referencePalette = {
       P3: '#ff8389',
       P15: '#f1c21b',
@@ -152,13 +150,13 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
         },
       },
     };
-  }, [t, patient]);
+  }, [t]);
 
-  if (!data?.patient) {
+  if (!patient) {
     return null;
   }
 
-  const birthDate = dayjs(data.patient.birthDate);
+  const birthDate = dayjs(patient.birthDate);
   const today = dayjs();
   const ageInMonths = today.diff(birthDate, 'month', true);
 
@@ -180,7 +178,7 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
     );
   }
 
-  const genderClass = data?.patient?.gender === 'female' ? styles.female : styles.male;
+  const genderClass = patient.gender === 'female' ? styles.female : styles.male;
 
   return (
     <div className={`${styles.chartContainer} ${genderClass}`}>
