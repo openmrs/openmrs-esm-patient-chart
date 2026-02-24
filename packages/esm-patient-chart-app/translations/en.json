@@ -88,7 +88,7 @@
   "loading": "Loading",
   "markAliveSuccessfully": "Patient marked alive successfully",
   "markDeceasedSuccessfully": "Patient marked deceased successfully",
-  "markDeceasedWarning": "Marking the patient as deceased will end any active visits for this patient",
+  "markDeceasedWarning": "Marking the patient as deceased updates this patient's death information",
   "markPatientAlive": "Mark patient alive",
   "markPatientAliveConfirmation": "Are you sure you want to mark this patient alive?",
   "markPatientDeceased": "Mark patient deceased",
