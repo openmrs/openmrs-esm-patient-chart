@@ -4,15 +4,14 @@ import type { Observation } from './growth-chart.resource';
 export interface TableRowData {
   id: string;
   date: string;
-  height: string;
   weight: string;
   rawDate: string;
 }
 
-export function transformGrowthChartData(heights: Observation[], weights: Observation[]): TableRowData[] {
-  const groupedMap = new Map<string, { height?: string; weight?: string; id: string }>();
+export function transformGrowthChartData(weights: Observation[]): TableRowData[] {
+  const groupedMap = new Map<string, { weight?: string; id: string }>();
 
-  const processObs = (obsList: Observation[], type: 'height' | 'weight') => {
+  const processObs = (obsList: Observation[], type: 'weight') => {
     obsList.forEach((obs) => {
       const dateKey = obs.effectiveDateTime;
       if (!groupedMap.has(dateKey)) {
@@ -23,14 +22,12 @@ export function transformGrowthChartData(heights: Observation[], weights: Observ
     });
   };
 
-  processObs(heights, 'height');
   processObs(weights, 'weight');
 
   return Array.from(groupedMap.entries())
     .map(([date, values]) => ({
       id: values.id,
       date: formatDate(parseDate(date)),
-      height: values.height || '-',
       weight: values.weight || '-',
       rawDate: date,
     }))

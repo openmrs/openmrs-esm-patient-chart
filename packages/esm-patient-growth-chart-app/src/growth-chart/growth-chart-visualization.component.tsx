@@ -178,10 +178,8 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
     );
   }
 
-  const genderClass = patient.gender === 'female' ? styles.female : styles.male;
-
   return (
-    <div className={`${styles.chartContainer} ${genderClass}`}>
+    <div className={styles.chartContainer}>
       <LineChart data={chartData} options={options} />
     </div>
   );

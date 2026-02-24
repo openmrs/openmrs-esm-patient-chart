@@ -5,7 +5,6 @@ export const configSchema = {
     _type: Type.Object,
     _description: 'Concepts used in the Growth Chart app',
     _default: {
-      heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
@@ -13,7 +12,6 @@ export const configSchema = {
 
 export type ConfigObject = {
   concepts: {
-    heightUuid: string;
     weightUuid: string;
   };
 };

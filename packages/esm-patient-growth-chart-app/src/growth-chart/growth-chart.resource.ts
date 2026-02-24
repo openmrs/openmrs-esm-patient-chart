@@ -19,7 +19,6 @@ export interface PatientDemographics {
 
 export interface GrowthChartData {
   patient: PatientDemographics;
-  heights: Observation[];
   weights: Observation[];
 }
 
@@ -68,19 +67,13 @@ export function useGrowthChartData(patientUuid: string) {
   const { patient, isLoading: isPatientLoading, isError: isPatientError } = usePatient(patientUuid);
 
   const {
-    observations: heights,
-    isLoading: isHeightLoading,
-    isError: isHeightError,
-  } = useObservations(patientUuid, concepts.heightUuid);
-
-  const {
     observations: weights,
     isLoading: isWeightLoading,
     isError: isWeightError,
   } = useObservations(patientUuid, concepts.weightUuid);
 
-  const isLoading = isPatientLoading || isHeightLoading || isWeightLoading;
-  const isError = isPatientError || isHeightError || isWeightError;
+  const isLoading = isPatientLoading || isWeightLoading;
+  const isError = isPatientError || isWeightError;
 
   let patientDemographics: PatientDemographics | undefined;
 
@@ -96,7 +89,6 @@ export function useGrowthChartData(patientUuid: string) {
   return {
     data: {
       patient: patientDemographics,
-      heights,
       weights,
     },
     isLoading,

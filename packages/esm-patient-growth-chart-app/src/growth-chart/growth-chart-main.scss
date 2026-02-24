@@ -13,6 +13,7 @@
 
 .chartContainer {
   padding: 1rem;
+  background: #ffffff;
 
   :global {
     .bx--cc--chart-wrapper {
@@ -43,14 +44,6 @@
       stroke-width: 3px !important;
       stroke-dasharray: none !important;
     }
-  }
-
-  &.female {
-    background: #ffffff;
-  }
-
-  &.male {
-    background: #ffffff;
   }
 }
 
