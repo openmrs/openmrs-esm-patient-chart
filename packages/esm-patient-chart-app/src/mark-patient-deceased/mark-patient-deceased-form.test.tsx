@@ -8,13 +8,6 @@ import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
-const mockReload = jest.fn();
-
-Object.defineProperty(window, 'location', {
-  value: { ...window.location, reload: mockReload },
-  writable: true,
-});
-
 const mockMarkPatientDeceased = jest.mocked(markPatientDeceased);
 const mockUseCausesOfDeath = jest.mocked(useCausesOfDeath);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
@@ -91,7 +84,7 @@ describe('MarkPatientDeceasedForm', () => {
 
     expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
     expect(
-      screen.getByText(/marking the patient as deceased will end any active visits for this patient/i),
+      screen.getByText(/marking the patient as deceased updates this patient's death information/i),
     ).toBeInTheDocument();
     const causes = screen.getAllByText(/cause of death/i);
     expect(causes.length).toBeGreaterThan(0);
@@ -167,6 +160,9 @@ describe('MarkPatientDeceasedForm', () => {
       '8b64f45e-1d5f-4894-b77c-4e1d840e2c99', // causeOfDeathUuid for Traumatic injury,
       '',
     );
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      title: 'Patient marked deceased successfully',
+    });
   });
 
   it('renders an error message when saving the cause of death fails', async () => {
