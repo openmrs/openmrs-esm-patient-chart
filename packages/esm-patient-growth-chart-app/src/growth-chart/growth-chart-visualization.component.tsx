@@ -141,13 +141,7 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
           }
           return value;
         },
-        customHTML: (data, defaultHTML) => {
-          if (defaultHTML) {
-            // Remove strictly the <li> that contains "Total"
-            return defaultHTML.replace(/<li[^>]*>(?:(?!<\/li>)[\s\S])*?Total(?:(?!<\/li>)[\s\S])*?<\/li>/i, '');
-          }
-          return defaultHTML;
-        },
+        showTotal: false,
       },
     };
   }, [t]);
