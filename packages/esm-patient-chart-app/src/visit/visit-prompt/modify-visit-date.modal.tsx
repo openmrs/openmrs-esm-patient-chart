@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
 
 interface ModifyVisitDateConfirmationModalProps {
@@ -13,9 +14,10 @@ const ModifyVisitDateConfirmationModal: React.FC<ModifyVisitDateConfirmationModa
   onConfirmation,
 }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={onDiscard} title={t('modifyVisitDate', 'Modify visit date')} />
       <ModalBody>
         <p className={styles.body}>

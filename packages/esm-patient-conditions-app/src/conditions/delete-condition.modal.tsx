@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
+import { useFocusTrap } from '@openmrs/esm-patient-common-lib';
 import { deleteCondition, useConditions } from './conditions.resource';
 import styles from './delete-condition.scss';
 
@@ -13,6 +14,7 @@ interface DeleteConditionModalProps {
 
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
   const { t } = useTranslation();
+  const containerRef = useFocusTrap();
   const { mutate } = useConditions(patientUuid);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -42,7 +44,7 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
   }, [closeDeleteModal, conditionId, mutate, t]);
 
   return (
-    <div>
+    <div role="dialog" aria-modal="true" ref={containerRef}>
       <ModalHeader closeModal={closeDeleteModal} title={t('deleteCondition', 'Delete condition')} />
       <ModalBody>
         <p>{t('deleteModalConfirmationText', 'Are you sure you want to delete this condition?')}</p>
