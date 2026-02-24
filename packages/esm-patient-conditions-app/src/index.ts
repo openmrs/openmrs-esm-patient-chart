@@ -38,6 +38,11 @@ export const conditionDeleteConfirmationDialog = getAsyncLifecycle(
   options,
 );
 
+export const conditionDuplicateConfirmationDialog = getAsyncLifecycle(
+  () => import('./conditions/duplicate-condition.modal'),
+  options,
+);
+
 // t('recordCondition', 'Record a Condition')
 export const conditionsFormWorkspace = getAsyncLifecycle(
   () => import('./conditions/conditions-form.workspace'),

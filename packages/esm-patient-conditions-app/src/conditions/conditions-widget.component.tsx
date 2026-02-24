@@ -17,7 +17,14 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { useFormContext, Controller } from 'react-hook-form';
-import { showSnackbar, useDebounce, useSession, ResponsiveWrapper, OpenmrsDatePicker } from '@openmrs/esm-framework';
+import {
+  showModal,
+  showSnackbar,
+  useDebounce,
+  useSession,
+  ResponsiveWrapper,
+  OpenmrsDatePicker,
+} from '@openmrs/esm-framework';
 import {
   type CodedCondition,
   type Condition,
@@ -76,6 +83,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
   const searchInputRef = useRef(null);
+  const isDuplicateModalOpen = useRef(false);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -91,11 +99,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     setSelectedCondition(selectedCondition);
   }, []);
 
-  const handleCreate = useCallback(async () => {
-    if (!selectedCondition) {
-      return;
-    }
-
+  const performCreate = useCallback(async () => {
     const payload: FormFields = {
       clinicalStatus: getValues('clinicalStatus'),
       conceptId: selectedCondition?.uuid,
@@ -132,6 +136,46 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     setIsSubmittingForm,
     t,
   ]);
+
+  const handleCreate = useCallback(() => {
+    if (!selectedCondition) {
+      return;
+    }
+
+    const existingCondition = conditions?.find(
+      (c) => c.conceptId?.toLowerCase() === selectedCondition.uuid?.toLowerCase(),
+    );
+
+    if (existingCondition) {
+      // Guard against the useEffect firing multiple times (e.g. React StrictMode
+      // double-invocation or handleCreate reference changes triggering re-runs
+      // before setIsSubmittingForm(false) is committed).
+      if (isDuplicateModalOpen.current) {
+        return;
+      }
+      isDuplicateModalOpen.current = true;
+      setIsSubmittingForm(false);
+
+      const dispose = showModal('condition-duplicate-confirmation-dialog', {
+        closeModal: () => {
+          isDuplicateModalOpen.current = false;
+          dispose();
+        },
+        conditionName: existingCondition.display,
+        existingOnsetDate: existingCondition.onsetDateTime
+          ? dayjs(existingCondition.onsetDateTime).format('DD-MMM-YYYY')
+          : t('unknownDate', 'unknown date'),
+        existingStatus: existingCondition.clinicalStatus,
+        onConfirm: () => {
+          isDuplicateModalOpen.current = false;
+          performCreate();
+        },
+      });
+      return;
+    }
+
+    performCreate();
+  }, [conditions, performCreate, selectedCondition, setIsSubmittingForm, t]);
 
   const handleUpdate = useCallback(async () => {
     const payload: FormFields = {
