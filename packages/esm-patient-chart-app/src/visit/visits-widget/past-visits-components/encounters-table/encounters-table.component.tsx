@@ -75,7 +75,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisitContext } = usePatientChartStore(patientUuid);
+  const { mutateVisitContext, patient } = usePatientChartStore(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -299,7 +299,12 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 name="form-widget-slot"
                                 state={{
                                   additionalProps: { mode: 'embedded-view' },
+                                  visitUuid: encounter.visitUuid ?? null,
+                                  visitTypeUuid: encounter.visitTypeUuid ?? null,
+                                  visitStartDatetime: encounter.visitStartDatetime ?? null,
+                                  visitStopDatetime: encounter.visitStopDatetime ?? null,
                                   patientUuid: patientUuid,
+                                  patient: patient,
                                   formUuid: encounter.form.uuid,
                                   encounterUuid: encounter.id,
                                   promptBeforeClosing: () => {},
