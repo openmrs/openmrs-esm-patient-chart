@@ -64,9 +64,8 @@ import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { type ChartConfig } from '../../config-schema';
+import { PRIVILEGE_RDE_ACCESS } from '../../constants';
 import styles from './visit-form.scss';
-
-const PRIVILEGE_RDE_ACCESS = 'App: patientmanagement.rde';
 
 interface VisitAttribute {
   attributeType: string;

@@ -12,6 +12,7 @@ import {
   useEmrConfiguration,
   useLocations,
   useVisitTypes,
+  userHasAccess,
   type Visit,
 } from '@openmrs/esm-framework';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
@@ -231,6 +232,7 @@ describe('Visit form', () => {
     });
     mockUseDefaultVisitLocation.mockReset();
     mockUseDefaultVisitLocation.mockReturnValue(defaultVisitLocation);
+    jest.mocked(userHasAccess).mockReturnValue(true);
   });
 
   it('renders the Start Visit form with all the relevant fields and values', async () => {
