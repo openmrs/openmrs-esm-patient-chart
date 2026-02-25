@@ -50,13 +50,14 @@ jobs:
         run: bash e2e/support/github/run-e2e-docker-env.sh
 
       - name: ⏳ Wait for OpenMRS instance to start
+        timeout-minutes: 60
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8080/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
       - name: 🧪 Run E2E tests
         run: yarn test-e2e
 
       - name: 🛑 Stop dev server
-        if: '!cancelled()'
+        if: always()
         run: docker stop $(docker ps -a -q)
 
       - name: 📤 Upload report
@@ -65,7 +66,7 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: 60
           overwrite: true
 
       - name: 📝 Capture Server Logs
@@ -80,5 +81,5 @@ jobs:
         with:
           name: server-logs
           path: './logs'
-          retention-days: 2
+          retention-days: 60
           overwrite: true
