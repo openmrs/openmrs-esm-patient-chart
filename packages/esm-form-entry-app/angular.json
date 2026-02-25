@@ -91,12 +91,12 @@
           "builder": "ngx-build-plus:dev-server",
           "options": {
             "publicHost": "http://localhost:4200",
-            "browserTarget": "openmrs-esm-form-entry-app:build",
+            "buildTarget": "openmrs-esm-form-entry-app:build",
             "extraWebpackConfig": "webpack.config.js"
           },
           "configurations": {
             "production": {
-              "browserTarget": "openmrs-esm-form-entry-app:build:production",
+              "buildTarget": "openmrs-esm-form-entry-app:build:production",
               "extraWebpackConfig": "webpack.prod.config.js"
             }
           }
@@ -104,7 +104,7 @@
         "extract-i18n": {
           "builder": "ngx-build-plus:extract-i18n",
           "options": {
-            "browserTarget": "openmrs-esm-form-entry-app:build",
+            "buildTarget": "openmrs-esm-form-entry-app:build",
             "extraWebpackConfig": "webpack.config.js"
           }
         },
