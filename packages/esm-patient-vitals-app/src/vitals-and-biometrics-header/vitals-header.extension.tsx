@@ -83,7 +83,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
         <Trans i18nKey="hoursOldVitals" count={hoursSinceVitalsTaken}>
           <span>
             {/* @ts-ignore: See comment below */}
-            These vitals are <strong>{{ count: hoursSinceVitalsTaken }} hour old</strong>
+            These vitals are <strong>{ hoursSinceVitalsTaken } {hourLabel} old</strong>
           </span>
         </Trans>
       );
@@ -92,7 +92,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
         <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
           <span>
             {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
-            These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
+            These vitals are <strong>{  vitalsOverdueDayCount } {dayLabel} old</strong>
           </span>
         </Trans>
       );
