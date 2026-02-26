@@ -18,6 +18,12 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+  orderTypeUuid: {
+    _type: Type.UUID,
+    _description:
+      'UUID identifying this order basket extension panel order type. Used by the order basket to determine whether to render this panel when filtering by visibleOrderPanels.',
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
   showPrintButton: {
     _type: Type.Boolean,
     _default: false,
@@ -44,6 +50,7 @@ export interface ConfigObject {
     display: string;
   };
   drugOrderTypeUUID: string;
+  orderTypeUuid: string;
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;

@@ -225,6 +225,10 @@ export interface OrderBasketExtensionProps {
   launchDrugOrderForm(order?: DrugOrderBasketItem): void;
   launchLabOrderForm(orderTypeUuid: string, order?: TestOrderBasketItem): void;
   launchGeneralOrderForm(orderTypeUuid: string, order?: OrderBasketItem): void;
+  /**
+   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
+   */
+  visibleOrderPanels?: Array<string>;
 }
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
@@ -324,4 +328,8 @@ export interface ExportedOrderBasketWindowProps {
   visitContext: Visit;
   mutateVisitContext: () => void;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+  /**
+   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
+   */
+  visibleOrderPanels?: Array<string>;
 }
