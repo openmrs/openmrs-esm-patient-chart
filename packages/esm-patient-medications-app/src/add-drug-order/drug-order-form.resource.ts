@@ -90,9 +90,11 @@ function useCreateMedicationOrderFormSchema() {
       freeTextDosage: z.string().refine((value) => !!value, {
         message: t('freeDosageErrorMessage', 'Add free dosage note'),
       }),
-      dosage: z.number({
-        invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
-      }),
+      dosage: z
+        .number({
+          invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
+        })
+        .gt(0, { message: t('dosageMustBeGreaterThanZero', 'Dose must be greater than 0') }),
       unit: z.object(
         { ...comboSchema },
         {
