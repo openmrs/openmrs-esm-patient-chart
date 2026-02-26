@@ -26,6 +26,13 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 - [Common lib](packages/esm-patient-common-lib/README.md)
 - [Patient chart](packages/esm-patient-chart-app/README.md)
 
+
+## Quick Start
+
+1. Install dependencies → `yarn`
+2. Start a microfrontend → `yarn start --sources packages/esm-patient-allergies-app`
+3. Open http://localhost:8080
+
 ## Setup
 
 Check out the developer documentation [in the Wiki](https://openmrs.atlassian.net/wiki/x/IABBHg).
