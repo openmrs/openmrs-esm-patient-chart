@@ -46,10 +46,7 @@ export interface Identifier {
   display: string;
 }
 
-export const generateRandomPatient = async (
-  api: APIRequestContext,
-  birthdate: string = `${new Date().getFullYear() - 5}-01-01`,
-): Promise<Patient> => {
+export const generateRandomPatient = async (api: APIRequestContext, birthdate?: string): Promise<Patient> => {
   const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {
     data: {},
   });
@@ -79,7 +76,7 @@ export const generateRandomPatient = async (
           },
         ],
         attributes: [],
-        birthdate: birthdate,
+        birthdate: birthdate || `${new Date().getFullYear() - 5}-01-01`,
         birthdateEstimated: true,
         dead: false,
         gender: 'M',

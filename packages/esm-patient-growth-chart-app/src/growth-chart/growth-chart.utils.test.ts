@@ -2,22 +2,7 @@ import { transformGrowthChartData } from './growth-chart.utils';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import type { Observation } from './growth-chart.resource';
 
-// Mock @openmrs/esm-framework
-jest.mock('@openmrs/esm-framework', () => ({
-  formatDate: jest.fn(),
-  parseDate: jest.fn(),
-}));
-
 describe('growth-chart.utils', () => {
-  const mockFormatDate = formatDate as jest.Mock;
-  const mockParseDate = parseDate as jest.Mock;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockFormatDate.mockImplementation((date) => `Formatted ${date}`);
-    mockParseDate.mockImplementation((date) => date);
-  });
-
   const createMockObservation = (date: string, value: number, unit: string, id: string): Observation => ({
     id,
     effectiveDateTime: date,
@@ -40,7 +25,7 @@ describe('growth-chart.utils', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       id: 'w1',
-      date: `Formatted ${date}`,
+      date: '01-Jan-2023',
       weight: '70 kg',
       rawDate: date,
     });
