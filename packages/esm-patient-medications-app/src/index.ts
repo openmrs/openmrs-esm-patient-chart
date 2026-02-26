@@ -3,6 +3,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta, moduleName } from './dashboard.meta';
 import medicationsSummaryComponent from './medications-summary/medications-summary.component';
+import futureMedicationsComponent from './future-medications/future-medications.component';
 import activeMedicationsComponent from './active-medications/active-medications.component';
 import pastMedicationsComponent from './past-medications/past-medications.component';
 
@@ -22,6 +23,8 @@ export const medicationsSummary = getSyncLifecycle(medicationsSummaryComponent, 
 export const activeMedications = getSyncLifecycle(activeMedicationsComponent, options);
 
 export const pastMedications = getSyncLifecycle(pastMedicationsComponent, options);
+
+export const futureMedications = getSyncLifecycle(futureMedicationsComponent, options);
 
 export const drugOrderPanel = getAsyncLifecycle(
   () => import('./drug-order-basket-panel/drug-order-basket-panel.extension'),

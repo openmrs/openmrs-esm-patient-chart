@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { useActivePatientOrders } from '../api/api';
+import { usePatientOrders } from '../api';
 
 interface ActiveMedicationsProps {
   patient: fhir.Patient;
@@ -14,8 +14,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
   const displayText = t('activeMedicationsDisplayText', 'active medications');
 
-  const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
-
+  const { activeOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
 
   if (isLoading) {
@@ -26,12 +25,12 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (activePatientOrders?.length) {
+  if (activeOrders?.length) {
     return (
       <MedicationsDetailsTable
         isValidating={isValidating}
         title={t('activeMedicationsTableTitle', 'Active Medications')}
-        medications={activePatientOrders}
+        medications={activeOrders}
         showDiscontinueButton={true}
         showModifyButton={true}
         showRenewButton={true}

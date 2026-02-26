@@ -68,7 +68,7 @@ export interface OrderBasketItem {
   previousOrder?: string;
   orderType?: string;
   orderNumber?: string;
-  scheduledDate?: Date;
+  scheduledDate?: string | Date;
   encounterUuid?: string;
   visit: Visit;
 }
@@ -97,7 +97,7 @@ export interface OrderPost {
   instructions?: string;
   accessionNumber?: string;
   orderType?: string;
-  scheduledDate?: string;
+  scheduledDate?: string | Date;
 }
 
 export interface DrugOrderPost extends OrderPost {
@@ -237,9 +237,8 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   quantityUnits: QuantityUnit | null;
   patientInstructions: string | null;
   asNeeded: boolean;
-  asNeededCondition: string | null;
-  startDate: Date | string;
-  durationUnit: DurationUnit | null;
+  asNeededCondition: string;
+  durationUnit: DurationUnit;
   duration: number | null;
   pillsDispensed: number | null;
   numRefills: number | null;

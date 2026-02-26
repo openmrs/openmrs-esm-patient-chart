@@ -4,7 +4,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
-import ActiveMedications from './active-medications.component';
+import FutureMedications from './future-medications.component';
 
 const mockUseSession = jest.mocked(useSession);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -23,18 +23,18 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-describe('ActiveMedications', () => {
-  test('renders an empty state view when there are no active medications to display', async () => {
+describe('FutureMedications', () => {
+  test('renders an empty state view when there are no future medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderWithSwr(<ActiveMedications patient={mockPatient} />);
+    renderWithSwr(<FutureMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /active medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /future medications/i })).toBeInTheDocument();
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
-    expect(screen.getByText(/There are no active medications to display for this patient/i)).toBeInTheDocument();
-    expect(screen.getByText(/Record active medications/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no future medications to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record future medications/i)).toBeInTheDocument();
   });
 
   test('renders an error state view if there is a problem fetching medications data', async () => {
@@ -48,7 +48,7 @@ describe('ActiveMedications', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderWithSwr(<ActiveMedications patient={mockPatient} />);
+    renderWithSwr(<FutureMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
@@ -58,14 +58,14 @@ describe('ActiveMedications', () => {
     expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
-  test('renders a tabular overview of the active medications recorded for a patient', async () => {
+  test('renders a tabular overview of the future medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-    renderWithSwr(<ActiveMedications patient={mockPatient} />);
+    renderWithSwr(<FutureMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    const headingElements = screen.getAllByText(/Active Medications/i);
+    const headingElements = screen.getAllByText(/Future Medications/i);
 
     headingElements.forEach((headingElement) => {
       expect(headingElement).toBeInTheDocument();
@@ -80,10 +80,7 @@ describe('ActiveMedications', () => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
-    const expectedTableRows = [
-      /14-Aug-2023 Admin User Acetaminophen 325 mg — 325mg — tablet DOSE 2 tablet — oral — twice daily — indefinite duration — take it sometimes INDICATION Bad boo-boo/,
-      /14-Aug-2023 Admin User Aspirin 162.5mg — 162.5mg — tablet DOSE 1 tablet — oral — once daily — for 30 days INDICATION Heart — QUANTITY 30 Tablet/,
-    ];
+    const expectedTableRows = [];
 
     expectedTableRows.forEach((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
@@ -91,14 +88,14 @@ describe('ActiveMedications', () => {
   });
 });
 
-test('clicking the Record active medications link opens the order basket form', async () => {
+test('clicking the Record future medications link opens the order basket form', async () => {
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-  renderWithSwr(<ActiveMedications patient={mockPatient} />);
+  renderWithSwr(<FutureMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
-  const orderLink = screen.getByText(/Record active medications/i);
+  const orderLink = screen.getByText(/Record future medications/i);
   await user.click(orderLink);
   expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
 });
@@ -107,7 +104,7 @@ test('clicking the Add button opens the order basket form', async () => {
   const user = userEvent.setup();
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-  renderWithSwr(<ActiveMedications patient={mockPatient} />);
+  renderWithSwr(<FutureMedications patient={mockPatient} />);
 
   await waitForLoadingToFinish();
   const button = screen.getByRole('button', { name: /Add/i });

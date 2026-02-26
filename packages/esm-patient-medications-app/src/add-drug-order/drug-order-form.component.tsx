@@ -49,7 +49,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useActivePatientOrders } from '../api';
+import { usePatientOrders } from '../api';
 import styles from './drug-order-form.scss';
 import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
@@ -167,7 +167,6 @@ export function DrugOrderForm({
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
   const dosage = watch('dosage');
-  const startDate = watch('startDate');
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -188,12 +187,22 @@ export function DrugOrderForm({
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      scheduledDate: data.scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
       visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
+
+    // If scheduledDate (startDate on UI) is today (active order) - add the current time (hours/min) to order
+    const now = new Date();
+    if (
+      data.scheduledDate.getFullYear() === now.getFullYear() &&
+      data.scheduledDate.getMonth() === now.getMonth() &&
+      data.scheduledDate.getDate() === now.getDate()
+    ) {
+      newBasketItem.scheduledDate = now;
+    }
 
     setIsSaving(true);
     await onSave(newBasketItem);
@@ -292,15 +301,8 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { data: activeOrders } = useActivePatientOrders(patient.id);
-  const drugAlreadyPrescribedForNewOrder = useMemo(
-    () =>
-      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem],
-  );
 
   return (
     <Workspace2 title={workspaceTitle} hasUnsavedChanges={isDirty}>
@@ -495,18 +497,16 @@ export function DrugOrderForm({
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
               <Grid className={styles.gridRow}>
-                {/* TODO: This input does nothing */}
                 <Column lg={16} md={4} sm={4}>
                   <div className={styles.fullWidthDatePickerContainer}>
                     <InputWrapper>
                       <Controller
-                        name="startDate"
+                        name="scheduledDate"
                         control={control}
                         render={({ field, fieldState }) => (
                           <OpenmrsDatePicker
                             {...field}
-                            maxDate={new Date()}
-                            id="startDatePicker"
+                            id="scheduledDatePicker"
                             labelText={t('startDate', 'Start date')}
                             size={isTablet ? 'lg' : 'sm'}
                             invalid={Boolean(fieldState?.error?.message)}
@@ -642,7 +642,7 @@ export function DrugOrderForm({
               kind="primary"
               type="submit"
               size="xl"
-              disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
+              disabled={!!errorFetchingOrderConfig || isSaving}
             >
               {saveButtonText}
             </Button>
