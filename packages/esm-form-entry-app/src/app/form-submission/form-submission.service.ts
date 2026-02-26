@@ -154,7 +154,7 @@ export class FormSubmissionService {
     }
     const config = this.configResourceService.getConfig();
 
-    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitUuid = this.singleSpaPropsService.getProp('visitUuid');
     const visitStartDatetime = this.singleSpaPropsService.getProp('visitStartDatetime');
     const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 
