@@ -22,6 +22,7 @@ import { SingleSpaPropsService } from './single-spa-props/single-spa-props.servi
 import { FormCreationService } from './form-creation/form-creation.service';
 import { JsonLoader } from './loaders/json-loader';
 import { ProgramResourceService } from './openmrs-api/program-resource.service';
+import { DiagnosisResourceService } from './openmrs-api/diagnosis.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -56,6 +57,7 @@ import { ProgramResourceService } from './openmrs-api/program-resource.service';
       useValue: (window as any).i18next.language.toLowerCase() ? (window as any).i18next.language.toLowerCase() : 'en',
     },
     ProgramResourceService,
+    DiagnosisResourceService,
   ],
   bootstrap: [AppComponent],
 })
