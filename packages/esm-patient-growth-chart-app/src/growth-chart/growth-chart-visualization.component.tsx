@@ -17,6 +17,39 @@ interface GrowthChartVisualizationProps {
 
 const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ data }) => {
   const { t } = useTranslation();
+  const { patient } = data;
+
+  if (!patient) {
+    return null;
+  }
+
+  const birthDate = dayjs(patient.birthDate);
+  const today = dayjs();
+  const ageInMonths = today.diff(birthDate, 'month', true);
+
+  if (ageInMonths > 60) {
+    return (
+      <div className={styles.emptyStateContainer}>
+        <Layer>
+          <Tile className={styles.emptyStateTile}>
+            <div className={styles.emptyStateHeading}>
+              <h4>{t('growthChartUnavailable', 'Growth Chart Unavailable')}</h4>
+            </div>
+            <EmptyDataIllustration />
+            <p className={styles.emptyStateContent}>
+              {t('growthChartAgeRestriction', 'Growth charts are only applicable for children under 5 years of age.')}
+            </p>
+          </Tile>
+        </Layer>
+      </div>
+    );
+  }
+
+  return <GrowthChart data={data} />;
+};
+
+const GrowthChart: React.FC<GrowthChartVisualizationProps> = ({ data }) => {
+  const { t } = useTranslation();
   const { patient, weights } = data;
 
   const chartData = useMemo(() => {
@@ -28,37 +61,8 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
       return [];
     }
 
-    const gender = patient.gender.toLowerCase();
-    const whoData = gender === 'female' ? girlsWeightData : boysWeightData;
-    const referenceSeries = [];
-    const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
-
-    whoData.forEach((point) => {
-      percentiles.forEach((p) => {
-        referenceSeries.push({
-          group: p,
-          age: point.age_months,
-          value: point[p],
-        });
-      });
-    });
-
-    const patientSeries = weights
-      .map((obs) => {
-        const obsDate = dayjs(obs.effectiveDateTime);
-        if (!obsDate.isValid()) return null;
-
-        const ageInMonths = obsDate.diff(birthDate, 'month', true);
-        if (ageInMonths < 0) return null;
-
-        return {
-          group: t('patientWeight', 'Patient Weight'),
-          age: ageInMonths,
-          value: obs.value,
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => a!.age - b!.age);
+    const referenceSeries = getReferenceSeries(patient.gender);
+    const patientSeries = getPatientSeries(weights, birthDate, t);
 
     return [...referenceSeries, ...patientSeries];
   }, [patient, weights, t]);
@@ -146,37 +150,48 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
     };
   }, [t]);
 
-  if (!patient) {
-    return null;
-  }
-
-  const birthDate = dayjs(patient.birthDate);
-  const today = dayjs();
-  const ageInMonths = today.diff(birthDate, 'month', true);
-
-  if (ageInMonths > 60) {
-    return (
-      <div className={styles.emptyStateContainer}>
-        <Layer>
-          <Tile className={styles.emptyStateTile}>
-            <div className={styles.emptyStateHeading}>
-              <h4>{t('growthChartUnavailable', 'Growth Chart Unavailable')}</h4>
-            </div>
-            <EmptyDataIllustration />
-            <p className={styles.emptyStateContent}>
-              {t('growthChartAgeRestriction', 'Growth charts are only applicable for children under 5 years of age.')}
-            </p>
-          </Tile>
-        </Layer>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.chartContainer}>
       <LineChart data={chartData} options={options} />
     </div>
   );
+};
+
+const getReferenceSeries = (gender: string) => {
+  const whoData = gender.toLowerCase() === 'female' ? girlsWeightData : boysWeightData;
+  const referenceSeries = [];
+  const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
+
+  whoData.forEach((point) => {
+    percentiles.forEach((p) => {
+      referenceSeries.push({
+        group: p,
+        age: point.age_months,
+        value: point[p],
+      });
+    });
+  });
+
+  return referenceSeries;
+};
+
+const getPatientSeries = (weights: any[], birthDate: dayjs.Dayjs, t: any) => {
+  return weights
+    .map((obs) => {
+      const obsDate = dayjs(obs.effectiveDateTime);
+      if (!obsDate.isValid()) return null;
+
+      const ageInMonths = obsDate.diff(birthDate, 'month', true);
+      if (ageInMonths < 0) return null;
+
+      return {
+        group: t('patientWeight', 'Patient Weight'),
+        age: ageInMonths,
+        value: obs.value,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a!.age - b!.age);
 };
 
 export default GrowthChartVisualization;
