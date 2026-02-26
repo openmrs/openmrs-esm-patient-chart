@@ -1,0 +1,92 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+:global {
+  .bx--cc--tooltip,
+  .cds--cc--tooltip {
+    .bx--cc--tooltip-list li:last-child,
+    .cds--cc--tooltip-list li:last-child {
+      display: none !important;
+    }
+  }
+}
+
+.chartContainer {
+  padding: 1rem;
+  background: #ffffff;
+
+  :global {
+    .bx--cc--chart-wrapper {
+      background: #f4f4f4;
+    }
+
+    .bx--chart-axis.bx--axis--bottom {
+      .tick text {
+        fill: #161616;
+        font-weight: 400; // Default to normal
+      }
+
+      // Bold every 6th tick starting from the first (0, 12, 24, 36, 48, 60)
+      // 0 is index 1 in nth-child, 12 is index 7, etc. (6n+1)
+      .tick:nth-child(6n + 1) text {
+        font-weight: 600;
+      }
+    }
+
+    .bx--cc--line path {
+      stroke-width: 1px;
+      stroke-dasharray: 4 2;
+    }
+
+    .bx--cc--line path[stroke='#000000'],
+    .bx--cc--line path[style*='stroke: rgb(0, 0, 0)'],
+    .bx--cc--line path[style*='stroke: #000000'] {
+      stroke-width: 3px !important;
+      stroke-dasharray: none !important;
+    }
+  }
+}
+
+.tile {
+  padding: layout.$spacing-06;
+  margin-bottom: layout.$spacing-05;
+}
+
+.heading {
+  @include type.type-style('heading-03');
+  margin-bottom: layout.$spacing-04;
+  color: var(--cds-text-primary);
+}
+
+.content {
+  @include type.type-style('body-01');
+  color: var(--cds-text-secondary);
+  line-height: 1.5;
+}
+
+.emptyStateContainer {
+  padding: 1rem;
+}
+
+.emptyStateTile {
+  text-align: center;
+  border: 1px solid var(--cds-ui-03);
+  padding: layout.$spacing-06;
+  background-color: var(--cds-layer);
+  width: 100%;
+}
+
+.emptyStateHeading {
+  @include type.type-style('heading-compact-01');
+  color: var(--cds-text-secondary);
+  margin-bottom: layout.$spacing-05;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.emptyStateContent {
+  @include type.type-style('body-compact-01');
+  color: var(--cds-text-secondary);
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}

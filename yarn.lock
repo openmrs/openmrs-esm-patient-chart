@@ -2002,6 +2002,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@carbon/charts-react@npm:^1.27.2":
+  version: 1.27.2
+  resolution: "@carbon/charts-react@npm:1.27.2"
+  dependencies:
+    "@carbon/charts": "npm:1.27.2"
+    "@carbon/icons-react": "npm:^11.64.0"
+    "@ibm/telemetry-js": "npm:^1.9.1"
+  peerDependencies:
+    react: ^16.8.6 || ^17.0.1 || ^18.2.0 || ^19.0.0
+    react-dom: ^16.8.6 || ^17.0.1 || ^18.2.0 || ^19.0.0
+  checksum: 10/3ef8025402e5e2636851814d31290111ce819ca8ab9376a1a2c90a7ef69e975576d5ee9597a2e2b8bdbbb8a2c8d5afec23c0fa090432ad6dd1527a4f7c252595
+  languageName: node
+  linkType: hard
+
 "@carbon/charts@npm:1.27.0, @carbon/charts@npm:^1.27.0":
   version: 1.27.0
   resolution: "@carbon/charts@npm:1.27.0"
@@ -2021,6 +2035,28 @@ __metadata:
     topojson-client: "npm:^3.1.0"
     tslib: "npm:^2.8.1"
   checksum: 10/c23c924a9053b8528e9a1e4fe0f01fd58b4232aefa15c8c8a52c4cce9dcc45e2f3ed7de91d0821b884a1eeee534b7965d24839e4a733275a9fd5d7023b544830
+  languageName: node
+  linkType: hard
+
+"@carbon/charts@npm:1.27.2, @carbon/charts@npm:^1.27.2":
+  version: 1.27.2
+  resolution: "@carbon/charts@npm:1.27.2"
+  dependencies:
+    "@carbon/colors": "npm:^11.37.0"
+    "@carbon/utils-position": "npm:^1.3.0"
+    "@ibm/telemetry-js": "npm:^1.9.1"
+    "@types/d3": "npm:^7.4.3"
+    "@types/topojson": "npm:^3.2.6"
+    d3: "npm:^7.9.0"
+    d3-cloud: "npm:^1.2.7"
+    d3-sankey: "npm:^0.12.3"
+    date-fns: "npm:^4.1.0"
+    dompurify: "npm:^3.2.6"
+    html-to-image: "npm:1.11.11"
+    lodash-es: "npm:^4.17.21"
+    topojson-client: "npm:^3.1.0"
+    tslib: "npm:^2.8.1"
+  checksum: 10/b6aa3bda3250c9b76c48de2554a30f0ac59cd241d468e42da21bcfd1d7a78dc2528a2d45ea12463310fc107042b33a1a92e504331b2efe680d685c61e86204cf
   languageName: node
   linkType: hard
 
@@ -5276,6 +5312,27 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 16.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
+"@openmrs/esm-patient-growth-chart-app@workspace:packages/esm-patient-growth-chart-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-growth-chart-app@workspace:packages/esm-patient-growth-chart-app"
+  dependencies:
+    "@carbon/charts": "npm:^1.27.2"
+    "@carbon/charts-react": "npm:^1.27.2"
+    "@carbon/react": "npm:^1.83.0"
+    "@openmrs/esm-patient-common-lib": "workspace:*"
+    webpack: "npm:^5.99.9"
+  peerDependencies:
+    "@openmrs/esm-framework": 8.x
+    "@openmrs/esm-patient-common-lib": 11.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 16.x
