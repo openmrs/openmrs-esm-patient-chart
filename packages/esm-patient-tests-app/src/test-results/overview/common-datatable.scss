@@ -24,6 +24,23 @@
   }
 }
 
+.table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.col-name {
+  width: 50%;
+}
+
+.col-value {
+  width: 25%;
+}
+
+.col-range {
+  width: 25%;
+}
+
 .offScaleHigh,
 .offScaleLow,
 .criticallyHigh,
