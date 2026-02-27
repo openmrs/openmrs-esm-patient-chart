@@ -12,6 +12,18 @@
         "fullWidth": false
       },
       "order": 5
+    },
+    {
+      "name": "sticky-notes-button",
+      "component": "stickyNotesButton",
+      "slot": "patient-info-slot",
+      "order": 1
+    }
+  ],
+  "modals": [
+    {
+      "name": "delete-sticky-note-modal",
+      "component": "deleteStickyNoteModal"
     }
   ],
   "workspaces2": [

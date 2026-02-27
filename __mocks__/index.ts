@@ -18,6 +18,7 @@ export * from './programs.mock';
 export * from './relationships.mock';
 export * from './results.mock';
 export * from './session.mock';
+export * from './sticky-notes.mock';
 export * from './visit-notes.mock';
 export * from './visitQueueEntry.mock';
 export * from './visits.mock';
