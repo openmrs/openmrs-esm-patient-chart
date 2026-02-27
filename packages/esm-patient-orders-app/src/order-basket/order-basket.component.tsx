@@ -61,7 +61,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     sessionLocation,
     user: { person },
   } = useSession();
-  const currentProvider: Provider = useMemo(() => ({ ..._currentProvider, person }), [_currentProvider, person]);
+  const currentProvider: Provider | null = useMemo(
+    () => (_currentProvider ? { ..._currentProvider, person } : null),
+    [_currentProvider, person],
+  );
   const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -79,6 +82,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const [orderLocationUuid, setOrderLocationUuid] = useState(sessionLocation.uuid);
 
   const allowSelectingOrderer = ordererProviderRoles?.length > 0;
+  const canPlaceOrders = Boolean(currentProvider) || allowSelectingOrderer;
   const {
     providers,
     isLoading: isLoadingProviders,
@@ -90,7 +94,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const [orderer, setOrderer] = useState<Provider>(allowSelectingOrderer ? null : currentProvider);
 
   useEffect(() => {
-    if (allowSelectingOrderer && providers?.length > 0) {
+    if (allowSelectingOrderer && providers?.length > 0 && currentProvider) {
       // default orderer to current user if they have the right provider roles
       if (providers.some((p) => p.uuid === currentProvider.uuid)) {
         setOrderer(currentProvider);
@@ -225,6 +229,29 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           </div>
         )}
         <div className={styles.orderBasketContainer}>
+          {!canPlaceOrders ? (
+            <InlineNotification
+              kind="error"
+              lowContrast
+              className={styles.inlineNotification}
+              title={t('cannotPlaceOrders', 'Cannot place orders')}
+              subtitle={t(
+                'notAProviderError',
+                'Your account is not associated with a provider. Contact your administrator.',
+              )}
+            />
+          ) : (
+            allowSelectingOrderer &&
+            !orderer && (
+              <InlineNotification
+                kind="info"
+                lowContrast
+                className={styles.inlineNotification}
+                title={t('selectOrderer', 'Select an orderer')}
+                subtitle={t('selectOrdererHint', 'Please select a prescribing clinician from the dropdown.')}
+              />
+            )
+          )}
           {!isLoadingProviders &&
             allowSelectingOrderer &&
             (errorLoadingProviders ? (
@@ -315,7 +342,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                 (visitRequired && !visitContext) ||
                 orders?.some(({ isOrderIncomplete }) => isOrderIncomplete) ||
                 !orderer ||
-                !orderLocationUuid
+                !orderLocationUuid ||
+                !canPlaceOrders
               }
             >
               {isSavingOrders ? (
