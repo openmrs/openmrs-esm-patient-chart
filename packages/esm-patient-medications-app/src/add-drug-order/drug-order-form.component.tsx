@@ -381,7 +381,7 @@ export function DrugOrderForm({
                             id="doseSelection"
                             placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                             label={t('editDoseComboBoxTitle', 'Dose')}
-                            min={1}
+                            min={0}
                             hideSteppers={true}
                             step={0.01}
                           />
