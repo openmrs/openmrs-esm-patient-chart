@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-label-printing-app",
-  "version": "12.0.1",
+  "version": "12.0.2",
   "license": "MPL-2.0",
   "description": "Patient Label Printing frontend module for O3",
   "browser": "dist/openmrs-esm-patient-label-printing-app.js",
