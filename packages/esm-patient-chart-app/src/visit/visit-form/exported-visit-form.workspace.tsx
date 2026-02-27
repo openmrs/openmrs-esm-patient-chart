@@ -29,6 +29,8 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
+  useSession,
+  userHasAccess,
   type Visit,
   Workspace2,
   type Workspace2DefinitionProps,
@@ -62,6 +64,7 @@ import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
 import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import { type ChartConfig } from '../../config-schema';
+import { PRIVILEGE_RDE_ACCESS } from '../../constants';
 import styles from './visit-form.scss';
 
 interface VisitAttribute {
@@ -119,6 +122,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const isTablet = useLayoutType() === 'tablet';
   const isOnline = useConnectivity();
   const config = useConfig<ChartConfig>();
+  const session = useSession();
+  const hasRdeAccess = userHasAccess(PRIVILEGE_RDE_ACCESS, session.user);
   const { emrConfiguration } = useEmrConfiguration();
   const [visitTypeContentSwitcherIndex, setVisitTypeContentSwitcherIndex] = useState(
     config.showRecommendedVisitTypeTab ? 0 : 1,
@@ -459,22 +464,43 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                     name="visitStatus"
                     control={control}
                     render={({ field: { onChange, value } }) => {
-                      const validVisitStatuses = visitToEdit ? ['ongoing', 'past'] : visitStatuses;
+                      const validVisitStatuses = visitToEdit
+                        ? ['ongoing', 'past']
+                        : hasRdeAccess
+                          ? visitStatuses
+                          : (['new', 'ongoing'] as const);
                       const idx = validVisitStatuses.indexOf(value);
                       const selectedIndex = idx >= 0 ? idx : 0;
 
                       // For some reason, Carbon throws NPE when trying to conditionally
                       // render a <Switch> component
-                      return visitToEdit ? (
-                        <ContentSwitcher
-                          selectedIndex={selectedIndex}
-                          onChange={({ name }) => onChange(name)}
-                          size="md"
-                        >
-                          <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
-                          <Switch name="past">{t('ended', 'Ended')}</Switch>
-                        </ContentSwitcher>
-                      ) : (
+                      if (visitToEdit) {
+                        return (
+                          <ContentSwitcher
+                            selectedIndex={selectedIndex}
+                            onChange={({ name }) => onChange(name)}
+                            size="md"
+                          >
+                            <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                            <Switch name="past">{t('ended', 'Ended')}</Switch>
+                          </ContentSwitcher>
+                        );
+                      }
+
+                      if (!hasRdeAccess) {
+                        return (
+                          <ContentSwitcher
+                            selectedIndex={selectedIndex}
+                            onChange={({ name }) => onChange(name)}
+                            size="md"
+                          >
+                            <Switch name="new">{t('new', 'New')}</Switch>
+                            <Switch name="ongoing">{t('ongoing', 'Ongoing')}</Switch>
+                          </ContentSwitcher>
+                        );
+                      }
+
+                      return (
                         <ContentSwitcher
                           selectedIndex={selectedIndex}
                           onChange={({ name }) => onChange(name)}

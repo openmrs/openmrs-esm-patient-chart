@@ -9,3 +9,4 @@ export const patientChartWorkspaceSlot = 'patient-chart-workspace-slot';
 export const patientChartWorkspaceHeaderSlot = 'patient-chart-workspace-header-slot';
 export const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 export const jsonSchemaResourceName = 'JSON schema';
+export const PRIVILEGE_RDE_ACCESS = 'App: patientmanagement.rde';
