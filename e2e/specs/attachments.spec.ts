@@ -4,6 +4,7 @@ import { AttachmentsPage } from '../pages';
 
 test('Add and remove an attachment', async ({ page, patient }) => {
   const attachmentsPage = new AttachmentsPage(page);
+  await page.context().grantPermissions(['camera']);
   const filePath = './e2e/support/upload/brainScan.jpeg';
   const displayedFileName = 'brainScan';
 
@@ -130,6 +131,78 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   await test.step('And I should not see the deleted attachment in the list', async () => {
     await expect(page.getByRole('button', { name: displayedFileName })).toBeHidden();
     await expect(page.getByText(displayedFileName, { exact: true })).toBeHidden();
+  });
+
+  await test.step('And the attachments table should be empty', async () => {
+    await expect(page.getByText(/there are no attachments to display for this patient/i)).toBeVisible();
+  });
+
+  await test.step('And I click on the `Record attachments` link', async () => {
+    await page.getByRole('button', { name: /record attachments/i }).click();
+  });
+
+  await test.step('And I switch to the Webcam tab', async () => {
+    await page.getByRole('tab', { name: 'Webcam' }).click();
+  });
+
+  const video = page.locator('video');
+  await expect(video).toBeVisible({ timeout: 1000 });
+
+  await page.waitForFunction(
+    () => {
+      const video = document.querySelector('video');
+      return video && video.readyState === 4;
+    },
+    { timeout: 1000 },
+  );
+
+  await test.step('And I capture a photo from webcam', async () => {
+    await page.locator('#inner-circle').click();
+  });
+
+  await test.step('And I add a description for the image to upload', async () => {
+    await page.getByLabel(/image description/i).clear();
+    await page.getByLabel(/image description/i).fill('This is a image of the patient');
+  });
+
+  await test.step('And I click on the `Add Attachment` button', async () => {
+    await page.getByRole('button', { name: 'Add Attachment' }).click();
+  });
+
+  await test.step('When I click on the `Close` button', async () => {
+    await page
+      .locator('button')
+      .filter({ hasText: /^Close$/ })
+      .click();
+  });
+
+  await test.step('Then I should see the captured image saved in attachments', async () => {
+    await expect(page.getByText(/upload complete/i)).toBeVisible();
+  });
+
+  await test.step('Then I should see the file I uploaded displayed in the attachments table', async () => {
+    await expect(page.getByRole('button', { name: /Image taken from camera/i })).toBeVisible();
+  });
+
+  await test.step('When I click on the `Table view` tab', async () => {
+    await page.getByLabel(/table view/i).click();
+  });
+
+  await test.step('And I click the overflow menu in the table row of the uploaded file', async () => {
+    await page.getByRole('button', { name: /options/i }).click();
+  });
+
+  await test.step('And I click on the `Delete` button', async () => {
+    await page.getByRole('menuitem', { name: /delete/i }).click();
+    await page.getByRole('button', { name: /delete/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/file deleted/i)).toBeVisible();
+  });
+
+  await test.step('And I should not see the deleted attachment in the list', async () => {
+    await expect(page.getByRole('button', { name: /Image taken from camera/i })).toBeHidden();
   });
 
   await test.step('And the attachments table should be empty', async () => {
