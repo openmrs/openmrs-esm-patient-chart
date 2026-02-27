@@ -12,18 +12,13 @@
   color: $text-02;
   display: flex;
   flex-wrap: wrap;
-  column-gap: layout.$spacing-02;
+  gap: layout.$spacing-02;
   align-items: center;
 }
 
 .allergyLabel {
   @include type.type-style('label-01');
-  display: inline-block;
   background-color: colors.$gray-20;
-  border-radius: layout.$spacing-05;
-  padding: layout.$spacing-02;
-  margin: layout.$spacing-02;
-  text-align: center;
 
   &[data-severity='moderate'] {
     background-color: colors.$orange-20;
