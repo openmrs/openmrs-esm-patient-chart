@@ -80,21 +80,33 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
 
     if (vitalsOverdueDayCount < 1) {
       overdueVitalsTagContent = (
-        <Trans i18nKey="hoursOldVitals" count={hoursSinceVitalsTaken}>
-          <span>
-            {/* @ts-ignore: See comment below */}
-            These vitals are <strong>{ hoursSinceVitalsTaken } {hourLabel} old</strong>
-          </span>
-        </Trans>
+       <Trans
+  i18nKey={`hoursOldVitals_${hoursSinceVitalsTaken == 1 ? 'one' : 'other'}`}
+  count={hoursSinceVitalsTaken}
+>
+  <span>
+    These vitals are{' '}
+    <strong>
+      {hoursSinceVitalsTaken}{' '}
+      {hoursSinceVitalsTaken == 1 ? 'hour' : 'hours'} old
+    </strong>
+  </span>
+</Trans>
       );
     } else if (vitalsOverdueDayCount >= 1 && vitalsOverdueDayCount < 7) {
       overdueVitalsTagContent = (
-        <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
-          <span>
-            {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
-            These vitals are <strong>{  vitalsOverdueDayCount } {dayLabel} old</strong>
-          </span>
-        </Trans>
+        <Trans
+  i18nKey={`daysOldVitals_${vitalsOverdueDayCount == 1 ? 'one' : 'other'}`}
+  count={vitalsOverdueDayCount}
+>
+  <span>
+    These vitals are{' '}
+    <strong>
+      {vitalsOverdueDayCount}{' '}
+      {vitalsOverdueDayCount == 1 ? 'day' : 'days'} old
+    </strong>
+  </span>
+</Trans>
       );
     } else if (vitalsOverdueDayCount >= 8 && vitalsOverdueDayCount <= 14) {
       overdueVitalsTagContent = (
