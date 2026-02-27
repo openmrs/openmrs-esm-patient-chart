@@ -65,10 +65,8 @@ import {
 } from '@openmrs/esm-framework';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import { ORDER_TYPES, getOrderGrouping, isValidOmrsOrderType } from '../constants/order-types';
-import GeneralOrderTable from './general-order-table.component';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
-import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
 
 interface OrderDetailsProps {
@@ -510,59 +508,58 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           <TableBody>
                             {rows.map((row) => {
                               const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
+                              const isExpandable = matchingOrder?.type === ORDER_TYPES.DRUG_ORDER;
+
+                              const cells = row.cells.map((cell) => (
+                                <TableCell className={styles.tableCell} key={cell.id}>
+                                  {cell.value?.['content'] ?? cell.value}
+                                </TableCell>
+                              ));
+
+                              const actionCell = !isPrinting && (
+                                <TableCell className="cds--table-column-menu">
+                                  {matchingOrder && isOmrsOrder(matchingOrder) ? (
+                                    <OrderBasketItemActions patient={patient} orderItem={matchingOrder} />
+                                  ) : (
+                                    <ExtensionSlot
+                                      name={`${matchingOrder?.type}-action-menu-items-slot`}
+                                      state={{
+                                        className: styles.menuItem,
+                                        orderItem: matchingOrder,
+                                        responsiveSize,
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
+                              );
 
                               return (
                                 <React.Fragment key={row.id}>
-                                  <TableExpandRow className={styles.row} {...getRowProps({ row })}>
-                                    {row.cells.map((cell) => (
-                                      <TableCell className={styles.tableCell} key={cell.id}>
-                                        {cell.value?.['content'] ?? cell.value}
-                                      </TableCell>
-                                    ))}
-                                    {!isPrinting && (
-                                      <TableCell className="cds--table-column-menu">
-                                        {matchingOrder && isOmrsOrder(matchingOrder) ? (
-                                          <OrderBasketItemActions patient={patient} orderItem={matchingOrder} />
-                                        ) : (
-                                          <ExtensionSlot
-                                            name={`${matchingOrder?.type}-action-menu-items-slot`}
-                                            state={{
-                                              className: styles.menuItem,
-                                              orderItem: matchingOrder,
-                                              responsiveSize,
-                                            }}
-                                          />
-                                        )}
-                                      </TableCell>
-                                    )}
-                                  </TableExpandRow>
-                                  {row.isExpanded ? (
-                                    <TableExpandedRow
-                                      colSpan={headers.length + 2}
-                                      {...getExpandedRowProps({
-                                        row,
-                                      })}
-                                    >
-                                      <>
-                                        {matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ? (
-                                          <MedicationRecord medication={matchingOrder} />
-                                        ) : matchingOrder?.type === ORDER_TYPES.TEST_ORDER ? (
-                                          <TestOrder testOrder={matchingOrder} patientUuid={patientUuid} />
-                                        ) : matchingOrder?.type === ORDER_TYPES.GENERAL_ORDER ? (
-                                          <GeneralOrderTable order={matchingOrder} />
-                                        ) : (
-                                          <ExtensionSlot
-                                            name={`${matchingOrder?.type}-detail-slot`}
-                                            state={{
-                                              orderItem: matchingOrder,
-                                            }}
-                                          />
-                                        )}
-                                      </>
-                                    </TableExpandedRow>
+                                  {isExpandable ? (
+                                    <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                                      {cells}
+                                      {actionCell}
+                                    </TableExpandRow>
                                   ) : (
-                                    <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                                      <TableCell />
+                                      {cells}
+                                      {actionCell}
+                                    </TableRow>
                                   )}
+                                  {isExpandable &&
+                                    (row.isExpanded ? (
+                                      <TableExpandedRow
+                                        colSpan={headers.length + 2}
+                                        {...getExpandedRowProps({
+                                          row,
+                                        })}
+                                      >
+                                        <MedicationRecord medication={matchingOrder} />
+                                      </TableExpandedRow>
+                                    ) : (
+                                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                                    ))}
                                 </React.Fragment>
                               );
                             })}
