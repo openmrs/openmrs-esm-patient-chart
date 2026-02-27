@@ -164,4 +164,38 @@ describe('Biometrics Overview', () => {
     expect(screen.getByRole('tab', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
   });
+
+  it('hides BMI column in table view when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+      biometrics: {
+        ...mockBiometricsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    await screen.findByRole('heading', { name: /biometrics/i });
+
+    // BMI column should not be present
+    expect(screen.queryByRole('columnheader', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other columns should still be present
+    expect(screen.getByRole('columnheader', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /muac/i })).toBeInTheDocument();
+  });
 });

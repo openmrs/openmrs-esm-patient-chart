@@ -5055,11 +5055,19 @@ export const mockFhirVitalsResponse = {
 
 export const mockBiometricsConfig = {
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-  biometrics: { bmiUnit: 'kg / m²' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    bmiMinimumAge: 0,
+  },
 };
 
 export const mockVitalsConfig = {
-  biometrics: { bmiUnit: 'kg / m²', heightUnit: 'm', weightUnit: 'kg' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    heightUnit: 'm',
+    weightUnit: 'kg',
+    bmiMinimumAge: 0,
+  },
   concepts: {
     diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
