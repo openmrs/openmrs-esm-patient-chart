@@ -66,7 +66,7 @@ export interface Order {
   uuid: string;
   action?: string | null;
   autoExpireDate?: Date | null;
-  dateActivated: string;
+  dateActivated: Date | string;
   dateStopped?: Date | null;
   fulfillerStatus?: string | null;
   dose: number;
@@ -106,6 +106,7 @@ export interface Order {
   };
   quantity: number;
   quantityUnits: OpenmrsResource;
+  scheduledDate: Date | string | null;
 }
 
 export interface Note {
