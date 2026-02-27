@@ -1,0 +1,21 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.content {
+  background-color: $ui-background;
+}
+
+.paginationContainer {
+  > div {
+    border-top: none !important;
+  }
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.widgetCard {
+  border: 1px solid $ui-03;
+  border-bottom: none;
+}
