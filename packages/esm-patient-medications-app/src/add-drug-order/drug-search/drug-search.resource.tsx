@@ -1,12 +1,19 @@
-import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
+  useFeatureFlag,
+  type Visit,
+} from '@openmrs/esm-framework';
 import {
   type Drug,
   type DrugOrderBasketItem,
   type DrugOrderTemplate,
   type OrderTemplate,
 } from '@openmrs/esm-patient-common-lib';
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -23,6 +30,22 @@ export interface DrugSearchResult {
   };
 }
 
+export interface ConceptTreeNode {
+  uuid: string;
+  display: string;
+  isSet: boolean;
+  setMembers?: Array<ConceptTreeNode>;
+}
+
+export interface ConceptSet {
+  uuid: string;
+  display: string;
+}
+
+interface ConceptFetchResponse {
+  [uuid: string]: ConceptSet;
+}
+
 interface OrderTemplateResource {
   uuid: string;
   drug: Drug;
@@ -30,16 +53,25 @@ interface OrderTemplateResource {
   template: string;
 }
 
+interface DrugListFetchResult {
+  drugs: Array<DrugSearchResult>;
+  hasFailures: boolean;
+}
+
+const maxConceptsPerRequest = 20;
+const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
+
 /**
- * Search for a list of drugs based on the given query string
+ * Search for a list of drugs based on the given query string or concepts (uuid/name/mapping)
  * @param query
  * @returns
  */
-export function useDrugSearch(query: string) {
+export function useDrugSearch(query: string, searchBy: 'name' | 'concepts' = 'name') {
+  const param = searchBy === 'concepts' ? 'concepts' : 'q';
+  const url = query ? `${restBaseUrl}/drug?${param}=${query}&v=${drugSearchRepresentation}` : null;
+
   const { data, ...rest } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
-    query
-      ? `${restBaseUrl}/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
-      : null,
+    url,
     openmrsFetch,
   );
 
@@ -52,6 +84,89 @@ export function useDrugSearch(query: string) {
   );
 
   return results;
+}
+
+export function useConceptTree(conceptUuid: string) {
+  const fetcher = (url: string) => openmrsFetch<ConceptTreeNode>(url).then((res) => res.data);
+
+  const { data, error, isLoading } = useSWRImmutable<ConceptTreeNode, Error>(
+    conceptUuid ? `${restBaseUrl}/concepttree?concept=${conceptUuid}` : null,
+    fetcher,
+  );
+
+  return {
+    tree: data,
+    isLoading,
+    isError: error,
+  };
+}
+
+export function useDrugsByConcepts(concepts: string[]) {
+  const shouldFetch = concepts && concepts.length > 0;
+  const cacheKey = shouldFetch ? ['drugs-by-uuids', ...concepts.sort()] : null;
+
+  const { data, error, isLoading } = useSWRImmutable<DrugListFetchResult, Error>(cacheKey, async () => {
+    if (!concepts.length) return { drugs: [], hasFailures: false };
+
+    const drugs: Array<DrugSearchResult> = [];
+    let hasFailures = false;
+
+    for (let start = 0; start < concepts.length; start += maxConceptsPerRequest) {
+      const batch = concepts.slice(start, start + maxConceptsPerRequest);
+      const conceptsParam = batch.join(',');
+      try {
+        const response = await openmrsFetch<{ results: Array<DrugSearchResult> }>(
+          `${restBaseUrl}/drug?concepts=${conceptsParam}&v=${drugSearchRepresentation}`,
+        );
+        if (response.data?.results) {
+          drugs.push(...response.data.results);
+        }
+      } catch (e) {
+        console.error(e);
+        hasFailures = true;
+      }
+    }
+
+    const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
+
+    return { drugs: deduped, hasFailures };
+  });
+
+  return {
+    drugs: data?.drugs ?? [],
+    hasFailures: data?.hasFailures ?? false,
+    isLoading,
+    error,
+  };
+}
+
+export function useConceptSets(conceptSetUuids: string[] = []) {
+  const url =
+    conceptSetUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptSetUuids.join(',')}&v=custom:(uuid,display)`
+      : null;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }, Error>(url, openmrsFetch);
+
+  const conceptSets: ConceptSet[] = data?.data
+    ? Object.values(data.data).map((concept) => ({
+        uuid: concept.uuid,
+        display: concept.display,
+      }))
+    : [];
+
+  if (error) {
+    showSnackbar({
+      title: error.name,
+      subtitle: error.message,
+      kind: 'error',
+    });
+  }
+
+  return {
+    conceptSets,
+    isLoading,
+  };
 }
 
 /**
