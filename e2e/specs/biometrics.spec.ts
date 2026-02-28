@@ -56,9 +56,10 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the biometrics row', async () => {
-    await biometricsPage.page
+    await biometricsPage
+      .biometricsTable()
+      .locator('tbody > tr')
       .getByRole('button', { name: /options/i })
-      .nth(0)
       .click();
   });
 
@@ -107,9 +108,10 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the biometrics row', async () => {
-    await biometricsPage.page
+    await biometricsPage
+      .biometricsTable()
+      .locator('tbody > tr')
       .getByRole('button', { name: /options/i })
-      .nth(0)
       .click();
   });
 

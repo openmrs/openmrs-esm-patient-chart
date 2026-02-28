@@ -1,7 +1,7 @@
-import { type APIRequestContext, expect } from '@playwright/test';
-import { type Encounter } from './types';
-import { type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
+import { type Encounter } from './types';
 
 export interface Observation {
   uuid: string;
@@ -57,5 +57,6 @@ export const createEncounter = async (
 };
 
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`encounter/${uuid}`, { data: {} });
+  const response = await api.delete(`encounter/${uuid}`);
+  expect([200, 204, 404].includes(response.status())).toBeTruthy();
 };

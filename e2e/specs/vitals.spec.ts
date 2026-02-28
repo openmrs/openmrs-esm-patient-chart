@@ -69,10 +69,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the vitals row', async () => {
-    await vitalsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Edit` button', async () => {
@@ -126,10 +123,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the vitals row', async () => {
-    await vitalsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {
