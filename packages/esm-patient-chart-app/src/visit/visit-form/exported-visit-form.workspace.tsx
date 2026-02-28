@@ -45,6 +45,7 @@ import { MemoizedRecommendedVisitType } from './recommended-visit-type.component
 import {
   convertToDate,
   createVisitAttribute,
+  createVisitFormResolver,
   deleteVisitAttribute,
   extractErrorMessagesFromResponse,
   updateVisitAttribute,
@@ -141,7 +142,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
-    resolver: zodResolver(visitFormSchema),
+    resolver: createVisitFormResolver(visitFormSchema, patientUuid, visitToEdit, t),
     defaultValues,
   });
 
