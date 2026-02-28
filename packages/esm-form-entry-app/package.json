@@ -53,7 +53,7 @@
     "@ngx-translate/core": "^16.0.4",
     "@openmrs/ngx-file-uploader": "^19.0.0",
     "@openmrs/ngx-formentry": "^19.0.0",
-    "jspdf": "^4.0.0",
+    "jspdf": "^4.2.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "ngx-bootstrap": "^19.0.2",
