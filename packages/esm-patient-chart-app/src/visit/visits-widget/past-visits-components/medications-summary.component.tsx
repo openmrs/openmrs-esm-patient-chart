@@ -132,6 +132,12 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         {medication?.order?.orderReasonNonCoded}
                       </span>
                     ) : null}
+                    {medication?.order?.orderReason && (
+                      <span>
+                        <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+                        {medication?.order?.orderReason?.display}
+                      </span>
+                    )}
                     {medication?.order?.orderReasonNonCoded && medication?.order?.quantity != null && <>&mdash;</>}
                     {medication?.order?.quantity != null ? (
                       <span>
