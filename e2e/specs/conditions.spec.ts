@@ -59,10 +59,7 @@ test('Record, edit and delete a condition', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu in the table row with the newly created condition', async () => {
-    await conditionsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Edit` button', async () => {
@@ -104,10 +101,7 @@ test('Record, edit and delete a condition', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu in the table row with the updated condition', async () => {
-    await conditionsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {

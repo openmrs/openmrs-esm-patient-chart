@@ -1,18 +1,34 @@
 import { expect } from '@playwright/test';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { generateRandomDrugOrder, deleteDrugOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
-import { type Encounter, type Provider } from '../commands/types';
-import { test } from '../core';
+import { type Encounter } from '../commands/types';
+import { test as base } from '../core';
 import { MedicationsPage, OrdersPage } from '../pages';
 
-let drugOrder: Order;
-let encounter: Encounter;
-let orderer: Provider;
+interface ExistingDrugOrderFixture {
+  existingDrugOrder: {
+    drugOrder: Order;
+    encounter: Encounter;
+  };
+}
 
-test.beforeEach(async ({ api, patient, visit }) => {
-  orderer = await getProvider(api);
-  encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
-  drugOrder = await generateRandomDrugOrder(api, patient.uuid, encounter, orderer.uuid);
+const test = base.extend<ExistingDrugOrderFixture>({
+  existingDrugOrder: async ({ api, patient, visit }, use) => {
+    const orderer = await getProvider(api);
+    const encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
+    const drugOrder = await generateRandomDrugOrder(api, patient.uuid, encounter, orderer.uuid);
+
+    try {
+      await use({ drugOrder, encounter });
+    } finally {
+      if (drugOrder?.uuid) {
+        await deleteDrugOrder(api, drugOrder.uuid);
+      }
+      if (encounter?.uuid) {
+        await deleteEncounter(api, encounter.uuid);
+      }
+    }
+  },
 });
 
 test.describe('Drug Order Tests', () => {
@@ -25,11 +41,25 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I click the Add button on the medications details table to launch the order basket', async () => {
-      await page.getByRole('button', { name: 'Add', exact: true }).click();
+      const launchOrderBasketButton = page
+        .getByRole('button', { name: /record active medications/i })
+        .or(page.getByRole('button', { name: 'Add', exact: true }))
+        .first();
+      await expect(launchOrderBasketButton).toBeVisible();
+      await launchOrderBasketButton.click();
     });
 
-    await test.step('And I click the `Add +` button to order drugs', async () => {
-      await page.locator("[id='order-basket']").getByRole('button', { name: 'Add', exact: true }).first().click();
+    await test.step('And I open the add-drug-order workspace in the order basket', async () => {
+      const addDrugOrderSearchbox = page.getByRole('searchbox', { name: /search for a drug or orderset/i });
+      const addToOrderBasketButton = page
+        .locator("[id='order-basket']")
+        .getByRole('button', { name: 'Add', exact: true })
+        .first();
+
+      // Some environments open the workspace directly after launching the order basket,
+      // while others require an additional "Add +" click.
+      await addToOrderBasketButton.click({ timeout: 5_000 }).catch(() => {});
+      await expect(addDrugOrderSearchbox).toBeVisible();
     });
 
     await test.step('Then the add drug order workspace should be visible in the order basket', async () => {
@@ -54,14 +84,25 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see a new incomplete drug order for "Aspirin 325mg"', async () => {
-      await expect(page.getByText(/incomplete/i)).toBeVisible();
-      await expect(page.getByRole('listitem').filter({ hasText: /aspirin 325mg — 325mg — tablet/i })).toBeVisible();
+      const orderBasketLauncher = page.getByRole('button', { name: /^order basket$/i });
+      const incompleteAspirinBasketItem = orderBasket
+        .getByRole('listitem')
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
+
+      await expect(incompleteAspirinBasketItem)
+        .toBeVisible({ timeout: 5_000 })
+        .catch(async () => {
+          await orderBasketLauncher.click();
+          await expect(incompleteAspirinBasketItem).toBeVisible();
+        });
+      await expect(incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i })).toBeVisible();
     });
 
     await test.step('When I click on the incomplete drug order', async () => {
-      await page
+      await orderBasket
         .getByRole('listitem')
-        .filter({ hasText: /incomplete/i })
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i })
+        .getByRole('status', { name: /incomplete/i })
         .click();
     });
 
@@ -85,18 +126,18 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I set duration to "3" days', async () => {
-      await page.getByText(/^duration$/i).clear();
-      await page.getByText(/^duration$/i).fill('3');
+      await page.getByLabel(/^duration$/i).clear();
+      await page.getByLabel(/^duration$/i).fill('3');
     });
 
     await test.step('And I set the quantity to dispense to 3', async () => {
-      await page.getByText(/^quantity to dispense$/i).clear();
-      await page.getByText(/^quantity to dispense$/i).fill('3');
+      await page.getByLabel(/^quantity to dispense$/i).clear();
+      await page.getByLabel(/^quantity to dispense$/i).fill('3');
     });
 
     await test.step('And I set the prescription refills to 1', async () => {
-      await page.getByText(/^prescription refills$/i).clear();
-      await page.getByText(/^prescription refills$/i).fill('1');
+      await page.getByLabel(/^prescription refills$/i).clear();
+      await page.getByLabel(/^prescription refills$/i).fill('1');
     });
 
     await test.step('And I set the indication to "Headache"', async () => {
@@ -133,18 +174,18 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Edit a drug order', async ({ page, patient }) => {
+  test('Edit a drug order', async ({ page, patient, existingDrugOrder }) => {
     const medicationsPage = new MedicationsPage(page);
-    const form = page.locator('#drugOrderForm');
-    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const drugOrderForm = page.locator('#drugOrderForm');
 
     await test.step('When I visit the medications page', async () => {
       await medicationsPage.goTo(patient.uuid);
     });
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
+        .getByRole('row')
+        .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
         .getByRole('button', { name: /options/i })
-        .nth(0)
         .click();
     });
 
@@ -153,7 +194,7 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see the medication order form launch in the workspace in edit mode', async () => {
-      await expect(form.getByText('Aspirin 81mg (81mg)')).toBeVisible();
+      await expect(drugOrderForm.getByText('Aspirin 81mg (81mg)')).toBeVisible();
     });
 
     await test.step('When I change the dose to "2" tablets', async () => {
@@ -162,8 +203,8 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I change the duration to "5" days', async () => {
-      await page.getByText(/^duration$/i).clear();
-      await page.getByText(/^duration$/i).fill('5');
+      await page.getByLabel(/^duration$/i).clear();
+      await page.getByLabel(/^duration$/i).fill('5');
     });
 
     await test.step('And I change the route to "Inhalation"', async () => {
@@ -179,7 +220,8 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I change the indication to "Hypertension"', async () => {
-      await form.getByText(/indication/i).fill('Hypertension');
+      await page.getByRole('textbox', { name: /indication/i }).clear();
+      await page.getByRole('textbox', { name: /indication/i }).fill('Hypertension');
     });
 
     await test.step('And I click on the "Save Order" button', async () => {
@@ -209,7 +251,7 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Renew a drug order', async ({ page, patient }) => {
+  test('Renew a drug order', async ({ page, patient, existingDrugOrder }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
     const medicationsPage = new MedicationsPage(page);
 
@@ -218,7 +260,7 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I open the options menu for the created medication', async () => {
-      const row = page.getByRole('row').filter({ hasText: drugOrder.drug.display }).first();
+      const row = page.getByRole('row').filter({ hasText: existingDrugOrder.drugOrder.drug.display }).first();
       await row.getByRole('button', { name: /options/i }).click();
     });
 
@@ -227,7 +269,9 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then the order basket should show a Renew item for the medication', async () => {
-      const basketItem = orderBasket.getByRole('listitem').filter({ hasText: drugOrder.drug.display });
+      const basketItem = orderBasket
+        .getByRole('listitem')
+        .filter({ hasText: existingDrugOrder.drugOrder.drug.display });
 
       await expect(basketItem).toBeVisible();
       await expect(basketItem.getByRole('status', { name: /renew/i })).toBeVisible();
@@ -238,18 +282,20 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(new RegExp(`placed order for.*${drugOrder.drug.display}`, 'i'))).toBeVisible();
+      await expect(
+        page.getByText(/placed order for/i).filter({ hasText: existingDrugOrder.drugOrder.drug.display }),
+      ).toBeVisible();
     });
 
     await test.step('And the renewed medication should appear in the active medications list', async () => {
       const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
       await expect(
-        activeMedicationsTable.getByRole('row').filter({ hasText: drugOrder.drug.display }).first(),
+        activeMedicationsTable.getByRole('row').filter({ hasText: existingDrugOrder.drugOrder.drug.display }).first(),
       ).toBeVisible();
     });
   });
 
-  test('Discontinue a drug order', async ({ page, patient }) => {
+  test('Discontinue a drug order', async ({ page, patient, existingDrugOrder }) => {
     const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
     const medicationsPage = new MedicationsPage(page);
 
@@ -258,7 +304,11 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('And I click on the "Discontinue" button', async () => {
-      await page.getByRole('button', { name: 'Options' }).click();
+      await page
+        .getByRole('row')
+        .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
+        .getByRole('button', { name: /options/i })
+        .click();
       await page.getByRole('menuitem', { name: /discontinue/i }).click();
     });
 
@@ -271,7 +321,9 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/discontinued aspirin 81mg/i)).toBeVisible();
+      await expect(
+        page.getByText(/discontinued/i).filter({ hasText: existingDrugOrder.drugOrder.drug.display }),
+      ).toBeVisible();
     });
 
     await test.step('And the medications table should be empty', async () => {
@@ -279,7 +331,7 @@ test.describe('Drug Order Tests', () => {
     });
   });
 
-  test('Cancel a existing drug order', async ({ page, patient }) => {
+  test('Cancel a existing drug order', async ({ page, patient, existingDrugOrder }) => {
     const ordersPage = new OrdersPage(page);
 
     await test.step('When I click on the Orders section', async () => {
@@ -293,7 +345,11 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('When I click the overflow menu in the table row with the existing drug order', async () => {
-      await page.getByRole('button', { name: 'Options' }).click();
+      await page
+        .getByRole('row')
+        .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
+        .getByRole('button', { name: /options/i })
+        .click();
     });
 
     await test.step('And I click on the `Cancel order` button', async () => {
@@ -305,12 +361,9 @@ test.describe('Drug Order Tests', () => {
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/Discontinued Aspirin 81mg./i)).toBeVisible();
+      await expect(
+        page.getByText(/discontinued/i).filter({ hasText: existingDrugOrder.drugOrder.drug.display }),
+      ).toBeVisible();
     });
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deleteEncounter(api, encounter.uuid);
-  await deleteDrugOrder(api, drugOrder.uuid);
 });
