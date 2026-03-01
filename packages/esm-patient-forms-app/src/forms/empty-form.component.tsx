@@ -17,7 +17,7 @@ const EmptyFormView: React.FC<EmptyFormViewProps> = ({ content }) => {
     <Layer>
       <Tile className={styles.tile}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{t('forms', 'Forms')}</h4>
+          <h2>{t('forms', 'Forms')}</h2>
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>{content}</p>
