@@ -1,0 +1,38 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.hint {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-bottom: layout.$spacing-05;
+}
+
+.skeletonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+}
+
+.errorTile,
+.emptyTile {
+  background-color: $ui-02;
+  padding: layout.$spacing-05;
+  text-align: center;
+}
+
+.drugOption {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.drugStrength {
+  @include type.type-style('body-compact-01');
+  font-weight: 600;
+}
+
+.drugForm {
+  @include type.type-style('label-01');
+  color: $text-02;
+}

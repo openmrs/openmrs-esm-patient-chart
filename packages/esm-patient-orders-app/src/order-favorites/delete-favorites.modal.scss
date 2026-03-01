@@ -1,0 +1,7 @@
+@use '@carbon/layout';
+
+.deleteButton {
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+}
