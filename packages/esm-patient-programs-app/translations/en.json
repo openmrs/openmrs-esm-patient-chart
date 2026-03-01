@@ -25,6 +25,7 @@
   "enrollmentUpdatesNowVisible": "Changes to the program are now visible in the Programs table",
   "errorDeletingProgram": "Error deleting program",
   "fullyEnrolled": "Enrolled in all programs",
+  "invalidValue": "Invalid value",
   "location": "Location",
   "noEligibleEnrollments": "There are no more programs left to enroll this patient in",
   "noProgramsConfigured": "No programs configured",

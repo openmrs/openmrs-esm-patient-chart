@@ -48,8 +48,14 @@ export interface ProgramsFormProps {
 const createProgramsFormSchema = (t: TFunction) =>
   z.object({
     selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
-    enrollmentDate: z.date(),
-    completionDate: z.date().optional().nullable(),
+    enrollmentDate: z
+      .date()
+      .refine((date) => date.getFullYear() >= 1000, { message: t('invalidValue', 'Invalid value') }),
+    completionDate: z
+      .date()
+      .optional()
+      .nullable()
+      .refine((date) => !date || date.getFullYear() >= 1000, { message: t('invalidValue', 'Invalid value') }),
     enrollmentLocation: z.string(),
     selectedProgramStatus: z.string(),
   });
