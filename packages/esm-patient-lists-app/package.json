@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-lists-app",
-  "version": "11.3.0",
+  "version": "12.0.1",
   "license": "MPL-2.0",
   "description": "An OpenMRS frontend module for managing patient lists in the Patient Chart",
   "browser": "dist/openmrs-esm-patient-lists-app.js",
@@ -40,8 +40,8 @@
     "@carbon/react": "^1.83.0"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "8.x",
-    "@openmrs/esm-patient-common-lib": "11.x",
+    "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-patient-common-lib": "12.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "16.x",

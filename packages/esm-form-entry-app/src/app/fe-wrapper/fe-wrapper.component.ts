@@ -272,7 +272,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   }
 
   private validateEncounterDatetimeWithVisit(encounterCreate: EncounterCreate) {
-    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitUuid = this.singleSpaPropsService.getProp('visitUuid');
     const visitStartDatetime = this.singleSpaPropsService.getProp('visitStartDatetime');
     const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 
