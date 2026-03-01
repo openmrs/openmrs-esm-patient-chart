@@ -57,6 +57,7 @@ import {
   type ErrorObject,
   type VisitFormCallbacks,
   type VisitFormData,
+  type VisitStatus,
 } from './visit-form.resource';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
@@ -464,11 +465,11 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                     name="visitStatus"
                     control={control}
                     render={({ field: { onChange, value } }) => {
-                      const validVisitStatuses = visitToEdit
+                      const validVisitStatuses: ReadonlyArray<VisitStatus> = visitToEdit
                         ? ['ongoing', 'past']
                         : hasRdeAccess
                           ? visitStatuses
-                          : (['new', 'ongoing'] as const);
+                          : ['new', 'ongoing', 'past'];
                       const idx = validVisitStatuses.indexOf(value);
                       const selectedIndex = idx >= 0 ? idx : 0;
 
