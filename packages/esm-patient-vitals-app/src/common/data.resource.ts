@@ -267,6 +267,8 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           return 'weight';
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
+        case concepts.generalPatientNoteUuid:
+          return 'note';
         default:
           return ''; // or throw an error for unknown conceptUuid
       }
@@ -281,6 +283,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       concepts.respiratoryRateUuid,
       concepts.temperatureUuid,
       concepts.weightUuid,
+      concepts.generalPatientNoteUuid,
     ],
   );
 
@@ -477,7 +480,7 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
       ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
-    value: resource?.valueQuantity?.value,
+    value: resource?.valueString || resource?.valueQuantity?.value,
   };
 }
 
