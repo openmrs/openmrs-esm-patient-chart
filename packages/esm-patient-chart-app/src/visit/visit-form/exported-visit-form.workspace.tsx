@@ -154,7 +154,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     watch,
   } = methods;
 
-  const visitStatus = watch('visitStatus') ?? defaultValues?.visitStatus;
+  const visitStatus = watch('visitStatus', defaultValues?.visitStatus);
 
   // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
   useEffect(() => {
