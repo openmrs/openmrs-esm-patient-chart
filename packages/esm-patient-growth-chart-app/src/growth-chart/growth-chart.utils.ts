@@ -1,35 +1,41 @@
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import boysWeightData from '../who-data/boys/weight-for-age.json';
+import girlsWeightData from '../who-data/girls/weight-for-age.json';
 import type { Observation } from './growth-chart.resource';
 
-export interface TableRowData {
-  id: string;
-  date: string;
-  weight: string;
-  rawDate: string;
-}
+export const getReferenceSeries = (gender: string) => {
+  const whoData = gender.toLowerCase() === 'female' ? girlsWeightData : boysWeightData;
+  const referenceSeries = [];
+  const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
 
-export function transformGrowthChartData(weights: Observation[]): TableRowData[] {
-  const groupedMap = new Map<string, { weight?: string; id: string }>();
-
-  const processObs = (obsList: Observation[], type: 'weight') => {
-    obsList.forEach((obs) => {
-      const dateKey = obs.effectiveDateTime;
-      if (!groupedMap.has(dateKey)) {
-        groupedMap.set(dateKey, { id: obs.id });
-      }
-      const existing = groupedMap.get(dateKey)!;
-      existing[type] = `${obs.value} ${obs.unit}`;
+  whoData.forEach((point) => {
+    percentiles.forEach((p) => {
+      referenceSeries.push({
+        group: p,
+        age: point.age_months,
+        value: point[p],
+      });
     });
-  };
+  });
 
-  processObs(weights, 'weight');
+  return referenceSeries;
+};
 
-  return Array.from(groupedMap.entries())
-    .map(([date, values]) => ({
-      id: values.id,
-      date: formatDate(parseDate(date)),
-      weight: values.weight || '-',
-      rawDate: date,
-    }))
-    .sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
-}
+export const getPatientSeries = (weights: Observation[], birthDate: dayjs.Dayjs, patientWeightLabel: string) => {
+  return weights
+    .map((obs) => {
+      const obsDate = dayjs(obs.effectiveDateTime);
+      if (!obsDate.isValid()) return null;
+
+      const ageInMonths = obsDate.diff(birthDate, 'month', true);
+      if (ageInMonths < 0) return null;
+
+      return {
+        group: patientWeightLabel,
+        age: ageInMonths,
+        value: obs.value,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a!.age - b!.age);
+};

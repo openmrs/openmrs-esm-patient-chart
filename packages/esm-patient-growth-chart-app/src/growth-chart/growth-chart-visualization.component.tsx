@@ -5,11 +5,10 @@ import { ScaleTypes, ToolbarControlTypes } from '@carbon/charts/interfaces';
 import '@carbon/charts/styles.css';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import boysWeightData from '../who-data/boys/weight-for-age.json';
-import girlsWeightData from '../who-data/girls/weight-for-age.json';
-import type { GrowthChartData } from './growth-chart.resource';
+import type { GrowthChartData, Observation } from './growth-chart.resource';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import styles from './growth-chart-main.scss';
+import { getReferenceSeries, getPatientSeries } from './growth-chart.utils';
 
 interface GrowthChartVisualizationProps {
   data: GrowthChartData;
@@ -62,7 +61,7 @@ const GrowthChart: React.FC<GrowthChartVisualizationProps> = ({ data }) => {
     }
 
     const referenceSeries = getReferenceSeries(patient.gender);
-    const patientSeries = getPatientSeries(weights, birthDate, t);
+    const patientSeries = getPatientSeries(weights, birthDate, t('patientWeight', 'Patient Weight'));
 
     return [...referenceSeries, ...patientSeries];
   }, [patient, weights, t]);
@@ -155,43 +154,6 @@ const GrowthChart: React.FC<GrowthChartVisualizationProps> = ({ data }) => {
       <LineChart data={chartData} options={options} />
     </div>
   );
-};
-
-const getReferenceSeries = (gender: string) => {
-  const whoData = gender.toLowerCase() === 'female' ? girlsWeightData : boysWeightData;
-  const referenceSeries = [];
-  const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
-
-  whoData.forEach((point) => {
-    percentiles.forEach((p) => {
-      referenceSeries.push({
-        group: p,
-        age: point.age_months,
-        value: point[p],
-      });
-    });
-  });
-
-  return referenceSeries;
-};
-
-const getPatientSeries = (weights: any[], birthDate: dayjs.Dayjs, t: any) => {
-  return weights
-    .map((obs) => {
-      const obsDate = dayjs(obs.effectiveDateTime);
-      if (!obsDate.isValid()) return null;
-
-      const ageInMonths = obsDate.diff(birthDate, 'month', true);
-      if (ageInMonths < 0) return null;
-
-      return {
-        group: t('patientWeight', 'Patient Weight'),
-        age: ageInMonths,
-        value: obs.value,
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a!.age - b!.age);
 };
 
 export default GrowthChartVisualization;
