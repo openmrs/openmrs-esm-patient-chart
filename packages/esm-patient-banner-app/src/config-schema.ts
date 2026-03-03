@@ -17,9 +17,20 @@ export const configSchema = {
     _description: "Whether to use the relationship name as a link to the associated person's patient chart.",
     _default: false,
   },
+  personAttributeTagsToDisplay: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+      _description: 'The UUID of the person attribute type',
+      _default: [],
+    },
+    _description: 'Whether to display person attribute tags in the patient banner',
+    _default: true,
+  },
 };
 
 export interface ConfigObject {
   contactAttributeTypes: Array<string>;
   useRelationshipNameLink: boolean;
+  personAttributeTagsToDisplay: Array<string>;
 }

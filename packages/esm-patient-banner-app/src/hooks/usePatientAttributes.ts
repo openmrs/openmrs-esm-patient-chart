@@ -1,10 +1,7 @@
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import useSWRImmutable from 'swr/immutable';
+import { restBaseUrl, useConfig, useOpenmrsSWR } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type Patient } from '../types';
-
-const customRepresentation =
-  'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name),identifierType:(uuid,name,format,formatDescription,validator)),person:(uuid,display,gender,birthdate,dead,age,deathDate,birthdateEstimated,causeOfDeath,preferredName:(uuid,preferred,givenName,middleName,familyName),attributes,preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))';
+import type { PersonAttributeResponse } from '../types';
+import { useMemo } from 'react';
 
 /**
  * React hook for obtaining patient attributes for a given patient {@link Attribute}
@@ -13,34 +10,30 @@ const customRepresentation =
  *
  * @param patientUuid The patient's UUID
  */
-export const usePatientAttributes = (patientUuid: string | null) => {
-  const { data, error, isLoading } = useSWRImmutable<{ data: Patient }>(
-    patientUuid ? `${restBaseUrl}/patient/${patientUuid}?v=${customRepresentation}` : null,
-    openmrsFetch,
+function usePersonAttributes(personUuid?: string | null, customRepresentation: string = null) {
+  customRepresentation = customRepresentation || 'custom:(uuid,display,attributeType:(uuid,display,format),value)';
+  const shouldFetch = !!personUuid;
+  const { personAttributeTagsToDisplay } = useConfig<ConfigObject>();
+  const { data, isLoading, error } = useOpenmrsSWR<{ results: Array<PersonAttributeResponse> }, Error>(
+    shouldFetch ? `${restBaseUrl}/person/${personUuid}/attribute?v=${customRepresentation}` : null,
   );
 
-  return {
-    isLoading,
-    attributes: data?.data?.person?.attributes ?? [],
-    person: data?.data?.person ?? null,
-    error: error,
-  };
-};
-
-/**
- *  React hook that takes patientUuid {@link string} and return contact details
- *  derived from patient-attributes using configured attributeTypes
- * @param patientUuid Unique patient identifier {@type string}
- * @returns Object containing `contactAttribute` {@link Attribute} loading status
- */
-export const usePatientContactAttributes = (patientUuid: string) => {
-  const { contactAttributeTypes } = useConfig<ConfigObject>();
-  const { attributes, isLoading } = usePatientAttributes(contactAttributeTypes.length ? patientUuid : null);
-  const contactAttributes = attributes?.filter(({ attributeType }) =>
-    contactAttributeTypes.includes(attributeType?.uuid),
+  const results = useMemo(
+    () => ({
+      data:
+        data?.data?.results.reduce((acc: Record<string, PersonAttributeResponse>, curr) => {
+          if (personAttributeTagsToDisplay.includes(curr.attributeType.uuid)) {
+            acc[curr.attributeType.uuid] = curr;
+          }
+          return acc;
+        }, {}) ?? {},
+      isLoading,
+      error,
+    }),
+    [data?.data?.results, personAttributeTagsToDisplay, isLoading, error],
   );
-  return {
-    contactAttributes: contactAttributes ?? [],
-    isLoading,
-  };
-};
+
+  return results;
+}
+
+export default usePersonAttributes;
