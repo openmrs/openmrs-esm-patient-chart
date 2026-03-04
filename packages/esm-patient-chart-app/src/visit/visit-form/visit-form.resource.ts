@@ -130,6 +130,10 @@ export function computeEarliestAllowedStartDate(
     return null;
   }
 
+  // When the birthdate is estimated, the backend's VisitValidator applies a grace period
+  // that shifts the earliest allowed date further into the past. The grace is half the
+  // patient's age (in years), with a minimum of 1 year.
+  // @see https://github.com/openmrs/openmrs-core/blob/master/api/src/main/java/org/openmrs/validator/VisitValidator.java
   if (birthdateEstimated && age != null) {
     const graceYears = Math.max(1, Math.floor(age * 0.5));
     earliest.setFullYear(earliest.getFullYear() - graceYears);
@@ -138,6 +142,9 @@ export function computeEarliestAllowedStartDate(
   return earliest;
 }
 
+// We need a separate REST call here because the FHIR Patient resource doesn't
+// include `birthdateEstimated` or `age`, which are required for the grace period
+// calculation. The FHIR patient's `birthDate` alone isn't sufficient.
 export function useEarliestAllowedVisitStartDate(patientUuid: string) {
   const { data, isLoading } = useSWRImmutable<FetchResponse<PatientPersonResponse>>(
     `${restBaseUrl}/patient/${patientUuid}?v=${patientPersonCustomRep}`,

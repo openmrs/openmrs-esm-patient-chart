@@ -917,6 +917,18 @@ describe('Visit form', () => {
     expect(screen.queryByText(/This patient already has an active visit/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Start visit/i })).toBeEnabled();
   });
+
+  it('does not show an active visit warning when editing an existing visit', () => {
+    mockUseVisit.mockReturnValue({
+      activeVisit: { uuid: 'some-active-visit-uuid' } as Visit,
+    } as ReturnType<typeof useVisit>);
+    mockUseAllowOverlappingVisits.mockReturnValue({ allowOverlappingVisits: false, isLoading: false });
+
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    expect(screen.queryByText(/This patient already has an active visit/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
+  });
 });
 
 // Note: For some reason, DatePicker and TimePicker don't get validated properly
