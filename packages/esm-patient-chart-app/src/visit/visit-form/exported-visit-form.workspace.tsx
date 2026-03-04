@@ -75,13 +75,20 @@ interface VisitAttribute {
  */
 export interface ExtraVisitInfo {
   /**
-   * Optional callback that extensions can provide to perform final
-   * preparation or validation before the visit is created/updated.
+   * Optional callback that extensions can provide to perform additional
+   * work after the visit is created/updated (e.g. creating a bill).
+   * Called after visit creation succeeds and before the workspace closes.
+   * May return a Promise; it will be awaited before closing the workspace.
    */
-  handleCreateExtraVisitInfo?: () => void;
+  handleCreateExtraVisitInfo?: () => void | Promise<void>;
   /**
    * Array of visit attributes to be included in the visit payload.
    * Each attribute must have an attributeType (UUID) and a value (string).
+   *
+   * Note: These attributes are only included when creating a new visit.
+   * They are not used when editing an existing visit because the backend
+   * rejects inline attribute updates with a maxOccurs violation, and
+   * these entries lack the UUIDs needed for update/delete operations.
    */
   attributes?: Array<VisitAttribute>;
 }
@@ -135,6 +142,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
+  const extraVisitAttributeSlotState = useMemo(() => ({ patientUuid, setExtraVisitInfo }), [patientUuid]);
 
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
     useVisitFormSchemaAndDefaultValues(visitToEdit);
@@ -162,14 +170,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       keepTouched: true,
     });
   }, [defaultValues, reset]);
-
-  const isValidVisitAttributesArray = useCallback((attributes: unknown): boolean => {
-    return (
-      Array.isArray(attributes) &&
-      attributes.length > 0 &&
-      attributes.every((attr) => attr?.attributeType?.trim().length > 0 && attr?.value?.trim().length > 0)
-    );
-  }, []);
 
   const getErrorDescription = useCallback(
     (error: unknown) => {
@@ -262,7 +262,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   );
 
   const onSubmit = useCallback(
-    (data: VisitFormData) => {
+    async (data: VisitFormData) => {
       const {
         visitStatus,
         visitStartTimeFormat,
@@ -282,6 +282,26 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       const startDatetime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
       const stopDatetime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
+      // For new visits, include attributes in the payload for atomic creation (avoids orphaned visits).
+      // For edits, attributes are managed separately (backend rejects inline updates with maxOccurs).
+      const formAttributes = !visitToEdit
+        ? Object.entries(visitAttributes)
+            .filter(([, value]) => value)
+            .map(([attributeType, value]) => ({ attributeType, value }))
+        : [];
+
+      // Deduplicate by attributeType, with form attributes taking precedence over extra attributes
+      const formAttributeTypes = new Set(formAttributes.map((attr) => attr.attributeType));
+      const deduplicatedExtraAttributes = (extraAttributes ?? []).filter(
+        (attr) => attr?.attributeType && !formAttributeTypes.has(attr.attributeType),
+      );
+
+      const inlineAttributes = !visitToEdit
+        ? [...formAttributes, ...deduplicatedExtraAttributes].filter(
+            (attr) => attr?.attributeType?.length > 0 && attr?.value?.length > 0,
+          )
+        : [];
+
       let payload: NewVisitPayload = {
         visitType: visitType,
         location: visitLocation?.uuid,
@@ -289,10 +309,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
         stopDatetime: hasStopTime ? stopDatetime : null,
         // The request throws 400 (Bad request) error when the patient is passed in the update payload for existing visit
         ...(!visitToEdit && { patient: patientUuid }),
-        ...(isValidVisitAttributesArray(extraAttributes) && { attributes: extraAttributes }),
+        ...(inlineAttributes.length > 0 && { attributes: inlineAttributes }),
       };
-
-      handleCreateExtraVisitInfo?.();
 
       const abortController = new AbortController();
       if (isOnline) {
@@ -340,28 +358,27 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
             invalidateCurrentVisit(globalMutate, patientUuid);
 
-            // handleVisitAttributes already has code to show error snackbar when attribute fails to update
-            // no need for catch block here
-            const visitAttributesRequest = handleVisitAttributes(visitAttributes, response.data.uuid).then(
-              (visitAttributesResponses) => {
-                if (visitAttributesResponses.length > 0) {
-                  showSnackbar({
-                    isLowContrast: true,
-                    kind: 'success',
-                    title: t(
-                      'additionalVisitInformationUpdatedSuccessfully',
-                      'Additional visit information updated successfully',
-                    ),
-                  });
-                }
-              },
-            );
+            const visitAttributesRequest = visitToEdit
+              ? handleVisitAttributes(visitAttributes, response.data.uuid).then((visitAttributesResponses) => {
+                  if (visitAttributesResponses.length > 0) {
+                    showSnackbar({
+                      isLowContrast: true,
+                      kind: 'success',
+                      title: t(
+                        'additionalVisitInformationUpdatedSuccessfully',
+                        'Additional visit information updated successfully',
+                      ),
+                    });
+                  }
+                })
+              : Promise.resolve();
 
             const onVisitCreatedOrUpdatedRequests = [...visitFormCallbacks.values()].map((callbacks) =>
               callbacks.onVisitCreatedOrUpdated(visit),
             );
 
             await Promise.all([visitAttributesRequest, ...onVisitCreatedOrUpdatedRequests]);
+            await handleCreateExtraVisitInfo?.();
             await closeWorkspace({ discardUnsavedChanges: true });
             onVisitStarted?.(visit);
           })
@@ -418,7 +435,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       t,
       visitFormCallbacks,
       visitToEdit,
-      isValidVisitAttributesArray,
     ],
   );
 
@@ -597,7 +613,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                 </section>
               )}
 
-              <ExtensionSlot state={{ patientUuid, setExtraVisitInfo }} name="extra-visit-attribute-slot" />
+              <ExtensionSlot state={extraVisitAttributeSlotState} name="extra-visit-attribute-slot" />
 
               {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
               <section>

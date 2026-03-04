@@ -483,6 +483,16 @@ describe('Visit form', () => {
     expect(mockSaveVisit).toHaveBeenCalledTimes(1);
     expect(mockSaveVisit).toHaveBeenCalledWith(
       {
+        attributes: [
+          {
+            attributeType: visitAttributes.punctuality.uuid,
+            value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb',
+          },
+          {
+            attributeType: visitAttributes.insurancePolicyNumber.uuid,
+            value: '183299',
+          },
+        ],
         location: mockLocations[1].uuid,
         patient: mockPatient.id,
         visitType: 'some-uuid1',
@@ -492,33 +502,19 @@ describe('Visit form', () => {
       expect.any(Object),
     );
 
-    expect(mockCreateVisitAttribute).toHaveBeenCalledTimes(2);
-    expect(mockCreateVisitAttribute).toHaveBeenCalledWith(
-      visitUuid,
-      visitAttributes.punctuality.uuid,
-      '66cdc0a1-aa19-4676-af51-80f66d78d9eb',
-    );
-    expect(mockCreateVisitAttribute).toHaveBeenCalledWith(
-      visitUuid,
-      visitAttributes.insurancePolicyNumber.uuid,
-      '183299',
-    );
+    // Attributes should be included in the visit payload, not created separately
+    expect(mockCreateVisitAttribute).not.toHaveBeenCalled();
 
     expect(mockOnVisitCreatedOrUpdatedCallback).toHaveBeenCalled();
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
 
-    expect(showSnackbar).toHaveBeenCalledTimes(2);
+    expect(showSnackbar).toHaveBeenCalledTimes(1);
     expect(showSnackbar).toHaveBeenCalledWith({
       isLowContrast: true,
       subtitle: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
-    });
-    expect(showSnackbar).toHaveBeenCalledWith({
-      isLowContrast: true,
-      title: expect.stringContaining('Additional visit information updated successfully'),
-      kind: 'success',
     });
   });
 
@@ -564,6 +560,10 @@ describe('Visit form', () => {
       }),
       expect.any(Object),
     );
+    // Inline attributes must not be included in the update payload because the
+    // backend rejects them with a maxOccurs violation. Attributes are managed
+    // separately via individual create/update/delete calls for existing visits.
+    expect(mockUpdateVisit.mock.calls[0][1]).not.toHaveProperty('attributes');
 
     expect(mockUpdateVisitAttribute).toHaveBeenCalledTimes(2);
     expect(mockUpdateVisitAttribute).toHaveBeenCalledWith(
@@ -666,10 +666,8 @@ describe('Visit form', () => {
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 
-  it('renders an error message if there was a problem updating visit attributes after starting a new visit', async () => {
+  it('does not create visit attributes separately when starting a new visit with attributes', async () => {
     const user = userEvent.setup();
-
-    mockCreateVisitAttribute.mockRejectedValue({ status: 500, statusText: 'Internal server error' });
 
     renderVisitForm();
 
@@ -689,27 +687,56 @@ describe('Visit form', () => {
 
     await user.click(saveButton);
 
-    expect(showSnackbar).toHaveBeenCalledTimes(3);
-    expect(showSnackbar).toHaveBeenCalledWith({
-      isLowContrast: true,
-      subtitle: expect.stringContaining('started successfully'),
-      kind: 'success',
-      title: 'Visit started',
-    });
-    expect(showSnackbar).toHaveBeenCalledWith({
-      isLowContrast: false,
-      subtitle: undefined,
-      kind: 'error',
-      title: 'Error creating the Punctuality visit attribute',
-    });
-    expect(showSnackbar).toHaveBeenCalledWith({
-      isLowContrast: false,
-      subtitle: undefined,
-      kind: 'error',
-      title: 'Error creating the Insurance Policy Number visit attribute',
-    });
+    // Attributes should be included in the saveVisit payload, not created via separate API calls
+    expect(mockSaveVisit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attributes: expect.arrayContaining([
+          { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
+          { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
+        ]),
+      }),
+      expect.any(Object),
+    );
+    expect(mockCreateVisitAttribute).not.toHaveBeenCalled();
+  });
 
-    expect(mockOnVisitCreatedOrUpdatedCallback).toHaveBeenCalled();
+  it('does not create an orphaned visit when the server rejects a new visit with attributes', async () => {
+    const user = userEvent.setup();
+
+    mockSaveVisit.mockRejectedValueOnce({ status: 400, statusText: 'Bad Request' });
+
+    renderVisitForm();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText(/Inpatient Ward/i));
+
+    const punctualityPicker = screen.getByRole('combobox', { name: 'Punctuality (optional)' });
+    await user.selectOptions(punctualityPicker, 'On time');
+
+    const insuranceNumberInput = screen.getByRole('textbox', { name: 'Insurance Policy Number (optional)' });
+    await user.clear(insuranceNumberInput);
+    await user.type(insuranceNumberInput, '183299');
+
+    await user.click(saveButton);
+
+    // Attributes are included in the saveVisit payload, so when the visit creation
+    // is rejected (e.g. due to overlapping visits), no orphaned visit is created
+    // and no separate attribute creation calls are made
+    expect(mockSaveVisit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attributes: expect.arrayContaining([
+          { attributeType: visitAttributes.punctuality.uuid, value: '66cdc0a1-aa19-4676-af51-80f66d78d9eb' },
+          { attributeType: visitAttributes.insurancePolicyNumber.uuid, value: '183299' },
+        ]),
+      }),
+      expect.any(Object),
+    );
+    expect(mockCreateVisitAttribute).not.toHaveBeenCalled();
+    expect(mockOnVisitCreatedOrUpdatedCallback).not.toHaveBeenCalled();
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 
