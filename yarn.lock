@@ -4919,7 +4919,7 @@ __metadata:
     "@ng-select/ng-select": "npm:^14.0.0"
     "@ngx-translate/core": "npm:^16.0.4"
     "@openmrs/ngx-file-uploader": "npm:^19.0.0"
-    "@openmrs/ngx-formentry": "npm:^19.0.1-pre.508"
+    "@openmrs/ngx-formentry": "npm:^19.0.1"
     "@schematics/angular": "npm:^19.2.0"
     "@types/jasmine": "npm:^5.1.8"
     "@types/node": "npm:^22.15.30"
@@ -5604,9 +5604,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/ngx-formentry@npm:^19.0.1-pre.508":
-  version: 19.0.1-pre.508
-  resolution: "@openmrs/ngx-formentry@npm:19.0.1-pre.508"
+"@openmrs/ngx-formentry@npm:^19.0.1":
+  version: 19.0.1
+  resolution: "@openmrs/ngx-formentry@npm:19.0.1"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -5627,7 +5627,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/f0222dde63a8610ea046511c885891b941022cfad5416d2b4e35fbe6b21dce80c274e6ced48b71d5f58a8221afc400966fab20deb2a4a42ab842bda6e4cdb4bd
+  checksum: 10/7cdb74950371b5286371594b683bb96d7d75b1e586fb56479d7e5a738c6e2a52fdad8a55f1884cd6342eaa346ac4bcb26f1cd1f3a42b24e465811ea97df25bb2
   languageName: node
   linkType: hard
 
