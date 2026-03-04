@@ -65,7 +65,7 @@
   "enterNonCodedCauseOfDeath": "Enter non-coded cause of death",
   "error": "Error",
   "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
-  "errorCreatingVisitAttribute": "Could not delete {{attributeName}} attribute",
+  "errorCreatingVisitAttribute": "Error creating the {{attributeName}} visit attribute",
   "errorDeletingVisit": "Error deleting visit",
   "errorDeletingVisitAttribute": "Could not delete {{attributeName}} attribute",
   "errorEndingVisit": "Error ending visit",

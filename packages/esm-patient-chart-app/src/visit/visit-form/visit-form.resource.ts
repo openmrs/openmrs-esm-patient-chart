@@ -54,25 +54,21 @@ export type ErrorObject = {
     message: string;
     detail: string;
     fieldErrors?: FieldError;
-    globalErrors?: FieldError;
+    globalErrors?: Array<{ code: string; message: string }>;
   };
 };
 
 export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TFunction) {
-  const {
-    error: { fieldErrors, globalErrors, message, code },
-  } = errorObject ?? {};
+  const { fieldErrors, globalErrors, message, code } = errorObject?.error ?? {};
 
-  if (fieldErrors) {
+  if (fieldErrors && Object.keys(fieldErrors).length > 0) {
     return Object.values(fieldErrors)
       .flatMap((errors) => errors.map((error) => error.message))
       .join('\n');
   }
 
-  if (globalErrors) {
-    return Object.values(globalErrors)
-      .flatMap((errors) => errors.map((error) => error.message))
-      .join('\n');
+  if (globalErrors?.length > 0) {
+    return globalErrors.map((error) => error.message).join('\n');
   }
 
   return message ?? code ?? t('unknownError', 'Unknown error');
