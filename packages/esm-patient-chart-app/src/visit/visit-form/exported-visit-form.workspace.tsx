@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import {
@@ -29,11 +29,12 @@ import {
   useConnectivity,
   useEmrConfiguration,
   useLayoutType,
-  type Visit,
+  useVisit,
   Workspace2,
-  type Workspace2DefinitionProps,
   type AssignedExtension,
   type NewVisitPayload,
+  type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import {
   createOfflineVisitForPatient,
@@ -48,7 +49,9 @@ import {
   deleteVisitAttribute,
   extractErrorMessagesFromResponse,
   updateVisitAttribute,
+  useAllowOverlappingVisits,
   useConditionalVisitTypes,
+  useEarliestAllowedVisitStartDate,
   useVisitFormCallbacks,
   useVisitFormSchemaAndDefaultValues,
   visitStatuses,
@@ -56,12 +59,12 @@ import {
   type VisitFormCallbacks,
   type VisitFormData,
 } from './visit-form.resource';
+import { type ChartConfig } from '../../config-schema';
+import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
 import BaseVisitType from './base-visit-type.component';
 import LocationSelector from './location-selector.component';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import VisitDateTimeSection from './visit-date-time.component';
-import { useVisitAttributeTypes } from '../hooks/useVisitAttributeType';
-import { type ChartConfig } from '../../config-schema';
 import styles from './visit-form.scss';
 
 interface VisitAttribute {
@@ -132,9 +135,13 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   );
   const visitHeaderSlotState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const { activeVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
+  const { allowOverlappingVisits, isLoading: isLoadingOverlapSetting } = useAllowOverlappingVisits();
 
   const { mutate: globalMutate } = useSWRConfig();
   const allVisitTypes = useConditionalVisitTypes();
+  const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =
+    useEarliestAllowedVisitStartDate(patientUuid);
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
@@ -142,10 +149,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
-  const extraVisitAttributeSlotState = useMemo(() => ({ patientUuid, setExtraVisitInfo }), [patientUuid]);
-
   const { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime } =
-    useVisitFormSchemaAndDefaultValues(visitToEdit);
+    useVisitFormSchemaAndDefaultValues(visitToEdit, earliestAllowedStartDate);
 
   const methods = useForm<VisitFormData>({
     mode: 'all',
@@ -160,6 +165,9 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = methods;
+
+  const visitStatus = useWatch({ control, name: 'visitStatus' });
+  const hasActiveVisitConflict = !visitToEdit && visitStatus !== 'past' && !!activeVisit && !allowOverlappingVisits;
 
   // default values are cached so form needs to be reset when they change (e.g. when default visit location finishes loading)
   useEffect(() => {
@@ -511,130 +519,149 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                   />
                 </FormGroup>
               </section>
-              <VisitDateTimeSection {...{ control, firstEncounterDateTime, lastEncounterDateTime }} />
-              {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
-              {config.showUpcomingAppointments && (
-                <section>
-                  <div className={styles.sectionField}>
-                    <VisitFormExtensionSlot
-                      name="visit-form-top-slot"
-                      patientUuid={patientUuid}
-                      visitFormOpenedFrom={openedFrom}
-                      setVisitFormCallbacks={setVisitFormCallbacks}
-                    />
-                  </div>
-                </section>
+              {hasActiveVisitConflict && (
+                <InlineNotification
+                  className={styles.inlineNotification}
+                  kind="info"
+                  lowContrast
+                  title={t('activeVisitExists', 'This patient already has an active visit')}
+                  subtitle={t('endActiveVisitFirst', 'You must end the current visit before starting a new one.')}
+                />
               )}
-
-              {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
-              <LocationSelector control={control} />
-
-              {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
-            to true. */}
-              {config.showRecommendedVisitTypeTab && (
-                <section>
-                  <h1 className={styles.sectionTitle}>{t('program', 'Program')}</h1>
-                  <FormGroup legendText={t('selectProgramType', 'Select program type')} className={styles.sectionField}>
-                    <Controller
-                      name="programType"
-                      control={control}
-                      render={({ field: { onChange } }) => (
-                        <RadioButtonGroup
-                          orientation="vertical"
-                          onChange={(uuid: string) =>
-                            onChange(activePatientEnrollment.find(({ program }) => program.uuid === uuid)?.uuid)
-                          }
-                          name="program-type-radio-group"
-                        >
-                          {activePatientEnrollment.map(({ uuid, display, program }) => (
-                            <RadioButton
-                              key={uuid}
-                              className={styles.radioButton}
-                              id={uuid}
-                              labelText={display}
-                              value={program.uuid}
-                            />
-                          ))}
-                        </RadioButtonGroup>
-                      )}
-                    />
-                  </FormGroup>
-                </section>
-              )}
-
-              {/* Lists available visit types if no atFacilityVisitType enabled. The content switcher only gets shown when recommended visit types are enabled */}
-              {!emrConfiguration?.atFacilityVisitType && (
-                <section>
-                  <h1 className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</h1>
-                  <div className={styles.sectionField}>
-                    {config.showRecommendedVisitTypeTab ? (
-                      <>
-                        <ContentSwitcher
-                          selectedIndex={visitTypeContentSwitcherIndex}
-                          onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
-                          size="md"
-                        >
-                          <Switch name="recommended">{t('recommended', 'Recommended')}</Switch>
-                          <Switch name="all">{t('all', 'All')}</Switch>
-                        </ContentSwitcher>
-                        {visitTypeContentSwitcherIndex === 0 && !isLoading && (
-                          <MemoizedRecommendedVisitType
-                            patientUuid={patientUuid}
-                            patientProgramEnrollment={(() => {
-                              return activePatientEnrollment?.find(
-                                ({ program }) => program.uuid === getValues('programType'),
-                              );
-                            })()}
-                            locationUuid={getValues('visitLocation')?.uuid}
-                          />
-                        )}
-                        {visitTypeContentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
-                      </>
-                    ) : (
-                      // Defaults to showing all possible visit types if recommended visits are not enabled
-                      <BaseVisitType visitTypes={allVisitTypes} />
-                    )}
-                  </div>
-
-                  {errors?.visitType && (
+              {!hasActiveVisitConflict && (
+                <>
+                  <VisitDateTimeSection
+                    {...{ control, firstEncounterDateTime, lastEncounterDateTime }}
+                    earliestStartDate={earliestAllowedStartDate?.getTime()}
+                  />
+                  {/* Upcoming appointments. This get shown when config.showUpcomingAppointments is true. */}
+                  {config.showUpcomingAppointments && (
                     <section>
                       <div className={styles.sectionField}>
-                        <InlineNotification
-                          role="alert"
-                          style={{ margin: '0', minWidth: '100%' }}
-                          kind="error"
-                          lowContrast={true}
-                          title={t('missingVisitType', 'Missing visit type')}
-                          subtitle={t('selectVisitType', 'Please select a Visit Type')}
+                        <VisitFormExtensionSlot
+                          name="visit-form-top-slot"
+                          patientUuid={patientUuid}
+                          visitFormOpenedFrom={openedFrom}
+                          setVisitFormCallbacks={setVisitFormCallbacks}
                         />
                       </div>
                     </section>
                   )}
-                </section>
+
+                  {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
+                  <LocationSelector control={control} />
+
+                  {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
+                to true. */}
+                  {config.showRecommendedVisitTypeTab && (
+                    <section>
+                      <h1 className={styles.sectionTitle}>{t('program', 'Program')}</h1>
+                      <FormGroup
+                        legendText={t('selectProgramType', 'Select program type')}
+                        className={styles.sectionField}
+                      >
+                        <Controller
+                          name="programType"
+                          control={control}
+                          render={({ field: { onChange } }) => (
+                            <RadioButtonGroup
+                              orientation="vertical"
+                              onChange={(uuid: string) =>
+                                onChange(activePatientEnrollment.find(({ program }) => program.uuid === uuid)?.uuid)
+                              }
+                              name="program-type-radio-group"
+                            >
+                              {activePatientEnrollment.map(({ uuid, display, program }) => (
+                                <RadioButton
+                                  key={uuid}
+                                  className={styles.radioButton}
+                                  id={uuid}
+                                  labelText={display}
+                                  value={program.uuid}
+                                />
+                              ))}
+                            </RadioButtonGroup>
+                          )}
+                        />
+                      </FormGroup>
+                    </section>
+                  )}
+
+                  {/* Lists available visit types if no atFacilityVisitType enabled. The content switcher only gets shown when recommended visit types are enabled */}
+                  {!emrConfiguration?.atFacilityVisitType && (
+                    <section>
+                      <h1 className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</h1>
+                      <div className={styles.sectionField}>
+                        {config.showRecommendedVisitTypeTab ? (
+                          <>
+                            <ContentSwitcher
+                              selectedIndex={visitTypeContentSwitcherIndex}
+                              onChange={({ index }) => setVisitTypeContentSwitcherIndex(index)}
+                              size="md"
+                            >
+                              <Switch name="recommended">{t('recommended', 'Recommended')}</Switch>
+                              <Switch name="all">{t('all', 'All')}</Switch>
+                            </ContentSwitcher>
+                            {visitTypeContentSwitcherIndex === 0 && !isLoading && (
+                              <MemoizedRecommendedVisitType
+                                patientUuid={patientUuid}
+                                patientProgramEnrollment={(() => {
+                                  return activePatientEnrollment?.find(
+                                    ({ program }) => program.uuid === getValues('programType'),
+                                  );
+                                })()}
+                                locationUuid={getValues('visitLocation')?.uuid}
+                              />
+                            )}
+                            {visitTypeContentSwitcherIndex === 1 && <BaseVisitType visitTypes={allVisitTypes} />}
+                          </>
+                        ) : (
+                          // Defaults to showing all possible visit types if recommended visits are not enabled
+                          <BaseVisitType visitTypes={allVisitTypes} />
+                        )}
+                      </div>
+
+                      {errors?.visitType && (
+                        <section>
+                          <div className={styles.sectionField}>
+                            <InlineNotification
+                              role="alert"
+                              style={{ margin: '0', minWidth: '100%' }}
+                              kind="error"
+                              lowContrast={true}
+                              title={t('missingVisitType', 'Missing visit type')}
+                              subtitle={t('selectVisitType', 'Please select a Visit Type')}
+                            />
+                          </div>
+                        </section>
+                      )}
+                    </section>
+                  )}
+
+                  <ExtensionSlot state={{ patientUuid, setExtraVisitInfo }} name="extra-visit-attribute-slot" />
+
+                  {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
+                  <section>
+                    <h1 className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</h1>
+                    <div className={styles.sectionField}>
+                      <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
+                    </div>
+                  </section>
+
+                  {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
+                      or when the form is opened from the queues app */}
+                  <section>
+                    <div className={styles.sectionField}>
+                      <VisitFormExtensionSlot
+                        name="visit-form-bottom-slot"
+                        patientUuid={patientUuid}
+                        visitFormOpenedFrom={openedFrom}
+                        setVisitFormCallbacks={setVisitFormCallbacks}
+                      />
+                    </div>
+                  </section>
+                </>
               )}
-
-              <ExtensionSlot state={extraVisitAttributeSlotState} name="extra-visit-attribute-slot" />
-
-              {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
-              <section>
-                <h1 className={styles.sectionTitle}>{isTablet && t('visitAttributes', 'Visit attributes')}</h1>
-                <div className={styles.sectionField}>
-                  <VisitAttributeTypeFields setErrorFetchingResources={setErrorFetchingResources} />
-                </div>
-              </section>
-
-              {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
-                  or when the form is opened from the queues app */}
-              <section>
-                <div className={styles.sectionField}>
-                  <VisitFormExtensionSlot
-                    name="visit-form-bottom-slot"
-                    patientUuid={patientUuid}
-                    visitFormOpenedFrom={openedFrom}
-                    setVisitFormCallbacks={setVisitFormCallbacks}
-                  />
-                </div>
-              </section>
             </Stack>
           </div>
           <ButtonSet
@@ -648,7 +675,14 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             </Button>
             <Button
               className={styles.button}
-              disabled={isSubmitting || errorFetchingResources?.blockSavingForm}
+              disabled={
+                isSubmitting ||
+                isLoadingVisit ||
+                isLoadingBirthdateCheck ||
+                isLoadingOverlapSetting ||
+                errorFetchingResources?.blockSavingForm ||
+                hasActiveVisitConflict
+              }
               kind="primary"
               type="submit"
             >
