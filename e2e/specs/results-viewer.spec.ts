@@ -281,7 +281,7 @@ test('Record and edit test results', async ({ page, patient }) => {
   });
 
   await test.step('When I navigate to the `Visits` page', async () => {
-    visitsPage.goTo(patient.uuid);
+    await visitsPage.goTo(patient.uuid);
   });
 
   await test.step('And I go to the `All encounters` tab', async () => {
@@ -309,8 +309,9 @@ test('Record and edit test results', async ({ page, patient }) => {
 
   await test.step('And I launch the overflow menu of the created test results', async () => {
     await page
+      .getByRole('row')
+      .filter({ hasText: /laboratory test results/i })
       .getByRole('button', { name: /options/i })
-      .nth(0)
       .click();
   });
 
