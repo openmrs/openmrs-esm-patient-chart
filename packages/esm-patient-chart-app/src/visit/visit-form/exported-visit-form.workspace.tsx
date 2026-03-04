@@ -171,6 +171,18 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     );
   }, []);
 
+  const getErrorDescription = useCallback(
+    (error: unknown) => {
+      if (OpenmrsFetchError && error instanceof OpenmrsFetchError) {
+        return typeof error.responseBody === 'string'
+          ? error.responseBody
+          : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t);
+      }
+      return (error as Error)?.message;
+    },
+    [t],
+  );
+
   const handleVisitAttributes = useCallback(
     (visitAttributes: { [p: string]: string }, visitUuid: string) => {
       const existingVisitAttributeTypes =
@@ -196,31 +208,31 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             if (value) {
               // Update attribute with new value
               promises.push(
-                updateVisitAttribute(visitUuid, attributeToEdit.uuid, value).catch((err) => {
+                updateVisitAttribute(visitUuid, attributeToEdit.uuid, value).catch((error) => {
                   showSnackbar({
                     title: t('errorUpdatingVisitAttribute', 'Error updating the {{attributeName}} visit attribute', {
                       attributeName: attributeToEdit.attributeType.display,
                     }),
                     kind: 'error',
                     isLowContrast: false,
-                    subtitle: err?.message,
+                    subtitle: getErrorDescription(error),
                   });
-                  return Promise.reject(err); // short-circuit promise chain
+                  return Promise.reject(error); // short-circuit promise chain
                 }),
               );
             } else {
               // Delete attribute if no value is provided
               promises.push(
-                deleteVisitAttribute(visitUuid, attributeToEdit.uuid).catch((err) => {
+                deleteVisitAttribute(visitUuid, attributeToEdit.uuid).catch((error) => {
                   showSnackbar({
                     title: t('errorDeletingVisitAttribute', 'Error deleting the {{attributeName}} visit attribute', {
                       attributeName: attributeToEdit.attributeType.display,
                     }),
                     kind: 'error',
                     isLowContrast: false,
-                    subtitle: err?.message,
+                    subtitle: getErrorDescription(error),
                   });
-                  return Promise.reject(err); // short-circuit promise chain
+                  return Promise.reject(error); // short-circuit promise chain
                 }),
               );
             }
@@ -228,16 +240,16 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
         } else {
           if (value) {
             promises.push(
-              createVisitAttribute(visitUuid, attributeType, value).catch((err) => {
+              createVisitAttribute(visitUuid, attributeType, value).catch((error) => {
                 showSnackbar({
                   title: t('errorCreatingVisitAttribute', 'Error creating the {{attributeName}} visit attribute', {
                     attributeName: visitAttributeTypes?.find((type) => type.uuid === attributeType)?.display,
                   }),
                   kind: 'error',
                   isLowContrast: false,
-                  subtitle: err?.message,
+                  subtitle: getErrorDescription(error),
                 });
-                return Promise.reject(err); // short-circuit promise chain
+                return Promise.reject(error); // short-circuit promise chain
               }),
             );
           }
@@ -246,7 +258,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
       return Promise.all(promises);
     },
-    [visitToEdit, t, visitAttributeTypes],
+    [getErrorDescription, visitToEdit, t, visitAttributeTypes],
   );
 
   const onSubmit = useCallback(
@@ -307,20 +319,13 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             return response;
           })
           .catch((error) => {
-            const errorDescription =
-              OpenmrsFetchError && error instanceof OpenmrsFetchError
-                ? typeof error.responseBody === 'string'
-                  ? error.responseBody
-                  : extractErrorMessagesFromResponse(error.responseBody as ErrorObject, t)
-                : error?.message;
-
             showSnackbar({
               title: !visitToEdit
                 ? t('startVisitError', 'Error starting visit')
                 : t('errorUpdatingVisitDetails', 'Error updating visit details'),
               kind: 'error',
               isLowContrast: false,
-              subtitle: errorDescription,
+              subtitle: getErrorDescription(error),
             });
             return Promise.reject(error); // short-circuit promise chain
           })
@@ -404,6 +409,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       closeWorkspace,
       config.offlineVisitTypeUuid,
       extraVisitInfo,
+      getErrorDescription,
       globalMutate,
       handleVisitAttributes,
       isOnline,
