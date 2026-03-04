@@ -37,7 +37,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   }, [onClosePreview]);
 
   return (
-    <div className={styles.previewContainer}>
+    <div role="dialog" aria-label={t('attachmentPreview', 'Attachment preview')} className={styles.previewContainer}>
       <div className={styles.leftPanel}>
         <Button
           className={styles.closePreviewButton}
