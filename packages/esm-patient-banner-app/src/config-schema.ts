@@ -22,10 +22,9 @@ export const configSchema = {
     _elements: {
       _type: Type.String,
       _description: 'The UUID of the person attribute type',
-      _default: [],
     },
-    _description: 'Whether to display person attribute tags in the patient banner',
-    _default: true,
+    _description: 'An array of UUIDs of person attribute types to display in the patient banner',
+    _default: [],
   },
 };
 

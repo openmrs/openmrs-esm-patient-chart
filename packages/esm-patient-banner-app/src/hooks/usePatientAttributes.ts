@@ -22,7 +22,7 @@ function usePersonAttributes(personUuid?: string | null, customRepresentation: s
     () => ({
       data:
         data?.data?.results.reduce((acc: Record<string, PersonAttributeResponse>, curr) => {
-          if (personAttributeTagsToDisplay.includes(curr.attributeType.uuid)) {
+          if (personAttributeTagsToDisplay?.includes(curr.attributeType.uuid)) {
             acc[curr.attributeType.uuid] = curr;
           }
           return acc;
