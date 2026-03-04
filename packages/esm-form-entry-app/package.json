@@ -52,7 +52,7 @@
     "@ng-select/ng-select": "^14.0.0",
     "@ngx-translate/core": "^16.0.4",
     "@openmrs/ngx-file-uploader": "^19.0.0",
-    "@openmrs/ngx-formentry": "^19.0.0",
+    "@openmrs/ngx-formentry": "^19.0.1-pre.508",
     "jspdf": "^4.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
