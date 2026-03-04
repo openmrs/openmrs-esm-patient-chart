@@ -12,10 +12,7 @@ interface PersonAttributeTagsProps {
 const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }) => {
   const { personAttributeTagsToDisplay } = useConfig<ConfigObject>();
   const { data: attributesData } = usePersonAttributes(patientUuid);
-  const { t } = useTranslation('@openmrs/esm-patient-registration-app');
-  const { fieldDefinitions } = useConfig<{ fieldDefinitions: Array<{ label: string; uuid: string }> }>({
-    externalModuleName: '@openmrs/esm-patient-registration-app',
-  });
+  const { t } = useTranslation();
 
   if (!personAttributeTagsToDisplay.length || !Object.keys(attributesData)?.length) {
     return null;
@@ -37,10 +34,7 @@ const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }
           return null;
         }
 
-        const label = t(
-          fieldDefinitions?.find((f) => f?.uuid === matchingAttribute.attributeType?.uuid)?.label ??
-            matchingAttribute.attributeType?.display,
-        );
+        const label = t(matchingAttribute.attributeType?.display);
 
         return (
           <Toggletip key={field}>
