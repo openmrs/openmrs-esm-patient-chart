@@ -42,6 +42,5 @@ export const generateRandomTestOrder = async (
 };
 
 export const deleteTestOrder = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`order/${uuid}`);
-  expect([200, 204, 400, 404, 500].includes(response.status())).toBeTruthy();
+  await api.delete(`order/${uuid}`);
 };

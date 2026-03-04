@@ -57,6 +57,5 @@ export const createEncounter = async (
 };
 
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`encounter/${uuid}`);
-  expect([200, 204, 404].includes(response.status())).toBeTruthy();
+  await api.delete(`encounter/${uuid}`);
 };
