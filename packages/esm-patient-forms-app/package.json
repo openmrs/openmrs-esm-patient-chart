@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-forms-app",
-  "version": "12.0.1",
+  "version": "12.0.2",
   "license": "MPL-2.0",
   "description": "Patient forms microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-forms-app.js",
