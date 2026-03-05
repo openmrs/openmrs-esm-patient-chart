@@ -63,6 +63,11 @@ function useCreateMedicationOrderFormSchema() {
       valueCoded: z.string(),
     };
 
+    const frequencySchema = {
+      ...comboSchema,
+      frequencyPerDay: z.number().nullish(),
+    };
+
     const baseSchemaFields = {
       drug: z
         .object(
@@ -117,7 +122,7 @@ function useCreateMedicationOrderFormSchema() {
         : z.string().nullish(),
       startDate: z.date(),
       frequency: z.object(
-        { ...comboSchema },
+        { ...frequencySchema },
         {
           invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
         },
@@ -183,7 +188,7 @@ function useCreateMedicationOrderFormSchema() {
       dosage: z.number().nullable(),
       unit: z.object(comboSchema).nullable(),
       route: z.object(comboSchema).nullable(),
-      frequency: z.object(comboSchema).nullable(),
+      frequency: z.object(frequencySchema).nullable(),
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
@@ -193,3 +198,18 @@ function useCreateMedicationOrderFormSchema() {
 }
 
 export type MedicationOrderFormData = z.infer<ReturnType<typeof useCreateMedicationOrderFormSchema>>;
+
+export function durationToDays(
+  duration: number | null,
+  durationUnitUuid: string | null,
+  durationUnitsDaysMap: Record<string, number>,
+): number | null {
+  if (duration == null || !durationUnitUuid) {
+    return null;
+  }
+  const multiplier = durationUnitsDaysMap[durationUnitUuid];
+  if (multiplier == null) {
+    return null;
+  }
+  return duration * multiplier;
+}
