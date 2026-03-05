@@ -83,6 +83,12 @@ export default function MedicationRecord({ medication }: MedicationRecordProps) 
               {order.orderReasonNonCoded}
             </span>
           ) : null}
+          {order.orderReason && (
+            <span>
+              <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+              {order.orderReason?.display}
+            </span>
+          )}
           {order.orderReasonNonCoded && order.quantity != null ? <> &mdash;</> : null}
           {order.quantity != null ? (
             <span>
