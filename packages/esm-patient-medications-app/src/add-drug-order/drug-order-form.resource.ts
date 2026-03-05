@@ -115,7 +115,9 @@ function useCreateMedicationOrderFormSchema() {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
         : z.string().nullish(),
-      startDate: z.date(),
+      startDate: z.date().refine((date) => date.getFullYear() >= 1000, {
+        message: t('invalidValue', 'Invalid value'),
+      }),
       frequency: z.object(
         { ...comboSchema },
         {
