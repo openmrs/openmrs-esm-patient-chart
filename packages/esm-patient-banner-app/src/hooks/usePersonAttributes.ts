@@ -1,14 +1,14 @@
+import { useMemo } from 'react';
 import { restBaseUrl, useConfig, useOpenmrsSWR } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import type { PersonAttributeResponse } from '../types';
-import { useMemo } from 'react';
 
 /**
- * React hook for obtaining patient attributes for a given patient {@link Attribute}
+ * React hook for obtaining person attributes for a given person {@link Attribute}
  *
- * If `patientUuid` is null, the hook does nothing.
+ * If `personUuid` is null, the hook does nothing.
  *
- * @param patientUuid The patient's UUID
+ * @param personUuid The person's UUID
  */
 function usePersonAttributes(personUuid?: string | null, customRepresentation: string = null) {
   customRepresentation = customRepresentation || 'custom:(uuid,display,attributeType:(uuid,display,format),value)';
