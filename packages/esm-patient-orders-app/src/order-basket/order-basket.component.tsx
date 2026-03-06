@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, ComboBox, FormLabel, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import {
+  Extension,
   ExtensionSlot,
   getPatientName,
   PatientBannerPatientInfo,
@@ -268,18 +269,31 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
               [styles.orderBasketSlotTablet]: isTablet,
             })}
             name="order-basket-slot"
-            state={orderBasketExtensionProps as any}
-          />
+          >
+            {(extension) =>
+              (!orderBasketExtensionProps.visibleOrderPanels ||
+                !extension.config?.orderTypeUuid ||
+                orderBasketExtensionProps.visibleOrderPanels.includes(extension.config.orderTypeUuid)) && (
+                <Extension state={{ ...orderBasketExtensionProps }} />
+              )
+            }
+          </ExtensionSlot>
           {orderTypes?.length > 0 &&
-            orderTypes.map((orderType) => (
-              <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                <GeneralOrderPanel
-                  {...orderType}
-                  launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
-                  patient={patient}
-                />
-              </div>
-            ))}
+            orderTypes
+              .filter(
+                (orderType) =>
+                  !orderBasketExtensionProps.visibleOrderPanels ||
+                  orderBasketExtensionProps.visibleOrderPanels.includes(orderType.orderTypeUuid),
+              )
+              .map((orderType) => (
+                <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
+                  <GeneralOrderPanel
+                    {...orderType}
+                    launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
+                    patient={patient}
+                  />
+                </div>
+              ))}
         </div>
         <div>
           {(creatingEncounterError || errorFetchingEncounterUuid) && (
