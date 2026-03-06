@@ -10,3 +10,4 @@ export * from './mark-patient-deceased-page';
 export * from './results-viewer-page';
 export * from './visits-page';
 export * from './vitals-and-biometrics-page';
+export * from './growth-chart-page';
