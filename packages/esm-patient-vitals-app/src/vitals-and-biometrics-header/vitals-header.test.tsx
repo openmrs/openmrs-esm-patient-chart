@@ -143,8 +143,27 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    // TODO: Fix pluralization so that the string reads "5 days old"
-    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/These vitals are 5 days old/i)).toBeInTheDocument();
+  });
+
+  it('displays correct overdue tag for vitals 1 day old', async () => {
+    const oneDayAgo = dayjs().subtract(1, 'days').toISOString();
+    const vitalsData = [
+      {
+        ...formattedVitals[0],
+        date: oneDayAgo,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsData,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getByTextWithMarkup(/These vitals are 1 day old/i)).toBeInTheDocument();
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
