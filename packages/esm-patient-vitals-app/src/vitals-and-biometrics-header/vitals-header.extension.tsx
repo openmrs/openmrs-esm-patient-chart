@@ -239,7 +239,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               unitSymbol={latestVitals?.bmi != null ? config.biometrics['bmiUnit'] ?? '' : ''}
               value={latestVitals?.bmi ?? '--'}
             />
-            {latestVitals?.muac && (
+            {latestVitals?.muac != null && (
               <VitalsHeaderItem
                 unitName={t('muac', 'MUAC')}
                 unitSymbol={
