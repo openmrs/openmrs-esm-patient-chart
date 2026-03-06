@@ -16,6 +16,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useOrderBasket, type Order } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
+import { createOrderBasketExtensionProps } from '../order-basket/order-basket.utils';
 import {
   createCompositeObservationPayload,
   isCoded,
@@ -41,12 +42,12 @@ export interface LabResultsFormProps {
   invalidateLabOrders?: () => void;
 }
 
-interface OrderBasketSlotProps {
-  patient: fhir.Patient;
-}
-
-const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
-  workspaceProps: { patient, order, invalidateLabOrders },
+const ExportedLabResultsForm: React.FC<
+  Workspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }, {}>
+> = ({
+  workspaceProps: { patient, order, invalidateLabOrders, ...remainingWorkspaceProps },
+  windowProps,
+  launchChildWorkspace,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -107,6 +108,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     resolver: zodResolver(compositeSchema),
     mode: 'all',
   });
+
   useEffect(() => {
     if (Array.isArray(completeLabResults) && completeLabResults.length > 1) {
       const conceptUuids = completeLabResults.map((r) => r.concept.uuid);
@@ -114,9 +116,16 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     }
   }, [completeLabResults]);
 
-  const extensionProps = {
-    patient,
-  } satisfies OrderBasketSlotProps;
+  const extensionProps = useMemo(
+    () => ({
+      ...createOrderBasketExtensionProps({
+        patient,
+        labOrderWorkspaceName: windowProps.labOrderWorkspaceName,
+        launchChildWorkspace,
+      }),
+    }),
+    [patient, windowProps.labOrderWorkspaceName, launchChildWorkspace],
+  );
 
   useEffect(() => {
     conceptArray.forEach((concept, index) => {

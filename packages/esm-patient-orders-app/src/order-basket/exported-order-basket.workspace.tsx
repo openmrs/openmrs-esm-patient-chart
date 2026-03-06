@@ -1,11 +1,8 @@
 import React, { useMemo } from 'react';
 import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import {
-  type OrderBasketExtensionProps,
-  type OrderBasketItem,
-  type ExportedOrderBasketWindowProps,
-} from '@openmrs/esm-patient-common-lib';
+import { type ExportedOrderBasketWindowProps } from '@openmrs/esm-patient-common-lib';
 import OrderBasket from './order-basket.component';
+import { createOrderBasketExtensionProps } from './order-basket.utils';
 
 /**
  * This workspace renders the main order basket, which contains the buttons to add a drug order and to add a lab order.
@@ -26,24 +23,17 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
   closeWorkspace,
   launchChildWorkspace,
 }) => {
-  const orderBasketExtensionProps = useMemo(() => {
-    const launchDrugOrderForm = (order: OrderBasketItem) => {
-      launchChildWorkspace(drugOrderWorkspaceName, { order });
-    };
-    const launchLabOrderForm = (orderTypeUuid: string, order: OrderBasketItem) => {
-      launchChildWorkspace(labOrderWorkspaceName, { orderTypeUuid, order });
-    };
-    const launchGeneralOrderForm = (orderTypeUuid: string, order: OrderBasketItem) => {
-      launchChildWorkspace(generalOrderWorkspaceName, { orderTypeUuid, order });
-    };
-
-    return {
-      patient,
-      launchDrugOrderForm,
-      launchLabOrderForm,
-      launchGeneralOrderForm,
-    } satisfies OrderBasketExtensionProps;
-  }, [launchChildWorkspace, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName, patient]);
+  const orderBasketExtensionProps = useMemo(
+    () =>
+      createOrderBasketExtensionProps({
+        patient,
+        drugOrderWorkspaceName: drugOrderWorkspaceName,
+        labOrderWorkspaceName: labOrderWorkspaceName,
+        generalOrderWorkspaceName: generalOrderWorkspaceName,
+        launchChildWorkspace,
+      }),
+    [launchChildWorkspace, patient, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName],
+  );
 
   return (
     <OrderBasket
