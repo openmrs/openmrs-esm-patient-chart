@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  Link,
   Table,
   TableBody,
   TableCell,
@@ -39,19 +40,60 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
-    switch (interpretation) {
-      case 'critically_high':
-        return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
-      case 'critically_low':
-        return <TableCell className={styles.criticallyLow}>{children}</TableCell>;
-      case 'high':
-        return <TableCell className={styles.high}>{children}</TableCell>;
-      case 'low':
-        return <TableCell className={styles.low}>{children}</TableCell>;
-      default:
-        return <TableCell>{children}</TableCell>;
+  const StyledTableCell = ({
+    children,
+    interpretation,
+    headerKey,
+  }: {
+    children: React.ReactNode;
+    interpretation: string;
+    headerKey: string;
+  }) => {
+    const isNoteCell = headerKey === 'noteRender';
+    const noteText = typeof children === 'string' ? children : '';
+    const noteThreshold = 75;
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    let cellClass = '';
+
+    if (isNoteCell) {
+      cellClass = styles.note;
+    } else {
+      switch (interpretation) {
+        case 'critically_high':
+          cellClass = styles.criticallyHigh;
+          break;
+        case 'critically_low':
+          cellClass = styles.criticallyLow;
+          break;
+        case 'high':
+          cellClass = styles.high;
+          break;
+        case 'low':
+          cellClass = styles.low;
+          break;
+        default:
+          break;
+      }
     }
+
+    if (isNoteCell && noteText.length > noteThreshold) {
+      return (
+        <TableCell className={cellClass}>
+          {isExpanded ? noteText : `${noteText.substring(0, noteThreshold)}...`}{' '}
+          <Link
+            onClick={(e) => {
+              e.preventDefault();
+              setIsExpanded(!isExpanded);
+            }}
+          >
+            {isExpanded ? t('readLess', 'Read less') : t('readMore', 'Read more')}
+          </Link>
+        </TableCell>
+      );
+    }
+
+    return <TableCell className={cellClass}>{children}</TableCell>;
   };
 
   const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
@@ -128,7 +170,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       const interpretation = vitalsObj?.[interpretationKey];
 
                       return (
-                        <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
+                        <StyledTableCell
+                          key={`styled-cell-${cell.id}`}
+                          interpretation={interpretation}
+                          headerKey={cell.info.header}
+                        >
                           {cell.value?.content ?? cell.value}
                         </StyledTableCell>
                       );
