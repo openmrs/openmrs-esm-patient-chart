@@ -5,7 +5,7 @@ import styles from './card-header.scss';
 
 interface CardHeaderProps {
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function CardHeader({ title, children }: CardHeaderProps) {

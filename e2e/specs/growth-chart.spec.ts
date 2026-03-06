@@ -1,10 +1,10 @@
 import { type APIRequestContext, expect } from '@playwright/test';
 import { test } from '../core';
 import { GrowthChartPage } from '../pages/growth-chart-page';
-import { deletePatient, generateRandomPatient } from '../commands';
+import { deletePatient, generateRandomPatient, type Patient } from '../commands';
 
 test.describe('Growth Chart', () => {
-  let patient;
+  let patient: Patient;
 
   test.afterEach(async ({ api }) => {
     if (patient) {

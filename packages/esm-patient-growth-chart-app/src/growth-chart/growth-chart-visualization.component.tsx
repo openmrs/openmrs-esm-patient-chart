@@ -1,14 +1,14 @@
 import React from 'react';
-import { LineChart } from '@carbon/charts-react';
-import { Tile, Layer } from '@carbon/react';
-import { ScaleTypes, ToolbarControlTypes } from '@carbon/charts/interfaces';
-import '@carbon/charts/styles.css';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import type { GrowthChartData, Observation } from './growth-chart.resource';
+import { useTranslation } from 'react-i18next';
+import { Tile, Layer } from '@carbon/react';
+import { LineChart } from '@carbon/charts-react';
+import { ScaleTypes, ToolbarControlTypes } from '@carbon/charts/interfaces';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import styles from './growth-chart-main.scss';
 import { getReferenceSeries, getPatientSeries } from './growth-chart.utils';
+import type { GrowthChartData, Observation } from './growth-chart.resource';
+import '@carbon/charts/styles.css';
+import styles from './growth-chart-main.scss';
 
 interface GrowthChartVisualizationProps {
   data: GrowthChartData;
@@ -18,15 +18,28 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
   const { t } = useTranslation();
   const { patient, weights } = data;
 
+  const birthDate = React.useMemo(() => dayjs(patient?.birthDate), [patient?.birthDate]);
+  const ageInMonths = React.useMemo(() => {
+    if (!birthDate.isValid()) {
+      return null;
+    }
+    return dayjs().diff(birthDate, 'month', true);
+  }, [birthDate]);
+
+  const chartData = React.useMemo(() => {
+    if (!patient || !weights || !birthDate.isValid()) {
+      return [];
+    }
+    return getChartData(patient, weights, t);
+  }, [patient, weights, t, birthDate]);
+
+  const chartOptions = React.useMemo(() => getChartOptions(t), [t]);
+
   if (!patient) {
     return null;
   }
 
-  const birthDate = dayjs(patient.birthDate);
-  const today = dayjs();
-  const ageInMonths = today.diff(birthDate, 'month', true);
-
-  if (ageInMonths > 60) {
+  if (ageInMonths !== null && ageInMonths > 60) {
     return (
       <div className={styles.emptyStateContainer}>
         <Layer>
@@ -43,9 +56,6 @@ const GrowthChartVisualization: React.FC<GrowthChartVisualizationProps> = ({ dat
       </div>
     );
   }
-
-  const chartData = getChartData(patient, weights, t);
-  const chartOptions = getChartOptions(t);
 
   return (
     <div className={styles.chartContainer}>

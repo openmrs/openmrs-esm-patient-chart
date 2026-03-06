@@ -12,7 +12,7 @@
 }
 
 .chartContainer {
-  padding: 1rem;
+  padding: layout.$spacing-05;
   background: #ffffff;
 
   :global {
@@ -23,11 +23,8 @@
     .bx--chart-axis.bx--axis--bottom {
       .tick text {
         fill: #161616;
-        font-weight: 400; // Default to normal
+        font-weight: 400;
       }
-
-      // Bold every 6th tick starting from the first (0, 12, 24, 36, 48, 60)
-      // 0 is index 1 in nth-child, 12 is index 7, etc. (6n+1)
       .tick:nth-child(6n + 1) text {
         font-weight: 600;
       }
@@ -65,7 +62,7 @@
 }
 
 .emptyStateContainer {
-  padding: 1rem;
+  padding: layout.$spacing-05;
 }
 
 .emptyStateTile {
