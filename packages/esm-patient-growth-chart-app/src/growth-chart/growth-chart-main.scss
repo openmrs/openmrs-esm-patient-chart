@@ -25,6 +25,7 @@
         fill: #161616;
         font-weight: 400;
       }
+
       .tick:nth-child(6n + 1) text {
         font-weight: 600;
       }
@@ -86,4 +87,12 @@
   color: var(--cds-text-secondary);
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
+}
+
+.container {
+  padding: layout.$spacing-05;
+}
+
+.visualizationContainer {
+  margin-top: layout.$spacing-05;
 }

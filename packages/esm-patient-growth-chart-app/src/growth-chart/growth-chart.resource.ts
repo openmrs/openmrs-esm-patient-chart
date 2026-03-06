@@ -1,4 +1,4 @@
-import { openmrsFetch, useConfig, age, fhirBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, age, getPatientName, fhirBaseUrl, type FetchResponse } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import type { ConfigObject } from '../config-schema';
 
@@ -10,15 +10,8 @@ export interface Observation {
   code: string;
 }
 
-export interface PatientDemographics {
-  name: string;
-  gender: string;
-  birthDate: string;
-  age: string;
-}
-
 export interface GrowthChartData {
-  patient: PatientDemographics;
+  patient: fhir.Patient;
   weights: Observation[];
 }
 
@@ -61,34 +54,29 @@ export function useObservations(patientUuid: string, conceptUuid: string) {
   };
 }
 
-export function useGrowthChartData(patientUuid: string) {
+export function useGrowthChartData(patient: fhir.Patient) {
   const { concepts } = useConfig<ConfigObject>();
-
-  const { patient, isLoading: isPatientLoading, isError: isPatientError } = usePatient(patientUuid);
 
   const {
     observations: weights,
     isLoading: isWeightLoading,
     isError: isWeightError,
-  } = useObservations(patientUuid, concepts.weightUuid);
+  } = useObservations(patient?.id, concepts.weightUuid);
 
-  const isLoading = isPatientLoading || isWeightLoading;
-  const isError = isPatientError || isWeightError;
-
-  let patientDemographics: PatientDemographics | undefined;
-
-  if (patient) {
-    patientDemographics = {
-      name: patient.name?.[0]?.text || '',
-      gender: patient.gender || 'unknown',
-      birthDate: patient.birthDate || '',
-      age: patient.birthDate ? age(patient.birthDate) : '',
+  if (!patient) {
+    return {
+      data: null,
+      isLoading: false,
+      isError: false,
     };
   }
 
+  const isLoading = isWeightLoading;
+  const isError = isWeightError;
+
   return {
     data: {
-      patient: patientDemographics,
+      patient,
       weights,
     },
     isLoading,

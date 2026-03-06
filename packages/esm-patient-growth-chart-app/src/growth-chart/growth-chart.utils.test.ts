@@ -1,6 +1,8 @@
-import { getReferenceSeries, getPatientSeries } from './growth-chart.utils';
-import type { Observation } from './growth-chart.resource';
 import dayjs from 'dayjs';
+import { getReferenceSeries, getChartOptions } from './growth-chart.utils';
+import { getPatientSeries } from './growth-chart-visualization.component';
+import type { Observation } from './growth-chart.resource';
+import type { TFunction } from 'i18next';
 
 describe('growth-chart.utils', () => {
   describe('getReferenceSeries', () => {
@@ -80,6 +82,16 @@ describe('growth-chart.utils', () => {
       expect(result).toHaveLength(2);
       expect(result[0].value).toBe(10);
       expect(result[1].value).toBe(12);
+    });
+  });
+
+  describe('getChartOptions', () => {
+    it('should return chart options object', () => {
+      const t = (key: string, defaultValue: string) => defaultValue;
+      const options = getChartOptions(t as unknown as TFunction);
+      expect(options).toHaveProperty('title');
+      expect(options).toHaveProperty('axes');
+      expect(options).toHaveProperty('toolbar');
     });
   });
 });
