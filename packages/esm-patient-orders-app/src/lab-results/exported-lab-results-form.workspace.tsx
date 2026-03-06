@@ -120,11 +120,11 @@ const ExportedLabResultsForm: React.FC<
     () => ({
       ...createOrderBasketExtensionProps({
         patient,
-        labOrderWorkspaceName: windowProps.labOrderWorkspaceName,
+        labOrderWorkspaceName: windowProps?.labOrderWorkspaceName,
         launchChildWorkspace,
       }),
     }),
-    [patient, windowProps.labOrderWorkspaceName, launchChildWorkspace],
+    [patient, windowProps?.labOrderWorkspaceName, launchChildWorkspace],
   );
 
   useEffect(() => {
