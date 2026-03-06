@@ -2,7 +2,6 @@ import type { TFunction } from 'i18next';
 import { ScaleTypes, ToolbarControlTypes } from '@carbon/charts/interfaces';
 import boysWeightData from '../who-data/boys/weight-for-age.json';
 import girlsWeightData from '../who-data/girls/weight-for-age.json';
-import type { Observation } from './growth-chart.resource';
 
 export const getReferenceSeries = (gender?: string) => {
   const whoData = gender?.toLowerCase() === 'female' ? girlsWeightData : boysWeightData;
