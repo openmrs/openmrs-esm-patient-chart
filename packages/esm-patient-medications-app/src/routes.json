@@ -31,13 +31,22 @@
       }
     },
     {
+      "name": "future-medications-widget",
+      "component": "futureMedications",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "fullWidth": false
+      },
+      "order": 4
+    },
+    {
       "name": "active-medications-widget",
       "component": "activeMedications",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
         "fullWidth": false
       },
-      "order": 4
+      "order": 5
     },
     {
       "name": "past-medications-widget",
@@ -46,7 +55,7 @@
       "meta": {
         "fullWidth": false
       },
-      "order": 5
+      "order": 6
     },
     {
       "name": "medications-summary-dashboard",
