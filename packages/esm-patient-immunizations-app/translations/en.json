@@ -23,6 +23,7 @@
   "immunizations__lower": "immunizations",
   "immunizationsHistory": "Immunizations history",
   "immunizationWorkspaceTitle": "Immunization Form",
+  "invalidValue": "Invalid value",
   "lastDoseOnDate": "Last dose on {{date}}",
   "lotNumber": "Lot number",
   "manufacturer": "Manufacturer",
