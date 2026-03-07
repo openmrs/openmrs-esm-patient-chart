@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "active": "Active",
   "activeVisitExists": "This patient already has an active visit",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
@@ -13,6 +14,9 @@
   "causeOfDeathIsRequired": "Please select the cause of death",
   "change": "Change",
   "checkFilters": "Check the filters above",
+  "completesOnDate": "Completes on {{date}}",
+  "completed": "Completed",
+  "completedOnDate": "Completed on {{date}}",
   "confirm": "Confirm",
   "confirmDeleteVisitText": "Deleting this {{visit}} will delete its associated encounters.",
   "confirmModifyingVisitDateToAccomodateEncounter": "The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?",
@@ -140,6 +144,7 @@
   "refreshToTryAgain": "Please refresh to try again",
   "required": "Required",
   "Routine": "Routine",
+  "runsIndefintely": "Runs indefinitely",
   "saveAndClose": "Save and close",
   "saving": "Saving",
   "scheduledForFuture": "Scheduled for future",
@@ -156,6 +161,7 @@
   "startDate": "Start date",
   "startingVisit": "Starting visit",
   "startNewVisit": "Start new visit",
+  "startsOnDate": "Starts on {{date}}",
   "startTime": "Start time",
   "startTimeFormat": "Start time format",
   "startVisit": "Start visit",
@@ -200,5 +206,6 @@
   "visitTypeRequired": "Visit type is required",
   "warning": "Warning",
   "yes": "Yes",
+  "yetToStart": "Yet to start",
   "youCanAddAdditionalEncounters": "You can add additional encounters to this visit in the visit summary."
 }

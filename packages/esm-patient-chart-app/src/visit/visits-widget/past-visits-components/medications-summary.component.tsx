@@ -16,17 +16,49 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
   const { t } = useTranslation();
   const { drugOrderTypeUUID } = useConfig<ChartConfig>();
 
+  const isScheduledAndActivatedDateDifferent = (order: OrderItem['order']): boolean => {
+    const scheduled = new Date(order.scheduledDate);
+    const activated = new Date(order.dateActivated);
+
+    return (
+      scheduled.getFullYear() !== activated.getFullYear() ||
+      scheduled.getMonth() !== activated.getMonth() ||
+      scheduled.getDate() !== activated.getDate()
+    );
+  };
+
   const isOrderedForFuture = (order: OrderItem['order']) => {
-    return order.scheduledDate && order.scheduledDate > order.dateActivated;
+    return (
+      order.scheduledDate &&
+      isScheduledAndActivatedDateDifferent(order) &&
+      new Date(order.scheduledDate) > new Date(order.dateActivated)
+    );
   };
   const isOrderedInPast = (order: OrderItem['order']) => {
-    return order.scheduledDate && order.scheduledDate < order.dateActivated;
+    return (
+      order.scheduledDate &&
+      isScheduledAndActivatedDateDifferent(order) &&
+      new Date(order.scheduledDate) < new Date(order.dateActivated)
+    );
   };
 
   const isDiscontinued = (order: OrderItem['order']) => {
     return (
       order.action === 'DISCONTINUE' ||
-      (order.dateStopped && order.autoExpireDate && new Date(order.dateStopped) <= new Date(order.autoExpireDate))
+      (order.dateStopped && !order.autoExpireDate) ||
+      (order.dateStopped && order.autoExpireDate && new Date(order.dateStopped) < new Date(order.autoExpireDate))
+    );
+  };
+
+  const isYetToStart = (order: OrderItem['order']) => {
+    return !isDiscontinued(order) && order.scheduledDate && new Date(order.scheduledDate) > new Date();
+  };
+
+  const isActive = (order: OrderItem['order']) => {
+    return (
+      !isDiscontinued(order) &&
+      (!order.scheduledDate || new Date(order.scheduledDate) < new Date()) &&
+      (!order.autoExpireDate || new Date(order.autoExpireDate) > new Date())
     );
   };
 
@@ -88,10 +120,47 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                         </Tag>
                       </Tooltip>
                     )}
-                    {isDiscontinued(medication.order) && (
+                    {isDiscontinued(medication.order) ? (
                       <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
                         <Tag type="red" className={styles.tag}>
                           {t('discontinued', 'Discontinued')}
+                        </Tag>
+                      </Tooltip>
+                    ) : isYetToStart(medication.order) ? (
+                      <Tooltip
+                        align="right"
+                        label={t('startsOnDate', 'Starts on {{date}}', {
+                          date: formatDate(new Date(medication.order.scheduledDate)),
+                        })}
+                      >
+                        <Tag type="blue" className={styles.tag}>
+                          {t('yetToStart', 'Yet to start')}
+                        </Tag>
+                      </Tooltip>
+                    ) : isActive(medication.order) ? (
+                      <Tooltip
+                        align="right"
+                        label={
+                          medication.order.autoExpireDate
+                            ? t('completesOnDate', 'Completes on {{date}}', {
+                                date: formatDate(new Date(medication.order.autoExpireDate)),
+                              })
+                            : t('runsIndefintely', 'Runs indefinitely')
+                        }
+                      >
+                        <Tag type="green" className={styles.tag}>
+                          {t('active', 'Active')}
+                        </Tag>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        align="right"
+                        label={t('completedOnDate', 'Completed on {{date}}', {
+                          date: formatDate(new Date(medication.order.autoExpireDate)),
+                        })}
+                      >
+                        <Tag type="gray" className={styles.tag}>
+                          {t('completed', 'Completed')}
                         </Tag>
                       </Tooltip>
                     )}
