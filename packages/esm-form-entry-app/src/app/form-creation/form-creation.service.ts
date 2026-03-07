@@ -1,13 +1,13 @@
-import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
+import { isFunction } from 'lodash-es';
 import moment from 'moment';
-import { FormDataSourceService } from '../form-data-source/form-data-source.service';
+import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
+import { Session } from '@openmrs/esm-framework';
 import { ConfigResourceService } from '../services/config-resource.service';
+import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
+import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
-import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
-import { Session } from '@openmrs/esm-framework';
-import { isFunction } from 'lodash-es';
 
 /**
  * Data required for creating a {@link Form} instance.
@@ -102,7 +102,7 @@ export class FormCreationService {
   }
 
   private async wireDataSources(createFormParams: CreateFormParams, formSchema: FormSchema) {
-    const visitTypeUuid = this.singleSpaPropsService.getPropOrThrow('visitTypeUuid');
+    const visitTypeUuid = this.singleSpaPropsService.getProp('visitTypeUuid');
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
 
     // Clear any previously configured data sources.
@@ -299,7 +299,7 @@ export class FormCreationService {
   private setUpPayloadProcessingInformation(form: Form, createFormParams: CreateFormParams) {
     const { session, formSchema, encounter } = createFormParams;
     const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
-    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitUuid = this.singleSpaPropsService.getProp('visitUuid');
     const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
 
     try {

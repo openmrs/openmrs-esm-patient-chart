@@ -213,6 +213,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const filterItemsByProviderName = useCallback((menu) => {
     return menu?.item?.person?.display?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
   }, []);
+  const extensionProps = useMemo(() => ({ ...orderBasketExtensionProps }), [orderBasketExtensionProps]);
 
   return (
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
@@ -295,9 +296,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
               [styles.orderBasketSlotTablet]: isTablet,
             })}
             name="order-basket-slot"
-            state={orderBasketExtensionProps as any}
+            state={extensionProps}
           />
           {orderTypes?.length > 0 &&
+            orderBasketExtensionProps.launchGeneralOrderForm &&
             orderTypes.map((orderType) => (
               <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
                 <GeneralOrderPanel
