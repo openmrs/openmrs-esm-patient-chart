@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import dayjs from 'dayjs';
+import useSWRImmutable from 'swr/immutable';
 import { z } from 'zod';
 import {
+  type FetchResponse,
   openmrsFetch,
   restBaseUrl,
   useConfig,
@@ -54,25 +56,21 @@ export type ErrorObject = {
     message: string;
     detail: string;
     fieldErrors?: FieldError;
-    globalErrors?: FieldError;
+    globalErrors?: Array<{ code: string; message: string }>;
   };
 };
 
 export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TFunction) {
-  const {
-    error: { fieldErrors, globalErrors, message, code },
-  } = errorObject ?? {};
+  const { fieldErrors, globalErrors, message, code } = errorObject?.error ?? {};
 
-  if (fieldErrors) {
+  if (fieldErrors && Object.keys(fieldErrors).length > 0) {
     return Object.values(fieldErrors)
       .flatMap((errors) => errors.map((error) => error.message))
       .join('\n');
   }
 
-  if (globalErrors) {
-    return Object.values(globalErrors)
-      .flatMap((errors) => errors.map((error) => error.message))
-      .join('\n');
+  if (globalErrors?.length > 0) {
+    return globalErrors.map((error) => error.message).join('\n');
   }
 
   return message ?? code ?? t('unknownError', 'Unknown error');
@@ -86,6 +84,96 @@ export function useConditionalVisitTypes() {
 
   return visitTypesHook();
 }
+
+interface PatientPersonResponse {
+  person: {
+    birthdate: string | null;
+    birthdateEstimated: boolean;
+    age: number | null;
+  };
+}
+
+const patientPersonCustomRep = 'custom:(person:(birthdate,birthdateEstimated,age))';
+
+/**
+ * Parses a date string into a local-midnight Date,
+ * avoiding timezone drift from `new Date(str)` or dayjs(str).
+ * Accepts both 'YYYY-MM-DD' and full ISO datetime strings
+ * like '1979-12-08T00:00:00.000+0530' (as returned by the REST API).
+ */
+function parseLocalDate(dateStr: string): Date | null {
+  const datePart = dateStr.split('T')[0];
+  const parts = datePart.split('-');
+  if (parts.length !== 3) {
+    return null;
+  }
+  const [y, m, d] = parts.map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/**
+ * Computes the earliest allowed visit start date based on the patient's birthdate.
+ * For estimated birthdates, a grace period shifts the boundary earlier,
+ * matching the backend's VisitValidator logic.
+ */
+export function computeEarliestAllowedStartDate(
+  birthdate: string | null,
+  birthdateEstimated: boolean,
+  age: number | null,
+): Date | null {
+  if (!birthdate) {
+    return null;
+  }
+
+  const earliest = parseLocalDate(birthdate);
+  if (!earliest) {
+    return null;
+  }
+
+  // When the birthdate is estimated, the backend's VisitValidator applies a grace period
+  // that shifts the earliest allowed date further into the past. The grace is half the
+  // patient's age (in years), with a minimum of 1 year.
+  // @see https://github.com/openmrs/openmrs-core/blob/master/api/src/main/java/org/openmrs/validator/VisitValidator.java
+  if (birthdateEstimated && age != null) {
+    const graceYears = Math.max(1, Math.floor(age * 0.5));
+    earliest.setFullYear(earliest.getFullYear() - graceYears);
+  }
+
+  return earliest;
+}
+
+// We need a separate REST call here because the FHIR Patient resource doesn't
+// include `birthdateEstimated` or `age`, which are required for the grace period
+// calculation. The FHIR patient's `birthDate` alone isn't sufficient.
+export function useEarliestAllowedVisitStartDate(patientUuid: string) {
+  const { data, isLoading } = useSWRImmutable<FetchResponse<PatientPersonResponse>>(
+    `${restBaseUrl}/patient/${patientUuid}?v=${patientPersonCustomRep}`,
+    openmrsFetch,
+  );
+
+  const earliestAllowedStartDate = useMemo(() => {
+    if (!data?.data?.person) {
+      return null;
+    }
+    const { birthdate, birthdateEstimated, age } = data.data.person;
+    return computeEarliestAllowedStartDate(birthdate, birthdateEstimated, age);
+  }, [data]);
+
+  return { earliestAllowedStartDate, isLoading };
+}
+
+export function useAllowOverlappingVisits() {
+  const isOnline = useConnectivity();
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ value: string }>>(
+    isOnline ? `${restBaseUrl}/systemsetting/visits.allowOverlappingVisits?v=custom:(value)` : null,
+    openmrsFetch,
+  );
+  return {
+    allowOverlappingVisits: error || !data ? true : (data.data.value ?? 'true').toLowerCase() === 'true',
+    isLoading,
+  };
+}
+
 export interface VisitFormCallbacks {
   onVisitCreatedOrUpdated: (visit: Visit) => Promise<any>;
 }
@@ -116,7 +204,7 @@ export function deleteVisitAttribute(visitUuid: string, visitAttributeUuid: stri
   });
 }
 
-export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
+export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestAllowedStartDate?: Date | null) {
   const { t } = useTranslation();
   const { visitAttributeTypes, restrictByVisitLocationTag } = useConfig<ChartConfig>();
   const isEmrApiModuleInstalled = useFeatureFlag('emrapi-module');
@@ -213,6 +301,12 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
               message: t('visitStartDateTimeRequired', 'Start date and time are required'),
               path: ['visitStartDate'],
             });
+          } else if (earliestAllowedStartDate && visitStartDateTime < earliestAllowedStartDate) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('visitStartDateBeforeBirthdate', "Start date cannot be before the patient's birth date"),
+              path: ['visitStartDate'],
+            });
           } else if (visitStartDateTime > now) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
@@ -276,7 +370,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit) {
       });
 
     return { visitFormSchema, defaultValues, firstEncounterDateTime, lastEncounterDateTime };
-  }, [t, visitAttributeTypes, visitToEdit, defaultVisitLocation, emrConfiguration]);
+  }, [t, visitAttributeTypes, visitToEdit, defaultVisitLocation, emrConfiguration, earliestAllowedStartDate]);
 }
 
 // Returns a Date object based on date, time and am/pm inputs from user.

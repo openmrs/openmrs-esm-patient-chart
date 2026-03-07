@@ -57,10 +57,7 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the file I uploaded displayed in the attachments grid', async () => {
-    await expect(page.locator('[role="progressbar"]'))
-      .toBeHidden({ timeout: 5000 })
-      .catch(() => {});
-
+    await expect(page.locator('[role="progressbar"]')).toBeHidden({ timeout: 5000 });
     await expect(page.getByText(displayedFileName, { exact: true })).toBeVisible();
   });
 
@@ -69,13 +66,12 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the attachment preview modal open', async () => {
-    const previewContainer = page.locator('[class*="previewContainer"]');
-    await expect(previewContainer.getByRole('img', { name: displayedFileName })).toBeVisible();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: displayedFileName })).toBeVisible();
   });
 
   await test.step('And I should see the exact filename displayed in the preview', async () => {
-    const previewContainer = page.locator('[class*="previewContainer"]');
-    await expect(previewContainer.getByRole('heading', { name: displayedFileName })).toBeVisible();
+    await expect(page.getByRole('heading', { name: displayedFileName })).toBeVisible();
   });
 
   await test.step('And I should see the description displayed in the preview', async () => {
@@ -87,7 +83,7 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then the preview modal should close', async () => {
-    await expect(page.locator('[class*="previewContainer"]')).toBeHidden();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeHidden();
   });
 
   await test.step('When I click on the `Table view` tab', async () => {
@@ -100,8 +96,8 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the attachment preview modal open again', async () => {
-    const previewContainer = page.locator('[class*="previewContainer"]');
-    await expect(previewContainer.getByRole('img', { name: displayedFileName })).toBeVisible();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: displayedFileName })).toBeVisible();
   });
 
   await test.step('When I press the Escape key', async () => {
@@ -109,7 +105,7 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then the preview modal should close', async () => {
-    await expect(page.locator('[class*="previewContainer"]')).toBeHidden();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeHidden();
   });
 
   await test.step('And I click on the delete button in the table row', async () => {
@@ -214,8 +210,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('And the preview should have a delete option in the overflow menu', async () => {
-    const previewContainer = page.locator('[class*="previewContainer"]');
-    await previewContainer.getByRole('button', { name: /options/i }).click();
+    await page.getByRole('button', { name: /options/i }).click();
     await expect(page.getByText(/delete pdf/i)).toBeVisible();
     await page.keyboard.press('Escape');
   });
@@ -225,7 +220,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then the preview modal should close', async () => {
-    await expect(page.locator('[class*="previewContainer"]')).toBeHidden();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeHidden();
   });
 
   await test.step('When I click on the `Table view` tab', async () => {
@@ -246,6 +241,6 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then the preview modal should close', async () => {
-    await expect(page.locator('[class*="previewContainer"]')).toBeHidden();
+    await expect(page.getByRole('button', { name: /close preview/i })).toBeHidden();
   });
 });

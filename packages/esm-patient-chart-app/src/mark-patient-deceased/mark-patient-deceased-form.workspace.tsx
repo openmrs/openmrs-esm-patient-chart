@@ -20,7 +20,12 @@ import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WarningFilled } from '@carbon/react/icons';
-import { type PatientWorkspace2DefinitionProps, EmptyState } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspace2DefinitionProps,
+  EmptyState,
+  invalidateCurrentVisit,
+  invalidateVisitAndEncounterData,
+} from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
   useLayoutType,
@@ -30,6 +35,7 @@ import {
   OpenmrsDatePicker,
   Workspace2,
 } from '@openmrs/esm-framework';
+import { useSWRConfig } from 'swr';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import { type ChartConfig } from '../config-schema';
 import styles from './mark-patient-deceased-form.scss';
@@ -44,6 +50,8 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
   const [searchTerm, setSearchTerm] = useState('');
   const { causesOfDeath, isLoading: isLoadingCausesOfDeath } = useCausesOfDeath();
   const { freeTextFieldConceptUuid } = useConfig<ChartConfig>();
+  const { mutate: globalMutate } = useSWRConfig();
+  const patientBirthDate = useMemo(() => (patient?.birthDate ? new Date(patient.birthDate) : undefined), [patient]);
 
   const filteredCausesOfDeath = useMemo(() => {
     if (!searchTerm) {
@@ -68,9 +76,14 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
       causeOfDeath: z.string().refine((causeOfDeath) => !!causeOfDeath, {
         message: t('causeOfDeathIsRequired', 'Please select the cause of death'),
       }),
-      deathDate: z.date().refine((date) => !!date, {
-        message: t('deathDateRequired', 'Please select the date of death'),
-      }),
+      deathDate: z
+        .date()
+        .refine((date) => !!date, {
+          message: t('deathDateRequired', 'Please select the date of death'),
+        })
+        .refine((date) => !patientBirthDate || date >= patientBirthDate, {
+          message: t('deathDateBeforeBirthDate', 'Death date cannot be before the date of birth'),
+        }),
       nonCodedCauseOfDeath: z.string().optional(),
     })
     .refine((data) => !(data.causeOfDeath === freeTextFieldConceptUuid && !data.nonCodedCauseOfDeath), {
@@ -103,8 +116,15 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
 
       markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
         .then(() => {
-          closeWorkspace();
-          window.location.reload();
+          globalMutate((key) => Array.isArray(key) && key[0] === 'patient' && key[1] === patientUuid);
+          invalidateCurrentVisit(globalMutate, patientUuid);
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
+
+          showSnackbar({
+            title: t('markDeceasedSuccessfully', 'Patient marked deceased successfully'),
+          });
+
+          closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch((error) => {
           showSnackbar({
@@ -115,7 +135,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
           });
         });
     },
-    [closeWorkspace, patientUuid, t],
+    [closeWorkspace, globalMutate, patientUuid, t],
   );
 
   const onError = (errors) => console.error(errors);
@@ -133,10 +153,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
             <span className={styles.warningContainer}>
               <WarningFilled aria-label={t('warning', 'Warning')} className={styles.warningIcon} size={20} />
               <span className={styles.warningText}>
-                {t(
-                  'markDeceasedWarning',
-                  'Marking the patient as deceased will end any active visits for this patient',
-                )}
+                {t('markDeceasedWarning', "Marking the patient as deceased updates this patient's death information")}
               </span>
             </span>
             <section>
@@ -153,6 +170,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
                         id="deceasedDate"
                         data-testid="deceasedDate"
                         labelText={t('date', 'Date')}
+                        minDate={patientBirthDate}
                         maxDate={new Date()}
                         invalid={Boolean(fieldState?.error?.message)}
                         invalidText={fieldState?.error?.message}

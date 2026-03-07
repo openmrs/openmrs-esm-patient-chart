@@ -42,10 +42,13 @@ const mockOrder = {
 
 const mockCloseWorkspace = jest.fn();
 
-const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
+const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }> = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     order: mockOrder as Order,
+  },
+  windowProps: {
+    labOrderWorkspaceName: 'add-lab-order',
   },
   groupProps: {
     patientUuid: mockPatient.id,
@@ -54,7 +57,6 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
     mutateVisitContext: null,
   },
   launchChildWorkspace: jest.fn(),
-  windowProps: {},
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
@@ -788,7 +790,6 @@ describe('LabResultsForm', () => {
   });
 
   test('should display second level of set members for a given concept, if present', () => {
-    const user = userEvent.setup();
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
