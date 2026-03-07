@@ -222,9 +222,9 @@ export type PostDataPrepFunction = (
 
 export interface OrderBasketExtensionProps {
   patient: fhir.Patient;
-  launchDrugOrderForm(order?: DrugOrderBasketItem): void;
-  launchLabOrderForm(orderTypeUuid: string, order?: TestOrderBasketItem): void;
-  launchGeneralOrderForm(orderTypeUuid: string, order?: OrderBasketItem): void;
+  launchDrugOrderForm?(order?: DrugOrderBasketItem): void;
+  launchLabOrderForm?(orderTypeUuid: string, order?: TestOrderBasketItem): void;
+  launchGeneralOrderForm?(orderTypeUuid: string, order?: OrderBasketItem): void;
 }
 
 export interface DrugOrderBasketItem extends OrderBasketItem {

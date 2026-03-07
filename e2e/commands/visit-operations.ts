@@ -34,11 +34,14 @@ export const endVisit = async (api: APIRequestContext, visit: Visit) => {
     },
   });
 
+  // 400 is expected when the visit was already ended via the UI
+  expect([200, 400].includes(visitRes.status())).toBeTruthy();
   return await visitRes.json();
 };
 
 export const getVisit = async (api: APIRequestContext, uuid: string): Promise<Visit> => {
   const visitRes = await api.get(`visit/${uuid}?v=full`);
+  expect(visitRes.ok()).toBeTruthy();
   return await visitRes.json();
 };
 

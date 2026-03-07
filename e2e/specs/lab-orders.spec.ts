@@ -1,13 +1,35 @@
 import { expect } from '@playwright/test';
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
-import { type Encounter, type Provider } from '../commands/types';
-import { test } from '../core';
+import { type Encounter } from '../commands/types';
+import { test as base } from '../core';
 import { OrdersPage, ResultsViewerPage } from '../pages';
 
-let testOrder: Order;
-let encounter: Encounter;
-let orderer: Provider;
+interface ExistingLabOrderFixture {
+  existingLabOrder: {
+    testOrder: Order;
+    encounter: Encounter;
+  };
+}
+
+const test = base.extend<ExistingLabOrderFixture>({
+  existingLabOrder: async ({ api, patient, visit }, use) => {
+    const orderer = await getProvider(api);
+    const encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
+    const testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
+
+    try {
+      await use({ testOrder, encounter });
+    } finally {
+      if (testOrder?.uuid) {
+        await deleteTestOrder(api, testOrder.uuid);
+      }
+      if (encounter?.uuid) {
+        await deleteEncounter(api, encounter.uuid);
+      }
+    }
+  },
+});
 
 test.describe('Running laboratory order tests sequentially', () => {
   test('Record a lab order', async ({ page, patient }) => {
@@ -71,30 +93,26 @@ test.describe('Running laboratory order tests sequentially', () => {
 });
 
 test.describe('Modify and discontinue laboratory order tests sequentially', () => {
-  test.beforeEach(async ({ api, patient, visit }) => {
-    orderer = await getProvider(api);
-    encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
-    testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
-  });
-
-  test('Add laboratory results via orders app', async ({ page, patient }) => {
+  test('Add laboratory results via orders app', async ({ page, patient, existingLabOrder }) => {
     const ordersPage = new OrdersPage(page);
+    const conceptName = existingLabOrder.testOrder.concept.display;
+
     await test.step('When i navigate to the Orders section under patient chart', async () => {
       await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then i should see the existing order from the list ie serum glucose', async () => {
       const row = page
-        .locator('tr')
+        .getByRole('row')
         .filter({ has: page.getByRole('cell', { name: 'Test order', exact: true }) })
-        .filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) });
+        .filter({ has: page.getByRole('cell', { name: conceptName, exact: true }) });
       await expect(row).toBeVisible();
     });
 
     await test.step('When I click the overflow menu in the table row', async () => {
       await page
-        .locator('tr')
-        .filter({ has: page.getByRole('cell', { name: 'Serum glucose', exact: true }) })
+        .getByRole('row')
+        .filter({ has: page.getByRole('cell', { name: conceptName, exact: true }) })
         .getByRole('button', { name: /options/i })
         .click();
     });
@@ -123,25 +141,28 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     });
 
     await test.step('Then I should see the saved lab result in the results viewer', async () => {
-      const row = page.locator('tr:has-text("Serum glucose"):has(td:has-text("55"))').first();
+      const row = page.getByRole('row').filter({ hasText: conceptName }).filter({ hasText: '55' }).first();
       await expect(row).toBeVisible();
     });
   });
 
-  test('Modify a lab order', async ({ page, patient }) => {
+  test('Modify a lab order', async ({ page, patient, existingLabOrder }) => {
     const ordersPage = new OrdersPage(page);
+    const conceptName = existingLabOrder.testOrder.concept.display;
+
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
-      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeVisible();
+      await expect(page.getByRole('cell', { name: conceptName })).toBeVisible();
     });
 
     await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
       await page
+        .getByRole('row')
+        .filter({ hasText: conceptName })
         .getByRole('button', { name: /options/i })
-        .nth(0)
         .click();
     });
 
@@ -159,24 +180,27 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/updated serum glucose/i)).toBeVisible();
+      await expect(page.getByText(/updated/i).filter({ hasText: conceptName })).toBeVisible();
     });
   });
 
-  test('Discontinue a lab order', async ({ page, patient }) => {
+  test('Discontinue a lab order', async ({ page, patient, existingLabOrder }) => {
     const ordersPage = new OrdersPage(page);
+    const conceptName = existingLabOrder.testOrder.concept.display;
+
     await test.step('When I visit the orders page', async () => {
       await ordersPage.goTo(patient.uuid);
     });
 
     await test.step('Then I should see the previously added lab order in the list', async () => {
-      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeVisible();
+      await expect(page.getByRole('cell', { name: conceptName })).toBeVisible();
     });
 
     await test.step('When I click the overflow menu in the table row with the existing lab order', async () => {
       await page
+        .getByRole('row')
+        .filter({ hasText: conceptName })
         .getByRole('button', { name: /options/i })
-        .nth(0)
         .click();
     });
 
@@ -193,22 +217,11 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
     });
 
     await test.step('Then I should see a success notification', async () => {
-      await expect(page.getByText(/discontinued serum glucose/i)).toBeVisible();
+      await expect(page.getByText(/discontinued/i).filter({ hasText: conceptName })).toBeVisible();
     });
 
     await test.step('And the discontinued order should no longer appear in the table', async () => {
-      await expect(page.getByRole('cell', { name: /serum glucose/i })).toBeHidden();
+      await expect(page.getByRole('cell', { name: conceptName })).toBeHidden();
     });
   });
-});
-
-test.afterEach(async ({ api }) => {
-  if (encounter) {
-    await deleteEncounter(api, encounter.uuid);
-    encounter = undefined;
-  }
-  if (testOrder) {
-    await deleteTestOrder(api, testOrder.uuid);
-    testOrder = undefined;
-  }
 });
