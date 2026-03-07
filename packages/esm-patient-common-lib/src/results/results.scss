@@ -1,0 +1,11 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.referenceRange {
+  @include type.type-style('body-compact-01');
+}
+
+.noRange {
+  color: colors.$gray-50;
+}

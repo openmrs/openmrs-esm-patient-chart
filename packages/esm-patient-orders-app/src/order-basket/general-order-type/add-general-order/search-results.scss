@@ -84,10 +84,6 @@
   padding: 0 layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
-
-  svg {
-    fill: currentColor !important;
-  }
 }
 
 .searchResultSkeletonWrapper {

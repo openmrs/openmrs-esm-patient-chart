@@ -175,11 +175,14 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   renderVisitNotesForm();
 
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.type(clinicalNote, 'x');
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
   await user.click(submitButton);
 
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
 
+  await user.clear(clinicalNote);
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = await screen.findByText('Diabetes Mellitus');
@@ -187,7 +190,6 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   await user.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.clear(clinicalNote);
   await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
@@ -243,7 +245,8 @@ test('initializes form with existing encounter data when in edit mode', () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -283,7 +286,8 @@ test('updates existing visit note when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -356,7 +360,8 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '2024-03-20T10:00:00.000Z',
+    datetime: '20/03/2024',
+    rawDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',

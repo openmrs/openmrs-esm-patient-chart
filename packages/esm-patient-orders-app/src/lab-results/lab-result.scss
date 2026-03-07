@@ -1,10 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.resultsCiontainer {
-  margin-top: layout.$spacing-05;
-}
-
 .detailsContainer {
   display: flex;
   flex-direction: column;

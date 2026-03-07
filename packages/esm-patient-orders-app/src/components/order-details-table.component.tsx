@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { capitalize, lowerCase } from 'lodash-es';
+import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -24,22 +25,25 @@ import {
   TableHeader,
   TableRow,
   TableToolbarContent,
+  Tag,
   Tile,
 } from '@carbon/react';
 import {
   CardHeader,
   EmptyState,
   ErrorState,
+  getDrugOrderByUuid,
+  invalidateVisitByUuid,
   PatientChartPagination,
+  type FulfillerStatus,
   type Order,
   type OrderBasketItem,
   type OrderType,
+  type OrderUrgency,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
-  getDrugOrderByUuid,
-  invalidateVisitByUuid,
 } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
 import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
@@ -66,7 +70,6 @@ import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
-import { useSWRConfig } from 'swr';
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -85,10 +88,37 @@ interface OrderHeaderProps {
   key: string;
   header: string;
   isSortable: boolean;
-  isVisible?: boolean;
 }
 
-type MutableOrderBasketItem = OrderBasketItem;
+function getPriorityTagType(urgency: OrderUrgency) {
+  switch (urgency) {
+    case 'ROUTINE':
+      return 'green';
+    case 'STAT':
+      return 'red';
+    default:
+      return 'gray';
+  }
+}
+
+function getStatusTagType(status: FulfillerStatus) {
+  switch (status) {
+    case 'RECEIVED':
+      return 'blue';
+    case 'IN_PROGRESS':
+      return 'cyan';
+    case 'ON_HOLD':
+      return 'teal';
+    case 'EXCEPTION':
+      return 'magenta';
+    case 'COMPLETED':
+      return 'green';
+    case 'DECLINED':
+      return 'red';
+    default:
+      return 'gray';
+  }
+}
 
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   patientUuid,
@@ -169,15 +199,8 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid, selectedFromDate, selectedToDate);
 
-  const displayedOrders = useMemo(() => {
-    if (!allOrders) {
-      return [];
-    }
-    if (!selectedOrderTypeUuid) {
-      return allOrders;
-    }
-    return allOrders.filter((order) => order.orderType?.uuid === selectedOrderTypeUuid);
-  }, [allOrders, selectedOrderTypeUuid]);
+  const displayedOrders = useMemo(() => allOrders ?? [], [allOrders]);
+
   const launchOrderBasketForNewItem = useCallback(
     () => _launchOrderBasket(null, { encounterUuid: '' }),
     [_launchOrderBasket],
@@ -239,39 +262,41 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         orderType: capitalize(order.orderType?.display ?? '-'),
         dosage:
           order.type === ORDER_TYPES.DRUG_ORDER ? (
-            <div className={styles.singleLineText}>{`${t('indication', 'Indication').toUpperCase()}
-            ${order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')} ${'-'} ${t(
-              'quantity',
-              'Quantity',
-            ).toUpperCase()} ${order.quantity} ${order?.quantityUnits?.display} `}</div>
+            <div className={styles.singleLineText}>
+              {`${t('indication', 'Indication').toUpperCase()} ${
+                order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')
+              } - ${t('quantity', 'Quantity').toUpperCase()} ${
+                order.quantity != null ? `${order.quantity} ${order?.quantityUnits?.display ?? ''}`.trim() : '--'
+              }`}
+            </div>
           ) : (
             '--'
           ),
         order: order.display,
         priority: (
-          <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
+          <Tag type={getPriorityTagType(order.urgency)}>
             {
               // t('ON_SCHEDULED_DATE', 'On scheduled date')
               // t('ROUTINE', 'Routine')
               // t('STAT', 'STAT')
             }
-            {t(order.urgency, capitalize(order.urgency.replace('_', ' ')))}
-          </div>
+            {t(order.urgency, capitalize(order.urgency.replaceAll('_', ' ')))}
+          </Tag>
         ),
         orderedBy: order.orderer?.display,
         status: order.fulfillerStatus ? (
-          <div className={styles.statusPill} data-status={lowerCase(order.fulfillerStatus)}>
+          <Tag type={getStatusTagType(order.fulfillerStatus)}>
             {
-              // t('RECEIVED', 'Received')
-              // t('IN_PROGRESS', 'In progress')
-              // t('EXCEPTION', 'Exception')
-              // t('ON_HOLD', 'On hold')
-              // t('DECLINED', 'Declined')
               // t('COMPLETED', 'Completed')
+              // t('DECLINED', 'Declined')
               // t('DISCONTINUED', 'Discontinued')
+              // t('EXCEPTION', 'Exception')
+              // t('IN_PROGRESS', 'In progress')
+              // t('ON_HOLD', 'On hold')
+              // t('RECEIVED', 'Received')
             }
-            {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replace('_', ' ')))}
-          </div>
+            {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replaceAll('_', ' ')))}
+          </Tag>
         ) : (
           '--'
         ),
@@ -389,7 +414,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />
       ) : error ? (
         <ErrorState error={error} headerTitle={title} />
-      ) : orderTypes && orderTypes?.length > 0 ? (
+      ) : orderTypes?.length > 0 ? (
         <>
           {!tableRows?.length ? (
             <EmptyState
@@ -522,12 +547,12 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                         {matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ? (
                                           <MedicationRecord medication={matchingOrder} />
                                         ) : matchingOrder?.type === ORDER_TYPES.TEST_ORDER ? (
-                                          <TestOrder testOrder={matchingOrder} />
+                                          <TestOrder testOrder={matchingOrder} patientUuid={patientUuid} />
                                         ) : matchingOrder?.type === ORDER_TYPES.GENERAL_ORDER ? (
                                           <GeneralOrderTable order={matchingOrder} />
                                         ) : (
                                           <ExtensionSlot
-                                            name={`${matchingOrder.type}-detail-slot`}
+                                            name={`${matchingOrder?.type}-detail-slot`}
                                             state={{
                                               orderItem: matchingOrder,
                                             }}
@@ -583,8 +608,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const { t } = useTranslation();
   const isDeclined = orderItem.fulfillerStatus === 'DECLINED';
 
-  // Use the appropriate grouping key and postDataPrepFunction based on order type
-  const getOrderBasketConfig = useCallback(() => {
+  const { grouping, postDataPrepFn } = useMemo(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       return {
         grouping: getOrderGrouping(ORDER_TYPES.DRUG_ORDER),
@@ -602,9 +626,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       };
     }
   }, [orderItem.type, orderItem.orderType.uuid]);
-
-  const { grouping, postDataPrepFn } = getOrderBasketConfig();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(patient, grouping, postDataPrepFn);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
   const { mutate: globalMutate } = useSWRConfig();
 
@@ -621,19 +643,25 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
 
   const handleCancelOrder = useCallback(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
-      getDrugOrderByUuid(orderItem.uuid).then((res) => {
-        const medicationOrder = res.data;
-        const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
-        setOrders([...orders, discontinueItem]);
-      });
+      getDrugOrderByUuid(orderItem.uuid)
+        .then((res) => {
+          const medicationOrder = res.data;
+          const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
+          setOrders([...orders, discontinueItem]);
+          launchWorkspace2('order-basket', {}, windowProps, groupProps);
+        })
+        .catch((e) => {
+          console.error('Error cancelling drug order: ', e);
+        });
     } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
       setOrders([...orders, labItem]);
+      launchWorkspace2('order-basket', {}, windowProps, groupProps);
     } else {
       const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
       setOrders([...orders, order]);
+      launchWorkspace2('order-basket', {}, windowProps, groupProps);
     }
-    launchWorkspace2('order-basket', {}, windowProps, groupProps);
   }, [orderItem, setOrders, orders, windowProps, groupProps]);
 
   const handleModifyOrder = useCallback(() => {
@@ -686,13 +714,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu
-        aria-label={t('actionsMenu', 'Actions menu')}
-        align="left"
-        flipped
-        selectorPrimaryFocus={'#modify'}
-        size={'md'}
-      >
+      <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
         <OverflowMenuItem
           className={styles.menuItem}
           disabled={alreadyInBasket}

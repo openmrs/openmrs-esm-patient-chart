@@ -112,7 +112,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       });
 
       return {
-        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, false])),
+        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, state.checkboxes[leaf] ?? false])),
         parents: parents,
         roots: action.trees,
         tests: flatTests,

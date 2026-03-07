@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
+import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, formatDate, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
-import { useTranslation } from 'react-i18next';
 
 interface ConceptGroupDescriptor {
   groupLabel: string;
@@ -28,13 +28,13 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     return Object.fromEntries(
       config.data
         .map((c) => c.concept)
-        .map((conceptUuid) => [conceptUuid, observations.filter((o) => o.conceptUuid == conceptUuid)]),
+        .map((conceptUuid) => [conceptUuid, observations.filter((o) => o.conceptUuid === conceptUuid)]),
     );
   }, [config.data, observations]);
 
   const configByConceptUuid = useMemo(() => {
     return Object.fromEntries(
-      observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept == o.conceptUuid)]),
+      observations.map((o) => [o.conceptUuid, config.data.find((c) => c.concept === o.conceptUuid)]),
     );
   }, [observations, config.data]);
 
@@ -48,11 +48,11 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .reduce((acc, curr) => {
           if (!curr.graphGroup) {
             acc.push({
-              groupLabel: curr.label || concepts.find((c) => c.uuid == curr.concept)?.display,
+              groupLabel: curr.label || concepts.find((c) => c.uuid === curr.concept)?.display,
               concepts: [curr],
             });
-          } else if (acc.find((a) => a.groupLabel == curr.graphGroup)) {
-            acc.find((a) => a.groupLabel == curr.graphGroup).concepts.push(curr);
+          } else if (acc.find((a) => a.groupLabel === curr.graphGroup)) {
+            acc.find((a) => a.groupLabel === curr.graphGroup).concepts.push(curr);
           } else {
             acc.push({
               groupLabel: curr.graphGroup,
@@ -122,7 +122,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         alwaysShowRulerTooltip: true,
         showTotal: false,
         valueFormatter: (value: any, label: string) =>
-          label == t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
+          label === t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
         truncation: {
           numCharacter: 40,
         },

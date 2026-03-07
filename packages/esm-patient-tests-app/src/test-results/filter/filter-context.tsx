@@ -192,10 +192,10 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
   }, [state.tests]);
 
   useEffect(() => {
-    if (roots.length && !Object.keys(state.parents).length) {
-      actions.initialize(roots);
+    if (roots.length) {
+      actions.initialize(roots); //ensures ui updates when new data comes up
     }
-  }, [actions, state.parents, roots]);
+  }, [actions, roots]);
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;

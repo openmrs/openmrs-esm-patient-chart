@@ -15,12 +15,17 @@ export interface LabResultsFormProps {
  * This workspace should only be used within the patient chart. Use ExportedLabResultsForm
  * for use cases outside the patient chart.
  */
-const LabResultsForm: React.FC<PatientWorkspace2DefinitionProps<LabResultsFormProps, {}>> = ({
-  workspaceProps: { order, invalidateLabOrders },
-  groupProps: { patient },
-  ...rest
-}) => {
-  return <ExportedLabResultsForm workspaceProps={{ patient, order, invalidateLabOrders }} groupProps={{}} {...rest} />;
+const LabResultsForm: React.FC<
+  PatientWorkspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }>
+> = ({ workspaceProps: { order, invalidateLabOrders }, windowProps, groupProps, ...rest }) => {
+  return (
+    <ExportedLabResultsForm
+      workspaceProps={{ patient: groupProps.patient, order, invalidateLabOrders }}
+      windowProps={windowProps}
+      groupProps={groupProps}
+      {...rest}
+    />
+  );
 };
 
 export default LabResultsForm;

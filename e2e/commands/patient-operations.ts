@@ -76,7 +76,7 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
           },
         ],
         attributes: [],
-        birthdate: '2020-2-1',
+        birthdate: `${new Date().getFullYear() - 5}-01-01`,
         birthdateEstimated: true,
         dead: false,
         gender: 'M',
@@ -101,6 +101,6 @@ export const getPatient = async (api: APIRequestContext, uuid: string): Promise<
 };
 
 export const deletePatient = async (api: APIRequestContext, uuid: string) => {
-  const response = await api.delete(`patient/${uuid}`, { data: {} });
+  const response = await api.delete(`patient/${uuid}`);
   await expect(response.ok()).toBeTruthy();
 };
