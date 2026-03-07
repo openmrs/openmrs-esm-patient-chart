@@ -3,6 +3,7 @@ import { configSchema } from './config-schema';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
 import patientBannerComponent from './banner/patient-banner.component';
 import visitTagComponent from './banner-tags/visit-tag.extension';
+import personAttributeTagsComponent from './banner-tags/person-attribute-tags.extension';
 
 const moduleName = '@openmrs/esm-patient-banner-app';
 
@@ -27,6 +28,8 @@ export const visitTag = getSyncLifecycle(visitTagComponent, options);
 export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, options);
 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
+
+export const personAttributeTags = getSyncLifecycle(personAttributeTagsComponent, options);
 
 /*
   The translations for built-in address fields are kept here in patient-banner.
