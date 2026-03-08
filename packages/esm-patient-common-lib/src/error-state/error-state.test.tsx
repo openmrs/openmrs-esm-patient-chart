@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { type FetchError } from '@openmrs/esm-framework';
 import { ErrorState } from '.';
 
 describe('ErrorState', () => {
@@ -9,7 +10,8 @@ describe('ErrorState', () => {
         status: 500,
         statusText: 'Internal Server Error',
       },
-    };
+      responseBody: null,
+    } as unknown as FetchError;
     render(<ErrorState headerTitle="appointments" error={testError} />);
 
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
