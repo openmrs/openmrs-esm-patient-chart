@@ -17,7 +17,7 @@ export const VitalsAndBiometricsFormSchema = z
   .partial()
   .refine(
     (fields) => {
-      return Object.values(fields).some((value) => Boolean(value));
+      return Object.values(fields).some((value) => value != null && value !== '');
     },
     {
       message: 'Please fill at least one field',
