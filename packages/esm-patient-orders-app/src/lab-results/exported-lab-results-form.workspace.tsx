@@ -14,9 +14,8 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderBasket, type Order } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ObservationValue } from '../types/encounter';
-import { createOrderBasketExtensionProps } from '../order-basket/order-basket.utils';
 import {
   createCompositeObservationPayload,
   isCoded,
@@ -36,17 +35,16 @@ import orderStyles from '../order-basket/order-basket.scss';
 export interface LabResultsFormProps {
   patient: fhir.Patient;
   order: Order;
+  launchLabOrderForm?: (orderTypeUuid: string, order?: OrderBasketItem) => void;
+  labOrderWorkspaceName?: string;
   /** Callback to refresh lab orders in the Laboratory app after results are saved.
    * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
 }
 
-const ExportedLabResultsForm: React.FC<
-  Workspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }, {}>
-> = ({
-  workspaceProps: { patient, order, invalidateLabOrders, ...remainingWorkspaceProps },
-  windowProps,
+const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
+  workspaceProps: { patient, order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
 }) => {
@@ -116,15 +114,24 @@ const ExportedLabResultsForm: React.FC<
     }
   }, [completeLabResults]);
 
+  const resolvedLaunchLabOrderForm = useMemo(() => {
+    if (launchLabOrderForm) {
+      return launchLabOrderForm;
+    }
+
+    if (labOrderWorkspaceName) {
+      return (orderTypeUuid: string, basketOrder?: OrderBasketItem) => {
+        launchChildWorkspace(labOrderWorkspaceName, { orderTypeUuid, order: basketOrder });
+      };
+    }
+  }, [labOrderWorkspaceName, launchChildWorkspace, launchLabOrderForm]);
+
   const extensionProps = useMemo(
     () => ({
-      ...createOrderBasketExtensionProps({
-        patient,
-        labOrderWorkspaceName: windowProps?.labOrderWorkspaceName,
-        launchChildWorkspace,
-      }),
+      patient,
+      launchLabOrderForm: resolvedLaunchLabOrderForm,
     }),
-    [patient, windowProps?.labOrderWorkspaceName, launchChildWorkspace],
+    [patient, resolvedLaunchLabOrderForm],
   );
 
   useEffect(() => {
@@ -304,7 +311,7 @@ const ExportedLabResultsForm: React.FC<
                 ) : (
                   <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
                 )}
-                {!isEditMode && (
+                {!isEditMode && resolvedLaunchLabOrderForm && (
                   <div className={orderStyles.orderBasketContainer}>
                     <div className={styles.heading}>
                       <span>{t('addOrderTests', 'Add Tests to this order')}</span>

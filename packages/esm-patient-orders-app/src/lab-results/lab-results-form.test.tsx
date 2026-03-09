@@ -11,6 +11,9 @@ import {
   useCompletedLabResultsArray,
 } from './lab-results.resource';
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
+import ExportedLabResultsForm, {
+  type LabResultsFormProps as ExportedLabResultsFormProps,
+} from './exported-lab-results-form.workspace';
 import { type PatientWorkspace2DefinitionProps, type Order } from '@openmrs/esm-patient-common-lib';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
@@ -42,20 +45,33 @@ const mockOrder = {
 
 const mockCloseWorkspace = jest.fn();
 
-const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }> = {
+const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
   workspaceProps: {
     order: mockOrder as Order,
   },
-  windowProps: {
-    labOrderWorkspaceName: 'add-lab-order',
-  },
+  windowProps: {},
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
     visitContext: null,
     mutateVisitContext: null,
   },
+  launchChildWorkspace: jest.fn(),
+  workspaceName: '',
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
+};
+
+const exportedTestProps = {
+  closeWorkspace: mockCloseWorkspace,
+  workspaceProps: {
+    patient: mockPatient,
+    order: mockOrder as Order,
+  } satisfies ExportedLabResultsFormProps,
+  windowProps: {},
+  groupProps: {},
   launchChildWorkspace: jest.fn(),
   workspaceName: '',
   windowName: '',
@@ -107,6 +123,32 @@ describe('LabResultsForm', () => {
       error: null,
       mutate: jest.fn(),
     });
+  });
+
+  test('shows the add tests basket in patient chart context', () => {
+    render(<LabResultsForm {...testProps} />);
+
+    expect(screen.getByText('Add Tests to this order')).toBeInTheDocument();
+  });
+
+  test('hides the add tests basket in exported context without a launch callback', () => {
+    render(<ExportedLabResultsForm {...exportedTestProps} />);
+
+    expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
+  });
+
+  test('shows the add tests basket in exported context when a child workspace name is supplied', () => {
+    render(
+      <ExportedLabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          labOrderWorkspaceName: 'lab-app-test-results-add-lab-order-workspace',
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Add Tests to this order')).toBeInTheDocument();
   });
 
   test('validates numeric input correctly', async () => {
