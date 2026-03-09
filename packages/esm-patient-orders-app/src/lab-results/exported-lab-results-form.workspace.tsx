@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -10,11 +10,13 @@ import {
   restBaseUrl,
   showSnackbar,
   useAbortController,
+  useConfig,
   useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
 import {
   createCompositeObservationPayload,
@@ -49,6 +51,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
+  const { enableAddTestsDuringResultEntry } = useConfig<ConfigObject>();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const isEditMode = order.fulfillerStatus === 'COMPLETED';
@@ -133,6 +136,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     }),
     [patient, resolvedLaunchLabOrderForm],
   );
+  const canUseResultEntryAddTests = enableAddTestsDuringResultEntry && !isEditMode && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
     conceptArray.forEach((concept, index) => {
@@ -311,7 +315,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 ) : (
                   <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
                 )}
-                {!isEditMode && resolvedLaunchLabOrderForm && (
+                {canUseResultEntryAddTests && (
                   <div className={orderStyles.orderBasketContainer}>
                     <div className={styles.heading}>
                       <span>{t('addOrderTests', 'Add Tests to this order')}</span>
@@ -326,7 +330,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                   </div>
                 )}
 
-                {orders?.length > 0 && (
+                {canUseResultEntryAddTests && orders?.length > 0 && (
                   <div className={orderStyles.orderBasketContainer}>
                     <ButtonSet className={styles.buttonSet}>
                       <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import {
   useOrderConceptsByUuids,
   useLabEncounter,
@@ -14,7 +15,13 @@ import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.wor
 import ExportedLabResultsForm, {
   type LabResultsFormProps as ExportedLabResultsFormProps,
 } from './exported-lab-results-form.workspace';
-import { type PatientWorkspace2DefinitionProps, type Order } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspace2DefinitionProps,
+  type Order,
+  type TestOrderBasketItem,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
@@ -22,6 +29,8 @@ const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
 const mockUseLabEncounter = jest.mocked(useLabEncounter);
 const mockUseObservation = jest.mocked(useObservation);
 const mockUseCompletedLabResultsArray = jest.mocked(useCompletedLabResultsArray);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseOrderBasket = jest.mocked(useOrderBasket);
 
 jest.mock('./lab-results.resource', () => ({
   ...jest.requireActual('./lab-results.resource'),
@@ -31,6 +40,11 @@ jest.mock('./lab-results.resource', () => ({
   useObservation: jest.fn(),
   updateOrderResult: jest.fn().mockResolvedValue({}),
   useCompletedLabResultsArray: jest.fn(),
+}));
+
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  useOrderBasket: jest.fn(),
 }));
 
 const mockOrder = {
@@ -81,6 +95,15 @@ const exportedTestProps = {
 
 describe('LabResultsForm', () => {
   beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableAddTestsDuringResultEntry: false,
+    });
+    mockUseOrderBasket.mockReturnValue({
+      orders: [],
+      setOrders: jest.fn(),
+      clearOrders: jest.fn(),
+    });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
         {
@@ -125,10 +148,10 @@ describe('LabResultsForm', () => {
     });
   });
 
-  test('shows the add tests basket in patient chart context', () => {
+  test('hides the add tests basket in patient chart context by default', () => {
     render(<LabResultsForm {...testProps} />);
 
-    expect(screen.getByText('Add Tests to this order')).toBeInTheDocument();
+    expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });
 
   test('hides the add tests basket in exported context without a launch callback', () => {
@@ -137,7 +160,37 @@ describe('LabResultsForm', () => {
     expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });
 
-  test('shows the add tests basket in exported context when a child workspace name is supplied', () => {
+  test('shows the add tests basket in patient chart context when enabled', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableAddTestsDuringResultEntry: true,
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    expect(screen.getByText('Add Tests to this order')).toBeInTheDocument();
+  });
+
+  test('hides the add tests basket in exported context with a child workspace name when disabled', () => {
+    render(
+      <ExportedLabResultsForm
+        {...exportedTestProps}
+        workspaceProps={{
+          ...exportedTestProps.workspaceProps,
+          labOrderWorkspaceName: 'lab-app-test-results-add-lab-order-workspace',
+        }}
+      />,
+    );
+
+    expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
+  });
+
+  test('shows the add tests basket in exported context when enabled and a child workspace name is supplied', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableAddTestsDuringResultEntry: true,
+    });
+
     render(
       <ExportedLabResultsForm
         {...exportedTestProps}
@@ -149,6 +202,46 @@ describe('LabResultsForm', () => {
     );
 
     expect(screen.getByText('Add Tests to this order')).toBeInTheDocument();
+  });
+
+  test('hides staged add-tests actions when disabled even if the basket has orders', () => {
+    mockUseOrderBasket.mockReturnValue({
+      orders: [
+        {
+          action: 'NEW',
+          display: 'Extra Test',
+          testType: { label: 'Extra Test', conceptUuid: 'extra-concept-uuid' },
+          visit: null as any,
+          isOrderIncomplete: false,
+        },
+      ] as Array<TestOrderBasketItem>,
+      setOrders: jest.fn(),
+      clearOrders: jest.fn(),
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    expect(screen.queryByRole('button', { name: /Cancel order/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Save Tests/i })).not.toBeInTheDocument();
+  });
+
+  test('hides the add tests basket in edit mode even when enabled', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableAddTestsDuringResultEntry: true,
+    });
+
+    render(
+      <LabResultsForm
+        {...testProps}
+        workspaceProps={{
+          ...testProps.workspaceProps,
+          order: { ...mockOrder, fulfillerStatus: 'COMPLETED' } as Order,
+        }}
+      />,
+    );
+
+    expect(screen.queryByText('Add Tests to this order')).not.toBeInTheDocument();
   });
 
   test('validates numeric input correctly', async () => {
