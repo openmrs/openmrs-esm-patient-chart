@@ -5,7 +5,7 @@ import { type FetchError, useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 
 export interface ErrorStateProps {
-  error: Error | FetchError;
+  error: FetchError | Error;
   headerTitle: string;
 }
 
