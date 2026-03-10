@@ -179,7 +179,7 @@ yarn
 
 ## Layout
 
-The patient chart consists of the following parts:
+The OpenMRS patient chart consists of the following parts:
 
 - Navigation menu
 - Patient header
