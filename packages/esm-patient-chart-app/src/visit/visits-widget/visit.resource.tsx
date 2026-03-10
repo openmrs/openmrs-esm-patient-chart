@@ -93,7 +93,7 @@ export interface Order {
   };
   numRefills: number;
   orderNumber: string;
-  orderReason: string | null;
+  orderReason: OpenmrsResource | null;
   orderReasonNonCoded: string | null;
   orderer: OpenmrsResource;
   orderType: {

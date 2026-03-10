@@ -147,7 +147,7 @@ export interface Order {
   instructions?: string | null;
   numRefills: number | null;
   orderNumber: string;
-  orderReason: string | null;
+  orderReason: OpenmrsResource | null;
   orderReasonNonCoded: string | null;
   orderType: {
     conceptClasses: Array<any>;
@@ -248,6 +248,7 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   freeTextDosage: string;
   previousOrder?: string;
   template?: OrderTemplate;
+  indicationCoded?: OpenmrsResource;
 }
 
 export interface DrugOrderTemplate {
