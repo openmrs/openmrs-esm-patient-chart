@@ -11,7 +11,7 @@ describe('ErrorState', () => {
         statusText: 'Internal Server Error',
       },
       responseBody: null,
-    } as unknown as FetchError;
+    } testError: FetchError = { ... }; 
     render(<ErrorState headerTitle="appointments" error={testError} />);
 
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
