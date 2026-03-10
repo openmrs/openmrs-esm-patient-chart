@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -10,13 +10,14 @@ import {
   restBaseUrl,
   showSnackbar,
   useAbortController,
+  useConfig,
   useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderBasket, type Order } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
-import { createOrderBasketExtensionProps } from '../order-basket/order-basket.utils';
 import {
   createCompositeObservationPayload,
   isCoded,
@@ -36,21 +37,21 @@ import orderStyles from '../order-basket/order-basket.scss';
 export interface LabResultsFormProps {
   patient: fhir.Patient;
   order: Order;
+  launchLabOrderForm?: (orderTypeUuid: string, order?: OrderBasketItem) => void;
+  labOrderWorkspaceName?: string;
   /** Callback to refresh lab orders in the Laboratory app after results are saved.
    * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
 }
 
-const ExportedLabResultsForm: React.FC<
-  Workspace2DefinitionProps<LabResultsFormProps, { labOrderWorkspaceName: string }, {}>
-> = ({
-  workspaceProps: { patient, order, invalidateLabOrders, ...remainingWorkspaceProps },
-  windowProps,
+const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
+  workspaceProps: { patient, order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName },
   launchChildWorkspace,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
+  const { enableAddTestsDuringResultEntry } = useConfig<ConfigObject>();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
   const isEditMode = order.fulfillerStatus === 'COMPLETED';
@@ -116,16 +117,26 @@ const ExportedLabResultsForm: React.FC<
     }
   }, [completeLabResults]);
 
+  const resolvedLaunchLabOrderForm = useMemo(() => {
+    if (launchLabOrderForm) {
+      return launchLabOrderForm;
+    }
+
+    if (labOrderWorkspaceName) {
+      return (orderTypeUuid: string, basketOrder?: OrderBasketItem) => {
+        launchChildWorkspace(labOrderWorkspaceName, { orderTypeUuid, order: basketOrder });
+      };
+    }
+  }, [labOrderWorkspaceName, launchChildWorkspace, launchLabOrderForm]);
+
   const extensionProps = useMemo(
     () => ({
-      ...createOrderBasketExtensionProps({
-        patient,
-        labOrderWorkspaceName: windowProps?.labOrderWorkspaceName,
-        launchChildWorkspace,
-      }),
+      patient,
+      launchLabOrderForm: resolvedLaunchLabOrderForm,
     }),
-    [patient, windowProps?.labOrderWorkspaceName, launchChildWorkspace],
+    [patient, resolvedLaunchLabOrderForm],
   );
+  const canUseResultEntryAddTests = enableAddTestsDuringResultEntry && !isEditMode && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
     conceptArray.forEach((concept, index) => {
@@ -304,7 +315,7 @@ const ExportedLabResultsForm: React.FC<
                 ) : (
                   <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
                 )}
-                {!isEditMode && (
+                {canUseResultEntryAddTests && (
                   <div className={orderStyles.orderBasketContainer}>
                     <div className={styles.heading}>
                       <span>{t('addOrderTests', 'Add Tests to this order')}</span>
@@ -319,7 +330,7 @@ const ExportedLabResultsForm: React.FC<
                   </div>
                 )}
 
-                {orders?.length > 0 && (
+                {canUseResultEntryAddTests && orders?.length > 0 && (
                   <div className={orderStyles.orderBasketContainer}>
                     <ButtonSet className={styles.buttonSet}>
                       <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
