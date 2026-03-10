@@ -5,7 +5,7 @@ import { type FetchError, useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 
 export interface ErrorStateProps {
-  error: FetchError;
+  error: Error | FetchError;
   headerTitle: string;
 }
 
@@ -20,8 +20,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) =>
           <h4>{headerTitle}</h4>
         </div>
         <p className={styles.errorMessage}>
-          {t('error', 'Error')} {`${error?.response?.status}: `}
-          {error?.response?.statusText}
+          {t('error', 'Error')} {`${(error as FetchError)?.response?.status}: `}
+          {(error as FetchError)?.response?.statusText}
         </p>
         <p className={styles.errorCopy}>
           {t(
