@@ -177,7 +177,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       }
 
       const allFieldsAreValid = Object.entries(formData)
-        .filter(([, value]) => Boolean(value))
+        .filter(([, value]) => value != null && value !== '')
         .every(([key, value]) => isValueWithinReferenceRange(conceptRanges, config.concepts[`${key}Uuid`], value));
 
       if (allFieldsAreValid) {
@@ -322,14 +322,15 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    temperature &&
-                    assessValue(
-                      temperature,
-                      getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
-                    )
+                    temperature != null
+                      ? assessValue(
+                          temperature,
+                          getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    temperature
+                    temperature != null
                       ? isValueWithinReferenceRange(conceptRanges, config.concepts['temperatureUuid'], temperature)
                       : true
                   }
@@ -359,28 +360,28 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    systolicBloodPressure &&
-                    diastolicBloodPressure &&
-                    interpretBloodPressure(
-                      systolicBloodPressure,
-                      diastolicBloodPressure,
-                      config.concepts,
-                      conceptRanges,
-                    )
+                    systolicBloodPressure != null && diastolicBloodPressure != null
+                      ? interpretBloodPressure(
+                          systolicBloodPressure,
+                          diastolicBloodPressure,
+                          config.concepts,
+                          conceptRanges,
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    systolicBloodPressure &&
-                    diastolicBloodPressure &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts.systolicBloodPressureUuid,
-                      systolicBloodPressure,
-                    ) &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts.diastolicBloodPressureUuid,
-                      diastolicBloodPressure,
-                    )
+                    systolicBloodPressure != null && diastolicBloodPressure != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts.systolicBloodPressureUuid,
+                          systolicBloodPressure,
+                        ) &&
+                        isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts.diastolicBloodPressureUuid,
+                          diastolicBloodPressure,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('bloodPressure', 'Blood pressure')}
@@ -400,10 +401,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    pulse && assessValue(pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
+                    pulse != null
+                      ? assessValue(pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    pulse && isValueWithinReferenceRange(conceptRanges, config.concepts['pulseUuid'], pulse)
+                    pulse != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['pulseUuid'], pulse)
+                      : true
                   }
                   label={t('heartRate', 'Heart rate')}
                   showErrorMessage={showErrorMessage}
@@ -423,15 +428,21 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    respiratoryRate &&
-                    assessValue(
-                      respiratoryRate,
-                      getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
-                    )
+                    respiratoryRate != null
+                      ? assessValue(
+                          respiratoryRate,
+                          getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    respiratoryRate &&
-                    isValueWithinReferenceRange(conceptRanges, config.concepts['respiratoryRateUuid'], respiratoryRate)
+                    respiratoryRate != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['respiratoryRateUuid'],
+                          respiratoryRate,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('respirationRate', 'Respiration rate')}
@@ -451,19 +462,21 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    oxygenSaturation &&
-                    assessValue(
-                      oxygenSaturation,
-                      getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
-                    )
+                    oxygenSaturation != null
+                      ? assessValue(
+                          oxygenSaturation,
+                          getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    oxygenSaturation &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts['oxygenSaturationUuid'],
-                      oxygenSaturation,
-                    )
+                    oxygenSaturation != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['oxygenSaturationUuid'],
+                          oxygenSaturation,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('spo2', 'SpO2')}
@@ -508,11 +521,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    weight &&
-                    assessValue(weight, getReferenceRangesForConcept(config.concepts.weightUuid, conceptRanges))
+                    weight != null
+                      ? assessValue(weight, getReferenceRangesForConcept(config.concepts.weightUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    height && isValueWithinReferenceRange(conceptRanges, config.concepts['weightUuid'], weight)
+                    weight != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['weightUuid'], weight)
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('weight', 'Weight')}
@@ -532,11 +548,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    height &&
-                    assessValue(height, getReferenceRangesForConcept(config.concepts.heightUuid, conceptRanges))
+                    height != null
+                      ? assessValue(height, getReferenceRangesForConcept(config.concepts.heightUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    weight && isValueWithinReferenceRange(conceptRanges, config.concepts['heightUuid'], height)
+                    height != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['heightUuid'], height)
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('height', 'Height')}
@@ -572,13 +591,13 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                   ]}
                   muacColorCode={muacColorCode}
                   isValueWithinReferenceRange={
-                    height &&
-                    weight &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts['midUpperArmCircumferenceUuid'],
-                      midUpperArmCircumference,
-                    )
+                    midUpperArmCircumference != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['midUpperArmCircumferenceUuid'],
+                          midUpperArmCircumference,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('muac', 'MUAC')}
