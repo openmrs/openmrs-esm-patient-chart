@@ -4,6 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { type FetchError, useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 
+function isFetchError(error: FetchError | Error): error is FetchError {
+  return 'response' in error;
+}
+
 export interface ErrorStateProps {
   error: FetchError | Error;
   headerTitle: string;
@@ -12,7 +16,6 @@ export interface ErrorStateProps {
 export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) => {
   const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const isTablet = useLayoutType() === 'tablet';
-
   return (
     <Layer>
       <Tile className={styles.tile}>
@@ -20,8 +23,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) =>
           <h4>{headerTitle}</h4>
         </div>
         <p className={styles.errorMessage}>
-          {t('error', 'Error')} {`${(error as FetchError)?.response?.status}: `}
-          {(error as FetchError)?.response?.statusText}
+          {t('error', 'Error')} {isFetchError(error) ? `${error.response?.status}: ` : ''}
+          {isFetchError(error) ? error.response?.statusText : ''}
         </p>
         <p className={styles.errorCopy}>
           {t(
