@@ -13,7 +13,6 @@ import type { PersonAttributeResponse } from '../types';
 function usePersonAttributes(personUuid?: string | null, customRepresentation: string = null) {
   customRepresentation = customRepresentation || 'custom:(uuid,display,attributeType:(uuid,display,format),value)';
   const shouldFetch = !!personUuid;
-  const { personAttributeTagsToDisplay } = useConfig<ConfigObject>();
   const { data, isLoading, error } = useOpenmrsSWR<{ results: Array<PersonAttributeResponse> }, Error>(
     shouldFetch ? `${restBaseUrl}/person/${personUuid}/attribute?v=${customRepresentation}` : null,
   );
@@ -22,15 +21,13 @@ function usePersonAttributes(personUuid?: string | null, customRepresentation: s
     () => ({
       data:
         data?.data?.results.reduce((acc: Record<string, PersonAttributeResponse>, curr) => {
-          if (personAttributeTagsToDisplay?.includes(curr.attributeType.uuid)) {
-            acc[curr.attributeType.uuid] = curr;
-          }
+          acc[curr.attributeType.uuid] = curr;
           return acc;
         }, {}) ?? {},
       isLoading,
       error,
     }),
-    [data?.data?.results, personAttributeTagsToDisplay, isLoading, error],
+    [data?.data?.results, isLoading, error],
   );
 
   return results;

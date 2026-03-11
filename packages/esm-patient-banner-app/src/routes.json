@@ -6,7 +6,6 @@
   "extensions": [
     {
       "name": "person-attribute-tags",
-      "slot": "patient-banner-tags-slot",
       "component": "personAttributeTags",
       "online": true,
       "offline": true,

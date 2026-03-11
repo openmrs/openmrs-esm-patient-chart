@@ -9,42 +9,29 @@ interface PersonAttributeTagsProps {
   patientUuid: string;
 }
 
+export interface PersonAttributeTagConfig {
+  attributeType: string;
+}
+
 const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }) => {
-  const { personAttributeTagsToDisplay } = useConfig<ConfigObject>();
-  const { data: attributesData } = usePersonAttributes(personAttributeTagsToDisplay?.length ? patientUuid : null);
+  const { attributeType } = useConfig<PersonAttributeTagConfig>();
+  const { data: attributesData } = usePersonAttributes(attributeType ? patientUuid : null);
   const { t } = useTranslation();
 
-  if (!personAttributeTagsToDisplay.length || !Object.keys(attributesData)?.length) {
+  if (!attributeType || !attributesData[attributeType]) {
     return null;
   }
 
+  const attribute = attributesData[attributeType];
+
   return (
     <>
-      {personAttributeTagsToDisplay.map((field) => {
-        const matchingAttribute = attributesData[field];
-
-        if (!matchingAttribute) {
-          return null;
-        }
-
-        const value =
-          typeof matchingAttribute.value === 'object' ? matchingAttribute.value?.display : matchingAttribute.value;
-
-        if (!value) {
-          return null;
-        }
-
-        const label = t(matchingAttribute.attributeType?.display);
-
-        return (
-          <Toggletip key={field}>
-            <ToggletipButton>
-              <Tag>{value}</Tag>
-            </ToggletipButton>
-            <ToggletipContent>{`${label}: ${value}`}</ToggletipContent>
-          </Toggletip>
-        );
-      })}
+      <Toggletip key={attribute.uuid}>
+        <ToggletipButton>
+          <Tag>{typeof attribute.value === 'object' ? attribute.value.display : attribute.value}</Tag>
+        </ToggletipButton>
+        <ToggletipContent>{`${attribute.attributeType.display}: ${attribute.value ? (typeof attribute.value === 'object' ? attribute.value.display : attribute.value) : ''}`}</ToggletipContent>
+      </Toggletip>
     </>
   );
 };
