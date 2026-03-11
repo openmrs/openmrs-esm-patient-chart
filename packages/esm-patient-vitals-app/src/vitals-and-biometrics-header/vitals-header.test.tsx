@@ -143,7 +143,6 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    // TODO: Fix pluralization so that the string reads "5 days old"
     expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
@@ -302,6 +301,26 @@ describe('VitalsHeader', () => {
 
     expect(screen.getAllByTitle(/abnormal value/i)).toHaveLength(1);
     expect(screen.getByTitle(/abnormal value/i)).toHaveClass('critically-low');
+  });
+
+  it('resolves plural translation keys correctly', async () => {
+    const { createInstance } = jest.requireActual('i18next');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const translations = require('../../translations/en.json');
+    const i18n = createInstance();
+
+    await i18n.init({
+      lng: 'en',
+      resources: { en: { translation: translations } },
+      interpolation: { escapeValue: false },
+    });
+
+    expect(i18n.t('hoursOldVitals', { count: 1 })).toContain('1 hour old');
+    expect(i18n.t('hoursOldVitals', { count: 1 })).not.toContain('hours');
+    expect(i18n.t('hoursOldVitals', { count: 5 })).toContain('5 hours old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).toContain('1 day old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).not.toContain('days');
+    expect(i18n.t('daysOldVitals', { count: 5 })).toContain('5 days old');
   });
 
   it('recalculates interpretation when backend does not provide interpretation', async () => {
