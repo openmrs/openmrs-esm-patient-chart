@@ -5,13 +5,10 @@ import { ErrorState } from '.';
 
 describe('ErrorState', () => {
   it('renders an error state widget card', () => {
-    const testError = {
-      response: {
-        status: 500,
-        statusText: 'Internal Server Error',
-      },
+    const testError: FetchError = {
+      response: { status: 500, statusText: 'Internal Server Error' } as Response,
       responseBody: null,
-    } as unknown as FetchError; 
+    };
     render(<ErrorState headerTitle="appointments" error={testError} />);
 
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
