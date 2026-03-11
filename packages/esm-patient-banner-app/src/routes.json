@@ -8,8 +8,7 @@
       "name": "person-attribute-tags",
       "component": "personAttributeTags",
       "online": true,
-      "offline": true,
-      "order": 0
+      "offline": true
     },
     {
       "name": "visit-tag",

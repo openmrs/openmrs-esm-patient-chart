@@ -25,14 +25,12 @@ const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }
   const attribute = attributesData[attributeType];
 
   return (
-    <>
-      <Toggletip key={attribute.uuid}>
-        <ToggletipButton>
-          <Tag>{typeof attribute.value === 'object' ? attribute.value.display : attribute.value}</Tag>
-        </ToggletipButton>
-        <ToggletipContent>{`${attribute.attributeType.display}: ${attribute.value ? (typeof attribute.value === 'object' ? attribute.value.display : attribute.value) : ''}`}</ToggletipContent>
-      </Toggletip>
-    </>
+    <Toggletip key={attribute.uuid}>
+      <ToggletipButton>
+        <Tag>{typeof attribute.value === 'object' ? attribute.value.display : attribute.value}</Tag>
+      </ToggletipButton>
+      <ToggletipContent>{`${attribute.attributeType.display}: ${typeof attribute.value === 'object' ? attribute.value.display : attribute.value}`}</ToggletipContent>
+    </Toggletip>
   );
 };
 
