@@ -4853,8 +4853,8 @@ __metadata:
     "@openmrs/esm-form-engine-lib": "npm:next"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
+    openmrs: "npm:next"
     react-error-boundary: "npm:^4.0.13"
-    webpack: "npm:^5.99.9"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5003,7 +5003,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5062,7 +5062,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5084,9 +5084,9 @@ __metadata:
     linkify-react: "npm:^4.3.2"
     linkifyjs: "npm:^4.3.2"
     lodash-es: "npm:^4.17.23"
+    openmrs: "npm:next"
     react-grid-gallery: "npm:^0.5.6"
     react-html5-camera-photo: "npm:^1.5.11"
-    webpack: "npm:^5.99.9"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5106,7 +5106,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5126,8 +5126,8 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     "@types/uuid": "npm:^9.0.4"
     lodash-es: "npm:^4.17.23"
+    openmrs: "npm:next"
     uuid: "npm:^8.3.2"
-    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 9.x
@@ -5217,6 +5217,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     lodash-es: "npm:^4.17.23"
+    openmrs: "npm:next"
     uuid: "npm:^8.3.2"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
@@ -5232,7 +5233,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5251,7 +5252,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5272,7 +5273,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5293,8 +5294,8 @@ __metadata:
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
+    openmrs: "npm:next"
     react-hook-form: "npm:^7.46.2"
-    webpack: "npm:^5.99.9"
     zod: "npm:^3.23.8"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
@@ -5313,7 +5314,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-label-printing-app@workspace:packages/esm-patient-label-printing-app"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     react: 18.x
@@ -5328,7 +5329,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5348,7 +5349,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5367,7 +5368,7 @@ __metadata:
   dependencies:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5387,7 +5388,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5407,7 +5408,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5429,7 +5430,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5449,7 +5450,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.17.23"
-    webpack: "npm:^5.99.9"
+    openmrs: "npm:next"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
     "@openmrs/esm-patient-common-lib": 12.x
