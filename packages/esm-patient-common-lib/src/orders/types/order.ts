@@ -279,7 +279,9 @@ export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
   value: number;
 }
 
-export type MedicationFrequency = CommonMedicationValueCoded;
+export interface MedicationFrequency extends CommonMedicationValueCoded {
+  frequencyPerDay?: number | null;
+}
 
 export type MedicationRoute = CommonMedicationValueCoded;
 
