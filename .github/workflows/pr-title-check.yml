@@ -8,6 +8,8 @@ on:
       - synchronize
       - reopened
 
+permissions: {}
+
 jobs:
   pr-title:
     uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/frontend-pr-title-check.yml@main
