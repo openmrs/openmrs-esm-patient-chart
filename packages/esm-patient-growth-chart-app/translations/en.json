@@ -1,0 +1,10 @@
+{
+  "ageInMonths": "Age (Months)",
+  "errorLoadingData": "Error loading growth chart data",
+  "growthChart": "Growth Chart",
+  "growthChartAgeRestriction": "Growth charts are only applicable for children under 5 years of age.",
+  "growthChartUnavailable": "Growth Chart Unavailable",
+  "patientWeight": "Patient Weight",
+  "weightForAge": "Weight for Age (0-5 Years)",
+  "weightKg": "Weight (kg)"
+}

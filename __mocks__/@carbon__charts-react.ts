@@ -13,3 +13,10 @@ export const TickRotations = {
   AUTO: 'auto',
   NEVER: 'never',
 };
+
+export const ToolbarControlTypes = {
+  MAKE_FULLSCREEN: 'make_fullscreen',
+  EXPORT_CSV: 'export_csv',
+  EXPORT_PNG: 'export_png',
+  EXPORT_JPG: 'export_jpg',
+};
