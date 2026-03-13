@@ -66,7 +66,11 @@ jest.mock('../common', () => ({
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
-});
+  biometrics: {
+    ...getDefaultsFromConfigSchema(configSchema).biometrics,
+    ...mockVitalsConfig.biometrics,
+  },
+} as ConfigObject);
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({
@@ -411,6 +415,42 @@ describe('VitalsBiometricsForm', () => {
       subtitle: 'Some of the values entered are invalid',
       title: 'Error saving Vitals and Biometrics',
     });
+  });
+
+  it('hides BMI field when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      biometrics: {
+        ...getDefaultsFromConfigSchema(configSchema).biometrics,
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        patient: minorPatient,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    // BMI field should not be present
+    expect(screen.queryByText(/bmi \(calc.\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other biometrics fields should still be present
+    expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
   });
 });
 
