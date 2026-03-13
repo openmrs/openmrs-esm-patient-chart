@@ -172,7 +172,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 latestVitals?.diastolicRenderInterpretation,
               )}
               unitName={t('bp', 'BP')}
-              unitSymbol={(latestVitals?.systolic && conceptUnits.get(config.concepts.systolicBloodPressureUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.systolic != null ? conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '' : ''
+              }
               value={`${latestVitals?.systolic ?? '--'} / ${latestVitals?.diastolic ?? '--'}`}
             />
             <VitalsHeaderItem
@@ -181,7 +183,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 assessValue(latestVitals?.pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
               }
               unitName={t('heartRate', 'Heart rate')}
-              unitSymbol={(latestVitals?.pulse && conceptUnits.get(config.concepts.pulseUuid)) ?? ''}
+              unitSymbol={latestVitals?.pulse != null ? conceptUnits.get(config.concepts.pulseUuid) ?? '' : ''}
               value={latestVitals?.pulse ?? '--'}
             />
             <VitalsHeaderItem
@@ -194,7 +196,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               }
               unitName={t('respiratoryRate', 'R. rate')}
               unitSymbol={
-                (latestVitals?.respiratoryRate && conceptUnits.get(config.concepts.respiratoryRateUuid)) ?? ''
+                latestVitals?.respiratoryRate != null ? conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '' : ''
               }
               value={latestVitals?.respiratoryRate ?? '--'}
             />
@@ -207,7 +209,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 )
               }
               unitName={t('spo2', 'SpO2')}
-              unitSymbol={(latestVitals?.spo2 && conceptUnits.get(config.concepts.oxygenSaturationUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.spo2 != null ? conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '' : ''
+              }
               value={latestVitals?.spo2 ?? '--'}
             />
             <VitalsHeaderItem
@@ -219,31 +223,33 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 )
               }
               unitName={t('temperatureAbbreviated', 'Temp')}
-              unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.temperature != null ? conceptUnits.get(config.concepts.temperatureUuid) ?? '' : ''
+              }
               value={latestVitals?.temperature ?? '--'}
             />
             <VitalsHeaderItem
               unitName={t('weight', 'Weight')}
-              unitSymbol={(latestVitals?.weight && conceptUnits.get(config.concepts.weightUuid)) ?? ''}
+              unitSymbol={latestVitals?.weight != null ? conceptUnits.get(config.concepts.weightUuid) ?? '' : ''}
               value={latestVitals?.weight ?? '--'}
             />
             <VitalsHeaderItem
               unitName={t('height', 'Height')}
-              unitSymbol={(latestVitals?.height && conceptUnits.get(config.concepts.heightUuid)) ?? ''}
+              unitSymbol={latestVitals?.height != null ? conceptUnits.get(config.concepts.heightUuid) ?? '' : ''}
               value={latestVitals?.height ?? '--'}
             />
             {showBmi && (
               <VitalsHeaderItem
                 unitName={t('bmi', 'BMI')}
-                unitSymbol={(latestVitals?.bmi && config.biometrics['bmiUnit']) ?? ''}
+                unitSymbol={latestVitals?.bmi != null ? config.biometrics['bmiUnit'] ?? '' : ''}
                 value={latestVitals?.bmi ?? '--'}
               />
             )}
-            {latestVitals?.muac && (
+            {latestVitals?.muac != null && (
               <VitalsHeaderItem
                 unitName={t('muac', 'MUAC')}
                 unitSymbol={
-                  (latestVitals?.muac && conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid)) ?? ''
+                  latestVitals?.muac != null ? conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? '' : ''
                 }
                 value={latestVitals?.muac ?? '--'}
               />

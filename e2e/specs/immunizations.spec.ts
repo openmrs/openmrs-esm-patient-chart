@@ -143,8 +143,8 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
         exact: true,
       }),
     ).toBeVisible();
-    await immunizationsSummaryTable.getByRole('button', { name: /edit/i }).isVisible();
-    await immunizationsSummaryTable.getByRole('button', { name: /delete/i }).isVisible();
+    await expect(immunizationsSummaryTable.getByRole('button', { name: /edit/i })).toBeVisible();
+    await expect(immunizationsSummaryTable.getByRole('button', { name: /delete/i })).toBeVisible();
   });
 
   await test.step('And I edit the immunization', async () => {

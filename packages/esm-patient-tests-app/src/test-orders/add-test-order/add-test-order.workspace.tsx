@@ -8,7 +8,7 @@ import AddLabOrder from './add-test-order.component';
 
 export interface AddTestOrderWorkspaceProps {
   order?: OrderBasketItem;
-  orderTypeUuid: string;
+  orderTypeUuid?: string;
 
   /**
    * This field should only be supplied for an existing order saved to the backend

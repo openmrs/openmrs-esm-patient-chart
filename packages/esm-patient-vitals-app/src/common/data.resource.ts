@@ -298,7 +298,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
-          if (vitalSign.value) {
+          if (vitalSign.value != null) {
             vitalsHashTable.set(encounterId, {
               date:
                 typeof vitalSign.recordedDate === 'string'

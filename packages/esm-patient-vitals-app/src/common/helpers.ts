@@ -15,20 +15,20 @@ export function calculateBodyMassIndex(weight: number, height: number) {
 }
 
 export function assessValue(value: number | undefined, range?: ObsReferenceRanges): ObservationInterpretation {
-  if (range && value) {
-    if (range.hiCritical && value >= range.hiCritical) {
+  if (range && value != null) {
+    if (range.hiCritical != null && value >= range.hiCritical) {
       return 'critically_high';
     }
 
-    if (range.hiNormal && value > range.hiNormal) {
+    if (range.hiNormal != null && value > range.hiNormal) {
       return 'high';
     }
 
-    if (range.lowCritical && value <= range.lowCritical) {
+    if (range.lowCritical != null && value <= range.lowCritical) {
       return 'critically_low';
     }
 
-    if (range.lowNormal && value < range.lowNormal) {
+    if (range.lowNormal != null && value < range.lowNormal) {
       return 'low';
     }
   }
@@ -158,13 +158,13 @@ export function prepareObsForSubmission(
           voided: true,
         });
 
-        if (newValue) {
+        if (newValue != null && newValue !== '') {
           obsForSubmission.newObs.push({
             concept: fieldToConceptMap[`${field}Uuid`],
             value: newValue,
           });
         }
-      } else if (dirtyFields[field] && newValue) {
+      } else if (dirtyFields[field] && newValue != null && newValue !== '') {
         // create new obs
         obsForSubmission.newObs.push({
           concept: fieldToConceptMap[`${field}Uuid`],
