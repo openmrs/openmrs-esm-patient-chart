@@ -5,8 +5,8 @@
   },
   "extensions": [
     {
-      "name": "person-attribute-tags",
-      "component": "personAttributeTags",
+      "name": "person-attribute-tag",
+      "component": "personAttributeTag",
       "online": true,
       "offline": true
     },

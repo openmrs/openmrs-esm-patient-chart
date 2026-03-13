@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
+import { Type, useConfig } from '@openmrs/esm-framework';
 import usePersonAttributes from '../hooks/usePersonAttributes';
 import type { ConfigObject } from '../config-schema';
 
@@ -12,6 +12,14 @@ interface PersonAttributeTagsProps {
 export interface PersonAttributeTagConfig {
   attributeType: string;
 }
+
+export const personAttributeTagsExtensionConfigSchema = {
+  attributeType: {
+    _type: Type.UUID,
+    _default: null,
+    _description: 'The UUID of the attribute type to display',
+  },
+};
 
 const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }) => {
   const { attributeType } = useConfig<PersonAttributeTagConfig>();
