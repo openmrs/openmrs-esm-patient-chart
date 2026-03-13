@@ -1,5 +1,6 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -197,5 +198,34 @@ describe('Biometrics Overview', () => {
     expect(screen.getByRole('columnheader', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /muac/i })).toBeInTheDocument();
+  });
+
+  it('shows BMI column for a 20-month-old patient when bmiMinimumAge is 1', async () => {
+    const toddlerPatient = {
+      ...mockPatient,
+      birthDate: dayjs().subtract(20, 'months').format('YYYY-MM-DD'),
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+      biometrics: {
+        ...mockBiometricsConfig.biometrics,
+        bmiMinimumAge: 1,
+      },
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} patient={toddlerPatient} />);
+
+    await waitForLoadingToFinish();
+
+    await screen.findByRole('heading', { name: /biometrics/i });
+
+    // A 20-month-old is 1 year old, so BMI should be shown
+    expect(screen.getByRole('columnheader', { name: /bmi/i })).toBeInTheDocument();
   });
 });
