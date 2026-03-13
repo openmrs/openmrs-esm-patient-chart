@@ -15,6 +15,7 @@
   "discontinue": "停止使用",
   "discontinued": "已停止",
   "dispensingInformation": "配药信息",
+  "dosageGreaterThanZeroErrorMessage": "Dose must be greater than 0",
   "dosageInstructions": "用药说明",
   "dosageRequiredErrorMessage": "剂量为必填项",
   "dose": "剂量",
