@@ -92,3 +92,10 @@
 .high::after {
   content: ' ↑';
 }
+
+.note {
+  max-width: 8rem;
+  white-space: normal !important;
+  word-wrap: break-word;
+  text-align: left;
+}

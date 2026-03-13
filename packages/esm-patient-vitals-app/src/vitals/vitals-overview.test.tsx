@@ -100,17 +100,17 @@ describe('VitalsOverview', () => {
 
     const initialRowElements = screen.getAllByRole('row');
 
-    const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/];
+    const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/, /note/];
 
     expectedColumnHeaders.map((header) =>
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
     const expectedTableRows = [
-      /19 — May — 2021, 04:26 AM 37 121 \/ 89 76 12 --/,
-      /10 — May — 2021, 06:41 AM 37 120 \/ 90 66 45 90/,
-      /07 — May — 2021, 09:04 AM -- 120 \/ 80 -- -- --/,
-      /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
+      /19 .* May .* 2021, .* 37 121 \/ 89 76 12 -- Pt reports severe L chest pain/,
+      /10 .* May .* 2021, .* 37 120 \/ 90 66 45 90 Follow up in 2 weeks.*Read more/,
+      /07 .* May .* 2021, .* -- 120 \/ 80 -- -- -- --/,
+      /08 .* Apr .* 2021, .* 36.5 -- \/ -- 78 65 -- --/,
     ];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
