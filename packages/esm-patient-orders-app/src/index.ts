@@ -73,3 +73,19 @@ export const exportedAddGeneralOrderWorkspace = getAsyncLifecycle(
   () => import('./order-basket/general-order-type/add-general-order/exported-add-general-order.workspace'),
   options,
 );
+
+export const drugPinButton = getAsyncLifecycle(() => import('./order-favorites/drug-actions-menu.component'), options);
+
+export const drugFavoritesModal = getAsyncLifecycle(() => import('./order-favorites/drug-favorites.modal'), options);
+
+export const strengthPickerModal = getAsyncLifecycle(() => import('./order-favorites/strength-picker.modal'), options);
+
+export const drugFavoritesListExtension = getAsyncLifecycle(
+  () => import('./order-favorites/drug-favorites-list.component'),
+  options,
+);
+
+export const deleteFavoritesModal = getAsyncLifecycle(
+  () => import('./order-favorites/delete-favorites.modal'),
+  options,
+);
