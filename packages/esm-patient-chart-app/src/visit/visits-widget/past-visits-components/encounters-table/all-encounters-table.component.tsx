@@ -36,6 +36,7 @@ const AllEncountersTable: React.FC<AllEncountersTableProps> = ({ patientUuid }) 
     showEncounterTypeFilter: true,
     showVisitType: true,
     totalCount,
+    isSelectable: false,
   };
 
   return <EncountersTable {...encountersTableProps} />;

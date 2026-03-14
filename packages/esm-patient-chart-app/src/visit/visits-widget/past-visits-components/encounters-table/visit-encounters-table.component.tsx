@@ -34,6 +34,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
     showEncounterTypeFilter: false,
     pageSize,
     setPageSize,
+    isSelectable: false,
   };
 
   return <EncountersTable {...encountersTableProps} />;
