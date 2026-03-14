@@ -128,7 +128,7 @@ export default function OrderBasketSearchResults({
   );
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
+export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   patient,
   drug,
   openOrderForm,
