@@ -1,14 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { type FetchError } from '@openmrs/esm-framework';
 import { ErrorState } from '.';
 
 describe('ErrorState', () => {
   it('renders an error state widget card', () => {
-    const testError = {
-      response: {
-        status: 500,
-        statusText: 'Internal Server Error',
-      },
+    const testError: FetchError = {
+      response: { status: 500, statusText: 'Internal Server Error' } as Response,
+      responseBody: null,
     };
     render(<ErrorState headerTitle="appointments" error={testError} />);
 
