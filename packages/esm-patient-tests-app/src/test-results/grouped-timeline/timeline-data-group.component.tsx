@@ -31,17 +31,15 @@ const PanelHeader: React.FC<{
 }> = ({ panelName, subRows }) => {
   // Calculate panel-specific dates from the actual data in this panel
   const panelDates = useMemo(() => {
-    const allTimes = [
-      ...new Set(
+    const allTimes = Array.from(
+      new Set(
         subRows
           .filter((row) => row?.entries && Array.isArray(row.entries))
-          .map((row) => row.entries.filter((entry) => entry).map((entry) => entry.obsDatetime))
-          .flat(),
+          .flatMap((row) => row.entries.filter((entry) => entry).map((entry) => entry.obsDatetime)),
       ),
-    ];
+    );
 
     allTimes.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
     const yearColumns: Array<{ year: string; size: number }> = [];
     const dayColumns: Array<{ year: string; day: string; size: number }> = [];
     const timeColumns: string[] = [];
