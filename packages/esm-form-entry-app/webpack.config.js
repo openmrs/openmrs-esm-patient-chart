@@ -77,6 +77,7 @@ module.exports = {
       shared: [...Object.keys(peerDependencies), '@openmrs/esm-framework/src/internal'].reduce((obj, depName) => {
         obj[depName] = {
           requiredVersion: peerDependencies[depName] ?? false,
+          strictVersion: false,
           singleton: true,
           import: depName,
           shareKey: depName,
@@ -110,6 +111,16 @@ module.exports = {
         })
       : {},
   ],
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        include: /node_modules\/@openmrs/,
+        enforce: 'post',
+        use: [require.resolve('style-loader'), require.resolve('css-loader')],
+      },
+    ],
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '.scss'],
     alias: {
