@@ -19,6 +19,7 @@ const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
   visitContext: mockOngoingVisitWithEncounters,
+  patient: mockPatient,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
@@ -143,7 +144,6 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    // TODO: Fix pluralization so that the string reads "5 days old"
     expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
@@ -304,6 +304,26 @@ describe('VitalsHeader', () => {
     expect(screen.getByTitle(/abnormal value/i)).toHaveClass('critically-low');
   });
 
+  it('resolves plural translation keys correctly', async () => {
+    const { createInstance } = jest.requireActual('i18next');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const translations = require('../../translations/en.json');
+    const i18n = createInstance();
+
+    await i18n.init({
+      lng: 'en',
+      resources: { en: { translation: translations } },
+      interpolation: { escapeValue: false },
+    });
+
+    expect(i18n.t('hoursOldVitals', { count: 1 })).toContain('1 hour old');
+    expect(i18n.t('hoursOldVitals', { count: 1 })).not.toContain('hours');
+    expect(i18n.t('hoursOldVitals', { count: 5 })).toContain('5 hours old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).toContain('1 day old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).not.toContain('days');
+    expect(i18n.t('daysOldVitals', { count: 5 })).toContain('5 days old');
+  });
+
   it('recalculates interpretation when backend does not provide interpretation', async () => {
     // All vitals are abnormal, and backend does not provide interpretation for any of them.
     // It should fallback to recalculating and mark them as abnormal.
@@ -351,5 +371,47 @@ describe('VitalsHeader', () => {
       return element.className === 'critically-high';
     });
     expect(criticallyHighElements).toHaveLength(1);
+  });
+
+  it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      // Make patient minor
+      birthDate: '2020-07-22',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      biometrics: {
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const someVitals: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 89,
+        systolic: 121,
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: someVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    // BMI should be hidden for minors when restriction is enabled
+    expect(screen.queryByText(/BMI/i)).not.toBeInTheDocument();
   });
 });
