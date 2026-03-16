@@ -15,6 +15,7 @@
   "discontinue": "停止使用",
   "discontinued": "Discontinued",
   "dispensingInformation": "Dispensing instructions",
+  "dosageGreaterThanZeroErrorMessage": "Dose must be greater than 0",
   "dosageInstructions": "Dosage instructions",
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "剂量",
