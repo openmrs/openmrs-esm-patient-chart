@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
@@ -76,14 +76,7 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    await screen.findByRole('heading', { name: /vitals/i });
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error: mockError, headerTitle: 'Vitals' }), {});
   });
 
   it("renders a tabular overview of the patient's vital signs", async () => {

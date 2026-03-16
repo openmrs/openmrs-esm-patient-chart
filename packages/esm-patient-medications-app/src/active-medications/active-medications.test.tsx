@@ -1,5 +1,5 @@
 import React from 'react';
-import { launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
@@ -52,10 +52,7 @@ describe('ActiveMedications', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /medications/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Active medications' }), {});
   });
 
   test('renders a tabular overview of the active medications recorded for a patient', async () => {

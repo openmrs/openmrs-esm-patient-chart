@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { ContentSwitcher, Switch, Button, DataTableSkeleton } from '@carbon/react';
-import { ErrorState , RenewIcon, restBaseUrl, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, RenewIcon, restBaseUrl, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useSWRConfig } from 'swr';
 import { type ConfigObject } from '../../config-schema';

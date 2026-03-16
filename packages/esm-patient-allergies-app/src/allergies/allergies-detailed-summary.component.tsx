@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType , ErrorState } from '@openmrs/esm-framework';
+import { AddIcon, ErrorState, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';

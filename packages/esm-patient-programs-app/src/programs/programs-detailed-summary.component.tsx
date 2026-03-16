@@ -18,6 +18,7 @@ import {
 import {
   AddIcon,
   type ConfigObject,
+  ErrorState,
   formatDate,
   formatDatetime,
   useConfig,
@@ -25,7 +26,6 @@ import {
   isDesktop as desktopLayout,
   launchWorkspace2,
 } from '@openmrs/esm-framework';
-import { ErrorState } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { findLastState, usePrograms } from './programs.resource';
 import { ProgramsActionMenu } from './programs-action-menu.component';

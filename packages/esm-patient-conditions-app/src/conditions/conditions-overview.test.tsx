@@ -2,6 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+  ErrorState,
   type FetchResponse,
   getDefaultsFromConfigSchema,
   launchWorkspace2,
@@ -52,10 +53,7 @@ describe('ConditionsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sorry, there was a problem displaying this information./i)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Conditions' }), {});
   });
 
   it("renders an overview of the patient's conditions when present", async () => {

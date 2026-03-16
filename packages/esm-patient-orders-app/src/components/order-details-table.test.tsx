@@ -4,6 +4,7 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
+  ErrorState,
   getDefaultsFromConfigSchema,
   openmrsFetch,
   useConfig,
@@ -126,7 +127,7 @@ describe('OrderDetailsTable', () => {
     renderOrderDetailsTable();
 
     await screen.findByRole('combobox', { name: /select order type/i });
-    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error }), {});
   });
 
   it('renders a tabular overview of order data when data is available', async () => {

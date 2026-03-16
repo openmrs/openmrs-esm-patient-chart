@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from '@carbon/react';
-import { formatDate, parseDate, useLayoutType, usePagination , ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { Immunization } from '../types';
 import styles from './immunization-history-card.scss';

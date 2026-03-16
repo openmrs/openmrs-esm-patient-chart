@@ -2,6 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import {
+  ErrorState,
   getDefaultsFromConfigSchema,
   launchWorkspace2,
   useConfig,
@@ -149,13 +150,7 @@ describe('ImmunizationsDetailedSummary', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Immunizations' }), {});
   });
 
   it('displays immunization records in a table when data is available', async () => {

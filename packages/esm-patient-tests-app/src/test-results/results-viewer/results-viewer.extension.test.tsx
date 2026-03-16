@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
@@ -100,19 +100,15 @@ describe('ResultsViewer', () => {
   });
 
   it('should return an error state when there is an error', async () => {
+    const error = new Error('An error occurred');
     mockUseGetManyObstreeData.mockReturnValue({
       roots: [],
       isLoading: false,
-      error: new Error('An error occurred'),
+      error,
     });
     render(<TreeView {...testProps} />);
-    const testResultsText = screen.getByRole('heading', { name: /data load error/i });
-    expect(testResultsText).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./i,
-      ),
-    ).toBeInTheDocument();
+
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Data Load Error' }), {});
   });
 
   it('should render the Tree wrapper component component', async () => {

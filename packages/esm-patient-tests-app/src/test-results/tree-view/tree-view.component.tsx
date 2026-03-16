@@ -2,7 +2,7 @@ import React, { useContext, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { AccordionSkeleton, Button, DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType, TreeViewAltIcon, useConfig , ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, TreeViewAltIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import { type GroupedObservation, type viewOpts } from '../../types';

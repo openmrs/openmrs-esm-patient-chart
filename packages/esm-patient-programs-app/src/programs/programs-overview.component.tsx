@@ -15,11 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ErrorState } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   type ConfigObject,
+  ErrorState,
   formatDate,
   formatDatetime,
   launchWorkspace2,

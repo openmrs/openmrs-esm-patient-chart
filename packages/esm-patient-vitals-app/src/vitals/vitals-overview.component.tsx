@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { ErrorState ,
+import {
   AddIcon,
-  PrinterIcon,
   age,
-  getPatientName,
+  ErrorState,
   formatDate,
+  getPatientName,
   parseDate,
+  PrinterIcon,
   useConfig,
   useLayoutType,
 } from '@openmrs/esm-framework';

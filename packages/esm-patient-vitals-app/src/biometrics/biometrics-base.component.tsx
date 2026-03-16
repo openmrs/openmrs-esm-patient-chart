@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, Analytics, Table } from '@carbon/react/icons';
-import { formatDatetime, parseDate, useConfig, useLayoutType , ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useConceptUnits, useVitalsAndBiometrics, withUnit } from '../common';
