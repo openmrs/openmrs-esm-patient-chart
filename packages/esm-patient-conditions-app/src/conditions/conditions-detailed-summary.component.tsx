@@ -16,8 +16,8 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType , ErrorState } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';

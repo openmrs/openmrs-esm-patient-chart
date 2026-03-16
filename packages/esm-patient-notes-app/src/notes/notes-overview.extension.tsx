@@ -1,14 +1,8 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { AddIcon, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  launchStartVisitPrompt,
-  usePatientChartStore,
-} from '@openmrs/esm-patient-common-lib';
+import { AddIcon, launchWorkspace, useLayoutType , ErrorState } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, launchStartVisitPrompt, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useVisitNotes } from './visit-notes.resource';
 import PaginatedNotes from './paginated-notes.component';
 import styles from './notes-overview.scss';

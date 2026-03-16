@@ -26,8 +26,8 @@ import {
   useConfig,
   useLayoutType,
   usePagination,
-} from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+ ErrorState } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, useConditions, useConditionsSorting } from './conditions.resource';
 import { type ConfigObject } from '../config-schema';
