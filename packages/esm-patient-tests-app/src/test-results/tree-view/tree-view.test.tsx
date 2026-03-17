@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -85,12 +86,10 @@ describe('TreeView', () => {
 
     render(<TreeView {...mockProps} />);
 
-    expect(screen.getByRole('heading', { name: /data load error/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /sorry, there was a problem displaying this information. you can try to reload this page, or contact the site administrator and quote the error code above./i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: mockError, headerTitle: 'Data Load Error' }),
+      {},
+    );
   });
 
   it('renders the tree view when test data is successfully fetched', async () => {
