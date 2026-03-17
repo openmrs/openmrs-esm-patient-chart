@@ -1,7 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
-import useSWR from 'swr';
 import {
-  closeWorkspaceGroup2,
   launchWorkspaceGroup2,
   openmrsFetch,
   restBaseUrl,
@@ -10,17 +7,13 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useEffect, useMemo, useRef } from 'react';
+import useSWR from 'swr';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
-  'encounters:(uuid,display,encounterDatetime,' +
-  'form:(uuid,name),location:ref,' +
-  'encounterType:ref,' +
-  'encounterProviders:(uuid,display,' +
-  'provider:(uuid,display))),' +
   'patient:(uuid,display),' +
   'visitType:(uuid,name,display),' +
-  'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
   'location:(uuid,name,display))';
 
 export function useVisitByUuid(visitUuid: string | null, representation: string = defaultVisitCustomRepresentation) {
@@ -42,9 +35,9 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  * When we enter the chart, we want to update the visit context as follows:
  * does the the stored visitContext exist and belong to the patient?
  * 1. If so, the visitContext should be valid but possibly stale; fetch the visit again
- *    and update the context
+ * and update the context
  * 2. If not, fetch the active visit of the patient, If it exists, set it as the
- *    visitContext; otherwise, clear it.
+ * visitContext; otherwise, clear it.
  * @param patientUuid
  * @returns
  */
@@ -64,11 +57,12 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     mutate: newMutateVisitContext,
     isValidating: isValidatingVisitContext,
   } = useVisitByUuid(isVisitContextValid ? visitContext.uuid : null);
+
   const {
     activeVisit,
     isValidating: isValidatingActiveVisit,
     mutate: mutateActiveVisit,
-  } = useVisit(isVisitContextValid ? null : patientUuid);
+  } = useVisit(isVisitContextValid ? null : patientUuid, defaultVisitCustomRepresentation);
 
   const isWorkspaceGroupLaunched = useRef(false);
 

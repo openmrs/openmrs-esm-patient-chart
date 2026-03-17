@@ -1,6 +1,3 @@
-import React, { useMemo } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
   type Diagnosis,
@@ -8,20 +5,38 @@ import {
   Extension,
   ExtensionSlot,
   formatTime,
+  openmrsFetch,
   parseDate,
+  restBaseUrl,
   useAssignedExtensions,
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import classNames from 'classnames';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import useSWR from 'swr';
+import { type ChartConfig } from '../../../config-schema';
+import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
 import { type Note, type Order, type OrderItem } from '../visit.resource';
+import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
-import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
-import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
-import { type ChartConfig } from '../../../config-schema';
 import styles from './visit-summary.scss';
+
+const heavyVisitRepresentation =
+  'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
+  'encounters:(uuid,display,encounterDatetime,' +
+  'form:(uuid,name),location:ref,' +
+  'encounterType:ref,' +
+  'encounterProviders:(uuid,display,' +
+  'provider:(uuid,display))),' +
+  'patient:(uuid,display),' +
+  'visitType:(uuid,name,display),' +
+  'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
+  'location:(uuid,name,display))';
 
 interface VisitSummaryProps {
   visit: Visit;
@@ -35,69 +50,72 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  const needsHeavyData = activeTabIndex === 2 || activeTabIndex === 3 || activeTabIndex === 4;
+  const heavyFetchUrl =
+    needsHeavyData && visit?.uuid ? `${restBaseUrl}/visit/${visit.uuid}?v=${heavyVisitRepresentation}` : null;
+
+  const { data: heavyVisitResponse } = useSWR<{ data: Visit }>(heavyFetchUrl, openmrsFetch);
+
+  // INJECT PHASE 4: The Adapter
+  const activeVisit = heavyVisitResponse?.data || visit;
+
   const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
-    // Medication Tab
     const medications: Array<OrderItem> = [];
-    // Diagnoses in a Visit
     const diagnoses: Array<Diagnosis> = [];
-    // Notes Tab
     const notes: Array<Note> = [];
 
-    visit?.encounters?.forEach((enc) => {
-      if (enc.hasOwnProperty('orders')) {
+    // Swapped to activeVisit
+    (activeVisit?.encounters || []).forEach((enc) => {
+      if (enc?.hasOwnProperty('orders')) {
         medications.push(
-          ...enc.orders.map((order: Order) => ({
+          ...(enc?.orders || []).map((order: Order) => ({
             order,
             provider: {
-              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+              name: (enc?.encounterProviders || []).length ? enc.encounterProviders[0].provider.person.display : '',
+              role: (enc?.encounterProviders || []).length ? enc.encounterProviders[0].encounterRole.display : '',
             },
           })),
         );
       }
 
-      // Check if there is a diagnosis associated with this encounter
-      if (enc.hasOwnProperty('diagnoses')) {
-        if (enc.diagnoses.length > 0) {
-          const validDiagnoses = enc.diagnoses.filter((diagnosis) => !diagnosis.voided);
+      if (enc?.hasOwnProperty('diagnoses')) {
+        if ((enc?.diagnoses || []).length > 0) {
+          const validDiagnoses = (enc?.diagnoses || []).filter((diagnosis) => !diagnosis?.voided);
           diagnoses.push(...validDiagnoses);
         }
       }
 
-      // Check for Visit Diagnoses and Notes
-      if (enc.hasOwnProperty('obs')) {
-        enc.obs.forEach((obs) => {
-          if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
-            // Putting all notes in a single array.
+      if (enc?.hasOwnProperty('obs')) {
+        (enc?.obs || []).forEach((obs) => {
+          if (config.notesConceptUuids?.includes(obs?.concept?.uuid)) {
             notes.push({
-              note: obs.value as string, // TODO: add better typing check
+              note: obs?.value as string,
               provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+                name: (enc?.encounterProviders || []).length ? enc.encounterProviders[0].provider.person.display : '',
+                role: (enc?.encounterProviders || []).length ? enc.encounterProviders[0].encounterRole.display : '',
               },
-              time: enc.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
-              concept: obs.concept,
+              time: enc?.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
+              concept: obs?.concept,
             });
           }
         });
       }
     });
 
-    // Sort the diagnoses by rank, so that primary diagnoses come first
     diagnoses.sort((a, b) => a.rank - b.rank);
-
-    // Sort medications by dateActivated DESC (newest first) to align with backend ordering
     medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
 
-    return [diagnoses, notes, medications];
-  }, [config.notesConceptUuids, visit?.encounters]);
+    return [diagnoses, notes, medications]; // Swapped dependency array to activeVisit
+  }, [config.notesConceptUuids, activeVisit?.encounters]);
 
   const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
-    const encounterIds = visit?.encounters?.map((e) => `Encounter/${e.uuid}`);
+    const encounterIds = (activeVisit?.encounters || []).map((e) => `Encounter/${e.uuid}`); // Swapped to activeVisit
     return ([entry]) => {
-      return encounterIds.includes(entry.encounter?.reference);
+      return encounterIds.includes(entry?.encounter?.reference);
     };
-  }, [visit?.encounters]);
+  }, [activeVisit?.encounters]); // Swapped to activeVisit
 
   return (
     <div className={styles.summaryContainer}>
@@ -111,7 +129,12 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <Tabs>
+      <Tabs
+        selectedIndex={activeTabIndex}
+        onChange={({ selectedIndex }) => {
+          setActiveTabIndex(selectedIndex);
+        }}
+      >
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
             {t('timeline', 'Timeline')}
@@ -136,7 +159,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <Tab
             className={styles.tab}
             id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            // Swapped to activeVisit
+            disabled={(activeVisit?.encounters || []).length <= 0 && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
@@ -157,17 +181,20 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
+            {/* Swapped to activeVisit */}
+            <TestsSummary patientUuid={patientUuid} encounters={activeVisit?.encounters || []} />
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+            {/* Swapped to activeVisit */}
+            <VisitEncountersTable visit={activeVisit} patientUuid={patientUuid} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
-              <Extension state={{ patientUuid, visit }} />
+              {/* Swapped to activeVisit */}
+              <Extension state={{ patientUuid, visit: activeVisit }} />
             </TabPanel>
           </ExtensionSlot>
         </TabPanels>
