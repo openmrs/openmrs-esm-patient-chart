@@ -5192,7 +5192,6 @@ __metadata:
     classnames: "npm:^2.3.2"
     concurrently: "npm:^8.2.1"
     cross-env: "npm:^7.0.3"
-    css-loader: "npm:^6.6.0"
     d3-selection: "npm:^3.0.0"
     dayjs: "npm:^1.11.10"
     dotenv: "npm:^16.3.1"
@@ -5222,12 +5221,9 @@ __metadata:
     react-to-print: "npm:^2.14.13"
     rxjs: "npm:^6.6.7"
     sass: "npm:^1.54.3"
-    swc-loader: "npm:^0.2.3"
     swr: "npm:2.2.5"
     turbo: "npm:^2.5.2"
     typescript: "npm:^5.0.0"
-    webpack: "npm:^5.99.9"
-    webpack-cli: "npm:^6.0.1"
     webpack-dev-server: "npm:^5.2.1"
     zod: "npm:^3.23.8"
   languageName: unknown
@@ -12327,30 +12323,6 @@ __metadata:
     webpack:
       optional: true
   checksum: 10/ddde22fb103888320f60a1414a6a04638d2e9760a532a52d03c45e6e2830b32dd76c734aeef426f78dd95b2d15f77eeec3854ac53061aff02569732dc6e6801c
-  languageName: node
-  linkType: hard
-
-"css-loader@npm:^6.6.0":
-  version: 6.10.0
-  resolution: "css-loader@npm:6.10.0"
-  dependencies:
-    icss-utils: "npm:^5.1.0"
-    postcss: "npm:^8.4.33"
-    postcss-modules-extract-imports: "npm:^3.0.0"
-    postcss-modules-local-by-default: "npm:^4.0.4"
-    postcss-modules-scope: "npm:^3.1.1"
-    postcss-modules-values: "npm:^4.0.0"
-    postcss-value-parser: "npm:^4.2.0"
-    semver: "npm:^7.5.4"
-  peerDependencies:
-    "@rspack/core": 0.x || 1.x
-    webpack: ^5.0.0
-  peerDependenciesMeta:
-    "@rspack/core":
-      optional: true
-    webpack:
-      optional: true
-  checksum: 10/1abd52e24a72a4c54762330bab2e0e816778db5bc711a8fc1b1ee99470a1728f2aa9b54b9ebbf2278a1730d68b76303094cc855f9119b2ffc0424fe57fea3bc6
   languageName: node
   linkType: hard
 
@@ -20699,7 +20671,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-modules-local-by-default@npm:^4.0.0, postcss-modules-local-by-default@npm:^4.0.4, postcss-modules-local-by-default@npm:^4.0.5":
+"postcss-modules-local-by-default@npm:^4.0.0, postcss-modules-local-by-default@npm:^4.0.5":
   version: 4.2.0
   resolution: "postcss-modules-local-by-default@npm:4.2.0"
   dependencies:
@@ -20712,7 +20684,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-modules-scope@npm:^3.0.0, postcss-modules-scope@npm:^3.1.1, postcss-modules-scope@npm:^3.2.0":
+"postcss-modules-scope@npm:^3.0.0, postcss-modules-scope@npm:^3.2.0":
   version: 3.2.1
   resolution: "postcss-modules-scope@npm:3.2.1"
   dependencies:
@@ -23557,7 +23529,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swc-loader@npm:0.2.7, swc-loader@npm:^0.2.3":
+"swc-loader@npm:0.2.7":
   version: 0.2.7
   resolution: "swc-loader@npm:0.2.7"
   dependencies:
@@ -24950,7 +24922,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:6.0.1, webpack-cli@npm:^6.0.1":
+"webpack-cli@npm:6.0.1":
   version: 6.0.1
   resolution: "webpack-cli@npm:6.0.1"
   dependencies:
@@ -25151,7 +25123,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.105.3, webpack@npm:^5.99.9":
+"webpack@npm:5.105.3":
   version: 5.105.3
   resolution: "webpack@npm:5.105.3"
   dependencies:
