@@ -54,9 +54,6 @@
   padding: layout.$spacing-05;
   margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 .inlineNotification {
