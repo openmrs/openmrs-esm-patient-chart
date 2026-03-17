@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
@@ -73,14 +74,11 @@ describe('Biometrics Overview', () => {
 
     await waitForLoadingToFinish();
 
-    await screen.findByRole('heading', { name: /biometrics/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: mockError, headerTitle: 'Biometrics' }),
+      {},
+    );
   });
 
   it("renders a tabular overview of the patient's biometrics data when available", async () => {

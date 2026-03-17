@@ -45,7 +45,6 @@
     "babel-preset-minify": "^0.5.2",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
-    "css-loader": "^6.6.0",
     "d3-selection": "^3.0.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
@@ -72,12 +71,9 @@
     "react-router-dom": "^6.16.0",
     "rxjs": "^6.6.7",
     "sass": "^1.54.3",
-    "swc-loader": "^0.2.3",
     "swr": "2.2.5",
     "turbo": "^2.5.2",
     "typescript": "^5.0.0",
-    "webpack": "^5.99.9",
-    "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1"
   },
   "lint-staged": {
