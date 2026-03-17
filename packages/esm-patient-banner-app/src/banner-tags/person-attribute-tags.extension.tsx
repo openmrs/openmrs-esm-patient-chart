@@ -33,7 +33,7 @@ const PersonAttributeTags: React.FC<PersonAttributeTagsProps> = ({ patientUuid }
   const attribute = attributesData[attributeType];
 
   return (
-    <Toggletip key={attribute.uuid}>
+    <Toggletip>
       <ToggletipButton>
         <Tag>{typeof attribute.value === 'object' ? attribute.value.display : attribute.value}</Tag>
       </ToggletipButton>
