@@ -1918,10 +1918,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.24.5, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.26.10, @babel/runtime@npm:^7.27.3, @babel/runtime@npm:^7.27.6, @babel/runtime@npm:^7.28.4, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.24.5, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.26.10, @babel/runtime@npm:^7.27.3, @babel/runtime@npm:^7.27.6, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.9.2":
   version: 7.28.6
   resolution: "@babel/runtime@npm:7.28.6"
   checksum: 10/fbcd439cb74d4a681958eb064c509829e3f46d8a4bfaaf441baa81bb6733d1e680bccc676c813883d7741bcaada1d0d04b15aa320ef280b5734e2192b50decf9
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.28.6":
+  version: 7.29.2
+  resolution: "@babel/runtime@npm:7.29.2"
+  checksum: 10/f55ba4052aa0255055b34371a145fbe69c29b37b49eaea14805b095bfb4153701486416e89392fd27ec8abafa53868be86e960b9f8f959fff91f2c8ac2a14b02
   languageName: node
   linkType: hard
 
@@ -4952,7 +4959,7 @@ __metadata:
     eslint: "npm:^8.57.0"
     jasmine-core: "npm:~5.1.1"
     jasmine-spec-reporter: "npm:~7.0.0"
-    jspdf: "npm:^4.0.0"
+    jspdf: "npm:^4.2.1"
     karma: "npm:~6.4.2"
     karma-chrome-launcher: "npm:~3.2.0"
     karma-coverage-istanbul-reporter: "npm:~3.0.3"
@@ -17626,11 +17633,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jspdf@npm:^4.0.0":
-  version: 4.1.0
-  resolution: "jspdf@npm:4.1.0"
+"jspdf@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "jspdf@npm:4.2.1"
   dependencies:
-    "@babel/runtime": "npm:^7.28.4"
+    "@babel/runtime": "npm:^7.28.6"
     canvg: "npm:^3.0.11"
     core-js: "npm:^3.6.0"
     dompurify: "npm:^3.3.1"
@@ -17646,7 +17653,7 @@ __metadata:
       optional: true
     html2canvas:
       optional: true
-  checksum: 10/07ca8deec968db23acf0747b4dc6ea6896a05cb4b0d4fc13ddd63b55e3165f66c2e80fc1d8383e162310a0e7af12382fb7f23c4d517c035d3a981f816da1b4bb
+  checksum: 10/594dd7c1f34a3d9c48e555be2a8e664b5875c2709e1e83490a0fe20d953b35d96193ecbeaba4aa751020d2b63c8c8a82bb91c73660a775d6f8b2bef4f9ca11b0
   languageName: node
   linkType: hard
 
