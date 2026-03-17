@@ -1,8 +1,16 @@
-import { defineConfigSchema, getSyncLifecycle, messageOmrsServiceWorker, restBaseUrl } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  defineExtensionConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
 import patientBannerComponent from './banner/patient-banner.component';
 import visitTagComponent from './banner-tags/visit-tag.extension';
+import { personAttributeTagsExtensionConfigSchema } from './banner-tags/person-attribute-tags.extension';
 
 const moduleName = '@openmrs/esm-patient-banner-app';
 
@@ -20,6 +28,7 @@ export function startupApp() {
   });
 
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('person-attribute-tag', personAttributeTagsExtensionConfigSchema);
 }
 
 export const visitTag = getSyncLifecycle(visitTagComponent, options);
@@ -27,6 +36,11 @@ export const visitTag = getSyncLifecycle(visitTagComponent, options);
 export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, options);
 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
+
+export const personAttributeTag = getAsyncLifecycle(
+  () => import('./banner-tags/person-attribute-tags.extension'),
+  options,
+);
 
 /*
   The translations for built-in address fields are kept here in patient-banner.
