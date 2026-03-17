@@ -15,6 +15,7 @@
   "discontinue": "Interrompre",
   "discontinued": "Arrété",
   "dispensingInformation": "Instructions de délivrance",
+  "dosageGreaterThanZeroErrorMessage": "Dose must be greater than 0",
   "dosageInstructions": "Posologie",
   "dosageRequiredErrorMessage": "Posologie requise",
   "dose": "Dose",

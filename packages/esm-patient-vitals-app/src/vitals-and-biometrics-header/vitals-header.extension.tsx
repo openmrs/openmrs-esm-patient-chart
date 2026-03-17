@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react';
-import classNames from 'classnames';
+import React, { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isToday from 'dayjs/plugin/isToday';
@@ -21,10 +20,12 @@ import { type ConfigObject } from '../config-schema';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+import { shouldShowBmi } from '../common/helpers';
 
 interface VitalsHeaderProps {
   patientUuid: string;
   visitContext: Visit;
+  patient: fhir.Patient;
 
   /**
    * custom function to launch the vitals form. Use this in places outside of the patient chart
@@ -40,6 +41,7 @@ interface VitalsHeaderProps {
 
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   patientUuid,
+  patient,
   visitContext,
   launchCustomVitalsForm,
   hideLinks = false,
@@ -54,6 +56,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
   const isActiveVisit = Boolean(visitContext && !visitContext.stopDatetime);
   const launchForm = useLaunchVitalsAndBiometricsForm(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -82,7 +85,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
       overdueVitalsTagContent = (
         <Trans i18nKey="hoursOldVitals" count={hoursSinceVitalsTaken}>
           <span>
-            {/* @ts-ignore: See comment below */}
+            {/* @ts-ignore https://github.com/i18next/react-i18next/issues/1543 */}
             These vitals are <strong>{{ count: hoursSinceVitalsTaken }} hour old</strong>
           </span>
         </Trans>
@@ -91,7 +94,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
       overdueVitalsTagContent = (
         <Trans i18nKey="daysOldVitals" count={vitalsOverdueDayCount}>
           <span>
-            {/* @ts-ignore Workaround for i18next types issue (see https://github.com/i18next/react-i18next/issues/1543 and https://github.com/i18next/react-i18next/issues/465). Additionally, I can't find a way to get the proper plural suffix to be used in the translation file without amending the translation file by hand. */}
+            {/* @ts-ignore https://github.com/i18next/react-i18next/issues/1543 */}
             These vitals are <strong>{{ count: vitalsOverdueDayCount }} day old</strong>
           </span>
         </Trans>
@@ -168,7 +171,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 latestVitals?.diastolicRenderInterpretation,
               )}
               unitName={t('bp', 'BP')}
-              unitSymbol={(latestVitals?.systolic && conceptUnits.get(config.concepts.systolicBloodPressureUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.systolic != null ? conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '' : ''
+              }
               value={`${latestVitals?.systolic ?? '--'} / ${latestVitals?.diastolic ?? '--'}`}
             />
             <VitalsHeaderItem
@@ -177,7 +182,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 assessValue(latestVitals?.pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
               }
               unitName={t('heartRate', 'Heart rate')}
-              unitSymbol={(latestVitals?.pulse && conceptUnits.get(config.concepts.pulseUuid)) ?? ''}
+              unitSymbol={latestVitals?.pulse != null ? conceptUnits.get(config.concepts.pulseUuid) ?? '' : ''}
               value={latestVitals?.pulse ?? '--'}
             />
             <VitalsHeaderItem
@@ -190,7 +195,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               }
               unitName={t('respiratoryRate', 'R. rate')}
               unitSymbol={
-                (latestVitals?.respiratoryRate && conceptUnits.get(config.concepts.respiratoryRateUuid)) ?? ''
+                latestVitals?.respiratoryRate != null ? conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '' : ''
               }
               value={latestVitals?.respiratoryRate ?? '--'}
             />
@@ -203,7 +208,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 )
               }
               unitName={t('spo2', 'SpO2')}
-              unitSymbol={(latestVitals?.spo2 && conceptUnits.get(config.concepts.oxygenSaturationUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.spo2 != null ? conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '' : ''
+              }
               value={latestVitals?.spo2 ?? '--'}
             />
             <VitalsHeaderItem
@@ -215,29 +222,33 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 )
               }
               unitName={t('temperatureAbbreviated', 'Temp')}
-              unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
+              unitSymbol={
+                latestVitals?.temperature != null ? conceptUnits.get(config.concepts.temperatureUuid) ?? '' : ''
+              }
               value={latestVitals?.temperature ?? '--'}
             />
             <VitalsHeaderItem
               unitName={t('weight', 'Weight')}
-              unitSymbol={(latestVitals?.weight && conceptUnits.get(config.concepts.weightUuid)) ?? ''}
+              unitSymbol={latestVitals?.weight != null ? conceptUnits.get(config.concepts.weightUuid) ?? '' : ''}
               value={latestVitals?.weight ?? '--'}
             />
             <VitalsHeaderItem
               unitName={t('height', 'Height')}
-              unitSymbol={(latestVitals?.height && conceptUnits.get(config.concepts.heightUuid)) ?? ''}
+              unitSymbol={latestVitals?.height != null ? conceptUnits.get(config.concepts.heightUuid) ?? '' : ''}
               value={latestVitals?.height ?? '--'}
             />
-            <VitalsHeaderItem
-              unitName={t('bmi', 'BMI')}
-              unitSymbol={(latestVitals?.bmi && config.biometrics['bmiUnit']) ?? ''}
-              value={latestVitals?.bmi ?? '--'}
-            />
-            {latestVitals?.muac && (
+            {showBmi && (
+              <VitalsHeaderItem
+                unitName={t('bmi', 'BMI')}
+                unitSymbol={latestVitals?.bmi != null ? config.biometrics['bmiUnit'] ?? '' : ''}
+                value={latestVitals?.bmi ?? '--'}
+              />
+            )}
+            {latestVitals?.muac != null && (
               <VitalsHeaderItem
                 unitName={t('muac', 'MUAC')}
                 unitSymbol={
-                  (latestVitals?.muac && conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid)) ?? ''
+                  latestVitals?.muac != null ? conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? '' : ''
                 }
                 value={latestVitals?.muac ?? '--'}
               />
