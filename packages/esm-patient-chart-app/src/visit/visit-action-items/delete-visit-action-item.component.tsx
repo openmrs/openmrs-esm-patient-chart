@@ -20,14 +20,13 @@ interface DeleteVisitActionItemProps {
   compact?: boolean;
 }
 
-const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUuid, visit, compact }) => {
+const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, compact }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const deleteVisit = () => {
     const dispose = showModal('delete-visit-dialog', {
-      patientUuid,
       visit,
       closeModal: () => dispose(),
     });

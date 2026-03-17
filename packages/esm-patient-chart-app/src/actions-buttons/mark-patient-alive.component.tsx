@@ -7,11 +7,13 @@ import styles from './action-button.scss';
 interface MarkPatientAliveOverflowMenuItemProps {
   patientUuid?: string;
   patient?: fhir.Patient;
+  closeMenu?: () => void;
 }
 
 const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({
   patientUuid,
   patient,
+  closeMenu,
 }) => {
   const { t } = useTranslation();
   const isDead = patient.deceasedBoolean ?? Boolean(patient.deceasedDateTime);
@@ -31,6 +33,7 @@ const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuIte
         className={styles.menuitem}
         itemText={t('markPatientAlive', 'Mark patient alive')}
         onClick={handleLaunchModal}
+        closeMenu={closeMenu}
       />
     )
   );

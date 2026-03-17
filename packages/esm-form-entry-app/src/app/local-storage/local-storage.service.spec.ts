@@ -10,7 +10,9 @@ describe('LocalStorageService Tests', () => {
     property2: 'another property',
   };
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [LocalStorageService],
+    });
     service = TestBed.inject(LocalStorageService);
   });
 

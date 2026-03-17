@@ -203,6 +203,33 @@ describe('AddLabOrder', () => {
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
   });
 
+  test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {
+    mockUseOrderType.mockClear();
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderToEditOrdererUuid: '',
+        }}
+        groupProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={jest.fn()}
+        windowName={''}
+        windowProps={{ encounterUuid: '' }}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockUseOrderType).toHaveBeenLastCalledWith('test-lab-order-type-uuid');
+  });
+
   test('should display an error message if test types fail to load', () => {
     mockUseTestTypes.mockReturnValue({
       testTypes: [],

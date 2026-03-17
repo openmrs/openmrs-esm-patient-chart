@@ -1,1 +1,1 @@
-export * from './error-state.component';
+export { ErrorState, type ErrorStateProps } from '@openmrs/esm-framework';

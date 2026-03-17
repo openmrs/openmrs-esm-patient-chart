@@ -33,7 +33,9 @@
       "name": "print-lab-results-action-button",
       "component": "printLabResultsButton",
       "slot": "print-lab-results-action-button-slot",
-      "meta":{ "fullWidth": false }
+      "meta": {
+        "fullWidth": false
+      }
     },
     {
       "name": "patient-orders-summary-dashboard",
