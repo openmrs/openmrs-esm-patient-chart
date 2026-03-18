@@ -1,8 +1,10 @@
 /* eslint-disable testing-library/no-node-access */
 import React from 'react';
+import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
@@ -72,14 +74,11 @@ describe('Biometrics Overview', () => {
 
     await waitForLoadingToFinish();
 
-    await screen.findByRole('heading', { name: /biometrics/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: mockError, headerTitle: 'Biometrics' }),
+      {},
+    );
   });
 
   it("renders a tabular overview of the patient's biometrics data when available", async () => {
@@ -163,5 +162,68 @@ describe('Biometrics Overview', () => {
     expect(screen.getByRole('tab', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bmi/i })).toBeInTheDocument();
+  });
+
+  it('hides BMI column in table view when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+      biometrics: {
+        ...mockBiometricsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    await screen.findByRole('heading', { name: /biometrics/i });
+
+    // BMI column should not be present
+    expect(screen.queryByRole('columnheader', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other columns should still be present
+    expect(screen.getByRole('columnheader', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /muac/i })).toBeInTheDocument();
+  });
+
+  it('shows BMI column for a 20-month-old patient when bmiMinimumAge is 1', async () => {
+    const toddlerPatient = {
+      ...mockPatient,
+      birthDate: dayjs().subtract(20, 'months').format('YYYY-MM-DD'),
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+      biometrics: {
+        ...mockBiometricsConfig.biometrics,
+        bmiMinimumAge: 1,
+      },
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} patient={toddlerPatient} />);
+
+    await waitForLoadingToFinish();
+
+    await screen.findByRole('heading', { name: /biometrics/i });
+
+    // A 20-month-old is 1 year old, so BMI should be shown
+    expect(screen.getByRole('columnheader', { name: /bmi/i })).toBeInTheDocument();
   });
 });

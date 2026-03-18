@@ -15,6 +15,7 @@
   "discontinue": "Descontinuar",
   "discontinued": "Descontinuado",
   "dispensingInformation": "Dispensing instructions",
+  "dosageGreaterThanZeroErrorMessage": "Dose must be greater than 0",
   "dosageInstructions": "Dosage instructions",
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "Dose",
