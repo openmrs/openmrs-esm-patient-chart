@@ -16,30 +16,30 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
+    if (!patientUuid) return;
+
     setIsDeleting(true);
 
-    deletePatientAllergy(patientUuid, allergyId, new AbortController())
-      .then((res) => {
-        if (res.ok) {
-          mutate();
-          closeDeleteModal();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            title: t('allergyDeleted', 'Allergy deleted'),
-          });
-        }
-      })
-      .catch((error) => {
-        console.error('Error deleting allergy: ', error);
-
-        showSnackbar({
-          isLowContrast: false,
-          kind: 'error',
-          title: t('errorDeletingAllergy', 'Error deleting allergy'),
-          subtitle: error?.message,
-        });
+    try {
+      await deletePatientAllergy(patientUuid, allergyId, new AbortController());
+      await mutate();
+      closeDeleteModal();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        title: t('allergyDeleted', 'Allergy deleted'),
       });
+    } catch (error) {
+      console.error('Error deleting allergy: ', error);
+      showSnackbar({
+        isLowContrast: false,
+        kind: 'error',
+        title: t('errorDeletingAllergy', 'Error deleting allergy'),
+        subtitle: error?.message,
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   }, [closeDeleteModal, allergyId, mutate, t, patientUuid]);
 
   return (
