@@ -6,7 +6,6 @@
 // Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
 
 .container {
-  background-color: $openmrs-background-grey;
   padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-05;
   border-bottom: 1px solid $ui-03;
 }
@@ -29,6 +28,7 @@
   outline: none;
   pointer-events: visibleFill;
   border-bottom: 1px solid $ui-03;
+  background-color: $openmrs-background-grey;
 
   .container {
     border-bottom: none;
