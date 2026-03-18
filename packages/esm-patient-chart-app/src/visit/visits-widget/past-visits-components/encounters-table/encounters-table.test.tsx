@@ -3,14 +3,23 @@
    without using parentElement and the expanded row functionality without using nextElementSibling. */
 
 import React from 'react';
-import { getConfig, getDefaultsFromConfigSchema, showModal, useConfig, userHasAccess } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  getDefaultsFromConfigSchema,
+  showModal,
+  useConfig,
+  useFeatureFlag,
+  userHasAccess,
+} from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockEncountersAlice, mockEncounterTypes, mockPatientAlice } from '__mocks__';
+import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import EncountersTable from './encounters-table.component';
 import { type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
 import { type ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
+import { jsonSchemaResourceName } from '../../../../constants';
 
 const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
@@ -27,6 +36,9 @@ const testProps: EncountersTableProps = {
 
 const mockShowModal = jest.mocked(showModal);
 const mockUserHasAccess = jest.mocked(userHasAccess).mockReturnValue(true);
+const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
+const mockExtensionSlot = jest.mocked(ExtensionSlot);
+const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
 const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
   data: mockEncounterTypes,
@@ -46,6 +58,23 @@ jest.mock('./encounters-table.resource', () => ({
   ...jest.requireActual('./encounters-table.resource'),
   useEncounterTypes: () => mockUseEncounterTypes(),
 }));
+
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  usePatientChartStore: jest.fn(),
+}));
+
+beforeEach(() => {
+  mockUseFeatureFlag.mockReturnValue(true);
+  mockUsePatientChartStore.mockReturnValue({
+    patientUuid: mockPatientAlice.uuid,
+    patient: mockFhirPatient,
+    visitContext: null,
+    mutateVisitContext: jest.fn(),
+    setPatient: jest.fn(),
+    setVisitContext: jest.fn(),
+  } as any);
+});
 
 describe('EncountersTable', () => {
   it('renders an empty state when no encounters are available', async () => {
@@ -78,6 +107,101 @@ describe('EncountersTable', () => {
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
+  });
+
+  it('passes visit and patient context to embedded form slot state', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
+    const encounterWithEmbeddedForm = {
+      ...mockEncountersAlice[0],
+      form: {
+        ...mockEncountersAlice[0].form,
+        resources: [
+          {
+            uuid: 'embedded-form-resource',
+            name: jsonSchemaResourceName,
+            dataType: 'AmpathJsonSchema',
+            valueReference: 'embedded-schema-reference',
+          },
+        ],
+      },
+    };
+
+    renderEncountersTable({
+      paginatedEncounters: [encounterWithEmbeddedForm],
+      totalCount: 1,
+    });
+
+    const [expandButton] = screen.getAllByRole('button', { name: /expand current row/i });
+    await user.click(expandButton);
+
+    await waitFor(() => {
+      expect(mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot')).toBeDefined();
+    });
+
+    const formWidgetCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot');
+    expect(formWidgetCall?.[0]?.state).toEqual(
+      expect.objectContaining({
+        visitUuid: encounterWithEmbeddedForm.visit.uuid,
+        visitTypeUuid: encounterWithEmbeddedForm.visit.visitType.uuid,
+        patientUuid: mockPatientAlice.uuid,
+        patient: mockFhirPatient,
+      }),
+    );
+  });
+
+  it('passes null visit context values to embedded form slot state for visitless encounters', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
+    const visitlessEncounterWithEmbeddedForm = {
+      ...mockEncountersAlice[0],
+      visit: null,
+      form: {
+        ...mockEncountersAlice[0].form,
+        resources: [
+          {
+            uuid: 'visitless-embedded-form-resource',
+            name: jsonSchemaResourceName,
+            dataType: 'AmpathJsonSchema',
+            valueReference: 'visitless-embedded-schema-reference',
+          },
+        ],
+      },
+    };
+
+    renderEncountersTable({
+      paginatedEncounters: [visitlessEncounterWithEmbeddedForm],
+      totalCount: 1,
+    });
+
+    const [expandButton] = screen.getAllByRole('button', { name: /expand current row/i });
+    await user.click(expandButton);
+
+    await waitFor(() => {
+      expect(mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot')).toBeDefined();
+    });
+
+    const formWidgetCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot');
+    expect(formWidgetCall?.[0]?.state).toEqual(
+      expect.objectContaining({
+        visitUuid: null,
+        visitTypeUuid: null,
+        visitStartDatetime: null,
+        visitStopDatetime: null,
+        patientUuid: mockPatientAlice.uuid,
+        patient: mockFhirPatient,
+      }),
+    );
   });
 });
 

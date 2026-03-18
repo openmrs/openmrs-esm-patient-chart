@@ -1,5 +1,9 @@
-import React from 'react';
-import { type Order, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback } from 'react';
+import {
+  type Order,
+  type OrderBasketItem,
+  type PatientWorkspace2DefinitionProps,
+} from '@openmrs/esm-patient-common-lib';
 import ExportedLabResultsForm from './exported-lab-results-form.workspace';
 
 export interface LabResultsFormProps {
@@ -17,10 +21,25 @@ export interface LabResultsFormProps {
  */
 const LabResultsForm: React.FC<PatientWorkspace2DefinitionProps<LabResultsFormProps, {}>> = ({
   workspaceProps: { order, invalidateLabOrders },
-  groupProps: { patient },
+  launchChildWorkspace,
+  groupProps,
   ...rest
 }) => {
-  return <ExportedLabResultsForm workspaceProps={{ patient, order, invalidateLabOrders }} groupProps={{}} {...rest} />;
+  const launchLabOrderForm = useCallback(
+    (orderTypeUuid: string, basketOrder?: OrderBasketItem) => {
+      launchChildWorkspace('add-lab-order', { orderTypeUuid, order: basketOrder });
+    },
+    [launchChildWorkspace],
+  );
+
+  return (
+    <ExportedLabResultsForm
+      launchChildWorkspace={launchChildWorkspace}
+      workspaceProps={{ patient: groupProps.patient, order, invalidateLabOrders, launchLabOrderForm }}
+      groupProps={groupProps}
+      {...rest}
+    />
+  );
 };
 
 export default LabResultsForm;

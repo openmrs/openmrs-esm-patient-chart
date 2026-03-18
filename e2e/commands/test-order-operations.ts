@@ -42,5 +42,5 @@ export const generateRandomTestOrder = async (
 };
 
 export const deleteTestOrder = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`order/${uuid}`, { data: {} });
+  await api.delete(`order/${uuid}`);
 };

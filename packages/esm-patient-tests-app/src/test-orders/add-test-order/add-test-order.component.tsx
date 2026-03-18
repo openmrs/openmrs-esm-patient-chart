@@ -28,7 +28,7 @@ export interface AddLabOrderProps {
    * This field should only be supplied for an existing order saved to the backend
    */
   orderToEditOrdererUuid?: string;
-  orderTypeUuid: string;
+  orderTypeUuid?: string;
   patient: fhir.Patient;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
@@ -46,7 +46,8 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
-  const { orderType } = useOrderType(orderTypeUuid);
+  const resolvedOrderTypeUuid = orderTypeUuid ?? orders.labOrderTypeUuid;
+  const { orderType } = useOrderType(resolvedOrderTypeUuid);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const title = useMemo(() => {
@@ -74,8 +75,10 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
       },
       ...additionalTestOrderTypes,
     ];
-    return allOrderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets;
-  }, [additionalTestOrderTypes, orderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
+    return (
+      allOrderTypes.find((orderType) => orderType.orderTypeUuid === resolvedOrderTypeUuid)?.orderableConceptSets ?? []
+    );
+  }, [additionalTestOrderTypes, resolvedOrderTypeUuid, orders.labOrderTypeUuid, orders.labOrderableConcepts, t]);
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -110,13 +113,13 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
             orderToEditOrdererUuid={orderToEditOrdererUuid}
             closeWorkspace={closeWorkspace}
             setHasUnsavedChanges={setHasUnsavedChanges}
-            orderTypeUuid={orderTypeUuid}
+            orderTypeUuid={resolvedOrderTypeUuid}
             orderableConceptSets={orderableConceptSets}
             patient={patient}
           />
         ) : (
           <TestTypeSearch
-            orderTypeUuid={orderTypeUuid}
+            orderTypeUuid={resolvedOrderTypeUuid}
             orderableConceptSets={orderableConceptSets}
             openLabForm={setCurrentLabOrder}
             closeWorkspace={closeWorkspace}

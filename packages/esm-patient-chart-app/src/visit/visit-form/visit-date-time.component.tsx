@@ -22,6 +22,7 @@ const maxOf = (...values: Array<number | undefined | null>) => {
 
 interface VisitDateTimeSectionProps {
   control: Control<VisitFormData, any>;
+  earliestStartDate?: number;
   firstEncounterDateTime: number;
   lastEncounterDateTime: number;
 }
@@ -32,6 +33,7 @@ interface VisitDateTimeSectionProps {
  */
 const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
   control,
+  earliestStartDate,
   firstEncounterDateTime,
   lastEncounterDateTime,
 }) => {
@@ -76,6 +78,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
         dateField={{ name: 'visitStartDate', label: t('startDate', 'Start date') }}
         timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
         timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
+        minDate={earliestStartDate}
         maxDate={minOf(Date.now(), firstEncounterDateTime, selectedVisitStopDateTime?.getTime())}
       />
       {hasStopTime && (
