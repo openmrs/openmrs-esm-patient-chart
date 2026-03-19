@@ -185,6 +185,59 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
+  test('discarding a new order returns to test type search', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('preserves search term when navigating back from order form', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toHaveValue('cd4');
+  });
+
+  test('save order button is disabled while submitting', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    const saveButton = screen.getByRole('button', { name: /save order/i });
+    expect(saveButton).toBeEnabled();
+  });
+
   test('back to order basket', async () => {
     const user = userEvent.setup();
     renderAddLabOrderWorkspace();
