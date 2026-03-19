@@ -16,13 +16,17 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
-    if (!patientUuid) return;
+    if (!patientUuid) {
+      console.error('DeleteAllergyModal opened without patientUuid');
+      return;
+    }
 
     setIsDeleting(true);
 
     try {
       await deletePatientAllergy(patientUuid, allergyId, new AbortController());
-      await mutate();
+      closeDeleteModal();
+      void mutate();
       closeDeleteModal();
       showSnackbar({
         isLowContrast: true,
