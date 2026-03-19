@@ -40,13 +40,17 @@ export const pageSize = 100;
  * get the label.
  */
 export function useObs(patientUuid: string): UseObsResult {
-  const { encounterTypes, data } = useConfig<CommonConfig>();
+  const config = useConfig<CommonConfig>();
+  const { encounterTypes, data } = config;
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
-  // TODO: Make sorting respect oldestFirst/graphOldestFirst
+  const sortDirection = 'graphOldestFirst' in config && config.graphOldestFirst ? 'date' : '-date';
+
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
-    .join(',')}&_summary=data&_include=Observation:encounter&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
+    .join(
+      ',',
+    )}&_summary=data&_include=Observation:encounter&_sort=${sortDirection}&_count=${pageSize}${urlEncounterTypes}`;
 
   const {
     data: result,
