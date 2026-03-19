@@ -79,13 +79,9 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           value: obs.valueQuantity.value,
         }));
 
-      if (config.graphOldestFirst) {
-        chartRecords.reverse();
-      }
-
       return chartRecords;
     },
-    [obsByConceptUuid, configByConceptUuid, config.graphOldestFirst, t],
+    [obsByConceptUuid, configByConceptUuid, t],
   );
 
   const chartColors = useMemo(
