@@ -13,11 +13,13 @@ const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patient }) 
 
   return (
     <div className={styles.container}>
-      <p className={styles.name}>{patient ? getPatientName(patient) : ''}</p>
+      <p className={styles.name}>Patient:{patient ? getPatientName(patient) : ''}</p>
       <div className={styles.details}>
         <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
         <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
       </div>
+
+      <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>Patient basic information</p>
     </div>
   );
 };
