@@ -49,6 +49,13 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
+jest.mock('./general-order-table.component', () => ({
+  __esModule: true,
+  default: function MockGeneralOrderTable() {
+    return 'General order details';
+  },
+}));
+
 jest.mock('./medication-record.component', () => ({
   __esModule: true,
   default: function MockMedicationRecord() {
@@ -56,17 +63,76 @@ jest.mock('./medication-record.component', () => ({
   },
 }));
 
+const testOrderTypeUuid = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
+const drugOrderTypeUuid = '131168f4-15f5-102d-96e4-000c29c2a5d7';
+const generalOrderTypeUuid = '67a92e56-0f88-11ea-8d71-362b9e155667';
+
+const drugOrderType = {
+  uuid: drugOrderTypeUuid,
+  display: 'Drug Order',
+  name: 'Drug Order',
+  retired: false,
+  description: 'Drug Order',
+};
+
+const testOrderType = {
+  uuid: testOrderTypeUuid,
+  display: 'Test Order',
+  name: 'Test Order',
+  retired: false,
+  description: 'Test Order',
+};
+
+const generalOrderType = {
+  uuid: generalOrderTypeUuid,
+  display: 'General Order',
+  name: 'General Order',
+  retired: false,
+  description: 'General Order',
+};
+
+const mockGeneralOrder = {
+  ...mockOrders[1],
+  uuid: 'general-order-uuid',
+  orderNumber: 'ORD-GEN-1',
+  type: 'order',
+  display: 'Chest X-Ray',
+  instructions: 'PA and lateral views',
+  orderType: {
+    uuid: generalOrderTypeUuid,
+    display: 'General Order',
+    name: 'General Order',
+    javaClassName: 'org.openmrs.Order',
+    retired: false,
+    description: 'General order type',
+    conceptClasses: [],
+    parent: null,
+    links: [],
+    resourceVersion: '1.10',
+  },
+};
 
 describe('OrderDetailsTable', () => {
   const user = userEvent.setup();
-  const testOrderTypeUuid = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
-  const drugOrderTypeUuid = '131168f4-15f5-102d-96e4-000c29c2a5d7';
 
   beforeEach(() => {
     mockUseOrderBasket.mockReturnValue({
       orders: [],
       setOrders: jest.fn(),
       clearOrders: jest.fn(),
+    });
+    mockUseOrderTypes.mockReturnValue({
+      data: [drugOrderType, testOrderType],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUsePatientOrders.mockReturnValue({
+      data: mockOrders as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
     });
   });
 
@@ -123,35 +189,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('renders a tabular overview of order data when data is available', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: 'Drug Order',
-          display: 'Routine',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-        {
-          uuid: 'Lab Order',
-          display: 'Urgent',
-          name: 'Lab Order',
-          retired: false,
-          description: 'Lab Order',
-        },
-      ],
-      error: null,
-      isLoading: false,
-      isValidating: false,
-    });
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
     renderOrderDetailsTable();
 
     const columns = {
@@ -185,35 +222,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('filters the orders list when the user types into the searchbox', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
     renderOrderDetailsTable();
 
     await screen.findByRole('table');
@@ -240,36 +248,7 @@ describe('OrderDetailsTable', () => {
 
   it('prints the orders in the list when the print button is clicked', async () => {
     const mockHandlePrint = jest.fn();
-
     mockUseReactToPrint.mockReturnValue(mockHandlePrint);
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      error: null,
-      isLoading: false,
-      isValidating: false,
-    });
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       showPrintButton: true,
@@ -286,29 +265,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('renders a date range picker with a default value of today', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
     renderOrderDetailsTable();
 
     await screen.findByRole('table');
@@ -323,21 +279,6 @@ describe('OrderDetailsTable', () => {
       { ...mockOrders[0], uuid: 'stat-order', orderNumber: 'ORD-S', urgency: 'STAT' },
       { ...mockOrders[0], uuid: 'scheduled-order', orderNumber: 'ORD-D', urgency: 'ON_SCHEDULED_DATE' },
     ];
-
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
 
     mockUsePatientOrders.mockReturnValue({
       data: ordersWithPriorities as unknown as Array<Order>,
@@ -364,21 +305,6 @@ describe('OrderDetailsTable', () => {
       { ...mockOrders[1], uuid: 'no-status-order', orderNumber: 'ORD-NUL', fulfillerStatus: null },
     ];
 
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
     mockUsePatientOrders.mockReturnValue({
       data: ordersWithStatuses as unknown as Array<Order>,
       error: undefined,
@@ -398,21 +324,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('shows medication details when expanding a drug order row', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
     mockUsePatientOrders.mockReturnValue({
       data: [mockOrders[0]] as unknown as Array<Order>,
       error: undefined,
@@ -431,22 +342,32 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByText('Medication details')).toBeInTheDocument();
   });
 
-  it('does not show an expand button for test orders since only drug orders are expandable', async () => {
+  it('shows general order details when expanding a general order row', async () => {
     mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      isLoading: false,
+      data: [generalOrderType],
       error: null,
+      isLoading: false,
       isValidating: false,
     });
+    mockUsePatientOrders.mockReturnValue({
+      data: [mockGeneralOrder] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
 
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+
+    const expandButton = screen.getByRole('button', { name: /expand current row/i });
+    await user.click(expandButton);
+
+    expect(screen.getByText('General order details')).toBeInTheDocument();
+  });
+
+  it('does not show an expand button for test orders', async () => {
     mockUsePatientOrders.mockReturnValue({
       data: [mockOrders[1]] as unknown as Array<Order>,
       error: undefined,
@@ -459,7 +380,6 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    // Test orders should not have an expand button since only drug orders are expandable
     expect(screen.queryByRole('button', { name: /expand current row/i })).not.toBeInTheDocument();
   });
 
@@ -469,21 +389,6 @@ describe('OrderDetailsTable', () => {
       uuid: `order-${index}`,
       orderNumber: `ORD-${index + 1}`,
     }));
-
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
 
     mockUsePatientOrders.mockReturnValue({
       data: manyOrders as unknown as Array<Order>,
@@ -507,28 +412,6 @@ describe('OrderDetailsTable', () => {
   it('handles order type filtering correctly with different order types', async () => {
     const allOrders = mockOrders;
     const testOrders = mockOrders.filter((order) => order.orderType.uuid === testOrderTypeUuid);
-
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-        {
-          uuid: testOrderTypeUuid,
-          display: 'Test Order',
-          name: 'Test Order',
-          retired: false,
-          description: 'Test Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
 
     mockUsePatientOrders.mockImplementation((_patientUuid, _status, orderType) => {
       const filteredOrders =
@@ -576,29 +459,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('shows add button when showAddButton prop is true', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
     renderOrderDetailsTable();
 
     await screen.findByRole('table');
@@ -608,29 +468,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('does not show add button when showAddButton prop is false', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
-    mockUsePatientOrders.mockReturnValue({
-      data: mockOrders as unknown as Array<Order>,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-
     render(
       <OrderDetailsTable
         patientUuid={mockPatient.id}
@@ -670,15 +507,7 @@ describe('OrderDetailsTable', () => {
 
   it('displays validation state when orders are being refreshed', async () => {
     mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
+      data: [drugOrderType],
       isLoading: false,
       error: null,
       isValidating: true,
@@ -708,21 +537,6 @@ describe('OrderDetailsTable', () => {
       fulfillerStatus: 'DECLINED',
     };
 
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
     mockUsePatientOrders.mockReturnValue({
       data: [declinedOrder] as unknown as Array<Order>,
       error: undefined,
@@ -740,21 +554,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('renders an empty state when there are order types but no orders', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
     mockUsePatientOrders.mockReturnValue({
       data: [],
       error: undefined,
@@ -772,21 +571,6 @@ describe('OrderDetailsTable', () => {
   });
 
   it('shows an overflow menu for active orders', async () => {
-    mockUseOrderTypes.mockReturnValue({
-      data: [
-        {
-          uuid: drugOrderTypeUuid,
-          display: 'Drug Order',
-          name: 'Drug Order',
-          retired: false,
-          description: 'Drug Order',
-        },
-      ],
-      isLoading: false,
-      error: null,
-      isValidating: false,
-    });
-
     mockUsePatientOrders.mockReturnValue({
       data: [mockOrders[0]] as unknown as Array<Order>,
       error: undefined,

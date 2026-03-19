@@ -65,6 +65,7 @@ import {
 } from '@openmrs/esm-framework';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
 import { ORDER_TYPES, getOrderGrouping, isValidOmrsOrderType } from '../constants/order-types';
+import GeneralOrderTable from './general-order-table.component';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import styles from './order-details-table.scss';
@@ -508,7 +509,9 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                           <TableBody>
                             {rows.map((row) => {
                               const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
-                              const isExpandable = matchingOrder?.type === ORDER_TYPES.DRUG_ORDER;
+                              const isExpandable =
+                                matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ||
+                                matchingOrder?.type === ORDER_TYPES.GENERAL_ORDER;
 
                               const cells = row.cells.map((cell) => (
                                 <TableCell className={styles.tableCell} key={cell.id}>
@@ -555,7 +558,11 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                           row,
                                         })}
                                       >
-                                        <MedicationRecord medication={matchingOrder} />
+                                        {matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ? (
+                                          <MedicationRecord medication={matchingOrder} />
+                                        ) : (
+                                          <GeneralOrderTable order={matchingOrder} />
+                                        )}
                                       </TableExpandedRow>
                                     ) : (
                                       <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
