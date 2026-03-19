@@ -80,7 +80,6 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     () =>
       patientBiometrics
         .filter((biometrics) => biometrics[selectedBiometrics.value])
-        .slice(0, 10)
         .sort((biometricA, biometricB) => new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime())
         .map(
           (biometrics) =>

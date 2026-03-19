@@ -74,7 +74,6 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   const chartData = useMemo(() => {
     return patientVitals
       .filter((vitals) => vitals[selectedVitalsSign.value])
-      .slice(0, 10)
       .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
         if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
