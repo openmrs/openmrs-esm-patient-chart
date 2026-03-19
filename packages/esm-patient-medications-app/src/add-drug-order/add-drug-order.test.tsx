@@ -181,6 +181,41 @@ describe('AddDrugOrderWorkspace drug search', () => {
       ]),
     );
   });
+
+  test('discarding a new order returns to drug search', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    await user.click(within(aspirin81Div).getByText(/Order form/i));
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByText(/Discard/i));
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('preserves search term when navigating back from order form', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    await user.click(within(aspirin81Div).getByText(/Order form/i));
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+
+    await user.click(screen.getByText(/Discard/i));
+
+    expect(screen.getByRole('searchbox')).toHaveValue('Aspirin');
+  });
+
   test('shows a validation error when dose is 0', async () => {
     const user = userEvent.setup();
 
