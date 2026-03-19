@@ -45,7 +45,7 @@ import {
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useActivePatientOrders } from '../api';
+import { useActivePatientOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import { durationToDays, type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
@@ -123,6 +123,7 @@ export function DrugOrderForm({
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
+  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
   const {
@@ -164,7 +165,6 @@ export function DrugOrderForm({
   const watchedUnit = watch('unit');
   const watchedUnitValue = watchedUnit?.value;
   const watchedDosage = watch('dosage');
-  const startDate = watch('startDate');
   const watchedFrequency = watch('frequency');
   const watchedDuration = watch('duration');
   const watchedDurationUnit = watch('durationUnit');
@@ -173,107 +173,81 @@ export function DrugOrderForm({
   const watchedQuantityUnits = watch('quantityUnits');
   const watchedPillsDispensed = watch('pillsDispensed');
 
-  const autoCalcDriverKey = useMemo(
-    () =>
-      [
-        watchedIsFreeText ? '1' : '0',
-        watchedDosage ?? '',
-        watchedFrequency?.valueCoded ?? '',
-        watchedFrequency?.frequencyPerDay ?? '',
-        watchedDuration ?? '',
-        watchedDurationUnit?.valueCoded ?? '',
-        watchedUnit?.valueCoded ?? '',
-      ].join('|'),
-    [
-      watchedIsFreeText,
-      watchedDosage,
-      watchedFrequency?.valueCoded,
-      watchedFrequency?.frequencyPerDay,
-      watchedDuration,
-      watchedDurationUnit?.valueCoded,
-      watchedUnit?.valueCoded,
-    ],
+  const isExistingOrder = initialOrderBasketItem?.action === 'REVISE' || initialOrderBasketItem?.action === 'RENEW';
+  const [isManualOverride, setIsManualOverride] = useState(
+    initialOrderBasketItem?.isQuantityManual ?? (isExistingOrder && initialOrderBasketItem?.pillsDispensed != null),
   );
-  const [manualDriverKey, setManualDriverKey] = useState<string | null>(
-    initialOrderBasketItem?.pillsDispensed != null ? autoCalcDriverKey : null,
-  );
-  const isManualMode = manualDriverKey === autoCalcDriverKey;
 
-  useEffect(() => {
-    if (isManualMode) {
-      return;
+  const calculatedQuantity = useMemo(() => {
+    if (watchedIsFreeText || watchedAsNeeded) {
+      return null;
     }
-
-    // For existing orders (REVISE/RENEW), frequencyPerDay is unavailable from the Order resource.
-    // Preserve the saved quantity — we can't recalculate, but the existing value may still be valid.
-    const isExistingOrder = initialOrderBasketItem?.action === 'REVISE' || initialOrderBasketItem?.action === 'RENEW';
-    if (watchedFrequency?.frequencyPerDay == null && isExistingOrder) {
-      return;
+    if (
+      watchedDosage == null ||
+      watchedDosage <= 0 ||
+      watchedFrequency?.frequencyPerDay == null ||
+      watchedFrequency.frequencyPerDay <= 0 ||
+      watchedDuration == null ||
+      watchedDuration <= 0
+    ) {
+      return null;
     }
-
-    // PRN (as-needed) orders have unpredictable frequency; auto-calc would be misleading
-    if (watchedAsNeeded) {
-      if (getValues('pillsDispensed') != null) {
-        setValue('pillsDispensed', null);
-      }
-      return;
+    if (watchedQuantityUnits && watchedQuantityUnits.valueCoded !== watchedUnit?.valueCoded) {
+      return null;
     }
-
-    const canCalc =
-      !watchedIsFreeText &&
-      watchedDosage != null &&
-      watchedDosage > 0 &&
-      watchedFrequency?.frequencyPerDay != null &&
-      watchedFrequency.frequencyPerDay > 0 &&
-      watchedDuration != null &&
-      watchedDuration > 0 &&
-      (!watchedQuantityUnits || watchedQuantityUnits.valueCoded === watchedUnit?.valueCoded);
-
-    if (!canCalc) {
-      if (getValues('pillsDispensed') != null) {
-        setValue('pillsDispensed', null);
-      }
-      return;
-    }
-
     const durationDays = durationToDays(watchedDuration, watchedDurationUnit?.valueCoded, durationUnitsDaysMap);
     if (durationDays == null) {
-      if (getValues('pillsDispensed') != null) {
-        setValue('pillsDispensed', null);
-      }
+      return null;
+    }
+    const result = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
+    return result > 0 && isFinite(result) ? result : null;
+  }, [
+    watchedIsFreeText,
+    watchedAsNeeded,
+    watchedDosage,
+    watchedFrequency?.frequencyPerDay,
+    watchedDuration,
+    watchedDurationUnit?.valueCoded,
+    watchedUnit?.valueCoded,
+    watchedQuantityUnits,
+    durationUnitsDaysMap,
+  ]);
+
+  useEffect(() => {
+    if (!requireOutpatientQuantity || isManualOverride) {
       return;
     }
 
-    const calculated = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
-
-    if (calculated > 0 && isFinite(calculated)) {
-      setValue('pillsDispensed', calculated, { shouldValidate: true });
+    if (calculatedQuantity != null) {
+      setValue('pillsDispensed', calculatedQuantity, { shouldValidate: true });
       if (!watchedQuantityUnits && watchedUnit) {
         setValue('quantityUnits', watchedUnit, { shouldValidate: true });
       }
+    } else if (getValues('pillsDispensed') != null) {
+      setValue('pillsDispensed', null);
     }
   }, [
-    watchedDosage,
-    isManualMode,
-    watchedAsNeeded,
-    watchedFrequency,
-    watchedDuration,
-    watchedDurationUnit,
-    watchedIsFreeText,
+    requireOutpatientQuantity,
+    isManualOverride,
+    calculatedQuantity,
+    watchedFrequency?.frequencyPerDay,
     watchedUnit,
     watchedQuantityUnits,
-    initialOrderBasketItem?.action,
-    durationUnitsDaysMap,
     getValues,
     setValue,
   ]);
 
-  const handleQuantityAfterChange = useCallback(
-    (_newValue: number | null, _prevValue: number | null) => {
-      setManualDriverKey(autoCalcDriverKey);
-    },
-    [autoCalcDriverKey],
-  );
+  const handleQuantityAfterChange = useCallback(() => {
+    setIsManualOverride(true);
+  }, []);
+
+  const handleRecalculate = useCallback(() => {
+    setValue('pillsDispensed', calculatedQuantity, { shouldValidate: true });
+    if (!watchedQuantityUnits && watchedUnit) {
+      setValue('quantityUnits', watchedUnit, { shouldValidate: true });
+    }
+    setIsManualOverride(false);
+  }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -290,6 +264,7 @@ export function DrugOrderForm({
       duration: data.duration,
       durationUnit: data.durationUnit,
       pillsDispensed: data.pillsDispensed,
+      isQuantityManual: isManualOverride,
       quantityUnits: data.quantityUnits,
       numRefills: data.numRefills,
       indication: data.indication,
@@ -682,12 +657,14 @@ export function DrugOrderForm({
                       getValues={getValues}
                       handleAfterChange={handleQuantityAfterChange}
                     />
-                    {!isManualMode &&
-                      (watchedFrequency?.frequencyPerDay == null
-                        ? watchedFrequency != null && (
-                            <span className={styles.autoCalcHelper}>
-                              {t('reselectFrequencyHint', 'Re-select frequency to enable auto-calculation')}
-                            </span>
+                    {requireOutpatientQuantity &&
+                      (isManualOverride
+                        ? calculatedQuantity != null && (
+                            <button type="button" className={styles.recalculateLink} onClick={handleRecalculate}>
+                              {t('applyCalculatedQuantity', 'Apply calculated quantity ({{quantity}})', {
+                                quantity: calculatedQuantity,
+                              })}
+                            </button>
                           )
                         : watchedPillsDispensed != null && (
                             <span className={styles.autoCalcHelper}>

@@ -6,6 +6,7 @@ import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
+import { useRequireOutpatientQuantity } from '../api/api';
 import { getTemplateOrderBasketItem } from './drug-search/drug-search.resource';
 import DrugOrderForm from './drug-order-form.component';
 
@@ -43,7 +44,7 @@ jest.mock('../api/api', () => ({
   useActivePatientOrders: jest.fn().mockReturnValue({ isLoading: false, data: [] }),
   useRequireOutpatientQuantity: jest
     .fn()
-    .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
+    .mockReturnValue({ requireOutpatientQuantity: true, error: null, isLoading: false }),
 }));
 
 function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
@@ -243,7 +244,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     });
   });
 
-  it('stops auto-calculating after manual edit of quantity', async () => {
+  it('stops auto-calculating after manual edit and shows recalculate link', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
 
@@ -277,9 +278,10 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       expect(quantityInput).toHaveValue(20);
     });
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/apply calculated quantity \(14\)/i)).toBeInTheDocument();
   });
 
-  it('resumes auto-calculation when an upstream input changes after manual edit', async () => {
+  it('keeps manual override when upstream inputs change', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
 
@@ -313,7 +315,128 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       expect(quantityInput).toHaveValue(20);
     });
 
-    // Change duration (driver key changes) — auto-calc should resume
+    // Change duration — manual value should be preserved, recalculate link should update
+    await user.clear(durationInput);
+    await user.type(durationInput, '14');
+
+    // Quantity stays at 20 (manual override is sticky)
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(20);
+    });
+    // Recalculate link shows the would-be value: 1 × 2.0 × 14 = 28
+    expect(screen.getByText(/apply calculated quantity \(28\)/i)).toBeInTheDocument();
+  });
+
+  it('resumes auto-calculation when recalculate link is clicked', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    // Fill all inputs
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '1');
+
+    const frequencyCombobox = screen.getByRole('combobox', { name: /frequency/i });
+    await user.click(frequencyCombobox);
+    await user.click(screen.getByText('Twice daily'));
+
+    const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
+    await user.clear(durationInput);
+    await user.type(durationInput, '7');
+
+    const durationUnitCombobox = screen.getByRole('combobox', { name: /duration unit/i });
+    await user.click(durationUnitCombobox);
+    await user.click(screen.getByText('Days'));
+
+    const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(14);
+    });
+
+    // Manual edit
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '20');
+
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(20);
+    });
+
+    // Click recalculate
+    await user.click(screen.getByText(/apply calculated quantity \(14\)/i));
+
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(14);
+    });
+    expect(screen.getByText(/auto-calculated/i)).toBeInTheDocument();
+    expect(screen.queryByText(/apply calculated quantity/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps manual override when quantity field is cleared', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    // Fill all inputs
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '1');
+
+    const frequencyCombobox = screen.getByRole('combobox', { name: /frequency/i });
+    await user.click(frequencyCombobox);
+    await user.click(screen.getByText('Twice daily'));
+
+    const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
+    await user.clear(durationInput);
+    await user.type(durationInput, '7');
+
+    const durationUnitCombobox = screen.getByRole('combobox', { name: /duration unit/i });
+    await user.click(durationUnitCombobox);
+    await user.click(screen.getByText('Days'));
+
+    const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(14);
+    });
+
+    // Manual edit
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '20');
+
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(20);
+    });
+
+    // Clear the quantity field — should stay empty (manual override is sticky)
+    await user.clear(quantityInput);
+
+    await waitFor(() => {
+      expect(quantityInput).toHaveValue(null);
+    });
+    expect(screen.getByText(/apply calculated quantity \(14\)/i)).toBeInTheDocument();
+  });
+
+  it('stays in auto mode when reopening a NEW basket item with auto-calculated quantity', async () => {
+    const user = userEvent.setup();
+    // Simulate reopening a saved NEW order that had auto-calculated quantity
+    const item = createNewOrderBasketItem({
+      pillsDispensed: 14,
+      isQuantityManual: false,
+      dosage: 1,
+      frequency: {
+        valueCoded: 'twice-daily-uuid',
+        value: 'Twice daily',
+        frequencyPerDay: 2.0,
+      },
+      duration: 7,
+      durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+    });
+    renderDrugOrderForm(item);
+
+    const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
+    expect(quantityInput).toHaveValue(14);
+    expect(screen.getByText(/auto-calculated/i)).toBeInTheDocument();
+
+    // Changing duration should auto-update quantity (not show recalculate link)
+    const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
     await user.clear(durationInput);
     await user.type(durationInput, '14');
 
@@ -322,6 +445,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       expect(quantityInput).toHaveValue(28);
     });
     expect(screen.getByText(/auto-calculated/i)).toBeInTheDocument();
+    expect(screen.queryByText(/apply calculated quantity/i)).not.toBeInTheDocument();
   });
 
   it('preserves quantity for REVISE orders when frequencyPerDay is null', async () => {
@@ -350,7 +474,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
   });
 
-  it('auto-calculates for REVISE orders after re-selecting frequency with frequencyPerDay', async () => {
+  it('shows recalculate link for REVISE orders after re-selecting frequency with frequencyPerDay', async () => {
     const user = userEvent.setup();
     const item = createNewOrderBasketItem({
       action: 'REVISE',
@@ -378,11 +502,60 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     await user.clear(frequencyCombobox);
     await user.click(screen.getByText('Twice daily'));
 
-    // 1 × 2.0 × 7 = 14
+    // Quantity is preserved — manual override is sticky for REVISE orders.
+    // Recalculate link shows the would-be value: 1 × 2.0 × 7 = 14
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(30);
+    });
+    expect(screen.getByText(/apply calculated quantity \(14\)/i)).toBeInTheDocument();
+
+    // Clicking recalculate applies the calculated value
+    await user.click(screen.getByText(/apply calculated quantity \(14\)/i));
+
     await waitFor(() => {
       expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(14);
     });
     expect(screen.getByText(/auto-calculated/i)).toBeInTheDocument();
+  });
+
+  it('does not auto-calculate when requireOutpatientQuantity is false', async () => {
+    const user = userEvent.setup();
+    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+      requireOutpatientQuantity: false,
+      error: null,
+      isLoading: false,
+    });
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '1');
+
+    const frequencyCombobox = screen.getByRole('combobox', { name: /frequency/i });
+    await user.click(frequencyCombobox);
+    await user.click(screen.getByText('Twice daily'));
+
+    const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
+    await user.clear(durationInput);
+    await user.type(durationInput, '7');
+
+    const durationUnitCombobox = screen.getByRole('combobox', { name: /duration unit/i });
+    await user.click(durationUnitCombobox);
+    await user.click(screen.getByText('Days'));
+
+    const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
+    // Quantity should remain empty — auto-calc is disabled
+    await waitFor(() => {
+      expect(quantityInput).not.toHaveValue();
+    });
+    expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
+
+    // Restore default mock
+    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
   });
 
   it('auto-sets quantity unit to match dose unit when quantity unit is empty', async () => {

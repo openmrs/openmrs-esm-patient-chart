@@ -242,6 +242,7 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
+  isQuantityManual?: boolean;
   numRefills: number | null;
   indication: string | null;
   isFreeTextDosage: boolean;

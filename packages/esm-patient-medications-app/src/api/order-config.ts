@@ -41,7 +41,7 @@ export function useOrderConfig(): {
     orderFrequencies: Array<MedicationFrequency>;
   };
 } {
-  const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
+  const { data, error, isLoading } = useSWRImmutable<{ data: OrderConfig }, Error>(
     `${restBaseUrl}/orderentryconfig`,
     openmrsFetch,
   );
