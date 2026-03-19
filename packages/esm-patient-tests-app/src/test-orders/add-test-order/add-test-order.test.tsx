@@ -223,6 +223,44 @@ describe('AddLabOrder', () => {
     expect(screen.getByRole('searchbox')).toHaveValue('cd4');
   });
 
+  test('discarding an edited order closes the workspace', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+          order: {
+            ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid, null),
+            action: 'REVISE',
+          },
+        }}
+        groupProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={jest.fn()}
+        windowName={''}
+        windowProps={{ encounterUuid: '' }}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    // Should render the order form directly (no search view)
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+  });
+
   test('save order button is disabled while submitting', async () => {
     const user = userEvent.setup();
 
