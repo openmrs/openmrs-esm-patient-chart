@@ -4,10 +4,10 @@ import { Button } from '@carbon/react';
 import {
   ArrowLeftIcon,
   showSnackbar,
-  useLayoutType,
   type Visit,
-  Workspace2,
   type Workspace2DefinitionProps,
+  useLayoutType,
+  Workspace2,
 } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
@@ -64,6 +64,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     prepMedicationOrderPostData,
   );
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  const [searchTerm, setSearchTerm] = useState('');
+  const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   const openOrderForm = useCallback(
@@ -137,7 +139,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   );
 
   const workspaceTitle =
-    initialOrder?.action == 'REVISE'
+    initialOrder?.action === 'REVISE'
       ? t('editDrugOrderWorkspaceTitle', 'Edit drug order')
       : t('addDrugOrderWorkspaceTitle', 'Add drug order');
 
@@ -162,6 +164,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
           visit={visitContext}
           closeWorkspace={closeWorkspace}
           openOrderForm={openOrderForm}
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
         />
       </Workspace2>
     );
@@ -169,8 +173,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     return (
       <DrugOrderForm
         initialOrderBasketItem={currentOrder}
-        onSave={currentOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
-        onCancel={closeWorkspace}
+        onSave={currentOrder?.action === 'REVISE' ? submitDrugOrderToServer : saveDrugOrderToBasket}
+        onCancel={isEditingExistingOrder ? closeWorkspace : () => setCurrentOrder(undefined)}
         patient={patient}
         visitContext={visitContext}
         saveButtonText={t('saveOrder', 'Save order')}
