@@ -25,7 +25,6 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
 
     try {
       await deletePatientAllergy(patientUuid, allergyId, new AbortController());
-      closeDeleteModal();
       void mutate();
       closeDeleteModal();
       showSnackbar({
