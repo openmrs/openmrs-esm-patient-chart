@@ -64,14 +64,13 @@
 }
 
 .stickyMedicationInfo {
-  position: fixed;
+  position: sticky;
   background-color: colors.$cyan-60;
   color: colors.$white-0;
-  top: layout.$spacing-12;
+  top: 0;
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
 
   .medicationInfo {
     margin: 0;
