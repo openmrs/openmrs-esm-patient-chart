@@ -9,7 +9,13 @@ import {
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';
-import { type Order, useOrderTypes, usePatientOrders, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  type Order,
+  ErrorState,
+  useOrderTypes,
+  usePatientOrders,
+  useOrderBasket,
+} from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -113,7 +119,7 @@ describe('OrderDetailsTable', () => {
     renderOrderDetailsTable();
 
     await screen.findByRole('combobox', { name: /select order type/i });
-    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Patient Orders' }), {});
   });
 
   it('renders a tabular overview of order data when data is available', async () => {

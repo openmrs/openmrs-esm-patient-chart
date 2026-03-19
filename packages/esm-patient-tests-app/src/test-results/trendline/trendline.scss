@@ -146,6 +146,5 @@
 }
 
 .background :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options .cds--overflow-menu-options__btn) {
-  inline-size: auto;
-  max-inline-size: none;
+  max-inline-size: none !important;
 }

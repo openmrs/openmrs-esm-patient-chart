@@ -26,16 +26,12 @@ test('Edit an existing ongoing visit', async ({ page, api, patient, visit }) => 
     const startTimeInput = chartPage.page.getByRole('textbox', { name: /start time/i });
 
     await expect(startDateInput).toBeVisible();
-    const startDateDayInputValue = await startDateDayInput.textContent();
-    expect(startDateDayInputValue).toBe(visitStartDatetime.format('DD'));
-    const startDateMonthInputValue = await startDateMonthInput.textContent();
-    expect(startDateMonthInputValue).toBe(visitStartDatetime.format('MM'));
-    const startDateYearInputValue = await startDateYearInput.textContent();
-    expect(startDateYearInputValue).toBe(visitStartDatetime.format('YYYY'));
+    await expect(startDateDayInput).toHaveText(visitStartDatetime.format('DD'));
+    await expect(startDateMonthInput).toHaveText(visitStartDatetime.format('MM'));
+    await expect(startDateYearInput).toHaveText(visitStartDatetime.format('YYYY'));
 
     await expect(startTimeInput).toBeVisible();
-    const timeValue = await startTimeInput.inputValue();
-    expect(timeValue).toMatch(/^(1[0-2]|0?[1-9]):([0-5][0-9])$/);
+    await expect(startTimeInput).toHaveValue(/^(1[0-2]|0?[1-9]):([0-5][0-9])$/);
 
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toBeVisible();
     await expect(chartPage.page.getByRole('combobox', { name: /select a location/i })).toHaveValue('Outpatient Clinic');

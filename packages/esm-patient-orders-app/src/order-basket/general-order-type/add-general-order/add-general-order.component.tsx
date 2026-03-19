@@ -27,7 +27,7 @@ interface AddGeneralOrderProps {
 }
 
 /**
- * This workspace displays the drug order form for adding or editing a general order.
+ * This workspace displays the order form for adding or editing a general order.
  */
 const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
   initialOrder,
@@ -41,12 +41,14 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
   const { orders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderTypes } = useConfig<ConfigObject>();
   const [currentOrder, setCurrentOrder] = useState(initialOrder);
+  const [searchTerm, setSearchTerm] = useState('');
   const { orderType } = useOrderType(orderTypeUuid);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
 
   const title = useMemo(() => {
     if (orderType) {
-      if (initialOrder?.action == 'REVISE') {
+      if (initialOrder?.action === 'REVISE') {
         return t(`editOrderableForOrderType`, 'Edit {{orderTypeDisplay}}', {
           orderTypeDisplay: orderType.display.toLocaleLowerCase(),
         });
@@ -64,10 +66,6 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
     () => orderTypes.find((orderType) => orderType.orderTypeUuid === orderTypeUuid).orderableConceptSets,
     [orderTypeUuid, orderTypes],
   );
-
-  const cancelDrugOrder = useCallback(() => {
-    closeWorkspace();
-  }, [closeWorkspace]);
 
   const openOrderForm = useCallback(
     (order: OrderBasketItem) => {
@@ -87,9 +85,9 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
-              iconDescription="Return to order basket"
+              iconDescription={t('backToOrderBasket', 'Back to order basket')}
               kind="ghost"
-              onClick={cancelDrugOrder}
+              onClick={() => closeWorkspace()}
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
               size="sm"
             >
@@ -101,6 +99,14 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
           <OrderForm
             initialOrder={currentOrder}
             closeWorkspace={closeWorkspace}
+            onCancel={
+              isEditingExistingOrder
+                ? closeWorkspace
+                : () => {
+                    setCurrentOrder(undefined);
+                    setHasUnsavedChanges(false);
+                  }
+            }
             setHasUnsavedChanges={setHasUnsavedChanges}
             orderTypeUuid={orderTypeUuid}
             patient={patient}
@@ -113,6 +119,8 @@ const AddGeneralOrder: React.FC<AddGeneralOrderProps> = ({
             orderTypeUuid={orderTypeUuid}
             patient={patient}
             visit={visitContext}
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
           />
         )}
       </div>
@@ -127,6 +135,8 @@ interface ConceptSearchProps {
   orderableConceptSets: Array<string>;
   patient: fhir.Patient;
   visit: Visit;
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
 }
 
 function ConceptSearch({
@@ -136,26 +146,23 @@ function ConceptSearch({
   orderableConceptSets,
   patient,
   visit,
+  searchTerm,
+  onSearchTermChange,
 }: ConceptSearchProps) {
   const { t } = useTranslation();
   const { orderType } = useOrderType(orderTypeUuid);
   const isTablet = useLayoutType() === 'tablet';
-  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const searchInputRef = useRef(null);
 
-  const cancelDrugOrder = useCallback(() => {
-    closeWorkspace();
-  }, [closeWorkspace]);
-
-  const focusAndClearSearchInput = () => {
-    setSearchTerm('');
+  const focusAndClearSearchInput = useCallback(() => {
+    onSearchTermChange('');
     searchInputRef.current?.focus();
-  };
+  }, [onSearchTermChange]);
 
   const handleSearchTermChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value ?? ''),
-    [setSearchTerm],
+    (event: React.ChangeEvent<HTMLInputElement>) => onSearchTermChange(event.target.value ?? ''),
+    [onSearchTermChange],
   );
 
   return (
@@ -179,9 +186,8 @@ function ConceptSearch({
         searchTerm={debouncedSearchTerm}
         openOrderForm={openOrderForm}
         focusAndClearSearchInput={focusAndClearSearchInput}
-        orderTypeUuid={orderTypeUuid}
-        cancelOrder={() => {}}
         orderableConceptSets={orderableConceptSets}
+        orderTypeUuid={orderTypeUuid}
         closeWorkspace={closeWorkspace}
         patient={patient}
         visit={visit}
@@ -189,7 +195,11 @@ function ConceptSearch({
       {isTablet && (
         <div className={styles.separatorContainer}>
           <p className={styles.separator}>{t('or', 'or')}</p>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={cancelDrugOrder}>
+          <Button
+            iconDescription={t('returnToOrderBasket', 'Return to order basket')}
+            kind="ghost"
+            onClick={() => closeWorkspace()}
+          >
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

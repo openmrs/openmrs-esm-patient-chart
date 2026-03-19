@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import {
   Button,
@@ -7,7 +7,6 @@ import {
   ComboBox,
   Form,
   Grid,
-  InlineNotification,
   Layer,
   Select,
   SelectItem,
@@ -34,7 +33,6 @@ import {
   showSnackbar,
   useConfig,
   useLayoutType,
-  useSession,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
@@ -45,6 +43,7 @@ import styles from './test-order-form.scss';
 export interface LabOrderFormProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   initialOrder: TestOrderBasketItem;
+  onCancel: () => void;
 
   /**
    * This field should only be supplied for an existing order saved to the backend
@@ -63,19 +62,18 @@ export function LabOrderForm({
   initialOrder,
   orderToEditOrdererUuid,
   closeWorkspace,
+  onCancel,
   orderTypeUuid,
   setHasUnsavedChanges,
   patient,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSession();
   const { orders, setOrders, clearOrders } = useOrderBasket<TestOrderBasketItem>(
     patient,
     orderTypeUuid,
     prepTestOrderPostData,
   );
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
   const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
@@ -121,7 +119,7 @@ export function LabOrderForm({
   const {
     control,
     handleSubmit,
-    formState: { errors, defaultValues, isDirty },
+    formState: { errors, defaultValues, isDirty, isSubmitting },
     setValue,
     watch,
   } = useForm<TestOrderBasketItem>({
@@ -183,7 +181,7 @@ export function LabOrderForm({
         ...initialOrder,
         ...data,
       };
-      postOrder(
+      return postOrder(
         prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
       )
         .then(() => {
@@ -217,20 +215,8 @@ export function LabOrderForm({
     [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
-  const cancelOrder = useCallback(() => {
-    setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace();
-  }, [closeWorkspace, orders, setOrders, defaultValues]);
-
-  const closeModifyOrderWorkspace = useCallback(() => {
-    clearOrders();
-    closeWorkspace();
-  }, [clearOrders, closeWorkspace]);
-
   const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
-    if (errors) {
-      setShowErrorNotification(true);
-    }
+    console.error('Error in lab order form', errors);
   };
 
   const handleUpdateUrgency = useCallback(
@@ -255,8 +241,11 @@ export function LabOrderForm({
   return (
     <Form
       className={styles.orderForm}
-      onSubmit={handleSubmit(initialOrder?.action == 'REVISE' ? submitLabOrderToServer : saveLabOrderToBasket, onError)}
-      id="drugOrderForm"
+      onSubmit={handleSubmit(
+        initialOrder?.action === 'REVISE' ? submitLabOrderToServer : saveLabOrderToBasket,
+        onError,
+      )}
+      id="labOrderForm"
     >
       <div className={styles.form}>
         <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -393,33 +382,14 @@ export function LabOrderForm({
           </Column>
         </Grid>
       </div>
-      <div>
-        {showErrorNotification && (
-          <Column className={styles.errorContainer}>
-            <InlineNotification
-              lowContrast
-              onClose={() => setShowErrorNotification(false)}
-              subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-              title={t('error', 'Error')}
-            />
-          </Column>
-        )}
-        <ButtonSet
-          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-        >
-          <Button
-            className={styles.button}
-            kind="secondary"
-            onClick={initialOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : cancelOrder}
-            size="xl"
-          >
-            {t('discard', 'Discard')}
-          </Button>
-          <Button className={styles.button} kind="primary" size="xl" type="submit">
-            {t('saveOrder', 'Save order')}
-          </Button>
-        </ButtonSet>
-      </div>
+      <ButtonSet className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}>
+        <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+          {t('discard', 'Discard')}
+        </Button>
+        <Button className={styles.button} kind="primary" size="xl" type="submit" disabled={isSubmitting}>
+          {t('saveOrder', 'Save order')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 }

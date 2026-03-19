@@ -15,7 +15,6 @@ import {
   InlineNotification,
   Layer,
   NumberInput,
-  Stack,
   TextArea,
   TextInput,
   Toggle,
@@ -30,7 +29,6 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
-  showSnackbar,
   useConfig,
   useLayoutType,
   Workspace2,
@@ -47,11 +45,11 @@ import {
   type MedicationRoute,
   type QuantityUnit,
 } from '@openmrs/esm-patient-common-lib';
+import { useActivePatientOrders } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useActivePatientOrders } from '../api';
-import styles from './drug-order-form.scss';
 import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
+import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
   /**
@@ -113,7 +111,7 @@ function InputWrapper({ children }) {
 }
 
 export function DrugOrderForm({
-  initialOrderBasketItem: initialOrderBasketItem,
+  initialOrderBasketItem,
   patient,
   onSave,
   saveButtonText,
@@ -126,13 +124,11 @@ export function DrugOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
 
-  const [isSaving, setIsSaving] = useState(false);
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
   const {
     control,
-    formState: { isDirty },
+    formState: { isDirty, isSubmitting },
     getValues,
-    reset,
     handleSubmit,
     setValue,
     watch,
@@ -167,7 +163,6 @@ export function DrugOrderForm({
   const routeValue = watch('route')?.value;
   const unitValue = watch('unit')?.value;
   const dosage = watch('dosage');
-  const startDate = watch('startDate');
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     const newBasketItem = {
@@ -195,21 +190,12 @@ export function DrugOrderForm({
       visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
 
-    setIsSaving(true);
     await onSave(newBasketItem);
-    setIsSaving(false);
   };
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
     if (errors) {
       console.error('Error in drug order form', errors);
-      showSnackbar({
-        title: t('drugOrderValidationFailed', 'Validation failed'),
-        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
-        kind: 'error',
-        timeoutInMs: 5000,
-        isLowContrast: true,
-      });
     }
   };
 
@@ -381,7 +367,7 @@ export function DrugOrderForm({
                             id="doseSelection"
                             placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                             label={t('editDoseComboBoxTitle', 'Dose')}
-                            min={0}
+                            min={0.01}
                             hideSteppers={true}
                             step={0.01}
                           />
@@ -642,7 +628,7 @@ export function DrugOrderForm({
               kind="primary"
               type="submit"
               size="xl"
-              disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
+              disabled={!!errorFetchingOrderConfig || isSubmitting || drugAlreadyPrescribedForNewOrder}
             >
               {saveButtonText}
             </Button>

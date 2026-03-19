@@ -253,6 +253,55 @@ describe('filterReducer', () => {
       expect(newState.lowestParents[0].flatName).toBe('CBC');
     });
 
+    it('should preserve existing checkbox selections when re-initialized with new data', () => {
+      const stateWithSelections: ReducerState = {
+        ...initialState,
+        checkboxes: {
+          'CBC: Hemoglobin': true,
+          'CBC: Hematocrit': false,
+        },
+      };
+
+      const updatedTrees: Array<TreeNode> = [
+        {
+          flatName: 'CBC',
+          display: 'Complete Blood Count',
+          subSets: [
+            {
+              flatName: 'CBC: Hemoglobin',
+              display: 'Hemoglobin',
+              obs: [{ obsDatetime: '2024-01-01', value: '12', interpretation: 'NORMAL' }],
+              hasData: true,
+            },
+            {
+              flatName: 'CBC: Hematocrit',
+              display: 'Hematocrit',
+              obs: [{ obsDatetime: '2024-01-01', value: '36', interpretation: 'NORMAL' }],
+              hasData: true,
+            },
+            {
+              flatName: 'CBC: WBC',
+              display: 'White Blood Cell Count',
+              obs: [{ obsDatetime: '2024-01-01', value: '7.5', interpretation: 'NORMAL' }],
+              hasData: true,
+            },
+          ],
+          hasData: true,
+        },
+      ];
+
+      const newState = reducer(stateWithSelections, {
+        type: ReducerActionType.INITIALIZE,
+        trees: updatedTrees,
+      });
+
+      expect(newState.checkboxes).toEqual({
+        'CBC: Hemoglobin': true,
+        'CBC: Hematocrit': false,
+        'CBC: WBC': false,
+      });
+    });
+
     it('should handle leaf nodes without subSets', () => {
       const mockTrees: Array<TreeNode> = [
         {

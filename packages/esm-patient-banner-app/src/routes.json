@@ -5,6 +5,12 @@
   },
   "extensions": [
     {
+      "name": "person-attribute-tag",
+      "component": "personAttributeTag",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "visit-tag",
       "slot": "patient-banner-tags-slot",
       "component": "visitTag",

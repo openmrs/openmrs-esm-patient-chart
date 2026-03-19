@@ -98,7 +98,6 @@ const GeneralOrderPanel: React.FC<GeneralOrderTypeProps> = ({
         </div>
         <div className={styles.buttonContainer}>
           <Button
-            className={styles.addButton}
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             iconDescription={t('addMedication', 'Add medication')}
@@ -108,7 +107,6 @@ const GeneralOrderPanel: React.FC<GeneralOrderTypeProps> = ({
             {t('add', 'Add')}
           </Button>
           <Button
-            className={styles.chevron}
             hasIconOnly
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>
