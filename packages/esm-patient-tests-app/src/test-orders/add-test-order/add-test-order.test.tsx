@@ -188,7 +188,7 @@ describe('AddLabOrder', () => {
   test('back to order basket', async () => {
     const user = userEvent.setup();
     renderAddLabOrderWorkspace();
-    const back = screen.getByText('Back');
+    const back = screen.getByText('Back to order basket');
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
