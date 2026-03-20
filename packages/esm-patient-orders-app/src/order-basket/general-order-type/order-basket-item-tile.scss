@@ -18,6 +18,10 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+
+  > div:first-child {
+    min-width: 0;
+  }
 }
 
 .label {
@@ -70,12 +74,4 @@
 
 .label01 {
   @include type.type-style('label-01');
-}
-
-.clipTextWithEllipsis {
-  font-size: layout.$spacing-05;
-  line-height: 1.5;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
