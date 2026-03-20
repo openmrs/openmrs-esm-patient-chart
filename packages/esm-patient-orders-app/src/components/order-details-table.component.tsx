@@ -243,14 +243,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     },
   ];
 
-  if (isPrinting) {
-    tableHeaders.push({
-      key: 'dosage',
-      header: t('dosage', 'Dosage'),
-      isSortable: true,
-    });
-  }
-
   const tableRows = useMemo(
     () =>
       displayedOrders?.map((order) => ({
@@ -259,18 +251,6 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
         orderNumber: order.orderNumber,
         dateOfOrder: <div className={styles.singleLineText}>{formatDate(parseDate(order.dateActivated))}</div>,
         orderType: capitalize(order.orderType?.display ?? '-'),
-        dosage:
-          order.type === ORDER_TYPES.DRUG_ORDER ? (
-            <div className={styles.singleLineText}>
-              {`${t('indication', 'Indication').toUpperCase()} ${
-                order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')
-              } - ${t('quantity', 'Quantity').toUpperCase()} ${
-                order.quantity != null ? `${order.quantity} ${order?.quantityUnits?.display ?? ''}`.trim() : '--'
-              }`}
-            </div>
-          ) : (
-            '--'
-          ),
         order: order.display,
         priority: (
           <Tag type={getPriorityTagType(order.urgency)}>
@@ -503,7 +483,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
                                   {header.header}
                                 </TableHeader>
                               ))}
-                              <TableExpandHeader />
+                              {!isPrinting && <TableExpandHeader />}
                             </TableRow>
                           </TableHead>
                           <TableBody>
