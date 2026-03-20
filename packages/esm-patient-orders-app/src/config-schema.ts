@@ -53,6 +53,12 @@ export const configSchema = {
     _description:
       'Whether to display the "Reference number" field in the Order form. This field maps to the accession_number property in the Order data model',
   },
+  enableAddTestsDuringResultEntry: {
+    _type: Type.Boolean,
+    _default: false,
+    _description:
+      'Controls whether users can add extra tests while entering lab results in the test-results workspace.',
+  },
   ordererProviderRoles: {
     _type: Type.Array,
     _description:
@@ -80,6 +86,7 @@ export interface ConfigObject {
   showPrintButton: boolean;
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
+  enableAddTestsDuringResultEntry: boolean;
   ordererProviderRoles: Array<string>;
   orderLocationTagName: string;
 }

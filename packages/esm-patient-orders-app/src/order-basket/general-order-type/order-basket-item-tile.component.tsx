@@ -26,7 +26,7 @@ const OrderBasketItemTile: React.FC<OrderBasketItemTileProps> = ({ orderBasketIt
 
   const labTile = (
     <div className={styles.orderBasketItemTile}>
-      <div className={styles.clipTextWithEllipsis}>
+      <div>
         <OrderActionLabel orderBasketItem={orderBasketItem} />
         <br />
         <span className={styles.name}>{orderBasketItem.concept?.display}</span>

@@ -24,15 +24,6 @@ const usePatientOrdersMock = jest.fn();
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
-/** This is needed to render the order form */
-global.IntersectionObserver = jest.fn(function (callback, options) {
-  this.observe = jest.fn();
-  this.unobserve = jest.fn();
-  this.disconnect = jest.fn();
-  this.trigger = (entries) => callback(entries, this);
-  this.options = options;
-}) as any;
-
 jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
   useDrugSearch: jest.fn(),
@@ -180,6 +171,60 @@ describe('AddDrugOrderWorkspace drug search', () => {
         }),
       ]),
     );
+  });
+
+  test('discarding a new order returns to drug search', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    await user.click(within(aspirin81Div).getByText(/Order form/i));
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByText(/Discard/i));
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('preserves search term when navigating back from order form', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    await user.click(within(aspirin81Div).getByText(/Order form/i));
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+
+    await user.click(screen.getByText(/Discard/i));
+
+    expect(screen.getByRole('searchbox')).toHaveValue('Aspirin');
+  });
+
+  test('shows a validation error when dose is 0', async () => {
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    await user.click(within(aspirin81Div).getByText(/Order form/i));
+
+    expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
+
+    // Clear the pre-filled dose value and enter 0
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '0');
+    await user.click(screen.getByText(/Save order/i));
+
+    expect(await screen.findByText(/dose must be greater than 0/i)).toBeInTheDocument();
   });
 });
 
