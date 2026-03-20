@@ -267,6 +267,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
       ? {
           valueCoded: order.frequency.uuid,
           value: order.frequency.display,
+          // Not available from the Order resource; auto-calc requires the user to re-select a frequency
+          frequencyPerDay: null,
         }
       : null,
     route: order.route

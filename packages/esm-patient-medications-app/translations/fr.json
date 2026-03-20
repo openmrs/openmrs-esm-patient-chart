@@ -22,8 +22,6 @@
   "drugAlreadyPrescribed": "Déjà prescrit",
   "drugName": "Nom du médicament",
   "drugOrders": "Prescriptions",
-  "drugOrderValidationFailed": "Échec de validation",
-  "drugOrderValidationFailedDescription": "Veuillez vérifier le formulaire pour corriger les erreurs et réessayer.",
   "drugRequiredErrorMessage": "Médicament requis",
   "duration": "Durée",
   "durationUnit": "Unité",
