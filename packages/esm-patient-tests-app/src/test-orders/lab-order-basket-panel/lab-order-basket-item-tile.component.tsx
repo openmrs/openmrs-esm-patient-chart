@@ -34,7 +34,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   const labTile = (
     <div>
       <div className={styles.orderBasketItemTile}>
-        <div className={styles.clipTextWithEllipsis}>
+        <div>
           <OrderActionLabel orderBasketItem={orderBasketItem} />
           <br />
           <span className={styles.name}>{orderBasketItem.testType?.label}</span>

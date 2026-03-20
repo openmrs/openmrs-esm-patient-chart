@@ -28,4 +28,19 @@ describe('VitalsHeaderItem', () => {
     expect(screen.getByText('Temp')).toBeInTheDocument();
     expect(screen.getByText('36.5')).toBeInTheDocument();
   });
+
+  it('displays 0 as a value instead of "Not available"', () => {
+    render(<VitalsHeaderItem unitName="Temp" value={0} unitSymbol="DEG C" />);
+
+    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.getByText('DEG C')).toBeInTheDocument();
+    expect(screen.queryByText('Not available')).not.toBeInTheDocument();
+  });
+
+  it('displays "Not available" when value is an empty string', () => {
+    render(<VitalsHeaderItem unitName="Temp" value="" unitSymbol="DEG C" />);
+
+    expect(screen.getByText('Not available')).toBeInTheDocument();
+    expect(screen.queryByText('DEG C')).not.toBeInTheDocument();
+  });
 });
