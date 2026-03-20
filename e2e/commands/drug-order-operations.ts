@@ -23,7 +23,7 @@ export const generateRandomDrugOrder = async (
       orderer: providerUuid,
       dosingType: 'org.openmrs.SimpleDosingInstructions',
       dose: '1.0',
-      doseUnits: '161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      doseUnits: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       route: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       frequency: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       quantity: 1.0,

@@ -24,15 +24,6 @@ const usePatientOrdersMock = jest.fn();
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
-/** This is needed to render the order form */
-global.IntersectionObserver = jest.fn(function (callback, options) {
-  this.observe = jest.fn();
-  this.unobserve = jest.fn();
-  this.disconnect = jest.fn();
-  this.trigger = (entries) => callback(entries, this);
-  this.options = options;
-}) as any;
-
 jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
   useDrugSearch: jest.fn(),
