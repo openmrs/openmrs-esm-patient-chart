@@ -7,7 +7,7 @@
   "closeFlagsList": "Close flags list",
   "discard": "Discard",
   "editFlags": "Edit flags",
-  "editPatientFlags": "Edit patient flags",
+  "editPatientFlags": "Patientenmerkmale bearbeiten",
   "flagCount_one": "{{count}} risk flag",
   "flagCount_other": "{{count}} risk flags",
   "flagsUpdated": "Flags updated",
