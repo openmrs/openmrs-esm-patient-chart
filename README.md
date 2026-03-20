@@ -3,9 +3,9 @@
 [![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
-> 👋 New to the project? Start with the [OpenMRS 3 Frontend Developer Documentation](https://om.rs/dev3docs).
+> New to the project? Start with the [OpenMRS 3 Frontend Developer Documentation](https://om.rs/dev3docs).
 
-A frontend monorepo for the [OpenMRS 3](https://openmrs.org/) Single Page Application (SPA). This package provides the patient chart experience — a collection of microfrontend widgets that together form a comprehensive, extensible patient dashboard.
+A frontend monorepo for the [OpenMRS 3](https://openmrs.org/) Single Page Application (SPA). This package provides the patient chart experience - a collection of microfrontend widgets that together form a comprehensive, extensible patient dashboard.
 
 ---
 
@@ -67,24 +67,24 @@ A frontend monorepo for the [OpenMRS 3](https://openmrs.org/) Single Page Applic
 
 The patient chart is composed of the following regions:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Patient Banner                      │
-├──────────┬──────────────────────────────────┬───────────┤
-│          │                                  │           │
-│   Nav    │       Chart Review / Dashboard   │   Side    │
-│   Menu   │                                  │   Menu    │
-│          │                                  │           │
-│          ├──────────────────────────────────┤           │
-│          │           Workspace              │           │
-└──────────┴──────────────────────────────────┴───────────┘
+```text
++---------------------------------------------------------+
+|                     Patient Banner                      |
++----------+----------------------------------+-----------+
+|          |                                  |           |
+|   Nav    |       Chart Review / Dashboard   |   Side    |
+|   Menu   |                                  |   Menu    |
+|          |                                  |           |
+|          +----------------------------------+           |
+|          |           Workspace              |           |
++----------+----------------------------------+-----------+
 ```
 
-- **Navigation Menu** — Left sidebar with links to dashboards.
-- **Patient Banner** — Displays patient demographics and uninvasive toast notifications.
-- **Chart Review / Dashboards** — Main content area. A dashboard is a collection of widget tiles.
-- **Workspace** — Data entry panel. Full-screen on mobile; sidebar on desktop.
-- **Side Menu** — Access to features without dedicated pages (e.g. notifications).
+- **Navigation Menu** - Left sidebar with links to dashboards.
+- **Patient Banner** - Displays patient demographics and toast notifications.
+- **Chart Review / Dashboards** - Main content area. A dashboard is a collection of widget tiles.
+- **Workspace** - Data entry panel. Full-screen on mobile; sidebar on desktop.
+- **Side Menu** - Access to features without dedicated pages (e.g. notifications).
 
 ---
 
@@ -111,7 +111,7 @@ yarn
 yarn start --sources 'packages/esm-patient-<package-name>-app'
 ```
 
-**Example — start the allergies app:**
+**Example - start the allergies app:**
 
 ```bash
 yarn start --sources 'packages/esm-patient-allergies-app'
@@ -121,7 +121,7 @@ This uses the OpenMRS tooling to spin up a dev server running `esm-patient-chart
 
 ### Start dev servers for multiple microfrontends simultaneously
 
-**Option 1 — Pass multiple `--sources` flags:**
+**Option 1 - Pass multiple `--sources` flags:**
 
 ```bash
 yarn start \
@@ -129,7 +129,7 @@ yarn start \
   --sources 'packages/esm-patient-biometrics-app'
 ```
 
-**Option 2 — Use `yarn serve` with import map overrides:**
+**Option 2 - Use `yarn serve` with import map overrides:**
 
 Run `yarn serve` from within individual packages, then use [import map overrides](https://github.com/single-spa/import-map-overrides) in the browser to wire them together.
 
@@ -202,9 +202,16 @@ E2E tests are written with [Playwright](https://playwright.dev/) and live in the
 ```bash
 # Install Playwright browsers
 npx playwright install
+```
 
-# Copy the example environment file
+Copy the example environment file:
+
+```bash
+# macOS / Linux
 cp example.env .env
+
+# Windows PowerShell
+Copy-Item example.env .env
 ```
 
 ### Configure the test target
@@ -227,7 +234,7 @@ E2E_BASE_URL=https://dev3.openmrs.org/openmrs
 | `yarn test-e2e --headed --ui` | Headed mode + interactive UI (recommended for development) |
 | `yarn test-e2e <test-name>` | Run a specific test file by name |
 
-**Example — test local changes to the Allergies app:**
+**Example - test local changes to the Allergies app:**
 
 ```bash
 # 1. Start the dev server
@@ -239,7 +246,7 @@ yarn test-e2e
 
 ### Updating Playwright
 
-> ⚠️ The Playwright version in `package.json` and in the Bamboo E2E Dockerfile **must always match**. If you update one, update the other.
+> Warning: The Playwright version in `package.json` and in the Bamboo E2E Dockerfile **must always match**. If you update one, update the other.
 
 For more detail, refer to the [E2E testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing/e2e-tests).
 
@@ -273,8 +280,8 @@ You likely have stale core library versions. Run the following to update them:
 # Upgrade to the latest next versions
 yarn up openmrs@next @openmrs/esm-framework@next
 
-# Restore version specifiers to `next` (do not commit actual version numbers)
-git checkout package.json
+# If `package.json` now contains pinned versions, change them back to `next`
+# before committing.
 
 # Regenerate the lockfile
 yarn
@@ -298,7 +305,7 @@ Contributions are welcome! Please:
 2. Follow the existing [Design Patterns](#design-patterns).
 3. Add or update tests for any changes.
 4. Ensure all tests pass (`yarn turbo run test`) before opening a PR.
-5. Keep the CI green — check the badge at the top of this README.
+5. Keep the CI green - check the badge at the top of this README.
 
 For questions, join the [OpenMRS Community](https://talk.openmrs.org/) or the `#openmrs-dev` Slack channel.
 
