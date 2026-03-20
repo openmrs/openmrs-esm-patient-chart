@@ -1,5 +1,6 @@
 import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
@@ -76,11 +77,17 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     value: BiometricType;
   }>;
 
+  const cutoff = useMemo(() => dayjs().subtract(12, 'month'), []);
+
   const chartData = useMemo(
     () =>
       patientBiometrics
         .filter((biometrics) => biometrics[selectedBiometrics.value])
-        .sort((biometricA, biometricB) => new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime())
+        .filter((biometrics) => dayjs(biometrics.date).isAfter(cutoff))
+        .sort(
+          (biometricA, biometricB) =>
+            new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime(),
+        )
         .map(
           (biometrics) =>
             biometrics[selectedBiometrics.value] && {
@@ -90,7 +97,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
               date: biometrics.date,
             },
         ),
-    [patientBiometrics, selectedBiometrics.title, selectedBiometrics.value],
+    [patientBiometrics, selectedBiometrics.title, selectedBiometrics.value, cutoff],
   );
 
   const chartOptions = useMemo(() => {
@@ -130,24 +137,12 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         enabled: true,
         numberOfIcons: 4,
         controls: [
-          {
-            type: 'Zoom in',
-          },
-          {
-            type: 'Zoom out',
-          },
-          {
-            type: 'Reset zoom',
-          },
-          {
-            type: 'Export as CSV',
-          },
-          {
-            type: 'Export as PNG',
-          },
-          {
-            type: 'Make fullscreen',
-          },
+          { type: 'Zoom in' },
+          { type: 'Zoom out' },
+          { type: 'Reset zoom' },
+          { type: 'Export as CSV' },
+          { type: 'Export as PNG' },
+          { type: 'Make fullscreen' },
         ],
       },
       zoomBar: {
@@ -182,8 +177,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
                     value,
                     groupName: id,
                   })
-                }
-              >
+                }>
                 {title}
               </Tab>
             ))}
