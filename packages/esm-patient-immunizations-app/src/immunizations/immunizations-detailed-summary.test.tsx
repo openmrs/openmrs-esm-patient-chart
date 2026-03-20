@@ -11,7 +11,7 @@ import {
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { ErrorState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
 
@@ -149,13 +149,7 @@ describe('ImmunizationsDetailedSummary', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Immunizations' }), {});
   });
 
   it('displays immunization records in a table when data is available', async () => {

@@ -22,8 +22,6 @@
   "drugAlreadyPrescribed": "Ya prescrito",
   "drugName": "Nombre del fármaco",
   "drugOrders": "Órdenes de medicamentos",
-  "drugOrderValidationFailed": "Validación fallida",
-  "drugOrderValidationFailedDescription": "Por favor revise el formulario en busca de errores e inténtelo de nuevo",
   "drugRequiredErrorMessage": "Se requiere el fármaco",
   "duration": "Duración",
   "durationUnit": "Unidad de duración",
