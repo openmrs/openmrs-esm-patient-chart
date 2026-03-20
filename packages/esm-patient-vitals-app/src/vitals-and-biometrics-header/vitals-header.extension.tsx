@@ -61,9 +61,13 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   const launchVitalsAndBiometricsForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      launchForm();
+      if (launchCustomVitalsForm) {
+        launchCustomVitalsForm();
+      } else {
+        launchForm();
+      }
     },
-    [launchForm],
+    [launchForm, launchCustomVitalsForm],
   );
 
   if (isLoading) {
@@ -150,7 +154,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 className={styles.recordVitalsButton}
                 data-openmrs-role="Record Vitals"
                 kind="ghost"
-                onClick={launchCustomVitalsForm ?? launchVitalsAndBiometricsForm}
+                onClick={launchVitalsAndBiometricsForm}
                 size="sm"
               >
                 {t('recordVitals', 'Record vitals')}
