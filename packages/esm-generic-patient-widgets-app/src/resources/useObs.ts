@@ -34,19 +34,22 @@ export type ObsResult = fhir.Observation & {
 
 export const pageSize = 100;
 
+export interface UseObsOptions {
+  oldestFirst?: boolean;
+}
+
 /**
  * Fetches the observations for the concepts in the config for this widget.
  * For any concept that has neither label nor obs, the concept is fetched to
  * get the label.
  */
-export function useObs(patientUuid: string): UseObsResult {
+export function useObs(patientUuid: string, options: UseObsOptions = {}): UseObsResult {
   const { encounterTypes, data } = useConfig<CommonConfig>();
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
-
-  // TODO: Make sorting respect oldestFirst/graphOldestFirst
-  let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
+  const sortDirection = options.oldestFirst ? '' : '-';
+  const url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
-    .join(',')}&_summary=data&_include=Observation:encounter&_sort=-date&_count=${pageSize}${urlEncounterTypes}`;
+    .join(',')}&_summary=data&_include=Observation:encounter&_sort=${sortDirection}date&_count=${pageSize}${urlEncounterTypes}`;
 
   const {
     data: result,
@@ -59,7 +62,7 @@ export function useObs(patientUuid: string): UseObsResult {
   const { concepts } = useConcepts(data.map((d) => d.concept));
 
   const encounters = getEncountersFromResources(result?.data?.entry);
-  const observations = filterAndMapObservations(result?.data?.entry, encounters, concepts);
+  const observations = filterAndMapObservations(result?.data?.entry, encounters, concepts, options.oldestFirst);
   return {
     data: { observations, concepts, encounters },
     error: error,
@@ -73,17 +76,22 @@ function filterAndMapObservations(
   entries: Array<fhir.BundleEntry>,
   encounters: Array<{ reference: string; display: string; encounterTypeUuid: string }>,
   concepts: Array<{ uuid: string; display: string; dataType: string }>,
+  oldestFirst = false,
 ): ObsResult[] {
   const conceptByUuid = Object.fromEntries(concepts.map((c) => [c.uuid, c]));
-  return (
+  const observations =
     entries
       ?.filter((entry) => entry?.resource?.resourceType === 'Observation')
       ?.map((entry) => {
         const resource = entry.resource as fhir.Observation;
+        const conceptUuid = resource.code.coding.find((c) => isUuid(c.code))?.code;
         const observation: ObsResult = {
           ...resource,
-          conceptUuid: resource.code.coding.find((c) => isUuid(c.code))?.code,
-          dataType: conceptByUuid[resource.code.coding.find((c) => isUuid(c.code))?.code]?.dataType,
+          conceptUuid,
+          dataType: conceptByUuid[conceptUuid]?.dataType,
+          encounter: {
+            ...resource.encounter,
+          },
         };
 
         const encounter = encounters.find(
@@ -95,8 +103,13 @@ function filterAndMapObservations(
         observation.encounter.encounterTypeUuid = encounter?.encounterTypeUuid;
 
         return observation;
-      }) || []
-  );
+      }) || [];
+
+  return observations.sort((a, b) => {
+    const timeA = new Date(a.effectiveDateTime).getTime();
+    const timeB = new Date(b.effectiveDateTime).getTime();
+    return oldestFirst ? timeA - timeB : timeB - timeA;
+  });
 }
 
 function getEncountersFromResources(resources: Array<fhir.BundleEntry>) {

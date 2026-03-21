@@ -40,9 +40,9 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
   const {
     data: { observations, concepts },
-  } = useObs(patientUuid);
+  } = useObs(patientUuid, { oldestFirst: config.tableSortOldestFirst });
 
-  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
+  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))];
   const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
     observations.filter((o) => o.encounter.reference === reference),
   );
