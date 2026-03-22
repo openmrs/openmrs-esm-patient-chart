@@ -31,3 +31,11 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   unobserve: jest.fn(),
   disconnect: jest.fn(),
 }));
+
+global.IntersectionObserver = jest.fn(function (callback, options) {
+  this.observe = jest.fn();
+  this.unobserve = jest.fn();
+  this.disconnect = jest.fn();
+  this.trigger = (entries) => callback(entries, this);
+  this.options = options;
+}) as any;

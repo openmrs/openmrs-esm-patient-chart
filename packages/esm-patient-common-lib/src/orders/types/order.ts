@@ -242,6 +242,7 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
+  isQuantityManual?: boolean;
   numRefills: number | null;
   indication: string | null;
   isFreeTextDosage: boolean;
@@ -279,7 +280,9 @@ export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
   value: number;
 }
 
-export type MedicationFrequency = CommonMedicationValueCoded;
+export interface MedicationFrequency extends CommonMedicationValueCoded {
+  frequencyPerDay?: number | null;
+}
 
 export type MedicationRoute = CommonMedicationValueCoded;
 
