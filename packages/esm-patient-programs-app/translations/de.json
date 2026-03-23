@@ -26,7 +26,7 @@
   "errorDeletingProgram": "Error deleting program",
   "fullyEnrolled": "Enrolled in all programs",
   "location": "Location",
-  "noEligibleEnrollments": "There are no more programs left to enroll this patient in",
+  "noEligibleEnrollments": "Es gibt keine Programme mehr, in die dieser Patient aufgenommen werden könnte",
   "noProgramsConfigured": "No programs configured",
   "programEnrollmentDeleted": "Program enrollment deleted",
   "programEnrollmentSaveError": "Error saving program enrollment",
