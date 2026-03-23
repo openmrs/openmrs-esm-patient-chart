@@ -175,11 +175,14 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   renderVisitNotesForm();
 
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
+  await user.type(clinicalNote, 'x');
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
   await user.click(submitButton);
 
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
 
+  await user.clear(clinicalNote);
   const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
   const targetSearchResult = await screen.findByText('Diabetes Mellitus');
@@ -187,7 +190,6 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   await user.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.clear(clinicalNote);
   await user.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');

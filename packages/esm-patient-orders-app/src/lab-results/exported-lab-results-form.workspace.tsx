@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import classNames from 'classnames';
+import { Button, ButtonSet, Form, Layer, InlineLoading, InlineNotification, Stack } from '@carbon/react';
 import { type Control, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -10,11 +10,13 @@ import {
   restBaseUrl,
   showSnackbar,
   useAbortController,
+  useConfig,
   useLayoutType,
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderBasket, type Order } from '@openmrs/esm-patient-common-lib';
+import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
 import {
   createCompositeObservationPayload,
@@ -35,23 +37,24 @@ import orderStyles from '../order-basket/order-basket.scss';
 export interface LabResultsFormProps {
   patient: fhir.Patient;
   order: Order;
+  launchLabOrderForm?: (orderTypeUuid: string, order?: OrderBasketItem) => void;
+  labOrderWorkspaceName?: string;
   /** Callback to refresh lab orders in the Laboratory app after results are saved.
    * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
 }
 
-interface OrderBasketSlotProps {
-  patient: fhir.Patient;
-}
-
 const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
-  workspaceProps: { patient, order, invalidateLabOrders },
+  workspaceProps: { patient, order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName },
+  launchChildWorkspace,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
+  const { enableAddTestsDuringResultEntry } = useConfig<ConfigObject>();
   const abortController = useAbortController();
   const isTablet = useLayoutType() === 'tablet';
+  const isEditMode = order.fulfillerStatus === 'COMPLETED';
   const [orderConceptUuids, setOrderConceptUuids] = useState([order.concept.uuid]);
   const { isLoading: isLoadingResultConcepts, concepts: conceptArray } = useOrderConceptsByUuids(orderConceptUuids);
   const [showEmptyFormErrorNotification, setShowEmptyFormErrorNotification] = useState(false);
@@ -106,6 +109,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     resolver: zodResolver(compositeSchema),
     mode: 'all',
   });
+
   useEffect(() => {
     if (Array.isArray(completeLabResults) && completeLabResults.length > 1) {
       const conceptUuids = completeLabResults.map((r) => r.concept.uuid);
@@ -113,14 +117,31 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     }
   }, [completeLabResults]);
 
-  const extensionProps = {
-    patient,
-  } satisfies OrderBasketSlotProps;
+  const resolvedLaunchLabOrderForm = useMemo(() => {
+    if (launchLabOrderForm) {
+      return launchLabOrderForm;
+    }
+
+    if (labOrderWorkspaceName) {
+      return (orderTypeUuid: string, basketOrder?: OrderBasketItem) => {
+        launchChildWorkspace(labOrderWorkspaceName, { orderTypeUuid, order: basketOrder });
+      };
+    }
+  }, [labOrderWorkspaceName, launchChildWorkspace, launchLabOrderForm]);
+
+  const extensionProps = useMemo(
+    () => ({
+      patient,
+      launchLabOrderForm: resolvedLaunchLabOrderForm,
+    }),
+    [patient, resolvedLaunchLabOrderForm],
+  );
+  const canUseResultEntryAddTests = enableAddTestsDuringResultEntry && !isEditMode && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
     conceptArray.forEach((concept, index) => {
       const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
-      if (concept && completeLabResult && order?.fulfillerStatus === 'COMPLETED') {
+      if (concept && completeLabResult && isEditMode) {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
           setValue(concept.uuid, completeLabResult.value.uuid);
         } else if (isNumeric(concept) && completeLabResult?.value) {
@@ -143,18 +164,22 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         }
       }
     });
-  }, [conceptArray, completeLabResults, order?.fulfillerStatus, setValue]);
+  }, [conceptArray, completeLabResults, isEditMode, setValue]);
 
   if (isLoadingResultConcepts) {
     return (
-      <div className={styles.loaderContainer}>
-        <InlineLoading
-          className={styles.loader}
-          description={t('loadingTestDetails', 'Loading test details') + '...'}
-          iconDescription={t('loading', 'Loading')}
-          status="active"
-        />
-      </div>
+      <Workspace2
+        title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
+      >
+        <div className={styles.loaderContainer}>
+          <InlineLoading
+            className={styles.loader}
+            description={t('loadingTestDetails', 'Loading test details') + '...'}
+            iconDescription={t('loading', 'Loading')}
+            status="active"
+          />
+        </div>
+      </Workspace2>
     );
   }
 
@@ -179,12 +204,19 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     };
 
     // Handle update operation for completed lab order results
-    if (order.fulfillerStatus === 'COMPLETED') {
-      const updateTasks = Object.entries(formValues).map(([conceptUuid, value]) => {
-        const completeLabResult = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
-        const obs = completeLabResult?.groupMembers?.find((v) => v.concept.uuid === conceptUuid) ?? completeLabResult;
-        return updateObservation(obs?.uuid, { value });
-      });
+    if (isEditMode) {
+      const updateTasks = Object.entries(formValues)
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([conceptUuid, value]) => {
+          let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
+          if (!obs) {
+            for (const result of completeLabResults) {
+              obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
+              if (obs) break;
+            }
+          }
+          return updateObservation(obs?.uuid, { value });
+        });
       const updateResults = await Promise.allSettled(updateTasks);
       const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
         if (curr.status === 'rejected') {
@@ -262,7 +294,10 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   };
 
   return (
-    <Workspace2 title={t('enterTestResults', 'Enter test results')} hasUnsavedChanges={isDirty}>
+    <Workspace2
+      title={isEditMode ? t('editTestResults', 'Edit test results') : t('enterTestResults', 'Enter test results')}
+      hasUnsavedChanges={isDirty}
+    >
       <Form className={styles.form} onSubmit={handleSubmit(saveLabResults)}>
         <Layer level={isTablet ? 1 : 0}>
           <div className={styles.grid}>
@@ -271,6 +306,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 {!isLoading ? (
                   conceptArray.map((c) => (
                     <ResultFormField
+                      key={c.uuid}
                       defaultValue={completeLabResults.find((r) => r.concept.uuid === c.uuid)}
                       concept={c}
                       control={control as unknown as Control<Record<string, unknown>>}
@@ -279,7 +315,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                 ) : (
                   <InlineLoading description={t('loadingInitialValues', 'Loading initial values') + '...'} />
                 )}
-                {order.fulfillerStatus !== 'COMPLETED' && (
+                {canUseResultEntryAddTests && (
                   <div className={orderStyles.orderBasketContainer}>
                     <div className={styles.heading}>
                       <span>{t('addOrderTests', 'Add Tests to this order')}</span>
@@ -294,7 +330,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
                   </div>
                 )}
 
-                {orders?.length > 0 && (
+                {canUseResultEntryAddTests && orders?.length > 0 && (
                   <div className={orderStyles.orderBasketContainer}>
                     <ButtonSet className={styles.buttonSet}>
                       <Button size="sm" className={styles.actionButton} kind="secondary" onClick={handleCancel}>
