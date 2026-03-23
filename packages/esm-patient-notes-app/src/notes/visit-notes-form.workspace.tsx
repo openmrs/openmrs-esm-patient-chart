@@ -392,7 +392,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         ? updateVisitNote(abortController, encounter.id, visitNotePayload)
         : saveVisitNote(abortController, visitNotePayload);
 
-      savePromise
+      return savePromise
         .then((response) => {
           if (response.status === 201 || response.status === 200) {
             const encounterUuid = encounter?.id || response.data.uuid;
@@ -723,7 +723,6 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
           <Button
             className={styles.button}
             kind="primary"
-            onClick={() => handleSubmit}
             disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
