@@ -1,19 +1,12 @@
-import {
-  type FetchResponse,
-  openmrsFetch,
-  restBaseUrl,
-  showSnackbar,
-  useFeatureFlag,
-  type Visit,
-} from '@openmrs/esm-framework';
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
 import {
   type Drug,
   type DrugOrderBasketItem,
   type DrugOrderTemplate,
   type OrderTemplate,
 } from '@openmrs/esm-patient-common-lib';
-import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -55,7 +48,7 @@ interface OrderTemplateResource {
 
 interface DrugListFetchResult {
   drugs: Array<DrugSearchResult>;
-  hasFailures: boolean;
+  errors: Array<Error>;
 }
 
 const maxConceptsPerRequest = 20;
@@ -66,12 +59,9 @@ const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:
  * @param query
  * @returns
  */
-export function useDrugSearch(query: string, searchBy: 'name' | 'concepts' = 'name') {
-  const param = searchBy === 'concepts' ? 'concepts' : 'q';
-  const url = query ? `${restBaseUrl}/drug?${param}=${query}&v=${drugSearchRepresentation}` : null;
-
+export function useDrugSearch(query: string) {
   const { data, ...rest } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
-    url,
+    query ? `${restBaseUrl}/drug?q=${query}&v=${drugSearchRepresentation}` : null,
     openmrsFetch,
   );
 
@@ -94,22 +84,24 @@ export function useConceptTree(conceptUuid: string) {
     fetcher,
   );
 
-  return {
-    tree: data,
-    isLoading,
-    isError: error,
-  };
+  return useMemo(
+    () => ({
+      tree: data,
+      isLoading,
+      isError: error,
+    }),
+    [data, isLoading, error],
+  );
 }
 
 export function useDrugsByConcepts(concepts: string[]) {
   const shouldFetch = concepts && concepts.length > 0;
-  const cacheKey = shouldFetch ? ['drugs-by-uuids', ...concepts.sort()] : null;
+  const sortedConcepts = [...concepts].sort();
+  const cacheKey = shouldFetch ? ['drugs-by-uuids', ...sortedConcepts] : null;
 
-  const { data, error, isLoading } = useSWRImmutable<DrugListFetchResult, Error>(cacheKey, async () => {
-    if (!concepts.length) return { drugs: [], hasFailures: false };
-
+  const { data, isLoading } = useSWRImmutable<DrugListFetchResult, Error>(cacheKey, async () => {
     const drugs: Array<DrugSearchResult> = [];
-    let hasFailures = false;
+    const errors: Array<Error> = [];
 
     for (let start = 0; start < concepts.length; start += maxConceptsPerRequest) {
       const batch = concepts.slice(start, start + maxConceptsPerRequest);
@@ -122,22 +114,24 @@ export function useDrugsByConcepts(concepts: string[]) {
           drugs.push(...response.data.results);
         }
       } catch (e) {
-        console.error(e);
-        hasFailures = true;
+        console.error(`Failed to fetch drugs for concepts: ${conceptsParam}`, e);
+        errors.push(e instanceof Error ? e : new Error(String(e)));
       }
     }
 
     const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
 
-    return { drugs: deduped, hasFailures };
+    return { drugs: deduped, errors };
   });
 
-  return {
-    drugs: data?.drugs ?? [],
-    hasFailures: data?.hasFailures ?? false,
-    isLoading,
-    error,
-  };
+  return useMemo(
+    () => ({
+      drugs: data?.drugs ?? [],
+      errors: data?.errors ?? [],
+      isLoading,
+    }),
+    [data, isLoading],
+  );
 }
 
 export function useConceptSets(conceptSetUuids: string[] = []) {
@@ -148,25 +142,20 @@ export function useConceptSets(conceptSetUuids: string[] = []) {
 
   const { data, error, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }, Error>(url, openmrsFetch);
 
-  const conceptSets: ConceptSet[] = data?.data
-    ? Object.values(data.data).map((concept) => ({
-        uuid: concept.uuid,
-        display: concept.display,
-      }))
-    : [];
+  return useMemo(() => {
+    const conceptSets: ConceptSet[] = data?.data
+      ? Object.values(data.data).map((concept) => ({
+          uuid: concept.uuid,
+          display: concept.display,
+        }))
+      : [];
 
-  if (error) {
-    showSnackbar({
-      title: error.name,
-      subtitle: error.message,
-      kind: 'error',
-    });
-  }
-
-  return {
-    conceptSets,
-    isLoading,
-  };
+    return {
+      conceptSets,
+      isLoading,
+      error,
+    };
+  }, [data, isLoading, error]);
 }
 
 /**

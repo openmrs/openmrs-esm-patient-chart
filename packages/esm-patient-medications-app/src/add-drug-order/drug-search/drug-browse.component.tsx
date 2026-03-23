@@ -1,9 +1,15 @@
-import { Button, ComboBox, Tile, Loading, Breadcrumb, BreadcrumbItem, ClickableTile } from '@carbon/react';
-import { useConfig, useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import { Folder } from '@carbon/react/icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Breadcrumb, BreadcrumbItem, Button, ClickableTile, ComboBox, Loading, Tile } from '@carbon/react';
+import { Folder } from '@carbon/react/icons';
+import {
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  type Visit,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 import { type ConfigObject } from '../../config-schema';
 import DrugBrowseResults from './drug-browse-results.component';
@@ -28,10 +34,25 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
   const isTablet = useLayoutType() === 'tablet';
 
   const { drugCategoryConceptSets } = useConfig<ConfigObject>();
-  const { conceptSets, isLoading: isLoadingConceptSets } = useConceptSets(drugCategoryConceptSets);
+  const {
+    conceptSets,
+    isLoading: isLoadingConceptSets,
+    error: conceptSetsError,
+  } = useConceptSets(drugCategoryConceptSets);
+
   const [rootConceptSet, setRootConceptSet] = useState<ConceptSet | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<ConceptTreeNode[]>([]);
   const { tree, isLoading: isLoadingTree, isError: isTreeError } = useConceptTree(rootConceptSet?.uuid);
+
+  useEffect(() => {
+    if (conceptSetsError) {
+      showSnackbar({
+        title: t('errorLoadingCategories', 'Error loading drug categories'),
+        subtitle: conceptSetsError.message,
+        kind: 'error',
+      });
+    }
+  }, [conceptSetsError, t]);
 
   useEffect(() => {
     if (tree) {
@@ -62,7 +83,7 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
     return { subCategories, drugConceptUuids };
   }, [currentNode]);
 
-  const { drugs, isLoading: isLoadingDrugs, hasFailures } = useDrugsByConcepts(drugConceptUuids);
+  const { drugs, isLoading: isLoadingDrugs, errors: drugFetchErrors } = useDrugsByConcepts(drugConceptUuids);
 
   const onRootChange = useCallback(({ selectedItem }: { selectedItem: ConceptSet }) => {
     setRootConceptSet(selectedItem ?? null);
@@ -94,7 +115,9 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
       </div>
 
       {isLoadingTree && (
-        <Loading description={t('loadingCategoryTree', 'Loading category tree...')} withOverlay={false} small />
+        <div className={styles.loadingContainer}>
+          <Loading description={t('loadingCategoryTree', 'Loading category tree...')} withOverlay={false} small />
+        </div>
       )}
 
       {isTreeError && (
@@ -138,11 +161,11 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
 
       {currentNode && (
         <div className={styles.drugResultsWrapper}>
-          {drugConceptUuids.length > 0 && <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>}
+          <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>
           <DrugBrowseResults
             drugs={drugs}
             isLoading={isLoadingDrugs}
-            isError={hasFailures}
+            errors={drugFetchErrors}
             patient={patient}
             visit={visit}
             closeWorkspace={closeWorkspace}
@@ -154,7 +177,6 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
 
       {isTablet && (
         <div className={styles.separatorContainer}>
-          <p className={styles.separator}>{t('or', 'or')}</p>
           <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>

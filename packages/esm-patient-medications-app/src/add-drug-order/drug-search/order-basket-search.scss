@@ -77,39 +77,15 @@
   }
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  padding: layout.$spacing-05;
+}
+
 .errorTile {
   margin: layout.$spacing-05;
   color: colors.$red-60;
-}
-
-.separator {
-  @include type.type-style('body-01');
-  color: colors.$gray-90;
-  width: 12rem;
-  margin: layout.$spacing-05 auto layout.$spacing-03;
-  overflow: hidden;
-  text-align: center;
-
-  &::before,
-  &::after {
-    background-color: colors.$gray-40;
-    content: '';
-    display: inline-block;
-    height: 1px;
-    position: relative;
-    vertical-align: middle;
-    width: 50%;
-  }
-
-  &::before {
-    right: layout.$spacing-05;
-    margin-left: -50%;
-  }
-
-  &::after {
-    left: layout.$spacing-05;
-    margin-right: -50%;
-  }
 }
 
 .separatorContainer {

@@ -1,9 +1,8 @@
-import { SkeletonText, Tile } from '@carbon/react';
-import { useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { InlineNotification, SkeletonText, Tile } from '@carbon/react';
+import { useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
 import { type DrugSearchResult } from './drug-search.resource';
@@ -13,7 +12,7 @@ import styles from './order-basket-search-results.scss';
 interface DrugBrowseResultsProps {
   drugs: DrugSearchResult[];
   isLoading: boolean;
-  isError?: boolean;
+  errors?: Array<Error>;
   hasSelection: boolean;
   patient: fhir.Patient;
   visit: Visit;
@@ -24,7 +23,7 @@ interface DrugBrowseResultsProps {
 export default function DrugBrowseResults({
   drugs,
   isLoading,
-  isError = false,
+  errors = [],
   hasSelection,
   patient,
   visit,
@@ -32,16 +31,17 @@ export default function DrugBrowseResults({
   openOrderForm,
 }: DrugBrowseResultsProps) {
   const { t } = useTranslation();
+  const hasErrors = errors.length > 0;
 
   if (isLoading) {
     return <DrugBrowseSkeleton />;
   }
 
-  if (isError) {
+  if (hasErrors && !drugs.length) {
     return <Tile>{t('errorFetchingDrugCategory', 'Error fetching drugs')}</Tile>;
   }
 
-  if (!drugs?.length) {
+  if (!drugs.length) {
     const emptyStateTitle = hasSelection
       ? t('noDrugsInCategory', 'No drugs found in this category')
       : t('chooseCategoryToGetStarted', 'Choose a category to get started');
@@ -58,8 +58,16 @@ export default function DrugBrowseResults({
 
   return (
     <div className={styles.container}>
+      {hasErrors && (
+        <InlineNotification
+          kind="warning"
+          lowContrast
+          title={t('partialDrugResults', 'Some drugs could not be loaded')}
+          hideCloseButton
+        />
+      )}
       <div className={styles.resultsContainer}>
-        {drugs?.map((drug) => (
+        {drugs.map((drug) => (
           <DrugSearchResultItem
             key={drug.uuid}
             drug={drug}

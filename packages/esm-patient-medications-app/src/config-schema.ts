@@ -50,7 +50,7 @@ export const configSchema = {
   drugCategoryConceptSets: {
     _type: Type.Array,
     _description:
-      'Concept Set UUIDs that define drug categories shown in the "List" tab, allowing users to browse drugs by category.',
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
     _default: [],
     _elements: {
       _type: Type.String,
