@@ -727,7 +727,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
             type="submit"
           >
             {isSubmitting ? (
-              <InlineLoading description={t('saving', 'Saving') + '...'} />
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
             ) : (
               <span>{t('saveAndClose', 'Save and close')}</span>
             )}
