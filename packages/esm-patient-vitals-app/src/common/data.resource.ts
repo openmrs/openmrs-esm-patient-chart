@@ -249,7 +249,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   // as standalone vitals entries. Notes are merged into existing vitals encounters below.
   const { data: notesData } = useSWR<VitalsFetchResponse, Error>(
     concepts.generalPatientNoteUuid && patientUuid
-      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_summary=data&_sort=-date&_count=${pageSize}`
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date&_count=${pageSize}`
       : null,
     openmrsFetch,
   );

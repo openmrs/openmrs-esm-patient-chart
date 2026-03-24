@@ -30,13 +30,7 @@ interface PaginatedVitalsProps {
   patient: fhir.Patient;
 }
 
-const StyledTableCell = ({
-  children,
-  interpretation,
-}: {
-  children: React.ReactNode;
-  interpretation: string;
-}) => {
+const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
   let cellClass = '';
 
   switch (interpretation) {
@@ -164,8 +158,16 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                         </TableCell>
                       </TableExpandRow>
                       {row.isExpanded && hasNote ? (
-                        <TableExpandedRow colSpan={headers.length + 2} {...getExpandedRowProps({ row })}>
-                          <p className={styles.expandedNote}>{vitalsObj.note}</p>
+                        <TableExpandedRow
+                          className={styles.expandedRow}
+                          colSpan={headers.length + 2}
+                          {...getExpandedRowProps({ row })}
+                        >
+                          <div className={styles.container}>
+                            <div className={styles.copy}>
+                              <span className={styles.content}>{vitalsObj.note}</span>
+                            </div>
+                          </div>
                         </TableExpandedRow>
                       ) : (
                         <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
