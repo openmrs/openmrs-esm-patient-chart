@@ -64,14 +64,13 @@
 }
 
 .stickyMedicationInfo {
-  position: fixed;
+  position: sticky;
   background-color: colors.$cyan-60;
   color: colors.$white-0;
-  top: layout.$spacing-12;
+  top: 0;
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
 
   .medicationInfo {
     margin: 0;
@@ -170,6 +169,10 @@
 /* Desktop */
 :global(.omrs-breakpoint-lt-desktop) .gridRow {
   align-items: center;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .topAlignedGridRow {
+  align-items: flex-start;
 }
 
 .field {
@@ -285,4 +288,27 @@
 
 .caption01 {
   @include type.type-style('legal-01');
+}
+
+.autoCalcHelper {
+  @include type.type-style('helper-text-01');
+  display: block;
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-02;
+}
+
+.recalculateLink {
+  @include type.type-style('helper-text-01');
+  display: block;
+  margin-top: layout.$spacing-02;
+  padding: 0;
+  border: none;
+  background: none;
+  color: colors.$blue-60;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: colors.$blue-70;
+  }
 }
