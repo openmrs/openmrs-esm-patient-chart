@@ -28,6 +28,7 @@ export interface EncountersTableProps {
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   isSelectable: boolean;
+  canPrintEncounters: boolean;
 }
 
 export interface MappedEncounter {

@@ -33,6 +33,7 @@ const testProps: EncountersTableProps = {
   pageSize: 10,
   setPageSize: jest.fn(),
   isSelectable: true,
+  canPrintEncounters: true,
 };
 
 const mockShowModal = jest.mocked(showModal);

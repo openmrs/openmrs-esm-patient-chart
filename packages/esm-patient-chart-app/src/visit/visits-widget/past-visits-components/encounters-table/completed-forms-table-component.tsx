@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { type EncounterType } from '@openmrs/esm-framework';
-import {
-  type EncountersTableProps,
-  useAllEncounters,
-  isCompletedFormEncounter,
-} from './encounters-table.resource';
+import { userHasAccess, useSession, type EncounterType } from '@openmrs/esm-framework';
+import { type EncountersTableProps, useAllEncounters, isCompletedFormEncounter } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
 
 interface CompletedFormsTableProps {
@@ -34,6 +30,9 @@ const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid }
     setCurrentPage(pageNumber);
   };
 
+  const session = useSession();
+  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+
   const encountersTableProps: EncountersTableProps = {
     currentPage,
     encounterTypeToFilter,
@@ -48,6 +47,7 @@ const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid }
     showVisitType: true,
     totalCount: filteredCompletedForms.length,
     isSelectable: true,
+    canPrintEncounters,
   };
 
   return <EncountersTable {...encountersTableProps} />;

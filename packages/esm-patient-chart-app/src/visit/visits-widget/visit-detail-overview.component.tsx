@@ -32,7 +32,7 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
           ) : (
             <></>
           )}
-          <Tab className={styles.tab} id="visit-summaries-tab">
+          <Tab className={styles.tab} id="completed-forms-tab">
             {t('completedForms', 'Completed Forms')}
           </Tab>
         </TabList>
