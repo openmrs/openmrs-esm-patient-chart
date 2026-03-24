@@ -108,14 +108,13 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
               const value = obs.valueQuantity?.value;
 
-              // If value is not a valid number, safely fallback
               if (typeof value !== 'number') {
-                rowData[obs.conceptUuid] = '';
+                rowData[obs.conceptUuid] = undefined;
                 break;
               }
 
               if (value % 1 !== 0) {
-                if (decimalPlaces && decimalPlaces > 0) {
+                if (decimalPlaces > 0) {
                   rowData[obs.conceptUuid] = value.toFixed(decimalPlaces);
                 } else {
                   rowData[obs.conceptUuid] = value.toFixed(2);
@@ -123,6 +122,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               } else {
                 rowData[obs.conceptUuid] = value;
               }
+
               break;
             }
 

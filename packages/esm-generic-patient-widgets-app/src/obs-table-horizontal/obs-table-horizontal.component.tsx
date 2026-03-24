@@ -193,13 +193,14 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
             let value;
 
-            // Safety check
             if (typeof rawValue !== 'number') {
-              value = '';
+              value = undefined;
             } else if (rawValue % 1 !== 0) {
-              value = decimalPlaces && decimalPlaces > 0
-                ? rawValue.toFixed(decimalPlaces)
-                : rawValue.toFixed(2);
+              if (decimalPlaces > 0) {
+                value = rawValue.toFixed(decimalPlaces);
+              } else {
+                value = rawValue.toFixed(2);
+              }
             } else {
               value = rawValue;
             }
@@ -209,6 +210,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
               obsUuid: obs.id,
               dataType: 'Numeric',
             };
+
             break;
           }
 
