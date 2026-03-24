@@ -23,7 +23,7 @@ export type MappedVitals = {
   interpretation: ObservationInterpretation;
   recordedDate: string | Date;
   encounterId: string;
-  value: number | string;
+  value: number;
 };
 
 export type FHIRInterpretation = 'Critically Low' | 'Critically High' | 'High' | 'Low' | 'Normal';

@@ -511,7 +511,7 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
       ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
       : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
-    value: resource?.valueString || resource?.valueQuantity?.value,
+    value: resource?.valueQuantity?.value,
   };
 }
 
