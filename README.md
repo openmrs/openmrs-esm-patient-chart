@@ -103,60 +103,83 @@ By default, `turbo` will cache test runs. This means that re-running tests wihou
 yarn turbo run test --force
 ```
 
-## Running End-to-End (E2E) tests 
+## Running End-to-End (E2E) tests
 
-Before running the E2E tests, you need to set up the test environment. Install Playwright browsers and setup the default test environment variables by running the following commands: 
+This repository uses [Playwright](https://playwright.dev/) for E2E coverage. The full local setup is documented in [e2e/README.md](e2e/README.md).
+
+### Quick start
+
+1. Install dependencies:
 
 ```bash
-npx playwright install
+yarn
+```
+
+2. Install the Playwright browser used by this project:
+
+```bash
+npx playwright install chromium
+```
+
+3. Create a local environment file:
+
+```bash
 cp example.env .env
 ```
 
-By default, tests run against a local backend at http://localhost:8080/openmrs. To test local changes, make sure your dev server is running before executing tests. For example, to test local changes to the Allergies app, run:
+On Windows PowerShell, use:
+
+```powershell
+Copy-Item example.env .env
+```
+
+4. Start the frontend against the backend you want to test. For example:
 
 ```bash
 yarn start --sources packages/esm-patient-allergies-app
 ```
 
-To test against a remote instance (such as the OpenMRS refapp hosted on dev3.openmrs.org, update the E2E_BASE_URL environment variable in your .env file:
+By default, tests run against `http://localhost:8080/openmrs`. To point the suite at another backend, update `E2E_BASE_URL` in `.env`. For example:
 
-```
+```env
 E2E_BASE_URL=https://dev3.openmrs.org/openmrs
 ```
 
-To run E2E tests:
+5. Run the tests:
 
 ```bash
 yarn test-e2e
 ```
 
-This will run all the E2E tests (files in the e2e directory with the *.spec.ts extension) in headless mode. That means no browser UI will be visible.
+### Common commands
 
-To run tests in headed mode (shows the browser while tests run) use:
+Run all E2E tests in headed mode:
 
 ```bash
 yarn test-e2e --headed
 ```
 
-To run tests in Playwright's UI mode (interactive debugger), use:
+Run tests in Playwright UI mode:
 
 ```bash
 yarn test-e2e --ui
 ```
 
-You'll most often want to run tests in both headed and UI mode:
+Run a single spec file:
 
 ```bash
-yarn test-e2e --headed --ui
+yarn test-e2e e2e/specs/allergies.spec.ts
 ```
 
-To run a specific test file:
+Run tests matching a name:
 
 ```bash
-yarn test-e2e <test-name>
+yarn test-e2e --grep "Allergies"
 ```
 
-Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) to learn more about End-to-End tests in this project.
+After a run, open `playwright-report/index.html` to inspect the HTML report.
+
+Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) for broader testing guidance.
 
 ### Updating Playwright
 
