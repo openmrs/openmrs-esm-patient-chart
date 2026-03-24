@@ -11,6 +11,7 @@ import {
   TableExpandRow,
   TableHead,
   TableHeader,
+  TableRow,
   type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
@@ -126,13 +127,15 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
           <TableContainer className={styles.tableContainer}>
             <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
               <TableHead>
-                <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })} key={header.key}>
-                    {header.header}
-                  </TableHeader>
-                ))}
-                <TableHeader aria-label={t('actions', 'Actions')} />
+                <TableRow>
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                  <TableHeader aria-label={t('actions', 'Actions')} />
+                </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row) => {
@@ -141,7 +144,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
                   return (
                     <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })} isExpanded={hasNote ? row.isExpanded : false}>
+                      <TableExpandRow
+                        {...getRowProps({ row })}
+                        className={!hasNote ? styles.noNoteRow : undefined}
+                        isExpanded={hasNote ? row.isExpanded : false}
+                      >
                         {row.cells.map((cell) => {
                           const interpretationKey = cell.info.header + 'Interpretation';
                           const interpretation = vitalsObj?.[interpretationKey];

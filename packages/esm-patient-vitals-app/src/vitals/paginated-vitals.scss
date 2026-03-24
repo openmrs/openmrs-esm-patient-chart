@@ -97,6 +97,11 @@
   display: none;
 }
 
+.noNoteRow :global(.cds--table-expand__button) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .expandedNote {
   padding: layout.$spacing-05;
 }
