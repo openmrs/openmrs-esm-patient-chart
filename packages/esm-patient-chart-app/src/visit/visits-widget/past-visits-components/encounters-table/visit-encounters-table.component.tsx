@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { usePagination, type Visit } from '@openmrs/esm-framework';
+import { usePagination, userHasAccess, useSession, type Visit } from '@openmrs/esm-framework';
 import EncountersTable from './encounters-table.component';
 import { type EncountersTableProps } from './encounters-table.resource';
 
@@ -23,6 +23,9 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
   );
   const { results: paginatedEncounters, currentPage, goTo } = usePagination(mappedEncounters, pageSize);
 
+  const session = useSession();
+  const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
+
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
     totalCount: visit.encounters.length,
@@ -35,6 +38,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
     pageSize,
     setPageSize,
     isSelectable: false,
+    canPrintEncounters,
   };
 
   return <EncountersTable {...encountersTableProps} />;
