@@ -2,14 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  Link,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
   TableHead,
   TableHeader,
-  TableRow,
   type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
@@ -28,59 +29,30 @@ interface PaginatedVitalsProps {
   patient: fhir.Patient;
 }
 
-const NOTE_THRESHOLD = 75;
-
 const StyledTableCell = ({
   children,
   interpretation,
-  headerKey,
 }: {
   children: React.ReactNode;
   interpretation: string;
-  headerKey: string;
 }) => {
-  const { t } = useTranslation();
-  const isNoteCell = headerKey === 'noteRender';
-  const noteText = typeof children === 'string' ? children : '';
-  const [isExpanded, setIsExpanded] = useState(false);
-
   let cellClass = '';
 
-  if (isNoteCell) {
-    cellClass = styles.note;
-  } else {
-    switch (interpretation) {
-      case 'critically_high':
-        cellClass = styles.criticallyHigh;
-        break;
-      case 'critically_low':
-        cellClass = styles.criticallyLow;
-        break;
-      case 'high':
-        cellClass = styles.high;
-        break;
-      case 'low':
-        cellClass = styles.low;
-        break;
-      default:
-        break;
-    }
-  }
-
-  if (isNoteCell && noteText.length > NOTE_THRESHOLD) {
-    return (
-      <TableCell className={cellClass}>
-        {isExpanded ? noteText : `${noteText.substring(0, NOTE_THRESHOLD)}...`}{' '}
-        <Link
-          onClick={(e) => {
-            e.preventDefault();
-            setIsExpanded(!isExpanded);
-          }}
-        >
-          {isExpanded ? t('readLess', 'Read less') : t('readMore', 'Read more')}
-        </Link>
-      </TableCell>
-    );
+  switch (interpretation) {
+    case 'critically_high':
+      cellClass = styles.criticallyHigh;
+      break;
+    case 'critically_low':
+      cellClass = styles.criticallyLow;
+      break;
+    case 'high':
+      cellClass = styles.high;
+      break;
+    case 'low':
+      cellClass = styles.low;
+      break;
+    default:
+      break;
   }
 
   return <TableCell className={cellClass}>{children}</TableCell>;
@@ -104,8 +76,8 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   });
 
   const handleSorting = (
-    cellA: any,
-    cellB: any,
+    _cellA: any,
+    _cellB: any,
     { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {
@@ -137,7 +109,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
-  const rows = isPrinting ? sortedData : paginatedVitals;
+  const displayedRows = isPrinting ? sortedData : paginatedVitals;
 
   return (
     <>
@@ -145,47 +117,55 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         headers={tableHeaders}
         isSortable
         overflowMenuOnHover={!isTablet}
-        rows={rows}
+        rows={displayedRows}
         size={isTablet ? 'lg' : 'sm'}
         sortRow={handleSorting}
         useZebraStyles
       >
-        {({ rows, headers, getTableProps, getHeaderProps }) => (
+        {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
           <TableContainer className={styles.tableContainer}>
             <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
               <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                  <TableHeader aria-label={t('actions', 'Actions')} />
-                </TableRow>
+                <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                {headers.map((header) => (
+                  <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                    {header.header}
+                  </TableHeader>
+                ))}
+                <TableHeader aria-label={t('actions', 'Actions')} />
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => {
-                      const vitalsObj = paginatedVitals.find((obj) => obj.id === row.id);
-                      const interpretationKey = cell.info.header + 'Interpretation';
-                      const interpretation = vitalsObj?.[interpretationKey];
+                {rows.map((row) => {
+                  const vitalsObj = displayedRows.find((obj) => obj.id === row.id);
+                  const hasNote = Boolean(vitalsObj?.note);
 
-                      return (
-                        <StyledTableCell
-                          key={`styled-cell-${cell.id}`}
-                          interpretation={interpretation}
-                          headerKey={cell.info.header}
-                        >
-                          {cell.value?.content ?? cell.value}
-                        </StyledTableCell>
-                      );
-                    })}
-                    <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                  return (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow {...getRowProps({ row })} isExpanded={hasNote ? row.isExpanded : false}>
+                        {row.cells.map((cell) => {
+                          const interpretationKey = cell.info.header + 'Interpretation';
+                          const interpretation = vitalsObj?.[interpretationKey];
+
+                          return (
+                            <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
+                              {cell.value?.content ?? cell.value}
+                            </StyledTableCell>
+                          );
+                        })}
+                        <TableCell className="cds--table-column-menu" id="actions">
+                          <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                        </TableCell>
+                      </TableExpandRow>
+                      {row.isExpanded && hasNote ? (
+                        <TableExpandedRow colSpan={headers.length + 2} {...getExpandedRowProps({ row })}>
+                          <p className={styles.expandedNote}>{vitalsObj.note}</p>
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

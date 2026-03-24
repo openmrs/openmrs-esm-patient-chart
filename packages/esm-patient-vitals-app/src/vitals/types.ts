@@ -13,7 +13,6 @@ export interface VitalsTableRow extends PatientVitalsAndBiometrics {
   temperatureRenderInterpretation?: ObservationInterpretation;
   respiratoryRateRender: string | number;
   respiratoryRateRenderInterpretation?: ObservationInterpretation;
-  noteRender?: string;
 }
 
 export interface VitalsTableHeader {
@@ -23,8 +22,7 @@ export interface VitalsTableHeader {
     | 'bloodPressureRender'
     | 'pulseRender'
     | 'respiratoryRateRender'
-    | 'spo2Render'
-    | 'noteRender';
+    | 'spo2Render';
   header: string;
   isSortable?: boolean;
   sortFunc: (valueA: VitalsTableRow, valueB: VitalsTableRow) => number;
