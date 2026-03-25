@@ -326,7 +326,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           ? updateVisit(visitToEdit?.uuid, payload, abortController)
           : saveVisit(payload, abortController);
 
-        visitRequest
+        await visitRequest
           .then((response) => {
             showSnackbar({
               isLowContrast: true,
@@ -394,7 +394,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             // do nothing, this catches any reject promises used for short-circuiting
           });
       } else {
-        createOfflineVisitForPatient(
+        await createOfflineVisitForPatient(
           patientUuid,
           visitLocation.uuid,
           config.offlineVisitTypeUuid,
@@ -422,12 +422,8 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
               isLowContrast: false,
               subtitle: error?.message,
             });
-
-            return Promise.reject(error);
           },
         );
-
-        return;
       }
     },
     [
