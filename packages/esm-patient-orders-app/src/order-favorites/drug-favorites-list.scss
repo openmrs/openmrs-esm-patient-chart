@@ -15,7 +15,6 @@
   background-color: $ui-03;
   border: none;
   width: 100%;
-  cursor: pointer;
 }
 
 .chevronButton {
@@ -24,6 +23,7 @@
   justify-content: center;
   padding: layout.$spacing-03;
   border-radius: 0;
+  cursor: pointer;
 
   &:hover {
     background-color: colors.$gray-10-hover;
@@ -52,7 +52,6 @@
   align-items: center;
   gap: layout.$spacing-05;
   padding: layout.$spacing-04 layout.$spacing-05;
-  cursor: pointer;
   border-bottom: 1px solid $ui-03;
 
   &:hover {
@@ -78,6 +77,16 @@
   width: 1rem;
   height: 1rem;
   fill: $text-02;
+}
+
+.itemButton {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
 .itemContent {

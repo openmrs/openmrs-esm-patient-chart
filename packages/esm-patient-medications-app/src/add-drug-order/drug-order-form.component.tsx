@@ -739,6 +739,18 @@ export function DrugOrderForm({
             </section>
           </div>
 
+          <ExtensionSlot
+            name="drug-order-form-actions-slot"
+            state={{
+              drug,
+              orderItem: {
+                dosage: watchedDosage,
+                unit: watchedUnit,
+                route: watch('route'),
+                frequency: watchedFrequency,
+              },
+            }}
+          />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}

@@ -48,18 +48,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
     const { t } = useTranslation();
 
     return (
-      <div
-        className={styles.favoriteItem}
-        onClick={() => !isEditMode && onClick(favorite)}
-        role="button"
-        tabIndex={0}
-        aria-label={favorite.displayName}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && !isEditMode) {
-            onClick(favorite);
-          }
-        }}
-      >
+      <div className={styles.favoriteItem}>
         {isEditMode ? (
           <div className={styles.checkboxWrapper}>
             <Checkbox
@@ -67,7 +56,6 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
               labelText=""
               checked={isSelected}
               onChange={() => onToggleSelection(favoriteKey)}
-              onClick={(e) => e.stopPropagation()}
             />
           </div>
         ) : (
@@ -75,30 +63,35 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
             <Pin className={styles.pinIcon} />
           </div>
         )}
-        <div className={styles.itemContent}>
-          <p className={styles.itemTitle}>{favorite.displayName}</p>
-          <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
-        </div>
-        {!isEditMode && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <OverflowMenu
-              size={isTablet ? 'md' : 'sm'}
-              flipped
-              aria-label={t('pinnedOrderActions', 'Pinned order actions')}
-            >
-              <OverflowMenuItem
-                className={styles.menuItem}
-                itemText={t('edit', 'Edit')}
-                onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
-              />
-              <OverflowMenuItem
-                className={styles.menuItem}
-                itemText={t('delete', 'Delete')}
-                onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
-                isDelete
-              />
-            </OverflowMenu>
+        <button
+          type="button"
+          className={styles.itemButton}
+          onClick={() => !isEditMode && onClick(favorite)}
+          aria-label={favorite.displayName}
+        >
+          <div className={styles.itemContent}>
+            <p className={styles.itemTitle}>{favorite.displayName}</p>
+            <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
           </div>
+        </button>
+        {!isEditMode && (
+          <OverflowMenu
+            size={isTablet ? 'md' : 'sm'}
+            flipped
+            aria-label={t('pinnedOrderActions', 'Pinned order actions')}
+          >
+            <OverflowMenuItem
+              className={styles.menuItem}
+              itemText={t('edit', 'Edit')}
+              onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
+            />
+            <OverflowMenuItem
+              className={styles.menuItem}
+              itemText={t('delete', 'Delete')}
+              onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
+              isDelete
+            />
+          </OverflowMenu>
         )}
       </div>
     );

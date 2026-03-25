@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { IconButton, InlineLoading } from '@carbon/react';
+import { Pin, PinFilled } from '@carbon/react/icons';
 import { showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import { isDrugFavorite, getDrugFavorite, extractDrugOrderAttributes } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { MODAL_NAMES } from './constants';
 import type { DrugActionsMenuProps } from './types';
-import styles from './drug-actions-menu.scss';
 
 const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug, orderItem }) => {
   const { t } = useTranslation();
@@ -61,13 +61,14 @@ const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug, orderItem }) =>
   }
 
   return (
-    <OverflowMenu size={isTablet ? 'md' : 'sm'} flipped aria-label={t('drugActions', 'Drug actions')}>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        itemText={isPinned ? t('unpinOrder', 'Unpin order') : t('pinOrder', 'Pin order')}
-        onClick={handlePinClick}
-      />
-    </OverflowMenu>
+    <IconButton
+      kind="ghost"
+      size={isTablet ? 'md' : 'sm'}
+      label={isPinned ? t('unpinOrder', 'Unpin order') : t('pinOrder', 'Pin order')}
+      onClick={handlePinClick}
+    >
+      {isPinned ? <PinFilled /> : <Pin />}
+    </IconButton>
   );
 };
 

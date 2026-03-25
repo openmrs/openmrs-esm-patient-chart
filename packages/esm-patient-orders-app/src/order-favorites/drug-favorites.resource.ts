@@ -75,7 +75,7 @@ function matchesOrderAttributes(favorite: DrugFavoriteOrder, orderItem?: DrugOrd
     [attributes.dose, orderItem.dosage == null ? undefined : orderItem.dosage.toString()],
     [attributes.unit, orderItem.unit?.value],
   ];
-  return pairs.every(([favValue, orderValue]) => !favValue || !orderValue || favValue === orderValue);
+  return pairs.every(([favValue, orderValue]) => !favValue || (!!orderValue && favValue === orderValue));
 }
 
 export function isDrugFavorite(

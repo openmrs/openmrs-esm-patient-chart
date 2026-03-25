@@ -112,7 +112,11 @@ export function useFormAttributes({
     () => ({
       strength: strength || selectedStrengthDrug?.strength || initialAttributes?.strength || effectiveDrug?.strength,
       dose: dose || initialAttributes?.dose || (manualDose == null ? undefined : manualDose.toString()),
-      unit: unit || initialAttributes?.unit || effectiveDrug?.dosageForm?.display,
+      unit:
+        unit ||
+        selectedStrengthDrug?.dosageForm?.display ||
+        initialAttributes?.unit ||
+        effectiveDrug?.dosageForm?.display,
       route: route || initialAttributes?.route || manualRoute?.display,
       frequency: frequency || initialAttributes?.frequency || manualFrequency?.display,
     }),
@@ -133,11 +137,12 @@ export function useFormAttributes({
 
   const resolvedUuids = useMemo(
     () => ({
-      unitUuid: initialAttributes?.unitUuid || effectiveDrug?.dosageForm?.uuid,
+      unitUuid:
+        selectedStrengthDrug?.dosageForm?.uuid || initialAttributes?.unitUuid || effectiveDrug?.dosageForm?.uuid,
       routeUuid: initialAttributes?.routeUuid || manualRoute?.uuid,
       frequencyUuid: initialAttributes?.frequencyUuid || manualFrequency?.uuid,
     }),
-    [initialAttributes, effectiveDrug, manualRoute, manualFrequency],
+    [selectedStrengthDrug, initialAttributes, effectiveDrug, manualRoute, manualFrequency],
   );
 
   // Handlers

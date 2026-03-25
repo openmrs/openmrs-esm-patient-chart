@@ -43,9 +43,8 @@ describe('DrugActionsMenu', () => {
     mockShowModal.mockReturnValue(jest.fn());
 
     render(<DrugActionsMenu drug={mockDrug} />);
-    const trigger = screen.getByRole('button', { name: /options/i });
-    await user.click(trigger);
-    await user.click(screen.getByText('Pin order'));
+    const pinButton = screen.getByRole('button', { name: /pin order/i });
+    await user.click(pinButton);
 
     expect(mockShowModal).toHaveBeenCalledWith('drug-favorites-modal', expect.objectContaining({ drug: mockDrug }));
   });
