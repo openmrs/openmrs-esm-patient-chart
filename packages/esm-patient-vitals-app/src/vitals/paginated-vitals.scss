@@ -121,6 +121,5 @@
 }
 
 .content {
-  @include type.type-style('body-01');
   color: colors.$gray-80;
 }
