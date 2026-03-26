@@ -110,6 +110,30 @@ describe('VitalsOverview', () => {
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
+  it('expands a vitals row to show an associated note', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+    await waitForLoadingToFinish();
+
+    // The first row has a note — its expand button should be visible
+    const expandButtons = document.querySelectorAll('.cds--table-expand__button');
+    expect(expandButtons.length).toBeGreaterThan(0);
+    expect(expandButtons[0]).toBeVisible();
+
+    // Expand and verify the note text appears
+    await user.click(expandButtons[0]);
+    expect(screen.getByText(/Pt reports severe L chest pain/i)).toBeInTheDocument();
+
+    // Collapse and verify the note text is removed
+    await user.click(expandButtons[0]);
+    expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();
+  });
+
   it('toggles between rendering either a tabular view or a chart view', async () => {
     const user = userEvent.setup();
 
