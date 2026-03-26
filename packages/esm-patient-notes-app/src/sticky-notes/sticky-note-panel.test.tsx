@@ -1,8 +1,8 @@
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockStickyNotesData } from '__mocks__';
-import React from 'react';
 import { createStickyNote, updateStickyNote, useStickyNotes } from './resources';
 import StickyNotePanel from './sticky-note-panel.component';
 
