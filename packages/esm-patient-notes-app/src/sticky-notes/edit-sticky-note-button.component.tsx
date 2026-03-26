@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { IconButton } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { EditIcon } from '@openmrs/esm-framework';
 
 interface EditStickyNoteProps {

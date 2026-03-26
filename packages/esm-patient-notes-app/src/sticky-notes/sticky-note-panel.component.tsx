@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText, TextArea } from '@carbon/react';
 import { formatDate, getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import AddStickyNote from './add-sticky-note-button';
-import DeleteStickyNote from './delete-sticky-note-button';
-import EditStickyNote from './edit-sticky-note-button';
 import { createStickyNote, updateStickyNote, useStickyNotes } from './resources';
+import AddStickyNote from './add-sticky-note-button.component';
+import DeleteStickyNote from './delete-sticky-note-button.component';
+import EditStickyNote from './edit-sticky-note-button.component';
 import styles from './sticky-note-panel.scss';
 
 interface StickyNotePanelProps {
@@ -15,7 +16,7 @@ interface StickyNotePanelProps {
 }
 
 const StickyNotePanel: React.FC<StickyNotePanelProps> = ({ patientUuid, onClose }) => {
-  const { notes: stickyNotes, isLoading, mutate } = useStickyNotes(patientUuid);
+  const { notes: stickyNotes, isLoading, isError, mutate } = useStickyNotes(patientUuid);
   const stickyNote = useMemo(() => {
     return stickyNotes[0] as fhir.Observation;
   }, [stickyNotes]);
@@ -97,6 +98,10 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({ patientUuid, onClose 
         </div>
       </div>
     );
+  }
+
+  if (isError) {
+    return <ErrorState error={isError} headerTitle={t('stickyNote', 'Sticky Note')} />;
   }
 
   return (

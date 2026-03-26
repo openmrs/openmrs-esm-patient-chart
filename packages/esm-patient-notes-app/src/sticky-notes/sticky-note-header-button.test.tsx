@@ -1,30 +1,20 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockStickyNotesData } from '__mocks__';
+import React from 'react';
 import { useStickyNotes } from './resources';
-import StickyNoteHeaderButton from './sticky-note-header-button';
+import StickyNoteHeaderButton from './sticky-note-header-button.component';
 
 jest.mock('./resources', () => ({
   useStickyNotes: jest.fn(),
 }));
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, defaultValue?: string) => defaultValue || key,
-  }),
-}));
-
-jest.mock('./sticky-note-panel', () => () => <div data-testid="sticky-note-panel" />);
+jest.mock('./sticky-note-panel.component', () => () => <div data-testid="sticky-note-panel" />);
 
 const mockUseStickyNotes = useStickyNotes as jest.Mock;
 
 describe('StickyNoteHeaderButton', () => {
   const patientUuid = '3355bd93-3c83-414d-87b1-c87e608ca85a';
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   it('renders button with sticky notes label', () => {
     mockUseStickyNotes.mockReturnValue({

@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { type ConfigObject } from '../config-schema';
 import { fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { type FHIRNoteObservation } from '../types';
 
 export const useStickyNotes = (patientUuid: string) => {

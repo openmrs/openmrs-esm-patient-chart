@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { deleteStickyNote } from './resources';
 

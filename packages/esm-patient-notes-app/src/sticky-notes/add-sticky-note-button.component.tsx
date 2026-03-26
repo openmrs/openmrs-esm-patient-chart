@@ -1,7 +1,7 @@
 import React from 'react';
+import { IconButton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { AddIcon } from '@openmrs/esm-framework';
-import { IconButton } from '@carbon/react';
 
 interface AddStickyNoteProps {
   onAddNote: () => void;

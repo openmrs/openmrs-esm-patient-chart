@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { IconButton } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { showModal, TrashCanIcon } from '@openmrs/esm-framework';
 import styles from './delete-sticky-note-button.scss';
 

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { type ConfigObject } from '../config-schema';
-import DeleteStickyNoteModal from './delete-sticky-note-modal';
+import DeleteStickyNoteModal from './delete-sticky-note.modal';
 import { deleteStickyNote } from './resources';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);

@@ -1,10 +1,10 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import StickyNotePanel from './sticky-note-panel';
 import { mockStickyNotesData } from '__mocks__';
+import React from 'react';
 import { createStickyNote, updateStickyNote, useStickyNotes } from './resources';
+import StickyNotePanel from './sticky-note-panel.component';
 
 jest.mock('./resources', () => ({
   useStickyNotes: jest.fn(),
@@ -39,6 +39,17 @@ describe('StickyNotePanel', () => {
 
     render(<StickyNotePanel patientUuid={patientUuid} onClose={onClose} />);
     expect(screen.queryByText('Sticky Note')).not.toBeInTheDocument();
+  });
+
+  it('shows error state when fetch fails', () => {
+    mockUseStickyNotes.mockReturnValue({
+      notes: [],
+      isLoading: false,
+      isError: new Error('Failed to fetch'),
+      mutate: jest.fn(),
+    });
+
+    render(<StickyNotePanel patientUuid={patientUuid} onClose={onClose} />);
   });
 
   it('renders the notes form when no data exist', async () => {

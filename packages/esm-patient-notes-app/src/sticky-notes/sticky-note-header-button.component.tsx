@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
 import { Button } from '@carbon/react';
 import { DocumentIcon } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStickyNotes } from './resources';
 import styles from './sticky-note-header-button.scss';
-import StickyNotePanel from './sticky-note-panel';
+import StickyNotePanel from './sticky-note-panel.component';
 
 interface StickyNoteHeaderButtonProps {
   patientUuid: string;
