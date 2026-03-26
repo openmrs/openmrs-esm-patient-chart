@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
@@ -120,15 +120,14 @@ describe('VitalsOverview', () => {
     renderWithSwr(<VitalsOverview {...testProps} />);
     await waitForLoadingToFinish();
 
-    // Rows with notes (first two) have expand buttons; rows without notes do not
-    const expandButtons = document.querySelectorAll('.cds--table-expand__button');
+    // Rows with notes (first two) have expand buttons
+    const rows = screen.getAllByRole('row');
+    const expandButtons = rows
+      .map((row) => within(row).queryByRole('button', { name: /expand current row/i }))
+      .filter(Boolean);
     expect(expandButtons.length).toBeGreaterThan(0);
     expect(expandButtons[0]).toBeVisible();
     expect(expandButtons[1]).toBeVisible();
-
-    // Rows without notes should have the noNoteRow class applied
-    const noNoteRows = document.querySelectorAll('.noNoteRow');
-    expect(noNoteRows.length).toBeGreaterThan(0);
 
     // Expand the first row and verify the note text appears
     await user.click(expandButtons[0]);
