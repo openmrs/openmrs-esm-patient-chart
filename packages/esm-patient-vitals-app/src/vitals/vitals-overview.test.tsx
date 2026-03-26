@@ -120,18 +120,31 @@ describe('VitalsOverview', () => {
     renderWithSwr(<VitalsOverview {...testProps} />);
     await waitForLoadingToFinish();
 
-    // The first row has a note — its expand button should be visible
+    // Rows with notes (first two) have expand buttons; rows without notes do not
     const expandButtons = document.querySelectorAll('.cds--table-expand__button');
     expect(expandButtons.length).toBeGreaterThan(0);
     expect(expandButtons[0]).toBeVisible();
+    expect(expandButtons[1]).toBeVisible();
 
-    // Expand and verify the note text appears
+    // Rows without notes should have the noNoteRow class applied
+    const noNoteRows = document.querySelectorAll('.noNoteRow');
+    expect(noNoteRows.length).toBeGreaterThan(0);
+
+    // Expand the first row and verify the note text appears
     await user.click(expandButtons[0]);
     expect(screen.getByText(/Pt reports severe L chest pain/i)).toBeInTheDocument();
 
     // Collapse and verify the note text is removed
     await user.click(expandButtons[0]);
     expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();
+
+    // Expand the second row and verify its note text appears
+    await user.click(expandButtons[1]);
+    expect(screen.getByText(/Follow up in 2 weeks/i)).toBeInTheDocument();
+
+    // Collapse the second row
+    await user.click(expandButtons[1]);
+    expect(screen.queryByText(/Follow up in 2 weeks/i)).not.toBeInTheDocument();
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
