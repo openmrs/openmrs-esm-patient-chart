@@ -122,7 +122,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
             <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  <TableExpandHeader {...getExpandHeaderProps()} />
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })} key={header.key}>
                       {header.header}
