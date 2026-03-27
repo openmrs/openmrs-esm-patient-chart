@@ -38,6 +38,7 @@ import {
   type EncounterType,
   ExtensionSlot,
   useFeatureFlag,
+  PrinterIcon,
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
@@ -157,6 +158,20 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     },
     [mutate, mutateVisitContext, patientUuid, t],
   );
+  const handlePrintEncounter = useCallback(
+    (encounterUuid: string) => {
+      const encounter = encountersByUuid.get(encounterUuid);
+      if (!encounter) return;
+
+      const dispose = showModal('print-encounter-modal', {
+        close: () => dispose(),
+        closeModal: () => dispose(),
+        encounter,
+        patientUuid,
+      });
+    },
+    [encountersByUuid, patientUuid],
+  );
 
   if (isLoadingEncounterTypes || isLoading) {
     return <DataTableSkeleton role="progressbar" zebra />;
@@ -257,6 +272,12 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 size={responsiveSize}
                                 align="left"
                               >
+                                <OverflowMenuItem
+                                  className={styles.menuItem}
+                                  hasDivider
+                                  itemText={t('printThisEncounter', 'Print this encounter')}
+                                  onClick={() => handlePrintEncounter(encounter.id)}
+                                />
                                 {canEditEncounter && (
                                   <OverflowMenuItem
                                     className={styles.menuItem}
@@ -314,6 +335,13 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                               <EncounterObservations observations={encounter.obs} />
                             )}
                             <>
+                              <Button
+                                kind="ghost"
+                                onClick={() => handlePrintEncounter(encounter.id)}
+                                renderIcon={PrinterIcon}
+                              >
+                                {t('printThisEncounter', 'Print this encounter')}
+                              </Button>
                               {canEditEncounter && (
                                 <Button
                                   kind="ghost"

@@ -39,6 +39,15 @@ export interface MappedEncounter {
   id: string;
   obs: Array<Obs>;
   provider: string;
+  patient: {
+    uuid: string;
+    display: string;
+    person: {
+      age: number;
+      display: string;
+      gender: string;
+    };
+  };
   visitStartDatetime?: string;
   visitStopDatetime?: string;
   visitType: string;
@@ -90,6 +99,15 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     form: encounter.form as Form,
     formName: encounter.form?.display ?? '--',
     obs: encounter.obs,
+    patient: {
+      uuid: encounter.patient?.uuid,
+      display: encounter.patient?.display,
+      person: {
+        age: encounter.patient?.person?.age,
+        display: encounter.patient?.person?.display,
+        gender: encounter.patient?.person?.gender,
+      },
+    },
     provider:
       encounter.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
     visitStartDatetime: encounter.visit?.startDatetime,

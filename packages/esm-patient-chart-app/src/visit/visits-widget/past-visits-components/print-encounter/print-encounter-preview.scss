@@ -1,0 +1,30 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  margin-top: layout.$spacing-03;
+}
+
+.cell {
+  @include type.type-style('label-02');
+  vertical-align: top;
+}
+
+.conceptCell {
+  font-weight: 600;
+  color: colors.$cool-gray-90;
+}
+
+.noObs {
+  @include type.type-style('body-01');
+  color: colors.$cool-gray-60;
+  margin-top: layout.$spacing-05;
+  font-style: italic;
+}
+
+@media print {
+  .cell {
+    font-size: 9pt;
+  }
+}

@@ -1,0 +1,120 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/themes';
+@use '@carbon/colors';
+
+.modalContentWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.modalBody {
+  padding: layout.$spacing-05;
+  overflow-y: auto;
+}
+
+.previewPanel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.printContent {
+  background: transparent;
+}
+
+.printableHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: layout.$spacing-05;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.headerRight {
+  text-align: right;
+}
+
+.facilityName {
+  @include type.type-style('label-01');
+  color: colors.$cool-gray-60;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid themes.$border-subtle-01;
+  margin: layout.$spacing-05 0;
+}
+
+.printableBody {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: layout.$spacing-07;
+}
+
+.patientDetails,
+.encounterDetails {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  flex: 1;
+}
+
+.titleHeader {
+  @include type.type-style('productive-heading-02');
+  font-weight: 600;
+  color: colors.$cool-gray-90;
+}
+
+.sectionHeader {
+  @include type.type-style('label-02');
+  font-weight: 700;
+  color: colors.$cool-gray-90;
+  margin-bottom: layout.$spacing-03;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sectionSubHeader {
+  @include type.type-style('label-02');
+  font-weight: 700;
+  color: colors.$cool-gray-70;
+  margin-bottom: layout.$spacing-02;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.itemLabel {
+  @include type.type-style('label-02');
+  color: colors.$cool-gray-90;
+  line-height: 1.5;
+}
+
+.metaLabel {
+  font-weight: 600;
+}
+
+@media print {
+  .previewPanel {
+    width: 100%;
+  }
+
+  .titleHeader {
+    font-size: 14pt;
+  }
+
+  .sectionHeader {
+    font-size: 9pt;
+  }
+
+  .itemLabel {
+    font-size: 9pt;
+  }
+}

@@ -195,6 +195,10 @@
       "component": "deleteEncounterModal"
     },
     {
+      "name": "print-encounter-modal",
+      "component": "printEncounterModal"
+    },
+    {
       "name": "delete-visit-dialog",
       "component": "deleteVisitModal"
     },
