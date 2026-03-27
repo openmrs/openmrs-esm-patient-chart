@@ -46,11 +46,9 @@ const PrintEncounterModal: React.FC<PrintEncounterModalProps> = ({ encounter, cl
   return (
     <>
       <ModalBody className={classNames(styles.modalBody, styles.modalContentWrapper)}>
-        {/* ── Preview panel ── */}
         <div className={styles.previewPanel}>
           <div ref={contentToPrintRef}>
             <div className={styles.printContent}>
-              {/* Header */}
               <div className={styles.printableHeader}>
                 <div className={styles.headerLeft}>
                   <p className={styles.titleHeader}>{capitalize(t('encounterReport', 'Encounter Report'))}</p>
@@ -67,9 +65,7 @@ const PrintEncounterModal: React.FC<PrintEncounterModalProps> = ({ encounter, cl
 
               <hr className={styles.divider} />
 
-              {/* Patient demographics + encounter meta */}
               <div className={styles.printableBody}>
-                {/* Left: patient info */}
                 <div className={styles.patientDetails}>
                   <p className={styles.sectionSubHeader}>
                     {capitalize(t('patientInformation', 'Patient information'))}
@@ -88,7 +84,6 @@ const PrintEncounterModal: React.FC<PrintEncounterModalProps> = ({ encounter, cl
                   </p>
                 </div>
 
-                {/* Right: encounter details */}
                 <div className={styles.encounterDetails}>
                   <p className={styles.sectionSubHeader}>{capitalize(t('encounterDetails', 'Encounter details'))}</p>
                   <p className={styles.itemLabel}>
@@ -115,8 +110,6 @@ const PrintEncounterModal: React.FC<PrintEncounterModalProps> = ({ encounter, cl
               </div>
 
               <hr className={styles.divider} />
-
-              {/* Observations */}
               <p className={styles.sectionHeader}>{capitalize(t('observations', 'Observations'))}</p>
               <PrintableEncounterReport observations={encounter?.obs ?? []} />
             </div>
