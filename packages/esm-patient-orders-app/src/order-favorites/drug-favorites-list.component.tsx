@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, InlineNotification, SkeletonText, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { ChevronDown, ChevronUp, Pin, TrashCan } from '@carbon/react/icons';
+import { Button, InlineNotification, SkeletonText, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { ChevronDown, ChevronUp, Pin } from '@carbon/react/icons';
 import { showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
@@ -21,52 +21,26 @@ interface DrugFavoritesListExtensionProps {
 
 interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
-  favoriteKey: string;
-  isEditMode: boolean;
-  isSelected: boolean;
   isTablet: boolean;
   anyStrengthLabel: string;
-  onToggleSelection: (key: string) => void;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onEdit: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
   onDelete: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
-  ({
-    favorite,
-    favoriteKey,
-    isEditMode,
-    isSelected,
-    isTablet,
-    anyStrengthLabel,
-    onToggleSelection,
-    onClick,
-    onEdit,
-    onDelete,
-  }) => {
+  ({ favorite, isTablet, anyStrengthLabel, onClick, onEdit, onDelete }) => {
     const { t } = useTranslation();
 
     return (
       <div className={styles.favoriteItem}>
-        {isEditMode ? (
-          <div className={styles.checkboxWrapper}>
-            <Checkbox
-              id={favoriteKey}
-              labelText=""
-              checked={isSelected}
-              onChange={() => onToggleSelection(favoriteKey)}
-            />
-          </div>
-        ) : (
-          <div className={styles.pinButton}>
-            <Pin className={styles.pinIcon} />
-          </div>
-        )}
+        <div className={styles.pinButton}>
+          <Pin className={styles.pinIcon} />
+        </div>
         <button
           type="button"
           className={styles.itemButton}
-          onClick={() => !isEditMode && onClick(favorite)}
+          onClick={() => onClick(favorite)}
           aria-label={favorite.displayName}
         >
           <div className={styles.itemContent}>
@@ -74,25 +48,23 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
             <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
           </div>
         </button>
-        {!isEditMode && (
-          <OverflowMenu
-            size={isTablet ? 'md' : 'sm'}
-            flipped
-            aria-label={t('pinnedOrderActions', 'Pinned order actions')}
-          >
-            <OverflowMenuItem
-              className={styles.menuItem}
-              itemText={t('edit', 'Edit')}
-              onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
-            />
-            <OverflowMenuItem
-              className={styles.menuItem}
-              itemText={t('delete', 'Delete')}
-              onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
-              isDelete
-            />
-          </OverflowMenu>
-        )}
+        <OverflowMenu
+          size={isTablet ? 'md' : 'sm'}
+          flipped
+          aria-label={t('pinnedOrderActions', 'Pinned order actions')}
+        >
+          <OverflowMenuItem
+            className={styles.menuItem}
+            itemText={t('edit', 'Edit')}
+            onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
+          />
+          <OverflowMenuItem
+            className={styles.menuItem}
+            itemText={t('delete', 'Delete')}
+            onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
+            isDelete
+          />
+        </OverflowMenu>
       </div>
     );
   },
@@ -114,27 +86,8 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   useEffect(() => {
     setIsCollapsed(isSearching);
   }, [isSearching]);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const toggleCollapsed = () => setIsCollapsed((prev) => !prev);
-
-  const toggleEditMode = useCallback(() => {
-    setIsEditMode((prev) => !prev);
-    setSelectedKeys(new Set());
-  }, []);
-
-  const toggleSelection = useCallback((favoriteKey: string) => {
-    setSelectedKeys((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(favoriteKey)) {
-        newSet.delete(favoriteKey);
-      } else {
-        newSet.add(favoriteKey);
-      }
-      return newSet;
-    });
-  }, []);
 
   const handleFavoriteClick = useCallback(
     (favorite: DrugFavoriteOrder) => {
@@ -169,22 +122,12 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     });
   }, []);
 
-  const handleToggleSelection = useCallback(
-    (favoriteKey: string) => {
-      toggleSelection(favoriteKey);
-    },
-    [toggleSelection],
-  );
-
-  const handleDeleteSelected = useCallback(() => {
-    const selectedFavorites = favorites.filter((f) => selectedKeys.has(getFavoriteKey(f)));
-    setSelectedKeys(new Set());
-    setIsEditMode(false);
+  const handleClearAll = useCallback(() => {
     const dispose = showModal(MODAL_NAMES.DELETE_FAVORITES, {
       closeModal: () => dispose(),
-      favorites: selectedFavorites,
+      favorites,
     });
-  }, [favorites, selectedKeys]);
+  }, [favorites]);
 
   const handleDelete = useCallback(
     (e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
@@ -233,24 +176,12 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <span className={styles.headerTitle}>{t('myPinnedDrugOrders', 'My pinned drug orders')}</span>
-        {!isCollapsed && (
-          <>
-            {isEditMode && selectedKeys.size > 0 && (
-              <Button
-                kind="danger--ghost"
-                size={isTablet ? 'md' : 'sm'}
-                renderIcon={TrashCan}
-                onClick={handleDeleteSelected}
-              >
-                {t('deleteSelected', 'Delete ({{total}})', { total: selectedKeys.size })}
-              </Button>
-            )}
-            <Button kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={toggleEditMode}>
-              {isEditMode ? t('done', 'Done') : t('edit', 'Edit')}
-            </Button>
-          </>
-        )}
         <div className={styles.headerActions}>
+          {!isCollapsed && (
+            <Button kind="danger--ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClearAll}>
+              {t('clearAll', 'Clear all')}
+            </Button>
+          )}
           <button
             type="button"
             className={styles.chevronButton}
@@ -267,24 +198,17 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
       </div>
       {!isCollapsed && (
         <div className={styles.listContainer}>
-          {favorites.map((favorite) => {
-            const key = getFavoriteKey(favorite);
-            return (
-              <FavoriteListItem
-                key={key}
-                favorite={favorite}
-                favoriteKey={key}
-                isEditMode={isEditMode}
-                isSelected={selectedKeys.has(key)}
-                isTablet={isTablet}
-                anyStrengthLabel={anyStrengthLabel}
-                onToggleSelection={handleToggleSelection}
-                onClick={handleFavoriteClick}
-                onEdit={handleEditItem}
-                onDelete={handleDelete}
-              />
-            );
-          })}
+          {favorites.map((favorite) => (
+            <FavoriteListItem
+              key={getFavoriteKey(favorite)}
+              favorite={favorite}
+              isTablet={isTablet}
+              anyStrengthLabel={anyStrengthLabel}
+              onClick={handleFavoriteClick}
+              onEdit={handleEditItem}
+              onDelete={handleDelete}
+            />
+          ))}
         </div>
       )}
     </div>

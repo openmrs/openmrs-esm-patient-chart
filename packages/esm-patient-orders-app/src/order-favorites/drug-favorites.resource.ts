@@ -66,8 +66,14 @@ export function removeDrugFavorite(currentFavorites: DrugFavoriteOrder[], id: st
   return currentFavorites.filter((f) => f.id !== id);
 }
 
+function hasOrderAttributes(orderItem?: DrugOrderSlotState): boolean {
+  return Boolean(
+    orderItem?.route?.value || orderItem?.frequency?.value || orderItem?.dosage != null || orderItem?.unit?.value,
+  );
+}
+
 function matchesOrderAttributes(favorite: DrugFavoriteOrder, orderItem?: DrugOrderSlotState): boolean {
-  if (!orderItem) return true;
+  if (!orderItem || !hasOrderAttributes(orderItem)) return true;
   const { attributes } = favorite;
   const pairs: [string | undefined, string | undefined][] = [
     [attributes.route, orderItem.route?.value],

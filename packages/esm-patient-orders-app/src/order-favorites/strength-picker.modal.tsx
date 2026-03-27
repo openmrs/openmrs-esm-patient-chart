@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -32,6 +32,13 @@ const StrengthPickerModal: React.FC<StrengthPickerModalProps> = ({
   const [selectedDrugUuid, setSelectedDrugUuid] = useState<string | null>(null);
 
   const { matchingDrugs, isLoading, error } = useDrugsByConceptName(conceptName, conceptUuid);
+
+  useEffect(() => {
+    if (!isLoading && !error && matchingDrugs.length === 1) {
+      onSelectDrug(matchingDrugs[0]);
+      closeModal();
+    }
+  }, [isLoading, error, matchingDrugs, onSelectDrug, closeModal]);
 
   const handleSelect = () => {
     const selectedDrug = matchingDrugs.find((d) => d.uuid === selectedDrugUuid);
@@ -85,6 +92,7 @@ const StrengthPickerModal: React.FC<StrengthPickerModalProps> = ({
                   <span className={styles.drugOption}>
                     <span className={styles.drugStrength}>{drug.strength || drug.display}</span>
                     {drug.dosageForm?.display && <span className={styles.drugForm}>{drug.dosageForm.display}</span>}
+                    {drug.strength && <span className={styles.drugName}>{drug.display}</span>}
                   </span>
                 }
                 value={drug.uuid}

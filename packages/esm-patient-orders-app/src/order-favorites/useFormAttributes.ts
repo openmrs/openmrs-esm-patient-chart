@@ -147,7 +147,15 @@ export function useFormAttributes({
 
   // Handlers
   const handleRemoveAttribute = useCallback((key: AttributeKey) => {
-    setSelectedAttributes((prev) => ({ ...prev, [key]: false }));
+    if (key === 'strength') {
+      setSelectedAttributes((prev) => ({ ...prev, strength: false, dose: false, route: false, frequency: false }));
+      setManualDose(null);
+      setManualRoute(null);
+      setManualFrequency(null);
+      setShowManualInputs({ dose: false, route: false, frequency: false });
+    } else {
+      setSelectedAttributes((prev) => ({ ...prev, [key]: false }));
+    }
   }, []);
 
   const handleAddAttribute = useCallback((key: AttributeKey) => {

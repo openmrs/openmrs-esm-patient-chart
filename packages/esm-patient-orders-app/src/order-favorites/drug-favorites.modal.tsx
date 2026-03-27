@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActionableNotification,
   Button,
   ComboBox,
   Dropdown,
@@ -24,12 +25,29 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
   const { t } = useTranslation();
   const form = useFavoriteForm(props);
   const { attributes } = form;
+  const [showStrengthWarning, setShowStrengthWarning] = useState(false);
+
+  const handleStrengthRemove = () => {
+    const hasManualData =
+      attributes.resolved.values.dose || attributes.resolved.values.route || attributes.resolved.values.frequency;
+    if (hasManualData) {
+      setShowStrengthWarning(true);
+    } else {
+      attributes.selection.onRemove('strength');
+    }
+  };
+
+  const confirmStrengthRemove = () => {
+    attributes.selection.onRemove('strength');
+    setShowStrengthWarning(false);
+  };
 
   const renderAttributeTag = (
     key: AttributeKey,
     label: string,
     value: string | undefined,
     skipForConceptBased = false,
+    onRemoveOverride?: () => void,
   ) => {
     if (!value || (skipForConceptBased && form.isConceptBasedFavorite)) return null;
 
@@ -40,7 +58,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
           <Tag
             type="blue"
             filter
-            onClose={() => attributes.selection.onRemove(key)}
+            onClose={onRemoveOverride ?? (() => attributes.selection.onRemove(key))}
             title={t('removeAttribute', 'Remove {{attribute}}', { attribute: label })}
           >
             {value}
@@ -181,7 +199,27 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
                 </div>
               )}
 
-              {renderAttributeTag('strength', t('strength', 'Strength'), attributes.resolved.values.strength)}
+              {renderAttributeTag(
+                'strength',
+                t('strength', 'Strength'),
+                attributes.resolved.values.strength,
+                false,
+                handleStrengthRemove,
+              )}
+              {showStrengthWarning && (
+                <ActionableNotification
+                  kind="warning"
+                  lowContrast
+                  inline
+                  title={t(
+                    'removeStrengthWarning',
+                    'Removing strength will also discard dose, route, and frequency selections.',
+                  )}
+                  actionButtonLabel={t('removeAnyway', 'Remove anyway')}
+                  onActionButtonClick={confirmStrengthRemove}
+                  onClose={() => setShowStrengthWarning(false)}
+                />
+              )}
               {renderAttributeTag('unit', t('doseUnit', 'Dose unit'), attributes.resolved.values.unit)}
               {!form.isConceptBasedFavorite &&
                 renderAttribute(

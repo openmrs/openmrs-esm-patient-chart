@@ -36,3 +36,8 @@
   @include type.type-style('label-01');
   color: $text-02;
 }
+
+.drugName {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
