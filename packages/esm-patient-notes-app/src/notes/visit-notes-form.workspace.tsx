@@ -308,7 +308,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     [combinedDiagnoses, selectedPrimaryDiagnoses, selectedSecondaryDiagnoses],
   );
 
-  const isDiagnosisNotSelected = (diagnosis: Concept) => {
+  const isDiagnosisNotSelected = (diagnosis: Concept | { uuid?: string; display: string }) => {
     const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some((selectedDiagnosis) =>
       diagnosis.uuid
         ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
@@ -811,8 +811,10 @@ function DiagnosesDisplay({
   onAddDiagnosis,
   searchResults,
   t,
-  value,
+  value: rawValue,
 }: DiagnosesDisplayProps) {
+  const value = rawValue?.trim();
+
   if (!value) {
     return null;
   }
@@ -822,6 +824,18 @@ function DiagnosesDisplay({
   }
 
   if (!isSearching && searchResults?.length > 0) {
+    if (
+      searchResults?.length === 1 &&
+      !isDiagnosisNotSelected(searchResults[0]) &&
+      searchResults[0]?.display?.toLocaleLowerCase() === value?.toLocaleLowerCase()
+    )
+      return (
+        <Tile className={styles.emptyResults}>
+          <span>
+            {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+          </span>
+        </Tile>
+      );
     return (
       <ul className={styles.diagnosisList}>
         {searchResults.map((diagnosis, index) => {
@@ -839,27 +853,31 @@ function DiagnosesDisplay({
           }
         })}
 
-        {!searchResults
-          .map((diagnosis) => diagnosis.display.toLocaleLowerCase())
-          .includes(value.toLocaleLowerCase()) && (
-          <li className={styles.diagnosis} role="menuitem">
-            <Button
-              size="md"
-              kind="ghost"
-              onClick={() =>
-                onAddDiagnosis(
-                  {
-                    display: value,
-                  },
-                  fieldName,
-                )
-              }
-              className={styles.customDiagnosisButton}
-            >
-              {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
-            </Button>
-          </li>
-        )}
+        {
+          // if the searchResults doesn't contain the exact search term,
+          // still allow proposing adding it as a custom free-text diagnosis
+          !searchResults
+            .map((diagnosis) => diagnosis.display.toLocaleLowerCase())
+            .includes(value.toLocaleLowerCase()) && (
+            <li className={styles.diagnosis} role="menuitem">
+              <Button
+                size="md"
+                kind="ghost"
+                onClick={() =>
+                  onAddDiagnosis(
+                    {
+                      display: value,
+                    },
+                    fieldName,
+                  )
+                }
+                className={styles.customDiagnosisButton}
+              >
+                {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
+              </Button>
+            </li>
+          )
+        }
       </ul>
     );
   }
@@ -867,30 +885,40 @@ function DiagnosesDisplay({
   if (searchResults?.length === 0) {
     return (
       <ResponsiveWrapper>
-        <Tile className={styles.emptyResults}>
-          <span>
-            {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{value}"</strong>
-          </span>
-        </Tile>
-        <ul className={styles.diagnosisList}>
-          <li className={styles.diagnosis} role="menuitem">
-            <Button
-              size="md"
-              kind="ghost"
-              onClick={() =>
-                onAddDiagnosis(
-                  {
-                    display: value,
-                  },
-                  fieldName,
-                )
-              }
-              className={styles.customDiagnosisButton}
-            >
-              {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
-            </Button>
-          </li>
-        </ul>
+        {isDiagnosisNotSelected({ display: value }) ? (
+          <>
+            <Tile className={styles.emptyResults}>
+              <span>
+                {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{value}"</strong>
+              </span>
+            </Tile>
+            <ul className={styles.diagnosisList}>
+              <li className={styles.diagnosis} role="menuitem">
+                <Button
+                  size="md"
+                  kind="ghost"
+                  onClick={() =>
+                    onAddDiagnosis(
+                      {
+                        display: value,
+                      },
+                      fieldName,
+                    )
+                  }
+                  className={styles.customDiagnosisButton}
+                >
+                  {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
+                </Button>
+              </li>
+            </ul>
+          </>
+        ) : (
+          <Tile className={styles.emptyResults}>
+            <span>
+              {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+            </span>
+          </Tile>
+        )}
       </ResponsiveWrapper>
     );
   }
