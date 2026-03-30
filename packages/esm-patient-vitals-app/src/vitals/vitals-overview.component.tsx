@@ -63,6 +63,11 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
       }
     };
 
+    const genderContext = patient?.gender ? patient.gender.toLowerCase() : undefined;
+    const patientLabel = genderContext
+      ? t('patient', { context: genderContext, defaultValue: 'Patient' })
+      : t('patient', 'Patient');
+
     const identifiers =
       patient?.identifier?.filter(
         (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
@@ -70,12 +75,13 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
 
     return {
       name: patient ? getPatientName(patient) : '',
+      title: patientLabel,
       age: age(patient?.birthDate),
       gender: getGender(patient?.gender),
       location: patient?.address?.[0].city,
       identifiers: identifiers?.length ? identifiers.map(({ value }) => value) : [],
     };
-  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids]);
+  }, [patient, t, excludePatientIdentifierCodeTypes?.uuids, patientLabel]);
 
   const tableHeaders: Array<VitalsTableHeader> = [
     {

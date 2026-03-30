@@ -1,5 +1,10 @@
 {
   "actions": "Actions",
+  "patient": "Patient",
+  "patient_male": "Male patient",
+  "patient_female": "Female patient",
+  "patient_other": "Patient",
+  "patient_unknown": "Patient",
   "activeVisitExists": "This patient already has an active visit",
   "addingToVisit": "Adding to:",
   "additionalVisitInformationUpdatedSuccessfully": "Additional visit information updated successfully",
