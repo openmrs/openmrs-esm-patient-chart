@@ -32,3 +32,9 @@
     background-color: colors.$red-20;
   }
 }
+
+.addButton {
+  min-block-size: auto;
+  padding-inline: layout.$spacing-03;
+  margin-inline-start: -#{layout.$spacing-03};
+}
