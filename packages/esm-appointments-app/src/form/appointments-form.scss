@@ -1,0 +1,75 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+$openmrs-background-grey: #ededed;
+
+.formWrapper {
+  margin: layout.$spacing-05;
+}
+
+.formGroup {
+  legend:global(.cds--label) {
+    @include type.type-style('heading-compact-02');
+    color: colors.$gray-70;
+  }
+}
+
+.heading {
+  color: colors.$gray-70;
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-03;
+}
+
+.inputContainer {
+  display: flex;
+  flex-flow: row wrap;
+  gap: layout.$spacing-05;
+  align-items: start;
+}
+
+.dateTimeFields {
+  max-width: 100%;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .dateTimeFields {
+  max-width: 32.25rem;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.loader {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: layout.$spacing-09;
+  height: 100vh;
+}
+
+.tablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: colors.$white;
+}
+
+.desktop {
+  padding: 0;
+}
+
+.weekSelect {
+  max-inline-size: fit-content;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: left;
+}

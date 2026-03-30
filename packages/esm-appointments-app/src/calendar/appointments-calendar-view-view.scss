@@ -1,0 +1,23 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.wrapper {
+  position: relative;
+}
+.monthlyCalendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(6, minmax(0px, 1fr));
+}
+
+.calendarViewContainer {
+  margin: layout.$spacing-05;
+}
+.backgroundColor {
+  margin: 1px 0 0;
+  transition: width 0.24s ease-in-out;
+  position: relative;
+  min-height: calc(100vh - 80px);
+  background-color: colors.$white;
+}

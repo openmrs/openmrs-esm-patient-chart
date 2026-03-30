@@ -1,0 +1,35 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.advancedPatientSearchDesktop {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 layout.$spacing-05;
+}
+
+.advancedPatientSearchTabletOrOverlay {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: calc(100vh - 9rem - 3px);
+  overflow-y: hidden;
+}
+
+.refineSearchDesktop {
+  margin-right: layout.$spacing-09;
+  width: 18rem;
+}
+
+.patientSearchResultsDesktop {
+  min-width: 37.5rem;
+  margin-right: layout.$spacing-10;
+}
+
+.patientSearchResultsTabletOrOverlay {
+  width: 100%;
+  overflow-y: auto;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .advancedPatientSearchTabletOrOverlay {
+  height: calc(100vh - layout.$spacing-11 - 2px);
+}

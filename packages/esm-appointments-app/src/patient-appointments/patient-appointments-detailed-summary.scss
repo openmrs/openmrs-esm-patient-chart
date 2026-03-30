@@ -1,0 +1,77 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+
+.productiveHeading01 {
+  @include type.type-style('heading-compact-01');
+}
+
+.contentSwitcherWrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 60%;
+}
+
+.contentSwitcherWrapper > div > button {
+  background-color: $ui-02;
+}
+
+.contentSwitcherWrapper > div button:first-child {
+  border-top: 1px solid colors.$blue-30;
+  border-bottom: 1px solid colors.$blue-30;
+  border-left: 1px solid colors.$blue-30;
+  border-right: none;
+  border-radius: layout.$spacing-02 0 0px layout.$spacing-02;
+}
+
+.contentSwitcherWrapper > div button:last-child {
+  border-top: 1px solid colors.$blue-30;
+  border-bottom: 1px solid colors.$blue-30;
+  border-right: 1px solid colors.$blue-30;
+  border-left: none;
+  border-radius: 0px layout.$spacing-02 layout.$spacing-02 0px;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true'],
+.contentSwitcherWrapper > div > button[aria-selected='true']:first-child {
+  background-color: colors.$blue-10;
+  color: colors.$blue-60;
+  border-color: colors.$blue-60;
+  border-right: 1px solid colors.$blue-60;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true'],
+.contentSwitcherWrapper > div > button[aria-selected='true']:last-child {
+  background-color: colors.$blue-10;
+  color: colors.$blue-60;
+  border-color: colors.$blue-60;
+  border-left: 1px solid colors.$blue-60;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true']:focus {
+  box-shadow: none;
+}
+
+.divider {
+  width: 1px;
+  height: layout.$spacing-05;
+  color: colors.$gray-20;
+  margin: 0 layout.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.tile {
+  text-align: center;
+}

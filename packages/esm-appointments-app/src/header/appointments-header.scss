@@ -1,0 +1,34 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.header {
+  background-color: $ui-02;
+  border-block: 1px solid $ui-03;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: layout.$spacing-03;
+}
+
+.rightJustifiedItems {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin: 0 layout.$spacing-03;
+  row-gap: layout.$spacing-01;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .date-and-location {
+    & > svg {
+      order: -1;
+    }
+    & > span:nth-child(2) {
+      order: -2;
+    }
+  }
+}

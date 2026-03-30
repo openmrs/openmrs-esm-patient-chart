@@ -1,0 +1,46 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
+
+.radioButtonGroup {
+  width: 100%;
+
+  :global(.cds--radio-button-wrapper) {
+    padding-bottom: layout.$spacing-02;
+
+    :global(.cds--radio-button__label) {
+      align-items: center;
+    }
+  }
+}
+
+.tag {
+  cursor: pointer;
+  margin: 0;
+}
+
+.orange {
+  background-color: colors.$orange-20;
+}
+
+.sectionTitle {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-top: layout.$spacing-04;
+  margin-bottom: layout.$spacing-02;
+}
+
+.sectionTitlePrimary {
+  @include type.type-style('label-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-02;
+}
+
+.queueEntryActionModalBody {
+  padding-bottom: layout.$spacing-05;
+}
+
+.dateTimeFields {
+  margin-top: layout.$spacing-04;
+}

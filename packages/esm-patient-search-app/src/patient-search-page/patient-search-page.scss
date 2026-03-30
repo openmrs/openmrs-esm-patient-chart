@@ -1,0 +1,10 @@
+@use '@carbon/layout';
+
+.patientSearchPage {
+  display: flex;
+  justify-content: center;
+}
+
+.patientSearchComponent {
+  margin-top: layout.$spacing-05;
+}

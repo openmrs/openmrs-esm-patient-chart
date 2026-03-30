@@ -1,0 +1,22 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.motherOrBabyRow {
+  display: flex;
+}
+
+.motherOrBabyRowElementsDiv {
+  flex: 1;
+}
+
+.motherOrBabyIconDiv {
+  display: flex;
+  align-items: center;
+}
+
+.motherOrBabyIcon {
+  padding: layout.$spacing-02;
+  border-radius: 50%;
+  background-color: $grey-2;
+  margin-right: layout.$spacing-03;
+}

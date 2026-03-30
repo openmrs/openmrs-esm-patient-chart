@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0",
+    "appointments": ">=2.0.0"
+  },
+  "extensions": [
+    {
+      "name": "home-appointments",
+      "slot": "homepage-widgets-slot",
+      "component": "homeAppointments",
+      "order": 1
+    },
+    {
+      "name": "clinical-appointments-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "appointmentsDashboardLink",
+      "meta": {
+        "name": "appointments",
+        "slot": "clinical-appointments-dashboard-slot",
+        "title": "Appointments"
+      },
+      "order": 2
+    },
+    {
+      "component": "root",
+      "name": "clinical-appointments-dashboard",
+      "slot": "clinical-appointments-dashboard-slot"
+    },
+    {
+      "name": "appointments-dashboard",
+      "slot": "appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
+    },
+    {
+      "name": "appointments-calendar-dashboard-link",
+      "slot": "calendar-dashboard-slot",
+      "component": "appointmentsCalendarDashboardLink"
+    },
+    {
+      "name": "todays-appointments-dashboard",
+      "slot": "todays-appointment-slot",
+      "component": "homeAppointments"
+    },
+    {
+      "name": "early-appointments-panel",
+      "component": "earlyAppointments"
+    },
+    {
+      "name": "patient-appointments-summary-dashboard",
+      "component": "patientAppointmentsSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 11,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "hideDashboardTitle": true,
+        "path": "Appointments",
+        "slot": "patient-chart-appointments-dashboard-slot",
+        "title": "Appointments"
+      }
+    },
+    {
+      "name": "appointments-details-widget",
+      "component": "patientAppointmentsDetailedSummary",
+      "slot": "patient-chart-appointments-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "patient-upcoming-appointment-widget",
+      "component": "patientUpcomingAppointmentsWidget",
+      "slot": "visit-form-top-slot"
+    },
+    {
+      "name": "home-appointments-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeAppointmentsTile"
+    },
+    {
+      "name": "metrics-card-scheduled-appointments",
+      "component": "metricsCardScheduledAppointments",
+      "slot": "appointments-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-highest-volume-service",
+      "component": "metricsCardHighestVolumeService",
+      "slot": "appointments-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-providers-booked",
+      "component": "metricsCardProvidersBooked",
+      "slot": "appointments-metrics-slot",
+      "order": 3
+    }
+  ],
+  "modals": [
+    {
+      "name": "end-appointment-modal",
+      "component": "endAppointmentModal"
+    },
+    {
+      "name": "cancel-appointment-modal",
+      "component": "cancelAppointmentModal"
+    },
+    {
+      "name": "batch-change-appointments-statuses-modal",
+      "component": "batchChangeAppointmentStatusesModal"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "appointments-group",
+      "scopePattern": "/home/appointments"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "appointments-window",
+      "group": "appointments-group"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "appointments-window"
+    },
+    {
+      "name": "appointments-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "appointments-window"
+    }
+  ]
+}

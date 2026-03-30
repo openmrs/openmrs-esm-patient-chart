@@ -1,0 +1,14 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.header {
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
+}
+
+.newListButton {
+  width: fit-content;
+  height: fit-content;
+  margin: layout.$spacing-05 0;
+}

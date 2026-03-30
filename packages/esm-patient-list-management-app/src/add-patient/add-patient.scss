@@ -1,0 +1,126 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  :global {
+    .cds--modal-content {
+      padding: 0 !important;
+    }
+  }
+}
+
+.checkbox {
+  padding-bottom: 0.875rem;
+}
+
+.fieldset {
+  padding: 0 layout.$spacing-05;
+}
+
+.subheader {
+  @include type.type-style('body-01');
+  margin: 0.875rem 0;
+}
+
+.pagination {
+  width: 100%;
+  overflow: hidden;
+}
+
+.pagination > div:first-child {
+  visibility: hidden;
+  width: 0;
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.search {
+  margin-bottom: 0.875rem;
+
+  input[role='searchbox'] {
+    background-color: colors.$gray-10;
+  }
+}
+
+.itemsCountDisplay {
+  position: absolute;
+  top: 0;
+  left: layout.$spacing-05;
+  height: layout.$spacing-09;
+  display: flex;
+  align-items: center;
+  color: colors.$gray-70;
+}
+
+.buttonSet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-top: 1px solid colors.$gray-20;
+
+  .createButton {
+    flex: 2;
+  }
+
+  div {
+    flex: 1;
+    display: flex;
+
+    > button {
+      flex: 1;
+    }
+  }
+
+  :global(.cds--inline-loading) {
+    min-height: layout.$spacing-05 !important;
+  }
+
+  :global(.cds--inline-loading__text) {
+    font-size: unset !important;
+  }
+}
+
+.bodyLong01 {
+  @include type.type-style('body-01');
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  padding: layout.$spacing-09 0;
+  margin-bottom: layout.$spacing-05;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.actionText {
+  @include type.type-style('body-01');
+  color: $text-02;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: layout.$spacing-05;
+}

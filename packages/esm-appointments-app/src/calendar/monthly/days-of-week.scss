@@ -1,0 +1,38 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tileContainer {
+  height: layout.$spacing-10;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+  border-right: none;
+
+  &:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
+
+  & > span {
+    font-size: layout.$spacing-05;
+    color: colors.$gray-70;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: layout.$spacing-05;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}

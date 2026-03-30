@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": ">=2.2.0"
+  },
+  "pages": [
+    {
+      "component": "root",
+      "route": "bed-management"
+    }
+  ],
+  "extensions": [
+    {
+      "component": "adminCardLink",
+      "name": "bed-management-admin-card-link",
+      "slot": "system-admin-page-card-link-slot"
+    },
+    {
+      "component": "adminLeftPanelLink",
+      "name": "bed-administration-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "bedTypeLeftPanelLink",
+      "name": "bed-type-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "bedTagLeftPanelLink",
+      "name": "bed-tag-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "summaryLeftPanelLink",
+      "name": "bed-management-home-dashboard-link",
+      "slot": "bed-management-left-panel-slot",
+      "order": 0
+    }
+  ],
+  "modals": [
+    {
+      "name": "delete-bed-tag-modal",
+      "component": "deleteBedTagModal"
+    },
+    {
+      "name": "delete-bed-type-modal",
+      "component": "deleteBedTypeModal"
+    },
+    {
+      "name": "edit-bed-tag-modal",
+      "component": "editBedTagModal"
+    },
+    {
+      "name": "edit-bed-type-modal",
+      "component": "editBedTypeModal"
+    },
+    {
+      "name": "new-bed-tag-modal",
+      "component": "newBedTagModal"
+    },
+    {
+      "name": "new-bed-type-modal",
+      "component": "newBedTypeModal"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "bed-management-group",
+      "scopePattern": "/bed-management",
+      "persistence": "closable"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "bed-management-window",
+      "group": "bed-management-group",
+      "canMaximize": true,
+      "width": "narrow"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "bed-form-workspace",
+      "component": "bedFormWorkspace",
+      "window": "bed-management-window"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.paginationBar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pageNumbers {
+  display: flex;
+}
+
+.paginationButton {
+  box-sizing: border-box;
+}
+
+.activeButton {
+  border-bottom: layout.$spacing-02 solid $brand-01;
+}

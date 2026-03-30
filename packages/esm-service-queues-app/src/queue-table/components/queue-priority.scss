@@ -1,0 +1,16 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tag {
+  margin: 0 layout.$spacing-02;
+  white-space: nowrap;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.orange {
+  background-color: colors.$orange-20;
+}

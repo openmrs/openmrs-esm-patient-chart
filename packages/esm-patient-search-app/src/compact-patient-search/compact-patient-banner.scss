@@ -1,0 +1,34 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.patientSearchResult,
+.deceased.patientSearchResult {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-bottom: 1px solid $ui-03;
+
+  &:hover,
+  &:focus {
+    background-color: $ui-01;
+  }
+}
+
+.patientSearchResultButton {
+  background: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.patientAvatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: layout.$spacing-05;
+  border-radius: 1px;
+}
+
+.skeletonIcon {
+  height: 3.5rem;
+  width: 3.5rem;
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "patient-lists-dashboard-link",
+      "component": "patientListDashboardLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "patient-lists",
+        "slot": "patient-lists-dashboard-slot",
+        "title": "Patient lists"
+      }
+    },
+    {
+      "name": "patient-lists-dashboard",
+      "component": "root",
+      "slot": "patient-lists-dashboard-slot"
+    },
+    {
+      "name": "list-details-table",
+      "component": "listDetailsTable"
+    },
+    {
+      "name": "add-patient-to-patient-list-button",
+      "component": "addPatientToPatientListMenuItem",
+      "slot": "patient-actions-slot"
+    }
+  ],
+  "modals": [
+    {
+      "name": "add-patient-to-patient-list-modal",
+      "component": "addPatientToListModal"
+    },
+    {
+      "name": "remove-patient-from-list-modal",
+      "component": "removePatientFromListModal"
+    },
+    {
+      "name": "delete-patient-list-modal",
+      "component": "deletePatientListModal"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "patient-list-form-workspace",
+      "component": "patientListFormWorkspace",
+      "window": "patient-list-form-window"
+    },
+    {
+      "name": "patient-list-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "patient-list-form-window"
+    },
+    {
+      "name": "patient-list-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "patient-list-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-list-form-window",
+      "group": "patient-list-form-workspace-group"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "patient-list-form-workspace-group",
+      "scopePattern": "/home/patient-lists",
+      "overlay": false
+    }
+  ]
+}

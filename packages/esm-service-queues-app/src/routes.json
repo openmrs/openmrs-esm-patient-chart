@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0",
+    "queue": ">=2.4.0 <4.0.0"
+  },
+  "extensions": [
+    {
+      "name": "outpatient-side-nav-ext",
+      "component": "outpatientSideNav",
+      "slot": "outpatient-sidebar-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "service-queues-dashboard-link",
+      "component": "serviceQueuesDashboardLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "service-queues",
+        "slot": "service-queues-dashboard-slot",
+        "title": "Service queues"
+      },
+      "online": true,
+      "offline": true,
+      "order": 1
+    },
+    {
+      "name": "queue-table-by-status-menu-dashboard-link",
+      "component": "queueTableByStatusMenu",
+      "meta": {
+        "name": "service-queues",
+        "slot": "service-queues-dashboard-slot",
+        "title": "Service queues"
+      },
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "root",
+      "name": "service-queues-dashboard",
+      "slot": "service-queues-dashboard-slot"
+    },
+    {
+      "name": "queue-table-by-status-view",
+      "component": "queueTableByStatusView",
+      "slot": "queue-table-by-status-view-slot"
+    },
+    {
+      "name": "previous-visit-summary-widget",
+      "component": "pastVisitSummary",
+      "slot": "previous-visit-summary-slot"
+    },
+    {
+      "name": "visit-form-queue-fields",
+      "component": "visitFormQueueFields",
+      "slot": "visit-form-bottom-slot"
+    },
+    {
+      "name": "queue-patient-info-queue-entry-status",
+      "component": "patientBannerQueueEntryStatus",
+      "slot": "patient-banner-tags-slot"
+    },
+    {
+      "name": "transition-overflow-menu-item",
+      "component": "transitionOverflowMenuItem",
+      "slot": "transition-overflow-menu-item-slot"
+    },
+    {
+      "name": "metrics-card-checked-in-patients",
+      "component": "metricsCardCheckedInPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "metrics-card-waiting-patients",
+      "component": "metricsCardWaitingPatients",
+      "slot": "service-queues-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "metrics-card-average-wait-time",
+      "component": "metricsCardAverageWaitTime",
+      "slot": "service-queues-metrics-slot",
+      "order": 3
+    },
+    {
+      "name": "queue-screen-link",
+      "component": "queueScreenLink",
+      "slot": "app-menu-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "admin-service-queues-card-link",
+      "component": "adminPageCardLink",
+      "slot": "system-admin-page-card-link-slot"
+    },
+    {
+      "component": "serviceQueuesAdminPage",
+      "name": "service-queues-admin",
+      "slot": "service-queues-admin-page-slot"
+    },
+    {
+      "component": "queueScreen",
+      "name": "queue-screen",
+      "slot": "queue-screen-slot"
+    }
+  ],
+  "modals": [
+    {
+      "name": "add-provider-to-room-modal",
+      "component": "addProviderToRoomModal"
+    },
+    {
+      "name": "clear-all-queue-entries-modal",
+      "component": "clearAllQueueEntriesModal"
+    },
+    {
+      "name": "edit-queue-entry-modal",
+      "component": "editQueueEntryModal"
+    },
+    {
+      "name": "remove-queue-entry-modal",
+      "component": "removeQueueEntryModal"
+    },
+    {
+      "name": "transition-patient-to-latest-queue-modal",
+      "component": "addOrMoveModal"
+    },
+    {
+      "name": "call-queue-entry-modal",
+      "component": "callQueueEntryModal"
+    },
+    {
+      "name": "move-queue-entry-modal",
+      "component": "moveQueueEntryModal"
+    },
+    {
+      "name": "transition-queue-entry-modal",
+      "component": "transitionQueueEntryModal"
+    },
+    {
+      "name": "undo-transition-queue-entry-modal",
+      "component": "undoTransitionQueueEntryModal"
+    },
+    {
+      "name": "delete-queue-entry-modal",
+      "component": "deleteQueueEntryModal"
+    },
+    {
+      "name": "delete-queue-modal",
+      "component": "deleteQueueModal"
+    },
+    {
+      "name": "delete-queue-room-modal",
+      "component": "deleteQueueRoomModal"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "create-queue-entry-workspace",
+      "component": "createQueueEntryWorkspace",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-workspace",
+      "component": "@openmrs/esm-patient-search-app#patientSearchWorkspace2",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "queue-patient-search-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "add-queue-entry"
+    },
+    {
+      "name": "service-queues-service-form",
+      "component": "addNewQueueWorkspace",
+      "window": "add-queue"
+    },
+    {
+      "name": "service-queues-room-workspace",
+      "component": "addNewQueueServiceRoomWorkspace",
+      "window": "add-queue-room"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "add-queue-entry",
+      "group": "service-queues"
+    },
+    {
+      "name": "add-queue",
+      "group": "service-queues"
+    },
+    {
+      "name": "add-queue-room",
+      "group": "service-queues"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "service-queues",
+      "scopePattern": "/home/service-queues"
+    }
+  ]
+}

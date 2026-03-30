@@ -1,0 +1,79 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.desktopOverlay {
+  position: fixed;
+  top: layout.$spacing-09;
+  bottom: 0;
+  right: 0;
+  width: 26.25rem;
+  background-color: $ui-01;
+  border-left: 1px solid $text-03;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 999;
+}
+
+.tabletOverlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background-color: $ui-01;
+  overflow: hidden;
+  padding-top: layout.$spacing-09;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.tabletOverlayHeader {
+  button {
+    @include brand-01(background-color);
+  }
+  .headerContent {
+    color: $ui-02;
+  }
+}
+
+.desktopHeader {
+  display: flex;
+  height: layout.$spacing-08;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $ui-03;
+  border-bottom: 1px solid $text-03;
+}
+
+.headerContent {
+  @include type.type-style('heading-compact-02');
+  align-items: center;
+  border: layout.$spacing-01 solid transparent;
+  color: $ui-05;
+  outline: none;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: center;
+}
+
+.closeButton,
+.closeButton:hover {
+  svg {
+    fill: white !important;
+  }
+}
+
+.overlayContent {
+  overflow-y: auto;
+}
+
+.buttonsGroup {
+  align-self: end;
+}
+
+.buttonsGroup button {
+  max-width: unset !important;
+}

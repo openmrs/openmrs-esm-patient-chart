@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.patientSearchBar {
+  width: 50vw;
+  position: relative;
+}
+
+.floatingSearchResultsContainer {
+  position: absolute;
+  overflow-y: auto;
+  box-shadow: 0 layout.$spacing-03 layout.$spacing-05 $ui-03;
+  z-index: 99;
+  width: 100%;
+  background-color: $ui-02;
+}

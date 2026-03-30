@@ -1,0 +1,145 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.searchContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: layout.$spacing-05;
+  background-color: #ededed;
+}
+
+.searchContainer > div {
+  align-self: center;
+  justify-self: end;
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.searchOverrides {
+  width: 100%;
+  max-width: 15.625rem;
+  border: 0px !important;
+}
+
+div.tableOverride {
+  background-color: $ui-01;
+}
+
+div.tableOverride > div {
+  white-space: nowrap;
+}
+
+div#table-tool-bar {
+  margin-top: layout.$spacing-09;
+}
+
+.table {
+  background-color: $ui-03;
+}
+
+.desktopRow,
+.desktopHeader {
+  height: layout.$spacing-07 !important;
+}
+
+.tabletRow,
+.tabletHeader {
+  height: layout.$spacing-09 !important;
+}
+
+.paginationOverride {
+  background-color: $ui-background;
+  border-top: 1px solid $ui-03 !important;
+  border-bottom: 1px solid $ui-03 !important;
+  overflow-x: hidden;
+}
+
+.paginationOverride > div {
+  background-color: $ui-background;
+  border-bottom: 0px !important;
+  border-top: 0px !important;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.dataTableSkeleton {
+  background-color: transparent;
+  padding: 0;
+}
+
+.skeletonContainer {
+  margin: layout.$spacing-05;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  margin: layout.$spacing-05 0;
+}
+
+.illo {
+  margin-top: layout.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.backButton {
+  padding: layout.$spacing-03 0;
+  max-width: fit-content;
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    display: flex;
+    padding-left: 0 !important;
+
+    svg {
+      order: 1;
+      margin: 0 layout.$spacing-03;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: layout.$spacing-09 !important;
+  text-align: center;
+  border: 1px solid $ui-03;
+  background-color: white;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

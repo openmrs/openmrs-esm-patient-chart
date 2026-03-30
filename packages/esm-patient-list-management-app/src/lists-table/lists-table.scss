@@ -1,0 +1,105 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.table {
+  tr {
+    &:last-of-type {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.desktopRow,
+.desktopHeader {
+  height: layout.$spacing-07 !important;
+}
+
+.tabletRow,
+.tabletHeader {
+  height: layout.$spacing-09 !important;
+}
+
+.tableBody {
+  background-color: $ui-01;
+}
+
+.tableCell,
+.interactiveText01 {
+  color: $interactive-01;
+}
+
+.tableContainer {
+  padding: 0;
+
+  :global(.cds--data-table-content) {
+    border: 1px solid colors.$gray-20;
+    border-bottom: none;
+  }
+}
+
+.link {
+  text-decoration: none;
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: layout.$spacing-09;
+  text-align: center;
+  border: 1px solid $ui-03;
+  background-color: white;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+// Patient List Table
+.filterContainer {
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.searchContainer > div {
+  align-self: center;
+  justify-self: flex-end;
+}
+
+.searchbox {
+  width: 100%;
+  max-width: 16rem;
+  background-color: $ui-02;
+  border-bottom-color: $ui-03;
+}

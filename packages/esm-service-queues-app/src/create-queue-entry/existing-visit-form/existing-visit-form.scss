@@ -1,0 +1,71 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  flex: 1;
+  margin: layout.$spacing-05;
+}
+
+.heading {
+  @include type.type-style('heading-03');
+  margin: layout.$spacing-05;
+}
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: layout.$spacing-05;
+}
+
+.dateTimeSection {
+  display: flex;
+}
+
+.radioButton {
+  margin: layout.$spacing-05 0;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: layout.$spacing-03 layout.$spacing-05;
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tabletButtons {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  margin-top: layout.$spacing-10;
+  background-color: $ui-02;
+}
+
+.desktopButtons {
+  padding: 0;
+  margin-top: layout.$spacing-10;
+}
+
+@media screen and (max-width: 600px) {
+  .dateTimeSection {
+    flex-direction: column;
+  }
+}

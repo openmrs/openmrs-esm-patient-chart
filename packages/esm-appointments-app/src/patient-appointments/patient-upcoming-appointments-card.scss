@@ -1,0 +1,47 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-05;
+
+  & section {
+    margin: layout.$spacing-05 0;
+  }
+}
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin: 0 0 layout.$spacing-03 0;
+}
+
+.checkbox {
+  &:not(:first-child) {
+    margin: 0;
+  }
+}
+
+.input {
+  margin: 0 layout.$spacing-05 layout.$spacing-05;
+}
+
+.headerLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.checkboxContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.structuredList {
+  padding: layout.$spacing-03 layout.$spacing-03 layout.$spacing-03;
+}
+
+.inlineNotification {
+  width: 100%;
+  max-width: unset;
+  padding: 0;
+}
