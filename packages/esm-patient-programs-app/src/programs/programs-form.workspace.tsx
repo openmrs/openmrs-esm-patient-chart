@@ -55,10 +55,13 @@ const createProgramsFormSchema = (t: TFunction) =>
       selectedProgramStatus: z.string(),
     })
     .superRefine((data, ctx) => {
-      if (data.completionDate && data.enrollmentDate && data.completionDate <= data.enrollmentDate) {
+      if (data.completionDate && data.enrollmentDate && data.completionDate < data.enrollmentDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: t('completionDateMustBeAfterEnrollmentDate', 'Completion date must be after the enrollment date'),
+          message: t(
+            'completionDateCannotBeBeforeEnrollmentDate',
+            'Completion date cannot be before the enrollment date',
+          ),
           path: ['completionDate'],
         });
       }
@@ -215,7 +218,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
           data-testid="enrollmentDate"
           maxDate={(() => {
             const completionDate = watch('completionDate');
-            return completionDate ? dayjs(completionDate).subtract(1, 'day').toDate() : new Date();
+            return completionDate ? dayjs(completionDate).toDate() : new Date();
           })()}
           labelText={t('dateEnrolled', 'Date enrolled')}
           invalid={Boolean(fieldState?.error?.message)}
@@ -234,9 +237,8 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
           {...field}
           id="completionDate"
           data-testid="completionDate"
-          minDate={dayjs(watch('enrollmentDate')).add(1, 'day').toDate()}
+          minDate={dayjs(watch('enrollmentDate')).toDate()}
           maxDate={new Date()}
-          isDisabled={dayjs(watch('enrollmentDate')).isSame(dayjs(), 'day')}
           labelText={t('dateCompleted', 'Date completed')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}
