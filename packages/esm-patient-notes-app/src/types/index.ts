@@ -154,7 +154,8 @@ export interface ObsData {
 export interface Diagnosis {
   patient: string;
   diagnosis: {
-    coded: string;
+    coded?: string; // Made optional
+    nonCoded?: string; // Added for custom text
   };
   certainty: string;
   rank: number;
@@ -166,7 +167,8 @@ export interface DiagnosisPayload {
   patient: string;
   condition: null;
   diagnosis: {
-    coded: string;
+    coded?: string; // Made optional
+    nonCoded?: string; // Added for custom text
   };
   certainty: string;
   rank: number;
@@ -191,4 +193,10 @@ export interface ObsPayload {
     concept: Concept;
     value: string;
   }>;
+}
+
+// a "Virtual" type to allow custom free custom text when there are no corresponding concepts
+export interface FreeConcept {
+  display: string;
+  uuid?: string; // Optional because custom text won't have a UUID
 }
