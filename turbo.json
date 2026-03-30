@@ -2,40 +2,71 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "!src/**/*.test.*",
+        "!src/**/setup-tests.*",
+        "tsconfig.json",
+        "tsconfig.build.json",
+        "webpack.config.js",
+        "rspack.config.js",
+        "rspack.config.cjs",
+        "translations/**"
       ],
-      "outputs": [
-        "dist/**"
-      ]
+      "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": [
-        "^test"
+      "inputs": [
+        "src/**",
+        "__mocks__/**",
+        "mock.ts",
+        "mock-jest.ts",
+        "mock-jest.tsx",
+        "vitest.config.ts",
+        "setup-tests.ts"
       ]
     },
     "test:watch": {
-      "dependsOn": [
-        "^test:watch"
-      ],
       "cache": false,
       "persistent": true
     },
     "coverage": {
-      "dependsOn": [
-        "^coverage"
-      ]
+      "inputs": [
+        "src/**",
+        "__mocks__/**",
+        "mock.ts",
+        "mock-jest.ts",
+        "mock-jest.tsx",
+        "vitest.config.ts",
+        "setup-tests.ts"
+      ],
+      "outputs": ["coverage/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "$TURBO_ROOT$/.eslintrc"
       ]
     },
     "typescript": {
-      "dependsOn": [
-        "^typescript"
+      "dependsOn": ["^typescript"],
+      "inputs": [
+        "src/**",
+        "tsconfig.json"
       ]
     },
-    "extract-translations": {}
+    "extract-translations": {
+      "inputs": [
+        "src/**/*.component.tsx",
+        "src/**/*.extension.tsx",
+        "src/**/*.modal.tsx",
+        "src/**/*.workspace.tsx",
+        "src/**/*.hook.tsx",
+        "src/**/*.resource.ts",
+        "src/index.ts",
+        "$TURBO_ROOT$/tools/i18next-parser.config.js"
+      ]
+    }
   }
 }

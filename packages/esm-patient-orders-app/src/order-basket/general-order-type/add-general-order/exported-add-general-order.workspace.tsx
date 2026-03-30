@@ -9,7 +9,7 @@ interface OrderableConceptSearchWorkspaceProps {
 }
 
 /**
- * This workspace displays the drug order form for adding or editing a general order.
+ * This workspace displays the order form for adding or editing a general order.
  *
  * This workspace is meant for use outside the patient chart.
  * @see exported-add-general-order.workspace.tsx

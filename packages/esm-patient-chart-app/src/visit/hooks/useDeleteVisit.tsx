@@ -28,6 +28,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         // Use targeted SWR invalidation instead of global mutateVisit
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
+        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
 
         showSnackbar({
           title: t('visitRestored', 'Visit restored'),
@@ -64,6 +65,7 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         // Use targeted SWR invalidation instead of global mutateVisit
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
+        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
 
         showSnackbar({
           title: t('visitDeleted', '{{visit}} deleted', {
