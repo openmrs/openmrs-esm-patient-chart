@@ -150,7 +150,9 @@ export default function DrugBrowse({
       )}
 
       <div className={styles.drugResultsWrapper}>
-        <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>
+        {(drugConceptUuids.length > 0 || isLoadingDrugs) && (
+          <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>
+        )}
         <DrugBrowseResults
           drugs={drugs}
           isLoading={isLoadingDrugs}

@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
 import {
   type Drug,
@@ -7,6 +5,8 @@ import {
   type DrugOrderTemplate,
   type OrderTemplate,
 } from '@openmrs/esm-patient-common-lib';
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -52,6 +52,7 @@ interface DrugListFetchResult {
 }
 
 const maxConceptsPerRequest = 20;
+const drugPageSize = 50;
 const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
 
 /**
@@ -107,11 +108,17 @@ export function useDrugsByConcepts(concepts: string[]) {
       const batch = concepts.slice(start, start + maxConceptsPerRequest);
       const conceptsParam = batch.join(',');
       try {
-        const response = await openmrsFetch<{ results: Array<DrugSearchResult> }>(
-          `${restBaseUrl}/drug?concepts=${conceptsParam}&v=${drugSearchRepresentation}`,
-        );
-        if (response.data?.results) {
-          drugs.push(...response.data.results);
+        let startIndex = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+          const response = await openmrsFetch<{ results: Array<DrugSearchResult> }>(
+            `${restBaseUrl}/drug?concepts=${conceptsParam}&v=${drugSearchRepresentation}&limit=${drugPageSize}&startIndex=${startIndex}`,
+          );
+          const results = response.data?.results ?? [];
+          drugs.push(...results);
+          hasMore = results.length === drugPageSize;
+          startIndex += drugPageSize;
         }
       } catch (e) {
         console.error(`Failed to fetch drugs for concepts: ${conceptsParam}`, e);
