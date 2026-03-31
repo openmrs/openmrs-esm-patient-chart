@@ -173,7 +173,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
             </Button>
           </div>
         )}
-        {drugCategoryConceptSets.length > 0 ? (
+        {drugCategoryConceptSets?.length > 0 ? (
           <Tabs>
             <TabList contained fullWidth>
               <Tab renderIcon={SearchIcon}>{t('search', 'Search')}</Tab>
