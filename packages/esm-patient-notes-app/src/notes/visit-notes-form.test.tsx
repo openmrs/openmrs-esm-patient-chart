@@ -7,6 +7,7 @@ import {
   showSnackbar,
   useConfig,
   useSession,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
@@ -54,6 +55,7 @@ const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUpdateVisitNote = jest.mocked(updateVisitNote);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseSession = jest.mocked(useSession);
+const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -78,12 +80,27 @@ mockUseConfig.mockReturnValue({
   ...ConfigMock,
 });
 
+test('does not render the date picker when RDE is disabled', () => {
+  mockedUseFeatureFlag.mockReturnValue(false);
+
+  renderVisitNotesForm();
+
+  expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
+});
+
+test('renders the date picker when RDE is enabled', () => {
+  mockedUseFeatureFlag.mockReturnValue(true);
+
+  renderVisitNotesForm();
+
+  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
+});
+
 test('renders the visit notes form with all the relevant fields and values', () => {
   mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
 
   renderVisitNotesForm();
 
-  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();

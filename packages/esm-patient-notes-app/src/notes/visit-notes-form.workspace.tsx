@@ -84,9 +84,9 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction) => {
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
   return z.object({
-    noteDate: z.date(),
+    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
@@ -126,7 +126,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const { allowedFileExtensions } = useAllowedFileExtensions();
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
-  const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
+  const visitNoteFormSchema = useMemo(
+    () => createSchema(t, isRetrospectiveDataEntryEnabled),
+    [t, isRetrospectiveDataEntryEnabled],
+  );
 
   const customResolver = useCallback(
     async (data, context, options) => {
@@ -359,6 +362,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
+
+      // When RDE is off, the datepicker is hidden and noteDate defaults to new Date().
+      // This always falls within the 30-minute window, so encounterDatetime is intentionally
+      // omitted from the payload -> letting the server attach the correct timestamp.
       if (finalNoteDate.diff(now, 'minute') <= 30) {
         finalNoteDate = null;
       }
