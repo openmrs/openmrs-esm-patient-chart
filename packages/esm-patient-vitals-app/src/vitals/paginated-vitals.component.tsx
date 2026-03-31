@@ -141,7 +141,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                       <TableExpandRow
                         {...getRowProps({ row })}
                         className={!hasNote ? styles.noNoteRow : undefined}
-                        isExpanded={hasNote ? row.isExpanded : false}
+                        isExpanded={hasNote ? (isPrinting || row.isExpanded) : false}
                       >
                         {row.cells.map((cell) => {
                           const interpretationKey = cell.info.header + 'Interpretation';
@@ -157,7 +157,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                           <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
                         </TableCell>
                       </TableExpandRow>
-                      {row.isExpanded && hasNote ? (
+                      {(isPrinting || row.isExpanded) && hasNote ? (
                         <TableExpandedRow
                           className={styles.expandedRow}
                           colSpan={headers.length + 2}

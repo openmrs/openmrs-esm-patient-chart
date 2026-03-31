@@ -247,9 +247,11 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
   // Fetch note observations separately so that note-only encounters are never included
   // as standalone vitals entries. Notes are merged into existing vitals encounters below.
+  // We omit _count so that every note for this patient is returned; notes are lightweight
+  // and typically few, so unbounded fetching is acceptable here.
   const { data: notesData } = useSWR<VitalsFetchResponse, Error>(
     concepts.generalPatientNoteUuid && patientUuid
-      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date&_count=${pageSize}`
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date`
       : null,
     openmrsFetch,
   );
