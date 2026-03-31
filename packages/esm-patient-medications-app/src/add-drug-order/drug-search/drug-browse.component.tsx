@@ -2,43 +2,33 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Breadcrumb, BreadcrumbItem, Button, ClickableTile, ComboBox, Loading, Tile } from '@carbon/react';
 import { Folder } from '@carbon/react/icons';
-import {
-  showSnackbar,
-  useConfig,
-  useLayoutType,
-  type Visit,
-  type Workspace2DefinitionProps,
-} from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
-
-import { type ConfigObject } from '../../config-schema';
 import DrugBrowseResults from './drug-browse-results.component';
-import {
-  type ConceptSet,
-  type ConceptTreeNode,
-  useConceptSets,
-  useConceptTree,
-  useDrugsByConcepts,
-} from './drug-search.resource';
+import { type ConceptSet, type ConceptTreeNode, useConceptTree, useDrugsByConcepts } from './drug-search.resource';
 import styles from './order-basket-search.scss';
 
 interface DrugBrowseProps {
+  conceptSets: ConceptSet[];
+  isLoadingConceptSets: boolean;
+  conceptSetsError?: Error;
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
   visit: Visit;
 }
 
-export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, visit }: DrugBrowseProps) {
+export default function DrugBrowse({
+  conceptSets,
+  isLoadingConceptSets,
+  conceptSetsError,
+  openOrderForm,
+  closeWorkspace,
+  patient,
+  visit,
+}: DrugBrowseProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-
-  const { drugCategoryConceptSets } = useConfig<ConfigObject>();
-  const {
-    conceptSets,
-    isLoading: isLoadingConceptSets,
-    error: conceptSetsError,
-  } = useConceptSets(drugCategoryConceptSets);
 
   const [rootConceptSet, setRootConceptSet] = useState<ConceptSet | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<ConceptTreeNode[]>([]);
@@ -159,25 +149,27 @@ export default function DrugBrowse({ openOrderForm, closeWorkspace, patient, vis
         </div>
       )}
 
-      {currentNode && (
-        <div className={styles.drugResultsWrapper}>
-          <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>
-          <DrugBrowseResults
-            drugs={drugs}
-            isLoading={isLoadingDrugs}
-            errors={drugFetchErrors}
-            patient={patient}
-            visit={visit}
-            closeWorkspace={closeWorkspace}
-            openOrderForm={openOrderForm}
-            hasSelection={Boolean(rootConceptSet)}
-          />
-        </div>
-      )}
+      <div className={styles.drugResultsWrapper}>
+        <h5 className={styles.sectionTitle}>{t('drugs', 'Drugs')}</h5>
+        <DrugBrowseResults
+          drugs={drugs}
+          isLoading={isLoadingDrugs}
+          errors={drugFetchErrors}
+          patient={patient}
+          visit={visit}
+          closeWorkspace={closeWorkspace}
+          openOrderForm={openOrderForm}
+          hasSelection={Boolean(rootConceptSet)}
+        />
+      </div>
 
       {isTablet && (
         <div className={styles.separatorContainer}>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
+          <Button
+            iconDescription={t('returnToOrderBasket', 'Return to order basket')}
+            kind="ghost"
+            onClick={() => closeWorkspace()}
+          >
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

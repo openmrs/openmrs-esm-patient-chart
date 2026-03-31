@@ -76,7 +76,11 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
   const { drugCategoryConceptSets } = useConfig<ConfigObject>();
-  const { conceptSets } = useConceptSets(drugCategoryConceptSets);
+  const {
+    conceptSets,
+    isLoading: isLoadingConceptSets,
+    error: conceptSetsError,
+  } = useConceptSets(drugCategoryConceptSets);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -189,6 +193,9 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
                 </TabPanel>
                 <TabPanel>
                   <DrugBrowse
+                    conceptSets={conceptSets}
+                    isLoadingConceptSets={isLoadingConceptSets}
+                    conceptSetsError={conceptSetsError}
                     patient={patient}
                     visit={visitContext}
                     closeWorkspace={closeWorkspace}
