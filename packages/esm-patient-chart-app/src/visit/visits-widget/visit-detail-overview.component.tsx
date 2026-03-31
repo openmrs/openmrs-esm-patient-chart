@@ -18,6 +18,8 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
 
+  const completedFormsTabIndex = showAllEncountersTab ? 2 : 1;
+
   return (
     <div className={styles.tabs}>
       <Tabs onChange={({ selectedIndex }) => setTabIndex(selectedIndex)} selectedIndex={tabIndex}>
@@ -46,7 +48,7 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
             </TabPanel>
           )}
           <TabPanel>
-            <CompletedFormsTable patientUuid={patientUuid} />
+            <CompletedFormsTable patientUuid={patientUuid} isTabActive={tabIndex === completedFormsTabIndex} />
           </TabPanel>
         </TabPanels>
       </Tabs>

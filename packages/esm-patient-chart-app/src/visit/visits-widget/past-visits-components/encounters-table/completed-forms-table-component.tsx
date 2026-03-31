@@ -5,15 +5,19 @@ import EncountersTable from './encounters-table.component';
 
 interface CompletedFormsTableProps {
   patientUuid: string;
+  isTabActive?: boolean;
 }
 
-const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid }) => {
+const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid, isTabActive = false }) => {
   const [encounterTypeToFilter, setEncounterTypeToFilter] = useState<EncounterType>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  const { data: allEncounters, isLoading } = useAllEncounters(patientUuid, encounterTypeToFilter?.uuid);
+  const { data: allEncounters, isLoading } = useAllEncounters(
+    isTabActive ? patientUuid : null,
+    encounterTypeToFilter?.uuid,
+  );
 
   const filteredCompletedForms = useMemo(() => {
     if (!allEncounters) return [];

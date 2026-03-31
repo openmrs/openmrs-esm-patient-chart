@@ -41,12 +41,12 @@ import {
   ExtensionSlot,
   useFeatureFlag,
   PrinterIcon,
-  openmrsFetch,
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
+  downloadPdf,
   mapEncounter,
   useEncounterTypes,
   type EncountersTableProps,
@@ -166,109 +166,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
     [mutate, mutateVisitContext, patientUuid, t],
   );
 
-  const downloadPdf = async (encounterUuids: string[]) => {
-    if (!encounterUuids || encounterUuids.length === 0) return;
-
-    setIsPrinting(true);
-    let currentJobId = null;
-
-    try {
-      const initResponse = await openmrsFetch('/ws/rest/v1/patientdocuments/encounters', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(encounterUuids),
-      });
-
-      if (!initResponse.ok) {
-        throw new Error('Failed to initiate PDF generation.');
-      }
-
-      const initData = await initResponse.json();
-      currentJobId = initData.uuid;
-
-      showSnackbar({
-        isLowContrast: true,
-        title: t('generatingPdf', 'Generating PDF...'),
-        kind: 'info',
-        subtitle: t('pdfWillDownloadSoon', 'Your document is being generated and will download automatically.'),
-      });
-
-      let isCompleted = false;
-      let isFailed = false;
-      let attempts = 0;
-      const maxAttempts = 60;
-
-      while (!isCompleted && !isFailed && attempts < maxAttempts) {
-        attempts++;
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const statusResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/status/${currentJobId}`);
-        if (!statusResponse.ok) {
-          continue;
-        }
-
-        const statusData = await statusResponse.json();
-
-        if (statusData.status === 'COMPLETED') {
-          isCompleted = true;
-        } else if (statusData.status === 'FAILED') {
-          isFailed = true;
-          throw new Error(statusData.error || 'Server failed to generate the report.');
-        }
-      }
-
-      if (!isCompleted) {
-        throw new Error('Report generation timed out. Please try again or select fewer encounters.');
-      }
-
-      const downloadResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/download/${currentJobId}`);
-
-      if (!downloadResponse.ok) {
-        throw new Error('Failed to download the generated PDF.');
-      }
-
-      const blob = await downloadResponse.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-
-      const contentDisposition = downloadResponse.headers.get('Content-Disposition');
-      let fileName = 'EncountersReport.pdf';
-      if (contentDisposition && contentDisposition.includes('filename=')) {
-        fileName = contentDisposition.split('filename=')[1].replace(/"/g, '');
-      }
-
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      showSnackbar({
-        isLowContrast: true,
-        title: t('printSuccess', 'Print successful'),
-        kind: 'success',
-        subtitle: t('pdfDownloaded', 'PDF has been downloaded successfully'),
-      });
-    } catch (error) {
-      console.error('Error in async PDF flow:', error);
-      showSnackbar({
-        isLowContrast: false,
-        title: t('error', 'Error'),
-        kind: 'error',
-        subtitle: error.message || t('printError', 'Failed to generate PDF. Please check server logs.'),
-      });
-    } finally {
-      setIsPrinting(false);
-    }
-  };
-
   const handlePrintSelected = (selectedRows: Array<any>) => {
     const selectedEncounterUuids = selectedRows.map((row) => row.id);
-    downloadPdf(selectedEncounterUuids);
+    setIsPrinting(true);
+    downloadPdf(selectedEncounterUuids, t).finally(() => setIsPrinting(false));
   };
 
   if (isLoadingEncounterTypes || isLoading) {
@@ -383,7 +284,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
-                              {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
+                              {(canDeleteEncounter || canPrintEncounter) && ( // equivalent to canDeleteEncounter || canEditEncounter
                                 <OverflowMenu
                                   aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                   flipped
@@ -425,7 +326,10 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       hasDivider
                                       itemText={t('printEncounter', 'Print this encounter')}
                                       disabled={isPrinting}
-                                      onClick={() => downloadPdf([encounter.id])}
+                                      onClick={() => {
+                                        setIsPrinting(true);
+                                        downloadPdf([encounter.id], t).finally(() => setIsPrinting(false));
+                                      }}
                                     />
                                   )}
                                 </OverflowMenu>

@@ -4,6 +4,7 @@ import {
   openmrsFetch,
   parseDate,
   restBaseUrl,
+  showSnackbar,
   type Diagnosis,
   type Encounter,
   type EncounterType,
@@ -126,4 +127,88 @@ export function isCompletedFormEncounter(encounter: Encounter): boolean {
   }
 
   return encounter.form.resources.some((resource: any) => resource.name === jsonSchemaResourceName);
+}
+
+export async function downloadPdf(encounterUuids: string[], t: (key: string, options?: any) => string) {
+  if (!encounterUuids || encounterUuids.length === 0) return;
+
+  let currentJobId = null;
+
+  try {
+    const initResponse = await openmrsFetch('/ws/rest/v1/patientdocuments/encounters', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(encounterUuids),
+    });
+
+    currentJobId = initResponse.data.uuid;
+
+    showSnackbar({
+      isLowContrast: true,
+      title: t('generatingPdf', 'Generating PDF...'),
+      kind: 'info',
+      subtitle: t('pdfWillDownloadSoon', 'Your document is being generated and will download automatically.'),
+    });
+
+    let isCompleted = false;
+    let isFailed = false;
+    let attempts = 0;
+    const maxAttempts = 60;
+
+    while (!isCompleted && !isFailed && attempts < maxAttempts) {
+      attempts++;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const statusResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/status/${currentJobId}`);
+      const statusData = statusResponse.data;
+
+      if (statusData.status === 'COMPLETED') {
+        isCompleted = true;
+      } else if (statusData.status === 'FAILED') {
+        isFailed = true;
+        throw new Error(statusData.error || 'Server failed to generate the report.');
+      }
+    }
+
+    if (!isCompleted) {
+      throw new Error('Report generation timed out. Please try again or select fewer encounters.');
+    }
+
+    const downloadResponse = await openmrsFetch(`/ws/rest/v1/patientdocuments/encounters/download/${currentJobId}`);
+
+    const blob = await downloadResponse.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+    let fileName = 'EncountersReport.pdf';
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].replace(/"/g, '');
+    }
+
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    showSnackbar({
+      isLowContrast: true,
+      title: t('printSuccess', 'Print successful'),
+      kind: 'success',
+      subtitle: t('pdfDownloaded', 'PDF has been downloaded successfully'),
+    });
+  } catch (error) {
+    console.error('Error in async PDF flow:', error);
+    showSnackbar({
+      isLowContrast: false,
+      title: t('error', 'Error'),
+      kind: 'error',
+      subtitle: error.message || t('printError', 'Failed to generate PDF. Please check server logs.'),
+    });
+  }
 }
