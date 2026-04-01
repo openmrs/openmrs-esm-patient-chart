@@ -4889,8 +4889,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 4.1.1-pre.2318
-  resolution: "@openmrs/esm-form-engine-lib@npm:4.1.1-pre.2318"
+  version: 4.1.1-pre.2320
+  resolution: "@openmrs/esm-form-engine-lib@npm:4.1.1-pre.2320"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     classnames: "npm:^2.5.1"
@@ -4907,7 +4907,7 @@ __metadata:
     react: 18.x
     react-i18next: 16.x
     swr: 2.x
-  checksum: 10/1fd6555b50b7b321f13e6a264a662dde7616a4efe17dd12f5428c7c3e3582ed5b5915c1454cfc049d051f7496a37a699e0306207956c71afd495bad048ff11ee
+  checksum: 10/12dd6faa69290ed1b18752a98ba4f7387683b4e2019bec43e509ab26f27b870a8f2d60927e5293690b17ba4f9f9c2904976de97538eba2c61ea56589779214e3
   languageName: node
   linkType: hard
 
