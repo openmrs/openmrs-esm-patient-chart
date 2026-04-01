@@ -3,18 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { Pin, PinFilled } from '@carbon/react/icons';
 import { usePinToggle } from './usePinToggle';
-import type { DrugOrderSlotState } from './types';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import styles from './drug-order-pin-action.scss';
 
 interface DrugOrderPinActionProps {
   drug: Drug;
-  orderItem?: DrugOrderSlotState;
 }
 
-const DrugOrderPinAction: React.FC<DrugOrderPinActionProps> = ({ drug, orderItem }) => {
+const DrugOrderPinAction: React.FC<DrugOrderPinActionProps> = ({ drug }) => {
   const { t } = useTranslation();
-  const { isPinned, isSaving, isLoading, isEnabled, toggle } = usePinToggle(drug, orderItem);
+  const { isPinned, isSaving, isLoading, isEnabled, toggle } = usePinToggle(drug);
 
   if (!isEnabled) {
     return null;

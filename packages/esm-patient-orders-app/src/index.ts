@@ -81,10 +81,6 @@ export const drugOrderPinAction = getAsyncLifecycle(
   options,
 );
 
-export const drugFavoritesModal = getAsyncLifecycle(() => import('./order-favorites/drug-favorites.modal'), options);
-
-export const strengthPickerModal = getAsyncLifecycle(() => import('./order-favorites/strength-picker.modal'), options);
-
 export const drugFavoritesListExtension = getAsyncLifecycle(
   () => import('./order-favorites/drug-favorites-list.component'),
   options,

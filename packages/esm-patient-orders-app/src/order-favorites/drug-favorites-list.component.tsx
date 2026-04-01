@@ -2,13 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, InlineNotification, SkeletonText } from '@carbon/react';
 import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
-import { showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
-import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { getFavoriteKey } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
-import { MODAL_NAMES } from './constants';
-import { formatDrugInfo, createDrugFromFavorite, buildBasketItem } from './helpers';
+import { createDrugFromFavorite, buildBasketItem } from './helpers';
 import type { DrugFavoriteOrder } from './types';
 import styles from './drug-favorites-list.scss';
 
@@ -22,41 +21,38 @@ interface DrugFavoritesListExtensionProps {
 interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
   isTablet: boolean;
-  anyStrengthLabel: string;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onUnpin: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
-const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
-  ({ favorite, isTablet, anyStrengthLabel, onClick, onUnpin }) => {
-    const { t } = useTranslation();
+const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(({ favorite, isTablet, onClick, onUnpin }) => {
+  const { t } = useTranslation();
 
-    return (
-      <div className={styles.favoriteItem}>
-        <button
-          type="button"
-          className={styles.itemButton}
-          onClick={() => onClick(favorite)}
-          aria-label={favorite.displayName}
-        >
-          <div className={styles.itemContent}>
-            <p className={styles.itemTitle}>{favorite.displayName}</p>
-            <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
-          </div>
-        </button>
-        <IconButton
-          kind="ghost"
-          size={isTablet ? 'md' : 'sm'}
-          label={t('unpinOrder', 'Unpin order')}
-          className={styles.pinButton}
-          onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
-        >
-          <PinFilled className={styles.pinIcon} />
-        </IconButton>
-      </div>
-    );
-  },
-);
+  return (
+    <div className={styles.favoriteItem}>
+      <button
+        type="button"
+        className={styles.itemButton}
+        onClick={() => onClick(favorite)}
+        aria-label={favorite.displayName}
+      >
+        <div className={styles.itemContent}>
+          <p className={styles.itemTitle}>{favorite.displayName}</p>
+          {favorite.attributes.strength && <p className={styles.itemDetails}>{favorite.attributes.strength}</p>}
+        </div>
+      </button>
+      <IconButton
+        kind="ghost"
+        size={isTablet ? 'md' : 'sm'}
+        label={t('unpinOrder', 'Unpin order')}
+        className={styles.pinButton}
+        onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
+      >
+        <PinFilled className={styles.pinIcon} />
+      </IconButton>
+    </div>
+  );
+});
 
 const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   openOrderForm,
@@ -79,24 +75,8 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
   const handleFavoriteClick = useCallback(
     (favorite: DrugFavoriteOrder) => {
-      if (favorite.drugUuid) {
-        const drug = createDrugFromFavorite(favorite);
-        if (drug) {
-          openOrderForm(buildBasketItem(drug, favorite, visit, daysDurationUnit));
-        }
-        return;
-      }
-
-      if (favorite.conceptUuid && favorite.conceptName) {
-        const dispose = showModal(MODAL_NAMES.STRENGTH_PICKER, {
-          closeModal: () => dispose(),
-          conceptUuid: favorite.conceptUuid,
-          conceptName: favorite.conceptName,
-          onSelectDrug: (selectedDrug: Drug) => {
-            openOrderForm(buildBasketItem(selectedDrug, favorite, visit, daysDurationUnit));
-          },
-        });
-      }
+      const drug = createDrugFromFavorite(favorite);
+      openOrderForm(buildBasketItem(drug, visit, daysDurationUnit));
     },
     [openOrderForm, visit, daysDurationUnit],
   );
@@ -108,8 +88,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     },
     [deleteMultipleFavorites],
   );
-
-  const anyStrengthLabel = t('anyStrength', 'Any strength');
 
   if (!enableDrugOrderFavorites) {
     return null;
@@ -170,7 +148,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
               key={getFavoriteKey(favorite)}
               favorite={favorite}
               isTablet={isTablet}
-              anyStrengthLabel={anyStrengthLabel}
               onClick={handleFavoriteClick}
               onUnpin={handleUnpin}
             />

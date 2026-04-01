@@ -105,14 +105,6 @@
     {
       "component": "printLabResultModal",
       "name": "print-lab-results-modal"
-    },
-    {
-      "name": "drug-favorites-modal",
-      "component": "drugFavoritesModal"
-    },
-    {
-      "name": "strength-picker-modal",
-      "component": "strengthPickerModal"
     }
   ]
 }

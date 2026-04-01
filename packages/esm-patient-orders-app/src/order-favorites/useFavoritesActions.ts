@@ -1,26 +1,13 @@
 import { useCallback, useRef } from 'react';
 import { showSnackbar, useSession, reportError } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useDrugFavorites, removeDrugFavorite, saveDrugFavorites } from './drug-favorites.resource';
-import { FAVORITES_PROPERTY_KEYS } from './constants';
-import type { DrugFavoriteOrder, UserResponse } from './types';
-
-type UserData = { data: UserResponse };
-
-function createOptimisticData(updatedFavorites: DrugFavoriteOrder[]) {
-  return (currentData: UserData | undefined): UserData | undefined =>
-    currentData
-      ? {
-          data: {
-            ...currentData.data,
-            userProperties: {
-              ...currentData.data.userProperties,
-              [FAVORITES_PROPERTY_KEYS.DRUG]: JSON.stringify({ favorites: updatedFavorites }),
-            },
-          },
-        }
-      : currentData;
-}
+import {
+  FAVORITES_PROPERTY_KEY,
+  useDrugFavorites,
+  removeDrugFavorite,
+  saveDrugFavorites,
+} from './drug-favorites.resource';
+import type { DrugFavoriteOrder } from './types';
 
 interface SnackbarMessages {
   successTitle: string;
@@ -39,7 +26,21 @@ export function useFavoritesActions() {
     async (updatedFavorites: DrugFavoriteOrder[], messages: SnackbarMessages): Promise<boolean> => {
       if (!user?.uuid || isLoading) return false;
 
-      mutate(createOptimisticData(updatedFavorites), false);
+      mutate(
+        (currentData) =>
+          currentData
+            ? {
+                data: {
+                  ...currentData.data,
+                  userProperties: {
+                    ...currentData.data.userProperties,
+                    [FAVORITES_PROPERTY_KEY]: JSON.stringify({ favorites: updatedFavorites }),
+                  },
+                },
+              }
+            : currentData,
+        false,
+      );
 
       try {
         await saveDrugFavorites(user.uuid, updatedFavorites);

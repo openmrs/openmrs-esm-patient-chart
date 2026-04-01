@@ -6,10 +6,10 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import { usePinToggle } from './usePinToggle';
 import type { DrugActionsMenuProps } from './types';
 
-const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug, orderItem }) => {
+const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { isPinned, isSaving, isLoading, isEnabled, toggle } = usePinToggle(drug, orderItem);
+  const { isPinned, isSaving, isLoading, isEnabled, toggle } = usePinToggle(drug);
 
   if (!isEnabled) {
     return null;

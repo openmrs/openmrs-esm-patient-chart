@@ -1,20 +1,19 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showModal, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import { isDrugFavorite, getDrugFavorite, extractDrugOrderAttributes } from './drug-favorites.resource';
+import { addDrugFavorite, isDrugFavorite, getDrugFavorite } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
-import { MODAL_NAMES } from './constants';
-import type { DrugOrderSlotState } from './types';
+import { buildFavoriteOrder } from './helpers';
 
-export function usePinToggle(drug: Drug | undefined, orderItem?: DrugOrderSlotState) {
+export function usePinToggle(drug: Drug | undefined) {
   const { t } = useTranslation();
   const { enableDrugOrderFavorites, maxPinnedDrugOrders } = useConfig<ConfigObject>();
-  const { favorites, isLoading, deleteMultipleFavorites } = useFavoritesActions();
+  const { favorites, isLoading, deleteMultipleFavorites, persistFavorites } = useFavoritesActions();
   const [isSaving, setIsSaving] = useState(false);
 
-  const isPinned = isDrugFavorite(favorites, drug?.uuid, drug?.concept?.uuid, Boolean(drug?.strength), orderItem);
+  const isPinned = isDrugFavorite(favorites, drug?.uuid);
 
   const toggle = useCallback(async () => {
     if (!drug?.uuid) {
@@ -22,7 +21,7 @@ export function usePinToggle(drug: Drug | undefined, orderItem?: DrugOrderSlotSt
     }
 
     if (isPinned) {
-      const favorite = getDrugFavorite(favorites, drug.uuid, drug.concept?.uuid, orderItem);
+      const favorite = getDrugFavorite(favorites, drug.uuid);
       if (favorite) {
         setIsSaving(true);
         await deleteMultipleFavorites([favorite]);
@@ -40,13 +39,20 @@ export function usePinToggle(drug: Drug | undefined, orderItem?: DrugOrderSlotSt
         });
         return;
       }
-      const dispose = showModal(MODAL_NAMES.DRUG_FAVORITES, {
-        closeModal: () => dispose(),
-        drug,
-        initialAttributes: extractDrugOrderAttributes(drug, orderItem),
+
+      setIsSaving(true);
+      const newFavorite = buildFavoriteOrder(drug);
+      const updatedFavorites = addDrugFavorite(favorites, newFavorite);
+      await persistFavorites(updatedFavorites, {
+        successTitle: t('orderPinned', 'Order pinned'),
+        successSubtitle: t('orderPinnedSubtitle', '{{drugName}} has been added to your pinned orders', {
+          drugName: newFavorite.displayName,
+        }),
+        errorTitle: t('errorPinningOrder', 'Error pinning order'),
       });
+      setIsSaving(false);
     }
-  }, [drug, isPinned, favorites, deleteMultipleFavorites, maxPinnedDrugOrders, t, orderItem]);
+  }, [drug, isPinned, favorites, deleteMultipleFavorites, persistFavorites, maxPinnedDrugOrders, t]);
 
   return { isPinned, isSaving, isLoading, isEnabled: Boolean(drug && enableDrugOrderFavorites), toggle };
 }

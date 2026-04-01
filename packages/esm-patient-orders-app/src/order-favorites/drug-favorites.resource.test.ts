@@ -26,13 +26,6 @@ describe('addDrugFavorite', () => {
     expect(result).toHaveLength(1);
     expect(result[0].displayName).toBe('New name');
   });
-
-  it('allows two favorites for the same drug with different ids', () => {
-    const oral = makeFavorite({ id: 'fav-1', drugUuid: 'drug-1', attributes: { route: 'Oral' } });
-    const iv = makeFavorite({ id: 'fav-2', drugUuid: 'drug-1', attributes: { route: 'IV' } });
-    const result = addDrugFavorite([oral], iv);
-    expect(result).toHaveLength(2);
-  });
 });
 
 describe('removeDrugFavorite', () => {

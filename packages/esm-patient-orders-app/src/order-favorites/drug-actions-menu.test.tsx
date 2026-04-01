@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import DrugActionsMenu from './drug-actions-menu.component';
 import { useFavoritesActions } from './useFavoritesActions';
@@ -13,7 +13,6 @@ jest.mock('./useFavoritesActions', () => ({
 
 const mockUseFavoritesActions = jest.mocked(useFavoritesActions);
 const mockUseConfig = jest.mocked(useConfig);
-const mockShowModal = jest.mocked(showModal);
 
 const mockDrug: Drug = {
   uuid: 'drug-1',
@@ -22,13 +21,11 @@ const mockDrug: Drug = {
   concept: { uuid: 'concept-1', display: 'Aspirin' },
 } as Drug;
 
-const defaultActions = {
-  favorites: [] as DrugFavoriteOrder[],
-  isLoading: false,
-  deleteMultipleFavorites: jest.fn(),
-  persistFavorites: jest.fn(),
-  error: undefined,
-};
+beforeAll(() => {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: { ...globalThis.crypto, randomUUID: jest.fn(() => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee') },
+  });
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -37,15 +34,24 @@ beforeEach(() => {
 });
 
 describe('DrugActionsMenu', () => {
-  it('opens modal when pinning a new favorite', async () => {
-    const user = userEvent.setup();
-    mockUseFavoritesActions.mockReturnValue(defaultActions);
-    mockShowModal.mockReturnValue(jest.fn());
+  it('pins a drug directly when clicking the pin icon', async () => {
+    const mockPersistFavorites = jest.fn().mockResolvedValue(true);
+    mockUseFavoritesActions.mockReturnValue({
+      favorites: [] as DrugFavoriteOrder[],
+      isLoading: false,
+      deleteMultipleFavorites: jest.fn(),
+      persistFavorites: mockPersistFavorites,
+      error: undefined,
+    });
 
+    const user = userEvent.setup();
     render(<DrugActionsMenu drug={mockDrug} />);
     const pinButton = screen.getByRole('button', { name: /pin order/i });
     await user.click(pinButton);
 
-    expect(mockShowModal).toHaveBeenCalledWith('drug-favorites-modal', expect.objectContaining({ drug: mockDrug }));
+    expect(mockPersistFavorites).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ drugUuid: 'drug-1', displayName: 'Aspirin 81mg' })]),
+      expect.objectContaining({ successTitle: 'Order pinned' }),
+    );
   });
 });
