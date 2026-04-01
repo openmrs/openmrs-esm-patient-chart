@@ -92,12 +92,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
-  const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
-    const encounterIds = visit?.encounters?.map((e) => `Encounter/${e.uuid}`);
-    return ([entry]) => {
-      return encounterIds.includes(entry.encounter?.reference);
-    };
-  }, [visit?.encounters]);
+  const encounterIds = useMemo(
+    () => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [],
+    [visit?.encounters],
+  );
+  
+  const testsFilter = useMemo<ExternalOverviewProps['filter']>(
+    () => ([entry]) => encounterIds.includes(entry.encounter?.reference),
+    [encounterIds],
+  );
 
   return (
     <div className={styles.summaryContainer}>
@@ -123,7 +126,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
+          <Tab className={styles.tab} id="tests-tab" disabled={encounterIds.length === 0 && config.disableEmptyTabs}>
             {t('tests', 'Tests')}
           </Tab>
           <Tab
