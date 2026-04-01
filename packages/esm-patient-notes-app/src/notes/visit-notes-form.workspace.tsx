@@ -35,6 +35,7 @@ import {
   showModal,
   showSnackbar,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
   Workspace2,
@@ -83,9 +84,9 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction) => {
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
   return z.object({
-    noteDate: z.date(),
+    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
@@ -123,8 +124,12 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
+  const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
-  const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
+  const visitNoteFormSchema = useMemo(
+    () => createSchema(t, isRetrospectiveDataEntryEnabled),
+    [t, isRetrospectiveDataEntryEnabled],
+  );
 
   const customResolver = useCallback(
     async (data, context, options) => {
@@ -357,6 +362,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
+
+      // When RDE is off, the datepicker is hidden and noteDate defaults to new Date().
+      // This always falls within the 30-minute window, so encounterDatetime is intentionally
+      // omitted from the payload -> letting the server attach the correct timestamp.
       if (finalNoteDate.diff(now, 'minute') <= 30) {
         finalNoteDate = null;
       }
@@ -392,7 +401,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         ? updateVisitNote(abortController, encounter.id, visitNotePayload)
         : saveVisitNote(abortController, visitNotePayload);
 
-      savePromise
+      return savePromise
         .then((response) => {
           if (response.status === 201 || response.status === 200) {
             const encounterUuid = encounter?.id || response.data.uuid;
@@ -513,31 +522,33 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         <div className={styles.formContainer}>
           <Stack gap={2}>
             {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
-            <Row className={styles.row}>
-              <Column sm={1}>
-                <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-              </Column>
-              <Column sm={3}>
-                <Controller
-                  name="noteDate"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <ResponsiveWrapper>
-                      <OpenmrsDatePicker
-                        {...field}
-                        data-testid="visitDateTimePicker"
-                        id="visitDateTimePicker"
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        isDisabled={isEditing}
-                        labelText={t('visitDate', 'Visit date')}
-                        maxDate={new Date()}
-                      />
-                    </ResponsiveWrapper>
-                  )}
-                />
-              </Column>
-            </Row>
+            {isRetrospectiveDataEntryEnabled && (
+              <Row className={styles.row}>
+                <Column sm={1}>
+                  <span className={styles.columnLabel}>{t('date', 'Date')}</span>
+                </Column>
+                <Column sm={3}>
+                  <Controller
+                    name="noteDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <ResponsiveWrapper>
+                        <OpenmrsDatePicker
+                          {...field}
+                          data-testid="visitDateTimePicker"
+                          id="visitDateTimePicker"
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                          isDisabled={isEditing}
+                          labelText={t('visitDate', 'Visit date')}
+                          maxDate={new Date()}
+                        />
+                      </ResponsiveWrapper>
+                    )}
+                  />
+                </Column>
+              </Row>
+            )}
             <div className={styles.diagnosesText}>
               {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
                 <>
@@ -723,12 +734,11 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
           <Button
             className={styles.button}
             kind="primary"
-            onClick={() => handleSubmit}
             disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {isSubmitting ? (
-              <InlineLoading description={t('saving', 'Saving') + '...'} />
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
             ) : (
               <span>{t('saveAndClose', 'Save and close')}</span>
             )}

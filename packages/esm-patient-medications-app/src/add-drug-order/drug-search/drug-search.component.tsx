@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import {
@@ -20,33 +20,42 @@ export interface DrugSearchProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
   visit: Visit;
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
 }
 
-export default function DrugSearch({ closeWorkspace, openOrderForm, patient, visit }: DrugSearchProps) {
+export default function DrugSearch({
+  closeWorkspace,
+  openOrderForm,
+  patient,
+  visit,
+  searchTerm,
+  onSearchTermChange,
+}: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [searchTerm, setSearchTerm] = useState('');
   const { debounceDelayInMs } = useConfig<ConfigObject>();
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
   const handleSearchTermChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(event.target.value ?? '');
+      onSearchTermChange(event.target.value ?? '');
     },
-    [setSearchTerm],
+    [onSearchTermChange],
   );
 
   const focusAndClearSearchInput = useCallback(() => {
-    setSearchTerm('');
+    onSearchTermChange('');
     searchInputRef.current?.focus();
-  }, [setSearchTerm]);
+  }, [onSearchTermChange]);
 
   return (
     <div className={styles.searchPopupContainer}>
       <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
       <ResponsiveWrapper>
         <Search
+          autoFocus
           className={styles.searchInput}
           labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
           onChange={handleSearchTermChange}
