@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { IconButton, InlineLoading } from '@carbon/react';
 import { Pin, PinFilled } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
+import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { usePinToggle } from './usePinToggle';
-import type { DrugActionsMenuProps } from './types';
 
-const DrugActionsMenu: React.FC<DrugActionsMenuProps> = ({ drug }) => {
+const DrugActionsMenu: React.FC<{ drug: Drug }> = ({ drug }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { isPinned, isSaving, isLoading, isEnabled, toggle } = usePinToggle(drug);

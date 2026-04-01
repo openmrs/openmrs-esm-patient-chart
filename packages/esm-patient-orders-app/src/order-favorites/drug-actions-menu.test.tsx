@@ -21,12 +21,6 @@ const mockDrug: Drug = {
   concept: { uuid: 'concept-1', display: 'Aspirin' },
 } as Drug;
 
-beforeAll(() => {
-  Object.defineProperty(globalThis, 'crypto', {
-    value: { ...globalThis.crypto, randomUUID: jest.fn(() => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee') },
-  });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseConfig.mockReturnValue({ enableDrugOrderFavorites: true, maxPinnedDrugOrders: 50 });

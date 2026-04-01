@@ -1,12 +1,6 @@
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { buildFavoriteOrder } from './helpers';
 
-beforeAll(() => {
-  Object.defineProperty(globalThis, 'crypto', {
-    value: { ...globalThis.crypto, randomUUID: jest.fn(() => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee') },
-  });
-});
-
 const makeDrug = (overrides: Partial<Drug> = {}): Drug =>
   ({
     uuid: 'drug-1',

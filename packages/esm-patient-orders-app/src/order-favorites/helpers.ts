@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import type { Visit } from '@openmrs/esm-framework';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import type { DrugFavoriteOrder } from './types';
@@ -51,7 +52,7 @@ export function buildBasketItem(
 
 export function buildFavoriteOrder(drug: Drug): DrugFavoriteOrder {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     drugUuid: drug.uuid,
     conceptUuid: drug.concept?.uuid,
     conceptName: drug.concept?.display,

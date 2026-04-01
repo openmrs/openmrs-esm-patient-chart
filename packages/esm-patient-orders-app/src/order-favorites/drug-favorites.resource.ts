@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { getLoggedInUser, openmrsFetch, restBaseUrl, setUserProperties } from '@openmrs/esm-framework';
-import type { DrugFavoriteOrder, StoredDrugFavorites, UserResponse } from './types';
+import type { DrugFavoriteOrder, UserResponse } from './types';
 
 export const FAVORITES_PROPERTY_KEY = 'order_favorites_drugs';
 
@@ -19,7 +19,7 @@ export function useDrugFavorites(userUuid: string | undefined) {
   const favorites = useMemo((): DrugFavoriteOrder[] => {
     if (!rawValue) return [];
     try {
-      const stored: StoredDrugFavorites = JSON.parse(rawValue);
+      const stored: { favorites: DrugFavoriteOrder[] } = JSON.parse(rawValue);
       return stored.favorites ?? [];
     } catch (e) {
       console.error('Error parsing drug favorites:', e);
@@ -32,7 +32,7 @@ export function useDrugFavorites(userUuid: string | undefined) {
 
 export async function saveDrugFavorites(userUuid: string, favorites: DrugFavoriteOrder[]) {
   const user = await getLoggedInUser();
-  const stored: StoredDrugFavorites = { favorites };
+  const stored = { favorites };
 
   return setUserProperties(userUuid, {
     ...user.userProperties,
