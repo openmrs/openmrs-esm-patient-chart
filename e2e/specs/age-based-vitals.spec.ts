@@ -3,10 +3,7 @@ import { test } from '../core';
 import { BiometricsAndVitalsPage } from '../pages';
 import { type Patient, deletePatient, endVisit, generateRandomPatient, startVisit } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { calculateBirthdate, getAfterContent, getBackgroundColor } from '../commands/test-helps';
-
-const createdPatients: Patient[] = [];
-const createdVisits: Visit[] = [];
+import { calculateBirthdate, getAfterContent, getBackgroundColor } from '../commands/test-helpers';
 
 const ageGroups = [
   {
@@ -43,9 +40,7 @@ test.describe('Vitals validation for different age groups', () => {
     test.beforeEach(async ({ api }) => {
       const birthdate = await calculateBirthdate(group.age);
       patient = await generateRandomPatient(api, { birthdate });
-      createdPatients.push(patient);
       visit = await startVisit(api, patient.uuid);
-      createdVisits.push(visit);
     });
 
     test.afterEach(async ({ api }) => {
@@ -193,6 +188,13 @@ test.describe('Vitals validation for different age groups', () => {
         const afterContent = await getAfterContent(criticalCell);
         expect(afterContent).toBe('" ↑"');
       });
+
+      // Respiratory rate styling assertions are not possible yet because the vitals
+      // table relies on backend-provided FHIR observation interpretation, which is not
+      // set for respiratory rate. The vitals header cards DO show correct age-based
+      // styling because they use NumericObservation with client-side reference range
+      // lookup. Once #3180 (NumericObservation migration) lands, the table cells will
+      // also calculate interpretation client-side and these assertions can be added.
     });
   });
 });
