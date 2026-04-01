@@ -158,16 +158,9 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
 
   return (
     <>
-      <ModalHeader
-        closeModal={props.closeModal}
-        title={
-          form.isEditing
-            ? t('editPinnedOrder', 'Edit pinned order')
-            : t('addOrderToPinnedOrders', 'Add order to my pinned orders')
-        }
-      />
+      <ModalHeader closeModal={props.closeModal} title={t('addOrderToPinnedOrders', 'Add order to my pinned orders')} />
       <ModalBody>
-        {form.isLoadingDrug || attributes.loading.isLoadingStrengths ? (
+        {attributes.loading.isLoadingStrengths ? (
           <div className={styles.loadingContainer}>
             <SkeletonText width="60%" />
             <SkeletonText width="80%" />
@@ -255,7 +248,7 @@ const DrugFavoritesModal: React.FC<DrugFavoritesModalProps> = (props) => {
         <Button kind="secondary" onClick={props.closeModal}>
           {getCoreTranslation('cancel', 'Cancel')}
         </Button>
-        <Button kind="primary" onClick={form.handleSave} disabled={form.isSaving || form.isLoadingDrug}>
+        <Button kind="primary" onClick={form.handleSave} disabled={form.isSaving}>
           {form.isSaving ? (
             <InlineLoading description={t('saving', 'Saving') + '...'} />
           ) : (

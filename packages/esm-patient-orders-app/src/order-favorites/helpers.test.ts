@@ -131,9 +131,4 @@ describe('buildFavoriteOrder', () => {
       'Cannot create concept-based favorite',
     );
   });
-
-  it('preserves existing id on edit', () => {
-    const result = buildFavoriteOrder(true, makeDrug(), 'Aspirin 81mg', attrs, undefined, undefined, 'existing-id');
-    expect(result.id).toBe('existing-id');
-  });
 });

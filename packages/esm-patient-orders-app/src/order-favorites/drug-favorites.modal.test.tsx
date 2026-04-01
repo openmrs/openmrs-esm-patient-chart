@@ -62,17 +62,9 @@ beforeEach(() => {
 });
 
 describe('DrugFavoritesModal', () => {
-  it('shows "Edit pinned order" title when editing an any-strength favorite', () => {
-    const existingFavorite: DrugFavoriteOrder = {
-      id: 'fav-1',
-      conceptUuid: 'concept-1',
-      conceptName: 'Aspirin',
-      displayName: 'Aspirin',
-      attributes: {},
-    } as DrugFavoriteOrder;
-
-    renderWithSwr(<DrugFavoritesModal closeModal={jest.fn()} existingFavorite={existingFavorite} />);
-    expect(screen.getByText('Edit pinned order')).toBeInTheDocument();
+  it('shows "Add order to my pinned orders" title', () => {
+    renderWithSwr(<DrugFavoritesModal closeModal={jest.fn()} drug={mockDrug} />);
+    expect(screen.getByText('Add order to my pinned orders')).toBeInTheDocument();
   });
 
   it('shows manual dose input when "Add dose" is clicked', async () => {
@@ -86,15 +78,13 @@ describe('DrugFavoritesModal', () => {
   });
 
   it('renders strength dropdown for concept-based favorites', async () => {
-    const existingFavorite: DrugFavoriteOrder = {
-      id: 'fav-1',
-      conceptUuid: 'concept-1',
-      conceptName: 'Aspirin',
-      displayName: 'Aspirin',
-      attributes: {},
-    } as DrugFavoriteOrder;
+    const conceptDrug = {
+      ...mockDrug,
+      uuid: undefined,
+      strength: undefined,
+    } as unknown as Drug;
 
-    renderWithSwr(<DrugFavoritesModal closeModal={jest.fn()} existingFavorite={existingFavorite} />);
+    renderWithSwr(<DrugFavoritesModal closeModal={jest.fn()} drug={conceptDrug} />);
 
     expect(await screen.findByText('Strength')).toBeInTheDocument();
   });

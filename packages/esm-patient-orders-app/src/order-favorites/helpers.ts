@@ -150,9 +150,8 @@ export function buildFavoriteOrder(
   attributes: DrugFavoriteAttributes,
   conceptUuid?: string,
   conceptName?: string,
-  existingId?: string,
 ): DrugFavoriteOrder {
-  const id = existingId ?? crypto.randomUUID();
+  const id = crypto.randomUUID();
   if (isSpecificFavorite) {
     return {
       id,
@@ -174,18 +173,6 @@ export function buildFavoriteOrder(
       attributes,
     };
   }
-}
-
-export function isConvertingFavoriteType(
-  existingFavorite: DrugFavoriteOrder | undefined,
-  isSpecificFavorite: boolean,
-): boolean {
-  if (!existingFavorite) return false;
-
-  const wasConceptBased = Boolean(existingFavorite.conceptUuid && !existingFavorite.drugUuid);
-  const wasDrugBased = Boolean(existingFavorite.drugUuid);
-
-  return (wasConceptBased && isSpecificFavorite) || (wasDrugBased && !isSpecificFavorite);
 }
 
 export function validateDrugAvailable(isSpecificFavorite: boolean, drug?: Drug): boolean {

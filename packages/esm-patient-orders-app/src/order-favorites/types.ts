@@ -53,7 +53,6 @@ export interface DrugFavoritesModalProps {
   closeModal: () => void;
   drug?: Drug;
   initialAttributes?: DrugFavoriteAttributes;
-  existingFavorite?: DrugFavoriteOrder;
 }
 
 export interface UserResponse {

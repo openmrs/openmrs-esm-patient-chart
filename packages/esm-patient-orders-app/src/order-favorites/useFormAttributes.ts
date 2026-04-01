@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { reportError } from '@openmrs/esm-framework';
 import type { Drug } from '@openmrs/esm-patient-common-lib';
 import { useDrugsByConceptName, useOrderConfig } from './drug-favorites.resource';
-import type { AttributeKey, DrugFavoriteAttributes, ManualInputKey, OrderConfigItem, StrengthOption } from './types';
+import type { AttributeKey, ManualInputKey, OrderConfigItem, StrengthOption } from './types';
 
 interface UseFormAttributesProps {
   // For strength selection (concept-based favorites)
@@ -12,7 +12,6 @@ interface UseFormAttributesProps {
   isConceptBased: boolean;
 
   // For initialization
-  initialAttributes?: DrugFavoriteAttributes;
   effectiveDrug?: Drug;
 
   // For pre-filled values
@@ -30,7 +29,6 @@ export function useFormAttributes({
   conceptName,
   conceptUuid,
   isConceptBased,
-  initialAttributes,
   effectiveDrug,
   strength,
   dose,
@@ -54,15 +52,14 @@ export function useFormAttributes({
 
   const [selectedStrengthId, setSelectedStrengthId] = useState<string>('any');
 
-  const targetStrength = initialAttributes?.strength || strength;
   useEffect(() => {
-    if (availableStrengths.length > 0 && targetStrength) {
-      const match = availableStrengths.find((d) => d.strength === targetStrength);
+    if (availableStrengths.length > 0 && strength) {
+      const match = availableStrengths.find((d) => d.strength === strength);
       if (match) {
         setSelectedStrengthId(match.uuid);
       }
     }
-  }, [availableStrengths, targetStrength]);
+  }, [availableStrengths, strength]);
 
   const selectedStrengthDrug = useMemo(
     () => (selectedStrengthId === 'any' ? undefined : availableStrengths.find((d) => d.uuid === selectedStrengthId)),
@@ -94,31 +91,27 @@ export function useFormAttributes({
   }, [strengthsError, orderConfigError]);
 
   // Attribute Toggles
-  const hasPrefilledStrength = Boolean(strength || initialAttributes?.strength || effectiveDrug?.strength);
-  const hasPrefilledDose = Boolean(dose || initialAttributes?.dose);
-  const hasPrefilledUnit = Boolean(unit || initialAttributes?.unit || effectiveDrug?.dosageForm?.display);
-  const hasPrefilledRoute = Boolean(route || initialAttributes?.route);
-  const hasPrefilledFrequency = Boolean(frequency || initialAttributes?.frequency);
+  const hasPrefilledStrength = Boolean(strength || effectiveDrug?.strength);
+  const hasPrefilledDose = Boolean(dose);
+  const hasPrefilledUnit = Boolean(unit || effectiveDrug?.dosageForm?.display);
+  const hasPrefilledRoute = Boolean(route);
+  const hasPrefilledFrequency = Boolean(frequency);
 
   const [selectedAttributes, setSelectedAttributes] = useState<Record<AttributeKey, boolean>>(() => ({
-    strength: initialAttributes ? Boolean(initialAttributes.strength) : hasPrefilledStrength,
-    dose: initialAttributes ? Boolean(initialAttributes.dose) : hasPrefilledDose,
-    unit: initialAttributes ? Boolean(initialAttributes.unit) : hasPrefilledUnit,
-    route: initialAttributes ? Boolean(initialAttributes.route) : hasPrefilledRoute,
-    frequency: initialAttributes ? Boolean(initialAttributes.frequency) : hasPrefilledFrequency,
+    strength: hasPrefilledStrength,
+    dose: hasPrefilledDose,
+    unit: hasPrefilledUnit,
+    route: hasPrefilledRoute,
+    frequency: hasPrefilledFrequency,
   }));
 
   const resolvedValues = useMemo(
     () => ({
-      strength: strength || selectedStrengthDrug?.strength || initialAttributes?.strength || effectiveDrug?.strength,
-      dose: dose || initialAttributes?.dose || (manualDose == null ? undefined : manualDose.toString()),
-      unit:
-        unit ||
-        selectedStrengthDrug?.dosageForm?.display ||
-        initialAttributes?.unit ||
-        effectiveDrug?.dosageForm?.display,
-      route: route || initialAttributes?.route || manualRoute?.display,
-      frequency: frequency || initialAttributes?.frequency || manualFrequency?.display,
+      strength: strength || selectedStrengthDrug?.strength || effectiveDrug?.strength,
+      dose: dose || (manualDose == null ? undefined : manualDose.toString()),
+      unit: unit || selectedStrengthDrug?.dosageForm?.display || effectiveDrug?.dosageForm?.display,
+      route: route || manualRoute?.display,
+      frequency: frequency || manualFrequency?.display,
     }),
     [
       strength,
@@ -127,7 +120,6 @@ export function useFormAttributes({
       route,
       frequency,
       selectedStrengthDrug,
-      initialAttributes,
       effectiveDrug,
       manualDose,
       manualRoute,
@@ -137,12 +129,11 @@ export function useFormAttributes({
 
   const resolvedUuids = useMemo(
     () => ({
-      unitUuid:
-        selectedStrengthDrug?.dosageForm?.uuid || initialAttributes?.unitUuid || effectiveDrug?.dosageForm?.uuid,
-      routeUuid: initialAttributes?.routeUuid || manualRoute?.uuid,
-      frequencyUuid: initialAttributes?.frequencyUuid || manualFrequency?.uuid,
+      unitUuid: selectedStrengthDrug?.dosageForm?.uuid || effectiveDrug?.dosageForm?.uuid,
+      routeUuid: manualRoute?.uuid,
+      frequencyUuid: manualFrequency?.uuid,
     }),
-    [selectedStrengthDrug, initialAttributes, effectiveDrug, manualRoute, manualFrequency],
+    [selectedStrengthDrug, effectiveDrug, manualRoute, manualFrequency],
   );
 
   // Handlers

@@ -1,74 +1,38 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, useConfig, openmrsFetch, reportError, restBaseUrl } from '@openmrs/esm-framework';
-import useSWRImmutable from 'swr/immutable';
-import type { Drug } from '@openmrs/esm-patient-common-lib';
-import { addDrugFavorite, removeDrugFavorite } from './drug-favorites.resource';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { addDrugFavorite } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { useFormAttributes } from './useFormAttributes';
 import {
   buildFavoriteAttributes,
   buildFavoriteOrder,
-  isConvertingFavoriteType,
   validateDrugAvailable,
   validateConceptAvailable,
 } from './helpers';
 import type { DrugFavoritesModalProps } from './types';
 import type { ConfigObject } from '../config-schema';
 
-export function useFavoriteForm({
-  drug,
-  initialAttributes: initialAttrs,
-  existingFavorite,
-  closeModal,
-}: DrugFavoritesModalProps) {
+export function useFavoriteForm({ drug, initialAttributes, closeModal }: DrugFavoritesModalProps) {
   const { t } = useTranslation();
   const { maxPinnedDrugOrders } = useConfig<ConfigObject>();
   const { favorites, persistFavorites } = useFavoritesActions();
   const [isSaving, setIsSaving] = useState(false);
 
-  const drugUuid = drug?.uuid || existingFavorite?.drugUuid;
-  const conceptUuid = drug?.concept?.uuid || existingFavorite?.conceptUuid;
-  const conceptName = drug?.concept?.display || existingFavorite?.conceptName;
-  const prefilled = initialAttrs || existingFavorite?.attributes;
-
-  // Determine edit mode and favorite type
-  const isEditing = Boolean(existingFavorite);
-  const existing = existingFavorite;
-
-  // Fetch drug if we only have drugUuid (from edit flow)
-  const {
-    data: fetchedDrugData,
-    isLoading: isLoadingDrug,
-    error: drugFetchError,
-  } = useSWRImmutable<{ data: Drug }>(
-    drugUuid && !drug
-      ? `${restBaseUrl}/drug/${drugUuid}?v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
-      : null,
-    openmrsFetch,
-  );
-
-  useEffect(() => {
-    if (drugFetchError) {
-      reportError(drugFetchError);
-    }
-  }, [drugFetchError]);
-
-  const effectiveDrug = fetchedDrugData?.data || drug;
+  const drugUuid = drug?.uuid;
+  const conceptUuid = drug?.concept?.uuid;
+  const conceptName = drug?.concept?.display;
 
   const attributes = useFormAttributes({
     conceptName,
     conceptUuid,
-    isConceptBased: existingFavorite
-      ? Boolean(existingFavorite.conceptUuid && !existingFavorite.drugUuid)
-      : Boolean(conceptUuid && !drugUuid),
-    initialAttributes: existing?.attributes,
-    effectiveDrug,
-    strength: prefilled?.strength,
-    dose: prefilled?.dose,
-    unit: prefilled?.unit,
-    route: prefilled?.route,
-    frequency: prefilled?.frequency,
+    isConceptBased: Boolean(conceptUuid && !drugUuid),
+    effectiveDrug: drug,
+    strength: initialAttributes?.strength,
+    dose: initialAttributes?.dose,
+    unit: initialAttributes?.unit,
+    route: initialAttributes?.route,
+    frequency: initialAttributes?.frequency,
   });
 
   const isConceptBasedFavorite = useMemo(() => {
@@ -79,14 +43,14 @@ export function useFavoriteForm({
     if (attributes.strength.selectedDrug) return attributes.strength.selectedDrug.display || '';
 
     const isSpecific = attributes.selection.selected.strength;
-    if (isSpecific) return effectiveDrug?.display || '';
+    if (isSpecific) return drug?.display || '';
 
-    return effectiveDrug?.concept?.display || conceptName || '';
-  }, [attributes.selection.selected.strength, attributes.strength.selectedDrug, effectiveDrug, conceptName]);
+    return drug?.concept?.display || conceptName || '';
+  }, [attributes.selection.selected.strength, attributes.strength.selectedDrug, drug, conceptName]);
 
   const handleSave = useCallback(async () => {
     const isSpecificFavorite = Boolean(attributes.strength.selectedDrug || attributes.selection.selected.strength);
-    const drugForSave = attributes.strength.selectedDrug || effectiveDrug;
+    const drugForSave = attributes.strength.selectedDrug || drug;
 
     // Validation
     if (!validateDrugAvailable(isSpecificFavorite, drugForSave)) {
@@ -98,7 +62,7 @@ export function useFavoriteForm({
       return;
     }
 
-    if (!validateConceptAvailable(isSpecificFavorite, effectiveDrug?.concept?.uuid ?? conceptUuid)) {
+    if (!validateConceptAvailable(isSpecificFavorite, conceptUuid)) {
       showSnackbar({
         kind: 'error',
         title: t('errorSavingOrder', 'Error saving order'),
@@ -107,7 +71,7 @@ export function useFavoriteForm({
       return;
     }
 
-    if (!isEditing && favorites.length >= maxPinnedDrugOrders) {
+    if (favorites.length >= maxPinnedDrugOrders) {
       showSnackbar({
         isLowContrast: false,
         kind: 'warning',
@@ -136,26 +100,15 @@ export function useFavoriteForm({
       favoriteAttributes,
       conceptUuid,
       conceptName,
-      existingFavorite?.id,
     );
 
-    // Handle type conversion if editing and switching between concept-based and drug-specific
-    let baseFavorites = favorites;
-    if (existingFavorite && isConvertingFavoriteType(existingFavorite, isSpecificFavorite)) {
-      baseFavorites = removeDrugFavorite(favorites, existingFavorite.id);
-    }
-
-    const updatedFavorites = addDrugFavorite(baseFavorites, newFavorite);
+    const updatedFavorites = addDrugFavorite(favorites, newFavorite);
 
     const success = await persistFavorites(updatedFavorites, {
-      successTitle: isEditing ? t('orderUpdated', 'Order updated') : t('orderPinned', 'Order pinned'),
-      successSubtitle: isEditing
-        ? t('orderUpdatedSubtitle', '{{drugName}} has been updated in your pinned orders', {
-            drugName: newFavorite.displayName,
-          })
-        : t('orderPinnedSubtitle', '{{drugName}} has been added to your pinned orders', {
-            drugName: newFavorite.displayName,
-          }),
+      successTitle: t('orderPinned', 'Order pinned'),
+      successSubtitle: t('orderPinnedSubtitle', '{{drugName}} has been added to your pinned orders', {
+        drugName: newFavorite.displayName,
+      }),
       errorTitle: t('errorPinningOrder', 'Error pinning order'),
     });
 
@@ -165,14 +118,12 @@ export function useFavoriteForm({
       closeModal();
     }
   }, [
-    effectiveDrug,
+    drug,
     conceptUuid,
     conceptName,
     attributes,
     favorites,
     maxPinnedDrugOrders,
-    isEditing,
-    existingFavorite,
     computedName,
     persistFavorites,
     closeModal,
@@ -180,9 +131,7 @@ export function useFavoriteForm({
   ]);
 
   return {
-    isLoadingDrug,
     isSaving,
-    isEditing,
     isConceptBasedFavorite,
     computedName,
     handleSave,

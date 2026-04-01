@@ -89,8 +89,3 @@ export const drugFavoritesListExtension = getAsyncLifecycle(
   () => import('./order-favorites/drug-favorites-list.component'),
   options,
 );
-
-export const deleteFavoritesModal = getAsyncLifecycle(
-  () => import('./order-favorites/delete-favorites.modal'),
-  options,
-);

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InlineNotification, SkeletonText, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { ChevronDown, ChevronUp, Pin } from '@carbon/react/icons';
+import { IconButton, InlineNotification, SkeletonText } from '@carbon/react';
+import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
 import { showModal, useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { Drug, DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
@@ -24,19 +24,24 @@ interface FavoriteListItemProps {
   isTablet: boolean;
   anyStrengthLabel: string;
   onClick: (favorite: DrugFavoriteOrder) => void;
-  onEdit: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
-  onDelete: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
+  onUnpin: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
-  ({ favorite, isTablet, anyStrengthLabel, onClick, onEdit, onDelete }) => {
+  ({ favorite, isTablet, anyStrengthLabel, onClick, onUnpin }) => {
     const { t } = useTranslation();
 
     return (
       <div className={styles.favoriteItem}>
-        <div className={styles.pinButton}>
-          <Pin className={styles.pinIcon} />
-        </div>
+        <IconButton
+          kind="ghost"
+          size={isTablet ? 'md' : 'sm'}
+          label={t('unpinOrder', 'Unpin order')}
+          className={styles.pinButton}
+          onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
+        >
+          <PinFilled className={styles.pinIcon} />
+        </IconButton>
         <button
           type="button"
           className={styles.itemButton}
@@ -48,23 +53,6 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
             <p className={styles.itemDetails}>{formatDrugInfo(favorite, anyStrengthLabel)}</p>
           </div>
         </button>
-        <OverflowMenu
-          size={isTablet ? 'md' : 'sm'}
-          flipped
-          aria-label={t('pinnedOrderActions', 'Pinned order actions')}
-        >
-          <OverflowMenuItem
-            className={styles.menuItem}
-            itemText={t('edit', 'Edit')}
-            onClick={(e: React.MouseEvent) => onEdit(e, favorite)}
-          />
-          <OverflowMenuItem
-            className={styles.menuItem}
-            itemText={t('delete', 'Delete')}
-            onClick={(e: React.MouseEvent) => onDelete(e, favorite)}
-            isDelete
-          />
-        </OverflowMenu>
       </div>
     );
   },
@@ -113,23 +101,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     [openOrderForm, visit, daysDurationUnit],
   );
 
-  const handleEditItem = useCallback((e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
-    e.stopPropagation();
-
-    const dispose = showModal(MODAL_NAMES.DRUG_FAVORITES, {
-      closeModal: () => dispose(),
-      existingFavorite: favorite,
-    });
-  }, []);
-
-  const handleClearAll = useCallback(() => {
-    const dispose = showModal(MODAL_NAMES.DELETE_FAVORITES, {
-      closeModal: () => dispose(),
-      favorites,
-    });
-  }, [favorites]);
-
-  const handleDelete = useCallback(
+  const handleUnpin = useCallback(
     (e: React.MouseEvent, favorite: DrugFavoriteOrder) => {
       e.stopPropagation();
       deleteMultipleFavorites([favorite]);
@@ -177,11 +149,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
       <div className={styles.header}>
         <span className={styles.headerTitle}>{t('myPinnedDrugOrders', 'My pinned drug orders')}</span>
         <div className={styles.headerActions}>
-          {!isCollapsed && (
-            <Button kind="danger--ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClearAll}>
-              {t('clearAll', 'Clear all')}
-            </Button>
-          )}
           <button
             type="button"
             className={styles.chevronButton}
@@ -205,8 +172,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
               isTablet={isTablet}
               anyStrengthLabel={anyStrengthLabel}
               onClick={handleFavoriteClick}
-              onEdit={handleEditItem}
-              onDelete={handleDelete}
+              onUnpin={handleUnpin}
             />
           ))}
         </div>
