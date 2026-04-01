@@ -152,8 +152,8 @@ describe('GroupedTimeline', () => {
               ...mockFilterContext.timelineData.data.rowData[0],
               entries: [
                 { value: '100', interpretation: 'HIGH', obsDatetime: '2024-05-31T01:39:00.000Z' },
-                { value: '50', interpretation: 'NORMAL', obsDatetime: '2024-05-31T01:39:00.000Z' },
-                { value: '10', interpretation: 'LOW', obsDatetime: '2024-05-31T01:39:00.000Z' },
+                { value: '50', interpretation: 'NORMAL', obsDatetime: '2024-05-30T10:00:00.000Z' },
+                { value: '10', interpretation: 'LOW', obsDatetime: '2024-05-29T08:00:00.000Z' },
               ],
             },
           ],

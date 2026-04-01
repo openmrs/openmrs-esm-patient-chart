@@ -5,7 +5,7 @@ import { BiometricsAndVitalsPage } from '../pages';
 test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -143,7 +143,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
 test('Add low and critically low range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -229,7 +229,7 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
 test('Add high and critically high range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
