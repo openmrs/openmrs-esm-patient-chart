@@ -80,9 +80,11 @@ mockUseConfig.mockReturnValue({
   ...ConfigMock,
 });
 
-test('does not render the date picker when RDE is disabled', () => {
+beforeEach(() => {
   mockedUseFeatureFlag.mockReturnValue(false);
+});
 
+test('does not render the date picker when RDE is disabled', () => {
   renderVisitNotesForm();
 
   expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
@@ -259,6 +261,8 @@ test('renders an error snackbar if there was a problem recording a condition', a
 });
 
 test('initializes form with existing encounter data when in edit mode', () => {
+  mockedUseFeatureFlag.mockReturnValue(true);
+
   const mockEncounter = {
     id: '123',
     uuid: '123',
