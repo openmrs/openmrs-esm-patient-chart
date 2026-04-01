@@ -30,6 +30,8 @@ interface CommonDataTableProps {
   description?: React.ReactNode;
 }
 
+const getColumnClass = (columnKey: string) => styles[`col-${columnKey}`];
+
 const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, description, toolbar, tableHeaders }) => {
   const interpretationToCSS = {
     OFF_SCALE_HIGH: 'offScaleHigh',
@@ -58,16 +60,16 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
           {...getTableContainerProps()}
         >
           {toolbar}
-          <Table {...getTableProps()} isSortable>
-            <colgroup className={styles.columns}>
-              <col span={1} />
-              <col span={1} />
-              <col span={1} />
-            </colgroup>
+          <Table className={styles.table} {...getTableProps()} isSortable>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
-                  <TableHeader key={header.key} {...getHeaderProps({ header })} isSortable>
+                  <TableHeader
+                    key={header.key}
+                    className={getColumnClass(header.key)}
+                    {...getHeaderProps({ header })}
+                    isSortable
+                  >
                     {header.header}
                   </TableHeader>
                 ))}
@@ -77,16 +79,24 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
               {rows.map((row, i) => (
                 <TypedTableRow
                   key={row.id}
-                  interpretation={data[i]?.interpretation as OBSERVATION_INTERPRETATION}
+                  interpretation={data[i]?.interpretation}
                   {...getRowProps({ row })}
                 >
                   {row.cells.map((cell) => {
                     return cell.value?.interpretation ? (
-                      <TableCell className={styles[interpretationToCSS[cell.value.interpretation]]} key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        className={classNames(
+                          styles[interpretationToCSS[cell.value.interpretation]],
+                          getColumnClass(cell.info.header),
+                        )}
+                      >
                         <span>{cell.value?.value ?? cell.value}</span>
                       </TableCell>
                     ) : (
-                      <TableCell key={cell.id}>{cell?.value}</TableCell>
+                      <TableCell key={cell.id} className={getColumnClass(cell.info.header)}>
+                        {cell?.value}
+                      </TableCell>
                     );
                   })}
                 </TypedTableRow>
