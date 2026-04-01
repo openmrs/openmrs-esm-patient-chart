@@ -115,7 +115,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
             &bull; {`${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`}
           </p>
         </div>
-        <DataTable rows={rowsData} headers={headers}>
+        <DataTable rows={rowsData} headers={headers} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <Table
