@@ -9,6 +9,7 @@ export interface NewRowStartCellProps {
   patientUuid: string;
   shadow?: boolean;
   isString?: boolean;
+  zebra?: boolean;
 }
 
 export interface TimelineCellProps {
