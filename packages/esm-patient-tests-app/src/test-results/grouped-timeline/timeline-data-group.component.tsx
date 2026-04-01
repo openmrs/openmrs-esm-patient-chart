@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import { showModal } from '@openmrs/esm-framework';
 import { Grid } from './grid.component';
@@ -10,7 +10,6 @@ import type {
   TimelineDataGroupProps,
 } from './grouped-timeline-types';
 import { getMostRecentObservationWithRange, formatRangeWithUnits } from './reference-range-helpers';
-import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.scss';
 
 export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} />;
@@ -25,12 +24,8 @@ const TimeSlots: React.FC<{
   </div>
 );
 
-const PanelHeader: React.FC<{
-  panelName: string;
-  subRows: any[];
-}> = ({ panelName, subRows }) => {
-  // Calculate panel-specific dates from the actual data in this panel
-  const panelDates = useMemo(() => {
+function usePanelDates(subRows: any[]) {
+  return useMemo(() => {
     const allTimes = [
       ...new Set(
         subRows
@@ -73,9 +68,14 @@ const PanelHeader: React.FC<{
       timeColumns.push(time);
     });
 
-    return { yearColumns, dayColumns, timeColumns };
+    return { yearColumns, dayColumns, timeColumns, sortedTimes: allTimes };
   }, [subRows]);
+}
 
+const PanelHeader: React.FC<{
+  panelName: string;
+  panelDates: ReturnType<typeof usePanelDates>;
+}> = ({ panelName, panelDates }) => {
   return (
     <div className={styles.panelHeader} data-panel-name={panelName}>
       <div className={styles.dateHeaderContainer}>
@@ -122,6 +122,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
   patientUuid,
   shadow = false,
   isString = false,
+  zebra = false,
 }) => {
   const handleLaunchResultsModal = useCallback(() => {
     const dispose = showModal('timeline-results-modal', {
@@ -136,7 +137,7 @@ const NewRowStartCell: React.FC<NewRowStartCellProps> = ({
 
   return (
     <div
-      className={styles.rowStartCell}
+      className={classNames(styles.rowStartCell, { [styles.timelineCellZebra]: zebra })}
       style={{
         boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
       }}
@@ -217,6 +218,7 @@ const DataRows: React.FC<DataRowsProps> = ({ patientUuid, timeColumns, rowData, 
                 conceptUuid: row.conceptUuid,
                 patientUuid,
                 isString,
+                zebra: !!(index % 2),
               }}
             />
             <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
@@ -234,12 +236,7 @@ export default function TimelineDataGroup({
   xScroll,
   setXScroll,
 }: TimelineDataGroupProps) {
-  const { timelineData } = useContext(FilterContext);
-  const {
-    data: {
-      parsedTime: { timeColumns, yearColumns, dayColumns, sortedTimes },
-    },
-  } = timelineData;
+  const panelDates = usePanelDates(subRows);
 
   const ref = useRef();
 
@@ -263,14 +260,14 @@ export default function TimelineDataGroup({
   return (
     <>
       <div>
-        <PanelHeader panelName={parent.display} subRows={subRows} />
+        <PanelHeader panelName={parent.display} panelDates={panelDates} />
         <div className={styles.gridContainer} ref={ref}>
           <DataRows
             patientUuid={patientUuid}
             rowData={subRows}
             showShadow={Boolean(xScroll)}
-            sortedTimes={sortedTimes}
-            timeColumns={timeColumns}
+            sortedTimes={panelDates.sortedTimes}
+            timeColumns={panelDates.timeColumns}
           />
           <ShadowBox />
         </div>
