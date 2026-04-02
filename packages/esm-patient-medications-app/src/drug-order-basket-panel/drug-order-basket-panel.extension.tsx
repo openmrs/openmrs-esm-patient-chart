@@ -2,12 +2,13 @@ import React, { type ComponentProps, useCallback, useEffect, useMemo, useState }
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Tile } from '@carbon/react';
-import { AddIcon, ChevronDownIcon, ChevronUpIcon, useLayoutType } from '@openmrs/esm-framework';
+import { AddIcon, ChevronDownIcon, ChevronUpIcon, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
   type OrderBasketExtensionProps,
   useOrderBasket,
   type DrugOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
+import type { ConfigObject } from '../config-schema';
 import { prepMedicationOrderPostData } from '../api/api';
 import OrderBasketItemTile from './order-basket-item-tile.component';
 import RxIcon from './rx-icon.component';
@@ -21,7 +22,9 @@ import styles from './drug-order-basket-panel.scss';
  */
 function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBasketExtensionProps) {
   const { t } = useTranslation();
+  const config = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
+
   const responsiveSize = isTablet ? 'md' : 'sm';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
     patient,
@@ -77,6 +80,12 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
   useEffect(() => {
     setIsExpanded(orders.length > 0);
   }, [orders]);
+
+  useEffect(() => {
+    if (config.orderTypeUuid !== config.drugOrderTypeUUID) {
+      console.warn('orderTypeUuid does not match drugOrderTypeUUID — order basket filtering may not work as expected');
+    }
+  }, [config.orderTypeUuid, config.drugOrderTypeUUID]);
 
   return (
     <Tile

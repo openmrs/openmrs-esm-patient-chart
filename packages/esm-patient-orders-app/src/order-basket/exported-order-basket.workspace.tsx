@@ -19,6 +19,7 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
     labOrderWorkspaceName,
     generalOrderWorkspaceName,
     onOrderBasketSubmitted,
+    visibleOrderPanels,
   },
   closeWorkspace,
   launchChildWorkspace,
@@ -27,12 +28,13 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
     () =>
       createOrderBasketExtensionProps({
         patient,
-        drugOrderWorkspaceName: drugOrderWorkspaceName,
-        labOrderWorkspaceName: labOrderWorkspaceName,
-        generalOrderWorkspaceName: generalOrderWorkspaceName,
+        drugOrderWorkspaceName,
+        labOrderWorkspaceName,
+        generalOrderWorkspaceName,
         launchChildWorkspace,
+        visibleOrderPanels,
       }),
-    [launchChildWorkspace, patient, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName],
+    [launchChildWorkspace, patient, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName, visibleOrderPanels],
   );
 
   return (
