@@ -205,7 +205,7 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await expect(dataRow).toContainText('15');
     await expect(dataRow).toContainText('91');
     const lowRange = vitalsPage.page.getByRole('cell', { name: '91 ↓' });
-    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '17 ↓↓' });
+    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '15 ↓↓' });
     const backgroundColor = await lowRange.evaluate(
       (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
     );
