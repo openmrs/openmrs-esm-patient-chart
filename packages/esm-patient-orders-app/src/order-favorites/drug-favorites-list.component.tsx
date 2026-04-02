@@ -30,12 +30,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(({ favorite
 
   return (
     <div className={styles.favoriteItem}>
-      <button
-        type="button"
-        className={styles.itemButton}
-        onClick={() => onClick(favorite)}
-        aria-label={favorite.displayName}
-      >
+      <button type="button" className={styles.itemButton} onClick={() => onClick(favorite)}>
         <div className={styles.itemContent}>
           <p className={styles.itemTitle}>{favorite.displayName}</p>
           {favorite.attributes.strength && <p className={styles.itemDetails}>{favorite.attributes.strength}</p>}
@@ -45,6 +40,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(({ favorite
         kind="ghost"
         size={isTablet ? 'md' : 'sm'}
         label={t('unpinOrder', 'Unpin order')}
+        align="left"
         className={styles.pinButton}
         onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
       >

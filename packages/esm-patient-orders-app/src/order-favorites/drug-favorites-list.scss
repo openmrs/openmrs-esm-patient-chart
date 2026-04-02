@@ -88,8 +88,7 @@
 }
 
 .itemTitle {
-  @include type.type-style('body-compact-01');
-  font-weight: 600;
+  @include type.type-style('heading-compact-01');
   margin: 0;
   color: colors.$gray-100;
 }

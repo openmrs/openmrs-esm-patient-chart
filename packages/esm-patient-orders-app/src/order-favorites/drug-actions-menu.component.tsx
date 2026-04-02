@@ -24,6 +24,7 @@ const DrugActionsMenu: React.FC<{ drug: Drug }> = ({ drug }) => {
       kind="ghost"
       size={isTablet ? 'md' : 'sm'}
       label={isPinned ? t('unpinOrder', 'Unpin order') : t('pinOrder', 'Pin order')}
+      align="left"
       onClick={(e: React.MouseEvent) => {
         e.stopPropagation();
         toggle();
