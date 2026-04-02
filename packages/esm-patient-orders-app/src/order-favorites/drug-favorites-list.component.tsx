@@ -122,20 +122,19 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <span className={styles.headerTitle}>{t('myPinnedDrugOrders', 'My pinned drug orders')}</span>
-        <div className={styles.headerActions}>
-          <button
-            type="button"
-            className={styles.chevronButton}
-            onClick={toggleCollapsed}
-            aria-label={
-              isCollapsed
-                ? t('expandPinnedOrders', 'Expand pinned orders')
-                : t('collapsePinnedOrders', 'Collapse pinned orders')
-            }
-          >
-            {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-          </button>
-        </div>
+        <IconButton
+          kind="ghost"
+          size="sm"
+          align="left"
+          label={
+            isCollapsed
+              ? t('expandPinnedOrders', 'Expand pinned orders')
+              : t('collapsePinnedOrders', 'Collapse pinned orders')
+          }
+          onClick={toggleCollapsed}
+        >
+          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </IconButton>
       </div>
       {!isCollapsed && (
         <div className={styles.listContainer}>

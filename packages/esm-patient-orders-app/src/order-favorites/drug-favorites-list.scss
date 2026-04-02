@@ -17,31 +17,10 @@
   width: 100%;
 }
 
-.chevronButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: layout.$spacing-03;
-  background: none;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
-
-  &:hover {
-    background-color: colors.$gray-10-hover;
-  }
-}
-
 .headerTitle {
   @include type.type-style('body-compact-01');
+  flex: 1;
   color: $text-02;
-}
-
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: layout.$spacing-03;
-  margin-left: auto;
 }
 
 .listContainer {
@@ -90,7 +69,7 @@
 .itemTitle {
   @include type.type-style('heading-compact-01');
   margin: 0;
-  color: colors.$gray-100;
+  color: colors.$gray-70;
 }
 
 .itemDetails {
