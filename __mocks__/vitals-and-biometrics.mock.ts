@@ -5105,6 +5105,7 @@ export const formattedVitals = [
     bmi: null,
     muac: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Pt reports severe L chest pain',
   },
   {
     id: '1',
@@ -5119,6 +5120,7 @@ export const formattedVitals = [
     spo2: 90,
     bmi: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Follow up in 2 weeks. Patient also mentioned having some trouble sleeping lately and asked for some advice on sleep hygiene. Advised to avoid caffeine in the afternoon.',
   },
   {
     id: '2',
