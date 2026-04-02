@@ -10,7 +10,7 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace2, UserHasAccess, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
@@ -20,9 +20,13 @@ const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 const mockUseSession = jest.mocked(useSession);
 const mockUseDrugSearch = jest.mocked(useDrugSearch);
 const mockUseDrugTemplate = jest.mocked(useDrugTemplate);
+const mockExtensionSlot = jest.mocked(ExtensionSlot);
+const mockUserHasAccess = jest.mocked(UserHasAccess);
 const usePatientOrdersMock = jest.fn();
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
+mockExtensionSlot.mockImplementation(() => null);
+mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
 
 jest.mock('./drug-search/drug-search.resource', () => ({
   ...jest.requireActual('./drug-search/drug-search.resource'),
@@ -73,14 +77,14 @@ describe('AddDrugOrderWorkspace drug search', () => {
     // Anotates results with dosing info if an order-template was found.
     const aspirin81 = getByTextWithMarkup(/Aspirin 81mg/i);
     expect(aspirin81).toBeInTheDocument();
-    expect(aspirin81.closest('div')).toHaveTextContent(/Aspirin.*81mg.*tablet.*twice daily.*oral/i);
+    expect(aspirin81.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*81mg.*tablet.*twice daily.*oral/i);
     // Only displays drug name for results without a matching order template
     const aspirin325 = getByTextWithMarkup(/Aspirin 325mg/i);
     expect(aspirin325).toBeInTheDocument();
-    expect(aspirin325.closest('div')).toHaveTextContent(/Aspirin.*325mg.*tablet/i);
+    expect(aspirin325.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*325mg.*tablet/i);
     const asprin162 = screen.getByText(/Aspirin 162.5mg/i);
     expect(asprin162).toBeInTheDocument();
-    expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
+    expect(asprin162.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
   test('no buttons to click if the medication is already prescribed', async () => {
@@ -94,7 +98,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
-    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('div').parentElement;
+    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('[role="listitem"]');
     expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
   });
 
@@ -108,7 +112,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
       useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
 
-    const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('div').parentElement;
+    const aspirin325Div = getByTextWithMarkup(/Aspirin 325mg/i).closest('[role="listitem"]') as HTMLElement;
     const aspirin325AddButton = within(aspirin325Div).getByText(/Add to basket/i);
     await user.click(aspirin325AddButton);
 
@@ -131,7 +135,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const { result: hookResult } = renderHook(() =>
       useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(aspirin81OpenFormButton);
 
@@ -147,7 +151,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
       useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     const openFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(openFormButton);
 
@@ -179,7 +183,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     await user.click(within(aspirin81Div).getByText(/Order form/i));
 
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
@@ -197,7 +201,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     await user.click(within(aspirin81Div).getByText(/Order form/i));
 
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
@@ -213,7 +217,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
     renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
-    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('div').parentElement;
+    const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     await user.click(within(aspirin81Div).getByText(/Order form/i));
 
     expect(screen.getByText(/Order Form/i)).toBeInTheDocument();
@@ -249,7 +253,7 @@ function renderAddDrugOrderWorkspace() {
       }}
       windowName={''}
       isRootWorkspace={false}
-      showActionMenu={true}
+      showActionMenu={false}
     />,
   );
 }
