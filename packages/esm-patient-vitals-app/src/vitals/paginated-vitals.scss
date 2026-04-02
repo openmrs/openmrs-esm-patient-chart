@@ -92,3 +92,34 @@
 .high::after {
   content: ' ↑';
 }
+
+.hiddenRow {
+  display: none;
+}
+
+.noNoteRow :global(.cds--table-expand__button) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.expandedRow > td {
+  padding-left: layout.$spacing-08 !important;
+}
+
+.expandedRow > td > div {
+  max-height: max-content !important;
+}
+
+.container {
+  margin: layout.$spacing-03;
+}
+
+.copy {
+  @include type.type-style('body-01');
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  color: colors.$gray-80;
+}

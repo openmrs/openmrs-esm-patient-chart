@@ -8,6 +8,7 @@ import {
   useConfig,
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
@@ -186,6 +187,10 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
 
   const conceptUuids = useMemo(() => {
     const biometricsKeys = ['heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
+    // These keys are not individual observation concepts for the FHIR query:
+    // generalPatientNoteUuid is fetched separately to avoid note-only encounters
+    // polluting the vitals list; vitalSignsConceptSetUuid is a concept set, not an obs concept.
+    const excludedFromQuery = new Set(['generalPatientNoteUuid', 'vitalSignsConceptSetUuid']);
 
     if (!concepts) {
       return [];
@@ -195,6 +200,9 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
       .filter(([key, conceptUuid]) => {
         if (!conceptUuid) {
           console.warn(`Missing UUID for concept ${key}`);
+          return false;
+        }
+        if (excludedFromQuery.has(key)) {
           return false;
         }
         if (mode === 'both') {
@@ -235,6 +243,17 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
     getPage,
     handleFetch,
+  );
+
+  // Fetch note observations separately so that note-only encounters are never included
+  // as standalone vitals entries. Notes are merged into existing vitals encounters below.
+  // We omit _count so that every note for this patient is returned; notes are lightweight
+  // and typically few, so unbounded fetching is acceptable here.
+  const { data: notesData } = useSWR<VitalsFetchResponse, Error>(
+    concepts.generalPatientNoteUuid && patientUuid
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date`
+      : null,
+    openmrsFetch,
   );
 
   // see the comments above for why this is here
@@ -285,7 +304,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
-    const vitalsHashTable = data?.[0]?.data?.entry
+    const vitalsHashTable: Map<string, Partial<PatientVitalsAndBiometrics>> = data?.[0]?.data?.entry
       ?.map((entry) => entry.resource)
       .filter(Boolean)
       .map(mapVitalsAndBiometrics)
@@ -310,9 +329,26 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           }
         }
         return vitalsHashTable;
-      }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
+      }, new Map<string, Partial<PatientVitalsAndBiometrics>>()) ??
+    new Map<string, Partial<PatientVitalsAndBiometrics>>();
 
-    return Array.from(vitalsHashTable ?? []).map(([encounterId, vitalSigns]) => {
+    // Attach notes to their existing vitals encounters. Encounters that contain only
+    // a note observation (no numeric vitals) are intentionally skipped so they never
+    // surface as standalone entries in the vitals list.
+    notesData?.data?.entry
+      ?.map((entry) => entry.resource)
+      .filter(Boolean)
+      .forEach((resource) => {
+        const encounterId = extractEncounterUuid(resource.encounter);
+        if (encounterId && vitalsHashTable.has(encounterId)) {
+          vitalsHashTable.set(encounterId, {
+            ...vitalsHashTable.get(encounterId),
+            note: resource.valueString,
+          });
+        }
+      });
+
+    return Array.from(vitalsHashTable).map(([encounterId, vitalSigns]) => {
       const result = {
         id: encounterId,
         date: vitalSigns.date,
@@ -340,7 +376,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
 
       return result;
     });
-  }, [conceptRanges, concepts, data, getVitalsMapKey, mode]);
+  }, [conceptRanges, concepts, data, getVitalsMapKey, mode, notesData]);
 
   return {
     data: data ? formattedObs : undefined,
