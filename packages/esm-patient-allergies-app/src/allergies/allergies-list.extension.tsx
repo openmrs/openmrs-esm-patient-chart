@@ -20,9 +20,9 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
     [],
   );
 
-  const sortedAllergies = allergies?.sort(
-    (a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity],
-  );
+  const sortedAllergies = allergies
+    ? [...allergies].sort((a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity])
+    : undefined;
 
   if (isLoading) {
     return (
@@ -52,15 +52,13 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
           </Tooltip>
         ))}
         <Button
-          className={styles.addButton}
+          hasIconOnly
           kind="ghost"
-          size="sm"
-          renderIcon={(props) => <AddIcon size={16} {...props} />}
           iconDescription={translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy')}
           onClick={launchAllergiesForm}
-        >
-          {translateFrom(moduleName, 'add', 'Add')}
-        </Button>
+          renderIcon={(props) => <AddIcon size={16} {...props} />}
+          size="sm"
+        />
       </div>
     );
   }
@@ -69,15 +67,13 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
     <div className={classNames(styles.label, styles.container)}>
       {translateFrom(moduleName, 'allergies', 'Allergies')}: {getCoreTranslation('unknown')}
       <Button
-        className={styles.addButton}
+        hasIconOnly
         kind="ghost"
-        size="sm"
-        renderIcon={(props) => <AddIcon size={16} {...props} />}
         iconDescription={translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy')}
         onClick={launchAllergiesForm}
-      >
-        {translateFrom(moduleName, 'add', 'Add')}
-      </Button>
+        renderIcon={(props) => <AddIcon size={16} {...props} />}
+        size="sm"
+      />
     </div>
   );
 };

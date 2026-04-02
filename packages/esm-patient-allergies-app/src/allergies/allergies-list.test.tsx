@@ -89,7 +89,7 @@ describe('AllergyList', () => {
 
     expect(screen.getByText(/allergies/i)).toBeInTheDocument();
     expect(screen.getByText(/unknown/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /recordnewallergy/i })).toBeInTheDocument();
   });
 
   it('renders allergy tags with correct severity indicators when allergies are available', () => {
@@ -106,7 +106,7 @@ describe('AllergyList', () => {
     expect(screen.getByText('Aspirin')).toBeInTheDocument();
     expect(screen.getByText('Fish')).toBeInTheDocument();
     expect(screen.getByText('ACE inhibitors')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /recordnewallergy/i })).toBeInTheDocument();
   });
 
   it('applies correct data-severity attributes to allergy tags', () => {
@@ -138,10 +138,13 @@ describe('AllergyList', () => {
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
-    const allergyTags = screen
-      .getAllByRole('button')
-      .filter((element) => ['Aspirin', 'ACE inhibitors', 'Fish'].includes(element.textContent ?? ''));
+    const allergyTags = screen.getAllByTestId(/allergy-tag-/);
 
+    expect(allergyTags.map((tag) => tag.getAttribute('data-testid'))).toEqual([
+      'allergy-tag-severe',
+      'allergy-tag-moderate',
+      'allergy-tag-mild',
+    ]);
     expect(allergyTags.map((tag) => tag.textContent)).toEqual(['Aspirin', 'ACE inhibitors', 'Fish']);
   });
 
@@ -156,7 +159,7 @@ describe('AllergyList', () => {
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
-    await user.click(screen.getByRole('button', { name: /add/i }));
+    await user.click(screen.getByRole('button', { name: /recordnewallergy/i }));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(patientAllergiesFormWorkspace, { formContext: 'creating' });
   });
