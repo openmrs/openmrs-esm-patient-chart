@@ -173,8 +173,8 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await vitalsPage.page.getByRole('spinbutton', { name: /pulse/i }).fill('80');
   });
 
-  await test.step('And I fill `17` as the respiration rate', async () => {
-    await vitalsPage.page.getByRole('spinbutton', { name: /respiration rate/i }).fill('17');
+  await test.step('And I fill `15` as the respiration rate', async () => {
+    await vitalsPage.page.getByRole('spinbutton', { name: /respiration rate/i }).fill('15');
   });
 
   await test.step('And I fill `91` as the oxygen saturation', async () => {
@@ -202,10 +202,10 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await expect(dataRow).toContainText('35');
     await expect(dataRow).toContainText('90 / 30');
     await expect(dataRow).toContainText('80');
-    await expect(dataRow).toContainText('17');
+    await expect(dataRow).toContainText('15');
     await expect(dataRow).toContainText('91');
     const lowRange = vitalsPage.page.getByRole('cell', { name: '91 ↓' });
-    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '17 ↓↓' });
+    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '15 ↓↓' });
     const backgroundColor = await lowRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
     expect(backgroundColor).toBe('rgb(255, 242, 232)');
 
