@@ -7,6 +7,7 @@ export interface CreateOrderBasketExtensionPropsArguments {
   labOrderWorkspaceName?: string;
   generalOrderWorkspaceName?: string;
   launchChildWorkspace?: Workspace2DefinitionProps['launchChildWorkspace'];
+  visibleOrderPanels?: Array<string>;
 }
 
 export function createOrderBasketExtensionProps({
@@ -15,9 +16,11 @@ export function createOrderBasketExtensionProps({
   labOrderWorkspaceName,
   generalOrderWorkspaceName,
   launchChildWorkspace,
+  visibleOrderPanels,
 }: CreateOrderBasketExtensionPropsArguments): OrderBasketExtensionProps {
   const result: OrderBasketExtensionProps = {
     patient,
+    visibleOrderPanels,
   };
 
   if (launchChildWorkspace) {
