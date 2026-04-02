@@ -10,7 +10,7 @@ const mockUseTask = jest.mocked(useTask);
 
 // Helper to check if a date-like value is displayed (contains digits and date separators)
 function expectDateToBeDisplayed() {
-  expect(screen.getByText(/2024/)).toBeInTheDocument();
+  expect(screen.getAllByText(/2024/).length).toBeGreaterThan(0);
 }
 
 describe('TaskDetailsView', () => {
