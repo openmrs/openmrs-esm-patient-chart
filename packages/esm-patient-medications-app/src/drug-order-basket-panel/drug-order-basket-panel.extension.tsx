@@ -83,12 +83,9 @@ function DrugOrderBasketPanelExtension({ patient, launchDrugOrderForm }: OrderBa
 
   useEffect(() => {
     if (config.orderTypeUuid !== config.drugOrderTypeUUID) {
-      console.warn(
-        'orderTypeUuid does not match drugOrderTypeUUID — order basket filtering may not work as expected',
-      );
+      console.warn('orderTypeUuid does not match drugOrderTypeUUID — order basket filtering may not work as expected');
     }
   }, [config.orderTypeUuid, config.drugOrderTypeUUID]);
-
 
   return (
     <Tile
