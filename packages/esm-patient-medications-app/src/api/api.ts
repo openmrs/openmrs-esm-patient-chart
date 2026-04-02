@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -165,6 +165,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -193,6 +194,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -221,6 +223,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
+      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -283,7 +286,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    startDate: order.dateActivated,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
