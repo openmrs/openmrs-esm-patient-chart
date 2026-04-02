@@ -22,7 +22,7 @@ import styles from './lab-order-basket-panel.scss';
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
  */
 export function LabOrderBasketPanelExtension({ patient, launchLabOrderForm }: OrderBasketExtensionProps) {
-  const { orders, additionalTestOrderTypes } = useConfig<ConfigObject>();
+  const { orders, additionalTestOrderTypes, orderTypeUuid } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const allOrderTypes: ConfigObject['additionalTestOrderTypes'] = [
     {
@@ -33,6 +33,14 @@ export function LabOrderBasketPanelExtension({ patient, launchLabOrderForm }: Or
     },
     ...additionalTestOrderTypes,
   ];
+
+  useEffect(() => {
+    if (orderTypeUuid !== orders.labOrderTypeUuid) {
+      console.warn(
+        'orderTypeUuid does not match orders.labOrderTypeUuid — order basket filtering may not work as expected',
+      );
+    }
+  }, [orderTypeUuid, orders.labOrderTypeUuid]);
 
   return (
     <>
