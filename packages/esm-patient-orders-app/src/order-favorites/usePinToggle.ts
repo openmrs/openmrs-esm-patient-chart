@@ -45,7 +45,7 @@ export function usePinToggle(drug: Drug | undefined) {
       const updatedFavorites = addDrugFavorite(favorites, newFavorite);
       await persistFavorites(updatedFavorites, {
         successTitle: t('orderPinned', 'Order pinned'),
-        successSubtitle: t('orderPinnedSubtitle', '{{drugName}} has been added to your pinned orders', {
+        successSubtitle: t('orderPinnedSubtitle', '{{drugName}} added to your pinned orders', {
           drugName: newFavorite.displayName,
         }),
         errorTitle: t('errorPinningOrder', 'Error pinning order'),

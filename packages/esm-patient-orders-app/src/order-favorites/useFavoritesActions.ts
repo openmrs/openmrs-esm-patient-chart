@@ -80,17 +80,15 @@ export function useFavoritesActions() {
       });
 
       return persistFavorites(updatedFavorites, {
-        successTitle: isSingleDelete
-          ? t('orderDeleted', 'Pinned order deleted')
-          : t('ordersDeleted', 'Pinned orders deleted'),
+        successTitle: isSingleDelete ? t('orderUnpinned', 'Order unpinned') : t('ordersUnpinned', 'Orders unpinned'),
         successSubtitle: isSingleDelete
-          ? t('orderDeletedSubtitle', '{{name}} has been removed from your pinned orders', { name: itemName })
-          : t('ordersDeletedSubtitle', '{{total}} orders have been removed from your pinned orders', {
-              total: favoritesToDelete.length,
+          ? t('orderUnpinnedSubtitle', '{{drugName}} removed from your pinned orders', { drugName: itemName })
+          : t('ordersUnpinnedSubtitle', '{{count}} orders removed from your pinned orders', {
+              count: favoritesToDelete.length,
             }),
         errorTitle: isSingleDelete
-          ? t('errorDeletingOrder', 'Error deleting pinned order')
-          : t('errorDeletingOrders', 'Error deleting pinned orders'),
+          ? t('errorUnpinningOrder', 'Error unpinning order')
+          : t('errorUnpinningOrders', 'Error unpinning orders'),
       });
     },
     [persistFavorites, t],
