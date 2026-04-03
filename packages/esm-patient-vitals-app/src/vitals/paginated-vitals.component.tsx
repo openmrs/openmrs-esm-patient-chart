@@ -14,7 +14,7 @@ import {
   TableRow,
   type DataTableSortState,
 } from '@carbon/react';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { NumericObservation, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
@@ -24,39 +24,18 @@ interface PaginatedVitalsProps {
   isPrinting?: boolean;
   pageSize: number;
   pageUrl: string;
+  patientUuid: string;
   tableHeaders: Array<VitalsTableHeader>;
   tableRows: Array<VitalsTableRow>;
   urlLabel: string;
   patient: fhir.Patient;
 }
 
-const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
-  let cellClass = '';
-
-  switch (interpretation) {
-    case 'critically_high':
-      cellClass = styles.criticallyHigh;
-      break;
-    case 'critically_low':
-      cellClass = styles.criticallyLow;
-      break;
-    case 'high':
-      cellClass = styles.high;
-      break;
-    case 'low':
-      cellClass = styles.low;
-      break;
-    default:
-      break;
-  }
-
-  return <TableCell className={cellClass}>{children}</TableCell>;
-};
-
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   isPrinting,
   pageSize,
   pageUrl,
+  patientUuid,
   tableHeaders,
   tableRows,
   urlLabel,
@@ -104,7 +83,13 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
+  const headerByKey = useMemo(
+    () => new Map<string, VitalsTableHeader>(tableHeaders.map((h) => [h.key, h])),
+    [tableHeaders],
+  );
+
   const displayedRows = isPrinting ? sortedData : paginatedVitals;
+  const hasAnyNotes = tableRows.some((row) => Boolean(row.note));
 
   return (
     <>
@@ -122,7 +107,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
             <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader {...getExpandHeaderProps()} />
+                  {hasAnyNotes && <TableExpandHeader {...getExpandHeaderProps()} />}
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })} key={header.key}>
                       {header.header}
@@ -136,21 +121,55 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                   const vitalsObj = displayedRows.find((obj) => obj.id === row.id);
                   const hasNote = Boolean(vitalsObj?.note);
 
+                  if (!hasAnyNotes) {
+                    return (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => {
+                          const interpretationKey = cell.info.header + 'Interpretation';
+                          const interpretation = vitalsObj?.[interpretationKey];
+                          const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
+
+                          return (
+                            <TableCell key={`styled-cell-${cell.id}`} className={styles.numericObsCell}>
+                              <NumericObservation
+                                value={cell.value?.content ?? cell.value}
+                                interpretation={interpretation}
+                                conceptUuid={conceptUuid}
+                                variant="cell"
+                                patientUuid={patientUuid}
+                              />
+                            </TableCell>
+                          );
+                        })}
+                        <TableCell className="cds--table-column-menu" id="actions">
+                          <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+
                   return (
                     <React.Fragment key={row.id}>
                       <TableExpandRow
                         {...getRowProps({ row })}
                         className={!hasNote ? styles.noNoteRow : undefined}
-                        isExpanded={hasNote ? (isPrinting || row.isExpanded) : false}
+                        isExpanded={hasNote ? isPrinting || row.isExpanded : false}
                       >
                         {row.cells.map((cell) => {
+                          const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
                           const interpretationKey = cell.info.header + 'Interpretation';
                           const interpretation = vitalsObj?.[interpretationKey];
 
                           return (
-                            <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
-                              {cell.value?.content ?? cell.value}
-                            </StyledTableCell>
+                            <TableCell key={`styled-cell-${cell.id}`} className={styles.numericObsCell}>
+                              <NumericObservation
+                                value={cell.value?.content ?? cell.value}
+                                interpretation={interpretation}
+                                conceptUuid={conceptUuid}
+                                variant="cell"
+                                patientUuid={patientUuid}
+                              />
+                            </TableCell>
                           );
                         })}
                         <TableCell className="cds--table-column-menu" id="actions">
