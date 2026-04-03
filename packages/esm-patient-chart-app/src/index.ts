@@ -165,6 +165,14 @@ export const deleteEncounterModal = getAsyncLifecycle(
   },
 );
 
+export const printEncounterModal = getAsyncLifecycle(
+  () => import('./visit/visits-widget/past-visits-components/print-encounter/print-encounter.modal'),
+  {
+    featureName: 'print-encounter-modal',
+    moduleName,
+  },
+);
+
 export const editVisitDetailsActionButton = getAsyncLifecycle(
   () => import('./visit/visit-action-items/edit-visit-details.component'),
   { featureName: 'edit-visit-details', moduleName },
