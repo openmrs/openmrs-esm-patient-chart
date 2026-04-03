@@ -107,6 +107,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   const displayedRows = isPrinting ? sortedData : paginatedVitals;
+  const hasAnyNotes = tableRows.some((row) => Boolean(row.note));
 
   return (
     <>
@@ -124,7 +125,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
             <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader {...getExpandHeaderProps()} />
+                  {hasAnyNotes && <TableExpandHeader {...getExpandHeaderProps()} />}
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })} key={header.key}>
                       {header.header}
@@ -137,6 +138,26 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                 {rows.map((row) => {
                   const vitalsObj = displayedRows.find((obj) => obj.id === row.id);
                   const hasNote = Boolean(vitalsObj?.note);
+
+                  if (!hasAnyNotes) {
+                    return (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => {
+                          const interpretationKey = cell.info.header + 'Interpretation';
+                          const interpretation = vitalsObj?.[interpretationKey];
+
+                          return (
+                            <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
+                              {cell.value?.content ?? cell.value}
+                            </StyledTableCell>
+                          );
+                        })}
+                        <TableCell className="cds--table-column-menu" id="actions">
+                          <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
 
                   return (
                     <React.Fragment key={row.id}>
