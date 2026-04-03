@@ -333,11 +333,11 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
               kind: 'success',
               subtitle: !visitToEdit
                 ? t('visitStartedSuccessfully', '{{visit}} started successfully', {
-                    visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
-                  })
+                  visit: response?.data?.visitType?.display ?? t('visit', 'Visit'),
+                })
                 : t('visitDetailsUpdatedSuccessfully', '{{visit}} updated successfully', {
-                    visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
-                  }),
+                  visit: response?.data?.visitType?.display ?? t('pastVisit', 'Past visit'),
+                }),
               title: !visitToEdit
                 ? t('visitStarted', 'Visit started')
                 : t('visitDetailsUpdated', 'Visit details updated'),
@@ -645,17 +645,20 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                   </section>
 
                   {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
-                      or when the form is opened from the queues app */}
-                  <section>
-                    <div className={styles.sectionField}>
-                      <VisitFormExtensionSlot
-                        name="visit-form-bottom-slot"
-                        patientUuid={patientUuid}
-                        visitFormOpenedFrom={openedFrom}
-                        setVisitFormCallbacks={setVisitFormCallbacks}
-                      />
-                    </div>
-                  </section>
+                      or when the form is opened from the queues app.
+                      They should NOT be shown if the visit is retrospective (past). */}
+                  {visitStatus !== 'past' && (
+                    <section>
+                      <div className={styles.sectionField}>
+                        <VisitFormExtensionSlot
+                          name="visit-form-bottom-slot"
+                          patientUuid={patientUuid}
+                          visitFormOpenedFrom={openedFrom}
+                          setVisitFormCallbacks={setVisitFormCallbacks}
+                        />
+                      </div>
+                    </section>
+                  )}
                 </>
               )}
             </Stack>
