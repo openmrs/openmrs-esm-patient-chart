@@ -31,29 +31,6 @@ interface PaginatedVitalsProps {
   patient: fhir.Patient;
 }
 
-const StyledTableCell = ({ children, interpretation }: { children: React.ReactNode; interpretation: string }) => {
-  let cellClass = '';
-
-  switch (interpretation) {
-    case 'critically_high':
-      cellClass = styles.criticallyHigh;
-      break;
-    case 'critically_low':
-      cellClass = styles.criticallyLow;
-      break;
-    case 'high':
-      cellClass = styles.high;
-      break;
-    case 'low':
-      cellClass = styles.low;
-      break;
-    default:
-      break;
-  }
-
-  return <TableCell className={cellClass}>{children}</TableCell>;
-};
-
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   isPrinting,
   pageSize,
@@ -106,6 +83,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 
+  const headerByKey = useMemo(
+    () => new Map<string, VitalsTableHeader>(tableHeaders.map((h) => [h.key, h])),
+    [tableHeaders],
+  );
+
   const displayedRows = isPrinting ? sortedData : paginatedVitals;
   const hasAnyNotes = tableRows.some((row) => Boolean(row.note));
 
@@ -145,11 +127,18 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                         {row.cells.map((cell) => {
                           const interpretationKey = cell.info.header + 'Interpretation';
                           const interpretation = vitalsObj?.[interpretationKey];
+                          const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
 
                           return (
-                            <StyledTableCell key={`styled-cell-${cell.id}`} interpretation={interpretation}>
-                              {cell.value?.content ?? cell.value}
-                            </StyledTableCell>
+                            <TableCell key={`styled-cell-${cell.id}`} className={styles.numericObsCell}>
+                              <NumericObservation
+                                value={cell.value?.content ?? cell.value}
+                                interpretation={interpretation}
+                                conceptUuid={conceptUuid}
+                                variant="cell"
+                                patientUuid={patientUuid}
+                              />
+                            </TableCell>
                           );
                         })}
                         <TableCell className="cds--table-column-menu" id="actions">
@@ -167,10 +156,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                         isExpanded={hasNote ? isPrinting || row.isExpanded : false}
                       >
                         {row.cells.map((cell) => {
-                          const header = tableHeaders.find((h) => h.key === cell.info.header);
-                          const conceptUuid = header?.conceptUuid;
-                          const lookupSource = isPrinting ? sortedData : paginatedVitals;
-                          const vitalsObj = lookupSource.find((obj) => obj.id === row.id);
+                          const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
                           const interpretationKey = cell.info.header + 'Interpretation';
                           const interpretation = vitalsObj?.[interpretationKey];
 
