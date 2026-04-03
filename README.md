@@ -210,3 +210,5 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 ## Deployment
 
 See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.
+### Contribution Note
+This repository is actively maintained...
