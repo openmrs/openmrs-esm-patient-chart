@@ -182,10 +182,15 @@ test.describe('Vitals validation for different age groups', () => {
 
       await test.step('And the temperature cell should have warning styling', async () => {
         const criticalCell = vitalsPage.page.getByRole('cell', { name: group.criticalVitals.temp });
-        const backgroundColor = await getBackgroundColor(criticalCell);
+        const backgroundColor = await criticalCell.evaluate(
+          (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+        );
         expect(backgroundColor).toBe('rgb(255, 242, 232)');
 
-        const afterContent = await getAfterContent(criticalCell);
+        const afterContent = await criticalCell.evaluate((el) => {
+          const after = window.getComputedStyle(el.querySelector('div'), '::after');
+          return after.content;
+        });
         expect(afterContent).toBe('" ↑"');
       });
 

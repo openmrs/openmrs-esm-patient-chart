@@ -2,7 +2,15 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
-import { AddIcon, navigate, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
+import {
+  AddIcon,
+  navigate,
+  NumericObservation,
+  showModal,
+  showSnackbar,
+  useConfig,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { EncounterListDataTable } from './table.component';
 import { type LaunchAction, launchEncounterForm } from '../utils/helpers';
@@ -169,6 +177,10 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               {typeof val === 'string' ? val : ''}
             </Link>
           );
+        } else if (typeof val === 'number' && column.concept) {
+          val = (
+            <NumericObservation value={val} conceptUuid={column.concept} patientUuid={patientUuid} variant="cell" />
+          );
         }
         tableRow[column.key] = val;
       });
@@ -221,6 +233,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     handleDeleteEncounter,
     visit,
     requireActiveVisitForEncounterTile,
+    patientUuid,
   ]);
 
   const headers = useMemo(() => {
