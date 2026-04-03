@@ -41,7 +41,7 @@ export function PrintComponent({ subheader, patientDetails }: PrintComponentProp
         <div className={styles.patientDetails}>
           <span className={styles.name}>{patientDetails?.name}</span>
           <span className={styles.patientInfo}>
-            {patientDetails?.gender}, {patientDetails?.age}, {patientDetails?.identifiers}{' '}
+            {patientDetails?.gender}, {patientDetails?.age}, {patientDetails?.identifiers}
           </span>
         </div>
 
