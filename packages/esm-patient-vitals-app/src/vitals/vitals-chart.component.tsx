@@ -1,5 +1,6 @@
 import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
@@ -71,11 +72,15 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
   ];
 
+  const cutoff = useMemo(() => dayjs().subtract(12, 'month'), []);
+
   const chartData = useMemo(() => {
     return patientVitals
       .filter((vitals) => vitals[selectedVitalsSign.value])
-      .slice(0, 10)
-      .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
+      .filter((vitals) => dayjs(vitals.date).isAfter(cutoff))
+      .sort(
+        (vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime(),
+      )
       .map((vitals) => {
         if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
           return [
@@ -100,7 +105,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           date: vitals.date,
         };
       });
-  }, [patientVitals, selectedVitalsSign]);
+  }, [patientVitals, selectedVitalsSign, cutoff]);
 
   const chartOptions = {
     title: selectedVitalsSign.title,
@@ -139,24 +144,12 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       enabled: true,
       numberOfIcons: 4,
       controls: [
-        {
-          type: 'Zoom in',
-        },
-        {
-          type: 'Zoom out',
-        },
-        {
-          type: 'Reset zoom',
-        },
-        {
-          type: 'Export as CSV',
-        },
-        {
-          type: 'Export as PNG',
-        },
-        {
-          type: 'Make fullscreen',
-        },
+        { type: 'Zoom in' },
+        { type: 'Zoom out' },
+        { type: 'Reset zoom' },
+        { type: 'Export as CSV' },
+        { type: 'Export as PNG' },
+        { type: 'Make fullscreen' },
       ],
     },
     zoomBar: {
@@ -187,8 +180,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
                     value,
                     unit,
                   })
-                }
-              >
+                }>
                 {title}
               </Tab>
             ))}
