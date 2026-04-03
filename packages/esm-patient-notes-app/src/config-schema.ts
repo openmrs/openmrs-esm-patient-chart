@@ -12,11 +12,17 @@ export const configSchema = {
     _default: true,
     _description: 'Indicates whether a primary diagnosis is required when submitting a visit note',
   },
+  stickyNoteConceptUuid: {
+    _type: Type.UUID,
+    _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _description: 'The concept UUID for storing sticky notes as observations',
+  },
   visitNoteConfig: notesConfigSchema,
 };
 
 export interface ConfigObject {
   diagnosisConceptClass: string;
   isPrimaryDiagnosisRequired: boolean;
+  stickyNoteConceptUuid: string;
   visitNoteConfig: VisitNoteConfigObject;
 }
