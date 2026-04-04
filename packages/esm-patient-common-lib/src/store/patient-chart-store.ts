@@ -3,8 +3,8 @@ import { type Actions, createGlobalStore, useStoreWithActions, type Visit } from
 export interface PatientChartStore {
   patientUuid: string;
   patient: fhir.Patient;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
+  visitContext: Visit | null;
+  mutateVisitContext: (() => void) | null;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
@@ -20,7 +20,7 @@ const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {
     return { patient, patientUuid: patient?.id ?? null };
   },
-  setVisitContext(_, visitContext: Visit, mutateVisitContext: () => void) {
+  setVisitContext(_, visitContext: Visit | null, mutateVisitContext: (() => void) | null) {
     return { visitContext, mutateVisitContext };
   },
 } satisfies Actions<PatientChartStore>;
