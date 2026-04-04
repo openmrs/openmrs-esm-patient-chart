@@ -78,16 +78,26 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     data: { observations, concepts, encounters },
     isValidating,
     mutate,
-  } = useObs(patientUuid);
+  } = useObs(patientUuid, { oldestFirst: config.oldestFirst });
 
   const [temporaryEncounters, setTemporaryEncounters] = useState<Array<ColumnData>>([]);
 
+  const encountersByReference = useMemo(
+    () => Object.fromEntries(encounters.map((encounter) => [encounter.reference, encounter])),
+    [encounters],
+  );
+
+  const orderedEncounterReferences = useMemo(
+    () => [...new Set(observations.map((observation) => observation.encounter.reference))],
+    [observations],
+  );
+
   let obssGroupedByEncounters = useMemo(
     () =>
-      encounters?.length
-        ? encounters.map((encounter) => observations.filter((o) => o.encounter.reference === encounter.reference))
+      orderedEncounterReferences.length
+        ? orderedEncounterReferences.map((reference) => observations.filter((o) => o.encounter.reference === reference))
         : [],
-    [encounters, observations],
+    [orderedEncounterReferences, observations],
   );
 
   const { encounterTypes, isLoading: isLoadingEncounterTypes, error: errorEncounterTypes } = useEncounterTypes();
@@ -115,16 +125,6 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
   const conceptByUuid = useMemo(() => {
     return Object.fromEntries(concepts.map((c) => [c.uuid, c]));
   }, [concepts]);
-
-  if (config.oldestFirst) {
-    obssGroupedByEncounters.sort(
-      (a, b) => new Date(a[0].effectiveDateTime).getTime() - new Date(b[0].effectiveDateTime).getTime(),
-    );
-  } else {
-    obssGroupedByEncounters.sort(
-      (a, b) => new Date(b[0].effectiveDateTime).getTime() - new Date(a[0].effectiveDateTime).getTime(),
-    );
-  }
 
   let tableRowLabels = config.data.map(({ concept, label }) => ({
     key: concept,
@@ -160,16 +160,17 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
   const tableColumns = useMemo(() => {
     const existingColumns = obssGroupedByEncounters?.map((obss, index) => {
-      const encounterReference = obss[0].encounter.reference;
-      const encounterUuid = encounterReference.split('/')[1];
-      const columnData: ColumnData = {
-        id: `${index}`,
-        date: new Date(obss[0].effectiveDateTime),
-        encounter: {
-          value: obss[0].encounter.name,
-          editPrivilege: editPrivilegePerEncounterReference[encounterReference],
-        },
-        encounterReference,
+        const encounterReference = obss[0].encounter.reference;
+        const encounterUuid = encounterReference.split('/')[1];
+        const encounterRecord = encountersByReference[encounterReference];
+        const columnData: ColumnData = {
+          id: `${index}`,
+          date: new Date(obss[0].effectiveDateTime),
+          encounter: {
+            value: encounterRecord?.display ?? obss[0].encounter.name,
+            editPrivilege: editPrivilegePerEncounterReference[encounterReference],
+          },
+          encounterReference,
         encounterUuid,
         obs: {} as Record<string, CellData>,
       };
@@ -218,7 +219,14 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
     });
 
     return [...existingColumns, ...temporaryEncounters];
-  }, [config.data, obssGroupedByEncounters, conceptByUuid, temporaryEncounters, editPrivilegePerEncounterReference]);
+  }, [
+    config.data,
+    obssGroupedByEncounters,
+    conceptByUuid,
+    temporaryEncounters,
+    editPrivilegePerEncounterReference,
+    encountersByReference,
+  ]);
 
   const { results, goTo, currentPage } = usePagination(tableColumns, config.maxColumns);
 
