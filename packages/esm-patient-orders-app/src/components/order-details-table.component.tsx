@@ -613,19 +613,27 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
   const { mutate: globalMutate } = useSWRConfig();
+  const encounterUuid = orderItem.encounter?.uuid ?? null;
+  const visitContext = orderItem.encounter?.visit ?? null;
+  const visitUuid = visitContext?.uuid;
+  const hasVisitContext = Boolean(encounterUuid && visitUuid);
 
-  const windowProps = useMemo(() => ({ encounterUuid: orderItem.encounter.uuid }), [orderItem.encounter.uuid]);
+  const windowProps = useMemo(() => ({ encounterUuid }), [encounterUuid]);
   const groupProps = useMemo(
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: orderItem.encounter.visit,
-      mutateVisitContext: invalidateVisitByUuid(globalMutate, orderItem.encounter.visit.uuid),
+      visitContext,
+      mutateVisitContext: visitUuid ? () => invalidateVisitByUuid(globalMutate, visitUuid) : null,
     }),
-    [patient, orderItem.encounter.visit, globalMutate],
+    [globalMutate, patient, visitContext, visitUuid],
   );
 
   const handleCancelOrder = useCallback(() => {
+    if (!hasVisitContext) {
+      return;
+    }
+
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       getDrugOrderByUuid(orderItem.uuid)
         .then((res) => {
@@ -646,9 +654,13 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       setOrders([...orders, order]);
       launchWorkspace2('order-basket', {}, windowProps, groupProps);
     }
-  }, [orderItem, setOrders, orders, windowProps, groupProps]);
+  }, [groupProps, hasVisitContext, orderItem, orders, setOrders, windowProps]);
 
   const handleModifyOrder = useCallback(() => {
+    if (!hasVisitContext) {
+      return;
+    }
+
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       // make another call to fetch the order,
       // this time with custom rep to include the drug field
@@ -685,7 +697,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         groupProps,
       );
     }
-  }, [orderItem, windowProps, groupProps]);
+  }, [groupProps, hasVisitContext, orderItem, windowProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
@@ -701,7 +713,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || !hasVisitContext}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
           onClick={handleModifyOrder}
@@ -721,7 +733,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         )}
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE'}
+          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE' || !hasVisitContext}
           hasDivider
           id="discontinue"
           isDelete

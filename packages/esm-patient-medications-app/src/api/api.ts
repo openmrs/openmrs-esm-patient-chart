@@ -297,7 +297,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
       : null,
     encounterUuid: order.encounter?.uuid,
     previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
-    visit: order.encounter.visit,
+    visit: order.encounter.visit ?? null,
   };
 }
 

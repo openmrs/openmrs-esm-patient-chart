@@ -101,7 +101,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
       : null,
     encounterUuid: order.encounter?.uuid,
     previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
-    visit: order.encounter.visit,
+    visit: order.encounter.visit ?? null,
   };
 }
 
@@ -126,7 +126,7 @@ export function buildLabOrder(order: Order, action?: OrderAction): TestOrderBask
     specimenSource: null,
     scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
     encounterUuid: order.encounter?.uuid,
-    visit: order.encounter.visit,
+    visit: order.encounter?.visit ?? null,
   };
 }
 
@@ -146,7 +146,7 @@ export function buildGeneralOrder(order: Order, action?: OrderAction): OrderBask
     orderType: order.orderType.uuid,
     scheduledDate: order.scheduledDate ? new Date(order.scheduledDate) : null,
     encounterUuid: order.encounter?.uuid,
-    visit: order.encounter.visit,
+    visit: order.encounter?.visit ?? null,
   };
 }
 

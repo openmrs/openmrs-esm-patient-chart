@@ -2,6 +2,7 @@ import { toOmrsIsoString } from '@openmrs/esm-framework';
 import { describe, it, expect } from 'vitest';
 import { prepMedicationOrderPostData, buildMedicationOrder, bucketMedicationOrders } from './api';
 import type { DrugOrderBasketItem, Order } from '@openmrs/esm-patient-common-lib';
+import { mockOrders } from '__mocks__';
 
 const selectedStartDate = new Date('2026-04-01T10:15:00.000Z');
 
@@ -24,7 +25,7 @@ const drugOrderBasketItem: DrugOrderBasketItem = {
   unit: {
     value: 'tablet',
     valueCoded: 'unit-uuid',
-  },
+    },
   commonMedicationName: 'Aspirin 81 mg',
   dosage: 1,
   frequency: {
@@ -330,5 +331,36 @@ describe('buildMedicationOrder', () => {
 
     expect(result.scheduledDate).toBeInstanceOf(Date);
     expect((result.scheduledDate as Date).toISOString()).toBe(new Date(medicationOrder.dateActivated).toISOString());
+  });
+
+  it('returns a basket item with a null visit when the source order has no encounter visit', () => {
+    const orderWithoutVisit = {
+      ...mockOrders[0],
+      encounter: {
+        ...mockOrders[0].encounter,
+        visit: null,
+      },
+    };
+
+    expect(buildMedicationOrder(orderWithoutVisit as any, 'REVISE')).toEqual(
+      expect.objectContaining({
+        encounterUuid: mockOrders[0].encounter.uuid,
+        visit: null,
+      }),
+    );
+  });
+
+  it('returns a basket item with no encounter UUID when the source order has no encounter', () => {
+    const orderWithoutEncounter = {
+      ...mockOrders[0],
+      encounter: null,
+    };
+
+    expect(buildMedicationOrder(orderWithoutEncounter as any, 'DISCONTINUE')).toEqual(
+      expect.objectContaining({
+        encounterUuid: undefined,
+        visit: null,
+      }),
+    );
   });
 });
