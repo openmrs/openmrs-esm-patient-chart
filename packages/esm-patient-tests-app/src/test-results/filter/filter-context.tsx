@@ -135,9 +135,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       const test = state.tests[key] as TestResult;
       if (test.obs && Array.isArray(test.obs)) {
         test.obs.forEach((obs) => {
-          // Use a more specific key that includes the test name to avoid over-deduplication
           const testKey = `${test.flatName}_${obs.obsDatetime}_${obs.value}`;
-
           if (!seenTests.has(testKey)) {
             seenTests.add(testKey);
             const flattenedEntry = {
@@ -151,44 +149,44 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       }
     }
 
+    flattenedObs.sort(
+      (a, b) =>
+        new Date((b as MappedObservation).obsDatetime).getTime() -
+        new Date((a as MappedObservation).obsDatetime).getTime(),
+    );
+
     const groupedObs: Record<string, GroupedObservation> = {};
+    const seenConcepts: Record<string, Set<string>> = {};
 
     flattenedObs.forEach((curr: MappedObservation) => {
       const flatNameParts = curr.flatName.split('-');
 
-      // Extract the actual panel name from the flatName
-      // Panel names are at index 1 (second part) like "Lipid panel", "Basic metabolic panel"
-      // This is based on the actual flatName structure we observed
       let groupKey: string;
       if (flatNameParts.length >= 2) {
-        // For names like "Hematology-Lipid panel-Total cholesterol" or "Chemistry-Basic metabolic panel-Serum sodium"
-        // Take the second part (index 1) which is the actual panel name
         groupKey = flatNameParts[1];
       } else {
-        // Fallback to first part if only one part exists
         groupKey = flatNameParts[0];
       }
 
-      const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
-
-      const compositeKey = `${groupKey}__${dateKey}`;
-      if (!groupedObs[compositeKey]) {
-        groupedObs[compositeKey] = {
+      if (!groupedObs[groupKey]) {
+        const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
+        groupedObs[groupKey] = {
           key: groupKey,
           date: dateKey,
           flatName: curr.flatName,
           entries: [],
         };
+        seenConcepts[groupKey] = new Set<string>();
       }
 
-      groupedObs[compositeKey].entries.push(curr);
+      const conceptId = curr.key;
+      if (!seenConcepts[groupKey].has(conceptId)) {
+        seenConcepts[groupKey].add(conceptId);
+        groupedObs[groupKey].entries.push(curr);
+      }
     });
 
-    const resultArray = Object.values(groupedObs).sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
-
-    return resultArray;
+    return Object.values(groupedObs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [state.tests]);
 
   useEffect(() => {
