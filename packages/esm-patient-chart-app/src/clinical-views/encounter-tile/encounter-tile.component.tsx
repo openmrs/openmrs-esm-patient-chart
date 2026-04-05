@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CodeSnippetSkeleton, Tile, Layer, Grid, Column } from '@carbon/react';
 import { isNil } from 'lodash-es';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { NumericObservation, useLayoutType } from '@openmrs/esm-framework';
 import { useLastEncounter } from '../hooks';
 import type { EncounterTileColumn, EncounterTileProps } from '../types';
 import { withUnit, getConceptUnitsFromEncounter } from '../utils/concept-utils';
@@ -65,11 +65,25 @@ const EncounterData: React.FC<{
     );
   }
 
+  const isNumericObs = typeof obsValue === 'number' && column.concept;
+  const showObsValue = !(obsValue === '--' && summaryValue !== '--' && !isNil(summaryValue));
+
   return (
     <>
-      <span className={styles.tileTitle}>{t(column.header)}</span>
-      {!(obsValue === '--' && summaryValue !== '--' && !isNil(summaryValue)) && (
-        <div className={styles.tileValue}>{withUnit(obsValue, units)}</div>
+      {showObsValue && isNumericObs ? (
+        <NumericObservation
+          value={obsValue}
+          unit={units}
+          label={t(column.header)}
+          conceptUuid={column.concept}
+          patientUuid={patientUuid}
+          variant="card"
+        />
+      ) : (
+        <>
+          <span className={styles.tileTitle}>{t(column.header)}</span>
+          {showObsValue && <div className={styles.tileValue}>{withUnit(obsValue, units)}</div>}
+        </>
       )}
 
       {!isNil(summaryValue) && summaryValue !== '--' && (

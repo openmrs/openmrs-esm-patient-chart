@@ -206,20 +206,24 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await expect(dataRow).toContainText('91');
     const lowRange = vitalsPage.page.getByRole('cell', { name: '91 ↓' });
     const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '15 ↓↓' });
-    const backgroundColor = await lowRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColor = await lowRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColor).toBe('rgb(255, 242, 232)');
 
     const lowRangeContent = await lowRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(lowRangeContent).toBe('" ↓"');
 
-    const backgroundColorLow = await criticallyLowRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColorLow = await criticallyLowRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
 
     expect(backgroundColorLow).toBe('rgb(255, 215, 217)');
     const criticalLowRangeContent = await criticallyLowRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(criticalLowRangeContent).toBe('" ↓↓"');
@@ -293,21 +297,25 @@ test('Add high and critically high range patient vitals', async ({ page, patient
     const highRange = vitalsPage.page.getByRole('cell', { name: '38 ↑' });
     const criticallyHighRange = vitalsPage.page.getByRole('cell', { name: '200 ↑↑' });
 
-    const backgroundColor = await highRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColor = await highRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColor).toBe('rgb(255, 215, 217)');
 
     const afterContent = await highRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
 
     expect(afterContent).toBe('" ↑↑"');
 
-    const backgroundColorLow = await criticallyHighRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColorLow = await criticallyHighRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColorLow).toBe('rgb(255, 215, 217)');
 
     const afterContentLow = await criticallyHighRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(afterContentLow).toBe('" ↑↑"');
