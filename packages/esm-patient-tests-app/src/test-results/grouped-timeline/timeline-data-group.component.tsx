@@ -30,13 +30,14 @@ function usePanelDates(subRows: any[]) {
       ...new Set(
         subRows
           .filter((row) => row?.entries && Array.isArray(row.entries))
-          .map((row) => row.entries.filter((entry) => entry).map((entry) => entry.obsDatetime))
+          .map((row) =>
+            row.entries.filter((entry) => entry).map((entry) => entry.obsDatetime)
+          )
           .flat(),
       ),
     ];
 
     allTimes.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
     const yearColumns: Array<{ year: string; size: number }> = [];
     const dayColumns: Array<{ year: string; day: string; size: number }> = [];
     const timeColumns: string[] = [];
