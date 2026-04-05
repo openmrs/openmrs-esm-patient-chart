@@ -71,7 +71,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    startDate: order.dateActivated,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
