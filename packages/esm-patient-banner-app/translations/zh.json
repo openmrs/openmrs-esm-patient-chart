@@ -1,16 +1,16 @@
 {
-  "activeVisit": "Active Visit",
+  "activeVisit": "活动就诊",
   "address1": "地址行1",
   "address2": "地址行2",
   "city": "城市",
   "cityVillage": "城市",
   "country": "国家",
   "countyDistrict": "区县",
-  "deceased": "Deceased",
+  "deceased": "已故的",
   "district": "区县",
-  "from_lower": "from",
+  "from_lower": "从",
   "postalCode": "邮政编码",
-  "started": "Started",
+  "started": "已开始",
   "state": "省份",
   "stateProvince": "省份"
 }
