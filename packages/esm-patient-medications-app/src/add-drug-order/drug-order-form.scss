@@ -54,6 +54,13 @@
   padding: layout.$spacing-05;
   margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.medicationInfoText {
+  flex: 1;
 }
 
 .inlineNotification {
@@ -171,6 +178,10 @@
   align-items: center;
 }
 
+:global(.omrs-breakpoint-lt-desktop) .topAlignedGridRow {
+  align-items: flex-start;
+}
+
 .field {
   margin-bottom: layout.$spacing-05;
 
@@ -284,4 +295,27 @@
 
 .caption01 {
   @include type.type-style('legal-01');
+}
+
+.autoCalcHelper {
+  @include type.type-style('helper-text-01');
+  display: block;
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-02;
+}
+
+.recalculateLink {
+  @include type.type-style('helper-text-01');
+  display: block;
+  margin-top: layout.$spacing-02;
+  padding: 0;
+  border: none;
+  background: none;
+  color: colors.$blue-60;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: colors.$blue-70;
+  }
 }
