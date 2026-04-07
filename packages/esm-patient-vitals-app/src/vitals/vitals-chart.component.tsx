@@ -72,40 +72,43 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
   ];
 
-  const cutoff = useMemo(() => dayjs().subtract(12, 'month'), []);
+  const monthsToShow = config?.monthsToShow ?? 12;
+  const cutoff = useMemo(() => dayjs().subtract(monthsToShow, 'month'), [monthsToShow]);
 
   const chartData = useMemo(() => {
-    return patientVitals
-      .filter((vitals) => vitals[selectedVitalsSign.value])
-      .filter((vitals) => dayjs(vitals.date).isAfter(cutoff))
+    const filtered = patientVitals.filter(
+      (v) => v[selectedVitalsSign.value] != null,
+  );
+
+    const recentData = filtered.filter((v) =>
+      dayjs(v.date).isAfter(cutoff),
+  );
+
+    const finalData =
+      recentData.length > 0 ? recentData : filtered.slice(-10);
+    
+    return finalData
       .sort(
-        (vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime(),
-      )
-      .map((vitals) => {
-        if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
-          return [
-            {
-              group: 'Systolic blood pressure',
-              key: formatDate(parseDate(vitals.date), { year: true }),
-              value: vitals.systolic,
-              date: vitals.date,
-            },
-            {
-              group: 'Diastolic blood pressure',
-              key: formatDate(parseDate(vitals.date), { year: true }),
-              value: vitals.diastolic,
-              date: vitals.date,
-            },
-          ];
-        }
-        return {
-          group: selectedVitalsSign.title,
-          key: formatDate(parseDate(vitals.date)),
-          value: vitals[selectedVitalsSign.value],
-          date: vitals.date,
-        };
-      });
-  }, [patientVitals, selectedVitalsSign, cutoff]);
+        (a, b) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
+    .map((v) => {
+      if (['systolic', 'diastolic'].includes(selectedVitalsSign.value)) {
+        return [
+          {
+            group: selectedVitalsSign.title,
+            value: v[selectedVitalsSign.value],
+            date: v.date,
+          },
+        ];
+      }
+      return {
+        group: selectedVitalsSign.title,
+        value: v[selectedVitalsSign.value],
+        date: v.date,
+      };
+    });
+  }, [patientVitals, selectedVitalsSign.value, selectedVitalsSign.title, cutoff]);
 
   const chartOptions = {
     title: selectedVitalsSign.title,
