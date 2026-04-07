@@ -30,7 +30,7 @@ import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.scss';
 
-export interface OfflineFormsProps {}
+export type OfflineFormsProps = object;
 
 const OfflineForms: React.FC<OfflineFormsProps> = () => {
   const { t } = useTranslation();
@@ -152,9 +152,9 @@ function OfflineFormToggle({ form, disabled }: { form: Form; disabled: boolean }
         aria-label={t('offlineToggle', 'Offline toggle')}
         id={`${form.uuid}-offline-toggle`}
         className={styles.availableOfflineToggle}
-        labelA=""
-        labelB=""
-        labelText=""
+        labelA={t('off', 'Off')}
+        labelB={t('on', 'On')}
+        labelText={t('offlineToggle', 'Offline toggle')}
         size="sm"
         toggled={isMarkedAsOffline}
         disabled={disabled || isUpdating || dynamicFormEntriesSwr.isValidating}

@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useOrderBasket } from './useOrderBasket';
 import { type OrderBasketItem, type PostDataPrepFunction } from './types';
 import { _resetOrderBasketStore } from './store';
+import { mockFhirPatient } from '__mocks__';
 
 const mockDrugOrderBasketItem = {
   action: 'NEW',
@@ -19,7 +20,9 @@ describe('useOrderBasket', () => {
   });
 
   it('returns the correct list of orders given a grouping', () => {
-    const { result } = renderHook(() => useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction));
+    const { result } = renderHook(() =>
+      useOrderBasket(mockFhirPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
+    );
     expect(result.current.orders).toEqual([]);
     act(() => {
       result.current.setOrders([mockDrugOrderBasketItem]);
@@ -29,10 +32,10 @@ describe('useOrderBasket', () => {
 
   it('can modify items in one grouping without affecting the other', () => {
     const { result: drugResult } = renderHook(() =>
-      useOrderBasket('medications', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockFhirPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
     );
     const { result: labResult } = renderHook(() =>
-      useOrderBasket('labs', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockFhirPatient, 'labs', ((x) => x) as unknown as PostDataPrepFunction),
     );
     expect(drugResult.current.orders).toEqual([]);
     expect(labResult.current.orders).toEqual([]);

@@ -7,7 +7,6 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
-  launchWorkspace,
   useConfig,
   useLayoutType,
   useSession,
@@ -17,18 +16,13 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
-import AddLabOrderWorkspace from './add-test-order.workspace';
+import AddTestOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as jest.Mock;
 const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseSession = jest.mocked(useSession);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
-
-mockCloseWorkspace.mockImplementation(({ onWorkspaceClose }) => {
-  onWorkspaceClose?.();
-});
 
 const mockTestTypes = [
   // {
@@ -62,34 +56,28 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   useOrderType: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib/src/store/patient-chart-store', () => ({
-  getPatientUuidFromStore: jest.fn(() => mockPatient.id),
-  usePatientChartStore: jest.fn(() => ({
-    patientUuid: mockPatient.id,
-    patient: mockPatient,
-  })),
-}));
-
 function renderAddLabOrderWorkspace() {
-  const mockCloseWorkspace = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
-    onWorkspaceClose();
-  });
-  const mockCloseWorkspaceWithSavedChanges = jest.fn().mockImplementation(({ onWorkspaceClose }) => {
-    onWorkspaceClose();
-  });
-  const mockPromptBeforeClosing = jest.fn();
-  const view = render(
-    <AddLabOrderWorkspace
+  return render(
+    <AddTestOrderWorkspace
       closeWorkspace={mockCloseWorkspace}
-      closeWorkspaceWithSavedChanges={mockCloseWorkspaceWithSavedChanges}
-      promptBeforeClosing={mockPromptBeforeClosing}
-      patientUuid={mockPatient.id}
-      patient={mockPatient}
-      setTitle={jest.fn()}
-      orderTypeUuid="test-lab-order-type-uuid"
+      workspaceProps={{
+        orderTypeUuid: 'test-lab-order-type-uuid',
+        orderToEditOrdererUuid: '',
+      }}
+      groupProps={{
+        patientUuid: mockPatient.id,
+        patient: mockPatient,
+        visitContext: null,
+        mutateVisitContext: null,
+      }}
+      workspaceName={''}
+      launchChildWorkspace={jest.fn()}
+      windowName={''}
+      windowProps={{ encounterUuid: '' }}
+      isRootWorkspace={false}
+      showActionMenu={true}
     />,
   );
-  return { mockCloseWorkspace, mockPromptBeforeClosing, mockCloseWorkspaceWithSavedChanges, ...view };
 }
 
 mockUseConfig.mockReturnValue({
@@ -126,9 +114,9 @@ describe('AddLabOrder', () => {
   test('happy path fill and submit form', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
     );
-    const { mockCloseWorkspaceWithSavedChanges } = renderAddLabOrderWorkspace();
+    renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
     await screen.findByText('CD4 COUNT');
 
@@ -166,19 +154,17 @@ describe('AddLabOrder', () => {
           instructions: 'plz do it thx',
           accessionNumber: 'lba-000124',
           testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
-          orderer: mockSessionDataResponse.data.currentProvider.uuid,
         }),
       ]);
     });
 
-    expect(mockCloseWorkspaceWithSavedChanges).toHaveBeenCalled();
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
+    expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
   test('from lab search, click add directly to order basket', async () => {
     const user = userEvent.setup();
     const { result: hookResult } = renderHook(() =>
-      useOrderBasket('test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepFunction),
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepFunction),
     );
     renderAddLabOrderWorkspace();
     await user.type(screen.getByRole('searchbox'), 'cd4');
@@ -190,27 +176,113 @@ describe('AddLabOrder', () => {
     await waitFor(() => {
       expect(hookResult.current.orders).toEqual([
         {
-          ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid),
+          ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid, null),
           isOrderIncomplete: true,
         },
       ]);
     });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mockCloseWorkspace).toHaveBeenCalledWith('add-lab-order', {
-      ignoreChanges: true,
-      onWorkspaceClose: expect.any(Function),
-    });
+  });
+
+  test('discarding a new order returns to test type search', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('preserves search term when navigating back from order form', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toHaveValue('cd4');
+  });
+
+  test('discarding an edited order closes the workspace', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+          order: {
+            ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid, null),
+            action: 'REVISE',
+          },
+        }}
+        groupProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={jest.fn()}
+        windowName={''}
+        windowProps={{ encounterUuid: '' }}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    // Should render the order form directly (no search view)
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+  });
+
+  test('save order button is disabled while submitting', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    const saveButton = screen.getByRole('button', { name: /save order/i });
+    expect(saveButton).toBeEnabled();
   });
 
   test('back to order basket', async () => {
     const user = userEvent.setup();
-    const { mockCloseWorkspace } = renderAddLabOrderWorkspace();
+    renderAddLabOrderWorkspace();
     const back = screen.getByText('Back to order basket');
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
-    expect(mockLaunchWorkspace).toHaveBeenCalledWith('order-basket');
   });
 
   test('should display a patient header on tablet', () => {
@@ -220,6 +292,33 @@ describe('AddLabOrder', () => {
     expect(screen.getByText(/male/i)).toBeInTheDocument();
     expect(screen.getByText(new RegExp(age(mockPatient.birthDate), 'i'))).toBeInTheDocument();
     expect(screen.getByText('04 — Apr — 1972')).toBeInTheDocument();
+  });
+
+  test('should fall back to the configured lab order type UUID when orderTypeUuid is not provided', () => {
+    mockUseOrderType.mockClear();
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderToEditOrdererUuid: '',
+        }}
+        groupProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={jest.fn()}
+        windowName={''}
+        windowProps={{ encounterUuid: '' }}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    expect(mockUseOrderType).toHaveBeenLastCalledWith('test-lab-order-type-uuid');
   });
 
   test('should display an error message if test types fail to load', () => {

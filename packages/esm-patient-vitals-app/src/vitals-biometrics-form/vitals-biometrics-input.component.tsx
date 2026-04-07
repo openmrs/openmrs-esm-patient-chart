@@ -75,7 +75,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
   function checkValidity(value, onChange) {
-    setInvalid(!(Number(value) || value === ''));
+    setInvalid(value !== '' && isNaN(Number(value)));
 
     if (!invalid) {
       onChange(value === '' ? undefined : Number(value));
@@ -107,7 +107,9 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
     <>
       <div className={containerClasses} style={{ width: fieldWidth }}>
         <section className={styles.labelContainer}>
-          <span className={styles.label}>{label}</span>
+          <span className={styles.label} id={`${fieldId}-label`}>
+            {label}
+          </span>
 
           {Boolean(hasAbnormalValue) ? (
             <span className={styles[interpretation.replace('_', '-')]} title={t('abnormalValue', 'Abnormal value')} />
@@ -140,7 +142,6 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                             <NumberInput
                               allowEmpty
                               className={numberInputClasses}
-                              defaultValue={''}
                               disableWheel
                               hideSteppers
                               id={`${fieldId}-${fieldProperty.id}`}
@@ -156,7 +157,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               style={{ ...fieldStyles }}
                               title={fieldProperty.name}
                               type="number"
-                              value={value}
+                              value={value ?? ''}
                             />
                           );
                         }}
@@ -178,6 +179,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                           className={styles.textarea}
                           id={`${fieldId}-${fieldProperty.id}`}
                           labelText={''}
+                          aria-labelledby={`${fieldId}-label`}
                           maxCount={100}
                           name={fieldProperty.name}
                           onBlur={() => handleFocusChange(false)}
@@ -188,7 +190,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                           rows={2}
                           style={{ ...fieldStyles }}
                           title={fieldProperty.name}
-                          value={value}
+                          value={value ?? ''}
                         />
                       )}
                     />

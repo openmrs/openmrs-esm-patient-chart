@@ -37,7 +37,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   }, [onClosePreview]);
 
   return (
-    <div className={styles.previewContainer}>
+    <div role="dialog" aria-label={t('attachmentPreview', 'Attachment preview')} className={styles.previewContainer}>
       <div className={styles.leftPanel}>
         <Button
           className={styles.closePreviewButton}
@@ -55,7 +55,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             <iframe className={styles.pdfViewer} src={attachmentToPreview.src} title="PDFViewer" />
           ) : null}
         </div>
-        <OverflowMenu className={styles.overflowMenu} flipped size={responsiveSize}>
+        <OverflowMenu align="left" className={styles.overflowMenu} flipped size={responsiveSize}>
           <OverflowMenuItem
             aria-label={t('options', 'Options')}
             className={styles.menuItem}

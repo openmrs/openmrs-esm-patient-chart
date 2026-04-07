@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
-import { EncounterAdapter, PersonAttribuAdapter, Form } from '@openmrs/ngx-formentry';
+import { catchError, mergeMap, switchMap } from 'rxjs/operators';
+import { EncounterAdapter, Form, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
 import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
+import { Form as ReactForm } from '@openmrs/esm-patient-common-lib';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
@@ -35,7 +36,7 @@ interface FormSubmissionResult {
 export class FormSubmissionService {
   constructor(
     private readonly encounterAdapter: EncounterAdapter,
-    private readonly personAttributeAdapter: PersonAttribuAdapter,
+    private readonly personAttributeAdapter: PersonAttributeAdapter,
     private readonly encounterResourceService: EncounterResourceService,
     private readonly personResourceService: PersonResourceService,
     private readonly formDataSourceService: FormDataSourceService,
@@ -103,7 +104,9 @@ export class FormSubmissionService {
     const result: FormSubmissionResult = { encounter: encounter as any };
     const syncItem: PatientFormSyncItemContent = {
       _id: syncItemIdToEdit ?? v4(),
-      formSchemaUuid: form.schema.uuid,
+      form: {
+        uuid: form.schema.uuid,
+      } as ReactForm,
       encounter,
       _payloads: {
         encounterCreate,
@@ -151,7 +154,7 @@ export class FormSubmissionService {
     }
     const config = this.configResourceService.getConfig();
 
-    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitUuid = this.singleSpaPropsService.getProp('visitUuid');
     const visitStartDatetime = this.singleSpaPropsService.getProp('visitStartDatetime');
     const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 

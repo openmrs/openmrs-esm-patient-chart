@@ -1,7 +1,10 @@
 {
-  "chartView": "Visualização do prontuário",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "Data e hora",
-  "displaying": "Exibindo",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "Tipo de encontro",
-  "tableView": "Visualização em tabela"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

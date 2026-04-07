@@ -9,7 +9,7 @@ import {
   userHasAccess,
   useSession,
 } from '@openmrs/esm-framework';
-import type { ConfigObject } from '../config-schema';
+import type { FormEntryConfigSchema } from '../config-schema';
 import type { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import {
   customEncounterRepresentation,
@@ -20,7 +20,7 @@ import {
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 function useCustomFormsUrl(patientUuid: string, visitUuid: string) {
-  const { customFormsUrl, showHtmlFormEntryForms } = useConfig<ConfigObject>();
+  const { customFormsUrl, showHtmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
   const hasCustomFormsUrl = Boolean(customFormsUrl);
 
   const baseUrl = hasCustomFormsUrl ? customFormsUrl : showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
@@ -78,7 +78,7 @@ export function useForms(
   cachedOfflineFormsOnly = false,
   orderBy: 'name' | 'most-recent' = 'name',
 ) {
-  const { htmlFormEntryForms } = useConfig<ConfigObject>();
+  const { htmlFormEntryForms } = useConfig<FormEntryConfigSchema>();
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid, visitUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
@@ -122,7 +122,6 @@ export function useForms(
     data: formsToDisplay,
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
-    allForms: allFormsRes.data,
     mutateForms,
   };
 }

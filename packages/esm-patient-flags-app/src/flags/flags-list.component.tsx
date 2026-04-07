@@ -1,223 +1,150 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { debounce, isEmpty, orderBy } from 'lodash-es';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, showSnackbar, parseDate, formatDate, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { usePatientFlags, enablePatientFlag, disablePatientFlag } from './hooks/usePatientFlags';
-import { getFlagType } from './utils';
+import { Button, OperationalTag, Tag } from '@carbon/react';
+import { EditIcon, launchWorkspace2, navigate, useConfig } from '@openmrs/esm-framework';
+import { carbonTagColors, type CarbonTagColor, type ConfigObject, type PriorityConfig } from '../config-schema';
+import { type FlagWithPriority, usePatientFlags } from './hooks/usePatientFlags';
 import styles from './flags-list.scss';
 
-type dropdownFilter = 'A - Z' | 'Active first' | 'Retired first';
+interface FlagsListProps {
+  patientUuid: string;
+  filterByTags?: Array<string>;
+}
 
-const FlagsList: React.FC<DefaultPatientWorkspaceProps> = ({
-  patientUuid,
-  closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-}) => {
+const FlagsList: React.FC<FlagsListProps> = ({ patientUuid, filterByTags = [] }) => {
   const { t } = useTranslation();
-  const { flags, isLoading, error, mutate } = usePatientFlags(patientUuid);
-  const isTablet = useLayoutType() === 'tablet';
+  const { flags, isLoading, error } = usePatientFlags(patientUuid);
+  const config = useConfig<ConfigObject>();
 
-  const searchRef = useRef(null);
-  const [isEnabling, setIsEnabling] = useState(false);
-  const [isDisabling, setIsDisabling] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<dropdownFilter>('A - Z');
+  const filteredFlags = useMemo(() => {
+    const filtered = flags.filter((flag) => {
+      if (flag.voided) {
+        return false;
+      }
+      if (filterByTags.length === 0) {
+        return true;
+      }
+      // Check if flag has at least one of the specified tags (by uuid or display name)
+      return flag.tags?.some((tag) => filterByTags.includes(tag.display));
+    });
 
-  const sortedRows = useMemo(() => {
-    if (!sortBy) {
-      return flags;
-    }
-    if (sortBy === 'Active first') {
-      return orderBy(flags, [(item) => Number(item.voided)], 'asc');
-    }
-    if (sortBy === 'Retired first') {
-      return orderBy(flags, [(item) => Number(item.voided)], 'desc');
-    }
-    return orderBy(flags, (f) => f.flag.display, 'asc');
-  }, [sortBy, flags]);
+    // Sort by priority rank (lower numbers = higher priority)
+    // Flags without a rank are sorted to the end
+    return filtered.sort((a, b) => {
+      const rankA = a.flagDefinition?.priority?.rank ?? Number.MAX_SAFE_INTEGER;
+      const rankB = b.flagDefinition?.priority?.rank ?? Number.MAX_SAFE_INTEGER;
+      return rankA - rankB;
+    });
+  }, [flags, filterByTags]);
 
-  const searchResults = useMemo(() => {
-    if (!isEmpty(searchTerm)) {
-      return sortedRows.filter((f) => f.flag.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1);
-    } else {
-      return sortedRows;
-    }
-  }, [searchTerm, sortedRows]);
+  const handleClickEditFlags = useCallback(() => launchWorkspace2('patient-flags-workspace'), []);
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), [setSearchTerm]);
-
-  const handleSortByChange = ({ selectedItem }) => setSortBy(selectedItem);
-
-  const handleEnableFlag = async (flagUuid) => {
-    setIsEnabling(true);
-    const res = await enablePatientFlag(flagUuid);
-
-    if (res.status === 200) {
-      mutate();
-      setIsEnabling(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'success',
-        subtitle: t('flagEnabledSuccessfully', 'Flag successfully enabled'),
-        title: t('enabledFlag', 'Enabled flag'),
-      });
-    } else {
-      showSnackbar({
-        isLowContrast: false,
-        kind: 'error',
-        subtitle: t('flagEnableError', 'Error enabling flag'),
-        title: t('flagEnabled', 'flag enabled'),
-      });
-    }
-  };
-
-  const handleDisableFlag = async (flagUuid) => {
-    setIsDisabling(true);
-    const res = await disablePatientFlag(flagUuid);
-
-    if (res.status === 204) {
-      mutate();
-      setIsDisabling(false);
-      showSnackbar({
-        isLowContrast: true,
-        kind: 'success',
-        subtitle: t('flagDisabledSuccessfully', 'Flag successfully disabled'),
-        title: t('flagDisabled', 'Flag disabled'),
-      });
-    } else {
-      showSnackbar({
-        isLowContrast: false,
-        kind: 'error',
-        subtitle: t('flagDisableError', 'Error disabling the flag'),
-        title: t('disableFlagError', 'Disable flag error'),
-      });
-    }
-  };
-
-  if (isLoading) {
-    return <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />;
+  if (!isLoading && !error) {
+    return (
+      <div className={styles.container}>
+        <ul className={styles.flagsList}>
+          {filteredFlags.map((flag) => (
+            <li key={flag.uuid}>
+              <Flag flag={flag} patientUuid={patientUuid} />
+            </li>
+          ))}
+        </ul>
+        {config.allowFlagDeletion && filteredFlags.length > 0 ? (
+          <Button
+            className={styles.actionButton}
+            hasIconOnly
+            kind="ghost"
+            size="sm"
+            renderIcon={EditIcon}
+            onClick={handleClickEditFlags}
+            iconDescription={t('editFlags', 'Edit flags')}
+          />
+        ) : null}
+      </div>
+    );
   }
+  return null;
+};
 
-  if (error) {
-    return <div>{error.message}</div>;
+interface FlagProps {
+  flag: FlagWithPriority;
+  patientUuid: string;
+}
+
+const Flag: React.FC<FlagProps> = ({ flag, patientUuid }) => {
+  const config = useConfig<ConfigObject>();
+  const priorityName = flag.flagDefinition?.priority?.name?.toLowerCase() ?? '';
+
+  const priorityConfig = useMemo<PriorityConfig>(() => {
+    return (
+      config.priorities.find((priorityConfig) => priorityConfig.priority.toLowerCase() === priorityName) || {
+        priority: 'info',
+        color: 'orange',
+        isRiskPriority: false,
+      }
+    );
+  }, [config.priorities, priorityName]);
+
+  const action = useMemo(() => {
+    const flagName = flag.flagDefinition?.display ?? flag.flag?.display;
+
+    const action =
+      config.flagActions.find((action) => action.flagName === flagName) ||
+      config.tagActions.find((action) => flag.tags?.some((tag) => tag.display === action.tagName));
+
+    return action;
+  }, [flag, config]);
+
+  const handleClick = useCallback(() => {
+    if (action.workspace) {
+      launchWorkspace2(action.workspace);
+    } else if (action.url) {
+      navigate({ to: action.url, templateParams: { patientUuid } });
+    }
+  }, [action, patientUuid]);
+
+  const isRiskPriority = priorityConfig?.isRiskPriority ?? false;
+  const flagText = isRiskPriority ? `🚩 ${flag.message}` : flag.message;
+
+  // Handle custom colors that aren't native Carbon Tag types
+  const isCustomColor = !carbonTagColors.includes(priorityConfig.color as CarbonTagColor);
+  const tagType = isCustomColor ? undefined : (priorityConfig.color as CarbonTagColor);
+
+  const customStyle = useMemo(() => {
+    switch (priorityConfig.color) {
+      case 'orange':
+        return { backgroundColor: '#ffd9be', color: '#8b3901', borderColor: '#ff832b' };
+      case 'yellow':
+        return { backgroundColor: '#fddc69', color: '#684e00', borderColor: '#d2a106' };
+      case 'high-contrast':
+        if (action) {
+          // OperationalTag for whatever reason doesn't provide the `high-contrast` color type
+          return { backgroundColor: '#393939', color: '#fafafa' };
+        } else {
+          return undefined;
+        }
+      default:
+        return undefined;
+    }
+  }, [priorityConfig.color, action]);
+
+  if (action) {
+    return (
+      <OperationalTag
+        className={styles.flagTag}
+        type={tagType}
+        style={customStyle}
+        onClick={handleClick}
+        text={flagText}
+      />
+    );
   }
 
   return (
-    <Form className={styles.formWrapper}>
-      {/* The <div> below is required to maintain the page layout styling */}
-      <div>
-        <ResponsiveWrapper>
-          <Search
-            labelText={t('searchForAFlag', 'Search for a flag')}
-            placeholder={t('searchForAFlag', 'Search for a flag')}
-            ref={searchRef}
-            size={isTablet ? 'lg' : 'md'}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </ResponsiveWrapper>
-        <Stack gap={4}>
-          <div className={styles.listWrapper}>
-            <div className={styles.flagsHeaderInfo}>
-              {searchResults.length > 0 ? (
-                <>
-                  <span className={styles.resultsCount}>
-                    {t('matchesForSearchTerm', '{{count}} flags', {
-                      count: searchResults.length,
-                    })}
-                  </span>
-                  <Dropdown
-                    className={styles.sortDropdown}
-                    id="sortBy"
-                    initialSelectedItem={'A - Z'}
-                    label=""
-                    type="inline"
-                    items={[
-                      t('alphabetically', 'A - Z'),
-                      t('activeFirst', 'Active first'),
-                      t('retiredFirst', 'Retired first'),
-                    ]}
-                    onChange={handleSortByChange}
-                    titleText="Sort by"
-                  />
-                </>
-              ) : null}
-            </div>
-            {searchResults.length > 0
-              ? searchResults.map((result) => (
-                  <div className={styles.flagTile} key={result.uuid}>
-                    <div className={styles.flagHeader}>
-                      <div className={styles.titleAndType}>
-                        <div className={styles.flagTitle}>{result.flag.display}</div>&middot;
-                        <span className={styles.type}>{getFlagType(result.tags)}</span>
-                      </div>
-                      <Toggle
-                        className={styles.flagToggle}
-                        defaultToggled={!Boolean(result.voided)}
-                        id={result.uuid}
-                        labelA=""
-                        labelB=""
-                        onToggle={(on) => (on ? handleEnableFlag(result.uuid) : handleDisableFlag(result.uuid))}
-                        size="sm"
-                      />
-                    </div>
-                    {result.voided ? null : (
-                      <div className={styles.secondRow}>
-                        <div className={styles.metadata}>
-                          <span className={styles.label}>Assigned</span>
-                          <span className={styles.value}>
-                            {formatDate(parseDate(result.auditInfo?.dateCreated), { time: false })}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              : null}
-
-            {searchResults.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Tile className={styles.tile}>
-                  <p className={styles.content}>{t('noFlagsFound', 'Sorry, no flags found matching your search')}</p>
-                  <p className={styles.helper}>
-                    <Button
-                      kind="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSearchTerm('');
-                        searchRef.current.value = '';
-                        searchRef.current.focus();
-                      }}
-                    >
-                      {t('clearSearch', 'Clear search')}
-                    </Button>
-                  </p>
-                </Tile>
-              </div>
-            ) : null}
-          </div>
-        </Stack>
-      </div>
-      <ButtonSet className={isTablet ? styles.tabletButtonSet : styles.desktopButtonSet}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button
-          className={styles.button}
-          disabled={isEnabling || isDisabling}
-          kind="primary"
-          type="submit"
-          onClick={() => closeWorkspaceWithSavedChanges()}
-        >
-          {(() => {
-            if (isEnabling) return t('enablingFlag', 'Enabling flag...');
-            if (isDisabling) return t('disablingFlag', 'Disabling flag...');
-            return t('saveAndClose', 'Save & close');
-          })()}
-        </Button>
-      </ButtonSet>
-    </Form>
+    <Tag className={styles.flagTag} type={tagType} style={customStyle}>
+      {isRiskPriority && <span className={styles.flagIcon}>&#128681;</span>}
+      {flag.message}
+    </Tag>
   );
 };
 

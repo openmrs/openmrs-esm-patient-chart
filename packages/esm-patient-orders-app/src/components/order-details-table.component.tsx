@@ -1,17 +1,13 @@
-import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { capitalize, lowerCase } from 'lodash-es';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dayjs from 'dayjs';
+import { capitalize } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import utc from 'dayjs/plugin/utc';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
   DataTableSkeleton,
-  DatePicker,
-  DatePickerInput,
   Dropdown,
   InlineLoading,
   Layer,
@@ -29,6 +25,7 @@ import {
   TableHeader,
   TableRow,
   TableToolbarContent,
+  Tag,
   Tile,
 } from '@carbon/react';
 import {
@@ -36,15 +33,21 @@ import {
   EmptyState,
   ErrorState,
   getDrugOrderByUuid,
+  invalidateVisitByUuid,
   PatientChartPagination,
+  type FulfillerStatus,
   type Order,
   type OrderBasketItem,
   type OrderType,
+  type OrderUrgency,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
 } from '@openmrs/esm-patient-common-lib';
+import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
+import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
+import { prepOrderPostData } from '../order-basket/general-order-type/resources';
 import {
   AddIcon,
   age,
@@ -52,7 +55,8 @@ import {
   formatDate,
   getCoreTranslation,
   getPatientName,
-  launchWorkspace,
+  launchWorkspace2,
+  OpenmrsDateRangePicker,
   parseDate,
   PrinterIcon,
   useConfig,
@@ -60,15 +64,11 @@ import {
   usePagination,
 } from '@openmrs/esm-framework';
 import { buildGeneralOrder, buildLabOrder, buildMedicationOrder } from '../utils';
+import { ORDER_TYPES, getOrderGrouping, isValidOmrsOrderType } from '../constants/order-types';
 import GeneralOrderTable from './general-order-table.component';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
-import TestOrder from './test-order.component';
 import styles from './order-details-table.scss';
-
-dayjs.extend(isSameOrBefore);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(utc);
 
 interface OrderDetailsProps {
   patientUuid: string;
@@ -79,30 +79,45 @@ interface OrderDetailsProps {
 }
 
 interface OrderBasketItemActionsProps {
-  openOrderBasket: () => void;
-  openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
   orderItem: Order;
-  responsiveSize: 'lg' | 'md' | 'sm';
+  patient: fhir.Patient;
 }
 
 interface OrderHeaderProps {
   key: string;
   header: string;
   isSortable: boolean;
-  isVisible?: boolean;
 }
 
-interface DataTableRow {
-  id: string;
-  cells: Array<{
-    id: number;
-    info: { header: string };
-    value: ReactNode | { props: { orderItem: Order }; content: string };
-  }>;
-  isExpanded: boolean;
+function getPriorityTagType(urgency: OrderUrgency) {
+  switch (urgency) {
+    case 'ROUTINE':
+      return 'green';
+    case 'STAT':
+      return 'red';
+    default:
+      return 'gray';
+  }
 }
 
-type MutableOrderBasketItem = OrderBasketItem;
+function getStatusTagType(status: FulfillerStatus) {
+  switch (status) {
+    case 'RECEIVED':
+      return 'blue';
+    case 'IN_PROGRESS':
+      return 'cyan';
+    case 'ON_HOLD':
+      return 'teal';
+    case 'EXCEPTION':
+      return 'magenta';
+    case 'COMPLETED':
+      return 'green';
+    case 'DECLINED':
+      return 'red';
+    default:
+      return 'gray';
+  }
+}
 
 const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   patientUuid,
@@ -116,49 +131,78 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
   const headerTitle = t('orders', 'Orders');
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'md';
-  const launchOrderBasket = useLaunchWorkspaceRequiringVisit('order-basket');
-  const launchAddDrugOrder = useLaunchWorkspaceRequiringVisit('add-drug-order');
-  const launchModifyLabOrder = useLaunchWorkspaceRequiringVisit('add-lab-order');
-  const launchModifyGeneralOrder = useLaunchWorkspaceRequiringVisit('orderable-concept-workspace');
-  const contentToPrintRef = useRef(null);
+  const _launchOrderBasket = useLaunchWorkspaceRequiringVisit(patientUuid, 'order-basket');
+  const contentToPrintRef = useRef<HTMLDivElement | null>(null);
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const [isPrinting, setIsPrinting] = useState(false);
   const { data: orderTypes } = useOrderTypes();
   const [selectedOrderTypeUuid, setSelectedOrderTypeUuid] = useState(null);
-  const [selectedFromDate, setSelectedFromDate] = useState(null);
-  const [selectedToDate, setSelectedToDate] = useState(null);
-  const selectedOrderName = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)?.name;
+  // UI-controlled date range
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([new Date(), new Date()]);
+  // Derived API filter dates (ISO strings)
+  const [startDate, endDate] = dateRange;
+  const selectedFromDate = useMemo(() => (startDate ? dayjs(startDate).format('YYYY-MM-DD') : null), [startDate]);
+  const selectedToDate = useMemo(() => (endDate ? dayjs(endDate).format('YYYY-MM-DD') : null), [endDate]);
+
+  const selectedOrderType = orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid);
+
+  const getOrderTypeDisplayText = useCallback(
+    (orderType: OrderType | undefined) => {
+      if (!orderType) {
+        return t('ordersLower', 'orders');
+      }
+
+      const label = (orderType.display || orderType.name || '').toLowerCase();
+      if (label.includes('test')) {
+        return t('testOrders', 'test orders');
+      }
+      if (label.includes('drug')) {
+        return t('drugOrders', 'drug orders');
+      }
+      return t('ordersLower', 'orders');
+    },
+    [t],
+  );
+
+  const emptyStateDisplayText = useMemo(() => {
+    return getOrderTypeDisplayText(selectedOrderType);
+  }, [selectedOrderType, getOrderTypeDisplayText]);
+
+  const getOrderTypeLabel = useCallback(
+    (orderType: OrderType) => {
+      if (!orderType) {
+        return '';
+      }
+      if (!orderType.uuid) {
+        return t('allOrders', 'All orders');
+      }
+
+      const label = (orderType.display || orderType.name || '').toLowerCase();
+      if (label.includes('drug')) {
+        const value = t('drugOrders', 'Drug orders');
+        return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+      }
+      if (label.includes('test')) {
+        const value = t('testOrders', 'Test orders');
+        return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+      }
+      return orderType.display || orderType.name || '';
+    },
+    [t],
+  );
+
   const {
     data: allOrders,
-    error: error,
+    error,
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', selectedOrderTypeUuid, selectedFromDate, selectedToDate);
 
-  // launch respective order basket based on order type
-  const openOrderForm = useCallback(
-    (orderItem: Order) => {
-      switch (orderItem.type) {
-        case 'drugorder':
-          launchAddDrugOrder({ order: buildMedicationOrder(orderItem, 'REVISE') });
-          break;
-        case 'testorder':
-          launchModifyLabOrder({
-            order: buildLabOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem.orderType.uuid,
-          });
-          break;
-        case 'order':
-          launchModifyGeneralOrder({
-            order: buildGeneralOrder(orderItem, 'REVISE'),
-            orderTypeUuid: orderItem.orderType.uuid,
-          });
-          break;
-        default:
-          launchOrderBasket();
-      }
-    },
-    [launchAddDrugOrder, launchModifyGeneralOrder, launchModifyLabOrder, launchOrderBasket],
+  const displayedOrders = useMemo(() => allOrders ?? [], [allOrders]);
+
+  const launchOrderBasketForNewItem = useCallback(
+    () => _launchOrderBasket(null, { encounterUuid: '' }),
+    [_launchOrderBasket],
   );
 
   const tableHeaders: Array<OrderHeaderProps> = [
@@ -185,7 +229,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     {
       key: 'priority',
       header: t('priority', 'Priority'),
-      isSortable: true,
+      isSortable: false,
     },
     {
       key: 'orderedBy',
@@ -195,66 +239,48 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     {
       key: 'status',
       header: t('status', 'Status'),
-      isSortable: true,
+      isSortable: false,
     },
   ];
 
-  if (isPrinting) {
-    tableHeaders.push({
-      key: 'dosage',
-      header: t('dosage', 'Dosage'),
-      isSortable: true,
-    });
-  }
-
   const tableRows = useMemo(
     () =>
-      allOrders?.map((order) => ({
+      displayedOrders?.map((order) => ({
         id: order.uuid,
         dateActivated: order.dateActivated,
         orderNumber: order.orderNumber,
         dateOfOrder: <div className={styles.singleLineText}>{formatDate(parseDate(order.dateActivated))}</div>,
         orderType: capitalize(order.orderType?.display ?? '-'),
-        dosage:
-          order.type === 'drugorder' ? (
-            <div className={styles.singleLineText}>{`${t('indication', 'Indication').toUpperCase()}
-            ${order.orderReasonNonCoded ?? t('noIndicationProvided', 'No indication provided')} ${'-'} ${t(
-              'quantity',
-              'Quantity',
-            ).toUpperCase()} ${order.quantity} ${order?.quantityUnits?.display} `}</div>
-          ) : (
-            '--'
-          ),
         order: order.display,
         priority: (
-          <div className={styles.priorityPill} data-priority={lowerCase(order.urgency)}>
+          <Tag type={getPriorityTagType(order.urgency)}>
             {
               // t('ON_SCHEDULED_DATE', 'On scheduled date')
               // t('ROUTINE', 'Routine')
               // t('STAT', 'STAT')
             }
-            {t(order.urgency, capitalize(order.urgency.replace('_', ' ')))}
-          </div>
+            {t(order.urgency, capitalize(order.urgency.replaceAll('_', ' ')))}
+          </Tag>
         ),
         orderedBy: order.orderer?.display,
         status: order.fulfillerStatus ? (
-          <div className={styles.statusPill} data-status={lowerCase(order.fulfillerStatus.replace('_', ' '))}>
+          <Tag type={getStatusTagType(order.fulfillerStatus)}>
             {
-              // t('RECEIVED', 'Received')
-              // t('IN_PROGRESS', 'In progress')
-              // t('EXCEPTION', 'Exception')
-              // t('ON_HOLD', 'On hold')
-              // t('DECLINED', 'Declined')
               // t('COMPLETED', 'Completed')
+              // t('DECLINED', 'Declined')
               // t('DISCONTINUED', 'Discontinued')
+              // t('EXCEPTION', 'Exception')
+              // t('IN_PROGRESS', 'In progress')
+              // t('ON_HOLD', 'On hold')
+              // t('RECEIVED', 'Received')
             }
-            {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replace('_', ' ')))}
-          </div>
+            {t(order.fulfillerStatus, capitalize(order.fulfillerStatus.replaceAll('_', ' ')))}
+          </Tag>
         ) : (
           '--'
         ),
       })) ?? [],
-    [allOrders, t],
+    [displayedOrders, t],
   );
 
   const { results: paginatedOrders, goTo, currentPage } = usePagination(tableRows, defaultPageSize);
@@ -277,7 +303,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
 
     const identifiers =
       patient?.identifier?.filter(
-        (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+        (identifier) => !excludePatientIdentifierCodeTypes?.uuids?.includes(identifier.type.coding[0].code),
       ) ?? [];
 
     return {
@@ -289,7 +315,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     };
   }, [patient, excludePatientIdentifierCodeTypes?.uuids]);
 
-  const onBeforeGetContentResolve = useRef(null);
+  const onBeforeGetContentResolve = useRef<null | ((value?: unknown) => void)>(null);
 
   useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
@@ -327,30 +353,14 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
     [orderTypes, t],
   );
 
-  const handleDateFilterChange = ([startDate, endDate]) => {
-    if (startDate) {
-      const start = dayjs(startDate).startOf('day').toISOString();
-      setSelectedFromDate(start);
-
-      if (selectedToDate && dayjs(selectedToDate).isBefore(startDate)) {
-        setSelectedToDate(start);
-      }
-    }
-
-    if (endDate) {
-      const end = dayjs(endDate).endOf('day').toISOString();
-      setSelectedToDate(end);
-
-      if (selectedFromDate && dayjs(selectedFromDate).isAfter(endDate)) {
-        setSelectedFromDate(end);
-      }
-    }
-  };
-
-  const isOmrsOrder = useCallback(
-    (orderItem: Order) => ['order', 'testorder', 'drugorder'].includes(orderItem.type),
+  const handleDateFilterChange = useCallback(
+    ([startDate, endDate]: [Date | null | undefined, Date | null | undefined]) => {
+      setDateRange([startDate ?? null, endDate ?? null]);
+    },
     [],
   );
+
+  const isOmrsOrder = useCallback((orderItem: Order) => isValidOmrsOrderType(orderItem.type), []);
 
   return (
     <>
@@ -359,331 +369,344 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
           <Dropdown
             id="orderTypeDropdown"
             items={orderTypesToDisplay}
-            itemToString={(orderType: OrderType) => (orderType ? capitalize(orderType.display) : '')}
+            itemToString={(orderType: OrderType) => getOrderTypeLabel(orderType)}
             label={t('allOrders', 'All orders')}
             onChange={(e: { selectedItem: OrderType }) => {
-              if (e.selectedItem.display === 'All') {
-                setSelectedOrderTypeUuid(null);
-                return;
-              }
-              setSelectedOrderTypeUuid(e.selectedItem.uuid);
+              const selected = e.selectedItem;
+              setSelectedOrderTypeUuid(selected?.uuid ?? null);
             }}
-            selectedItem={orderTypes?.find((x) => x.uuid === selectedOrderTypeUuid)}
+            selectedItem={orderTypesToDisplay.find((x) => x.uuid === selectedOrderTypeUuid)}
             titleText={t('selectOrderType', 'Select order type') + ':'}
             type="inline"
           />
         </div>
-        <span className={styles.rangeLabel}>{t('dateRange', 'Date range')}:</span>
-        <DatePicker
-          datePickerType="range"
-          dateFormat={'d/m/Y'}
-          value={''}
-          onChange={([startDate, endDate]) => {
-            handleDateFilterChange([startDate, endDate]);
-          }}
-        >
-          <DatePickerInput
-            id="startDatePickerInput"
-            data-testid="startDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-          <DatePickerInput
-            id="endDatePickerInput"
-            data-testid="endDatePickerInput"
-            labelText=""
-            placeholder="dd/mm/yyyy"
-          />
-        </DatePicker>
+        <OpenmrsDateRangePicker
+          className={styles.inlineDateRange}
+          labelText={t('dateRange', 'Date range') + ':'}
+          maxDate={new Date()}
+          onChange={handleDateFilterChange}
+          value={dateRange}
+        />
       </div>
 
-      {(() => {
-        if (isLoading) {
-          return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
-        }
-
-        if (error) {
-          return <ErrorState error={error} headerTitle={title} />;
-        }
-
-        if (orderTypes && orderTypes?.length > 0) {
-          return (
-            <>
-              {!tableRows?.length ? (
-                <EmptyState
-                  headerTitle={headerTitle}
-                  displayText={
-                    selectedOrderTypeUuid === null
-                      ? t('orders', 'Orders')
-                      : // t('Drug Order_few', 'Drug Orders')
-                        // t('Test Order_few', 'Test Orders')
-                        t(selectedOrderName?.toLowerCase() ?? 'orders', {
-                          count: 3,
-                          default: selectedOrderName,
-                        })
-                  }
-                  launchForm={launchOrderBasket}
-                />
-              ) : (
-                <div className={styles.widgetCard}>
-                  <CardHeader title={title}>
-                    {isValidating ? (
-                      <span>
-                        <InlineLoading />
-                      </span>
-                    ) : null}
-                    <div className={styles.buttons}>
-                      {showPrintButton && (
-                        <Button
-                          className={styles.printButton}
-                          iconDescription={t('printOrder', 'Print order')}
-                          kind="ghost"
-                          onClick={handlePrint}
-                          renderIcon={PrinterIcon}
-                        >
-                          {t('print', 'Print')}
-                        </Button>
-                      )}
-                      {showAddButton && (
-                        <Button
-                          className={styles.addButton}
-                          kind="ghost"
-                          renderIcon={AddIcon}
-                          iconDescription={t('launchOrderBasket', 'Launch order basket')}
-                          onClick={launchOrderBasket}
-                        >
-                          {t('add', 'Add')}
-                        </Button>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <div ref={contentToPrintRef}>
-                    <PrintComponent subheader={title} patientDetails={patientDetails} />
-                    <DataTable
-                      aria-label={t('orderDetails', 'Order details')}
-                      data-floating-menu-container
-                      headers={tableHeaders}
-                      isSortable
-                      overflowMenuOnHover={!isTablet}
-                      rows={paginatedOrders}
-                      size={responsiveSize}
-                      useZebraStyles
+      {isLoading ? (
+        <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />
+      ) : error ? (
+        <ErrorState error={error} headerTitle={title} />
+      ) : orderTypes?.length > 0 ? (
+        <>
+          {!tableRows?.length ? (
+            <EmptyState
+              headerTitle={headerTitle}
+              displayText={emptyStateDisplayText}
+              launchForm={() => launchOrderBasketForNewItem()}
+            />
+          ) : (
+            <div className={styles.widgetCard}>
+              <CardHeader title={title}>
+                {isValidating ? (
+                  <span>
+                    <InlineLoading />
+                  </span>
+                ) : null}
+                <div className={styles.buttons}>
+                  {showPrintButton && (
+                    <Button
+                      className={styles.printButton}
+                      iconDescription={t('printOrder', 'Print order')}
+                      kind="ghost"
+                      onClick={handlePrint}
+                      renderIcon={PrinterIcon}
                     >
-                      {({
-                        getExpandedRowProps,
-                        getExpandHeaderProps,
-                        getHeaderProps,
-                        getRowProps,
-                        getTableContainerProps,
-                        getTableProps,
-                        headers,
-                        onInputChange,
-                        rows,
-                      }) => (
-                        <>
-                          <TableContainer {...getTableContainerProps}>
-                            {!isPrinting && (
-                              <div className={styles.toolBarContent}>
-                                <TableToolbarContent>
-                                  <Layer>
-                                    <Search
-                                      isExpanded
-                                      labelText=""
-                                      onChange={(e) =>
-                                        onInputChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
-                                      }
-                                      placeholder={t('searchTable', 'Search table')}
-                                      size="lg"
-                                    />
-                                  </Layer>
-                                </TableToolbarContent>
-                              </div>
-                            )}
-                            <Table className={styles.table} {...getTableProps()}>
-                              <TableHead>
-                                <TableRow>
-                                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                                  {headers.map((header) => (
-                                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                                  ))}
-                                  <TableExpandHeader />
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {rows.map((row) => {
-                                  const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
-
-                                  return (
-                                    <React.Fragment key={row.id}>
-                                      <TableExpandRow className={styles.row} {...getRowProps({ row })}>
-                                        {row.cells.map((cell) => (
-                                          <TableCell className={styles.tableCell} key={cell.id}>
-                                            {cell.value?.['content'] ?? cell.value}
-                                          </TableCell>
-                                        ))}
-                                        {!isPrinting && (
-                                          <TableCell className="cds--table-column-menu">
-                                            {isOmrsOrder(matchingOrder) ? (
-                                              <OrderBasketItemActions
-                                                openOrderBasket={launchOrderBasket}
-                                                openOrderForm={() => openOrderForm(matchingOrder)}
-                                                orderItem={matchingOrder}
-                                                responsiveSize={responsiveSize}
-                                              />
-                                            ) : (
-                                              <ExtensionSlot
-                                                name={`${matchingOrder.type}-action-menu-items-slot`}
-                                                state={{
-                                                  className: styles.menuItem,
-                                                  orderItem: matchingOrder,
-                                                  responsiveSize,
-                                                }}
-                                              />
-                                            )}
-                                          </TableCell>
-                                        )}
-                                      </TableExpandRow>
-                                      {row.isExpanded ? (
-                                        <TableExpandedRow
-                                          colSpan={headers.length + 2}
-                                          {...getExpandedRowProps({
-                                            row,
-                                          })}
-                                        >
-                                          <>
-                                            {matchingOrder?.type === 'drugorder' ? (
-                                              <MedicationRecord medication={matchingOrder} />
-                                            ) : matchingOrder?.type === 'testorder' ? (
-                                              <TestOrder testOrder={matchingOrder} />
-                                            ) : matchingOrder?.type === 'order' ? (
-                                              <GeneralOrderTable order={matchingOrder} />
-                                            ) : (
-                                              <ExtensionSlot
-                                                name={`${matchingOrder.type}-detail-slot`}
-                                                state={{
-                                                  orderItem: matchingOrder,
-                                                }}
-                                              />
-                                            )}
-                                          </>
-                                        </TableExpandedRow>
-                                      ) : (
-                                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                                      )}
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                          {rows.length === 0 ? (
-                            <div className={styles.tileContainer}>
-                              <Tile className={styles.emptyStateTile}>
-                                <div className={styles.tileContent}>
-                                  <p className={styles.content}>
-                                    {t('noMatchingOrdersToDisplay', 'No matching orders to display')}
-                                  </p>
-                                  <p className={styles.helperText}>{t('checkFilters', 'Check the filters above')}</p>
-                                </div>
-                              </Tile>
-                            </div>
-                          ) : null}
-                        </>
-                      )}
-                    </DataTable>
-                    {!isPrinting && (
-                      <div className={styles.paginationContainer}>
-                        <PatientChartPagination
-                          pageNumber={currentPage}
-                          totalItems={tableRows.length}
-                          currentItems={paginatedOrders.length}
-                          pageSize={defaultPageSize}
-                          onPageNumberChange={({ page }) => goTo(page)}
-                        />
-                      </div>
-                    )}
-                  </div>
+                      {t('print', 'Print')}
+                    </Button>
+                  )}
+                  {showAddButton && (
+                    <Button
+                      className={styles.addButton}
+                      kind="ghost"
+                      renderIcon={AddIcon}
+                      iconDescription={t('launchOrderBasket', 'Launch order basket')}
+                      onClick={() => launchOrderBasketForNewItem()}
+                    >
+                      {t('add', 'Add')}
+                    </Button>
+                  )}
                 </div>
-              )}
-            </>
-          );
-        }
-      })()}
+              </CardHeader>
+              <div ref={contentToPrintRef}>
+                <PrintComponent subheader={title} patientDetails={patientDetails} />
+                <DataTable
+                  aria-label={t('orderDetails', 'Order details')}
+                  data-floating-menu-container
+                  headers={tableHeaders}
+                  isSortable
+                  overflowMenuOnHover={!isTablet}
+                  rows={paginatedOrders}
+                  size={responsiveSize}
+                  useZebraStyles
+                >
+                  {({
+                    getExpandedRowProps,
+                    getExpandHeaderProps,
+                    getHeaderProps,
+                    getRowProps,
+                    getTableContainerProps,
+                    getTableProps,
+                    headers,
+                    onInputChange,
+                    rows,
+                  }) => (
+                    <>
+                      <TableContainer {...getTableContainerProps()}>
+                        {!isPrinting && (
+                          <div className={styles.toolBarContent}>
+                            <TableToolbarContent>
+                              <Search
+                                isExpanded
+                                labelText={t('searchTable', 'Search table')}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onInputChange(e)}
+                                placeholder={t('searchTable', 'Search table')}
+                              />
+                            </TableToolbarContent>
+                          </div>
+                        )}
+                        <Table className={styles.table} {...getTableProps()}>
+                          <TableHead>
+                            <TableRow>
+                              <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                              {headers.map((header) => (
+                                <TableHeader
+                                  {...getHeaderProps({ header })}
+                                  isSortable={(header as unknown as OrderHeaderProps).isSortable}
+                                >
+                                  {header.header}
+                                </TableHeader>
+                              ))}
+                              {!isPrinting && <TableExpandHeader />}
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {rows.map((row) => {
+                              const matchingOrder = allOrders?.find((order) => order.uuid === row.id);
+                              const isExpandable =
+                                matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ||
+                                matchingOrder?.type === ORDER_TYPES.GENERAL_ORDER;
+
+                              const cells = row.cells.map((cell) => (
+                                <TableCell className={styles.tableCell} key={cell.id}>
+                                  {cell.value?.['content'] ?? cell.value}
+                                </TableCell>
+                              ));
+
+                              const actionCell = !isPrinting && (
+                                <TableCell className="cds--table-column-menu">
+                                  {matchingOrder && isOmrsOrder(matchingOrder) ? (
+                                    <OrderBasketItemActions patient={patient} orderItem={matchingOrder} />
+                                  ) : (
+                                    <ExtensionSlot
+                                      name={`${matchingOrder?.type}-action-menu-items-slot`}
+                                      state={{
+                                        className: styles.menuItem,
+                                        orderItem: matchingOrder,
+                                        responsiveSize,
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
+                              );
+
+                              return (
+                                <React.Fragment key={row.id}>
+                                  {isExpandable ? (
+                                    <TableExpandRow className={styles.row} {...getRowProps({ row })}>
+                                      {cells}
+                                      {actionCell}
+                                    </TableExpandRow>
+                                  ) : (
+                                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                                      <TableCell />
+                                      {cells}
+                                      {actionCell}
+                                    </TableRow>
+                                  )}
+                                  {isExpandable &&
+                                    (row.isExpanded ? (
+                                      <TableExpandedRow
+                                        colSpan={headers.length + 2}
+                                        {...getExpandedRowProps({
+                                          row,
+                                        })}
+                                      >
+                                        {matchingOrder?.type === ORDER_TYPES.DRUG_ORDER ? (
+                                          <MedicationRecord medication={matchingOrder} />
+                                        ) : (
+                                          <GeneralOrderTable order={matchingOrder} />
+                                        )}
+                                      </TableExpandedRow>
+                                    ) : (
+                                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                                    ))}
+                                </React.Fragment>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      {rows.length === 0 ? (
+                        <div className={styles.tileContainer}>
+                          <Tile className={styles.emptyStateTile}>
+                            <div className={styles.tileContent}>
+                              <p className={styles.content}>
+                                {t('noMatchingOrdersToDisplay', 'No matching orders to display')}
+                              </p>
+                              <p className={styles.helperText}>{t('checkFilters', 'Check the filters above')}</p>
+                            </div>
+                          </Tile>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+                </DataTable>
+                {!isPrinting && (
+                  <div className={styles.paginationContainer}>
+                    <PatientChartPagination
+                      pageNumber={currentPage}
+                      totalItems={tableRows.length}
+                      currentItems={paginatedOrders.length}
+                      pageSize={defaultPageSize}
+                      onPageNumberChange={({ page }) => goTo(page)}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      ) : null}
     </>
   );
 };
 
-function OrderBasketItemActions({
-  orderItem,
-  openOrderBasket,
-  openOrderForm,
-  responsiveSize,
-}: OrderBasketItemActionsProps) {
+function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsProps) {
   const { t } = useTranslation();
-  const { orders, setOrders } = useOrderBasket<MutableOrderBasketItem>(orderItem.orderType.uuid);
-  const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
+  const isDeclined = orderItem.fulfillerStatus === 'DECLINED';
 
-  const handleModifyClick = useCallback(() => {
-    if (orderItem.type === 'drugorder') {
+  const { grouping, postDataPrepFn } = useMemo(() => {
+    if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.DRUG_ORDER),
+        postDataPrepFn: prepMedicationOrderPostData,
+      };
+    } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.TEST_ORDER, orderItem.orderType.uuid),
+        postDataPrepFn: prepTestOrderPostData,
+      };
+    } else {
+      return {
+        grouping: getOrderGrouping(ORDER_TYPES.GENERAL_ORDER, orderItem.orderType.uuid),
+        postDataPrepFn: prepOrderPostData,
+      };
+    }
+  }, [orderItem.type, orderItem.orderType.uuid]);
+  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
+  const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
+  const { mutate: globalMutate } = useSWRConfig();
+
+  const windowProps = useMemo(() => ({ encounterUuid: orderItem.encounter.uuid }), [orderItem.encounter.uuid]);
+  const groupProps = useMemo(
+    () => ({
+      patient,
+      patientUuid: patient.id,
+      visitContext: orderItem.encounter.visit,
+      mutateVisitContext: invalidateVisitByUuid(globalMutate, orderItem.encounter.visit.uuid),
+    }),
+    [patient, orderItem.encounter.visit, globalMutate],
+  );
+
+  const handleCancelOrder = useCallback(() => {
+    if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       getDrugOrderByUuid(orderItem.uuid)
         .then((res) => {
           const medicationOrder = res.data;
-          const medicationItem = buildMedicationOrder(medicationOrder, 'REVISE');
-          setOrders([...orders, medicationItem]);
-          openOrderForm({ order: medicationItem });
+          const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
+          setOrders([...orders, discontinueItem]);
+          launchWorkspace2('order-basket', {}, windowProps, groupProps);
+        })
+        .catch((e) => {
+          console.error('Error cancelling drug order: ', e);
+        });
+    } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
+      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
+      setOrders([...orders, labItem]);
+      launchWorkspace2('order-basket', {}, windowProps, groupProps);
+    } else {
+      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
+      setOrders([...orders, order]);
+      launchWorkspace2('order-basket', {}, windowProps, groupProps);
+    }
+  }, [orderItem, setOrders, orders, windowProps, groupProps]);
+
+  const handleModifyOrder = useCallback(() => {
+    if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
+      // make another call to fetch the order,
+      // this time with custom rep to include the drug field
+      // (when we fetch the array containing orderItem, we fetched for
+      // all order types and including the drug field in the custom rep will
+      // yield an error)
+      getDrugOrderByUuid(orderItem.uuid)
+        .then((res) => {
+          const medicationOrder = res.data;
+          launchWorkspace2(
+            'add-drug-order',
+            { order: buildMedicationOrder(medicationOrder, 'REVISE'), orderToEditOrdererUuid: orderItem.orderer.uuid },
+            windowProps,
+            groupProps,
+          );
         })
         .catch((e) => {
           console.error('Error modifying drug order: ', e);
         });
-    } else if (orderItem.type === 'testorder') {
+    } else if (orderItem.type === ORDER_TYPES.TEST_ORDER) {
       const labItem = buildLabOrder(orderItem, 'REVISE');
-      setOrders([...orders, labItem]);
-      openOrderForm({ order: labItem });
-    } else if (orderItem.type === 'order') {
-      const order = buildGeneralOrder(orderItem, 'REVISE');
-      setOrders([...orders, order]);
-      openOrderForm({ order });
+      launchWorkspace2(
+        'add-lab-order',
+        { order: labItem, orderTypeUuid: orderItem.orderType.uuid, orderToEditOrdererUuid: orderItem.orderer.uuid },
+        windowProps,
+        groupProps,
+      );
+    } else if (orderItem.type === ORDER_TYPES.GENERAL_ORDER) {
+      const generalItem = buildGeneralOrder(orderItem, 'REVISE');
+      launchWorkspace2(
+        'orderable-concept-workspace',
+        { order: generalItem, orderTypeUuid: orderItem.orderType.uuid, orderToEditOrdererUuid: orderItem.orderer.uuid },
+        windowProps,
+        groupProps,
+      );
     }
-  }, [orderItem, openOrderForm, orders, setOrders]);
+  }, [orderItem, windowProps, groupProps]);
 
-  const handleAddResultsClick = useCallback(() => {
-    launchWorkspace('test-results-form-workspace', { order: orderItem });
-  }, [orderItem]);
+  const handleAddOrEditTestResults = useCallback(() => {
+    launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
+  }, [orderItem, patient]);
 
-  const handleCancelClick = useCallback(() => {
-    if (orderItem.type === 'drugorder') {
-      getDrugOrderByUuid(orderItem.uuid).then((res) => {
-        let medicationOrder = res.data;
-        setOrders([...orders, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
-        openOrderBasket();
-      });
-    } else if (orderItem.type === 'testorder') {
-      const labItem = buildLabOrder(orderItem, 'DISCONTINUE');
-      setOrders([...orders, labItem]);
-      openOrderBasket();
-    } else {
-      const order = buildGeneralOrder(orderItem, 'DISCONTINUE');
-      setOrders([...orders, order]);
-      openOrderBasket();
-    }
-  }, [orderItem, setOrders, orders, openOrderBasket]);
+  // No actions available for declined orders
+  if (isDeclined) {
+    return null;
+  }
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu
-        aria-label={t('actionsMenu', 'Actions menu')}
-        flipped
-        selectorPrimaryFocus={'#modify'}
-        size={responsiveSize}
-      >
+      <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
         <OverflowMenuItem
           className={styles.menuItem}
           disabled={alreadyInBasket}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
-          onClick={handleModifyClick}
+          onClick={handleModifyOrder}
         />
-        {orderItem?.type === 'testorder' && (
+        {orderItem?.type === ORDER_TYPES.TEST_ORDER && (
           <OverflowMenuItem
             className={styles.menuItem}
             disabled={alreadyInBasket}
@@ -693,7 +716,7 @@ function OrderBasketItemActions({
                 ? t('editResults', 'Edit results')
                 : t('addResults', 'Add results')
             }
-            onClick={handleAddResultsClick}
+            onClick={handleAddOrEditTestResults}
           />
         )}
         <OverflowMenuItem
@@ -703,7 +726,7 @@ function OrderBasketItemActions({
           id="discontinue"
           isDelete
           itemText={t('cancelOrder', 'Cancel order')}
-          onClick={handleCancelClick}
+          onClick={handleCancelOrder}
         />
       </OverflowMenu>
     </Layer>

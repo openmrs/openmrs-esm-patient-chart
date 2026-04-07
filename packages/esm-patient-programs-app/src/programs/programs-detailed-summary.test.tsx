@@ -1,13 +1,14 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, launchWorkspace, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, launchWorkspace2, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace);
+const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
@@ -20,8 +21,8 @@ describe('ProgramsDetailedSummary', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(screen.getByText(/There are no program enrollments to display for this patient/)).toBeInTheDocument();
-    expect(screen.getByText(/Record program enrollments/)).toBeInTheDocument();
+    expect(screen.getByText(/There are no program enrollments to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record program enrollments/i)).toBeInTheDocument();
   });
 
   it('renders an error state view if there is a problem fetching program enrollments', async () => {
@@ -39,12 +40,7 @@ describe('ProgramsDetailedSummary', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Care Programs' }), {});
   });
 
   it('renders a detailed tabular summary of the patient program enrollments', async () => {

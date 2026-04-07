@@ -1,23 +1,22 @@
 import React from 'react';
 import styles from './grid.scss';
 
-export const Grid: React.FC<{
+interface GridProps {
   children?: React.ReactNode;
   style: React.CSSProperties;
   padding?: boolean;
   dataColumns: number;
-}> = ({ dataColumns, style = {}, padding = false, ...props }) => {
-  const minColumnWidth = 4;
-  const maxColumnWidth = 10;
+}
 
-  const dynamicColumnWidth = Math.max(minColumnWidth, Math.min(maxColumnWidth, 100 / dataColumns));
-
+export const Grid: React.FC<GridProps> = ({ dataColumns, style = {}, padding = false, ...props }) => {
   return (
     <div
       style={{
         ...style,
-        gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, ${dynamicColumnWidth}em)`,
+        gridTemplateColumns: `${padding ? '9rem ' : ''} repeat(${dataColumns}, minmax(8rem, 1fr))`,
         overflow: 'hidden',
+        width: '100%',
+        minWidth: '100%',
       }}
       className={styles.grid}
       {...props}

@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
-import { mockPatient } from 'tools';
-import DeleteVisitDialog from './delete-visit-dialog.component';
+
+import DeleteVisitDialog from './delete-visit-dialog.modal';
 
 const mockCloseModal = jest.fn();
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
@@ -21,7 +21,7 @@ describe('Delete visit', () => {
 
     mockOpenmrsFetch.mockResolvedValue(response as FetchResponse);
 
-    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
+    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const deleteVisitButton = screen.getByRole('button', { name: /delete visit$/i });
@@ -53,7 +53,7 @@ describe('Delete visit', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
 
-    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
+    render(<DeleteVisitDialog visit={mockCurrentVisit} closeModal={mockCloseModal} />);
 
     const cancelButton = screen.getByRole('button', { name: /^cancel$/i });
     const deleteVisitButton = screen.getByRole('button', { name: /delete visit$/i });

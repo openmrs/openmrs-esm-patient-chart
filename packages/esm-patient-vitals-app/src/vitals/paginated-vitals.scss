@@ -10,85 +10,37 @@
   }
 }
 
-.criticallyLow,
-.criticallyHigh,
-.low,
-.high {
-  td:nth-child(2) {
-    @include type.type-style('heading-compact-01');
-  }
+.numericObsCell {
+  padding: 0 !important;
 }
 
-.criticallyHigh,
-.criticallyLow {
-  border-top: 1px solid colors.$red-20-hover !important;
-  background-color: colors.$red-20 !important;
+.hiddenRow {
+  display: none;
 }
 
-.high,
-.low {
-  border-top: 1px solid colors.$orange-20 !important;
-  background-color: colors.$orange-10 !important;
+.noNoteRow :global(.cds--table-expand__button) {
+  visibility: hidden;
+  pointer-events: none;
 }
 
-.criticallyLow {
-  td:nth-child(2)::after {
-    content: ' ↓↓';
-  }
+.expandedRow > td {
+  padding-left: layout.$spacing-08 !important;
 }
 
-.criticallyHigh {
-  td:nth-child(2)::after {
-    content: ' ↑↑';
-  }
+.expandedRow > td > div {
+  max-height: max-content !important;
 }
 
-.low {
-  td:nth-child(2)::after {
-    content: ' ↓';
-  }
+.container {
+  margin: layout.$spacing-03;
 }
 
-.high {
-  td:nth-child(2)::after {
-    content: ' ↑';
-  }
+.copy {
+  @include type.type-style('body-01');
+  display: flex;
+  flex-direction: column;
 }
 
-.off-scale-low {
-  td:nth-child(2)::after {
-    content: ' ↓↓↓';
-  }
-}
-
-.off-scale-high {
-  td:nth-child(2)::after {
-    content: ' ↑↑↑';
-  }
-}
-
-.offScaleHigh,
-.offScaleLow,
-.criticallyHigh,
-.criticallyLow,
-.high,
-.low {
-  @include type.type-style('heading-compact-01');
-  color: colors.$gray-100 !important;
-}
-
-.criticallyLow::after {
-  content: ' ↓↓';
-}
-
-.criticallyHigh::after {
-  content: ' ↑↑';
-}
-
-.low::after {
-  content: ' ↓';
-}
-
-.high::after {
-  content: ' ↑';
+.content {
+  color: colors.$gray-80;
 }

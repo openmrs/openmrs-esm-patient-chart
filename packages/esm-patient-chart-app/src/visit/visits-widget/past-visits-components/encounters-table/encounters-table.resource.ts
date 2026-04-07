@@ -8,7 +8,6 @@ import {
   type Encounter,
   type EncounterType,
   type Obs,
-  type OpenmrsResource,
   useOpenmrsFetchAll,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
@@ -31,6 +30,7 @@ export interface EncountersTableProps {
 
 export interface MappedEncounter {
   datetime: string;
+  rawDatetime: string;
   diagnoses: Array<Diagnosis>;
   editPrivilege: string;
   encounterType: string;
@@ -59,7 +59,9 @@ export function usePaginatedEncounters(patientUuid: string, encounterType: strin
   url.searchParams.set('patient', patientUuid);
   url.searchParams.set('v', customRep);
   url.searchParams.set('order', 'desc');
-  encounterType && url.searchParams.set('encounterType', encounterType);
+  if (encounterType) {
+    url.searchParams.set('encounterType', encounterType);
+  }
   return useOpenmrsPagination<Encounter>(patientUuid ? url : null, pageSize);
 }
 
@@ -75,6 +77,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
     datetime: formatDatetime(parseDate(encounter.encounterDatetime), {
       noToday: true,
     }),
+    rawDatetime: encounter.encounterDatetime,
     diagnoses:
       encounter.diagnoses
         ?.filter((diagnosis) => !diagnosis.voided)
@@ -91,7 +94,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
       encounter.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
     visitStartDatetime: encounter.visit?.startDatetime,
     visitStopDatetime: encounter.visit?.stopDatetime,
-    visitType: encounter.visit?.visitType?.display,
+    visitType: encounter.visit?.visitType?.display ?? '--',
     visitTypeUuid: encounter.visit?.visitType?.uuid,
     visitUuid: encounter.visit?.uuid,
   };

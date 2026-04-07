@@ -7,6 +7,7 @@
   "lastCompleted": "Último completado",
   "never": "Nunca",
   "noFormsToDisplay": "No hay formularios para mostrar.",
+  "off": "Off",
   "offlineForms": "Formularios sin internet",
   "offlineForms__lower": "formularios sin internet",
   "offlineFormsOverviewCardAvailableOffline": "Disponible sin internet",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "Buscar en esta lista",
   "offlinePatientsTableSearchPlaceholder": "Buscar en esta lista",
   "offlineToggle": "Interruptor sin internet",
+  "on": "On",
   "searchThisList": "Buscar en esta lista"
 }

@@ -1,0 +1,34 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  margin: layout.$spacing-03 layout.$spacing-05;
+}
+
+.label {
+  @include type.type-style('label-01');
+  color: $text-02;
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-02;
+  align-items: center;
+}
+
+.allergyLabel {
+  @include type.type-style('label-01');
+  background-color: colors.$gray-20;
+
+  &[data-severity='moderate'] {
+    background-color: colors.$orange-20;
+  }
+
+  &[data-severity='mild'] {
+    background-color: colors.$yellow-20;
+  }
+
+  &[data-severity='severe'] {
+    background-color: colors.$red-20;
+  }
+}

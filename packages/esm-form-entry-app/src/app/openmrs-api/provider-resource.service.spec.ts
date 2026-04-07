@@ -1,5 +1,6 @@
-import { TestBed, inject, waitForAsync } from '@angular/core/testing';
-import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ProviderResourceService } from './provider-resource.service';
 import { OpenmrsApiModule } from './openmrs-api.module';
@@ -10,13 +11,13 @@ describe('Service : ProviderResourceService Unit Tests', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      imports: [OpenmrsApiModule],
       declarations: [],
-      providers: [],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
-    providerResourceService = TestBed.get(ProviderResourceService);
-    httpMock = TestBed.get(HttpTestingController);
+    providerResourceService = TestBed.inject(ProviderResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
   }));
 
   afterEach(() => {
@@ -31,7 +32,7 @@ describe('Service : ProviderResourceService Unit Tests', () => {
   it('should return a provider when the correct uuid is provided', (done) => {
     const providerUuid = 'xxx-xxx-xxx-xxx';
 
-    providerResourceService.getProviderByUuid(providerUuid).subscribe((response) => {
+    providerResourceService.getProviderByUuid(providerUuid).subscribe((_response) => {
       expect(req.request.method).toBe('GET');
       done();
     });
@@ -45,24 +46,27 @@ describe('Service : ProviderResourceService Unit Tests', () => {
     const results = {
       results: [
         {
-          uuid: 'uuid',
-          display: 'test',
+          uuid: 'uuid-1',
+          display: 'test provider',
         },
         {
-          uuid: 'uuid',
-          display: 'other',
+          uuid: 'uuid-2',
+          display: 'another test provider',
         },
       ],
     };
 
     providerResourceService.searchProvider(searchText).subscribe((providers) => {
-      for (const provider of providers) {
-        expect(provider.display).toContain('test');
-      }
+      expect(providers.length).toBe(2);
+      expect(providers[0].display).toBe('test provider');
+      expect(providers[1].display).toBe('another test provider');
       done();
     });
 
-    const req = httpMock.expectOne(providerResourceService.getUrl());
+    const req = httpMock.expectOne((request) => {
+      return request.url.includes('provider') && request.params.get('q') === searchText;
+    });
+    expect(req.request.method).toBe('GET');
     req.flush(results);
   });
 });

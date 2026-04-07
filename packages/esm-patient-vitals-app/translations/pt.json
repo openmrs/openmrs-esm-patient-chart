@@ -39,7 +39,6 @@
   "male": "Masculino",
   "muac": "MUAC",
   "noDataRecorded": "Nenhum dado foi registado para este utente",
-  "notAvailable": "Not available",
   "notes": "Notas",
   "other": "Outro",
   "outOfDateVitals": "<0>Estes sinais vitais estão  <1>desactualizados</1></0>",
@@ -75,6 +74,6 @@
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Histórico de sinais vitais",
   "vitalSignDisplayed": "Sinal vital visualizado",
-  "vitalSigns": "Sinais vitais",
+  "vitalSigns": "vital signs",
   "weight": "Peso"
 }

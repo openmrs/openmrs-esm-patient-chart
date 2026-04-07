@@ -8,11 +8,11 @@ import {
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
 import {
+  type Allergy,
   type FHIRAllergy,
   type FHIRAllergyResponse,
-  type Allergy,
-  type UseAllergies,
   type PatientAllergyPayload,
+  type UseAllergies,
 } from '../types';
 
 export function useAllergies(patientUuid: string): UseAllergies {
@@ -33,7 +33,7 @@ export function useAllergies(patientUuid: string): UseAllergies {
 
   return {
     allergies: data ? formattedAllergies : null,
-    error: error,
+    error,
     isLoading,
     isValidating,
     mutate,

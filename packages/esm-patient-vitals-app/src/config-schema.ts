@@ -52,7 +52,7 @@ export const configSchema = {
       _type: Type.Boolean,
       _default: false,
       _description:
-        'Whether to use an Ampath form as the vitals and biometrics form. If set to true, encounterUuid and formUuid must be set as well.',
+        'Whether to use the form engine for vitals and biometrics. If set to true, formUuid must be configured (formName is optional).',
     },
     encounterTypeUuid: {
       _type: Type.UUID,
@@ -105,6 +105,11 @@ export const configSchema = {
       _type: Type.String,
       _default: 'kg / m²',
     },
+    bmiMinimumAge: {
+      _type: Type.Number,
+      _default: 0,
+      _description: 'The minimum age (in years) required to display BMI. Set to 0 to show BMI for all patients.',
+    },
   },
 };
 
@@ -112,6 +117,7 @@ export interface BiometricsConfigObject {
   bmiUnit: string;
   heightUnit: string;
   weightUnit: string;
+  bmiMinimumAge: number;
 }
 
 export interface LogoConfigObject {

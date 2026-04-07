@@ -1,7 +1,10 @@
 {
-  "chartView": "Chart View",
-  "dateAndTime": "Date and time",
-  "displaying": "Displaying",
-  "encounterType": "Encounter type",
-  "tableView": "Table View"
+  "addEncounter": "Ereignis hinzufügen",
+  "date": "Datum",
+  "dateAndTime": "Datum und Zeit",
+  "editabilityNote": "Tippe auf einen Befund, um ihn zu bearbeiten",
+  "encounterType": "Ereignistyp",
+  "errorSavingObservation": "Fehler beim Speichern des Befundes",
+  "noValue": "Kein Wert",
+  "observationSaved": "Befund erfolgreich gespeichert"
 }

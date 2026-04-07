@@ -1,4 +1,5 @@
-import { age, formatDate, launchWorkspace, parseDate, type Visit } from '@openmrs/esm-framework';
+import { age, formatDate, launchWorkspace2, parseDate, type Visit } from '@openmrs/esm-framework';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import type {
   ConfigConcepts,
   Encounter,
@@ -8,36 +9,35 @@ import type {
   GetObsFromEncounterParams,
   Observation,
 } from '../types';
+import type { TFunction } from 'i18next';
 
-type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
+export type LaunchAction = 'add' | 'view' | 'edit' | 'embedded-view';
 
 export function launchEncounterForm(
   form: Form,
-  visit: Visit,
   action: LaunchAction = 'add',
-  onFormSave: () => void,
-  encounterUuid?: string,
   intent: string = '*',
-  patientUuid?: string,
+  requireActiveVisitForEncounterTile: boolean = true,
+  visit?: Visit,
+  encounterUuid?: string,
 ) {
-  launchWorkspace('patient-form-entry-workspace', {
-    workspaceTitle: form?.name,
-    mutateForm: onFormSave,
-    formInfo: {
+  if (!visit && requireActiveVisitForEncounterTile) {
+    launchStartVisitPrompt();
+  } else {
+    launchWorkspace2('patient-form-entry-workspace', {
+      workspaceTitle: form?.display ?? form?.name,
+      form,
       encounterUuid,
-      formUuid: form?.uuid,
-      patientUuid: patientUuid,
-      visit: visit,
       additionalProps: {
         mode: action === 'add' ? 'enter' : action,
         formSessionIntent: intent,
         openClinicalFormsWorkspaceOnFormClose: false,
       },
-    },
-  });
+    });
+  }
 }
 
-export function getEncounterValues(encounter: Encounter, param: string, isDate?: Boolean) {
+export function getEncounterValues(encounter: Encounter, param: string, isDate?: boolean) {
   if (isDate) return formatDate(encounter[param]);
   else return encounter[param] ?? '--';
 }
@@ -56,11 +56,11 @@ export function getObsFromEncounters(encounters: Encounter, obsConcept: string, 
   return getObsFromEncounter({ encounter: filteredEnc, obsConcept: obsConcept, config: config });
 }
 
-export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings) {
+export function resolveValueUsingMappings(encounter: Encounter, concept: string, mappings, t: TFunction) {
   const obs = findObs(encounter, concept);
   for (const key in mappings) {
     if (typeof obs?.value === 'object' && 'uuid' in obs.value && mappings[key] === obs?.value?.uuid) {
-      return key;
+      return t(key);
     }
   }
   return '--';
@@ -132,7 +132,8 @@ export function getObsFromEncounter({
   config,
 }: GetObsFromEncounterParams) {
   let obs = findObs(encounter, obsConcept);
-  if (!encounter || !obsConcept) {
+
+  if (!encounter && !obsConcept) {
     return '--';
   }
 
@@ -144,7 +145,7 @@ export function getObsFromEncounter({
 
   // handles things like location, provider, visit type, etc. that are not in the encounter
   if (type) {
-    getEncounterProperty(encounter, type);
+    return getEncounterProperty(encounter, type);
   }
 
   if (secondaryConcept && typeof obs.value === 'object' && obs.value.names) {
@@ -167,14 +168,14 @@ export function getObsFromEncounter({
   // format format obs date or datetime based on the obs value's type
   if (isDate) {
     if (typeof obs.value === 'object' && obs.value?.names) {
-      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide' });
+      return formatDate(parseDate(obs.obsDatetime), { mode: 'wide', time: false });
     } else if (typeof obs.value === 'string') {
-      return formatDate(parseDate(obs.value), { mode: 'wide' });
+      return formatDate(parseDate(obs.value), { mode: 'wide', time: false });
     }
   }
 
   if (typeof obs.value === 'object' && obs.value?.name) {
-    return obs.value?.name?.display;
+    return obs.value?.name?.display ?? obs.value?.name?.name ?? '--';
   }
   return obs.value;
 }
@@ -198,12 +199,27 @@ export const getEncounterProperty = (encounter: Encounter, type: EncounterProper
     return encounter.encounterProviders.map((p) => p.provider.name).join(' | ');
   }
 
-  if (type === 'visitType') {
+  if (type === 'encounterType') {
     return encounter.encounterType.name;
   }
 
   if (type === 'ageAtEncounter') {
     return age(encounter.patient.birthDate, encounter.encounterDatetime);
+  }
+
+  if (type === 'visitDate') {
+    if (encounter.visit?.startDatetime) {
+      return formatDate(parseDate(encounter.visit.startDatetime), { mode: 'wide' });
+    }
+    return '--';
+  }
+
+  if (type === 'visitType') {
+    return encounter.visit?.visitType?.display ?? '--';
+  }
+
+  if (type === 'encounterDatetime') {
+    return formatDate(parseDate(encounter.encounterDatetime), { mode: 'wide' });
   }
 };
 

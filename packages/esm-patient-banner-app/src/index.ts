@@ -1,5 +1,6 @@
 import {
   defineConfigSchema,
+  defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
   messageOmrsServiceWorker,
@@ -9,6 +10,7 @@ import { configSchema } from './config-schema';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
 import patientBannerComponent from './banner/patient-banner.component';
 import visitTagComponent from './banner-tags/visit-tag.extension';
+import { personAttributeTagsExtensionConfigSchema } from './banner-tags/person-attribute-tags.extension';
 
 const moduleName = '@openmrs/esm-patient-banner-app';
 
@@ -26,6 +28,7 @@ export function startupApp() {
   });
 
   defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema('person-attribute-tag', personAttributeTagsExtensionConfigSchema);
 }
 
 export const visitTag = getSyncLifecycle(visitTagComponent, options);
@@ -34,17 +37,9 @@ export const deceasedPatientTag = getSyncLifecycle(deceasedPatientTagComponent, 
 
 export const patientBanner = getSyncLifecycle(patientBannerComponent, options);
 
-export const printIdentifierStickerModal = getAsyncLifecycle(
-  () => import('./print-identifier-sticker/print-identifier-sticker.modal'),
+export const personAttributeTag = getAsyncLifecycle(
+  () => import('./banner-tags/person-attribute-tags.extension'),
   options,
-);
-
-export const printIdentifierStickerActionButton = getAsyncLifecycle(
-  () => import('./print-identifier-sticker/print-identifier-sticker-action-button.component'),
-  {
-    featureName: 'patient-actions-slot-print-identifier-sticker-button',
-    moduleName,
-  },
 );
 
 /*

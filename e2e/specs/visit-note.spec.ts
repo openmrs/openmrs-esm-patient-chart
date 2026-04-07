@@ -68,6 +68,10 @@ test('Add and delete a visit note', async ({ page, patient }) => {
     await page.getByRole('button', { name: /expand current row/i }).click();
   });
 
+  await test.step('And I click the `Notes` tab', async () => {
+    await page.getByRole('tab', { name: /notes/i }).click();
+  });
+
   await test.step('Then I should see the newly added visit note', async () => {
     await expect(page.getByText(/this is a note/i)).toBeVisible();
   });
@@ -78,8 +82,9 @@ test('Add and delete a visit note', async ({ page, patient }) => {
 
   await test.step('And I click the overflow menu in the table row of the newly added visit note', async () => {
     await page
+      .getByRole('row')
+      .filter({ hasText: /visit note/i })
       .getByRole('button', { name: /options/i })
-      .nth(0)
       .click();
   });
 

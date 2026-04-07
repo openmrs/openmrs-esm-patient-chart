@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
-import { useTranslation, type TFunction } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, type Control } from 'react-hook-form';
+import { Controller, useForm, type Control } from 'react-hook-form';
+import type { TFunction } from 'i18next';
 import {
   Button,
   ButtonSet,
@@ -23,24 +24,29 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, WarningFilled, CloseFilled } from '@carbon/react/icons';
+import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
-  type Encounter,
   ExtensionSlot,
   OpenmrsDatePicker,
   ResponsiveWrapper,
   restBaseUrl,
   showModal,
   showSnackbar,
-  type UploadedFile,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
-  useVisitContextStore,
+  Workspace2,
+  type Encounter,
+  type UploadedFile,
 } from '@openmrs/esm-framework';
-import { type DefaultPatientWorkspaceProps, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
+import {
+  invalidateVisitAndEncounterData,
+  type PatientWorkspace2DefinitionProps,
+  useAllowedFileExtensions,
+} from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import {
@@ -70,7 +76,7 @@ interface DiagnosesDisplayProps {
 
 interface DiagnosisSearchProps {
   control: Control<VisitNotesFormData>;
-  error?: Object;
+  error?: object;
   handleSearch: (fieldName) => void;
   labelText: string;
   name: 'noteDate' | 'primaryDiagnosisSearch' | 'secondaryDiagnosisSearch' | 'clinicalNote';
@@ -78,9 +84,9 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction) => {
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
   return z.object({
-    noteDate: z.date(),
+    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
@@ -88,26 +94,23 @@ const createSchema = (t: TFunction) => {
   });
 };
 
-interface VisitNotesFormProps extends DefaultPatientWorkspaceProps {
+export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
 }
 
-const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
+const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}>> = ({
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  patientUuid,
-  promptBeforeClosing,
-  encounter,
-  formContext = 'creating',
+  workspaceProps: { formContext, encounter },
+  groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
   const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const config = useConfig<ConfigObject>();
-  const memoizedState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
+  const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [isLoadingPrimaryDiagnoses, setIsLoadingPrimaryDiagnoses] = useState(false);
@@ -121,13 +124,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
+  const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
-  const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
+  const visitNoteFormSchema = useMemo(
+    () => createSchema(t, isRetrospectiveDataEntryEnabled),
+    [t, isRetrospectiveDataEntryEnabled],
+  );
 
   const customResolver = useCallback(
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-      if (selectedPrimaryDiagnoses.length === 0) {
+
+      if (isPrimaryDiagnosisRequired && selectedPrimaryDiagnoses.length === 0) {
         return {
           ...zodResult,
           errors: {
@@ -142,13 +150,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       return zodResult;
     },
-    [visitNoteFormSchema, selectedPrimaryDiagnoses, t],
+    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedPrimaryDiagnoses, t],
   );
 
   const {
     clearErrors,
     control,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
     setValue,
     watch,
@@ -157,16 +165,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     resolver: customResolver,
     defaultValues: {
       primaryDiagnosisSearch: '',
-      noteDate: isEditing ? new Date(encounter.datetime) : new Date(),
+      noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
         : '',
     },
   });
-
-  useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
 
   useEffect(() => {
     if (encounter?.diagnoses?.length) {
@@ -197,12 +201,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const currentImages = watch('images');
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { mutateVisit } = useVisitContextStore();
-  const { mutate } = useSWRConfig();
+  const { mutate: globalMutate } = useSWRConfig();
 
   const mutateAttachments = useCallback(
-    () => mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
-    [mutate],
+    () => globalMutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/attachment`)),
+    [globalMutate],
   );
 
   const locationUuid = session?.sessionLocation?.uuid;
@@ -353,12 +356,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     (data: VisitNotesFormData) => {
       const { noteDate, clinicalNote, images } = data;
 
-      if (!selectedPrimaryDiagnoses.length) {
+      if (isPrimaryDiagnosisRequired && !selectedPrimaryDiagnoses.length) {
         return;
       }
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
+
+      // When RDE is off, the datepicker is hidden and noteDate defaults to new Date().
+      // This always falls within the 30-minute window, so encounterDatetime is intentionally
+      // omitted from the payload -> letting the server attach the correct timestamp.
       if (finalNoteDate.diff(now, 'minute') <= 30) {
         finalNoteDate = null;
       }
@@ -394,7 +401,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         ? updateVisitNote(abortController, encounter.id, visitNotePayload)
         : saveVisitNote(abortController, visitNotePayload);
 
-      savePromise
+      return savePromise
         .then((response) => {
           if (response.status === 201 || response.status === 200) {
             const encounterUuid = encounter?.id || response.data.uuid;
@@ -445,14 +452,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
         })
         .then(() => {
-          mutateVisit();
+          // Invalidate encounter and notes data since we created a new encounter with notes
+          // Also invalidate visit history table since the visit now has new encounters
+          invalidateVisitAndEncounterData(globalMutate, patientUuid);
           mutateVisitNotes();
 
           if (images?.length) {
             mutateAttachments();
           }
 
-          closeWorkspaceWithSavedChanges();
+          closeWorkspace({ discardUnsavedChanges: true });
 
           showSnackbar({
             isLowContrast: true,
@@ -474,7 +483,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     },
     [
       clinicianEncounterRole,
-      closeWorkspaceWithSavedChanges,
+      closeWorkspace,
       combinedDiagnoses,
       encounter?.diagnoses,
       encounter?.id,
@@ -482,10 +491,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       encounterNoteTextConceptUuid,
       encounterTypeUuid,
       formConceptUuid,
+      globalMutate,
       isEditing,
+      isPrimaryDiagnosisRequired,
       locationUuid,
       mutateAttachments,
-      mutateVisit,
       mutateVisitNotes,
       patientUuid,
       providerUuid,
@@ -496,241 +506,246 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onError = (errors) => console.error(errors);
 
+  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
+
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
+        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
-      {isTablet && (
-        <Row className={styles.headerGridRow}>
-          <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
-        </Row>
-      )}
+        {isTablet && (
+          <Row className={styles.headerGridRow}>
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={memoizedState} />
+          </Row>
+        )}
 
-      <div className={styles.formContainer}>
-        <Stack gap={2}>
-          {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
-          <Row className={styles.row}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-            </Column>
-            <Column sm={3}>
-              <Controller
-                name="noteDate"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <ResponsiveWrapper>
-                    <OpenmrsDatePicker
-                      {...field}
-                      data-testid="visitDateTimePicker"
-                      id="visitDateTimePicker"
-                      invalid={Boolean(fieldState?.error?.message)}
-                      invalidText={fieldState?.error?.message}
-                      isDisabled={isEditing}
-                      labelText={t('visitDate', 'Visit date')}
-                      maxDate={new Date()}
-                    />
-                  </ResponsiveWrapper>
-                )}
-              />
-            </Column>
-          </Row>
-          <div className={styles.diagnosesText}>
-            {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-              <>
-                {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                  <Tag
-                    className={styles.tag}
-                    filter
-                    key={index}
-                    onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                    type="red"
-                  >
-                    {diagnosis.display}
-                  </Tag>
-                ))}
-              </>
-            ) : null}
-            {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-              <>
-                {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                  <Tag
-                    className={styles.tag}
-                    filter
-                    key={index}
-                    onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                    type="blue"
-                  >
-                    {diagnosis.display}
-                  </Tag>
-                ))}
-              </>
-            ) : null}
-            {selectedPrimaryDiagnoses &&
-              !selectedPrimaryDiagnoses.length &&
-              selectedSecondaryDiagnoses &&
-              !selectedSecondaryDiagnoses.length && (
-                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-              )}
-          </div>
-          <Row className={styles.row}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
-            </Column>
-            <Column sm={3}>
-              <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
-                <DiagnosisSearch
-                  name="primaryDiagnosisSearch"
-                  control={control}
-                  labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
-                  placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
-                  handleSearch={handleSearch}
-                  error={errors?.primaryDiagnosisSearch}
-                  setIsSearching={setIsSearching}
-                />
-                {error ? (
-                  <InlineNotification
-                    className={styles.errorNotification}
-                    lowContrast
-                    title={t('error', 'Error')}
-                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                    onClose={() => setError(null)}
-                  />
-                ) : null}
-                <DiagnosesDisplay
-                  fieldName={'primaryDiagnosisSearch'}
-                  isDiagnosisNotSelected={isDiagnosisNotSelected}
-                  isLoading={isLoadingPrimaryDiagnoses}
-                  isSearching={isSearching}
-                  onAddDiagnosis={handleAddDiagnosis}
-                  searchResults={searchPrimaryResults}
-                  t={t}
-                  value={watch('primaryDiagnosisSearch')}
-                />
-              </FormGroup>
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
-            </Column>
-            <Column sm={3}>
-              <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
-                <DiagnosisSearch
-                  name="secondaryDiagnosisSearch"
-                  control={control}
-                  labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
-                  placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
-                  handleSearch={handleSearch}
-                  setIsSearching={setIsSearching}
-                />
-                {error ? (
-                  <InlineNotification
-                    className={styles.errorNotification}
-                    lowContrast
-                    title={t('error', 'Error')}
-                    subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
-                    onClose={() => setError(null)}
-                  />
-                ) : null}
-                <DiagnosesDisplay
-                  fieldName={'secondaryDiagnosisSearch'}
-                  isDiagnosisNotSelected={isDiagnosisNotSelected}
-                  isLoading={isLoadingSecondaryDiagnoses}
-                  isSearching={isSearching}
-                  onAddDiagnosis={handleAddDiagnosis}
-                  searchResults={searchSecondaryResults}
-                  t={t}
-                  value={watch('secondaryDiagnosisSearch')}
-                />
-              </FormGroup>
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('note', 'Note')}</span>
-            </Column>
-            <Column sm={3}>
-              <Controller
-                name="clinicalNote"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <ResponsiveWrapper>
-                    <TextArea
-                      id="additionalNote"
-                      rows={rows}
-                      labelText={t('clinicalNoteLabel', 'Write your notes')}
-                      placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
-                      value={value}
-                      onBlur={onBlur}
-                      onChange={(event) => {
-                        onChange(event);
-                        const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
-                        const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
-                        setRows(newRows);
-                      }}
-                    />
-                  </ResponsiveWrapper>
-                )}
-              />
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('image', 'Image')}</span>
-            </Column>
-            <Column sm={3}>
-              <FormGroup legendText="">
-                <p className={styles.imgUploadHelperText}>
-                  {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
-                </p>
-                <Button
-                  className={styles.uploadButton}
-                  kind={isTablet ? 'ghost' : 'tertiary'}
-                  onClick={showImageCaptureModal}
-                  renderIcon={(props) => <Add size={16} {...props} />}
-                >
-                  {t('addImage', 'Add image')}
-                </Button>
-                <div className={styles.imgThumbnailGrid}>
-                  {currentImages?.map((image, index) => (
-                    <div key={index} className={styles.imgThumbnailItem}>
-                      <div className={styles.imgThumbnailContainer}>
-                        <img
-                          className={styles.imgThumbnail}
-                          src={image.base64Content}
-                          alt={image.fileDescription ?? image.fileName}
+        <div className={styles.formContainer}>
+          <Stack gap={2}>
+            {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
+            {isRetrospectiveDataEntryEnabled && (
+              <Row className={styles.row}>
+                <Column sm={1}>
+                  <span className={styles.columnLabel}>{t('date', 'Date')}</span>
+                </Column>
+                <Column sm={3}>
+                  <Controller
+                    name="noteDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <ResponsiveWrapper>
+                        <OpenmrsDatePicker
+                          {...field}
+                          data-testid="visitDateTimePicker"
+                          id="visitDateTimePicker"
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                          isDisabled={isEditing}
+                          labelText={t('visitDate', 'Visit date')}
+                          maxDate={new Date()}
                         />
-                      </div>
-                      <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                        <CloseFilled size={16} className={styles.closeIcon} />
-                      </Button>
-                    </div>
+                      </ResponsiveWrapper>
+                    )}
+                  />
+                </Column>
+              </Row>
+            )}
+            <div className={styles.diagnosesText}>
+              {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
+                <>
+                  {selectedPrimaryDiagnoses.map((diagnosis, index) => (
+                    <Tag
+                      className={styles.tag}
+                      filter
+                      key={index}
+                      onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                      type="red"
+                    >
+                      {diagnosis.display}
+                    </Tag>
                   ))}
-                </div>
-              </FormGroup>
-            </Column>
-          </Row>
-        </Stack>
-      </div>
-      <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          onClick={() => handleSubmit}
-          disabled={isSubmitting}
-          type="submit"
-        >
-          {isSubmitting ? (
-            <InlineLoading description={t('saving', 'Saving') + '...'} />
-          ) : (
-            <span>{t('saveAndClose', 'Save and close')}</span>
-          )}
-        </Button>
-      </ButtonSet>
-    </Form>
+                </>
+              ) : null}
+              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
+                <>
+                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
+                    <Tag
+                      className={styles.tag}
+                      filter
+                      key={index}
+                      onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                      type="blue"
+                    >
+                      {diagnosis.display}
+                    </Tag>
+                  ))}
+                </>
+              ) : null}
+              {selectedPrimaryDiagnoses &&
+                !selectedPrimaryDiagnoses.length &&
+                selectedSecondaryDiagnoses &&
+                !selectedSecondaryDiagnoses.length && (
+                  <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+                )}
+            </div>
+            <Row className={styles.row}>
+              <Column sm={1}>
+                <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary diagnosis')}</span>
+              </Column>
+              <Column sm={3}>
+                <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
+                  <DiagnosisSearch
+                    name="primaryDiagnosisSearch"
+                    control={control}
+                    labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnoses')}
+                    placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
+                    handleSearch={handleSearch}
+                    error={errors?.primaryDiagnosisSearch}
+                    setIsSearching={setIsSearching}
+                  />
+                  {error ? (
+                    <InlineNotification
+                      className={styles.errorNotification}
+                      lowContrast
+                      title={t('error', 'Error')}
+                      subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                      onClose={() => setError(null)}
+                    />
+                  ) : null}
+                  <DiagnosesDisplay
+                    fieldName={'primaryDiagnosisSearch'}
+                    isDiagnosisNotSelected={isDiagnosisNotSelected}
+                    isLoading={isLoadingPrimaryDiagnoses}
+                    isSearching={isSearching}
+                    onAddDiagnosis={handleAddDiagnosis}
+                    searchResults={searchPrimaryResults}
+                    t={t}
+                    value={watch('primaryDiagnosisSearch')}
+                  />
+                </FormGroup>
+              </Column>
+            </Row>
+            <Row className={styles.row}>
+              <Column sm={1}>
+                <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary diagnosis')}</span>
+              </Column>
+              <Column sm={3}>
+                <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
+                  <DiagnosisSearch
+                    name="secondaryDiagnosisSearch"
+                    control={control}
+                    labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnoses')}
+                    placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnosis')}
+                    handleSearch={handleSearch}
+                    setIsSearching={setIsSearching}
+                  />
+                  {error ? (
+                    <InlineNotification
+                      className={styles.errorNotification}
+                      lowContrast
+                      title={t('error', 'Error')}
+                      subtitle={t('errorFetchingConcepts', 'There was a problem fetching concepts') + '.'}
+                      onClose={() => setError(null)}
+                    />
+                  ) : null}
+                  <DiagnosesDisplay
+                    fieldName={'secondaryDiagnosisSearch'}
+                    isDiagnosisNotSelected={isDiagnosisNotSelected}
+                    isLoading={isLoadingSecondaryDiagnoses}
+                    isSearching={isSearching}
+                    onAddDiagnosis={handleAddDiagnosis}
+                    searchResults={searchSecondaryResults}
+                    t={t}
+                    value={watch('secondaryDiagnosisSearch')}
+                  />
+                </FormGroup>
+              </Column>
+            </Row>
+            <Row className={styles.row}>
+              <Column sm={1}>
+                <span className={styles.columnLabel}>{t('note', 'Note')}</span>
+              </Column>
+              <Column sm={3}>
+                <Controller
+                  name="clinicalNote"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ResponsiveWrapper>
+                      <TextArea
+                        id="additionalNote"
+                        rows={rows}
+                        labelText={t('clinicalNoteLabel', 'Write your notes')}
+                        placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
+                        value={value}
+                        onBlur={onBlur}
+                        onChange={(event) => {
+                          onChange(event);
+                          const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                          const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                          setRows(newRows);
+                        }}
+                      />
+                    </ResponsiveWrapper>
+                  )}
+                />
+              </Column>
+            </Row>
+            <Row className={styles.row}>
+              <Column sm={1}>
+                <span className={styles.columnLabel}>{t('image', 'Image')}</span>
+              </Column>
+              <Column sm={3}>
+                <FormGroup legendText="">
+                  <p className={styles.imgUploadHelperText}>
+                    {t('imageUploadHelperText', "Upload images or use this device's camera to capture images")}
+                  </p>
+                  <Button
+                    className={styles.uploadButton}
+                    kind={isTablet ? 'ghost' : 'tertiary'}
+                    onClick={showImageCaptureModal}
+                    renderIcon={(props) => <Add size={16} {...props} />}
+                  >
+                    {t('addImage', 'Add image')}
+                  </Button>
+                  <div className={styles.imgThumbnailGrid}>
+                    {currentImages?.map((image, index) => (
+                      <div key={index} className={styles.imgThumbnailItem}>
+                        <div className={styles.imgThumbnailContainer}>
+                          <img
+                            className={styles.imgThumbnail}
+                            src={image.base64Content}
+                            alt={image.fileDescription ?? image.fileName}
+                          />
+                        </div>
+                        <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
+                          <CloseFilled size={16} className={styles.closeIcon} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </FormGroup>
+              </Column>
+            </Row>
+          </Stack>
+        </div>
+        <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            kind="primary"
+            disabled={!hasUserUnsavedChanges || isSubmitting}
+            type="submit"
+          >
+            {isSubmitting ? (
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
+            ) : (
+              <span>{t('saveAndClose', 'Save and close')}</span>
+            )}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </Workspace2>
   );
 };
 

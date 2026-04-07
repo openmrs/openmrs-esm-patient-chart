@@ -1,20 +1,26 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenuButton, PenIcon } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
+import { ActionMenuButton2, PenIcon } from '@openmrs/esm-framework';
+import { useStartVisitIfNeeded, type PatientChartWorkspaceActionButtonProps } from '@openmrs/esm-patient-common-lib';
 
-const VisitNoteActionButton: React.FC = () => {
+/**
+ * This button uses the patient chart store and MUST only be used
+ * within the patient chart
+ */
+const VisitNoteActionButton: React.FC<PatientChartWorkspaceActionButtonProps> = ({ groupProps: { patientUuid } }) => {
   const { t } = useTranslation();
 
-  const launchVisitNotesWorkspace = useLaunchWorkspaceRequiringVisit('visit-notes-form-workspace');
+  const startVisitIfNeeded = useStartVisitIfNeeded(patientUuid);
 
   return (
-    <ActionMenuButton
-      getIcon={(props: ComponentProps<typeof PenIcon>) => <PenIcon {...props} />}
+    <ActionMenuButton2
+      icon={(props: ComponentProps<typeof PenIcon>) => <PenIcon {...props} />}
       label={t('visitNote', 'Visit note')}
-      iconDescription={t('note', 'Note')}
-      handler={launchVisitNotesWorkspace}
-      type={'visit-note'}
+      workspaceToLaunch={{
+        workspaceName: 'visit-notes-form-workspace',
+        workspaceProps: {},
+      }}
+      onBeforeWorkspaceLaunch={startVisitIfNeeded}
     />
   );
 };

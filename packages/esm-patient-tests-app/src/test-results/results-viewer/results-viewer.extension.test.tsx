@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
@@ -66,6 +67,7 @@ const mockFilterContext: FilterContextProps = {
   resetTree: jest.fn(),
   roots: mockResults,
   tests: {},
+  filteredResultsCount: 0,
 };
 
 global.IntersectionObserver = jest.fn(function (callback, options) {
@@ -105,13 +107,10 @@ describe('ResultsViewer', () => {
       error: new Error('An error occurred'),
     });
     render(<TreeView {...testProps} />);
-    const testResultsText = screen.getByRole('heading', { name: /data load error/i });
-    expect(testResultsText).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: new Error('An error occurred'), headerTitle: 'Data Load Error' }),
+      {},
+    );
   });
 
   it('should render the Tree wrapper component component', async () => {
@@ -156,10 +155,16 @@ describe('ResultsViewer', () => {
       });
     });
 
-    const panelButton = screen.getByRole('button', { name: /Comprehensive metabolic panel/i });
+    // Look for a panel that actually has children with data and is rendered as an accordion
+    // "Complete blood count" has children with data (like Platelets), so it should be rendered as an accordion
+    const panelButtons = screen.getAllByRole('button', { name: /Complete blood count/i });
+    expect(panelButtons).toHaveLength(2); // There should be 2 buttons with this name
+    const panelButton = panelButtons[0]; // Use the first one
     expect(panelButton).toBeInTheDocument();
 
     await userEvent.click(panelButton);
-    expect(screen.getByText(/Comprehensive metabolic panel/i)).toBeVisible();
+    const completeBloodCountTexts = screen.getAllByText(/Complete blood count/i);
+    expect(completeBloodCountTexts.length).toBeGreaterThan(0);
+    expect(completeBloodCountTexts[0]).toBeVisible();
   });
 });

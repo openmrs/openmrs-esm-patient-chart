@@ -31,8 +31,8 @@
   content: '';
   display: block;
   width: layout.$spacing-07;
-  padding-top: 0.188rem;
-  border-bottom: 0.375rem solid var(--brand-03);
+  padding-top: layout.$spacing-02;
+  border-bottom: layout.$spacing-03 solid var(--brand-03);
 }
 
 .subtitleText {
@@ -121,7 +121,34 @@
 }
 
 .table {
-  td {
-    border-bottom: none !important;
+  table-layout: fixed;
+  width: 100%;
+
+  tbody .col-testName {
+    color: colors.$blue-60;
+  }
+}
+
+.tableWithRange {
+  .col-testName {
+    width: 50%;
+  }
+
+  .col-value {
+    width: 25%;
+  }
+
+  .col-referenceRange {
+    width: 25%;
+  }
+}
+
+.tableWithoutRange {
+  .col-testName {
+    width: 60%;
+  }
+
+  .col-value {
+    width: 40%;
   }
 }

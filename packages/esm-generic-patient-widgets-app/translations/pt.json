@@ -1,7 +1,10 @@
 {
-  "chartView": "Visualização de Gráfico",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "Data e hora",
-  "displaying": "Visualizando",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "Tipo de consulta",
-  "tableView": "Visualização em Tabela"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

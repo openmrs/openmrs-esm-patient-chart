@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Allergy } from '../types';
-import styles from './allergies-action-menu.scss';
 import { patientAllergiesFormWorkspace } from '../constants';
+import styles from './allergies-action-menu.scss';
 
 interface allergiesActionMenuProps {
   allergy: Allergy;
@@ -16,15 +16,14 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
   const isTablet = useLayoutType() === 'tablet';
 
   const launchEditAllergiesForm = useCallback(() => {
-    launchWorkspace(patientAllergiesFormWorkspace, {
-      workspaceTitle: t('editAllergy', 'Edit an allergy'),
+    launchWorkspace2(patientAllergiesFormWorkspace, {
       allergy,
       formContext: 'editing',
     });
-  }, [allergy, t]);
+  }, [allergy]);
 
   const launchDeleteAllergyDialog = (allergyId: string) => {
-    const dispose = showModal('allergy-delete-confirmation-dialog', {
+    const dispose = showModal('delete-allergy-modal', {
       closeDeleteModal: () => dispose(),
       allergyId,
       patientUuid,
@@ -35,6 +34,7 @@ export const AllergiesActionMenu = ({ allergy, patientUuid }: allergiesActionMen
     <Layer className={styles.layer}>
       <OverflowMenu
         aria-label={t('editOrDeleteAllergy', 'Edit or delete allergy')}
+        align="left"
         size={isTablet ? 'lg' : 'sm'}
         flipped
       >

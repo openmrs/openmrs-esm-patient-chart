@@ -1,22 +1,18 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
-import { launchWorkspace, showModal, type Visit } from '@openmrs/esm-framework';
-import { clinicalFormsWorkspace, type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { showModal, type Visit, type Encounter } from '@openmrs/esm-framework';
+import { type FormRendererProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';
 
-interface FormRendererProps extends DefaultPatientWorkspaceProps {
-  additionalProps?: Record<string, any>;
-  encounterUuid?: string;
-  formUuid: string;
-  patientUuid: string;
-  visit?: Visit;
-  clinicalFormsWorkspaceName?: string;
-}
-
+/**
+ * This component is a thin wrapper to load an O3 form from the server,
+ * then display it using the React form engine
+ *
+ */
 const FormRenderer: React.FC<FormRendererProps> = ({
   additionalProps,
   closeWorkspace,
@@ -24,19 +20,31 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   encounterUuid,
   formUuid,
   patientUuid,
-  promptBeforeClosing,
-  visit,
-  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+  setHasUnsavedChanges,
+  visit: visitRaw,
+  visitUuid,
+  hideControls,
+  hidePatientBanner,
+  handlePostResponse,
+  preFilledQuestions,
 }) => {
   const { t } = useTranslation();
+
   const { schema, error, isLoading } = useFormSchema(formUuid);
-  const openClinicalFormsWorkspaceOnFormClose = additionalProps?.openClinicalFormsWorkspaceOnFormClose ?? true;
   const formSessionIntent = additionalProps?.formSessionIntent ?? '*';
 
   const handleCloseForm = useCallback(() => {
-    closeWorkspace();
-    !encounterUuid && openClinicalFormsWorkspaceOnFormClose && launchWorkspace(clinicalFormsWorkspaceName);
-  }, [closeWorkspace, encounterUuid, openClinicalFormsWorkspaceOnFormClose, clinicalFormsWorkspaceName]);
+    closeWorkspace?.();
+  }, [closeWorkspace]);
+
+  const visit = useMemo(() => {
+    if (visitRaw) {
+      return visitRaw;
+    }
+    if (visitUuid) {
+      return { uuid: visitUuid } as Visit;
+    }
+  }, [visitRaw, visitUuid]);
 
   const handleConfirmQuestionDeletion = useCallback(() => {
     return new Promise<void>((resolve, reject) => {
@@ -53,9 +61,16 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     });
   }, []);
 
-  const handleMarkFormAsDirty = useCallback(
-    (isDirty: boolean) => promptBeforeClosing(() => isDirty),
-    [promptBeforeClosing],
+  const handleOnSubmit = useCallback(
+    (encounters?: Array<Encounter>) => {
+      if (closeWorkspaceWithSavedChanges) {
+        closeWorkspaceWithSavedChanges();
+      } else {
+        closeWorkspace({ closeWindow: true, discardUnsavedChanges: true });
+      }
+      handlePostResponse?.(encounters[0]);
+    },
+    [closeWorkspace, closeWorkspaceWithSavedChanges, handlePostResponse],
   );
 
   if (isLoading) {
@@ -80,13 +95,16 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         <FormEngine
           encounterUUID={encounterUuid}
           formJson={schema}
+          formSessionIntent={formSessionIntent}
           handleClose={handleCloseForm}
           handleConfirmQuestionDeletion={handleConfirmQuestionDeletion}
-          markFormAsDirty={handleMarkFormAsDirty}
+          hideControls={hideControls}
+          hidePatientBanner={hidePatientBanner}
+          markFormAsDirty={setHasUnsavedChanges}
           mode={additionalProps?.mode}
-          formSessionIntent={formSessionIntent}
-          onSubmit={closeWorkspaceWithSavedChanges}
+          onSubmit={handleOnSubmit}
           patientUUID={patientUuid}
+          preFilledQuestions={preFilledQuestions}
           visit={visit}
         />
       )}

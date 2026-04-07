@@ -20,14 +20,13 @@ interface DeleteVisitActionItemProps {
   compact?: boolean;
 }
 
-const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUuid, visit, compact }) => {
+const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, compact }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   const deleteVisit = () => {
     const dispose = showModal('delete-visit-dialog', {
-      patientUuid,
       visit,
       closeModal: () => dispose(),
     });
@@ -40,7 +39,13 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ patientUu
   return (
     <UserHasAccess privilege="Delete Visits">
       {compact ? (
-        <IconButton onClick={deleteVisit} label={getCoreTranslation('delete')} kind="ghost" size={responsiveSize}>
+        <IconButton
+          onClick={deleteVisit}
+          label={getCoreTranslation('delete')}
+          kind="ghost"
+          size={responsiveSize}
+          align="top-end"
+        >
           <TrashCanIcon size={16} />
         </IconButton>
       ) : (

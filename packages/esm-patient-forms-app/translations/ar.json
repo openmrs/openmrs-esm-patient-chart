@@ -7,6 +7,7 @@
   "lastCompleted": "آخر اكتمال",
   "never": "أبدًا",
   "noFormsToDisplay": "لا يوجد نماذج للعرض.",
+  "off": "Off",
   "offlineForms": "نماذج بدون اتصال",
   "offlineForms__lower": "نماذج بدون اتصال",
   "offlineFormsOverviewCardAvailableOffline": "متاح بدون اتصال",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "ابحث في هذه القائمة",
   "offlinePatientsTableSearchPlaceholder": "ابحث في هذه القائمة",
   "offlineToggle": "تبديل الوضع بدون اتصال",
+  "on": "On",
   "searchThisList": "ابحث في هذه القائمة"
 }

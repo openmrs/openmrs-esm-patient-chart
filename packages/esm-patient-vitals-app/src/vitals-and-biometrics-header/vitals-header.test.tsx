@@ -2,29 +2,30 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type WorkspacesInfo, getDefaultsFromConfigSchema, useConfig, useWorkspaces } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, NumericObservation, useConfig, useVisit } from '@openmrs/esm-framework';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import {
   formattedVitals,
   mockConceptUnits,
-  mockCurrentVisit,
+  mockOngoingVisitWithEncounters,
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { useVitalsAndBiometrics } from '../common';
-import VitalsHeader from './vitals-header.component';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
+  visitContext: mockOngoingVisitWithEncounters,
+  patient: mockPatient,
 };
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockUseWorkspaces = jest.mocked(useWorkspaces);
+const mockNumericObservation = jest.mocked(NumericObservation);
 
-mockUseWorkspaces.mockReturnValue({ workspaces: [] } as WorkspacesInfo);
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
@@ -35,7 +36,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
-    useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
     useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
@@ -145,7 +145,6 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    // TODO: Fix pluralization so that the string reads "5 days old"
     expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
@@ -199,7 +198,10 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByTitle(/abnormal value/i)).toBeInTheDocument();
+    const abnormalCalls = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.interpretation && props.interpretation !== 'normal',
+    );
+    expect(abnormalCalls.length).toBeGreaterThan(0);
   });
 
   it('should launch Form Entry vitals and biometrics form', async () => {
@@ -259,5 +261,157 @@ describe('VitalsHeader', () => {
 
     expect(screen.queryByRole('link', { name: /vitals history/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /record vitals/i })).not.toBeInTheDocument();
+  });
+
+  it('uses backend interpretation without recalculating', async () => {
+    // Pulse 240 would normally be calculated as "critically_high" (>= 230)
+    // Temperature 41 would normally be calculated as "high" (> 37.5 but < 43)
+    // SpO2 70 would normally be calculated as "critically_low" (< 95)
+    // Respiratory Rate 5 would normally be calculated as "critically_low" (< 12)
+    // Backend sends the interpretation for all vitals as "normal", except for Respiratory Rate which is "critically_low" (< 12)
+    // It should use backend's interpretation and NOT recalculate
+    const vitalsWithConflictingInterpretation: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 240,
+        temperature: 41,
+        respiratoryRate: 5,
+        diastolic: 145,
+        systolic: 240,
+        spo2: 70,
+        diastolicRenderInterpretation: 'normal',
+        systolicRenderInterpretation: 'normal',
+        bloodPressureRenderInterpretation: 'normal',
+        pulseRenderInterpretation: 'normal',
+        temperatureRenderInterpretation: 'normal',
+        respiratoryRateRenderInterpretation: 'critically_low',
+        spo2RenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsWithConflictingInterpretation,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getByTextWithMarkup(/BP\s*240 \/ 145\s*mmHg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Heart rate\s*240\s*beats\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Temp\s*41\s*DEG C/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
+
+    const abnormalCalls = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.interpretation && props.interpretation !== 'normal',
+    );
+    expect(abnormalCalls).toHaveLength(1);
+    expect(abnormalCalls[0][0].interpretation).toBe('critically_low');
+  });
+
+  it('resolves plural translation keys correctly', async () => {
+    const { createInstance } = jest.requireActual('i18next');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const translations = require('../../translations/en.json');
+    const i18n = createInstance();
+
+    await i18n.init({
+      lng: 'en',
+      resources: { en: { translation: translations } },
+      interpolation: { escapeValue: false },
+    });
+
+    expect(i18n.t('hoursOldVitals', { count: 1 })).toContain('1 hour old');
+    expect(i18n.t('hoursOldVitals', { count: 1 })).not.toContain('hours');
+    expect(i18n.t('hoursOldVitals', { count: 5 })).toContain('5 hours old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).toContain('1 day old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).not.toContain('days');
+    expect(i18n.t('daysOldVitals', { count: 5 })).toContain('5 days old');
+  });
+
+  it('passes conceptUuid for interpretation fallback when backend does not provide interpretation', async () => {
+    // When backend does not provide interpretation, NumericObservation uses conceptUuid
+    // to fetch reference ranges and calculate interpretation internally.
+    const vitalsWithoutInterpretation: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 240,
+        temperature: 41,
+        respiratoryRate: 5,
+        diastolic: 145,
+        systolic: 240,
+        spo2: 70,
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: vitalsWithoutInterpretation,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(getByTextWithMarkup(/BP\s*240 \/ 145\s*mmHg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Heart rate\s*240\s*beats\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Temp\s*41\s*DEG C/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
+
+    // Vitals with no backend interpretation should have conceptUuid passed so
+    // NumericObservation can fetch reference ranges and calculate interpretation
+    const callsWithConceptUuid = mockNumericObservation.mock.calls.filter(([props]) => props.conceptUuid);
+    expect(callsWithConceptUuid.length).toBeGreaterThanOrEqual(4);
+
+    // Vitals without backend interpretation should not have interpretation set
+    const callsWithoutBpAndWithoutInterpretation = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.conceptUuid && !props.interpretation,
+    );
+    expect(callsWithoutBpAndWithoutInterpretation.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      // Make patient minor
+      birthDate: '2020-07-22',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      biometrics: {
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const someVitals: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 89,
+        systolic: 121,
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: someVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    // BMI should be hidden for minors when restriction is enabled
+    expect(screen.queryByText(/BMI/i)).not.toBeInTheDocument();
   });
 });

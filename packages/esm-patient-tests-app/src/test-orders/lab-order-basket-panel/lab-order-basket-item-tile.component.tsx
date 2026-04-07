@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ClickableTile, IconButton, Tile } from '@carbon/react';
 import { ExtensionSlot, TrashCanIcon, useLayoutType, WarningIcon } from '@openmrs/esm-framework';
-import type { TestOrderBasketItem } from '../../types';
+import type { TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import styles from './lab-order-basket-item-tile.scss';
 
 export interface OrderBasketItemTileProps {
@@ -34,7 +34,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   const labTile = (
     <div>
       <div className={styles.orderBasketItemTile}>
-        <div className={styles.clipTextWithEllipsis}>
+        <div>
           <OrderActionLabel orderBasketItem={orderBasketItem} />
           <br />
           <span className={styles.name}>{orderBasketItem.testType?.label}</span>

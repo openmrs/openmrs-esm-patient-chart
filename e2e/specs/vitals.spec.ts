@@ -5,7 +5,7 @@ import { BiometricsAndVitalsPage } from '../pages';
 test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -69,10 +69,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the vitals row', async () => {
-    await vitalsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Edit` button', async () => {
@@ -126,10 +123,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu on the vitals row', async () => {
-    await vitalsPage.page
-      .getByRole('button', { name: /options/i })
-      .nth(0)
-      .click();
+    await dataRow.getByRole('button', { name: /options/i }).click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {
@@ -149,7 +143,7 @@ test('Add, edit and delete patient vitals', async ({ page, patient }) => {
 test('Add low and critically low range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -179,8 +173,8 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await vitalsPage.page.getByRole('spinbutton', { name: /pulse/i }).fill('80');
   });
 
-  await test.step('And I fill `17` as the respiration rate', async () => {
-    await vitalsPage.page.getByRole('spinbutton', { name: /respiration rate/i }).fill('17');
+  await test.step('And I fill `15` as the respiration rate', async () => {
+    await vitalsPage.page.getByRole('spinbutton', { name: /respiration rate/i }).fill('15');
   });
 
   await test.step('And I fill `91` as the oxygen saturation', async () => {
@@ -208,24 +202,28 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
     await expect(dataRow).toContainText('35');
     await expect(dataRow).toContainText('90 / 30');
     await expect(dataRow).toContainText('80');
-    await expect(dataRow).toContainText('17');
+    await expect(dataRow).toContainText('15');
     await expect(dataRow).toContainText('91');
     const lowRange = vitalsPage.page.getByRole('cell', { name: '91 ↓' });
-    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '17 ↓↓' });
-    const backgroundColor = await lowRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const criticallyLowRange = vitalsPage.page.getByRole('cell', { name: '15 ↓↓' });
+    const backgroundColor = await lowRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColor).toBe('rgb(255, 242, 232)');
 
     const lowRangeContent = await lowRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(lowRangeContent).toBe('" ↓"');
 
-    const backgroundColorLow = await criticallyLowRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColorLow = await criticallyLowRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
 
     expect(backgroundColorLow).toBe('rgb(255, 215, 217)');
     const criticalLowRangeContent = await criticallyLowRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(criticalLowRangeContent).toBe('" ↓↓"');
@@ -235,7 +233,7 @@ test('Add low and critically low range patient vitals', async ({ page, patient }
 test('Add high and critically high range patient vitals', async ({ page, patient }) => {
   const vitalsPage = new BiometricsAndVitalsPage(page);
   const headerRow = vitalsPage.vitalsTable().locator('thead > tr');
-  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr');
+  const dataRow = vitalsPage.vitalsTable().locator('tbody > tr').first();
 
   await test.step('When I visit the vitals and biometrics page', async () => {
     await vitalsPage.goTo(patient.uuid);
@@ -299,21 +297,25 @@ test('Add high and critically high range patient vitals', async ({ page, patient
     const highRange = vitalsPage.page.getByRole('cell', { name: '38 ↑' });
     const criticallyHighRange = vitalsPage.page.getByRole('cell', { name: '200 ↑↑' });
 
-    const backgroundColor = await highRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColor = await highRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColor).toBe('rgb(255, 215, 217)');
 
     const afterContent = await highRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
 
     expect(afterContent).toBe('" ↑↑"');
 
-    const backgroundColorLow = await criticallyHighRange.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    const backgroundColorLow = await criticallyHighRange.evaluate(
+      (el) => window.getComputedStyle(el.querySelector('div')).backgroundColor,
+    );
     expect(backgroundColorLow).toBe('rgb(255, 215, 217)');
 
     const afterContentLow = await criticallyHighRange.evaluate((el) => {
-      const after = window.getComputedStyle(el, '::after');
+      const after = window.getComputedStyle(el.querySelector('div'), '::after');
       return after.content;
     });
     expect(afterContentLow).toBe('" ↑↑"');

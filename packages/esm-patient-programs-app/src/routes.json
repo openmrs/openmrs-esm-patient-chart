@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "extensions": [
     {
@@ -30,11 +30,17 @@
     }
   ],
   "pages": [],
-  "workspaces": [
+  "workspaces2": [
     {
       "name": "programs-form-workspace",
-      "title": "programEnrollmentWorkspaceTitle",
-      "component": "programsFormWorkspace"
+      "component": "programsFormWorkspace",
+      "window": "programs-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "programs-form-window",
+      "group": "patient-chart"
     }
   ],
   "modals": [

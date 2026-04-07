@@ -1,0 +1,80 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.widgetContainer {
+  background-color: $ui-background;
+  border: 1px solid $ui-03;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
+}
+
+.headerActionItems {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: end;
+}
+
+.backgroundDataFetchingIndicator {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: end;
+}
+
+.headerTime {
+  font-weight: 400;
+}
+
+.editabilityNote {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-right: layout.$spacing-05;
+}
+
+.cellContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+}
+
+.cellValue {
+  flex: 1;
+}
+
+.editButton {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  flex-shrink: 0;
+}
+
+.editableCell {
+  &:hover {
+    text-decoration: underline;
+    .editButton {
+      opacity: 1;
+    }
+  }
+}
+
+.editContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  width: 100%;
+}
+
+.editButtons {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  flex-shrink: 0;
+}

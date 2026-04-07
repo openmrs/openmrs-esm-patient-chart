@@ -5,7 +5,7 @@ import { age, getPatientName, formatDate, parseDate } from '@openmrs/esm-framewo
 import styles from './patient-details-tile.scss';
 
 interface PatientDetailsTileInterface {
-  patient: fhir.Patient;
+  patient?: fhir.Patient;
 }
 
 const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patient }) => {

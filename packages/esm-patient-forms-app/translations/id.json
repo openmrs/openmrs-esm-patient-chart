@@ -7,6 +7,7 @@
   "lastCompleted": "Terakhir diselesaikan",
   "never": "Tidak pernah",
   "noFormsToDisplay": "Tidak ada formulir untuk ditampilkan.",
+  "off": "Off",
   "offlineForms": "Formulir offline",
   "offlineForms__lower": "formulir offline",
   "offlineFormsOverviewCardAvailableOffline": "Tersedia offline",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "Cari dalam daftar ini",
   "offlinePatientsTableSearchPlaceholder": "Cari dalam daftar ini",
   "offlineToggle": "Toggle offline",
+  "on": "On",
   "searchThisList": "Cari dalam daftar ini"
 }

@@ -1,7 +1,7 @@
-import { type APIRequestContext, expect } from '@playwright/test';
-import { type Encounter } from './types';
-import { type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { type Visit } from '@openmrs/esm-framework';
+import { type Encounter } from './types';
 
 export interface Observation {
   uuid: string;
@@ -35,9 +35,7 @@ export const createEncounter = async (
   providerId: string,
   visit: Visit,
 ): Promise<Encounter> => {
-  const encounterAfterVisit = dayjs(visit.startDatetime).add(1, 'minute');
-  const now = dayjs().subtract(1, 'second');
-  const encounterDatetime = encounterAfterVisit.isBefore(now) ? encounterAfterVisit.format() : now.format();
+  const encounterDatetime = dayjs().format();
   const encounterRes = await api.post('encounter', {
     data: {
       encounterDatetime,
@@ -59,5 +57,5 @@ export const createEncounter = async (
 };
 
 export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`encounter/${uuid}`, { data: {} });
+  await api.delete(`encounter/${uuid}`);
 };

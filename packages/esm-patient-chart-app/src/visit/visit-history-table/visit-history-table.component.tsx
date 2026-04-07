@@ -18,21 +18,22 @@ import {
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
+import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
-import VisitActionsCell from './visit-actions-cell.component';
 import styles from './visit-history-table.scss';
 
 interface VisitHistoryTableProps {
   patientUuid: string;
+  patient: fhir.Patient;
 }
 
 /**
  * This show a list of visit histories in the visit tab in patient chart
  */
-const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) => {
+const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
@@ -54,7 +55,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid }) =>
   const rowData = visits?.map((visit) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} />;
+      row[key] = <CellComponent key={key} visit={visit} patient={patient} />;
     }
     return row;
   });

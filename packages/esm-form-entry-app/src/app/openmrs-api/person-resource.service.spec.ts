@@ -1,5 +1,6 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { PersonResourceService } from './person-resource.service';
 import { OpenmrsApiModule } from './openmrs-api.module';
@@ -12,13 +13,13 @@ describe('PersonResourceService', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      imports: [OpenmrsApiModule],
       declarations: [],
-      providers: [],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
-    service = TestBed.get(PersonResourceService);
-    httpMock = TestBed.get(HttpTestingController);
+    service = TestBed.inject(PersonResourceService);
+    httpMock = TestBed.inject(HttpTestingController);
   }));
 
   afterEach(() => {
@@ -26,7 +27,7 @@ describe('PersonResourceService', () => {
     TestBed.resetTestingModule();
   });
 
-  const personuid = 'uuid';
+  const personUuid = 'uuid';
   const personPayload = {
     age: 21,
     names: [
@@ -69,32 +70,32 @@ describe('PersonResourceService', () => {
   });
 
   it('should return a person when the correct uuid is provided without v', (done) => {
-    service.getPersonByUuid(personuid).subscribe((response) => {
-      expect(req.request.urlWithParams).toContain(`person/${personuid}?v=full`);
+    service.getPersonByUuid(personUuid).subscribe((_response) => {
+      expect(req.request.urlWithParams).toContain(`person/${personUuid}?v=full`);
       expect(req.request.method).toBe('GET');
       done();
     });
-    const req = httpMock.expectOne(`${service.getUrl()}/${personuid}?v=full`);
+    const req = httpMock.expectOne(`${service.getUrl()}/${personUuid}?v=full`);
     req.flush(JSON.stringify({}));
   });
 
   it('should return a person when the correct uuid is provided with v', (done) => {
-    service.getPersonByUuid(personuid, '9').subscribe((response) => {
-      expect(req.request.urlWithParams).toContain(`person/${personuid}?v=9`);
+    service.getPersonByUuid(personUuid, '9').subscribe((_response) => {
+      expect(req.request.urlWithParams).toContain(`person/${personUuid}?v=9`);
       expect(req.request.method).toBe('GET');
       done();
     });
-    const req = httpMock.expectOne(`${service.getUrl()}/${personuid}?v=9`);
+    const req = httpMock.expectOne(`${service.getUrl()}/${personUuid}?v=9`);
     req.flush(JSON.stringify({}));
   });
 
   it('should save a person', (done) => {
-    service.saveUpdatePerson(personuid, personPayload).subscribe((response) => {
+    service.saveUpdatePerson(personUuid, personPayload).subscribe((_response) => {
       done();
     });
 
-    const req = httpMock.expectOne(service.getUrl() + '/' + personuid);
-    expect(req.request.url).toContain('person/' + personuid);
+    const req = httpMock.expectOne(service.getUrl() + '/' + personUuid);
+    expect(req.request.url).toContain('person/' + personUuid);
     expect(req.request.method).toBe('POST');
     req.flush(JSON.stringify({}));
   });

@@ -9,16 +9,8 @@
   "deceased": "Deceased",
   "district": "Huyện",
   "from_lower": "from",
-  "implementationLogo": "Logo triển khai",
-  "patientAge": "Tuổi\"",
-  "patientDateOfBirthWithSeparator": "Ngày sinh:",
-  "patientGenderWithSeparator": "Giới tính:",
-  "patientIdentifierSticker": "Nhãn dán nhận dạng bệnh nhân",
-  "patientNameWithSeparator": "Tên bệnh nhân:",
   "postalCode": "Mã bưu chính",
-  "printIdentifierSticker": "In nhãn dán nhận dạng",
   "started": "Started",
   "state": "State",
-  "stateProvince": "State",
-  "telephoneNumberWithSeparator": "Số điện thoại:"
+  "stateProvince": "State"
 }

@@ -1,5 +1,6 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ComboBox,
@@ -26,18 +27,20 @@ import {
 import {
   EditIcon,
   isDesktop,
+  launchWorkspace2,
   showModal,
   showSnackbar,
   TrashCanIcon,
-  useLayoutType,
-  useSession,
-  userHasAccess,
   useConfig,
+  useLayoutType,
+  userHasAccess,
+  useSession,
   type EncounterType,
-  launchWorkspace,
-  useVisitContextStore,
+  ExtensionSlot,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { type HtmlFormEntryForm, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
   mapEncounter,
@@ -47,6 +50,7 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
+import { type ChartConfig } from '../../../../config-schema';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -71,16 +75,21 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisit } = useVisitContextStore();
+  const { mutateVisitContext, patient } = usePatientChartStore(patientUuid);
+  const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
-
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
+  const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
+  const paginatedMappedEncounters = useMemo(
+    () => (paginatedEncounters ?? []).map(mapEncounter).filter(Boolean),
+    [paginatedEncounters],
+  );
 
-  const formsConfig: { htmlFormEntryForms: HtmlFormEntryForm[] } = useConfig({
-    externalModuleName: '@openmrs/esm-patient-forms-app',
-  });
-  const { htmlFormEntryForms } = formsConfig;
-  const paginatedMappedEncounters = useMemo(() => paginatedEncounters?.map(mapEncounter), [paginatedEncounters]);
+  const encountersByUuid = useMemo(
+    () => new Map(paginatedMappedEncounters?.map((encounter) => [encounter.id, encounter]) ?? []),
+    [paginatedMappedEncounters],
+  );
 
   const tableHeaders = [
     {
@@ -118,7 +127,11 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           const abortController = new AbortController();
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
-              mutateVisit();
+              // Update current visit data for critical components
+              mutateVisitContext?.();
+
+              // Also invalidate visit history and encounter tables since the encounter was deleted
+              invalidateVisitAndEncounterData(mutate, patientUuid);
 
               showSnackbar({
                 isLowContrast: true,
@@ -142,7 +155,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         },
       });
     },
-    [mutateVisit, t],
+    [mutate, mutateVisitContext, patientUuid, t],
   );
 
   if (isLoadingEncounterTypes || isLoading) {
@@ -168,90 +181,103 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getTableProps,
         }: {
           headers: Array<{ header: React.ReactNode; key: string }>;
-          rows: Array<{ isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
+          rows: Array<{ id: string; isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
           [key: string]: any;
         }) => (
-          <>
-            <TableContainer className={styles.tableContainer}>
-              {showEncounterTypeFilter && (
-                <TableToolbar {...getToolbarProps()}>
-                  <TableToolbarContent>
-                    <div className={styles.filterContainer}>
-                      <ComboBox
-                        aria-label={t('filterByEncounterType', 'Filter by encounter type')}
-                        className={styles.substitutionType}
-                        id="encounterTypeFilter"
-                        items={encounterTypes}
-                        itemToString={(item: EncounterType) => item?.display}
-                        onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
-                        placeholder={t('filterByEncounterType', 'Filter by encounter type')}
-                        selectedItem={encounterTypeToFilter}
-                        size={responsiveSize}
-                      />
-                    </div>
-                  </TableToolbarContent>
-                </TableToolbar>
-              )}
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                    {headers.map((header, i) => (
-                      <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                    <TableHeader aria-label={t('actions', 'Actions')} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows?.map((row, i) => {
-                    const encounter = paginatedMappedEncounters[i];
+          <TableContainer className={styles.tableContainer}>
+            {showEncounterTypeFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent>
+                  <div className={styles.filterContainer}>
+                    <ComboBox
+                      aria-label={t('filterByEncounterType', 'Filter by encounter type')}
+                      className={styles.substitutionType}
+                      id="encounterTypeFilter"
+                      items={encounterTypes}
+                      itemToString={(item: EncounterType) => item?.display}
+                      onChange={({ selectedItem }) => setEncounterTypeToFilter(selectedItem)}
+                      placeholder={t('filterByEncounterType', 'Filter by encounter type')}
+                      selectedItem={encounterTypeToFilter}
+                      size={responsiveSize}
+                    />
+                  </div>
+                </TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  {headers.map((header, i) => (
+                    <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                  <TableHeader aria-label={t('actions', 'Actions')} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows?.map((row) => {
+                  const encounter = encountersByUuid.get(row.id);
 
-                    const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                      encounter.encounterType === 'Visit Note' && !encounter.form;
+                  if (!encounter) return null;
 
-                    return (
-                      <React.Fragment key={encounter.id}>
-                        <TableExpandRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                          ))}
-                          <TableCell className="cds--table-column-menu">
-                            <Layer className={styles.layer}>
+                  const isVisitNoteEncounter = (encounter: MappedEncounter) =>
+                    encounter.encounterType === 'Visit Note' && !encounter.form;
+
+                  const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
+                    encounter.form?.uuid &&
+                    encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
+
+                  const encounterAgeInMinutes = (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
+
+                  const canDeleteEncounter =
+                    userHasAccess(encounter.editPrivilege, session?.user) &&
+                    (encounterEditableDuration === 0 ||
+                      (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
+                      encounterEditableDurationOverridePrivileges.some((privilege) =>
+                        userHasAccess(privilege, session?.user),
+                      ));
+
+                  const canEditEncounter =
+                    canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
+
+                  return (
+                    <React.Fragment key={encounter.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                        <TableCell className="cds--table-column-menu">
+                          <Layer className={styles.layer}>
+                            {canDeleteEncounter && ( // equivalent to canDeleteEncounter || canEditEncounter
                               <OverflowMenu
                                 aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                 flipped
                                 size={responsiveSize}
+                                align="left"
                               >
-                                {userHasAccess(encounter.editPrivilege, session?.user) &&
-                                  (encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
-                                    <OverflowMenuItem
-                                      className={styles.menuItem}
-                                      itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchFormEntryOrHtmlForms(
-                                            htmlFormEntryForms,
-                                            patientUuid,
-                                            encounter.form,
-                                            encounter.visitUuid,
-                                            encounter.id,
-                                            encounter.visitTypeUuid,
-                                            encounter.visitStartDatetime,
-                                            encounter.visitStopDatetime,
-                                          );
-                                        }
-                                      }}
-                                    />
-                                  )}
-                                {userHasAccess(encounter.editPrivilege, session?.user) && (
+                                {canEditEncounter && (
+                                  <OverflowMenuItem
+                                    className={styles.menuItem}
+                                    itemText={t('editThisEncounter', 'Edit this encounter')}
+                                    onClick={() => {
+                                      if (isVisitNoteEncounter(encounter)) {
+                                        launchWorkspace2('visit-notes-form-workspace', {
+                                          encounter,
+                                          formContext: 'editing',
+                                          patientUuid,
+                                        });
+                                      } else {
+                                        launchWorkspace2('patient-form-entry-workspace', {
+                                          form: encounter.form,
+                                          encounterUuid: encounter.id,
+                                        });
+                                      }
+                                    }}
+                                  />
+                                )}
+                                {canDeleteEncounter && (
                                   <OverflowMenuItem
                                     className={styles.menuItem}
                                     hasDivider
@@ -261,78 +287,90 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                   />
                                 )}
                               </OverflowMenu>
-                            </Layer>
-                          </TableCell>
-                        </TableExpandRow>
-                        {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
-                            <>
+                            )}
+                          </Layer>
+                        </TableCell>
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
+                          <>
+                            {enableEmbeddedFormView && supportsEmbeddedFormView(encounter) ? (
+                              <ExtensionSlot
+                                name="form-widget-slot"
+                                state={{
+                                  additionalProps: { mode: 'embedded-view' },
+                                  visitUuid: encounter.visitUuid ?? null,
+                                  visitTypeUuid: encounter.visitTypeUuid ?? null,
+                                  visitStartDatetime: encounter.visitStartDatetime ?? null,
+                                  visitStopDatetime: encounter.visitStopDatetime ?? null,
+                                  patientUuid: patientUuid,
+                                  patient: patient,
+                                  formUuid: encounter.form.uuid,
+                                  encounterUuid: encounter.id,
+                                  promptBeforeClosing: () => {},
+                                }}
+                              />
+                            ) : (
                               <EncounterObservations observations={encounter.obs} />
-                              {userHasAccess(encounter.editPrivilege, session?.user) && (
-                                <>
-                                  {(encounter.form?.uuid || isVisitNoteEncounter(encounter)) && (
-                                    <Button
-                                      kind="ghost"
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchFormEntryOrHtmlForms(
-                                            htmlFormEntryForms,
-                                            patientUuid,
-                                            encounter.form,
-                                            encounter.visitUuid,
-                                            encounter.id,
-                                            encounter.visitTypeUuid,
-                                            encounter.visitStartDatetime,
-                                            encounter.visitStopDatetime,
-                                          );
-                                        }
-                                      }}
-                                      renderIcon={(props: ComponentProps<typeof EditIcon>) => (
-                                        <EditIcon size={16} {...props} />
-                                      )}
-                                    >
-                                      {t('editThisEncounter', 'Edit this encounter')}
-                                    </Button>
+                            )}
+                            <>
+                              {canEditEncounter && (
+                                <Button
+                                  kind="ghost"
+                                  onClick={() => {
+                                    if (isVisitNoteEncounter(encounter)) {
+                                      launchWorkspace2('visit-notes-form-workspace', {
+                                        encounter,
+                                        formContext: 'editing',
+                                        patientUuid,
+                                      });
+                                    } else {
+                                      launchWorkspace2('patient-form-entry-workspace', {
+                                        form: encounter.form,
+                                        encounterUuid: encounter.id,
+                                      });
+                                    }
+                                  }}
+                                  renderIcon={(props: ComponentProps<typeof EditIcon>) => (
+                                    <EditIcon size={16} {...props} />
                                   )}
-                                  <Button
-                                    kind="danger--ghost"
-                                    onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
-                                      <TrashCanIcon size={16} {...props} />
-                                    )}
-                                  >
-                                    {t('deleteThisEncounter', 'Delete this encounter')}
-                                  </Button>
-                                </>
+                                >
+                                  {t('editThisEncounter', 'Edit this encounter')}
+                                </Button>
+                              )}
+                              {canDeleteEncounter && (
+                                <Button
+                                  kind="danger--ghost"
+                                  onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
+                                  renderIcon={(props: ComponentProps<typeof TrashCanIcon>) => (
+                                    <TrashCanIcon size={16} {...props} />
+                                  )}
+                                >
+                                  {t('deleteThisEncounter', 'Delete this encounter')}
+                                </Button>
                               )}
                             </>
-                          </TableExpandedRow>
-                        ) : (
-                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              {rows?.length === 0 && (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
-                </div>
-              )}
-            </TableContainer>
-          </>
+                          </>
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {rows?.length === 0 && (
+              <div className={styles.tileContainer}>
+                <Tile className={styles.tile}>
+                  <div className={styles.tileContent}>
+                    <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
+                    <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                  </div>
+                </Tile>
+              </div>
+            )}
+          </TableContainer>
         )}
       </DataTable>
       {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type LabOrderConcept, useOrderConceptByUuid } from './lab-results.resource';
+import { type LabOrderConcept } from './lab-results.resource';
 
 type SchemaRecord = Record<string, z.ZodType>;
 
@@ -25,17 +25,26 @@ function createSchemaForConcept(labOrderConcept: LabOrderConcept): SchemaRecord 
   };
 }
 
+function createSchemaForConceptArray(labOrderConcepts: Array<LabOrderConcept>): SchemaRecord {
+  return labOrderConcepts.reduce((acc, concept) => {
+    return {
+      ...acc,
+      ...createSchemaForConcept(concept), // reuses recursive logic
+    };
+  }, {});
+}
+
 /**
- * Custom hook to generate a Zod schema for lab results form based on a lab order concept.
+ * Custom hook to generate a Zod schema for lab results form based on multiple lab order concepts.
  * This function is used to generate the schema for the lab results form.
- * @param labOrderConceptUuid - The UUID of the lab order concept.
+ * @param {Array<string>} labOrderConceptUuid - The List of UUID of the lab order concepts.
  * @returns A Zod schema object for the lab results form.
  */
-export const createLabResultsFormSchema = (labOrderConcepts: LabOrderConcept) => {
+export const createLabResultsFormCompositeSchema = (labOrderConcepts: Array<LabOrderConcept>) => {
   if (!labOrderConcepts) {
     return z.object({});
   }
-  const schema = createSchemaForConcept(labOrderConcepts);
+  const schema = createSchemaForConceptArray(labOrderConcepts);
 
   return z.object(schema);
 };
@@ -129,4 +138,6 @@ const createNumericSchema = (
       message: `${display} must be less than or equal to ${upperLimit}`,
     });
   }
+
+  return baseSchema;
 };

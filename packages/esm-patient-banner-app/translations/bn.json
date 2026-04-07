@@ -9,16 +9,8 @@
   "deceased": "Deceased",
   "district": "জেলা",
   "from_lower": "from",
-  "implementationLogo": "Implementation logo",
-  "patientAge": "বয়স:",
-  "patientDateOfBirthWithSeparator": "জন্মতারিখ:",
-  "patientGenderWithSeparator": "লিঙ্গ:",
-  "patientIdentifierSticker": "Patient identifier sticker",
-  "patientNameWithSeparator": "রোগীর নাম:",
   "postalCode": "পোস্টাল কোড",
-  "printIdentifierSticker": "Print identifier sticker",
   "started": "শুরু হয়েছে",
   "state": "State",
-  "stateProvince": "State",
-  "telephoneNumberWithSeparator": "টেলিফোন নম্বর:"
+  "stateProvince": "State"
 }

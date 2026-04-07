@@ -1,6 +1,5 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-
 import {
   Button,
   ButtonSet,
@@ -8,7 +7,6 @@ import {
   ComboBox,
   Form,
   Grid,
-  InlineNotification,
   Layer,
   Select,
   SelectItem,
@@ -20,30 +18,41 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
-  type DefaultPatientWorkspaceProps,
   type OrderUrgency,
   priorityOptions,
   useOrderBasket,
   useOrderType,
+  type TestOrderBasketItem,
+  postOrder,
+  useMutatePatientOrders,
+  showOrderSuccessToast,
 } from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
-  launchWorkspace,
   OpenmrsDatePicker,
+  showSnackbar,
   useConfig,
   useLayoutType,
-  useSession,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
 import { ordersEqual } from './test-order';
 import { type ConfigObject } from '../../config-schema';
-import { type TestOrderBasketItem } from '../../types';
 import styles from './test-order-form.scss';
 
-export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
+export interface LabOrderFormProps {
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   initialOrder: TestOrderBasketItem;
+  onCancel: () => void;
+
+  /**
+   * This field should only be supplied for an existing order saved to the backend
+   */
+  orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+  patient: fhir.Patient;
 }
 
 // Designs:
@@ -51,23 +60,29 @@ export interface LabOrderFormProps extends DefaultPatientWorkspaceProps {
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
 export function LabOrderForm({
   initialOrder,
+  orderToEditOrdererUuid,
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
+  onCancel,
   orderTypeUuid,
-  orderableConceptSets,
+  setHasUnsavedChanges,
+  patient,
 }: LabOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSession();
-  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<TestOrderBasketItem>(orderTypeUuid, prepTestOrderPostData);
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const { orders, setOrders, clearOrders } = useOrderBasket<TestOrderBasketItem>(
+    patient,
+    orderTypeUuid,
+    prepTestOrderPostData,
+  );
   const config = useConfig<ConfigObject>();
-  const { orderType, isLoadingOrderType } = useOrderType(orderTypeUuid);
-  const orderReasonRequired = (
-    config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
-  ).required;
+  const { orderType } = useOrderType(orderTypeUuid);
+  const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
+  const orderReasonRequired = useMemo(
+    () =>
+      (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})
+        .required,
+    [config.labTestsWithOrderReasons, initialOrder?.testType?.conceptUuid],
+  );
 
   const labOrderFormSchema = useMemo(
     () =>
@@ -104,7 +119,7 @@ export function LabOrderForm({
   const {
     control,
     handleSubmit,
-    formState: { errors, defaultValues, isDirty },
+    formState: { errors, defaultValues, isDirty, isSubmitting },
     setValue,
     watch,
   } = useForm<TestOrderBasketItem>({
@@ -133,13 +148,12 @@ export function LabOrderForm({
     return itemDisplay?.includes(inputValue);
   }, []);
 
-  const handleFormSubmission = useCallback(
+  const saveLabOrderToBasket = useCallback(
     (data: TestOrderBasketItem) => {
       const finalizedOrder: TestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -156,46 +170,83 @@ export function LabOrderForm({
 
       setOrders(newOrders);
 
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-        closeWorkspaceGroup: false,
-      });
+      closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [orders, setOrders, closeWorkspace, initialOrder],
   );
 
-  const cancelOrder = useCallback(() => {
-    setOrders(orders.filter((order) => order.testType.conceptUuid !== defaultValues.testType.conceptUuid));
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
-  }, [closeWorkspace, orders, setOrders, defaultValues]);
+  const submitLabOrderToServer = useCallback(
+    (data: TestOrderBasketItem) => {
+      const finalizedOrder: TestOrderBasketItem = {
+        ...initialOrder,
+        ...data,
+      };
+      return postOrder(
+        prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
+      )
+        .then(() => {
+          clearOrders();
+          mutateOrders();
+
+          /* Translation keys used by showOrderSuccessToast:
+           * t('ordersCompleted', 'Orders completed')
+           * t('orderPlaced', 'Order placed')
+           * t('ordersPlaced', 'Orders placed')
+           * t('orderUpdated', 'Order updated')
+           * t('ordersUpdated', 'Orders updated')
+           * t('orderDiscontinued', 'Order discontinued')
+           * t('ordersDiscontinued', 'Orders discontinued')
+           * t('orderedFor', 'Placed order for')
+           * t('updated', 'Updated')
+           * t('discontinued', 'Discontinued')
+           */
+          showOrderSuccessToast('@openmrs/esm-patient-tests-app', [finalizedOrder]);
+          closeWorkspace({ discardUnsavedChanges: true });
+        })
+        .catch((error) => {
+          showSnackbar({
+            isLowContrast: false,
+            kind: 'error',
+            title: t('errorSavingLabOrder', 'Error saving lab order'),
+            subtitle: error.message,
+          });
+        });
+    },
+    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
+  );
 
   const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
-    if (errors) {
-      setShowErrorNotification(true);
-    }
+    console.error('Error in lab order form', errors);
   };
 
-  const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
-    return (e: ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value as OrderUrgency;
-      if (value !== 'ON_SCHEDULED_DATE') {
-        setValue('scheduledDate', null);
-      }
-      fieldOnChange(e);
-    };
-  };
+  const handleUpdateUrgency = useCallback(
+    (fieldOnChange: ControllerRenderProps['onChange']) => {
+      return (e: ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value as OrderUrgency;
+        if (value !== 'ON_SCHEDULED_DATE') {
+          setValue('scheduledDate', null);
+        }
+        fieldOnChange(e);
+      };
+    },
+    [setValue],
+  );
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   return (
-    <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+    <Form
+      className={styles.orderForm}
+      onSubmit={handleSubmit(
+        initialOrder?.action === 'REVISE' ? submitLabOrderToServer : saveLabOrderToBasket,
+        onError,
+      )}
+      id="labOrderForm"
+    >
       <div className={styles.form}>
         <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
         <Grid className={styles.gridRow}>
@@ -331,28 +382,14 @@ export function LabOrderForm({
           </Column>
         </Grid>
       </div>
-      <div>
-        {showErrorNotification && (
-          <Column className={styles.errorContainer}>
-            <InlineNotification
-              lowContrast
-              onClose={() => setShowErrorNotification(false)}
-              subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-              title={t('error', 'Error')}
-            />
-          </Column>
-        )}
-        <ButtonSet
-          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-        >
-          <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
-            {t('discard', 'Discard')}
-          </Button>
-          <Button className={styles.button} kind="primary" size="xl" type="submit">
-            {t('saveOrder', 'Save order')}
-          </Button>
-        </ButtonSet>
-      </div>
+      <ButtonSet className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}>
+        <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+          {t('discard', 'Discard')}
+        </Button>
+        <Button className={styles.button} kind="primary" size="xl" type="submit" disabled={isSubmitting}>
+          {t('saveOrder', 'Save order')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 }

@@ -39,7 +39,6 @@
   "male": "Male",
   "muac": "MUAC",
   "noDataRecorded": "No data has been recorded for this patient",
-  "notAvailable": "Not available",
   "notes": "Notes",
   "other": "Other",
   "outOfDateVitals": "<0>These vitals are <1>out of date</1></0>",
@@ -75,6 +74,6 @@
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Vitals history",
   "vitalSignDisplayed": "Vital sign displayed",
-  "vitalSigns": "Vital signs",
+  "vitalSigns": "vital signs",
   "weight": "Weight"
 }

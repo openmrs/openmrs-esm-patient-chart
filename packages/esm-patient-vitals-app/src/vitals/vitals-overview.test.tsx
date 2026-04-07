@@ -1,7 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { formattedVitals, mockConceptUnits, mockVitalsConfig } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
@@ -76,14 +77,8 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    await screen.findByRole('heading', { name: /vitals/i });
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error: mockError, headerTitle: 'Vitals' }), {});
   });
 
   it("renders a tabular overview of the patient's vital signs", async () => {
@@ -107,29 +102,48 @@ describe('VitalsOverview', () => {
     );
 
     const expectedTableRows = [
-      /19 — May — 2021, 04:26 AM 37 121 \/ 89 76 12 --/,
-      /10 — May — 2021, 06:41 AM 37 120 \/ 90 66 45 90/,
-      /07 — May — 2021, 09:04 AM -- 120 \/ 80 -- -- --/,
-      /08 — Apr — 2021, 02:44 PM 36.5 -- \/ -- 78 65 --/,
+      /19 .* May .* 2021, .* 37 121 \/ 89 76 12 --/,
+      /10 .* May .* 2021, .* 37 120 \/ 90 66 45 90/,
+      /07 .* May .* 2021, .* -- 120 \/ 80 -- -- --/,
+      /08 .* Apr .* 2021, .* 36.5 -- \/ -- 78 65 --/,
     ];
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+  });
 
-    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
+  it('expands a vitals row to show an associated note', async () => {
+    const user = userEvent.setup();
 
-    // Sorting in descending order
-    // Since the date order is already in descending order, the rows should be the same
-    await user.click(sortRowsButton);
-    // Sorting in ascending order
-    await user.click(sortRowsButton);
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    expect(screen.getAllByRole('row')).not.toEqual(initialRowElements);
+    renderWithSwr(<VitalsOverview {...testProps} />);
+    await waitForLoadingToFinish();
 
-    // Sorting order = NONE, hence it is still in the ascending order
-    await user.click(sortRowsButton);
-    // Sorting in descending order
-    await user.click(sortRowsButton);
+    // Rows with notes (first two) have expand buttons
+    const rows = screen.getAllByRole('row');
+    const expandButtons = rows
+      .map((row) => within(row).queryByRole('button', { name: /expand current row/i }))
+      .filter(Boolean);
+    expect(expandButtons.length).toBeGreaterThan(0);
+    expect(expandButtons[0]).toBeVisible();
+    expect(expandButtons[1]).toBeVisible();
 
-    expect(screen.getAllByRole('row')).toEqual(initialRowElements);
+    // Expand the first row and verify the note text appears
+    await user.click(expandButtons[0]);
+    expect(screen.getByText(/Pt reports severe L chest pain/i)).toBeInTheDocument();
+
+    // Collapse and verify the note text is removed
+    await user.click(expandButtons[0]);
+    expect(screen.queryByText(/Pt reports severe L chest pain/i)).not.toBeInTheDocument();
+
+    // Expand the second row and verify its note text appears
+    await user.click(expandButtons[1]);
+    expect(screen.getByText(/Follow up in 2 weeks/i)).toBeInTheDocument();
+
+    // Collapse the second row
+    await user.click(expandButtons[1]);
+    expect(screen.queryByText(/Follow up in 2 weeks/i)).not.toBeInTheDocument();
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

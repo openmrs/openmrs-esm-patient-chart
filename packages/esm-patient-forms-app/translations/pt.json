@@ -7,6 +7,7 @@
   "lastCompleted": "Último preenchido",
   "never": "Nunca",
   "noFormsToDisplay": "Não há formulários para visualizar.",
+  "off": "Off",
   "offlineForms": "Formulários off-line",
   "offlineForms__lower": "Formulários on-line",
   "offlineFormsOverviewCardAvailableOffline": "Disponível off-line",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "Pesquisar esta lista",
   "offlinePatientsTableSearchPlaceholder": "Pesquisar esta lista",
   "offlineToggle": "Alternar off-line",
+  "on": "On",
   "searchThisList": "Pesquisar esta lista"
 }

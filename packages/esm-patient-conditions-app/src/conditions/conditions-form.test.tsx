@@ -6,24 +6,41 @@ import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-fra
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditionsSearch } from './conditions.resource';
-import ConditionsForm from './conditions-form.workspace';
+import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const utc = require('dayjs/plugin/utc');
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
-const defaultProps = {
-  condition: null,
+const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
   closeWorkspace: jest.fn(),
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
-  promptBeforeClosing: jest.fn(),
-  formContext: 'creating' as 'creating' | 'editing',
-  setTitle: jest.fn(),
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  workspaceProps: {
+    condition: null,
+    formContext: 'creating' as 'creating' | 'editing',
+  },
+  windowProps: {},
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
 };
 
-function renderConditionsForm(props = {}) {
-  render(<ConditionsForm {...defaultProps} {...props} />);
+function renderConditionsForm(workspaceProps?: ConditionFormProps) {
+  const props = {
+    ...defaultProps,
+    workspaceProps: {
+      ...defaultProps.workspaceProps,
+      ...workspaceProps,
+    },
+  };
+  render(<ConditionsForm {...props} />);
 }
 
 const mockCreateCondition = jest.mocked(createCondition);
@@ -57,7 +74,7 @@ describe('Conditions form', () => {
     expect(screen.getByRole('searchbox', { name: /enter condition/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/^active/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^active/i)).not.toBeChecked();
+    expect(screen.getByLabelText(/^active/i)).toBeChecked();
     expect(screen.getByLabelText(/inactive/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/inactive/i)).not.toBeChecked();
 
@@ -210,15 +227,10 @@ describe('Conditions form', () => {
     await user.click(submitButton);
 
     expect(screen.getByText(/a condition is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
+    expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
-    await user.click(submitButton);
-
-    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
-
-    await user.click(screen.getByLabelText(/^active/i));
     await user.click(submitButton);
 
     expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();

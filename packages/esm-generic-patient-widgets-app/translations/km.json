@@ -1,7 +1,10 @@
 {
-  "chartView": "មើលគំនូសតាង",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "កាលបរិច្ឆេទ និងម៉ោង",
-  "displaying": "ការបង្ហាញ",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "ប្រភេទនៃការជួបប្រទះ",
-  "tableView": "មើលតារាង"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

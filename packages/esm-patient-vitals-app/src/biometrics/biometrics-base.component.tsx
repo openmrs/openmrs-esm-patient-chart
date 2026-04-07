@@ -6,6 +6,7 @@ import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/es
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import { useConceptUnits, useVitalsAndBiometrics, withUnit } from '../common';
+import { shouldShowBmi } from '../common/helpers';
 import { type ConfigObject } from '../config-schema';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import BiometricsChart from './biometrics-chart.component';
@@ -16,10 +17,11 @@ interface BiometricsBaseProps {
   pageSize: number;
   pageUrl: string;
   patientUuid: string;
+  patient: fhir.Patient;
   urlLabel: string;
 }
 
-const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, urlLabel, pageUrl }) => {
+const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
@@ -30,7 +32,8 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
   const { bmiUnit } = config.biometrics;
   const { data: biometrics, isLoading, error, isValidating } = useVitalsAndBiometrics(patientUuid, 'biometrics');
   const { conceptUnits } = useConceptUnits();
-  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm();
+  const launchBiometricsForm = useLaunchVitalsAndBiometricsForm(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const tableHeaders: Array<BiometricsTableHeader> = [
     {
@@ -51,12 +54,16 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
     },
-    {
-      key: 'bmiRender',
-      header: `${t('bmi', 'BMI')} (${bmiUnit})`,
-      isSortable: true,
-      sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
-    },
+    ...(showBmi
+      ? [
+          {
+            key: 'bmiRender' as const,
+            header: `${t('bmi', 'BMI')} (${bmiUnit})`,
+            isSortable: true,
+            sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
+          },
+        ]
+      : []),
     {
       key: 'muacRender',
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),
@@ -73,11 +80,11 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
           dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
           weightRender: biometricsData.weight ?? '--',
           heightRender: biometricsData.height ?? '--',
-          bmiRender: biometricsData.bmi ?? '--',
+          bmiRender: showBmi ? biometricsData.bmi ?? '--' : '--',
           muacRender: biometricsData.muac ?? '--',
         };
       }),
-    [biometrics],
+    [biometrics, showBmi],
   );
 
   if (isLoading) {
@@ -122,7 +129,12 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
           </div>
         </CardHeader>
         {chartView ? (
-          <BiometricsChart patientBiometrics={biometrics} conceptUnits={conceptUnits} config={config} />
+          <BiometricsChart
+            patientBiometrics={biometrics}
+            conceptUnits={conceptUnits}
+            config={config}
+            showBmi={showBmi}
+          />
         ) : (
           <PaginatedBiometrics
             tableRows={tableRows}
@@ -130,6 +142,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, pageSize, 
             urlLabel={urlLabel}
             pageUrl={pageUrl}
             tableHeaders={tableHeaders}
+            patient={patient}
           />
         )}
       </div>

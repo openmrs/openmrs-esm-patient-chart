@@ -1,100 +1,36 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useConnectivity, useFeatureFlag, useVisitContextStore } from '@openmrs/esm-framework';
-import {
-  clinicalFormsWorkspace,
-  type DefaultPatientWorkspaceProps,
-  type FormEntryProps,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import React from 'react';
+import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import FormEntry from './form-entry.component';
 
-interface FormEntryComponentProps extends DefaultPatientWorkspaceProps {
-  mutateForm: () => void;
-  formInfo: FormEntryProps;
-  clinicalFormsWorkspaceName?: string;
+interface FormEntryWorkspaceProps {
+  form: Form;
+  encounterUuid?: string;
+  additionalProps?: Record<string, any>;
 }
 
-const FormEntry: React.FC<FormEntryComponentProps> = ({
-  patientUuid,
-  patient,
-  clinicalFormsWorkspaceName = clinicalFormsWorkspace,
+/**
+ * This workspace renders a React or HTML form to be filled out for a given patient.
+ *
+ * This workspace must only be used within the patient chart.
+ * @see exported-form-entry.workspace.tsx
+ */
+const FormEntryWorkspace: React.FC<PatientWorkspace2DefinitionProps<FormEntryWorkspaceProps, object>> = ({
   closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  mutateForm,
-  formInfo,
+  workspaceProps: { form, encounterUuid, additionalProps },
+  groupProps: { patientUuid, patient, visitContext, mutateVisitContext },
 }) => {
-  const { encounterUuid, formUuid, visitStartDatetime, visitStopDatetime, visitTypeUuid, visitUuid, additionalProps } =
-    formInfo || {};
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const [showForm, setShowForm] = useState(true);
-  const isOnline = useConnectivity();
-  const { mutateVisit } = useVisitContextStore();
-
-  const state = useMemo(
-    () => ({
-      view: 'form',
-      formUuid: formUuid ?? null,
-      visitUuid: visitUuid ?? currentVisit?.uuid ?? null,
-      visitTypeUuid: visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
-      visitStartDatetime: visitStartDatetime ?? currentVisit?.startDatetime ?? null,
-      visitStopDatetime: visitStopDatetime ?? currentVisit?.stopDatetime ?? null,
-      isOffline: !isOnline,
-      patientUuid: patientUuid ?? null,
-      patient,
-      encounterUuid: encounterUuid ?? null,
-      closeWorkspace: () => {
-        typeof mutateForm === 'function' && mutateForm();
-        closeWorkspace();
-      },
-      closeWorkspaceWithSavedChanges: () => {
-        typeof mutateForm === 'function' && mutateForm();
-        mutateVisit();
-        closeWorkspaceWithSavedChanges();
-      },
-      promptBeforeClosing,
-      additionalProps,
-      clinicalFormsWorkspaceName,
-    }),
-    [
-      formUuid,
-      visitUuid,
-      visitTypeUuid,
-      encounterUuid,
-      visitStartDatetime,
-      visitStopDatetime,
-      currentVisit?.uuid,
-      currentVisit?.visitType?.uuid,
-      currentVisit?.startDatetime,
-      currentVisit?.stopDatetime,
-      patientUuid,
-      patient,
-      isOnline,
-      mutateForm,
-      mutateVisit,
-      closeWorkspace,
-      closeWorkspaceWithSavedChanges,
-      promptBeforeClosing,
-      additionalProps,
-      clinicalFormsWorkspaceName,
-    ],
-  );
-
-  // FIXME: This logic triggers a reload of the form when the formUuid changes. It's a workaround for the fact that the form doesn't reload when the formUuid changes.
-  useEffect(() => {
-    if (state.formUuid) {
-      setShowForm(false);
-      setTimeout(() => {
-        setShowForm(true);
-      });
-    }
-  }, [state]);
-
   return (
-    <div>
-      <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
-      {showForm && formInfo && patientUuid && patient && <ExtensionSlot name="form-widget-slot" state={state} />}
-    </div>
+    <FormEntry
+      form={form}
+      encounterUuid={encounterUuid}
+      additionalProps={additionalProps}
+      patient={patient}
+      patientUuid={patientUuid}
+      visitContext={visitContext}
+      mutateVisitContext={mutateVisitContext}
+      closeWorkspace={closeWorkspace}
+    />
   );
 };
 
-export default FormEntry;
+export default FormEntryWorkspace;

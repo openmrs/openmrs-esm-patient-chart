@@ -2,11 +2,12 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { createOrUpdateVitalsAndBiometrics, useEncounterVitalsAndBiometrics } from '../common';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockConceptUnits, mockVitalsConceptMetadata, mockVitalsConfig } from '__mocks__';
 import { mockPatient } from 'tools';
-import VitalsAndBiometricsForm from './vitals-biometrics-form.workspace';
+import VitalsAndBiometricsForm, { type VitalsAndBiometricsFormProps } from './vitals-biometrics-form.workspace';
 
 const heightValue = 180;
 const muacValue = 23;
@@ -17,14 +18,23 @@ const weightValue = 62;
 const systolicBloodPressureValue = 120;
 const temperatureValue = 37;
 
-const testProps = {
-  closeWorkspace: () => {},
-  closeWorkspaceWithSavedChanges: jest.fn(),
-  patientUuid: mockPatient.id,
-  patient: mockPatient,
-  promptBeforeClosing: () => {},
-  formContext: 'creating' as 'creating' | 'editing',
-  setTitle: jest.fn(),
+const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+  workspaceProps: {
+    formContext: 'creating',
+  },
+  windowProps: {},
+  groupProps: {
+    patientUuid: mockPatient.id,
+    patient: mockPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+  },
+  workspaceName: '',
+  launchChildWorkspace: jest.fn(),
+  closeWorkspace: jest.fn(),
+  windowName: '',
+  isRootWorkspace: false,
+  showActionMenu: true,
 };
 
 const mockShowSnackbar = jest.mocked(showSnackbar);
@@ -56,7 +66,11 @@ jest.mock('../common', () => ({
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
-});
+  biometrics: {
+    ...getDefaultsFromConfigSchema(configSchema).biometrics,
+    ...mockVitalsConfig.biometrics,
+  },
+} as ConfigObject);
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({
@@ -145,10 +159,10 @@ function setupMockUseEncounterVitalsAndBiometrics() {
 
 describe('VitalsBiometricsForm', () => {
   it('renders the vitals and biometrics form', async () => {
-    render(<VitalsAndBiometricsForm {...testProps} />);
+    renderVitalsAndBiometricsForm();
 
-    expect(screen.getByText(/vitals/i)).toBeInTheDocument();
-    expect(screen.getByText(/biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/record vitals$/i)).toBeInTheDocument();
+    expect(screen.getByText(/record biometrics/i)).toBeInTheDocument();
     expect(screen.getByText(/blood pressure/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /systolic/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /diastolic/i })).toBeInTheDocument();
@@ -172,13 +186,15 @@ describe('VitalsBiometricsForm', () => {
     expect(screen.getByText(/kg \/ m²/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    expect(saveButton).toBeInTheDocument();
+    expect(saveButton).toBeDisabled();
   });
 
   it("computes a patient's BMI from the given height and weight values", async () => {
     const user = userEvent.setup();
 
-    render(<VitalsAndBiometricsForm {...testProps} />);
+    renderVitalsAndBiometricsForm();
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -203,7 +219,7 @@ describe('VitalsBiometricsForm', () => {
       response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
     );
 
-    render(<VitalsAndBiometricsForm {...testProps} />);
+    renderVitalsAndBiometricsForm();
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -272,7 +288,7 @@ describe('VitalsBiometricsForm', () => {
 
   it('correctly initializes the form with existing vitals and biometrics data while in edit mode', async () => {
     setupMockUseEncounterVitalsAndBiometrics();
-    render(<VitalsAndBiometricsForm {...testProps} formContext="editing" editEncounterUuid="encounter-uuid" />);
+    renderVitalsAndBiometricsForm('editing', 'encounter-uuid');
 
     expect(screen.getByRole('spinbutton', { name: /height/i })).toHaveValue(170);
     expect(screen.getByRole('spinbutton', { name: /weight/i })).toHaveValue(65);
@@ -299,7 +315,7 @@ describe('VitalsBiometricsForm', () => {
       response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
     );
 
-    render(<VitalsAndBiometricsForm {...testProps} formContext="editing" editEncounterUuid="encounter-uuid" />);
+    renderVitalsAndBiometricsForm('editing', 'encounter-uuid');
 
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
     const systolicInput = screen.getByRole('spinbutton', { name: /systolic/i });
@@ -368,7 +384,7 @@ describe('VitalsBiometricsForm', () => {
 
     mockCreateOrUpdateVitalsAndBiometrics.mockRejectedValueOnce(error);
 
-    render(<VitalsAndBiometricsForm {...testProps} />);
+    renderVitalsAndBiometricsForm();
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
@@ -400,4 +416,52 @@ describe('VitalsBiometricsForm', () => {
       title: 'Error saving Vitals and Biometrics',
     });
   });
+
+  it('hides BMI field when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      biometrics: {
+        ...getDefaultsFromConfigSchema(configSchema).biometrics,
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        patient: minorPatient,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    // BMI field should not be present
+    expect(screen.queryByText(/bmi \(calc.\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other biometrics fields should still be present
+    expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
+  });
 });
+
+function renderVitalsAndBiometricsForm(formContext?: 'creating' | 'editing', editEncounterUuid?: string) {
+  const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+    ...defaultProps,
+    workspaceProps: {
+      ...defaultProps.workspaceProps,
+      formContext: formContext ?? defaultProps.workspaceProps.formContext,
+      editEncounterUuid: editEncounterUuid ?? defaultProps.workspaceProps.editEncounterUuid,
+    },
+  };
+  return render(<VitalsAndBiometricsForm {...props} />);
+}

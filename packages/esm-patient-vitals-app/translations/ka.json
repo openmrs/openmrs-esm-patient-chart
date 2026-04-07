@@ -39,7 +39,6 @@
   "male": "მამრი",
   "muac": "შუამხრის გარშემოწერილობა",
   "noDataRecorded": "No data has been recorded for this patient",
-  "notAvailable": "ხელმისაწვდომი არაა",
   "notes": "შენიშვნები",
   "other": "სხვა",
   "outOfDateVitals": "<0>These vitals are <1>out of date</1></0>",
@@ -75,6 +74,6 @@
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "სასიცოცხლო მნიშვნელობების ისტორია",
   "vitalSignDisplayed": "ნაჩვენები სიცოცხლის ნიშანი",
-  "vitalSigns": "სასიცოცხლო მნიშვნელობის ნიშნები",
+  "vitalSigns": "vital signs",
   "weight": "წონა"
 }

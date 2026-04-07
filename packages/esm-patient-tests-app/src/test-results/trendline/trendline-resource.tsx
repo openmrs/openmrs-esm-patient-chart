@@ -3,20 +3,67 @@ import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { assessValue } from '../loadPatientTestData/helpers';
 import { type TreeNode } from '../filter/filter-types';
+import { selectReferenceRange, type ReferenceRanges } from '../grouped-timeline/reference-range-helpers';
 
-function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
+export function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
   const tests: Array<TreeNode> = [];
   if (!treeNode) {
     return tests;
   }
   treeNode?.subSets.forEach((subNode) => {
     if ((subNode as TreeNode)?.obs) {
-      const TreeNode = subNode as TreeNode;
-      const assess = assessValue(TreeNode);
+      const subTreeNode = subNode as TreeNode;
+      // Node-level reference ranges for trendline (aggregate view)
+      const nodeRanges: ReferenceRanges = {
+        hiAbsolute: subTreeNode.hiAbsolute,
+        hiCritical: subTreeNode.hiCritical,
+        hiNormal: subTreeNode.hiNormal,
+        lowAbsolute: subTreeNode.lowAbsolute,
+        lowCritical: subTreeNode.lowCritical,
+        lowNormal: subTreeNode.lowNormal,
+        units: subTreeNode.units,
+      };
+
+      const processedObs = subTreeNode.obs.map((ob) => {
+        // Note: Units are only at the concept/node level, not observation-level
+        const hasObservationRanges =
+          ob.lowNormal !== undefined ||
+          ob.hiNormal !== undefined ||
+          ob.lowCritical !== undefined ||
+          ob.hiCritical !== undefined ||
+          ob.lowAbsolute !== undefined ||
+          ob.hiAbsolute !== undefined;
+        const observationRanges: ReferenceRanges | undefined = hasObservationRanges
+          ? {
+              hiAbsolute: ob.hiAbsolute,
+              hiCritical: ob.hiCritical,
+              hiNormal: ob.hiNormal,
+              lowAbsolute: ob.lowAbsolute,
+              lowCritical: ob.lowCritical,
+              lowNormal: ob.lowNormal,
+            }
+          : undefined;
+
+        const selectedRanges = selectReferenceRange(observationRanges, nodeRanges);
+        const resolvedRanges = selectedRanges ?? nodeRanges;
+        const assess = assessValue(resolvedRanges);
+        const interpretation = ob.interpretation ?? assess(ob.value);
+
+        return {
+          ...ob,
+          interpretation,
+          lowNormal: resolvedRanges?.lowNormal,
+          hiNormal: resolvedRanges?.hiNormal,
+          lowCritical: resolvedRanges?.lowCritical,
+          hiCritical: resolvedRanges?.hiCritical,
+          lowAbsolute: resolvedRanges?.lowAbsolute,
+          hiAbsolute: resolvedRanges?.hiAbsolute,
+        };
+      });
+
       tests.push({
-        ...TreeNode,
-        range: TreeNode.hiNormal && TreeNode.lowNormal ? `${TreeNode.lowNormal} - ${TreeNode.hiNormal}` : '',
-        obs: TreeNode.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) })),
+        ...subTreeNode,
+        obs: processedObs,
       });
     } else if (subNode?.subSets) {
       const subTreesTests = computeTrendlineData(subNode as TreeNode); // recursion
@@ -58,7 +105,6 @@ export function useObstreeData(
           hiNormal: 0,
           lowNormal: 0,
           units: '',
-          range: '',
         } as TreeNode),
       isValidating,
     }),

@@ -19,9 +19,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({ patientUuid, overviewDa
   const { t } = useTranslation();
 
   const headers = [
-    { key: 'name', header: 'Test Name' },
-    { key: 'value', header: 'Value' },
-    { key: 'range', header: 'Reference Range' },
+    { key: 'name', header: t('testName', 'Test Name') },
+    { key: 'value', header: t('value', 'Value') },
+    { key: 'range', header: t('referenceRange', 'Reference range') },
   ];
 
   const handleSeeAvailableResults = useCallback(() => {

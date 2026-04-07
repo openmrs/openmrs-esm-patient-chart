@@ -16,34 +16,37 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
+    if (!patientUuid) {
+      console.error('DeleteAllergyModal opened without patientUuid');
+      return;
+    }
+
     setIsDeleting(true);
 
-    deletePatientAllergy(patientUuid, allergyId, new AbortController())
-      .then((res) => {
-        if (res.ok) {
-          mutate();
-          closeDeleteModal();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            title: t('allergyDeleted', 'Allergy deleted'),
-          });
-        }
-      })
-      .catch((error) => {
-        console.error('Error deleting allergy: ', error);
-
-        showSnackbar({
-          isLowContrast: false,
-          kind: 'error',
-          title: t('errorDeletingAllergy', 'Error deleting allergy'),
-          subtitle: error?.message,
-        });
+    try {
+      await deletePatientAllergy(patientUuid, allergyId, new AbortController());
+      void mutate();
+      closeDeleteModal();
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'success',
+        title: t('allergyDeleted', 'Allergy deleted'),
       });
+    } catch (error) {
+      console.error('Error deleting allergy: ', error);
+      showSnackbar({
+        isLowContrast: false,
+        kind: 'error',
+        title: t('errorDeletingAllergy', 'Error deleting allergy'),
+        subtitle: error?.message,
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   }, [closeDeleteModal, allergyId, mutate, t, patientUuid]);
 
   return (
-    <div>
+    <>
       <ModalHeader closeModal={closeDeleteModal} title={t('deletePatientAllergy', 'Delete allergy')} />
       <ModalBody>
         <p>{t('deleteModalConfirmationText', 'Are you sure you want to delete this allergy?')}</p>
@@ -60,7 +63,7 @@ const DeleteAllergyModal: React.FC<DeleteAllergyModalProps> = ({ closeDeleteModa
           )}
         </Button>
       </ModalFooter>
-    </div>
+    </>
   );
 };
 

@@ -39,7 +39,6 @@
   "male": "Barbat",
   "muac": "MUAC",
   "noDataRecorded": "Nu exista date inregistrate pentru acest pacient",
-  "notAvailable": "Indisponibil",
   "notes": "Observatii",
   "other": "Altul",
   "outOfDateVitals": "<0>Aceaste date sunt <1>expirate</1></0>",
@@ -75,6 +74,6 @@
   "vitalsAndBiometricsUpdateError": "Eroare la actualizarea semnelor vitale si biometriei",
   "vitalsHistory": "Istoric semne vitale",
   "vitalSignDisplayed": "Semn vital afisat",
-  "vitalSigns": "Semne vitale",
+  "vitalSigns": "semne vitale",
   "weight": "Greutate"
 }

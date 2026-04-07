@@ -7,6 +7,7 @@
   "lastCompleted": "ბოლოს დსარულდა",
   "never": "არასდროს",
   "noFormsToDisplay": "There are no forms to display.",
+  "off": "Off",
   "offlineForms": "ინტერნეტის გარეშე ფორმები",
   "offlineForms__lower": "ინტერნეტის გარეშე ფორმა",
   "offlineFormsOverviewCardAvailableOffline": "ხელმისაწვდომია ინტერნეტის გარეშეც",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "ამ სიაში ძებნა",
   "offlinePatientsTableSearchPlaceholder": "ამ სიაში ძებნა",
   "offlineToggle": "ინტერნეტის სტატუსის გადართვა",
+  "on": "On",
   "searchThisList": "ამ სიაში ძებნა"
 }

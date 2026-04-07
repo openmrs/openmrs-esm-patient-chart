@@ -8,10 +8,16 @@ import {
   useConfig,
   type OpenmrsResource,
 } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite from 'swr/infinite';
 import { type ConfigObject } from '../config-schema';
-import { assessValue, calculateBodyMassIndex, getReferenceRangesForConcept, interpretBloodPressure } from './helpers';
+import {
+  assessValue,
+  calculateBodyMassIndex,
+  interpretBloodPressure,
+  mapFhirInterpretationToObservationInterpretation,
+} from './helpers';
 import type {
   FHIRObservationResource,
   FHIRSearchBundleResponse,
@@ -181,6 +187,10 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
 
   const conceptUuids = useMemo(() => {
     const biometricsKeys = ['heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
+    // These keys are not individual observation concepts for the FHIR query:
+    // generalPatientNoteUuid is fetched separately to avoid note-only encounters
+    // polluting the vitals list; vitalSignsConceptSetUuid is a concept set, not an obs concept.
+    const excludedFromQuery = new Set(['generalPatientNoteUuid', 'vitalSignsConceptSetUuid']);
 
     if (!concepts) {
       return [];
@@ -190,6 +200,9 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
       .filter(([key, conceptUuid]) => {
         if (!conceptUuid) {
           console.warn(`Missing UUID for concept ${key}`);
+          return false;
+        }
+        if (excludedFromQuery.has(key)) {
           return false;
         }
         if (mode === 'both') {
@@ -230,6 +243,17 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   const { data, isLoading, isValidating, setSize, error, size, mutate } = useSWRInfinite<VitalsFetchResponse, Error>(
     getPage,
     handleFetch,
+  );
+
+  // Fetch note observations separately so that note-only encounters are never included
+  // as standalone vitals entries. Notes are merged into existing vitals encounters below.
+  // We omit _count so that every note for this patient is returned; notes are lightweight
+  // and typically few, so unbounded fetching is acceptable here.
+  const { data: notesData } = useSWR<VitalsFetchResponse, Error>(
+    concepts.generalPatientNoteUuid && patientUuid
+      ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${concepts.generalPatientNoteUuid}&_sort=-date`
+      : null,
+    openmrsFetch,
   );
 
   // see the comments above for why this is here
@@ -280,7 +304,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
   );
 
   const formattedObs: Array<PatientVitalsAndBiometrics> = useMemo(() => {
-    const vitalsHashTable = data?.[0]?.data?.entry
+    const vitalsHashTable: Map<string, Partial<PatientVitalsAndBiometrics>> = data?.[0]?.data?.entry
       ?.map((entry) => entry.resource)
       .filter(Boolean)
       .map(mapVitalsAndBiometrics)
@@ -293,7 +317,7 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
             [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
           });
         } else {
-          vitalSign.value &&
+          if (vitalSign.value != null) {
             vitalsHashTable.set(encounterId, {
               date:
                 typeof vitalSign.recordedDate === 'string'
@@ -302,11 +326,29 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
               [getVitalsMapKey(vitalSign.code)]: vitalSign.value,
               [getInterpretationKey(getVitalsMapKey(vitalSign.code))]: vitalSign.interpretation,
             });
+          }
         }
         return vitalsHashTable;
-      }, new Map<string, Partial<PatientVitalsAndBiometrics>>());
+      }, new Map<string, Partial<PatientVitalsAndBiometrics>>()) ??
+    new Map<string, Partial<PatientVitalsAndBiometrics>>();
 
-    return Array.from(vitalsHashTable ?? []).map(([encounterId, vitalSigns]) => {
+    // Attach notes to their existing vitals encounters. Encounters that contain only
+    // a note observation (no numeric vitals) are intentionally skipped so they never
+    // surface as standalone entries in the vitals list.
+    notesData?.data?.entry
+      ?.map((entry) => entry.resource)
+      .filter(Boolean)
+      .forEach((resource) => {
+        const encounterId = extractEncounterUuid(resource.encounter);
+        if (encounterId && vitalsHashTable.has(encounterId)) {
+          vitalsHashTable.set(encounterId, {
+            ...vitalsHashTable.get(encounterId),
+            note: resource.valueString,
+          });
+        }
+      });
+
+    return Array.from(vitalsHashTable).map(([encounterId, vitalSigns]) => {
       const result = {
         id: encounterId,
         date: vitalSigns.date,
@@ -323,28 +365,18 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           vitalSigns.diastolic,
           concepts,
           conceptRanges,
+          vitalSigns.systolicRenderInterpretation,
+          vitalSigns.diastolicRenderInterpretation,
         );
-        result.pulseRenderInterpretation = assessValue(
-          vitalSigns.pulse,
-          getReferenceRangesForConcept(concepts.pulseUuid, conceptRanges),
-        );
-        result.temperatureRenderInterpretation = assessValue(
-          vitalSigns.temperature,
-          getReferenceRangesForConcept(concepts.temperatureUuid, conceptRanges),
-        );
-        result.spo2RenderInterpretation = assessValue(
-          vitalSigns.spo2,
-          getReferenceRangesForConcept(concepts.oxygenSaturationUuid, conceptRanges),
-        );
-        result.respiratoryRateRenderInterpretation = assessValue(
-          vitalSigns.respiratoryRate,
-          getReferenceRangesForConcept(concepts.respiratoryRateUuid, conceptRanges),
-        );
+        result.pulseRenderInterpretation = vitalSigns.pulseRenderInterpretation;
+        result.temperatureRenderInterpretation = vitalSigns.temperatureRenderInterpretation;
+        result.spo2RenderInterpretation = vitalSigns.spo2RenderInterpretation;
+        result.respiratoryRateRenderInterpretation = vitalSigns.respiratoryRateRenderInterpretation;
       }
 
       return result;
     });
-  }, [conceptRanges, concepts, data, getVitalsMapKey, mode]);
+  }, [conceptRanges, concepts, data, getVitalsMapKey, mode, notesData]);
 
   return {
     data: data ? formattedObs : undefined,
@@ -472,7 +504,14 @@ function mapVitalsAndBiometrics(resource: FHIRObservationResource): MappedVitals
   return {
     code: resource?.code?.coding?.[0]?.code,
     encounterId: extractEncounterUuid(resource.encounter),
-    interpretation: assessValue(resource?.valueQuantity?.value, referenceRanges),
+    // Use Observation.interpretation from FHIR when available (preferred).
+    // Fallback to calculation for backward compatibility: existing observations may not have
+    // interpretation set if they were created before interpretation was added, or if reference
+    // ranges weren't available at creation time (OpenMRS core only sets interpretation when
+    // ObsReferenceRange is present).
+    interpretation: resource.interpretation?.[0]?.coding?.[0]?.display
+      ? mapFhirInterpretationToObservationInterpretation(resource.interpretation?.[0]?.coding?.[0]?.display)
+      : assessValue(resource?.valueQuantity?.value, referenceRanges),
     recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
   };

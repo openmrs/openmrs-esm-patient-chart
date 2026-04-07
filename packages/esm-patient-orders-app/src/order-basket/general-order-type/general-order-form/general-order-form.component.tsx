@@ -1,66 +1,59 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import {
-  Button,
-  ButtonSet,
-  Column,
-  Form,
-  Grid,
-  InlineNotification,
-  Layer,
-  Select,
-  SelectItem,
-  TextArea,
-  TextInput,
-} from '@carbon/react';
+import { Button, ButtonSet, Column, Form, Grid, Layer, Select, SelectItem, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   priorityOptions,
-  type DefaultPatientWorkspaceProps,
   type OrderBasketItem,
   type OrderUrgency,
   useOrderBasket,
   useOrderType,
+  postOrder,
+  useMutatePatientOrders,
 } from '@openmrs/esm-patient-common-lib';
 import {
   useLayoutType,
-  useSession,
   useConfig,
   ExtensionSlot,
   OpenmrsDatePicker,
-  launchWorkspace,
+  type Workspace2DefinitionProps,
+  showSnackbar,
 } from '@openmrs/esm-framework';
 import { ordersEqual, prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';
 import styles from './general-order-form.scss';
 
-export interface OrderFormProps extends DefaultPatientWorkspaceProps {
+export interface OrderFormProps {
   initialOrder: OrderBasketItem;
+  orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
-  orderableConceptSets: Array<string>;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  onCancel: () => void;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+  patient: fhir.Patient;
 }
 
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
 export function OrderForm({
+  patient,
   initialOrder,
-  closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
+  orderToEditOrdererUuid,
   orderTypeUuid,
+  closeWorkspace,
+  onCancel,
+  setHasUnsavedChanges,
 }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSession();
-  const isEditing = useMemo(() => initialOrder && initialOrder.action === 'REVISE', [initialOrder]);
-  const { orders, setOrders } = useOrderBasket<OrderBasketItem>(orderTypeUuid, prepOrderPostData);
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const { orders, setOrders, clearOrders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
   const { orderType } = useOrderType(orderTypeUuid);
   const config = useConfig<ConfigObject>();
+  const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
 
   const OrderFormSchema = useMemo(
     () =>
@@ -90,7 +83,7 @@ export function OrderForm({
   const {
     control,
     handleSubmit,
-    formState: { errors, defaultValues, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     setValue,
     watch,
   } = useForm<OrderBasketItem>({
@@ -103,17 +96,12 @@ export function OrderForm({
 
   const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
 
-  const filterItemsByName = useCallback((menu) => {
-    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  }, []);
-
-  const handleFormSubmission = useCallback(
+  const saveOrderToBasket = useCallback(
     (data: OrderBasketItem) => {
       const finalizedOrder: OrderBasketItem = {
         ...initialOrder,
         ...data,
       };
-      finalizedOrder.orderer = session.currentProvider.uuid;
 
       const newOrders = [...orders];
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
@@ -130,26 +118,45 @@ export function OrderForm({
 
       setOrders(newOrders);
 
-      closeWorkspaceWithSavedChanges({
-        onWorkspaceClose: () => launchWorkspace('order-basket'),
-        closeWorkspaceGroup: false,
-      });
+      closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, session?.currentProvider?.uuid, closeWorkspaceWithSavedChanges, initialOrder],
+    [orders, setOrders, initialOrder, closeWorkspace],
   );
 
-  const cancelOrder = useCallback(() => {
-    setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
-    closeWorkspace({
-      onWorkspaceClose: () => launchWorkspace('order-basket'),
-      closeWorkspaceGroup: false,
-    });
-  }, [closeWorkspace, orders, setOrders, defaultValues]);
+  const submitOrderToServer = useCallback(
+    (data: OrderBasketItem) => {
+      const finalizedOrder: OrderBasketItem = {
+        ...initialOrder,
+        ...data,
+      };
+
+      return postOrder(
+        prepOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
+      )
+        .then(() => {
+          clearOrders();
+          mutateOrders();
+          showSnackbar({
+            isLowContrast: false,
+            kind: 'success',
+            title: t('successSavingDrugOrder', 'Order saved'),
+          });
+          closeWorkspace({ discardUnsavedChanges: true });
+        })
+        .catch((error) => {
+          showSnackbar({
+            isLowContrast: false,
+            kind: 'error',
+            title: t('errorSavingDrugOrder', 'Error saving order'),
+            subtitle: error,
+          });
+        });
+    },
+    [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
+  );
 
   const onError = (errors: FieldErrors<OrderBasketItem>) => {
-    if (errors) {
-      setShowErrorNotification(true);
-    }
+    console.error('Error in order form', errors);
   };
 
   const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
@@ -163,14 +170,18 @@ export function OrderForm({
   };
 
   useEffect(() => {
-    promptBeforeClosing(() => isDirty);
-  }, [isDirty, promptBeforeClosing]);
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const responsiveSize = isTablet ? 'lg' : 'sm';
 
   return (
     <>
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+      <Form
+        className={styles.orderForm}
+        onSubmit={handleSubmit(initialOrder?.action === 'REVISE' ? submitOrderToServer : saveOrderToBasket, onError)}
+        id="generalOrderForm"
+      >
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
           <Grid className={styles.gridRow}>
@@ -279,28 +290,16 @@ export function OrderForm({
             </Column>
           </Grid>
         </div>
-        <div>
-          {showErrorNotification && (
-            <Column className={styles.errorContainer}>
-              <InlineNotification
-                lowContrast
-                onClose={() => setShowErrorNotification(false)}
-                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-                title={t('error', 'Error')}
-              />
-            </Column>
-          )}
-          <ButtonSet
-            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-          >
-            <Button className={styles.button} kind="secondary" onClick={cancelOrder} size="xl">
-              {t('discard', 'Discard')}
-            </Button>
-            <Button className={styles.button} kind="primary" size="xl" type="submit">
-              {t('saveOrder', 'Save order')}
-            </Button>
-          </ButtonSet>
-        </div>
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
+          <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} kind="primary" size="xl" type="submit" disabled={isSubmitting}>
+            {t('saveOrder', 'Save order')}
+          </Button>
+        </ButtonSet>
       </Form>
     </>
   );

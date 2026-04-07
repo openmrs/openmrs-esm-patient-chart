@@ -149,6 +149,7 @@
   justify-content: space-between;
 
   .bodyLong01 {
+    gap: layout.$spacing-02;
     margin: layout.$spacing-02 0;
   }
 }
@@ -157,6 +158,23 @@
   background-color: $ui-01;
   padding: layout.$spacing-05;
   width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.medicationContainer > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.medicationContainer p {
+  margin: layout.$spacing-02 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .dosage {
@@ -217,6 +235,11 @@
 
 .label01 {
   @include type.type-style('label-01');
+}
+
+.tag {
+  margin: 0 layout.$spacing-02 0 !important;
+  text-transform: uppercase;
 }
 
 .text02 {

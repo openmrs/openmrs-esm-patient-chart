@@ -1,7 +1,10 @@
 {
-  "chartView": "Tampilan Grafik",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "Tanggal dan waktu",
-  "displaying": "Menampilkan",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "Jenis pertemuan",
-  "tableView": "Tampilan Tabel"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

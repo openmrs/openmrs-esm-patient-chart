@@ -1,26 +1,44 @@
-import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { type ComponentProps, useState, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InlineLoading, SkeletonText } from '@carbon/react';
+import { Button, InlineLoading, SkeletonPlaceholder, SkeletonText } from '@carbon/react';
 import { LineChart, ScaleTypes, TickRotations } from '@carbon/charts-react';
 import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
 import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
+import { useObstreeData } from './trendline-resource';
+import { formatReferenceRange } from '../grouped-timeline/reference-range-helpers';
 import CommonDataTable from '../overview/common-datatable.component';
 import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
 
 interface TrendlineProps {
-  patientUuid: string;
   conceptUuid: string;
-  basePath: string;
+  patientUuid: string;
   hideTrendlineHeader?: boolean;
   showBackToTimelineButton?: boolean;
 }
 
-const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
+interface TrendLineBackgroundProps {
+  children?: React.ReactNode;
+}
 
-const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, showBackToTimelineButton }) => {
+const TrendLineBackground: React.FC<TrendLineBackgroundProps> = ({ ...props }) => (
+  <div {...props} className={styles.background} />
+);
+
+interface TrendlineHeaderProps {
+  isValidating: boolean;
+  patientUuid: string;
+  showBackToTimelineButton: boolean;
+  title: string;
+}
+
+const TrendlineHeader: React.FC<TrendlineHeaderProps> = ({
+  patientUuid,
+  title,
+  isValidating,
+  showBackToTimelineButton,
+}) => {
   const { t } = useTranslation();
   return (
     <div className={styles.header}>
@@ -28,9 +46,9 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
         {showBackToTimelineButton && (
           <ConfigurableLink to={testResultsBasePath(`/patient/${patientUuid}/chart`)}>
             <Button
+              iconDescription={t('returnToTimeline', 'Return to timeline')}
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              iconDescription={t('returnToTimeline', 'Return to timeline')}
             >
               <span>{t('backToTimeline', 'Back to timeline')}</span>
             </Button>
@@ -39,7 +57,6 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
       </div>
       <div className={styles.content}>
         <span className={styles.title}>{title}</span>
-        <span className={styles['reference-range']}>{referenceRange}</span>
       </div>
       <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
@@ -52,9 +69,9 @@ const Trendline: React.FC<TrendlineProps> = ({
   hideTrendlineHeader = false,
   showBackToTimelineButton = false,
 }) => {
-  const { trendlineData, isLoading, isValidating } = useObstreeData(patientUuid, conceptUuid);
   const { t } = useTranslation();
-  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
+  const { trendlineData, isLoading, isValidating } = useObstreeData(patientUuid, conceptUuid);
+  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle } = trendlineData;
   const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
   const [showResultsTable, setShowResultsTable] = useState(false);
@@ -83,52 +100,72 @@ const Trendline: React.FC<TrendlineProps> = ({
     }
   }, [obs]);
 
-  const data: Array<{
-    date: Date;
-    value: number;
-    group: string;
-    min?: number;
-    max?: number;
-  }> = [];
+  useEffect(() => {
+    setRange(undefined);
+  }, [conceptUuid]);
 
-  const tableData: Array<{
-    id: string;
-    dateTime: string;
-    value:
-      | number
-      | {
-          value: number;
-          interpretation: OBSERVATION_INTERPRETATION;
-        };
-  }> = [];
+  const { data, tableData } = useMemo(() => {
+    const chartData: Array<{
+      date: Date;
+      value: number;
+      group: string;
+      min?: number;
+      max?: number;
+      rangeLabel?: string;
+    }> = [];
 
-  const dataset = chartTitle;
+    const table: Array<{
+      id: string;
+      dateTime: string;
+      range: string;
+      value: {
+        value: number;
+        interpretation: OBSERVATION_INTERPRETATION;
+      };
+    }> = [];
 
-  obs.forEach((obs, idx) => {
-    const range =
-      hiNormal && lowNormal
+    obs.forEach((observation, idx) => {
+      const resolvedLow = observation.lowNormal ?? lowNormal;
+      const resolvedHigh = observation.hiNormal ?? hiNormal;
+      const hasRange = resolvedLow !== undefined && resolvedHigh !== undefined;
+      const normalRange = hasRange
         ? {
-            max: hiNormal,
-            min: lowNormal,
+            max: resolvedHigh,
+            min: resolvedLow,
           }
         : {};
+      const rangeLabel = formatReferenceRange(
+        hasRange
+          ? {
+              lowNormal: resolvedLow,
+              hiNormal: resolvedHigh,
+              units: leftAxisTitle,
+            }
+          : null,
+        leftAxisTitle,
+      );
 
-    data.push({
-      date: new Date(Date.parse(obs.obsDatetime)),
-      value: parseFloat(obs.value),
-      group: chartTitle,
-      ...range,
+      chartData.push({
+        date: new Date(Date.parse(observation.obsDatetime)),
+        value: parseFloat(observation.value),
+        group: chartTitle,
+        ...normalRange,
+        rangeLabel,
+      });
+
+      table.push({
+        id: `${idx}`,
+        dateTime: observation.obsDatetime,
+        range: rangeLabel,
+        value: {
+          value: parseFloat(observation.value),
+          interpretation: observation.interpretation,
+        },
+      });
     });
 
-    tableData.push({
-      id: `${idx}`,
-      dateTime: obs.obsDatetime,
-      value: {
-        value: parseFloat(obs.value),
-        interpretation: obs.interpretation,
-      },
-    });
-  });
+    return { data: chartData, tableData: table };
+  }, [obs, chartTitle, hiNormal, leftAxisTitle, lowNormal]);
 
   const chartOptions = useMemo(
     () => ({
@@ -143,7 +180,6 @@ const Trendline: React.FC<TrendlineProps> = ({
           scaleType: ScaleTypes.TIME,
           ticks: {
             rotation: TickRotations.ALWAYS,
-            // formatter: x => x.toLocaleDateString("en-US", TableDateFormatOption)
           },
           domain: range,
         },
@@ -154,8 +190,7 @@ const Trendline: React.FC<TrendlineProps> = ({
           includeZero: false,
         },
       },
-      height: '20.125rem',
-
+      height: '400px',
       color: {
         scale: {
           [chartTitle]: '#6929c4',
@@ -169,12 +204,48 @@ const Trendline: React.FC<TrendlineProps> = ({
         enabled: false,
       },
       tooltip: {
-        customHTML: ([{ date, value }]) =>
-          `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
-          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
+        customHTML: ([{ date, value, rangeLabel }]) => {
+          const valueLabel = t('trendlineTooltipValue', 'Value');
+          const dateLabel = t('trendlineTooltipDate', 'Date');
+          const rangeLabelText = t('trendlineTooltipRange', 'Range');
+          return `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
+            <div style="font-size:1rem; line-height:1.4">${valueLabel}: <span>${value} ${leftAxisTitle}</span></div>
+            <div style="font-size:0.875rem; font-weight:500; margin-top:0.125rem">${rangeLabelText}: ${rangeLabel || '--'}</div>
+            <div style="color:#6F6F6F; font-size:0.875rem; font-weight:500; margin-top:0.125rem">${dateLabel}: ${formatDate(date)}</div>
+          </div>`;
+        },
+      },
+      toolbar: {
+        enabled: true,
+        numberOfIcons: 4,
+        controls: [
+          {
+            type: 'Zoom in',
+          },
+          {
+            type: 'Zoom out',
+          },
+          {
+            type: 'Reset zoom',
+          },
+          {
+            type: 'Export as CSV',
+          },
+          {
+            type: 'Export as PNG',
+          },
+          {
+            type: 'Make fullscreen',
+          },
+        ],
+      },
+      zoomBar: {
+        top: {
+          enabled: true,
+        },
       },
     }),
-    [bottomAxisTitle, leftAxisTitle, range, chartTitle],
+    [bottomAxisTitle, leftAxisTitle, range, chartTitle, t],
   );
 
   const tableHeaderData = useMemo(
@@ -184,30 +255,47 @@ const Trendline: React.FC<TrendlineProps> = ({
         key: 'dateTime',
       },
       {
-        header: `${t('value', 'Value')} (${leftAxisTitle})`,
+        header: leftAxisTitle ? `${t('value', 'Value')} (${leftAxisTitle})` : t('value', 'Value'),
         key: 'value',
+      },
+      {
+        header: t('referenceRange', 'Reference range'),
+        key: 'range',
       },
     ],
     [leftAxisTitle, t],
   );
 
   if (isLoading) {
-    return <SkeletonText />;
+    return (
+      <div className={styles.container} data-testid="trendline-loading">
+        <div className={styles.loadingHeader} data-testid="trendline-loading-header">
+          <SkeletonText heading={true} />
+        </div>
+        <div className={styles.loadingTabs} data-testid="trendline-loading-tabs">
+          <SkeletonText paragraph={true} lineCount={1} />
+        </div>
+        <SkeletonPlaceholder className={styles.loadingChart} data-testid="trendline-loading-chart" />
+      </div>
+    );
   }
 
   if (obs.length === 0) {
-    return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
+    return (
+      <div className={styles.container}>
+        <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />
+      </div>
+    );
   }
 
   return (
     <div className={styles.container}>
       {!hideTrendlineHeader && (
         <TrendlineHeader
-          showBackToTimelineButton={showBackToTimelineButton}
           isValidating={isValidating}
           patientUuid={patientUuid}
-          title={dataset}
-          referenceRange={referenceRange}
+          showBackToTimelineButton={showBackToTimelineButton}
+          title={chartTitle}
         />
       )}
       <TrendLineBackground>
@@ -215,24 +303,44 @@ const Trendline: React.FC<TrendlineProps> = ({
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
 
-      {showResultsTable ? (
-        <>
-          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
-            {t('hideResultsTable', 'Hide results table')}
+      <div className={styles.tableControls}>
+        {showResultsTable ? (
+          <>
+            <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(false)}>
+              {t('hideResultsTable', 'Hide results table')}
+            </Button>
+            <DrawTable {...{ tableData, tableHeaderData }} />
+          </>
+        ) : (
+          <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
+            {t('showResultsTable', 'Show results table')}
           </Button>
-          <DrawTable {...{ tableData, tableHeaderData }} />
-        </>
-      ) : (
-        <Button className={styles['show-hide-table']} kind="ghost" onClick={() => setShowResultsTable(true)}>
-          {t('showResultsTable', 'Show results table')}
-        </Button>
-      )}
+        )}
+      </div>
     </div>
   );
 };
 
-const DrawTable = React.memo<{ tableData; tableHeaderData }>(({ tableData, tableHeaderData }) => {
-  return <CommonDataTable data={tableData} tableHeaders={tableHeaderData} />;
+interface DrawTableProps {
+  tableData: Array<{
+    id: string;
+    dateTime: string;
+    range: string;
+    value: {
+      value: number;
+      interpretation: OBSERVATION_INTERPRETATION;
+    };
+  }>;
+  tableHeaderData: Array<{
+    header: string;
+    key: string;
+  }>;
+}
+
+const DrawTable = React.memo<DrawTableProps>(({ tableData, tableHeaderData }) => {
+  return <CommonDataTable data={tableData as any} tableHeaders={tableHeaderData} />;
 });
+
+DrawTable.displayName = 'DrawTable';
 
 export default Trendline;

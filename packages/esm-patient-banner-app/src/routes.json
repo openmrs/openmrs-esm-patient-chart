@@ -1,9 +1,15 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "extensions": [
+    {
+      "name": "person-attribute-tag",
+      "component": "personAttributeTag",
+      "online": true,
+      "offline": true
+    },
     {
       "name": "visit-tag",
       "slot": "patient-banner-tags-slot",
@@ -24,26 +30,6 @@
       "component": "patientBanner",
       "online": true,
       "offline": true
-    },
-    {
-      "name": "print-identifier-sticker-button",
-      "slot": "patient-actions-slot",
-      "component": "printIdentifierStickerActionButton",
-      "online": true,
-      "offline": true
-    }
-  ],
-  "modals": [
-    {
-      "name": "print-identifier-sticker-modal",
-      "component": "printIdentifierStickerModal"
-    }
-  ],
-  "featureFlags": [
-    {
-      "description": "Features to support printing a patient identifier sticker",
-      "flagName": "print-patient-identifier-sticker",
-      "label": "Print patient identifier sticker"
     }
   ]
 }

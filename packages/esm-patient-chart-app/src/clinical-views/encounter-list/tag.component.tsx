@@ -9,36 +9,35 @@ export const renderTag = (
   statusColorMappings: Record<string, string>,
   config: ConfigConcepts,
 ) => {
-  const columnStatus = getObsFromEncounter({ encounter: encounter, obsConcept: concept, config: config });
+  const columnStatus = getObsFromEncounter({ encounter, obsConcept: concept, config });
   const columnStatusObs = findObs(encounter, concept);
 
-  if (columnStatus == '--') {
+  if (columnStatus === '--') {
     return '--';
-  } else {
-    return (
-      <Tag
-        type={
-          typeof columnStatusObs?.value === 'object' && 'uuid' in columnStatusObs.value
-            ? (statusColorMappings[columnStatusObs.value.uuid] as
-                | 'red'
-                | 'magenta'
-                | 'purple'
-                | 'blue'
-                | 'cyan'
-                | 'teal'
-                | 'green'
-                | 'gray'
-                | 'cool-gray'
-                | 'warm-gray'
-                | 'high-contrast'
-                | 'outline')
-            : undefined
-        }
-        title={typeof columnStatus === 'string' ? columnStatus : ''}
-        style={{ minWidth: '80px' }}
-      >
-        {typeof columnStatus === 'string' ? columnStatus : ''}
-      </Tag>
-    );
   }
+
+  return (
+    <Tag
+      type={
+        typeof columnStatusObs?.value === 'object' && 'uuid' in columnStatusObs.value
+          ? (statusColorMappings[columnStatusObs.value.uuid] as
+              | 'red'
+              | 'magenta'
+              | 'purple'
+              | 'blue'
+              | 'cyan'
+              | 'teal'
+              | 'green'
+              | 'gray'
+              | 'cool-gray'
+              | 'warm-gray'
+              | 'high-contrast'
+              | 'outline')
+          : undefined
+      }
+      style={{ minWidth: '80px' }}
+    >
+      {typeof columnStatus === 'string' ? columnStatus : ''}
+    </Tag>
+  );
 };

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   visit: Visit;
+  patient: fhir.Patient;
 }
 
 const VisitDateCell: React.FC<Props> = ({ visit }) => {

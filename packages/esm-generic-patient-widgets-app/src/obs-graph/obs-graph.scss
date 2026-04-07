@@ -10,43 +10,49 @@
   @include type.type-style('body-compact-01');
 }
 
-.graphContainer {
+.graphWidgetContainer {
   display: flex;
   margin: 0 layout.$spacing-05;
   flex-direction: row;
   justify-content: space-between;
+
+  // Carbon charts always left-align the overflow menu; override to align with the trigger.
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options) {
+    inset-inline-start: auto !important;
+    inset-inline-end: 0;
+    width: auto;
+    min-width: 0;
+    margin-top: layout.$spacing-03;
+  }
+
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options .cds--overflow-menu-options__option) {
+    inline-size: auto;
+  }
+
+  :global(.cds--chart-holder .cds--cc--toolbar .cds--overflow-menu-options .cds--overflow-menu-options__btn) {
+    max-inline-size: none !important;
+  }
+
+  // Ensures the chart toolbar tooltips are visible
+  :global(.cds--tabs--vertical ~ .cds--tab-content) {
+    overflow-y: visible;
+  }
 }
 
 .conceptPickerTabs {
-  flex-grow: 1;
   margin: layout.$spacing-03 0;
-  padding-right: layout.$spacing-05;
+  flex-grow: 1;
 }
 
 .lineChartContainer {
-  flex-grow: 4;
-  padding: 0 layout.$spacing-05 layout.$spacing-09;
-
-  :global(.cds--cc--layout-row) {
-    height: 0;
-  }
-
-  :global(.layout-child) {
-    margin-top: layout.$spacing-03;
-  }
-}
-
-.conceptLabel {
-  @extend .label01;
-  margin-bottom: layout.$spacing-05;
-  display: inline-block;
+  flex-grow: 1;
+  margin: layout.$spacing-03 0;
 }
 
 .tab {
   outline: 0;
   outline-offset: 0;
   min-height: layout.$spacing-07 !important;
-  block-size: layout.$spacing-05 !important;
 
   &:active,
   &:focus {
@@ -55,14 +61,13 @@
 
   &[aria-selected='true'] {
     box-shadow: inset 4px 0 0 0 var(--brand-03) !important;
-    border-bottom: none;
-    font-weight: 600;
-    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
+    line-height: normal !important;
   }
 
   &[aria-selected='false'] {
     border-bottom: none;
-    border-left: layout.$spacing-01 solid $ui-03;
-    margin-left: 0 !important;
+    border-inline-start: layout.$spacing-01 solid $ui-03;
+    margin-inline-start: 0 !important;
   }
 }

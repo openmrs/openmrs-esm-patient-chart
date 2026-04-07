@@ -1,7 +1,10 @@
 {
-  "chartView": "Vizualizare grafica",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "Data si ora",
-  "displaying": "Se afiseaza",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "Tip intalnire",
-  "tableView": "Vizualizare tabel"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

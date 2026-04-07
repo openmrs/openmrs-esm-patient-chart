@@ -10,8 +10,8 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import biometricsDetailedSummaryComponent from './biometrics/biometrics-main.component';
 import biometricsOverviewComponent from './biometrics/biometrics-overview.component';
-import dashboardMeta from './dashboard.meta';
-import vitalsHeaderComponent from './vitals-and-biometrics-header/vitals-header.component';
+import { dashboardMeta } from './dashboard.meta';
+import vitalsHeaderComponent from './vitals-and-biometrics-header/vitals-header.extension';
 import vitalsMainComponent from './vitals/vitals-main.component';
 import vitalsSummaryComponent from './vitals/vitals-summary.component';
 
@@ -59,9 +59,13 @@ export const vitalsAndBiometricsDashboardLink =
 
 export const weightTile = getAsyncLifecycle(() => import('./components/weight-tile/weight-tile.component'), options);
 
-// t('recordVitalsAndBiometrics', 'Record Vitals and Biometrics')
 export const vitalsBiometricsFormWorkspace = getAsyncLifecycle(
   () => import('./vitals-biometrics-form/vitals-biometrics-form.workspace'),
+  options,
+);
+
+export const exportedVitalsBiometricsFormWorkspace = getAsyncLifecycle(
+  () => import('./vitals-biometrics-form/exported-vitals-biometrics-form.workspace'),
   options,
 );
 

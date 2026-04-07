@@ -1,7 +1,10 @@
 {
-  "chartView": "Xem biểu đồ",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "Ngày và giờ",
-  "displaying": "Đang hiển thị",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "Loại gặp gỡ",
-  "tableView": "Xem bảng"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

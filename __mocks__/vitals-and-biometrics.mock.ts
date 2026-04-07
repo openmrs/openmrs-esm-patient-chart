@@ -5055,11 +5055,19 @@ export const mockFhirVitalsResponse = {
 
 export const mockBiometricsConfig = {
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-  biometrics: { bmiUnit: 'kg / m²' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    bmiMinimumAge: 0,
+  },
 };
 
 export const mockVitalsConfig = {
-  biometrics: { bmiUnit: 'kg / m²', heightUnit: 'm', weightUnit: 'kg' },
+  biometrics: {
+    bmiUnit: 'kg / m²',
+    heightUnit: 'm',
+    weightUnit: 'kg',
+    bmiMinimumAge: 0,
+  },
   concepts: {
     diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -5097,6 +5105,7 @@ export const formattedVitals = [
     bmi: null,
     muac: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Pt reports severe L chest pain',
   },
   {
     id: '1',
@@ -5111,6 +5120,7 @@ export const formattedVitals = [
     spo2: 90,
     bmi: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Follow up in 2 weeks. Patient also mentioned having some trouble sleeping lately and asked for some advice on sleep hygiene. Advised to avoid caffeine in the afternoon.',
   },
   {
     id: '2',

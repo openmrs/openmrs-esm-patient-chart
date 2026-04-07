@@ -1,7 +1,10 @@
 {
-  "chartView": "תצוגת תרשים",
+  "addEncounter": "Add encounter",
+  "date": "Date",
   "dateAndTime": "תאריך ושעה",
-  "displaying": "מציג",
+  "editabilityNote": "Tap an observation to edit",
   "encounterType": "סוג הביקור",
-  "tableView": "תצוגת טבלה"
+  "errorSavingObservation": "Error saving observation",
+  "noValue": "No value",
+  "observationSaved": "Observation saved successfully"
 }

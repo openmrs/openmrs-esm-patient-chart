@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRInfinite from 'swr/infinite';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { extractMetaInformation, getConceptUuid } from './helper';
 import {
   type Concept,
@@ -159,32 +159,46 @@ export default function usePanelData(patientUuid: string) {
     [observations],
   );
 
-  const setObservations: Array<ObsRecord> = useMemo(
-    () =>
-      observations
-        ? observations
-            .filter((obs) => !!obs.hasMember)
-            .map((obs) => {
-              const relatedObs = [];
-              obs.hasMember.forEach((memb) => {
-                const membUuid = memb.reference.split('/')[1];
-                const memberObservationIndex = individualObservations.findIndex((obs) => obs.id === membUuid);
-                if (memberObservationIndex > -1) {
-                  relatedObs.push(individualObservations[memberObservationIndex]);
-                  individualObservations.splice(memberObservationIndex, 1);
-                }
-              });
-              return {
-                ...obs,
-                relatedObs,
-              };
-            })
-        : [],
-    [individualObservations, observations],
-  );
+  const setObservations: Array<ObsRecord> = useMemo(() => {
+    if (!observations) {
+      return [];
+    }
+
+    // Create a map of individual observations for efficient lookup
+    const individualObsMap = new Map(individualObservations.map((obs) => [obs.id, obs]));
+    const usedIndividualObsIds = new Set<string>();
+
+    return observations
+      .filter((obs) => !!obs.hasMember)
+      .map((obs) => {
+        const relatedObs: Array<ObsRecord> = [];
+        obs.hasMember.forEach((memb) => {
+          const membUuid = memb.reference.split('/')[1];
+          const memberObs = individualObsMap.get(membUuid);
+          if (memberObs && !usedIndividualObsIds.has(membUuid)) {
+            relatedObs.push(memberObs);
+            usedIndividualObsIds.add(membUuid);
+          }
+        });
+        return {
+          ...obs,
+          relatedObs,
+        };
+      });
+  }, [individualObservations, observations]);
+
+  const remainingIndividualObservations = useMemo(() => {
+    const usedIds = new Set<string>();
+    setObservations.forEach((setObs) => {
+      setObs.relatedObs.forEach((relatedObs) => {
+        usedIds.add(relatedObs.id);
+      });
+    });
+    return individualObservations.filter((obs) => !usedIds.has(obs.id));
+  }, [individualObservations, setObservations]);
 
   const panels = useMemo(() => {
-    const allPanels = [...individualObservations, ...setObservations].sort(
+    const allPanels = [...remainingIndividualObservations, ...setObservations].sort(
       (obs1, obs2) => Date.parse(obs2.effectiveDateTime) - Date.parse(obs1.effectiveDateTime),
     );
     const usedConcepts: Set<string> = new Set();
@@ -195,7 +209,7 @@ export default function usePanelData(patientUuid: string) {
       latestPanels.push(panel);
     });
     return latestPanels;
-  }, [individualObservations, setObservations]);
+  }, [remainingIndividualObservations, setObservations]);
 
   const panelsData = useMemo(
     () => ({

@@ -2,12 +2,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .orderForm {
   flex-grow: 1;
   display: flex;
@@ -43,6 +37,16 @@
   :global(.cds--number__control-btn) {
     border: 0;
   }
+
+  counter-reset: section;
+
+  h3 {
+    counter-increment: section;
+
+    &::before {
+      content: counter(section) '. ';
+    }
+  }
 }
 
 .medicationInfo {
@@ -50,6 +54,13 @@
   padding: layout.$spacing-05;
   margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.medicationInfoText {
+  flex: 1;
 }
 
 .inlineNotification {
@@ -60,14 +71,13 @@
 }
 
 .stickyMedicationInfo {
-  position: fixed;
+  position: sticky;
   background-color: colors.$cyan-60;
   color: colors.$white-0;
-  top: layout.$spacing-12;
+  top: 0;
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
 
   .medicationInfo {
     margin: 0;
@@ -75,7 +85,7 @@
 }
 
 .patientHeader {
-  padding: layout.$spacing-03 layout.$spacing-05 layout.$spacing-06;
+  padding: layout.$spacing-05;
   background-color: colors.$gray-10;
 
   span:first-of-type {
@@ -90,6 +100,7 @@
 .orderFormHeading {
   @include type.type-style('heading-03');
   margin-bottom: 0;
+  margin-top: layout.$spacing-03;
 }
 
 .formSection {
@@ -167,6 +178,10 @@
   align-items: center;
 }
 
+:global(.omrs-breakpoint-lt-desktop) .topAlignedGridRow {
+  align-items: flex-start;
+}
+
 .field {
   margin-bottom: layout.$spacing-05;
 
@@ -239,10 +254,6 @@
     background-color: #ededed;
   }
 
-  .stickyMedicationInfo {
-    top: layout.$spacing-09;
-  }
-
   .buttonSet {
     padding: layout.$spacing-06 layout.$spacing-05;
     background-color: colors.$white-0;
@@ -284,4 +295,27 @@
 
 .caption01 {
   @include type.type-style('legal-01');
+}
+
+.autoCalcHelper {
+  @include type.type-style('helper-text-01');
+  display: block;
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-02;
+}
+
+.recalculateLink {
+  @include type.type-style('helper-text-01');
+  display: block;
+  margin-top: layout.$spacing-02;
+  padding: 0;
+  border: none;
+  background: none;
+  color: colors.$blue-60;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: colors.$blue-70;
+  }
 }

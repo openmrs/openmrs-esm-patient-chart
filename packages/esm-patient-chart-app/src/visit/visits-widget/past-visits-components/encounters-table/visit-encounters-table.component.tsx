@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import { usePagination, type Visit } from '@openmrs/esm-framework';
 import EncountersTable from './encounters-table.component';
 import { type EncountersTableProps } from './encounters-table.resource';
-import { usePagination, useVisitContextStore, type Visit } from '@openmrs/esm-framework';
 
 interface VisitEncountersTableProps {
   patientUuid: string;
@@ -15,7 +15,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
   const [pageSize, setPageSize] = useState(10);
   const mappedEncounters = useMemo(
     () =>
-      visit.encounters.map((encounter) => {
+      (visit.encounters ?? []).map((encounter) => {
         encounter.visit = visit;
         return encounter;
       }),
@@ -25,7 +25,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
 
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
-    totalCount: visit.encounters.length,
+    totalCount: mappedEncounters.length,
     currentPage,
     goTo,
     isLoading: false,

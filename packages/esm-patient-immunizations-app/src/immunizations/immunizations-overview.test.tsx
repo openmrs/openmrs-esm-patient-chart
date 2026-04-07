@@ -1,7 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockPatientImmunizationsSearchResponse } from '__mocks__';
+import { useFhirFetchAll } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { mockImmunizationData } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ImmunizationsOverview from './immunizations-overview.component';
 
@@ -11,11 +12,11 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseFhirFetchAll = useFhirFetchAll as jest.Mock;
 
 describe('ImmunizationOverview', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: [] });
 
     renderWithSwr(<ImmunizationsOverview {...testProps} />);
 
@@ -37,24 +38,24 @@ describe('ImmunizationOverview', () => {
       },
     };
 
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockUseFhirFetchAll.mockReturnValue({
+      data: null,
+      error,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
 
     renderWithSwr(<ImmunizationsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Immunizations' }), {});
   });
 
   it('renders a tabular overview of recently administered immunizations if available', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockPatientImmunizationsSearchResponse });
+    mockUseFhirFetchAll.mockReturnValueOnce({ data: mockImmunizationData });
 
     renderWithSwr(<ImmunizationsOverview {...testProps} />);
 

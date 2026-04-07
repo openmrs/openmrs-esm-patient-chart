@@ -4,10 +4,10 @@ import { render, screen } from '@testing-library/react';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import { deletePatientImmunization } from '../hooks/useImmunizations';
+import { type ImmunizationConfigObject } from '../config-schema';
 import DeleteImmunizationModal from './delete-immunization.modal';
-import type { ConfigObject } from '../config-schema';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseConfig = jest.mocked(useConfig<ImmunizationConfigObject>);
 
 jest.mock('../hooks/useImmunizations', () => ({
   ...jest.requireActual('../hooks/useImmunizations'),
@@ -30,10 +30,8 @@ jest.mock('../hooks/useImmunizationsConceptSet', () => ({
 
 beforeEach(() => {
   return mockUseConfig.mockReturnValue({
-    immunizationsConfig: {
-      immunizationConceptSet: '',
-      sequenceDefinitions: [],
-    },
+    immunizationConceptSet: '',
+    sequenceDefinitions: [],
   });
 });
 
@@ -48,7 +46,7 @@ const defaultProps = {
   vaccineUuid: '886AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 };
 
-describe('<DeleteImmunizationModal />', () => {
+describe('DeleteImmunizationModal', () => {
   it('renders modal with correct elements', () => {
     render(<DeleteImmunizationModal {...defaultProps} />);
     expect(screen.getByRole('heading', { name: /delete immunization/i })).toBeInTheDocument();

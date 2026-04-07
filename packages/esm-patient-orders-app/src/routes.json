@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": ">=2.2.0"
   },
   "optionalBackendDependencies": {
     "fhirproxy": "^1.0.0-SNAPSHOT",
-    "stockmanagement": "^1.4.0 || ^2.0.0",
-    "billing": "^1.2.0-SNAPSHOT"
+    "stockmanagement": "^1.4.0 || ^2.0.0 || >=3.0.0-0",
+    "billing": "^1.2.0-SNAPSHOT || >=2.0.0-0"
   },
   "extensions": [
     {
@@ -22,14 +22,6 @@
       "order": 1
     },
     {
-      "name": "order-basket-action-menu",
-      "component": "orderBasketActionMenu",
-      "slots": [
-        "action-menu-patient-chart-items-slot",
-        "action-menu-ward-patient-items-slot"
-      ]
-    },
-    {
       "name": "lab-result",
       "component": "labResult",
       "slot": "completed-lab-order-results-slot",
@@ -41,7 +33,9 @@
       "name": "print-lab-results-action-button",
       "component": "printLabResultsButton",
       "slot": "print-lab-results-action-button-slot",
-      "meta":{ "fullWidth": false }
+      "meta": {
+        "fullWidth": false
+      }
     },
     {
       "name": "patient-orders-summary-dashboard",
@@ -61,35 +55,50 @@
       "meta": {
         "fullWidth": false
       }
-    }
-  ],
-  "workspaces": [
-    {
-      "name": "order-basket",
-      "title": "orderBasketWorkspaceTitle",
-      "component": "orderBasketWorkspace",
-      "type": "order",
-      "canHide": true
     },
     {
-      "name": "patient-orders-form-workspace",
-      "title": "orderCancellation",
-      "component": "patientOrdersFormWorkspace",
-      "type": "order",
-      "canHide": false
+      "name": "drug-favorites-list",
+      "component": "drugFavoritesListExtension",
+      "slot": "drug-search-slot"
+    },
+    {
+      "name": "drug-pin-button",
+      "component": "drugPinButton",
+      "slot": "drug-search-result-actions-slot"
+    },
+    {
+      "name": "drug-order-pin-action",
+      "component": "drugOrderPinAction",
+      "slot": "drug-order-form-actions-slot"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "order-basket",
+      "component": "orderBasketWorkspace",
+      "window": "patient-chart-order-basket"
     },
     {
       "name": "test-results-form-workspace",
-      "title": "enterTestResults",
       "component": "testResultsFormWorkspace",
-      "type": "lab-results",
-      "canHide": false
+      "window": "lab-results"
     },
     {
       "name": "orderable-concept-workspace",
-      "title": "searchOrderables",
-      "component": "orderableConceptSearch",
-      "type": "order"
+      "component": "addGeneralOrderWorkspace",
+      "window": "patient-chart-order-basket"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-chart-order-basket",
+      "icon": "ShoppingCartIcon",
+      "group": "patient-chart",
+      "order": 1
+    },
+    {
+      "name": "lab-results",
+      "group": "patient-chart"
     }
   ],
   "modals": [

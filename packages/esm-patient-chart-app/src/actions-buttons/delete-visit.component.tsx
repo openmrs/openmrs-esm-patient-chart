@@ -6,27 +6,33 @@ import styles from './action-button.scss';
 
 interface DeleteVisitOverflowMenuItemProps {
   patientUuid: string;
+  closeMenu?: () => void;
 }
 
-const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid }) => {
+/**
+ * This button shows up in the patient banner action menu, but only when the patient has an active visit.
+ * On click, it opens the modal in delete-visit-dialog.component.tsx to DELETE the visit
+ */
+const DeleteVisitOverflowMenuItem: React.FC<DeleteVisitOverflowMenuItemProps> = ({ patientUuid, closeMenu }) => {
   const { t } = useTranslation();
   const { activeVisit } = useVisit(patientUuid);
 
   const handleLaunchModal = useCallback(() => {
     const dispose = showModal('delete-visit-dialog', {
       closeModal: () => dispose(),
-      patientUuid,
       visit: activeVisit,
     });
-  }, [patientUuid, activeVisit]);
+  }, [activeVisit]);
 
   return (
     activeVisit && (
       <OverflowMenuItem
         className={styles.menuitem}
+        closeMenu={closeMenu}
+        hasDivider
+        isDelete
         itemText={t('deleteActiveVisit', 'Delete active visit')}
         onClick={handleLaunchModal}
-        isDelete
       />
     )
   );

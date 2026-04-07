@@ -1,0 +1,95 @@
+import React, { useState, useMemo } from 'react';
+import { Button, InlineLoading, Tag } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { ArrowRightIcon, CloseIcon, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../../config-schema';
+import { useCurrentPath, usePatientFlags } from '../hooks/usePatientFlags';
+import FlagsList from '../flags-list.component';
+import styles from './flags-risk-count.scss';
+import { type FlagsRiskCountExtensionConfig } from './extension-config-schema';
+
+interface FlagsRiskCountExtensionProps {
+  patientUuid: string;
+}
+
+const FlagsRiskCountExtension: React.FC<FlagsRiskCountExtensionProps> = ({ patientUuid }) => {
+  const path = useCurrentPath();
+  const { t } = useTranslation();
+  const { flags, isLoading, error } = usePatientFlags(patientUuid);
+  const filteredFlags = flags.filter((f) => !f.voided);
+  const config = useConfig<FlagsRiskCountExtensionConfig & ConfigObject>();
+
+  // Get all priority names that are marked as risk priorities
+  const riskPriorityNames = useMemo(() => {
+    return (config.priorities ?? [])
+      .filter((style) => style.isRiskPriority)
+      .map((style) => style.priority.toLowerCase());
+  }, [config.priorities]);
+
+  const riskFlags = useMemo(() => {
+    return filteredFlags.filter((f) => {
+      const priorityName = f.flagDefinition?.priority?.name?.toLowerCase() ?? '';
+      return riskPriorityNames.includes(priorityName);
+    });
+  }, [filteredFlags, riskPriorityNames]);
+
+  const [showFlagsList, setShowFlagsList] = useState(false);
+
+  const lastSegment = decodeURI(path).split('/').filter(Boolean).pop();
+  if (lastSegment && config.hideOnPages.includes(lastSegment)) {
+    return null;
+  }
+
+  if (isLoading) {
+    return <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} />;
+  }
+
+  if (error) {
+    return <div>{error.message}</div>;
+  }
+
+  if (riskFlags.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={styles.flagSummary}>
+      <Tag
+        className={styles.flagsCountTag}
+        type={showFlagsList ? 'outline' : 'high-contrast'}
+        onClick={() => setShowFlagsList(!showFlagsList)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setShowFlagsList(!showFlagsList);
+          }
+        }}
+      >
+        <span className={styles.flagIcon}>&#128681;</span>
+        {t('flagCount', '{{count}} risk flags', { count: riskFlags.length })}
+        {!showFlagsList && <ArrowRightIcon className={styles.arrowInTag} size={16} />}
+      </Tag>
+      {showFlagsList && (
+        <>
+          <ArrowRightIcon className={styles.arrow} size={16} />
+          <div className={styles.flagsListContainer}>
+            <FlagsList patientUuid={patientUuid} />
+          </div>
+          <Button
+            className={styles.actionButton}
+            hasIconOnly
+            iconDescription={t('closeFlagsList', 'Close flags list')}
+            kind="ghost"
+            size="sm"
+            renderIcon={CloseIcon}
+            onClick={() => setShowFlagsList(false)}
+          />
+        </>
+      )}
+    </div>
+  );
+};
+
+export default FlagsRiskCountExtension;

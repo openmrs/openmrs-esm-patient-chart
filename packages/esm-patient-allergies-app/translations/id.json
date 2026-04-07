@@ -47,5 +47,6 @@
   "severityRequired": "Tingkat keparahan diperlukan",
   "typeAdditionalComments": "Ketik komentar tambahan di sini",
   "typeAllergenName": "Silakan ketik nama alergen",
-  "typeAllergicReactionName": "Silakan ketik nama reaksi alergi"
+  "typeAllergicReactionName": "Silakan ketik nama reaksi alergi",
+  "unknown": "Unknown"
 }

@@ -7,6 +7,7 @@
   "lastCompleted": "הושלם לאחרונה",
   "never": "אף פעם",
   "noFormsToDisplay": "אין טפסים לתצוגה.",
+  "off": "Off",
   "offlineForms": "טפסים לא מקוונים",
   "offlineForms__lower": "טפסים לא מקוונים",
   "offlineFormsOverviewCardAvailableOffline": "זמין לשימוש לא מקוון",
@@ -16,5 +17,6 @@
   "offlinePatientsTableSearchLabel": "חפש ברשימה זו",
   "offlinePatientsTableSearchPlaceholder": "חפש ברשימה זו",
   "offlineToggle": "מצב לא מקוון",
+  "on": "On",
   "searchThisList": "חפש ברשימה זו"
 }
