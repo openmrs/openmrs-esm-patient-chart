@@ -77,28 +77,32 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     value: BiometricType;
   }>;
 
-  const cutoff = useMemo(() => dayjs().subtract(12, 'month'), []);
+  const monthsToShow = config?.monthsToShow ?? 12;
+  const cutoff = useMemo(() => dayjs().subtract(monthsToShow, 'month'), [monthsToShow]);
 
-  const chartData = useMemo(
-    () =>
-      patientBiometrics
-        .filter((biometrics) => biometrics[selectedBiometrics.value])
-        .filter((biometrics) => dayjs(biometrics.date).isAfter(cutoff))
-        .sort(
-          (biometricA, biometricB) =>
-            new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime(),
-        )
-        .map(
-          (biometrics) =>
-            biometrics[selectedBiometrics.value] && {
-              group: selectedBiometrics.title,
-              key: formatDate(parseDate(biometrics.date), { year: true }),
-              value: biometrics[selectedBiometrics.value],
-              date: biometrics.date,
-            },
-        ),
-    [patientBiometrics, selectedBiometrics.title, selectedBiometrics.value, cutoff],
+  const chartData = useMemo(() => {
+    const filtered = patientBiometrics.filter(
+      (b) => b[selectedBiometrics.value],
+    );
+    const recentData = filtered.filter((b) =>
+      dayjs(b.date).isAfter(cutoff),
   );
+    const finalData =
+      recentData.length > 0 ? recentData : filtered.slice(-10);
+    return finalData
+      .sort(
+        (a, b) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
+    .map(
+      (b) =>
+        b[selectedBiometrics.value] && {
+          value: b[selectedBiometrics.value],
+          group: selectedBiometrics.title,
+          date: b.date,
+        },
+    );
+}, [patientBiometrics, selectedBiometrics.value, cutoff]);
 
   const chartOptions = useMemo(() => {
     return {
