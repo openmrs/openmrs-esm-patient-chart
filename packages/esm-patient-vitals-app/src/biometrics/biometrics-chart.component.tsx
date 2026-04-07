@@ -102,7 +102,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           date: b.date,
         },
     );
-}, [patientBiometrics, selectedBiometrics.value, cutoff]);
+}, [patientBiometrics, selectedBiometrics.value, selectedBiometrics.title, cutoff]);
 
   const chartOptions = useMemo(() => {
     return {
