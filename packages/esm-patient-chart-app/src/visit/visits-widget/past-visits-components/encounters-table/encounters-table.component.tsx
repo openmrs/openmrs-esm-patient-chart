@@ -284,7 +284,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Layer className={styles.layer}>
-                              {(canDeleteEncounter || canPrintEncounter) && ( // equivalent to canDeleteEncounter || canEditEncounter
+                              {(canDeleteEncounter || canPrintEncounter) && (
                                 <OverflowMenu
                                   aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                   flipped
