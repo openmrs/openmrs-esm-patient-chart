@@ -39,7 +39,7 @@ describe('CompletedFormsTable', () => {
       error: undefined,
     } as any);
 
-    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} />);
+    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} isTabActive />);
 
     expect(screen.getByTestId('encounters-table')).toBeInTheDocument();
   });
@@ -51,7 +51,7 @@ describe('CompletedFormsTable', () => {
       error: undefined,
     } as any);
 
-    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} />);
+    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} isTabActive />);
 
     expect(mockUseAllEncounters).toHaveBeenCalledWith(mockPatientAlice.uuid, undefined);
   });
@@ -63,7 +63,7 @@ describe('CompletedFormsTable', () => {
       error: undefined,
     } as any);
 
-    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} />);
+    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} isTabActive />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-is-selectable', 'true');
@@ -76,7 +76,7 @@ describe('CompletedFormsTable', () => {
       error: undefined,
     } as any);
 
-    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} />);
+    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} isTabActive />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-show-encounter-type-filter', 'true');
@@ -89,7 +89,7 @@ describe('CompletedFormsTable', () => {
       error: undefined,
     } as any);
 
-    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} />);
+    renderWithSwr(<CompletedFormsTable patientUuid={mockPatientAlice.uuid} isTabActive />);
 
     const table = screen.getByTestId('encounters-table');
     expect(table).toHaveAttribute('data-show-visit-type', 'true');

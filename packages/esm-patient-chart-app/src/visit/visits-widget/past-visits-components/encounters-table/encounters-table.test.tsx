@@ -98,9 +98,9 @@ describe('EncountersTable', () => {
 
     const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /form name/, /provider/];
     const expectedTableRows = [
-      /18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- options/,
-      /03\-aug\-2021, 12:47 am facility visit visit note \-\- user one options/,
-      /05\-jul\-2021, 10:07 am facility visit consultation covid 19 dennis the doctor options/,
+      /select row 18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- options/,
+      /select row 03\-aug\-2021, 12:47 am facility visit visit note \-\- user one options/,
+      /select row 05\-jul\-2021, 10:07 am facility visit consultation covid 19 dennis the doctor options/,
     ];
 
     expectedColumnHeaders.forEach((header) => {
@@ -223,7 +223,7 @@ describe('Encounter editability', () => {
     renderEncountersTable();
 
     const row = screen.getByRole('row', {
-      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
     });
 
     // Check overflow menu buttons
@@ -260,7 +260,7 @@ describe('Encounter editability', () => {
 
     // Check today's encounter -- should be editable
     const todayRow = screen.getByRole('row', {
-      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
     });
 
     // Check overflow menu buttons
@@ -280,7 +280,7 @@ describe('Encounter editability', () => {
 
     // Check old encounter -- should not be editable
     const oldRow = screen.getByRole('row', {
-      name: /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One/i,
+      name: /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One/i,
     });
     expect(within(oldRow).queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
@@ -310,7 +310,7 @@ describe('Encounter editability', () => {
     renderEncountersTable();
 
     const oldRow = screen.getByRole('row', {
-      name: /03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i,
+      name: /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i,
     });
 
     // Check overflow menu buttons
@@ -349,7 +349,7 @@ describe('Delete Encounter', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
 
     const row = screen.getByRole('row', {
-      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
     });
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
