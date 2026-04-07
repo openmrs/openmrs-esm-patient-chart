@@ -21,8 +21,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig<ConfigObjectSwitchable>();
   const { t } = useTranslation();
   const {
-    data: { observations, concepts },
-  } = useObs(patientUuid);
+  data: { observations, concepts },
+} = useObs(patientUuid, config.graphOldestFirst);
 
   const obsByConceptUuid = useMemo(() => {
     return Object.fromEntries(
