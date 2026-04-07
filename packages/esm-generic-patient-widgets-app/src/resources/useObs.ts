@@ -39,12 +39,15 @@ export const pageSize = 100;
  * For any concept that has neither label nor obs, the concept is fetched to
  * get the label.
  */
-export function useObs(patientUuid: string): UseObsResult {
+export function useObs(
+  patientUuid: string,
+  oldestFirst = false
+): UseObsResult {
   const config = useConfig<CommonConfig>();
   const { encounterTypes, data } = config;
   const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
-  const sortDirection = 'graphOldestFirst' in config && config.graphOldestFirst ? 'date' : '-date';
+  const sortDirection = oldestFirst ? 'date' : '-date';
 
   let url = `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${data
     .map((d) => d.concept)
