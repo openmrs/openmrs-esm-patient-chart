@@ -15,7 +15,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
   const [pageSize, setPageSize] = useState(10);
   const mappedEncounters = useMemo(
     () =>
-      visit.encounters.map((encounter) => {
+      (visit.encounters ?? []).map((encounter) => {
         encounter.visit = visit;
         return encounter;
       }),
@@ -25,7 +25,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
 
   const encountersTableProps: EncountersTableProps = {
     patientUuid,
-    totalCount: visit.encounters.length,
+    totalCount: mappedEncounters.length,
     currentPage,
     goTo,
     isLoading: false,

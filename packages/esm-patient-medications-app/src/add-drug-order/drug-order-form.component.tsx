@@ -79,24 +79,32 @@ function MedicationInfoHeader({
 
   return (
     <div className={styles.medicationInfo} id="medicationInfo">
-      <strong className={styles.productiveHeading02}>
-        {drug?.display} {drug?.strength && `(${drug?.strength})`}
-      </strong>{' '}
-      <span className={styles.bodyLong01}>
-        {routeValue && <>&mdash; {routeValue}</>}{' '}
-        {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
-      </span>
-      {dosage && unitValue ? (
-        <>
-          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <strong>
-            <span className={styles.productiveHeading02}>
-              {dosage} {unitValue.toLowerCase()}
-            </span>
-          </strong>
-        </>
-      ) : null}{' '}
-      <ExtensionSlot name="medication-info-slot" state={{ order: { drug } as DrugOrderBasketItem }} />
+      <div className={styles.medicationInfoText}>
+        <strong className={styles.productiveHeading02}>
+          {drug?.display} {drug?.strength && `(${drug?.strength})`}
+        </strong>{' '}
+        <span className={styles.bodyLong01}>
+          {routeValue && <>&mdash; {routeValue}</>}{' '}
+          {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
+        </span>
+        {dosage && unitValue ? (
+          <>
+            &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+            <strong>
+              <span className={styles.productiveHeading02}>
+                {dosage} {unitValue.toLowerCase()}
+              </span>
+            </strong>
+          </>
+        ) : null}
+      </div>
+      <ExtensionSlot
+        name="medication-info-slot"
+        state={{
+          drug,
+          orderItem: { dosage, unit: { value: unitValue }, route: { value: routeValue } },
+        }}
+      />
     </div>
   );
 }
@@ -731,6 +739,18 @@ export function DrugOrderForm({
             </section>
           </div>
 
+          <ExtensionSlot
+            name="drug-order-form-actions-slot"
+            state={{
+              drug,
+              orderItem: {
+                dosage: watchedDosage,
+                unit: watchedUnit,
+                route: watch('route'),
+                frequency: watchedFrequency,
+              },
+            }}
+          />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}

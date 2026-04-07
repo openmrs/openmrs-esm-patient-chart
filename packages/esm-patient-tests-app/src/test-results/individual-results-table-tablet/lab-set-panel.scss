@@ -124,8 +124,8 @@
   table-layout: fixed;
   width: 100%;
 
-  td {
-    border-bottom: none !important;
+  tbody .col-testName {
+    color: colors.$blue-60;
   }
 }
 
