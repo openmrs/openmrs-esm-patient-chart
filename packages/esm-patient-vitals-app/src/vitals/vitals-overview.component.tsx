@@ -182,7 +182,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
     <>
       {(() => {
         if (isLoading) {
-          return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+          return <DataTableSkeleton role="progressbar" zebra />;
         }
 
         if (error) {

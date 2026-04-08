@@ -390,7 +390,7 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
       </div>
 
       {isLoading ? (
-        <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />
+        <DataTableSkeleton role="progressbar" zebra />
       ) : error ? (
         <ErrorState error={error} headerTitle={title} />
       ) : orderTypes?.length > 0 ? (

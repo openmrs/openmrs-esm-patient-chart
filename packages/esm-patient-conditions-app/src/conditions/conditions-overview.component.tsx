@@ -134,7 +134,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem.id);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {
@@ -212,7 +212,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
                         <TableRow key={row.id}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>
-                              {cell.value?.content ?? cell.info.header === 'status'
+                              {(cell.value?.content ?? cell.info.header === 'status')
                                 ? t(cell.value.toLowerCase(), cell.value)
                                 : cell.value}
                             </TableCell>

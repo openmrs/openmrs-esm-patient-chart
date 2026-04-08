@@ -124,7 +124,7 @@ const TestOrder: React.FC<TestOrderProps> = ({ testOrder, patientUuid: patientUu
   }, [isLoadingResult, testResultObs, conceptList, referenceRanges]);
 
   if (isLoadingTestConcepts || isLoadingResultsConcepts || isLoadingResult || isLoadingRanges) {
-    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (!concept) {

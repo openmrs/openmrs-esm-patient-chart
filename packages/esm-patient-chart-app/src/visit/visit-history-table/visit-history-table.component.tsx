@@ -61,7 +61,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   });
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {
@@ -75,6 +75,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
       </div>
     );
   }
+
   return (
     <div className={styles.container}>
       {/* @ts-ignore */}

@@ -60,7 +60,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const launchAllergiesForm = useCallback(() => launchWorkspace2(patientAllergiesFormWorkspace), []);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {

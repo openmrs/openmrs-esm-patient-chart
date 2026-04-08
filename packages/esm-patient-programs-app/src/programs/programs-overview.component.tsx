@@ -105,7 +105,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   }, [paginatedEnrollments, t]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {

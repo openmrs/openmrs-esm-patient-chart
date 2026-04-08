@@ -108,7 +108,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }, [availablePrograms, enrollments]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {

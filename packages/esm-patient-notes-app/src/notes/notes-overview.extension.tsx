@@ -44,7 +44,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
   }, [visitContext]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
   if (error) {
     return <ErrorState error={error} headerTitle={headerTitle} />;

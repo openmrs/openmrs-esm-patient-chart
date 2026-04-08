@@ -115,7 +115,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   if (isLoading) {
     return (
       <div className={styles.attachmentTable}>
-        <DataTableSkeleton className={styles.dataTableSkeleton} compact={isDesktop} zebra />
+        <DataTableSkeleton className={styles.dataTableSkeleton} zebra />
       </div>
     );
   }

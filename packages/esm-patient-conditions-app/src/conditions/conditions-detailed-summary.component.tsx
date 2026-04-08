@@ -100,7 +100,7 @@ function ConditionsDetailedSummary({ patient }) {
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem.id);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+    return <DataTableSkeleton role="progressbar" zebra />;
   }
 
   if (error) {
@@ -176,7 +176,7 @@ function ConditionsDetailedSummary({ patient }) {
                         <TableRow key={row.id} {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>
-                              {cell.value?.content ?? cell.info.header === 'status'
+                              {(cell.value?.content ?? cell.info.header === 'status')
                                 ? t(cell.value.toLowerCase(), cell.value)
                                 : cell.value}
                             </TableCell>
