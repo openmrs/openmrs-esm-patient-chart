@@ -135,7 +135,9 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       const test = state.tests[key] as TestResult;
       if (test.obs && Array.isArray(test.obs)) {
         test.obs.forEach((obs) => {
+          // Use a more specific key that includes the test name to avoid over-deduplication
           const testKey = `${test.flatName}_${obs.obsDatetime}_${obs.value}`;
+
           if (!seenTests.has(testKey)) {
             seenTests.add(testKey);
             const flattenedEntry = {
@@ -149,6 +151,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       }
     }
 
+    // Sort descending so the first obs per concept we encounter is always the most recent
     flattenedObs.sort(
       (a, b) =>
         new Date((b as MappedObservation).obsDatetime).getTime() -
@@ -161,13 +164,22 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
     flattenedObs.forEach((curr: MappedObservation) => {
       const flatNameParts = curr.flatName.split('-');
 
+      // Extract the actual panel name from the flatName
+      // Panel names are at index 1 (second part) like "Lipid panel", "Basic metabolic panel"
+      // This is based on the actual flatName structure we observed
       let groupKey: string;
       if (flatNameParts.length >= 2) {
+        // For names like "Hematology-Lipid panel-Total cholesterol" or "Chemistry-Basic metabolic panel-Serum sodium"
+        // Take the second part (index 1) which is the actual panel name
         groupKey = flatNameParts[1];
       } else {
+        // Fallback to first part if only one part exists
         groupKey = flatNameParts[0];
       }
 
+      // Group by panel name only (not panel+date) so all observations for the
+      // same panel are considered together. We then keep only the most recent
+      // result per individual test concept, matching what the Overtime view shows.
       if (!groupedObs[groupKey]) {
         const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
         groupedObs[groupKey] = {
