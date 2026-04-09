@@ -72,10 +72,6 @@ const augmentObstreeData = (node: ObsTreeNode, prefix: string | undefined) => {
   }
 
   if (outData?.obs?.length) {
-    // Sort observations by date descending and keep only the most recent one
-    outData.obs.sort((a, b) => new Date(b.obsDatetime ?? 0).getTime() - new Date(a.obsDatetime ?? 0).getTime());
-    outData.obs = [outData.obs[0]];
-    outData.obs = [outData.obs[0]]; // keep only the most recent
     outData.obs = outData.obs.map((ob) => {
       // Note: Units are only at the concept/node level, not observation-level
       const observationRanges: ReferenceRanges | undefined =
