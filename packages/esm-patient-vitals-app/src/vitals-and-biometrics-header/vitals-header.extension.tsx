@@ -8,12 +8,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig, type Visit } from '@openmrs/esm-framework';
-import {
-  interpretBloodPressure,
-  useConceptUnits,
-  useVitalsAndBiometrics,
-  useVitalsConceptMetadata,
-} from '../common';
+import { interpretBloodPressure, useConceptUnits, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import { type ConfigObject } from '../config-schema';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
 import VitalsHeaderItem from './vitals-header-item.component';
@@ -135,7 +130,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
             {!hideLinks && (
               <ConfigurableLink
                 className={styles.link}
-                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
+                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/vitals-and-biometrics`}
               >
                 {t('vitalsHistory', 'Vitals history')}
               </ConfigurableLink>

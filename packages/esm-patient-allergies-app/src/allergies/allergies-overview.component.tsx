@@ -29,7 +29,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Allergies`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/allergies`;
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';

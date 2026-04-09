@@ -43,7 +43,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-orders-dashboard-slot",
-        "path": "Orders",
+        "path": "orders",
         "hideDashboardTitle": true
       },
       "order": 4

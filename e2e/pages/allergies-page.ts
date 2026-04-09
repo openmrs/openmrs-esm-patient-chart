@@ -6,6 +6,6 @@ export class PatientAllergiesPage {
   readonly allergiesTable = () => this.page.getByRole('table', { name: /allergies summary/i });
 
   async goTo(uuid: string) {
-    await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/Allergies');
+    await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/allergies');
   }
 }
