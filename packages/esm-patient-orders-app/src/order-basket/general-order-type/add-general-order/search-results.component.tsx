@@ -52,11 +52,11 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
     return (
       <Tile className={styles.emptyState}>
         <div>
-          <h4 className={styles.heading}>
+          <h2 className={styles.heading}>
             {t('errorFetchingTestTypes', 'Error fetching results for "{{searchTerm}}"', {
               searchTerm,
             })}
-          </h4>
+          </h2>
           <p className={styles.bodyShort01}>
             <span>{t('trySearchingAgain', 'Please try searching again')}</span>
           </p>
@@ -103,11 +103,11 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   return (
     <Tile className={styles.emptyState}>
       <div>
-        <h4 className={styles.heading}>
+        <h2 className={styles.heading}>
           {t('noResultsForTestTypeSearch', 'No results to display for "{{searchTerm}}"', {
             searchTerm,
           })}
-        </h4>
+        </h2>
         <p className={styles.bodyShort01}>
           <span>{t('tryTo', 'Try to')}</span>{' '}
           <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>

@@ -100,9 +100,9 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
       <div className={styles.resultsContainer}>
         <div ref={headerRef} className={styles.headerSentinel} />
         <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
-          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+          <h2 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             filteredResultsCount ? `(${filteredResultsCount})` : ''
-          }`}</h4>
+          }`}</h2>
           <div className={styles.leftHeaderActions}>
             <RefreshDataButton isTablet={isTablet} patientUuid={patientUuid} t={t} />
             <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
@@ -130,16 +130,16 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
       <div className={styles.headerSentinel} ref={headerRef} />
       <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
-          <h4>{t('tests', 'Tests')}</h4>
+          <h2>{t('tests', 'Tests')}</h2>
           <Button className={styles.button} kind="ghost" onClick={resetTree} size={isTablet ? 'md' : 'sm'}>
             <span>{t('reset', 'Reset')}</span>
           </Button>
         </div>
         <div className={styles.rightSectionHeader}>
           <div className={styles.viewOptsContentSwitcherContainer}>
-            <h4 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
+            <h2 className={styles.viewOptionsText}>{`${t('results', 'Results')} ${
               filteredResultsCount ? `(${filteredResultsCount})` : ''
-            }`}</h4>
+            }`}</h2>
             <div className={styles.buttonsContainer}>
               <RefreshDataButton isTablet={isTablet} patientUuid={patientUuid} t={t} />
               <span className={styles.contentSwitcherLabel}>{t('view', 'View')}: </span>
