@@ -28,6 +28,7 @@ const legacyPathAliases: Record<string, string> = {
   'Vitals & Biometrics': 'vitals-and-biometrics',
   'Vitals %26 Biometrics': 'vitals-and-biometrics',
   Allergies: 'allergies',
+  Appointments: 'appointments',
   Attachments: 'attachments',
   Conditions: 'conditions',
   Encounters: 'encounters',
