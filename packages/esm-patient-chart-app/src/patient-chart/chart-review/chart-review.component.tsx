@@ -30,6 +30,7 @@ const legacyPathAliases: Record<string, string> = {
   Allergies: 'allergies',
   Appointments: 'appointments',
   Attachments: 'attachments',
+  'Billing history': 'billing-history',
   Conditions: 'conditions',
   Encounters: 'encounters',
   Immunizations: 'immunizations',
