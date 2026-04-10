@@ -11,7 +11,7 @@ interface VitalsOverviewProps {
 const VitalsSummary: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/vitals-and-biometrics`;
   const urlLabel = t('seeAll', 'See all');
 
   return (

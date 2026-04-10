@@ -37,7 +37,7 @@ jest.mock('../grouped-timeline', () => ({
 const testProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
-  basePath: '/spa/patient/some-uuid/chart/Results',
+  basePath: '/spa/patient/some-uuid/chart/results',
   testUuid: 'test-uuid',
   expanded: false,
   type: 'default',

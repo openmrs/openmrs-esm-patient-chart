@@ -25,7 +25,7 @@ interface NotesOverviewProps {
 const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Forms & Notes`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/visits`;
   const urlLabel = t('seeAll', 'See all');
 
   const { visitContext } = usePatientChartStore(patientUuid);
