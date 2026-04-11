@@ -64,6 +64,7 @@
   "temperatureAbbreviated": "Temp",
   "unknown": "Unknown",
   "validationInputError": "Value must be between {{min}} and {{max}}",
+  "viewReferenceRanges": "View reference ranges",
   "vitals": "Vitals",
   "Vitals & Biometrics": "Vitals & Biometrics",
   "vitalsAndBiometrics": "Vitals and biometrics",
@@ -74,7 +75,6 @@
   "vitalsAndBiometricsUpdated": "Vitals and Biometrics updated",
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Vitals history",
-  "viewReferenceRanges": "View reference ranges",
   "vitalSignDisplayed": "Vital sign displayed",
   "vitalSigns": "vital signs",
   "weight": "Weight"

@@ -11,6 +11,7 @@ import {
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
+import { useVitalsConceptMetadata } from '../common';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
 import VitalsHeader from './vitals-header.extension';
@@ -25,6 +26,7 @@ const testProps = {
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockNumericObservation = jest.mocked(NumericObservation);
+const mockUseVitalsConceptMetadata = jest.mocked(useVitalsConceptMetadata);
 
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
@@ -61,6 +63,10 @@ mockUseConfig.mockReturnValue({
 } as ConfigObject);
 
 describe('VitalsHeader', () => {
+  beforeEach(() => {
+    mockUseVitalsConceptMetadata.mockReturnValue(mockVitalsConceptMetadata);
+  });
+
   it('renders an empty state view when there are no vitals data to show', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
@@ -371,6 +377,54 @@ describe('VitalsHeader', () => {
       ([props]) => props.conceptUuid && !props.interpretation,
     );
     expect(callsWithoutBpAndWithoutInterpretation.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('shows the reference ranges toggletip button when conceptRangeMap has entries', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('button', { name: /view reference ranges/i })).toBeInTheDocument();
+  });
+
+  it('hides the reference ranges toggletip button when conceptRangeMap is empty', async () => {
+    mockUseVitalsConceptMetadata.mockReturnValue({
+      ...mockVitalsConceptMetadata,
+      conceptRangeMap: new Map(),
+    });
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('button', { name: /view reference ranges/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsConceptMetadata.mockReturnValue(mockVitalsConceptMetadata);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const toggletipButton = screen.getByRole('button', { name: /view reference ranges/i });
+    await user.click(toggletipButton);
+
+    expect(screen.getByText(/reference ranges/i)).toBeInTheDocument();
   });
 
   it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
