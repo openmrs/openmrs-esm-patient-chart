@@ -15,7 +15,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-attachments-dashboard-slot",
-        "path": "Attachments"
+        "path": "attachments"
       },
       "order": 9
     },

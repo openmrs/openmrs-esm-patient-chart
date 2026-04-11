@@ -18,6 +18,11 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+  orderTypeUuid: {
+    _type: Type.UUID,
+    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
   showPrintButton: {
     _type: Type.Boolean,
     _default: false,
@@ -36,6 +41,17 @@ export const configSchema = {
     _description: 'Whether to require an indication when placing a medication order',
     _default: true,
   },
+  durationUnitsDaysMap: {
+    _type: Type.Object,
+    _description:
+      'Maps duration unit CIEL concept UUIDs to their equivalent number of days for auto-calculating dispense quantity. Months uses 30 as an approximation.',
+    _default: {
+      '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 1, // Days
+      '1073AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 7, // Weeks
+      '1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 30, // Months
+      '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -44,7 +60,9 @@ export interface ConfigObject {
     display: string;
   };
   drugOrderTypeUUID: string;
+  orderTypeUuid: string;
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
+  durationUnitsDaysMap: Record<string, number>;
 }

@@ -6,6 +6,6 @@ export class ConditionsPage {
   readonly conditionsTable = () => this.page.getByRole('table', { name: /conditions summary/i });
 
   async goTo(uuid: string) {
-    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/Conditions`);
+    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/conditions`);
   }
 }

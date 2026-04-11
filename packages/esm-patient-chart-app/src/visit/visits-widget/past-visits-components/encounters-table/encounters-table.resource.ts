@@ -94,7 +94,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
       encounter.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
     visitStartDatetime: encounter.visit?.startDatetime,
     visitStopDatetime: encounter.visit?.stopDatetime,
-    visitType: encounter.visit?.visitType?.display,
+    visitType: encounter.visit?.visitType?.display ?? '--',
     visitTypeUuid: encounter.visit?.visitType?.uuid,
     visitUuid: encounter.visit?.uuid,
   };

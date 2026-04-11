@@ -31,7 +31,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "slot": "patient-chart-immunizations-dashboard-slot",
-        "path": "Immunizations"
+        "path": "immunizations"
       },
       "order": 8
     }
