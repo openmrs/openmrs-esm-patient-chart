@@ -64,7 +64,9 @@ mockUseConfig.mockReturnValue({
 
 describe('VitalsHeader', () => {
   beforeEach(() => {
-    mockUseVitalsConceptMetadata.mockReturnValue(mockVitalsConceptMetadata);
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
   });
 
   it('renders an empty state view when there are no vitals data to show', async () => {
@@ -395,7 +397,7 @@ describe('VitalsHeader', () => {
     mockUseVitalsConceptMetadata.mockReturnValue({
       ...mockVitalsConceptMetadata,
       conceptRangeMap: new Map(),
-    });
+    } as ReturnType<typeof useVitalsConceptMetadata>);
 
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [formattedVitals[0]],
@@ -411,7 +413,9 @@ describe('VitalsHeader', () => {
   it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockUseVitalsConceptMetadata.mockReturnValue(mockVitalsConceptMetadata);
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
 
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [formattedVitals[0]],
