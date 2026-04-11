@@ -5,8 +5,8 @@ import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 dayjs.extend(duration);
 import { Trans, useTranslation } from 'react-i18next';
-import { Button, InlineLoading, Tag } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
+import { Button, InlineLoading, Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { ArrowRight, Information } from '@carbon/react/icons';
 import { ConfigurableLink, formatDate, parseDate, useConfig, type Visit } from '@openmrs/esm-framework';
 import { interpretBloodPressure, useConceptUnits, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import { type ConfigObject } from '../config-schema';
@@ -43,7 +43,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
   const config = useConfig<ConfigObject>();
   const { conceptUnits } = useConceptUnits();
   const { data: vitals, isLoading, isValidating } = useVitalsAndBiometrics(patientUuid, 'both');
-  const { conceptRanges } = useVitalsConceptMetadata(patientUuid);
+  const { conceptRanges, conceptRangeMap } = useVitalsConceptMetadata(patientUuid);
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
@@ -119,6 +119,71 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
         <div className={styles.vitalsHeader} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
           <div className={styles.headerItems}>
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
+            {conceptRangeMap?.size > 0 && (
+              <Toggletip align="bottom-left">
+                <ToggletipButton
+                  className={styles.referenceRangeButton}
+                  label={t('viewReferenceRanges', 'View reference ranges')}
+                >
+                  <Information size={16} />
+                </ToggletipButton>
+                <ToggletipContent>
+                  <div className={styles.referenceRangeContent}>
+                    <p className={styles.referenceRangeHeading}>{t('referenceRanges', 'Reference ranges')}</p>
+                    <table className={styles.referenceRangeTable}>
+                      <tbody>
+                        {[
+                          {
+                            label: t('bp', 'BP'),
+                            uuid: config.concepts.systolicBloodPressureUuid,
+                            unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid),
+                          },
+                          {
+                            label: t('heartRate', 'Heart rate'),
+                            uuid: config.concepts.pulseUuid,
+                            unit: conceptUnits.get(config.concepts.pulseUuid),
+                          },
+                          {
+                            label: t('respiratoryRate', 'R. rate'),
+                            uuid: config.concepts.respiratoryRateUuid,
+                            unit: conceptUnits.get(config.concepts.respiratoryRateUuid),
+                          },
+                          {
+                            label: t('spo2', 'SpO2'),
+                            uuid: config.concepts.oxygenSaturationUuid,
+                            unit: conceptUnits.get(config.concepts.oxygenSaturationUuid),
+                          },
+                          {
+                            label: t('temperatureAbbreviated', 'Temp'),
+                            uuid: config.concepts.temperatureUuid,
+                            unit: conceptUnits.get(config.concepts.temperatureUuid),
+                          },
+                        ]
+                          .filter(({ uuid }) => conceptRangeMap?.get(uuid))
+                          .map(({ label, uuid, unit }) => {
+                            const range = conceptRangeMap.get(uuid);
+                            return (
+                              <tr key={uuid}>
+                                <td className={styles.referenceRangeLabel}>{label}</td>
+                                <td className={styles.referenceRangeValue}>
+                                  {range.lowNormal != null && range.hiNormal != null
+                                    ? `${range.lowNormal}–${range.hiNormal}`
+                                    : range.lowNormal != null
+                                      ? `≥ ${range.lowNormal}`
+                                      : range.hiNormal != null
+                                        ? `≤ ${range.hiNormal}`
+                                        : '—'}
+                                </td>
+                                <td className={styles.referenceRangeUnit}>{unit ?? ''}</td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                </ToggletipContent>
+              </Toggletip>
+            )}
             <span className={styles.bodyText}>
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>

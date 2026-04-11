@@ -51,6 +51,7 @@
   "recordBiometrics": "Record biometrics",
   "recordVitals": "Record vitals",
   "recordVitalsAndBiometrics": "Record Vitals and Biometrics",
+  "referenceRanges": "Reference ranges",
   "respirationRate": "Respiration rate",
   "respiratoryRate": "R. rate",
   "respiratoryRateAbbreviated": "R. Rate",
@@ -73,6 +74,7 @@
   "vitalsAndBiometricsUpdated": "Vitals and Biometrics updated",
   "vitalsAndBiometricsUpdateError": "Error updating Vitals and Biometrics",
   "vitalsHistory": "Vitals history",
+  "viewReferenceRanges": "View reference ranges",
   "vitalSignDisplayed": "Vital sign displayed",
   "vitalSigns": "vital signs",
   "weight": "Weight"
