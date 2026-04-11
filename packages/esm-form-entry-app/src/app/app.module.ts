@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { ApplicationRef, LOCALE_ID, NgModule, DoBootstrap } from '@angular/core';
 import { TranslateLoader, TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -23,6 +23,7 @@ import { FormCreationService } from './form-creation/form-creation.service';
 import { JsonLoader } from './loaders/json-loader';
 import { ProgramResourceService } from './openmrs-api/program-resource.service';
 import { FormPrepopulationService } from './services/pre-populate-question.service';
+import { dequeueContainerElement } from '../single-spa-props';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -59,6 +60,14 @@ import { FormPrepopulationService } from './services/pre-populate-question.servi
     ProgramResourceService,
     FormPrepopulationService,
   ],
-  bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule implements DoBootstrap {
+  // ngDoBootstrap runs synchronously during bootstrapModule resolution.
+  // At that point the container element is already queued, so we can safely
+  // target the exact DOM element that belongs to this parcel instance.
+  ngDoBootstrap(appRef: ApplicationRef): void {
+    const containerElement = dequeueContainerElement();
+    const rootElement = containerElement?.querySelector('my-app-root') as HTMLElement | null;
+    appRef.bootstrap(AppComponent, rootElement ?? undefined);
+  }
+}
