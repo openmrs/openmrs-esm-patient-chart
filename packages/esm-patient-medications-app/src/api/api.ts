@@ -10,11 +10,12 @@ import {
   type PostDataPrepFunction,
   careSettingUuid,
   type OrderAction,
+  normalizeDrugOrders,
 } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 
 const customRepresentation =
-  'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
+  'custom:(uuid,drugNonCoded,dosingType,orderNumber,accessionNumber,' +
   'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
   'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,fulfillerStatus,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
@@ -59,7 +60,7 @@ export function usePatientOrders(patientUuid: string) {
     [mutate, patientUuid],
   );
 
-  const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
+  const drugOrders = useMemo(() => normalizeDrugOrders(sortOrdersByDateActivated(data?.data?.results)) ?? null, [data]);
 
   return {
     data: data ? drugOrders : null,
@@ -91,7 +92,10 @@ export function useActivePatientOrders(patientUuid: string) {
     openmrsFetch,
   );
 
-  const activeOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
+  const activeOrders = useMemo(
+    () => normalizeDrugOrders(sortOrdersByDateActivated(data?.data?.results)) ?? null,
+    [data],
+  );
 
   return {
     data: activeOrders,
@@ -119,7 +123,7 @@ export function usePastPatientOrders(patientUuid: string) {
     const filteredDrugOrders = allOrders.filter(
       (order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid),
     );
-    return sortOrdersByDateActivated(filteredDrugOrders);
+    return normalizeDrugOrders(sortOrdersByDateActivated(filteredDrugOrders));
   }, [allOrders, activeOrders]);
 
   return {
@@ -148,7 +152,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       careSetting: careSettingUuid,
       orderer: orderingProviderUuid,
       encounter: encounterUuid,
-      drug: order.drug.uuid,
+      drug: order.drug?.uuid ?? null,
+      drugNonCoded: order.drug?.drugNonCoded ?? null,
       dose: order.dosage,
       doseUnits: order.unit?.valueCoded,
       route: order.route?.valueCoded,
@@ -176,7 +181,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       careSetting: careSettingUuid,
       orderer: orderingProviderUuid,
       encounter: encounterUuid,
-      drug: order.drug.uuid,
+      drug: order.drug?.uuid ?? null,
+      drugNonCoded: order.drug?.drugNonCoded ?? null,
       dose: order.dosage,
       doseUnits: order.unit?.valueCoded,
       route: order.route?.valueCoded,
@@ -204,7 +210,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       careSetting: careSettingUuid,
       orderer: orderingProviderUuid,
       encounter: encounterUuid,
-      drug: order.drug.uuid,
+      drug: order.drug?.uuid ?? null,
+      drugNonCoded: order.drug?.drugNonCoded ?? null,
       dose: order.dosage,
       doseUnits: order.unit?.valueCoded,
       route: order.route?.valueCoded,
@@ -233,7 +240,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
       encounter: encounterUuid,
       orderer: orderingProviderUuid,
       concept: order.drug.concept.uuid,
-      drug: order.drug.uuid,
+      drug: order.drug?.uuid ?? null,
+      drugNonCoded: order.drug?.drugNonCoded ?? null,
       orderReasonNonCoded: null,
     };
   } else {

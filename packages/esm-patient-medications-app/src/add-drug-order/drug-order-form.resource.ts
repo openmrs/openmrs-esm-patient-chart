@@ -69,10 +69,12 @@ function useCreateMedicationOrderFormSchema() {
     };
 
     const baseSchemaFields = {
+      // Conditionnally check drug based on whether it's a coded drug or not
       drug: z
         .object(
           {
-            uuid: z.string(),
+            uuid: z.string().optional(),
+            drugNonCoded: z.string().optional(),
             concept: z
               .object({
                 uuid: z.string(),
@@ -83,15 +85,23 @@ function useCreateMedicationOrderFormSchema() {
                 uuid: z.string(),
               })
               .passthrough()
-              .nullable(),
-            strength: z.string().nullable(),
+              .nullish(),
+            strength: z.string().nullish(),
             display: z.string().nullable(),
           },
           {
             message: t('drugRequiredErrorMessage', 'Drug is required'),
           },
         )
-        .passthrough(),
+        .passthrough()
+        .refine(
+          // IF it's NOT a non-coded drug, then UUID MUST exist
+          // If drugNonCoded IS present, we don't need the drug UUID
+          (data) => (!data.drugNonCoded ? !!data.uuid : !!data.drugNonCoded),
+          {
+            message: t('drugRequiredErrorMessage', 'Drug is required'),
+          },
+        ),
       freeTextDosage: z.string().refine((value) => !!value, {
         message: t('freeDosageErrorMessage', 'Add free dosage note'),
       }),

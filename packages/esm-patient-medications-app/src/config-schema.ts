@@ -47,6 +47,15 @@ export const configSchema = {
       '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
     },
   },
+  drugNonCodedUUID: {
+    _type: Type.UUID,
+    _description:
+      "UUID for the 'Drug, non-coded' concept for custom free-text other drug when placing a medication order",
+    // TODO: Add this CIEL:163101 "Drug, non-coded" to OpenMRS Basic Drug List OCL collection
+    // _default: '163101AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    // Using aspirin temporarily as a supposedly non-coded drug till the above is resolved
+    _default: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
 };
 
 export interface ConfigObject {
@@ -59,4 +68,5 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
+  drugNonCodedUUID: string;
 }
