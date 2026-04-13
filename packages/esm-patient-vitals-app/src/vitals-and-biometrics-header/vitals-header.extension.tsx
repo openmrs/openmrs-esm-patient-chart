@@ -134,9 +134,14 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                       <tbody>
                         {[
                           {
-                            label: t('bp', 'BP'),
+                            label: t('systolic', 'Systolic'),
                             uuid: config.concepts.systolicBloodPressureUuid,
                             unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid),
+                          },
+                          {
+                            label: t('diastolic', 'Diastolic'),
+                            uuid: config.concepts.diastolicBloodPressureUuid,
+                            unit: conceptUnits.get(config.concepts.diastolicBloodPressureUuid),
                           },
                           {
                             label: t('heartRate', 'Heart rate'),
