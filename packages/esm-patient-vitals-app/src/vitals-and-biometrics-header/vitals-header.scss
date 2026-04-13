@@ -167,16 +167,10 @@
 
 .referenceRangeValue {
   @include type.type-style('body-compact-01');
-  padding: layout.$spacing-02 layout.$spacing-02;
+  padding: layout.$spacing-02 0 layout.$spacing-02 layout.$spacing-05;
   font-weight: 600;
   white-space: nowrap;
-}
-
-.referenceRangeUnit {
-  @include type.type-style('body-compact-01');
-  padding: layout.$spacing-02 0;
-  color: colors.$gray-30;
-  white-space: nowrap;
+  text-align: right;
 }
 
 // Overriding styles for RTL support

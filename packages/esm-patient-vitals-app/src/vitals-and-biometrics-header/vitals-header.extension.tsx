@@ -119,6 +119,22 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
         <div className={styles.vitalsHeader} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
           <div className={styles.headerItems}>
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
+            <span className={styles.bodyText}>
+              {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
+            </span>
+            {areVitalsOverdue ? (
+              <Tag className={styles.tag} type="red">
+                <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
+              </Tag>
+            ) : null}
+            {!hideLinks && (
+              <ConfigurableLink
+                className={styles.link}
+                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/vitals-and-biometrics`}
+              >
+                {t('vitalsHistory', 'Vitals history')}
+              </ConfigurableLink>
+            )}
             {conceptRangeMap?.size > 0 && (
               <Toggletip align="bottom-left">
                 <ToggletipButton
@@ -164,22 +180,23 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                             unit: conceptUnits.get(config.concepts.temperatureUuid),
                           },
                         ]
-                          .filter(({ uuid }) => conceptRangeMap?.get(uuid))
+                          .filter(({ uuid }) => uuid && conceptRangeMap?.get(uuid))
                           .map(({ label, uuid, unit }) => {
                             const range = conceptRangeMap.get(uuid);
+                            const rangeValue =
+                              range.lowNormal != null && range.hiNormal != null
+                                ? `${range.lowNormal}–${range.hiNormal}`
+                                : range.lowNormal != null
+                                  ? `≥ ${range.lowNormal}`
+                                  : range.hiNormal != null
+                                    ? `≤ ${range.hiNormal}`
+                                    : '—';
                             return (
                               <tr key={uuid}>
                                 <td className={styles.referenceRangeLabel}>{label}</td>
                                 <td className={styles.referenceRangeValue}>
-                                  {range.lowNormal != null && range.hiNormal != null
-                                    ? `${range.lowNormal}–${range.hiNormal}`
-                                    : range.lowNormal != null
-                                      ? `≥ ${range.lowNormal}`
-                                      : range.hiNormal != null
-                                        ? `≤ ${range.hiNormal}`
-                                        : '—'}
+                                  {unit ? `${rangeValue} ${unit}` : rangeValue}
                                 </td>
-                                <td className={styles.referenceRangeUnit}>{unit ?? ''}</td>
                               </tr>
                             );
                           })}
@@ -188,22 +205,6 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                   </div>
                 </ToggletipContent>
               </Toggletip>
-            )}
-            <span className={styles.bodyText}>
-              {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
-            </span>
-            {areVitalsOverdue ? (
-              <Tag className={styles.tag} type="red">
-                <span className={styles.overdueIndicator}>{overdueVitalsTagContent}</span>
-              </Tag>
-            ) : null}
-            {!hideLinks && (
-              <ConfigurableLink
-                className={styles.link}
-                to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/vitals-and-biometrics`}
-              >
-                {t('vitalsHistory', 'Vitals history')}
-              </ConfigurableLink>
             )}
           </div>
           {isValidating ? (
