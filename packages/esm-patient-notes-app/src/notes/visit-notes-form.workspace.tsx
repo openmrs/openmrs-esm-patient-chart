@@ -308,16 +308,16 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     [combinedDiagnoses, selectedPrimaryDiagnoses, selectedSecondaryDiagnoses],
   );
 
-  const isDiagnosisNotSelected = (diagnosis: Concept | { uuid?: string; display: string }) => {
+  const isDiagnosisNotSelected = (diagnosis: Concept | FreeConcept) => {
     const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some((selectedDiagnosis) =>
       diagnosis.uuid
         ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
-        : diagnosis.display === selectedDiagnosis.diagnosis.nonCoded,
+        : diagnosis.display.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded.toLocaleLowerCase(),
     );
     const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some((selectedDiagnosis) =>
       diagnosis.uuid
         ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
-        : diagnosis.display === selectedDiagnosis.diagnosis.nonCoded,
+        : diagnosis.display.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded.toLocaleLowerCase(),
     );
 
     return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
@@ -853,7 +853,7 @@ function DiagnosesDisplay({
           }
         })}
 
-        {
+        {isDiagnosisNotSelected({ display: value }) ? (
           // if the searchResults doesn't contain the exact search term,
           // still allow proposing adding it as a custom free-text diagnosis
           !searchResults
@@ -877,7 +877,13 @@ function DiagnosesDisplay({
               </Button>
             </li>
           )
-        }
+        ) : (
+          <Tile className={styles.emptyResults}>
+            <span>
+              {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+            </span>
+          </Tile>
+        )}
       </ul>
     );
   }
