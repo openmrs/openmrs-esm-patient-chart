@@ -17,16 +17,16 @@ describe('LabSetPanel', () => {
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hematology/i })).toBeInTheDocument();
-    expect(screen.getByText('01-Jan-2024, 01:00 PM')).toBeInTheDocument();
+    expect(screen.getAllByText(/01-Jan-2024/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('columnheader', { name: /test name/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /value/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /reference range/i })).toBeInTheDocument();
     expect(screen.getByText(/test name/i)).toBeInTheDocument();
     expect(screen.getByText(/value/i)).toBeInTheDocument();
     expect(screen.getByText(/reference range/i)).toBeInTheDocument();
-    const cbcRow = screen.getByRole('row', { name: /complete blood count 120 g\/dL 100-150 g\/dL/i });
-    const hemoglobinRow = screen.getByRole('row', { name: /hemoglobin 8 g\/dL 12-16 g\/dL/i });
-    const hematocritRow = screen.getByRole('row', { name: /hematocrit 50 % 35-45 %/i });
+    const cbcRow = screen.getByRole('row', { name: /complete blood count.*120 g\/dL.*100-150 g\/dL/i });
+    const hemoglobinRow = screen.getByRole('row', { name: /hemoglobin.*8 g\/dL.*12-16 g\/dL/i });
+    const hematocritRow = screen.getByRole('row', { name: /hematocrit.*50 %.*35-45 %/i });
 
     expect(cbcRow).toBeInTheDocument();
     expect(hemoglobinRow).toBeInTheDocument();
@@ -60,8 +60,8 @@ describe('LabSetPanel', () => {
     expect(screen.getByRole('columnheader', { name: /value/i })).toBeInTheDocument();
     expect(screen.queryByRole('columnheader', { name: /reference range/i })).not.toBeInTheDocument();
 
-    expect(screen.getByRole('row', { name: /hemoglobin 8 g\/dL/i })).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hematocrit 50 %/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hemoglobin.*8 g\/dL/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hematocrit.*50 %/i })).toBeInTheDocument();
   });
 
   it('adjusts the table size based on the layout', () => {

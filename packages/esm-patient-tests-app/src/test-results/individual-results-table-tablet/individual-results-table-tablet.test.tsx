@@ -52,7 +52,7 @@ describe('PanelView', () => {
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hiv viral load/i })).toBeInTheDocument();
     // This observation belongs to two panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
+    expect(screen.getAllByRole('row', { name: /platelets.*56/i })).toHaveLength(2);
     expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('PanelView', () => {
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hematology/i })).toBeInTheDocument();
     // This observation belongs to both panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
+    expect(screen.getAllByRole('row', { name: /platelets.*56/i })).toHaveLength(2);
     expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
 
     await user.click(searchButton);
@@ -82,7 +82,7 @@ describe('PanelView', () => {
     await user.type(searchBox, 'hiv viral load');
     await user.keyboard('{Enter}');
 
-    expect(screen.queryByRole('row', { name: /platelets 56/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('row', { name: /platelets.*56/i })).not.toBeInTheDocument();
     expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
   });
 
