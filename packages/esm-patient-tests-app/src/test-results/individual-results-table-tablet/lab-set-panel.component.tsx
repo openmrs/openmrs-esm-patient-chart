@@ -12,7 +12,7 @@ import {
   Layer,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, isDesktop, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
 import { getClass } from './helper';
 import type { GroupedObservation } from '../../types';
@@ -42,6 +42,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
               key: 'testName',
               header: t('testName', 'Test name'),
             },
+            { id: 'resultDate', key: 'resultDate', header: t('resultDate', 'Result Date') },
             {
               id: 'value',
               key: 'value',
@@ -74,9 +75,13 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
         ? panel.entries.map((test) => {
             const units = test.units ?? '';
             const range = formatRangeWithUnits(test.range, units);
+            const resultDate = test.obsDatetime
+              ? formatDate(parseDate(test.obsDatetime), { mode: 'standard', time: true })
+              : '--';
             return {
               id: test.conceptUuid,
               testName: test.display,
+              resultDate,
               value: {
                 content: <span>{`${test.value} ${units}`}</span>,
               },
@@ -86,9 +91,13 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
           })
         : panel.entries.map((test) => {
             const units = test.units ?? '';
+            const resultDate = test.obsDatetime
+              ? formatDate(parseDate(test.obsDatetime), { mode: 'standard', time: true })
+              : '--';
             return {
               id: test.conceptUuid,
               testName: test.display,
+              resultDate,
               value: {
                 content: <span>{`${test.value} ${units}`}</span>,
               },
