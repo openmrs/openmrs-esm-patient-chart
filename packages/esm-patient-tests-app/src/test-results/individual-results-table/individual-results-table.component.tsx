@@ -82,6 +82,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
   const tableHeaders = useMemo(() => {
     return [
       { key: 'testName', header: t('testName', 'Test Name') },
+      { key: 'resultDate', header: t('resultDate', 'Result Date') },
       {
         key: 'value',
         header: t('value', 'Value'),
@@ -101,6 +102,9 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
         const isString = isNaN(parseFloat(row.value));
 
         const referenceRangeDisplay = formatRangeWithUnits(displayRange, displayUnits);
+        const resultDate = row.obsDatetime
+          ? formatDate(parseDate(row.obsDatetime), { mode: 'standard', time: true })
+          : '--';
 
         return {
           ...row,
@@ -119,6 +123,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
               )}
             </span>
           ),
+          resultDate,
           value: {
             value: `${row.value} ${displayUnits}`,
             interpretation: row?.interpretation,
