@@ -13,10 +13,15 @@ interface DeleteConditionModalProps {
 
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
   const { t } = useTranslation();
-  const { mutate } = useConditions(patientUuid);
+  const { mutate } = useConditions(patientUuid ?? '');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
+    if (!patientUuid) {
+      console.error('DeleteConditionModal opened without patientUuid');
+      return;
+    }
+
     setIsDeleting(true);
 
     try {
@@ -36,10 +41,12 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingCondition', 'Error deleting condition'),
-        subtitle: error?.message,
+        subtitle: error && typeof error === 'object' && 'message' in error ? (error as any).message : String(error),
       });
+    } finally {
+      setIsDeleting(false);
     }
-  }, [closeDeleteModal, conditionId, mutate, t]);
+  }, [closeDeleteModal, conditionId, mutate, t, patientUuid]);
 
   return (
     <div>
@@ -58,6 +65,7 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
             <span>{t('delete', 'Delete')}</span>
           )}
         </Button>
+        {isDeleting && <div style={{ display: 'none' }} data-testid="delete-in-progress" />}
       </ModalFooter>
     </div>
   );

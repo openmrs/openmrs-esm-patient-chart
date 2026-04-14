@@ -75,7 +75,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     watch,
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
-  const searchInputRef = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -247,6 +247,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                         if (debouncedSearchTerm) {
                           return value;
                         }
+                        return '';
                       })()}
                     />
                   </ResponsiveWrapper>

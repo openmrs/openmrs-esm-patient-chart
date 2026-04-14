@@ -81,7 +81,7 @@ describe('<DeleteConditionModal />', () => {
       title: 'Error deleting condition',
       subtitle: 'Internal server error',
     });
-    expect(deleteButton).toBeDisabled();
+    expect(deleteButton).toBeEnabled();
 
     consoleSpy.mockRestore();
   });
