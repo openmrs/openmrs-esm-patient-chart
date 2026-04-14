@@ -114,6 +114,19 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
       );
     }
 
+    const formatRange = (range: { lowNormal: number | null; hiNormal: number | null }) =>
+      range.lowNormal != null && range.hiNormal != null
+        ? `${range.lowNormal}–${range.hiNormal}`
+        : range.lowNormal != null
+          ? `≥ ${range.lowNormal}`
+          : range.hiNormal != null
+            ? `≤ ${range.hiNormal}`
+            : '—';
+
+    const sysRange = conceptRangeMap?.get(config.concepts.systolicBloodPressureUuid);
+    const diaRange = conceptRangeMap?.get(config.concepts.diastolicBloodPressureUuid);
+    const bpUnit = conceptUnits.get(config.concepts.systolicBloodPressureUuid);
+
     return (
       <div className={styles.container}>
         <div className={styles.vitalsHeader} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
@@ -148,17 +161,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                     <p className={styles.referenceRangeHeading}>{t('normalRanges', 'Normal ranges')}</p>
                     <table className={styles.referenceRangeTable}>
                       <tbody>
+                        {sysRange && diaRange && (
+                          <tr key="bp">
+                            <td className={styles.referenceRangeLabel}>{t('bloodPressureAbbreviated', 'BP')}</td>
+                            <td className={styles.referenceRangeValue}>
+                              {`${formatRange(sysRange)} / ${formatRange(diaRange)} ${bpUnit ?? ''}`}
+                            </td>
+                          </tr>
+                        )}
                         {[
-                          {
-                            label: t('systolicAbbreviated', 'Systolic'),
-                            uuid: config.concepts.systolicBloodPressureUuid,
-                            unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid),
-                          },
-                          {
-                            label: t('diastolicAbbreviated', 'Diastolic'),
-                            uuid: config.concepts.diastolicBloodPressureUuid,
-                            unit: conceptUnits.get(config.concepts.diastolicBloodPressureUuid),
-                          },
                           {
                             label: t('heartRate', 'Heart rate'),
                             uuid: config.concepts.pulseUuid,
@@ -182,15 +193,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                         ]
                           .filter(({ uuid }) => uuid && conceptRangeMap?.get(uuid))
                           .map(({ label, uuid, unit }) => {
-                            const range = conceptRangeMap.get(uuid);
-                            const rangeValue =
-                              range.lowNormal != null && range.hiNormal != null
-                                ? `${range.lowNormal}–${range.hiNormal}`
-                                : range.lowNormal != null
-                                  ? `≥ ${range.lowNormal}`
-                                  : range.hiNormal != null
-                                    ? `≤ ${range.hiNormal}`
-                                    : '—';
+                            const rangeValue = formatRange(conceptRangeMap.get(uuid));
                             return (
                               <tr key={uuid}>
                                 <td className={styles.referenceRangeLabel}>{label}</td>

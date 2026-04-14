@@ -429,9 +429,8 @@ describe('VitalsHeader', () => {
 
     expect(screen.getByText(/normal ranges/i)).toBeInTheDocument();
     // Assert on actual range values from mock data to confirm rows are populated
+    expect(screen.getByText('90–120 / 60–80 mmHg')).toBeInTheDocument(); // BP range
     expect(screen.getByText('60–100 beats/min')).toBeInTheDocument(); // pulse range
-    expect(screen.getByText('90–120 mmHg')).toBeInTheDocument(); // systolic range
-    expect(screen.getByText('60–80 mmHg')).toBeInTheDocument(); // diastolic range
   });
 
   it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
