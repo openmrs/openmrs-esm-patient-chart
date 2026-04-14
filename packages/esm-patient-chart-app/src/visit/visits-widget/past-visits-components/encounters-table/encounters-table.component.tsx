@@ -14,9 +14,9 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -43,6 +43,7 @@ import {
   PrinterIcon,
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,
@@ -54,7 +55,6 @@ import {
 } from './encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
-import { type ChartConfig } from '../../../../config-schema';
 
 /**
  * This components is used by the AllEncountersTable and VisitEncountersTable to display
@@ -183,7 +183,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
         overflowMenuOnHover={desktopLayout}
         rows={paginatedMappedEncounters ?? []}
         size={responsiveSize}
-        useZebraStyles={totalCount > 1 ? true : false}
+        useZebraStyles={totalCount > 1}
       >
         {({
           rows,
@@ -311,6 +311,17 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       }}
                                     />
                                   )}
+                                  {canPrintEncounter && (
+                                    <OverflowMenuItem
+                                      className={styles.menuItem}
+                                      itemText={t('printEncounter', 'Print this encounter')}
+                                      disabled={isPrinting}
+                                      onClick={() => {
+                                        setIsPrinting(true);
+                                        downloadPdf([encounter.id], t).finally(() => setIsPrinting(false));
+                                      }}
+                                    />
+                                  )}
                                   {canDeleteEncounter && (
                                     <OverflowMenuItem
                                       className={styles.menuItem}
@@ -318,18 +329,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                       isDelete
                                       itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                       onClick={() => handleDeleteEncounter(encounter.id, encounter.form?.display)}
-                                    />
-                                  )}
-                                  {canPrintEncounter && (
-                                    <OverflowMenuItem
-                                      className={styles.menuItem}
-                                      hasDivider
-                                      itemText={t('printEncounter', 'Print this encounter')}
-                                      disabled={isPrinting}
-                                      onClick={() => {
-                                        setIsPrinting(true);
-                                        downloadPdf([encounter.id], t).finally(() => setIsPrinting(false));
-                                      }}
                                     />
                                   )}
                                 </OverflowMenu>
@@ -417,7 +416,9 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
                       <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      {showEncounterTypeFilter && encounterTypeToFilter && (
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      )}
                     </div>
                   </Tile>
                 </div>
