@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
+import { Button, ButtonSkeleton, Callout, SkeletonText, Tile } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { type DrugOrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
@@ -52,6 +52,7 @@ export default function OrderBasketSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
+  const { drugNonCodedUUID } = useConfig<ConfigObject>();
 
   if (!searchTerm) {
     return <div className={styles.container}></div>;
@@ -80,22 +81,39 @@ export default function OrderBasketSearchResults({
 
   if (drugs?.length === 0) {
     return (
-      <Tile className={styles.emptyState}>
-        <div>
-          <h4 className={styles.productiveHeading01}>
-            {t('noResultsForDrugSearch', 'No results to display for "{{searchTerm}}"', {
-              searchTerm,
-            })}
-          </h4>
-          <p className={styles.bodyShort01}>
-            <span>{t('tryTo', 'Try to')}</span>{' '}
-            <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
-              {t('searchAgain', 'search again')}
-            </span>{' '}
-            <span>{t('usingADifferentTerm', 'using a different term')}</span>
-          </p>
-        </div>
-      </Tile>
+      <div className={styles.container}>
+        <Tile className={styles.emptyState}>
+          <div>
+            <h4 className={styles.productiveHeading01}>
+              {t('noResultsForDrugSearch', 'No results to display for "{{searchTerm}}"', {
+                searchTerm,
+              })}
+            </h4>
+            <p className={styles.bodyShort01}>
+              <span>{t('tryTo', 'Try to')}</span>{' '}
+              <span className={styles.link} role="link" tabIndex={0} onClick={focusAndClearSearchInput}>
+                {t('searchAgain', 'search again')}
+              </span>{' '}
+              <span>{t('usingADifferentTerm', 'using a different term')};</span>
+            </p>
+            <p className={styles.bodyShort01}>{t('customDrugPossibility', 'Or add it as custom drug below')}.</p>
+          </div>
+        </Tile>
+        <DrugSearchResultItem
+          patient={patient}
+          drug={{
+            // Allow creating the searchTerm as a non-coded drug
+            display: searchTerm,
+            drugNonCoded: searchTerm,
+            concept: {
+              uuid: drugNonCodedUUID,
+            },
+          }}
+          openOrderForm={openOrderForm}
+          visit={visit}
+          closeWorkspace={closeWorkspace}
+        />
+      </div>
     );
   }
 
@@ -150,8 +168,11 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const drugAlreadyPrescribed = useMemo(
-    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug?.uuid],
+    () =>
+      activeOrders?.some((order) =>
+        order?.drug?.uuid ? order?.drug?.uuid === drug?.uuid : order?.drugNonCoded === drug?.drugNonCoded,
+      ),
+    [activeOrders, drug?.uuid, drug?.drugNonCoded],
   );
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
@@ -193,6 +214,21 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
           })}
         >
           <div className={classNames(styles.searchResultTileContent, styles.text02)}>
+            {!drug?.uuid && (
+              <>
+                <Callout
+                  kind="info"
+                  statusIconDescription="notification"
+                  subtitle={t(
+                    'customDrugCalloutSubtitle',
+                    'For custom or non-standard drugs that are not available in the search results.',
+                  )}
+                  title={t('customDrugCalloutTitle', 'Add as free-text drug?')}
+                  // lowContrast
+                />
+                <br />
+              </>
+            )}
             <p>
               <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
               {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}

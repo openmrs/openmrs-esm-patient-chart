@@ -13,12 +13,40 @@ export interface Concept extends OpenmrsResource {
   answers?: Array<Concept>;
   setMembers?: Array<Concept>;
 }
+
+// Detailed (and restrictive) Typescript defintions for Drug
+// // Base attributes for either Coded or NonCoded drugs
+// export interface BaseDrug {
+//   concept: Concept;
+//   display: string;
+//   uuid?: string; // Optional at base level
+//   drugNonCoded?: string; // Optional at base level
+// }
+// export interface CodedDrug extends BaseDrug {
+//   uuid: string;
+//   strength: string;
+//   dosageForm: OpenmrsResource;
+//   // drugNonCoded?: string; //  Optional for coded entries (or even should never be present for coded drugs?)
+// }
+// export interface NonCodedDrug extends BaseDrug {
+//   // uuid?: string;        // Optional for non-coded entries , (or not needed at all ?)
+//   strength?: string; // Optional for non-coded entries
+//   dosageForm?: OpenmrsResource; // Optional for non-coded entries
+//   drugNonCoded: string; // Required for non-coded entries
+// }
+// export type Drug = CodedDrug | NonCodedDrug;
+
+// Simpler (and less strict) Typescript definition
+// without the Type Casting headaches or extensive Type Checking on the UI Components level
+// (on the presence or abscence of uuid vs drugNonCoded for coded and non-coded drugs)
+// and instead rely on zod for logical validation for API interactions
 export interface Drug {
-  uuid: string;
-  strength: string;
+  uuid?: string;
+  strength?: string;
   concept: Concept;
-  dosageForm: OpenmrsResource;
+  dosageForm?: OpenmrsResource;
   display: string;
+  drugNonCoded?: string;
 }
 
 export type OrderAction = 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
@@ -102,6 +130,7 @@ export interface OrderPost {
 
 export interface DrugOrderPost extends OrderPost {
   drug?: string;
+  drugNonCoded?: string;
   dose?: number;
   doseUnits?: string;
   route?: string;
@@ -140,6 +169,7 @@ export interface Order {
   dosingInstructions: string | null;
   dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   drug: Drug | null;
+  drugNonCoded?: string | null;
   duration: number | null;
   durationUnits: OpenmrsResource | null;
   encounter: Encounter;

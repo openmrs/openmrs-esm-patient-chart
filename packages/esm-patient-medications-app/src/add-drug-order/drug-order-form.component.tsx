@@ -370,7 +370,9 @@ export function DrugOrderForm({
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
       (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
+      activeOrders?.some((order) =>
+        order?.drug?.uuid ? order?.drug?.uuid === drug?.uuid : order?.drugNonCoded === drug?.drugNonCoded,
+      ),
     [activeOrders, drug, initialOrderBasketItem],
   );
 

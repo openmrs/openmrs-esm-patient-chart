@@ -9,18 +9,19 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 
 export interface DrugSearchResult {
-  uuid: string;
+  uuid?: string;
   display: string;
-  name: string;
-  strength: string;
-  dosageForm: {
+  name?: string;
+  strength?: string;
+  dosageForm?: {
     display: string;
     uuid: string;
   };
   concept: {
-    display: string;
+    display?: string;
     uuid: string;
   };
+  drugNonCoded?: string;
 }
 
 interface OrderTemplateResource {
