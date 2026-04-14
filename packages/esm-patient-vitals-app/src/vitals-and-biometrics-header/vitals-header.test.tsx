@@ -11,9 +11,8 @@ import {
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
-import { useVitalsConceptMetadata } from '../common';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
@@ -52,7 +51,7 @@ jest.mock('../common/data.resource', () => {
       error: null,
       isLoading: false,
     })),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
+    useVitalsConceptMetadata: jest.fn(),
     useVitalsAndBiometrics: jest.fn(),
   };
 });
@@ -390,7 +389,7 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('button', { name: /view reference ranges/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /view normal ranges/i })).toBeInTheDocument();
   });
 
   it('hides the reference ranges toggletip button when conceptRangeMap is empty', async () => {
@@ -407,7 +406,7 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.queryByRole('button', { name: /view reference ranges/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /view normal ranges/i })).not.toBeInTheDocument();
   });
 
   it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
@@ -425,10 +424,10 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    const toggletipButton = screen.getByRole('button', { name: /view reference ranges/i });
+    const toggletipButton = screen.getByRole('button', { name: /view normal ranges/i });
     await user.click(toggletipButton);
 
-    expect(screen.getByText(/reference ranges/i)).toBeInTheDocument();
+    expect(screen.getByText(/normal ranges/i)).toBeInTheDocument();
     // Assert on actual range values from mock data to confirm rows are populated
     expect(screen.getByText('60–100 beats/min')).toBeInTheDocument(); // pulse range
     expect(screen.getByText('90–120 mmHg')).toBeInTheDocument(); // systolic range

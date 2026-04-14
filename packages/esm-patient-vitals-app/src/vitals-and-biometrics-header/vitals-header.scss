@@ -129,10 +129,13 @@
   color: $interactive-01;
 }
 
+.referenceRangeToggletip {
+  align-self: center;
+}
+
 .referenceRangeButton {
   display: flex;
   align-items: center;
-  align-self: center;
   padding: 0;
   border: none;
   background: transparent;

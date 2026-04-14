@@ -136,26 +136,26 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               </ConfigurableLink>
             )}
             {conceptRangeMap?.size > 0 && (
-              <Toggletip align="bottom-left">
+              <Toggletip align="bottom-left" className={styles.referenceRangeToggletip}>
                 <ToggletipButton
                   className={styles.referenceRangeButton}
-                  label={t('viewReferenceRanges', 'View reference ranges')}
+                  label={t('viewNormalRanges', 'View normal ranges')}
                 >
                   <Information size={16} />
                 </ToggletipButton>
                 <ToggletipContent>
                   <div className={styles.referenceRangeContent}>
-                    <p className={styles.referenceRangeHeading}>{t('referenceRanges', 'Reference ranges')}</p>
+                    <p className={styles.referenceRangeHeading}>{t('normalRanges', 'Normal ranges')}</p>
                     <table className={styles.referenceRangeTable}>
                       <tbody>
                         {[
                           {
-                            label: t('systolic', 'Systolic'),
+                            label: t('systolicAbbreviated', 'Systolic'),
                             uuid: config.concepts.systolicBloodPressureUuid,
                             unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid),
                           },
                           {
-                            label: t('diastolic', 'Diastolic'),
+                            label: t('diastolicAbbreviated', 'Diastolic'),
                             uuid: config.concepts.diastolicBloodPressureUuid,
                             unit: conceptUnits.get(config.concepts.diastolicBloodPressureUuid),
                           },
