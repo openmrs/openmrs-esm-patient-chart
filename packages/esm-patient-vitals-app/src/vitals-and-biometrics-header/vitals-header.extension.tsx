@@ -149,7 +149,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
               </ConfigurableLink>
             )}
             {conceptRangeMap?.size > 0 && (
-              <Toggletip align="bottom-left" className={styles.referenceRangeToggletip}>
+              <Toggletip align="bottom-start" autoAlign className={styles.referenceRangeToggletip}>
                 <ToggletipButton
                   className={styles.referenceRangeButton}
                   label={t('viewNormalRanges', 'View normal ranges')}
