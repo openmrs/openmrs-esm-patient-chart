@@ -9,6 +9,11 @@ import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { useVitalsAndBiometrics } from '../common';
 import VitalsOverview from './vitals-overview.component';
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  age: jest.fn(() => '54 years'),
+}));
+
 const testProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
@@ -171,5 +176,31 @@ describe('VitalsOverview', () => {
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /temp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /r\. rate/i })).toBeInTheDocument();
+  });
+
+  it('renders correctly when patient identifier metadata is incomplete', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    const patientWithIncompleteIdentifierMetadata = {
+      ...mockPatient,
+      identifier: [
+        {
+          ...mockPatient.identifier[0],
+          type: undefined,
+        },
+        {
+          ...mockPatient.identifier[1],
+          type: { text: 'OpenMRS ID' },
+        },
+      ],
+    } as fhir.Patient;
+
+    renderWithSwr(<VitalsOverview {...testProps} patient={patientWithIncompleteIdentifierMetadata} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
   });
 });
