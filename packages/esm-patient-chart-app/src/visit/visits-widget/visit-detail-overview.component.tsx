@@ -6,6 +6,7 @@ import type { ChartConfig } from '../../config-schema';
 import VisitHistoryTable from '../visit-history-table/visit-history-table.component';
 import AllEncountersTable from './past-visits-components/encounters-table/all-encounters-table.component';
 import styles from './visit-detail-overview.scss';
+import CompletedFormsTable from './past-visits-components/encounters-table/completed-forms-table-component';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -16,6 +17,8 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
   const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const { showAllEncountersTab } = useConfig<ChartConfig>();
+
+  const completedFormsTabIndex = showAllEncountersTab ? 2 : 1;
 
   return (
     <div className={styles.tabs}>
@@ -31,6 +34,9 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
           ) : (
             <></>
           )}
+          <Tab className={styles.tab} id="completed-forms-tab">
+            {t('completedForms', 'Completed Forms')}
+          </Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -41,6 +47,9 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
               <AllEncountersTable patientUuid={patientUuid} />
             </TabPanel>
           )}
+          <TabPanel>
+            <CompletedFormsTable patientUuid={patientUuid} isTabActive={tabIndex === completedFormsTabIndex} />
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </div>

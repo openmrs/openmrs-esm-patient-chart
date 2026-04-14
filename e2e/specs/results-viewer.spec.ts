@@ -300,7 +300,9 @@ test('Record and edit test results', async ({ page, patient }) => {
   });
 
   await test.step('Then I should NOT see the newly added test results included in the list', async () => {
-    await expect(page.getByText(/No encounters to display/i)).toBeVisible();
+    await expect(
+      page.getByRole('tabpanel').getByText(/No encounters to display/i)
+    ).toBeVisible();
   });
 
   await test.step('When I clear the filter', async () => {
