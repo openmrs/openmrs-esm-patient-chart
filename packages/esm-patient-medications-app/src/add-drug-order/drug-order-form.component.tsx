@@ -40,6 +40,7 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
+  isDesktop,
   useConfig,
   useLayoutType,
   Workspace2,
@@ -110,9 +111,9 @@ function MedicationInfoHeader({
 }
 
 function InputWrapper({ children }) {
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
   return (
-    <Layer level={isTablet ? 1 : 0}>
+    <Layer level={isDesktop(layout) ? 0 : 1}>
       <div className={styles.field}>{children}</div>
     </Layer>
   );
@@ -129,7 +130,8 @@ export function DrugOrderForm({
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
@@ -395,13 +397,15 @@ export function DrugOrderForm({
             />
           </div>
         )}
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
+        {isTablet && (
+          <div className={styles.patientHeader}>
+            <span className={styles.bodyShort02}>{patientName}</span>
+            <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+            </span>
+          </div>
+        )}
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         <Form
           className={styles.orderForm}
@@ -598,7 +602,7 @@ export function DrugOrderForm({
                             maxDate={new Date()}
                             id="startDatePicker"
                             labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
+                            size={isDesktop(layout) ? 'sm' : 'lg'}
                             invalid={Boolean(fieldState?.error?.message)}
                             invalidText={fieldState?.error?.message}
                           />
@@ -866,7 +870,7 @@ const ControlledFieldInput = ({
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
   } = useController<MedicationOrderFormData>({ name, control });
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
 
   const fieldErrorStyles = classNames({
     [styles.fieldError]: error?.message,
@@ -889,7 +893,7 @@ const ControlledFieldInput = ({
           onToggle={handleChange}
           ref={ref}
           // @ts-ignore
-          size={isTablet ? 'md' : 'sm'}
+          size={isDesktop(layout) ? 'sm' : 'md'}
           labelA={t('on', 'On')}
           labelB={t('off', 'Off')}
           {...restProps}
@@ -923,7 +927,7 @@ const ControlledFieldInput = ({
             handleChange(isNaN(number) ? null : number);
           }}
           ref={ref}
-          size={isTablet ? 'md' : 'sm'}
+          size={isDesktop(layout) ? 'sm' : 'md'}
           value={typeof value === 'number' ? value : ''}
           {...numberInputProps}
         />
@@ -952,7 +956,7 @@ const ControlledFieldInput = ({
           onChange={(e) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
-          size={isTablet ? 'md' : 'sm'}
+          size={isDesktop(layout) ? 'sm' : 'md'}
           value={typeof value === 'string' ? value : ''}
           {...textInputProps}
         />
@@ -967,7 +971,7 @@ const ControlledFieldInput = ({
           onBlur={onBlur}
           onChange={({ selectedItem }) => handleChange(selectedItem)}
           ref={ref}
-          size={isTablet ? 'md' : 'sm'}
+          size={isDesktop(layout) ? 'sm' : 'md'}
           selectedItem={value}
           initialSelectedItem={value}
           {...comboBoxProps}
@@ -976,7 +980,7 @@ const ControlledFieldInput = ({
     }
 
     return null;
-  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet, t]);
+  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, layout, t]);
 
   return (
     <>
