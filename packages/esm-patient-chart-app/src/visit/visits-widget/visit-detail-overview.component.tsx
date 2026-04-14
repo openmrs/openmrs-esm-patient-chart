@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import type { ChartConfig } from '../../config-schema';
-import VisitHistoryTable from '../visit-history-table/visit-history-table.component';
 import AllEncountersTable from './past-visits-components/encounters-table/all-encounters-table.component';
+import CompletedFormsTable from './past-visits-components/encounters-table/completed-forms-table.component';
+import VisitHistoryTable from '../visit-history-table/visit-history-table.component';
 import styles from './visit-detail-overview.scss';
-import CompletedFormsTable from './past-visits-components/encounters-table/completed-forms-table-component';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -35,7 +35,7 @@ function VisitDetailOverviewComponent({ patientUuid, patient }: VisitOverviewCom
             <></>
           )}
           <Tab className={styles.tab} id="completed-forms-tab">
-            {t('completedForms', 'Completed Forms')}
+            {t('completedForms', 'Completed forms')}
           </Tab>
         </TabList>
         <TabPanels>

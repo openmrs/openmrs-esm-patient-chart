@@ -16,10 +16,10 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import EncountersTable from './encounters-table.component';
 import { type EncountersTableProps, useEncounterTypes } from './encounters-table.resource';
 import { type ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
+import EncountersTable from './encounters-table.component';
 
 const testProps: EncountersTableProps = {
   patientUuid: mockPatientAlice.uuid,
@@ -371,21 +371,51 @@ function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
 }
 
 describe('EncountersTable print functionality', () => {
-  it('hides print button when isSelectable is false', async () => {
-    mockUserHasAccess.mockReturnValue(false);
-    renderEncountersTable({ isSelectable: false, showEncounterTypeFilter: true });
+  beforeEach(() => {
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
+    mockUserHasAccess.mockReturnValue(true);
+  });
+
+  it('hides print button and selection checkboxes when canPrintEncounters is false', async () => {
+    renderEncountersTable({ isSelectable: true, canPrintEncounters: false, showEncounterTypeFilter: true });
 
     await screen.findByRole('table');
 
     expect(screen.queryByRole('button', { name: /print selected/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', { name: /select all rows/i })).not.toBeInTheDocument();
   });
 
-  it('shows print button when isSelectable is true', async () => {
-    mockUserHasAccess.mockReturnValue(true);
-    renderEncountersTable({ isSelectable: true, showEncounterTypeFilter: true });
+  it('shows print button and selection checkboxes when isSelectable and canPrintEncounters are true', async () => {
+    renderEncountersTable({ isSelectable: true, canPrintEncounters: true, showEncounterTypeFilter: true });
 
     await screen.findByRole('table');
 
     expect(screen.getByRole('button', { name: /print selected/i })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /select all rows/i })).toBeInTheDocument();
+  });
+
+  it('disables print button when no rows are selected', async () => {
+    renderEncountersTable({ isSelectable: true, canPrintEncounters: true, showEncounterTypeFilter: true });
+
+    await screen.findByRole('table');
+
+    expect(screen.getByRole('button', { name: /print selected/i })).toBeDisabled();
+  });
+
+  it('enables print button after selecting a row', async () => {
+    const user = userEvent.setup();
+    renderEncountersTable({ isSelectable: true, canPrintEncounters: true, showEncounterTypeFilter: true });
+
+    await screen.findByRole('table');
+
+    const firstRowCheckbox = screen.getAllByRole('checkbox', { name: /select row/i })[0];
+    await user.click(firstRowCheckbox);
+
+    expect(screen.getByRole('button', { name: /print selected/i })).toBeEnabled();
   });
 });

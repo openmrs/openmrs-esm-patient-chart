@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { userHasAccess, useSession, type EncounterType } from '@openmrs/esm-framework';
-import { type EncountersTableProps, useAllEncounters, isCompletedFormEncounter } from './encounters-table.resource';
+import { type EncountersTableProps, useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
 
 interface CompletedFormsTableProps {
@@ -25,8 +25,10 @@ const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid, 
   );
 
   const filteredCompletedForms = useMemo(() => {
-    if (!allEncounters) return [];
-    return allEncounters.filter(isCompletedFormEncounter);
+    if (!allEncounters) {
+      return [];
+    }
+    return allEncounters.filter(encounterHasJsonSchemaForm);
   }, [allEncounters]);
 
   const paginatedEncounters = useMemo(() => {
