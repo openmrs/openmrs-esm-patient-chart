@@ -1,15 +1,15 @@
 import { renderHook } from '@testing-library/react';
-import { useAllEncounters, isCompletedFormEncounter } from './encounters-table.resource';
+import { useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
 
 const mockUseOpenmrsFetchAll = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   makeUrl: jest.fn((path: string) => `http://localhost/${path}`),
   restBaseUrl: '/ws/rest/v1',
-  useOpenmrsFetchAll: (...args) => mockUseOpenmrsFetchAll(...args),
+  useOpenmrsFetchAll: (...args: unknown[]) => mockUseOpenmrsFetchAll(...args),
 }));
 
-describe('isCompletedFormEncounter', () => {
+describe('encounterHasJsonSchemaForm', () => {
   it('returns true when encounter has form with JSON schema resource', () => {
     const encounter = {
       uuid: 'encounter-1',
@@ -20,7 +20,7 @@ describe('isCompletedFormEncounter', () => {
       },
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(true);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(true);
   });
 
   it('returns false when encounter has no form', () => {
@@ -29,7 +29,7 @@ describe('isCompletedFormEncounter', () => {
       form: null,
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(false);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(false);
   });
 
   it('returns false when form is undefined', () => {
@@ -37,7 +37,7 @@ describe('isCompletedFormEncounter', () => {
       uuid: 'encounter-1',
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(false);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(false);
   });
 
   it('returns false when form has no resources array', () => {
@@ -49,7 +49,7 @@ describe('isCompletedFormEncounter', () => {
       },
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(false);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(false);
   });
 
   it('returns false when form has empty resources array', () => {
@@ -62,7 +62,7 @@ describe('isCompletedFormEncounter', () => {
       },
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(false);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(false);
   });
 
   it('returns false when resources do not contain JSON schema', () => {
@@ -75,7 +75,7 @@ describe('isCompletedFormEncounter', () => {
       },
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(false);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(false);
   });
 
   it('returns true when resources contain multiple items including JSON schema', () => {
@@ -92,7 +92,7 @@ describe('isCompletedFormEncounter', () => {
       },
     } as any;
 
-    expect(isCompletedFormEncounter(encounter)).toBe(true);
+    expect(encounterHasJsonSchemaForm(encounter)).toBe(true);
   });
 });
 

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { userHasAccess, useSession, type Visit } from '@openmrs/esm-framework';
+import { type EncountersTableProps, encounterHasJsonSchemaForm } from './encounters-table.resource';
 import EncountersTable from './encounters-table.component';
-import { type EncountersTableProps, isCompletedFormEncounter } from './encounters-table.resource';
 
 interface VisitCompletedFormsTableProps {
   patientUuid: string;
@@ -16,9 +16,11 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ pat
   const [pageSize, setPageSize] = useState(10);
 
   const mappedFilteredEncounters = useMemo(() => {
-    if (!visit || !visit.encounters) return [];
+    if (!visit || !visit.encounters) {
+      return [];
+    }
 
-    const completedForms = visit.encounters.filter(isCompletedFormEncounter);
+    const completedForms = visit.encounters.filter(encounterHasJsonSchemaForm);
 
     return completedForms.map((encounter) => {
       return { ...encounter, visit };
