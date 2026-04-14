@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
@@ -11,6 +11,7 @@ import { getTemplateOrderBasketItem } from './drug-search/drug-search.resource';
 import DrugOrderForm from './drug-order-form.component';
 
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockUseSession = jest.mocked(useSession);
 
 mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
@@ -583,5 +584,32 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       const quantityUnitCombobox = screen.getByRole('combobox', { name: /quantity unit/i });
       expect(quantityUnitCombobox).toHaveValue('Tablet');
     });
+  });
+});
+
+describe('DrugOrderForm - responsive layout behavior', () => {
+  afterEach(() => {
+    mockUseLayoutType.mockReset();
+  });
+
+  it('shows the patient header on tablet layout', () => {
+    mockUseLayoutType.mockReturnValue('tablet');
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    expect(screen.getByText('John Wilson')).toBeInTheDocument();
+  });
+
+  it('hides the patient header on desktop layout', () => {
+    mockUseLayoutType.mockReturnValue('small-desktop');
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    expect(screen.queryByText('John Wilson')).not.toBeInTheDocument();
+  });
+
+  it('hides the patient header on phone layout', () => {
+    mockUseLayoutType.mockReturnValue('phone');
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    expect(screen.queryByText('John Wilson')).not.toBeInTheDocument();
   });
 });
