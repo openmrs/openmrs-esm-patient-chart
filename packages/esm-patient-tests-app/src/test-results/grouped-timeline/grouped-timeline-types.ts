@@ -25,6 +25,7 @@ export interface TimelineDataGroupProps {
   xScroll: number;
   setXScroll: (x: number) => void;
   groupNumber: number;
+  inOverlay?: boolean;
 }
 
 export interface DataRowsProps {
