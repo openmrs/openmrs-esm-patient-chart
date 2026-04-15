@@ -38,9 +38,9 @@
   },
   "dependencies": {
     "@carbon/react": "^1.83.0",
-    "@hookform/resolvers": "^5.2.2",
-    "react-hook-form": "^7.66.0",
-    "zod": "^4.1.12"
+    "@hookform/resolvers": "^3.3.1",
+    "react-hook-form": "^7.52.0",
+    "zod": "^3.23.8"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "9.x",
