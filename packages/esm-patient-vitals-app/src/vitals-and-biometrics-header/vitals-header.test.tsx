@@ -12,7 +12,7 @@ import {
   mockVitalsConfig,
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
@@ -25,6 +25,7 @@ const testProps = {
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
 const mockNumericObservation = jest.mocked(NumericObservation);
+const mockUseVitalsConceptMetadata = jest.mocked(useVitalsConceptMetadata);
 
 const mockLaunchWorkspaceRequiringVisit = jest.fn();
 const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
@@ -50,7 +51,7 @@ jest.mock('../common/data.resource', () => {
       error: null,
       isLoading: false,
     })),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
+    useVitalsConceptMetadata: jest.fn(),
     useVitalsAndBiometrics: jest.fn(),
   };
 });
@@ -61,6 +62,12 @@ mockUseConfig.mockReturnValue({
 } as ConfigObject);
 
 describe('VitalsHeader', () => {
+  beforeEach(() => {
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+  });
+
   it('renders an empty state view when there are no vitals data to show', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
@@ -371,6 +378,59 @@ describe('VitalsHeader', () => {
       ([props]) => props.conceptUuid && !props.interpretation,
     );
     expect(callsWithoutBpAndWithoutInterpretation.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('shows the reference ranges toggletip button when conceptRangeMap has entries', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('button', { name: /view normal ranges/i })).toBeInTheDocument();
+  });
+
+  it('hides the reference ranges toggletip button when conceptRangeMap is empty', async () => {
+    mockUseVitalsConceptMetadata.mockReturnValue({
+      ...mockVitalsConceptMetadata,
+      conceptRangeMap: new Map(),
+    } as ReturnType<typeof useVitalsConceptMetadata>);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('button', { name: /view normal ranges/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const toggletipButton = screen.getByRole('button', { name: /view normal ranges/i });
+    await user.click(toggletipButton);
+
+    expect(screen.getByText(/normal ranges/i)).toBeInTheDocument();
+    // Assert on actual range values from mock data to confirm rows are populated
+    expect(screen.getByText('90–120 / 60–80 mmHg')).toBeInTheDocument(); // BP range
+    expect(screen.getByText('60–100 beats/min')).toBeInTheDocument(); // pulse range
   });
 
   it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
