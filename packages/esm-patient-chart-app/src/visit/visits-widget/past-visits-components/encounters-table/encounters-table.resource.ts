@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import {
   formatDatetime,
   makeUrl,
@@ -117,7 +118,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
   };
 }
 
-export function isCompletedFormEncounter(encounter: Encounter): boolean {
+export function encounterHasJsonSchemaForm(encounter: Encounter): boolean {
   if (!encounter.form) {
     return false;
   }
@@ -129,8 +130,10 @@ export function isCompletedFormEncounter(encounter: Encounter): boolean {
   return encounter.form.resources.some((resource: any) => resource.name === jsonSchemaResourceName);
 }
 
-export async function downloadPdf(encounterUuids: string[], t: (key: string, options?: any) => string) {
-  if (!encounterUuids || encounterUuids.length === 0) return;
+export async function downloadPdf(encounterUuids: string[], t: TFunction) {
+  if (!encounterUuids || encounterUuids.length === 0) {
+    return;
+  }
 
   let currentJobId = null;
 
@@ -147,9 +150,9 @@ export async function downloadPdf(encounterUuids: string[], t: (key: string, opt
 
     showSnackbar({
       isLowContrast: true,
-      title: t('generatingPdf', 'Generating PDF...'),
       kind: 'info',
-      subtitle: t('pdfWillDownloadSoon', 'Your document is being generated and will download automatically.'),
+      title: t('generatingPdf', 'Generating PDF'),
+      subtitle: t('thisMayTakeAMoment', 'This may take a moment.'),
     });
 
     let isCompleted = false;
@@ -198,12 +201,10 @@ export async function downloadPdf(encounterUuids: string[], t: (key: string, opt
 
     showSnackbar({
       isLowContrast: true,
-      title: t('printSuccess', 'Print successful'),
       kind: 'success',
-      subtitle: t('pdfDownloaded', 'PDF has been downloaded successfully'),
+      title: t('pdfDownloaded', 'PDF downloaded'),
     });
   } catch (error) {
-    console.error('Error in async PDF flow:', error);
     showSnackbar({
       isLowContrast: false,
       title: t('error', 'Error'),
