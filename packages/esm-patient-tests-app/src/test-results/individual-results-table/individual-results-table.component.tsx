@@ -20,7 +20,7 @@ import styles from './individual-results-table.scss';
 import { formatResultDate } from '../helpers';
 
 interface IndividualResultsTableProps {
-  patientUuid;
+  patientUuid: string;
   isLoading: boolean;
   subRows: GroupedObservation;
   index: number;
@@ -94,8 +94,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
 
   const tableRows = useMemo(
     () =>
-      subRows?.entries.length &&
-      subRows.entries.map((row, i) => {
+      subRows?.entries?.map((row, i) => {
         // Use observation-level range/units if available, otherwise fallback to node-level
         // MappedObservation has range and units fields, but they may come from node-level
         const displayRange = row.range ?? '';
@@ -128,7 +127,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
           },
           referenceRange: referenceRangeDisplay,
         };
-      }),
+      }) ?? [],
     [index, subRows, launchResultsDialog],
   );
 
