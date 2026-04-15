@@ -131,6 +131,55 @@ describe('AddTaskForm', () => {
       expect(mockOnBack).toHaveBeenCalled();
     });
 
+    it('should default to "None" due date and submit without a dueDate', async () => {
+      const user = userEvent.setup();
+
+      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} />);
+
+      // "None" tab should be selected by default
+      const noneTab = screen.getByRole('tab', { name: /^none$/i });
+      expect(noneTab).toHaveAttribute('aria-selected', 'true');
+
+      const taskNameInput = screen.getByLabelText(/task name/i);
+      await user.type(taskNameInput, 'Task Without Due Date');
+
+      const addButton = screen.getByRole('button', { name: /add task/i });
+      await user.click(addButton);
+
+      await waitFor(() => {
+        expect(mockSaveTask).toHaveBeenCalledWith(
+          patientUuid,
+          expect.objectContaining({
+            name: 'Task Without Due Date',
+            dueDate: undefined,
+          }),
+        );
+      });
+    });
+
+    it('should select "None" when editing a task with no due date', async () => {
+      const taskWithNoDueDate: Task = {
+        ...baseTask,
+        dueDate: undefined,
+      };
+
+      mockUseTask.mockReturnValue({
+        task: taskWithNoDueDate,
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+      });
+
+      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
+      });
+
+      const noneTab = screen.getByRole('tab', { name: /^none$/i });
+      expect(noneTab).toHaveAttribute('aria-selected', 'true');
+    });
+
     it('should show error snackbar when saveTask fails', async () => {
       const user = userEvent.setup();
       mockSaveTask.mockRejectedValue(new Error('Network error'));
@@ -404,6 +453,45 @@ describe('AddTaskForm', () => {
       const thisVisitTab = screen.getByRole('tab', { name: /this visit/i });
       expect(dateTab).toHaveAttribute('aria-selected', 'false');
       expect(thisVisitTab).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('should preserve referenceVisitUuid when editing a visit-based task', async () => {
+      const user = userEvent.setup();
+      const taskWithThisVisit: Task = {
+        ...baseTask,
+        dueDate: {
+          type: 'THIS_VISIT',
+          referenceVisitUuid: 'original-visit-uuid-999',
+        },
+      };
+
+      mockUseTask.mockReturnValue({
+        task: taskWithThisVisit,
+        isLoading: false,
+        error: null,
+        mutate: jest.fn(),
+      });
+
+      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
+      });
+
+      const saveButton = screen.getByRole('button', { name: /save task/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockUpdateTask).toHaveBeenCalledWith(
+          patientUuid,
+          expect.objectContaining({
+            dueDate: expect.objectContaining({
+              type: 'THIS_VISIT',
+              referenceVisitUuid: 'original-visit-uuid-999',
+            }),
+          }),
+        );
+      });
     });
 
     it('should send provider role assignee when updating task with role assignment', async () => {

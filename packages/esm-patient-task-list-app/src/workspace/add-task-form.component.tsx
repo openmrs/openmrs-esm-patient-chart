@@ -195,10 +195,19 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
           ? { uuid: data.assigneeRole.id, display: data.assigneeRole.label, type: 'role' as const }
           : undefined;
 
+      // For visit-based due dates in edit mode, preserve the original reference visit
+      // to avoid re-anchoring the task to a different visit
+      const existingVisitUuid =
+        isEditMode &&
+        existingTask?.dueDate?.type === data.dueDateType &&
+        (data.dueDateType === 'THIS_VISIT' || data.dueDateType === 'NEXT_VISIT')
+          ? (existingTask.dueDate as { referenceVisitUuid?: string }).referenceVisitUuid
+          : undefined;
+
       const dueDate: Task['dueDate'] = data.dueDateType
         ? data.dueDateType === 'DATE'
           ? { type: 'DATE', date: parseDate(data.dueDate!) }
-          : { type: data.dueDateType, referenceVisitUuid: visitUuid }
+          : { type: data.dueDateType, referenceVisitUuid: existingVisitUuid ?? visitUuid }
         : undefined;
 
       if (isEditMode && existingTask) {
@@ -304,25 +313,27 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
                   name="dueDateType"
                   control={control}
                   render={({ field: { onChange, value } }) => {
-                    const validDueDateTypes: Array<'NEXT_VISIT' | 'THIS_VISIT' | 'DATE'> = [
-                      'NEXT_VISIT',
-                      'THIS_VISIT',
-                      'DATE',
-                    ];
-                    const idx = validDueDateTypes.indexOf(value as 'NEXT_VISIT' | 'THIS_VISIT' | 'DATE');
+                    const dueDateOptions = ['NONE', 'NEXT_VISIT', 'THIS_VISIT', 'DATE'] as const;
+                    const idx = dueDateOptions.indexOf((value as (typeof dueDateOptions)[number]) ?? 'NONE');
                     const selectedIndex = idx >= 0 ? idx : 0;
 
                     return (
                       <ContentSwitcher
                         selectedIndex={selectedIndex}
                         onChange={({ name }) => {
-                          onChange(name);
-                          if (name === 'NEXT_VISIT' || name === 'THIS_VISIT') {
+                          if (name === 'NONE') {
+                            onChange(undefined);
                             setValue('dueDate', undefined);
+                          } else {
+                            onChange(name);
+                            if (name === 'NEXT_VISIT' || name === 'THIS_VISIT') {
+                              setValue('dueDate', undefined);
+                            }
                           }
                         }}
                         size="md"
                       >
+                        <Switch name="NONE" text={t('none', 'None')} />
                         <Switch
                           name="NEXT_VISIT"
                           text={t('nextVisit', 'Next visit')}

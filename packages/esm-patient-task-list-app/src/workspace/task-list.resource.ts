@@ -181,7 +181,7 @@ function createTaskFromCarePlan(carePlan: CarePlan): Task {
   const status = detail?.status;
 
   const performers = detail?.performer ?? [];
-  const { dueDate, dueDateType } = extractDueDate(detail);
+  const { dueDate, dueDateType, referenceVisitUuid } = extractDueDate(detail);
   const priority = extractPriority(detail);
   const createdBy = carePlan?.author?.display;
   const systemTaskUuid = extractSystemTaskUuid(carePlan.instantiatesCanonical);
@@ -189,7 +189,7 @@ function createTaskFromCarePlan(carePlan: CarePlan): Task {
   const taskDueDate: Task['dueDate'] = dueDateType
     ? dueDateType === 'DATE'
       ? { type: 'DATE', date: dueDate! }
-      : { type: dueDateType, date: dueDate }
+      : { type: dueDateType, date: dueDate, referenceVisitUuid }
     : undefined;
 
   const task: Task = {
@@ -365,13 +365,15 @@ function parseAssignment(
 function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
   dueDate?: Date;
   dueDateType?: DueDateType;
+  referenceVisitUuid?: string;
 } {
   if (!detail) {
     return {};
   }
 
-  // Read due date type from activity-dueKind extension
+  // Read due date type and reference visit from extensions
   let dueDateType: DueDateType | undefined;
+  let referenceVisitUuid: string | undefined;
 
   if (detail.extension) {
     for (const ext of detail.extension) {
@@ -383,6 +385,11 @@ function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
           dueDateType = 'NEXT_VISIT';
         } else if (value === 'date') {
           dueDateType = 'DATE';
+        }
+      } else if (ext.url === 'http://hl7.org/fhir/StructureDefinition/encounter-associatedEncounter') {
+        const ref = (ext as any).valueReference?.reference;
+        if (ref && ref.startsWith('Encounter/')) {
+          referenceVisitUuid = ref.substring('Encounter/'.length);
         }
       }
     }
@@ -404,6 +411,7 @@ function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
   return {
     dueDate: dueDate ? parseDate(dueDate) : undefined,
     dueDateType,
+    referenceVisitUuid,
   };
 }
 
