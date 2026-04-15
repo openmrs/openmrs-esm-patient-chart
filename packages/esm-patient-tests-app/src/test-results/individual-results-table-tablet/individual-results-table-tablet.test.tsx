@@ -110,4 +110,27 @@ describe('PanelView', () => {
     expect(backButton).not.toBeInTheDocument();
     expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
   });
+
+  it('applies the overlay sticky header fix when opening a panel overlay on tablet', async () => {
+    const user = userEvent.setup();
+
+    mockUseLayoutType.mockReturnValue('tablet');
+    mockIsDesktop.mockReturnValue(false);
+
+    render(
+      <FilterProvider roots={mockResults as Roots} isLoading={false}>
+        <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
+      </FilterProvider>,
+    );
+
+    const hivViralLoadCell = screen.getByRole('cell', { name: /hiv viral load/i });
+    await user.click(hivViralLoadCell);
+
+    // The panel header in the overlay should have the panelHeaderOverlay class
+    // which sets top: 0 instead of the default top: 6rem
+    // eslint-disable-next-line testing-library/no-node-access
+    const panelHeader = document.querySelector('[data-panel-name="HIV viral load"]');
+    expect(panelHeader).toBeInTheDocument();
+    expect(panelHeader).toHaveClass('panelHeaderOverlay');
+  });
 });
