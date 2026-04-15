@@ -17,6 +17,7 @@ import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-fr
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
+import { formatResultDate } from '../helpers';
 
 interface IndividualResultsTableProps {
   patientUuid;
@@ -82,7 +83,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
   const tableHeaders = useMemo(() => {
     return [
       { key: 'testName', header: t('testName', 'Test Name') },
-      { key: 'resultDate', header: t('resultDate', 'Result Date') },
+      { key: 'resultDate', header: t('resultDate', 'Result date') },
       {
         key: 'value',
         header: t('value', 'Value'),
@@ -102,9 +103,6 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
         const isString = isNaN(parseFloat(row.value));
 
         const referenceRangeDisplay = formatRangeWithUnits(displayRange, displayUnits);
-        const resultDate = row.obsDatetime
-          ? formatDate(parseDate(row.obsDatetime), { mode: 'standard', time: true })
-          : '--';
 
         return {
           ...row,
@@ -123,7 +121,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
               )}
             </span>
           ),
-          resultDate,
+          resultDate: formatResultDate(row.obsDatetime),
           value: {
             value: `${row.value} ${displayUnits}`,
             interpretation: row?.interpretation,

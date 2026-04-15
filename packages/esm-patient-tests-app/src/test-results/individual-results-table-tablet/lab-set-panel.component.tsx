@@ -17,6 +17,7 @@ import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helper
 import { getClass } from './helper';
 import type { GroupedObservation } from '../../types';
 import styles from './lab-set-panel.scss';
+import { formatResultDate } from '../helpers';
 
 interface LabSetPanelProps {
   panel: GroupedObservation;
@@ -42,7 +43,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
               key: 'testName',
               header: t('testName', 'Test name'),
             },
-            { id: 'resultDate', key: 'resultDate', header: t('resultDate', 'Result Date') },
+            { id: 'resultDate', key: 'resultDate', header: t('resultDate', 'Result date') },
             {
               id: 'value',
               key: 'value',
@@ -60,6 +61,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
               key: 'testName',
               header: t('testName', 'Test name'),
             },
+            { id: 'resultDate', key: 'resultDate', header: t('resultDate', 'Result date') },
             {
               id: 'value',
               key: 'value',
@@ -75,13 +77,10 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
         ? panel.entries.map((test) => {
             const units = test.units ?? '';
             const range = formatRangeWithUnits(test.range, units);
-            const resultDate = test.obsDatetime
-              ? formatDate(parseDate(test.obsDatetime), { mode: 'standard', time: true })
-              : '--';
             return {
               id: test.conceptUuid,
               testName: test.display,
-              resultDate,
+              resultDate: formatResultDate(test.obsDatetime),
               value: {
                 content: <span>{`${test.value} ${units}`}</span>,
               },
@@ -91,13 +90,10 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
           })
         : panel.entries.map((test) => {
             const units = test.units ?? '';
-            const resultDate = test.obsDatetime
-              ? formatDate(parseDate(test.obsDatetime), { mode: 'standard', time: true })
-              : '--';
             return {
               id: test.conceptUuid,
               testName: test.display,
-              resultDate,
+              resultDate: formatResultDate(test.obsDatetime),
               value: {
                 content: <span>{`${test.value} ${units}`}</span>,
               },
