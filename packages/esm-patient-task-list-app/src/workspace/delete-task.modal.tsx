@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
-import { useSWRConfig } from 'swr';
 import { deleteTask, taskListSWRKey, type Task } from './task-list.resource';
 import styles from './delete-task.scss';
 

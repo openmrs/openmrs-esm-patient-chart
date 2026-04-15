@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Checkbox, Tile, Tag, Layer } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
 import { showSnackbar, useLayoutType, EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type Task, useTaskList, setTaskStatusCompleted, getPriorityLabel } from './task-list.resource';
 import Loader from '../loader/loader.component';
@@ -72,7 +72,7 @@ const TaskListView: React.FC<TaskListViewProps> = ({ patientUuid, onTaskClick })
   }
 
   if (error) {
-    return <p className={styles.errorText}>{t('taskLoadError', 'There was a problem loading the task list.')}</p>;
+    return <p className={styles.errorText}>{t('taskListLoadError', 'There was a problem loading the task list.')}</p>;
   }
 
   if (!tasks || tasks.length === 0) {
@@ -81,7 +81,7 @@ const TaskListView: React.FC<TaskListViewProps> = ({ patientUuid, onTaskClick })
         <Tile className={styles.emptyStateTile}>
           <div className={styles.emptyStateTileContent}>
             <EmptyCardIllustration />
-            <p className={styles.emptyStateContent}>{t('noTasksMessage', 'No tasks to display')}</p>
+            <p className={styles.emptyStateContent}>{t('noTasksMessage', 'No tasks yet')}</p>
           </div>
         </Tile>
       </Layer>

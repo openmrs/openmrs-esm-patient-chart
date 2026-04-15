@@ -9,11 +9,6 @@
   gap: layout.$spacing-02;
 }
 
-.helperText {
-  margin: layout.$spacing-05 0;
-  color: $interactive-01;
-}
-
 .errorText {
   margin: layout.$spacing-05 0;
 }
@@ -95,40 +90,6 @@
   :global(.cds--checkbox-label) {
     text-decoration: line-through;
     color: $text-02;
-  }
-}
-
-.dueDate {
-  font-size: 0.875rem;
-  color: $text-02;
-  white-space: nowrap;
-}
-
-.taskBody {
-  display: grid;
-  gap: layout.$spacing-03;
-  color: $text-02;
-  font-size: 0.875rem;
-}
-
-.taskMeta {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: layout.$spacing-02;
-  row-gap: layout.$spacing-01;
-}
-
-.metaLabel {
-  font-weight: 600;
-}
-
-.taskRationale {
-  display: grid;
-  gap: layout.$spacing-02;
-
-  p {
-    margin: 0;
-    line-height: 1.4;
   }
 }
 

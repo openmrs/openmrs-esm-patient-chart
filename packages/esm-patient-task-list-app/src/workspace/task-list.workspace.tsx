@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, ArrowLeft } from '@carbon/react/icons';
-import { useTranslation } from 'react-i18next';
 import { Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type Task } from './task-list.resource';
 import AddTaskForm from './add-task-form.component';

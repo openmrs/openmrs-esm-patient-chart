@@ -30,14 +30,6 @@
   margin-top: layout.$spacing-03;
 }
 
-// Tablet
-:global(.omrs-breakpoint-lt-desktop) {
-  .buttonSet {
-    padding: layout.$spacing-06 layout.$spacing-05;
-    background-color: colors.$white-0;
-  }
-}
-
 // System task selection styling
 .systemTaskSelected {
   :global(.cds--combo-box) {

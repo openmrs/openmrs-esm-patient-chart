@@ -4,12 +4,14 @@ import useSWRImmutable from 'swr/immutable';
 import { type TFunction } from 'i18next';
 import {
   type FetchResponse,
+  fhirBaseUrl,
   openmrsFetch,
   restBaseUrl,
   parseDate,
   useDebounce,
   useConfig,
 } from '@openmrs/esm-framework';
+import { type Config } from '../config-schema';
 import { type CarePlan } from '../types';
 
 export interface Assignee {
@@ -71,11 +73,6 @@ export interface FHIRCarePlanResponse {
   entry: Array<{
     resource: CarePlan;
   }>;
-}
-
-export interface SelectOption {
-  id: string;
-  label?: string;
 }
 
 export interface ProviderSearchResponse {
@@ -189,15 +186,18 @@ function createTaskFromCarePlan(carePlan: CarePlan): Task {
   const createdBy = carePlan?.author?.display;
   const systemTaskUuid = extractSystemTaskUuid(carePlan.instantiatesCanonical);
 
+  const taskDueDate: Task['dueDate'] = dueDateType
+    ? dueDateType === 'DATE'
+      ? { type: 'DATE', date: dueDate! }
+      : { type: dueDateType, date: dueDate }
+    : undefined;
+
   const task: Task = {
     uuid: carePlan.id ?? '',
     name: detail?.description ?? '',
     status,
     createdDate: parseDate(carePlan.created),
-    dueDate: {
-      type: dueDateType as 'DATE' | 'THIS_VISIT' | 'NEXT_VISIT',
-      date: dueDate,
-    },
+    dueDate: taskDueDate,
     rationale: carePlan.description ?? undefined,
     createdBy,
     completed: status === 'completed',
@@ -359,12 +359,11 @@ function parseAssignment(
   }
 
   console.warn('Unknown performer type', performer);
-  return null;
+  return undefined;
 }
 
 function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
   dueDate?: Date;
-  dueDateCreatedDate?: Date;
   dueDateType?: DueDateType;
 } {
   if (!detail) {
@@ -373,7 +372,6 @@ function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
 
   // Read due date type from activity-dueKind extension
   let dueDateType: DueDateType | undefined;
-  let visitUuid: string | undefined;
 
   if (detail.extension) {
     for (const ext of detail.extension) {
@@ -385,11 +383,6 @@ function extractDueDate(detail?: fhir.CarePlanActivityDetail): {
           dueDateType = 'NEXT_VISIT';
         } else if (value === 'date') {
           dueDateType = 'DATE';
-        }
-      } else if (ext.url === 'http://hl7.org/fhir/StructureDefinition/encounter-associatedEncounter') {
-        const ref = (ext as any).valueReference?.reference;
-        if (ref && ref.startsWith('Encounter/')) {
-          visitUuid = ref.substring('Encounter/'.length);
         }
       }
     }
@@ -418,16 +411,18 @@ function extractPriority(detail?: fhir.CarePlanActivityDetail): Priority | undef
   if (!detail?.extension) {
     return undefined;
   }
+  return extractExtensionPriority(detail.extension);
+}
 
-  for (const ext of detail.extension) {
+function extractExtensionPriority(extensions: Array<{ url: string; [key: string]: any }>): Priority | undefined {
+  for (const ext of extensions) {
     if (ext.url === 'http://openmrs.org/fhir/StructureDefinition/activity-priority') {
-      const value = (ext as any).valueCode || (ext as any).valueString;
+      const value = ext.valueCode || ext.valueString;
       if (value === 'high' || value === 'medium' || value === 'low') {
         return value;
       }
     }
   }
-
   return undefined;
 }
 
@@ -449,7 +444,7 @@ export function useFetchProviders() {
 }
 
 export function useProviderRoles() {
-  const { allowAssigningProviderRole } = useConfig();
+  const { allowAssigningProviderRole } = useConfig<Config>();
   const url = allowAssigningProviderRole ? `${restBaseUrl}/providerrole?v=custom:(uuid,name)` : null;
   const response = useSWRImmutable<FetchResponse<ProviderRoleSearchResponse>>(url, openmrsFetch);
   const results = response?.data?.data?.results ?? [];
@@ -515,23 +510,10 @@ export interface SystemTask {
   rationale?: string;
 }
 
-const fhirBaseUrl = '/ws/fhir2/R4';
-
 function planDefinitionToSystemTask(pd: PlanDefinition): SystemTask {
   const action = pd.action?.[0];
 
-  // Extract priority from action extension
-  let priority: Priority | undefined;
-  if (action?.extension) {
-    for (const ext of action.extension) {
-      if (ext.url === 'http://openmrs.org/fhir/StructureDefinition/activity-priority') {
-        const value = ext.valueCode;
-        if (value === 'high' || value === 'medium' || value === 'low') {
-          priority = value;
-        }
-      }
-    }
-  }
+  const priority = action?.extension ? extractExtensionPriority(action.extension) : undefined;
 
   // Extract default assignee role from action participant
   let defaultAssigneeRoleUuid: string | undefined;
