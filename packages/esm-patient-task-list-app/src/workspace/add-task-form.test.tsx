@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getDefaultsFromConfigSchema, showSnackbar, useVisit, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import AddTaskForm from './add-task-form.component';
 import {
   useTask,
@@ -11,7 +12,6 @@ import {
   useReferenceVisit,
   type Task,
 } from './task-list.resource';
-import { getDefaultsFromConfigSchema, showSnackbar, useVisit, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { configSchema, type Config } from '../config-schema';
 
 const emptySystemTasks: never[] = [];

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -41,7 +42,6 @@ import {
   useTask,
   useSystemTasks,
 } from './task-list.resource';
-import { useSWRConfig } from 'swr';
 
 export interface AddTaskFormProps {
   patientUuid: string;
