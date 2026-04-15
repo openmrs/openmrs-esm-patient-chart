@@ -109,8 +109,8 @@ export function useTaskList(patientUuid: string) {
         return a.completed ? 1 : -1;
       }
 
-      const aDue = a.dueDate?.date?.getTime() ?? 0;
-      const bDue = b.dueDate?.date?.getTime() ?? 0;
+      const aDue = a.dueDate?.date?.getTime() ?? Infinity;
+      const bDue = b.dueDate?.date?.getTime() ?? Infinity;
 
       return aDue - bDue;
     });
