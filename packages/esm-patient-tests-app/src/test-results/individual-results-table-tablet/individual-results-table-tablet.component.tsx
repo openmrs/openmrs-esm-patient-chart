@@ -100,6 +100,7 @@ const IndividualResultsTableTablet: React.FC<IndividualResultsTableTabletProps> 
             <div className={styles.overlay}>
               <TimelineDataGroup
                 groupNumber={1}
+                inOverlay
                 parent={activeTimelineParent}
                 patientUuid={patientUuid}
                 setXScroll={() => {}}
