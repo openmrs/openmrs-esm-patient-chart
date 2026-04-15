@@ -5456,7 +5456,6 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@hookform/resolvers": "npm:^5.2.2"
-    lodash-es: "npm:^4.17.23"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.66.0"
     zod: "npm:^4.1.12"
@@ -21176,16 +21175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:^7.46.2, react-hook-form@npm:^7.52.0":
-  version: 7.52.2
-  resolution: "react-hook-form@npm:7.52.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10/91a738881d9463fb73794374a5aec17b3fac41aac92ddf64ccfa205fd2ebc211376a6a41a8c579fd256cda4aae4d64b0c1f3e872e361b9673edef5e2f0b75c35
-  languageName: node
-  linkType: hard
-
-"react-hook-form@npm:^7.66.0":
+"react-hook-form@npm:^7.46.2, react-hook-form@npm:^7.52.0, react-hook-form@npm:^7.66.0":
   version: 7.72.0
   resolution: "react-hook-form@npm:7.72.0"
   peerDependencies:
