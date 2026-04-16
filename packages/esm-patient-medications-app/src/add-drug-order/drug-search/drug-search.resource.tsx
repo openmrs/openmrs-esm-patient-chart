@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch, restBaseUrl, useFeatureFlag, type Visit } from '@openmrs/esm-framework';
 import {
   type Drug,
@@ -5,8 +7,6 @@ import {
   type DrugOrderTemplate,
   type OrderTemplate,
 } from '@openmrs/esm-patient-common-lib';
-import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
 
 export interface DrugSearchResult {
   uuid: string;
@@ -89,7 +89,7 @@ export function useConceptTree(conceptUuid: string) {
     () => ({
       tree: data,
       isLoading,
-      isError: error,
+      error,
     }),
     [data, isLoading, error],
   );

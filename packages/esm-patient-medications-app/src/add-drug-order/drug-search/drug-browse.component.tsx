@@ -32,7 +32,7 @@ export default function DrugBrowse({
 
   const [rootConceptSet, setRootConceptSet] = useState<ConceptSet | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<ConceptTreeNode[]>([]);
-  const { tree, isLoading: isLoadingTree, isError: isTreeError } = useConceptTree(rootConceptSet?.uuid);
+  const { tree, isLoading: isLoadingTree, error: isTreeError } = useConceptTree(rootConceptSet?.uuid);
 
   useEffect(() => {
     if (conceptSetsError) {

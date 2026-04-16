@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { InlineNotification, SkeletonText, Tile } from '@carbon/react';
 import { useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import classNames from 'classnames';
 import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
 import { type DrugSearchResult } from './drug-search.resource';
 import { DrugSearchResultItem } from './order-basket-search-results.component';
