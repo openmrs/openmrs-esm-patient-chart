@@ -13,16 +13,20 @@ interface DeleteConditionModalProps {
 
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
   const { t } = useTranslation();
-  const { mutate } = useConditions(patientUuid);
+  const { mutate } = useConditions(patientUuid ?? '');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
+    if (!patientUuid) {
+      console.error('DeleteConditionModal opened without patientUuid');
+      return;
+    }
+
     setIsDeleting(true);
 
     try {
       await deleteCondition(conditionId);
-      await mutate();
-
+      void mutate();
       closeDeleteModal();
       showSnackbar({
         isLowContrast: true,
@@ -32,14 +36,23 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
     } catch (error) {
       console.error('Error deleting condition: ', error);
 
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? String(error.message)
+            : undefined;
+
       showSnackbar({
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingCondition', 'Error deleting condition'),
-        subtitle: error?.message,
+        subtitle: errorMessage,
       });
+    } finally {
+      setIsDeleting(false);
     }
-  }, [closeDeleteModal, conditionId, mutate, t]);
+  }, [closeDeleteModal, conditionId, mutate, patientUuid, t]);
 
   return (
     <div>

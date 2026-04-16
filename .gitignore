@@ -100,3 +100,7 @@ e2e/storageState.json
 
 # misc
 .angular
+
+# Managed browser artifacts for esm-form-entry-app tests
+packages/esm-form-entry-app/.cache/
+packages/esm-form-entry-app/scripts/chrome-path.json
