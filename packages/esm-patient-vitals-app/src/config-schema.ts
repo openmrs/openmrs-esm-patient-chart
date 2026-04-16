@@ -42,6 +42,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    bodyMassIndexUuid: {
+      _type: Type.ConceptUuid,
+      _default: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
     vitalSignsConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: '1114AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -138,6 +142,7 @@ export interface ConfigObject {
     respiratoryRateUuid: string;
     generalPatientNoteUuid: string;
     midUpperArmCircumferenceUuid: string;
+    bodyMassIndexUuid: string;
     vitalSignsConceptSetUuid: string;
   };
   vitals: {

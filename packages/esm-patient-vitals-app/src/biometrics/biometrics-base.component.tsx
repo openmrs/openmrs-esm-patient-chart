@@ -44,12 +44,14 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
     },
     {
       key: 'weightRender',
+      conceptUuid: config.concepts.weightUuid,
       header: withUnit(t('weight', 'Weight'), conceptUnits.get(config.concepts.weightUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.weight && valueB.weight ? valueA.weight - valueB.weight : 0),
     },
     {
       key: 'heightRender',
+      conceptUuid: config.concepts.heightUuid,
       header: withUnit(t('height', 'Height'), conceptUnits.get(config.concepts.heightUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.height && valueB.height ? valueA.height - valueB.height : 0),
@@ -58,6 +60,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       ? [
           {
             key: 'bmiRender' as const,
+            conceptUuid: config.concepts.bodyMassIndexUuid,
             header: `${t('bmi', 'BMI')} (${bmiUnit})`,
             isSortable: true,
             sortFunc: (valueA, valueB) => (valueA.bmi && valueB.bmi ? valueA.bmi - valueB.bmi : 0),
@@ -66,6 +69,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       : []),
     {
       key: 'muacRender',
+      conceptUuid: config.concepts.midUpperArmCircumferenceUuid,
       header: withUnit(t('muac', 'MUAC'), conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.muac && valueB.muac ? valueA.muac - valueB.muac : 0),
@@ -143,6 +147,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
             pageUrl={pageUrl}
             tableHeaders={tableHeaders}
             patient={patient}
+            patientUuid={patientUuid}
           />
         )}
       </div>
