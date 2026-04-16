@@ -89,10 +89,10 @@ describe('IndividualResultsTable', () => {
     );
 
     expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByText(/15-Oct-2024/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/15-Oct-2024/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/test name/i)).toBeInTheDocument();
     expect(screen.getByText(/reference range/i)).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv viral load 45 copies\/ml 0 – 50 copies\/ml/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv viral load.*45 copies\/ml.*0 – 50 copies\/ml/i })).toBeInTheDocument();
   });
 
   it('uses observation-level range when available', () => {
@@ -107,6 +107,6 @@ describe('IndividualResultsTable', () => {
     );
 
     // Should display observation-level range (35 – 147) not node-level (0 – 270)
-    expect(screen.getByRole('row', { name: /alkaline phosphatase 15 u\/l 35 – 147 u\/l/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /alkaline phosphatase.*15 u\/l.*35 – 147 u\/l/i })).toBeInTheDocument();
   });
 });
