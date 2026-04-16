@@ -9,6 +9,7 @@ export interface NewRowStartCellProps {
   patientUuid: string;
   shadow?: boolean;
   isString?: boolean;
+  zebra?: boolean;
 }
 
 export interface TimelineCellProps {
@@ -24,6 +25,7 @@ export interface TimelineDataGroupProps {
   xScroll: number;
   setXScroll: (x: number) => void;
   groupNumber: number;
+  inOverlay?: boolean;
 }
 
 export interface DataRowsProps {

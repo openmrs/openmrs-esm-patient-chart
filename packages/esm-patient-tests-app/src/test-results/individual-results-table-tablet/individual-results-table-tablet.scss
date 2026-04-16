@@ -63,4 +63,8 @@
 
 .overlay {
   padding: layout.$spacing-05;
+
+  > div {
+    border: 0.5px solid colors.$gray-50;
+  }
 }

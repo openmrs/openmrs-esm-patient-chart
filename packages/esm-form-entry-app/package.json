@@ -54,7 +54,7 @@
     "@openmrs/ngx-file-uploader": "^19.0.0",
     "@openmrs/ngx-formentry": "^19.0.1",
     "jspdf": "^4.2.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "moment": "^2.29.4",
     "ngx-bootstrap": "^19.0.2",
     "ngx-webcam": "^0.4.1",

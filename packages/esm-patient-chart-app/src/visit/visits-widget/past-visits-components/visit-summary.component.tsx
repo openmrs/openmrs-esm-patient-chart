@@ -13,14 +13,16 @@ import {
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
+import type { ChartConfig } from '../../../config-schema';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import { type Note, type Order, type OrderItem } from '../visit.resource';
+import type { Note, Order, OrderItem } from '../visit.resource';
+import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
+import VisitCompletedFormsTable from './encounters-table/visit-completed-forms-table.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
-import { type ChartConfig } from '../../../config-schema';
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
@@ -92,12 +94,19 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     return [diagnoses, notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
-  const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
-    const encounterIds = visit?.encounters?.map((e) => `Encounter/${e.uuid}`);
-    return ([entry]) => {
-      return encounterIds.includes(entry.encounter?.reference);
-    };
-  }, [visit?.encounters]);
+  const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
+
+  const testsFilter = useMemo<ExternalOverviewProps['filter']>(
+    () =>
+      ([entry]) =>
+        encounterIds.includes(entry.encounter?.reference),
+    [encounterIds],
+  );
+
+  const hasCompletedForms = useMemo(
+    () => visit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
+    [visit?.encounters],
+  );
 
   return (
     <div className={styles.summaryContainer}>
@@ -123,7 +132,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
+          <Tab className={styles.tab} id="tests-tab" disabled={encounterIds.length === 0 && config.disableEmptyTabs}>
             {t('tests', 'Tests')}
           </Tab>
           <Tab
@@ -132,6 +141,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             disabled={medications.length <= 0 && config.disableEmptyTabs}
           >
             {t('medications', 'Medications')}
+          </Tab>
+          <Tab className={styles.tab} id="completed-forms-tab" disabled={!hasCompletedForms && config.disableEmptyTabs}>
+            {t('completedForms', 'Completed forms')}
           </Tab>
           <Tab
             className={styles.tab}
@@ -161,6 +173,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
+          </TabPanel>
+          <TabPanel>
+            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
             <VisitEncountersTable visit={visit} patientUuid={patientUuid} />

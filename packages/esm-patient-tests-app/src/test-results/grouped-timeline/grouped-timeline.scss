@@ -112,7 +112,7 @@
 }
 
 .timelineCellZebra {
-  background-color: $ui-03;
+  background-color: colors.$gray-10;
 }
 
 .dateHeaderInner {
@@ -157,6 +157,10 @@
   background: white;
   border-bottom: 1px solid $ui-03;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panelHeaderOverlay {
+  top: 0;
 }
 
 .panelHeader + div .grid > div:first-child {
