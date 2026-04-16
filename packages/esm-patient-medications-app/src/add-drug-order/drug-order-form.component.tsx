@@ -40,7 +40,6 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
-  isDesktop,
   useConfig,
   useLayoutType,
   Workspace2,
@@ -111,9 +110,9 @@ function MedicationInfoHeader({
 }
 
 function InputWrapper({ children }) {
-  const layout = useLayoutType();
+  const isTablet = useLayoutType() === 'tablet';
   return (
-    <Layer level={isDesktop(layout) ? 0 : 1}>
+    <Layer level={isTablet ? 1 : 0}>
       <div className={styles.field}>{children}</div>
     </Layer>
   );
@@ -130,8 +129,7 @@ export function DrugOrderForm({
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
-  const layout = useLayoutType();
-  const isTablet = layout === 'tablet';
+  const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
@@ -602,7 +600,7 @@ export function DrugOrderForm({
                             maxDate={new Date()}
                             id="startDatePicker"
                             labelText={t('startDate', 'Start date')}
-                            size={isDesktop(layout) ? 'sm' : 'lg'}
+                            size={isTablet ? 'lg' : 'sm'}
                             invalid={Boolean(fieldState?.error?.message)}
                             invalidText={fieldState?.error?.message}
                           />
@@ -870,7 +868,7 @@ const ControlledFieldInput = ({
     field: { onBlur, onChange, value, ref },
     fieldState: { error },
   } = useController<MedicationOrderFormData>({ name, control });
-  const layout = useLayoutType();
+  const isTablet = useLayoutType() === 'tablet';
 
   const fieldErrorStyles = classNames({
     [styles.fieldError]: error?.message,
@@ -893,7 +891,7 @@ const ControlledFieldInput = ({
           onToggle={handleChange}
           ref={ref}
           // @ts-ignore
-          size={isDesktop(layout) ? 'sm' : 'md'}
+          size={isTablet ? 'md' : 'sm'}
           labelA={t('on', 'On')}
           labelB={t('off', 'Off')}
           {...restProps}
@@ -927,7 +925,7 @@ const ControlledFieldInput = ({
             handleChange(isNaN(number) ? null : number);
           }}
           ref={ref}
-          size={isDesktop(layout) ? 'sm' : 'md'}
+          size={isTablet ? 'md' : 'sm'}
           value={typeof value === 'number' ? value : ''}
           {...numberInputProps}
         />
@@ -956,7 +954,7 @@ const ControlledFieldInput = ({
           onChange={(e) => handleChange(e.target.value)}
           onBlur={onBlur}
           ref={ref}
-          size={isDesktop(layout) ? 'sm' : 'md'}
+          size={isTablet ? 'md' : 'sm'}
           value={typeof value === 'string' ? value : ''}
           {...textInputProps}
         />
@@ -971,7 +969,7 @@ const ControlledFieldInput = ({
           onBlur={onBlur}
           onChange={({ selectedItem }) => handleChange(selectedItem)}
           ref={ref}
-          size={isDesktop(layout) ? 'sm' : 'md'}
+          size={isTablet ? 'md' : 'sm'}
           selectedItem={value}
           initialSelectedItem={value}
           {...comboBoxProps}
@@ -980,7 +978,7 @@ const ControlledFieldInput = ({
     }
 
     return null;
-  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, layout, t]);
+  }, [type, value, restProps, handleChange, fieldErrorStyles, onBlur, ref, isTablet, t]);
 
   return (
     <>
