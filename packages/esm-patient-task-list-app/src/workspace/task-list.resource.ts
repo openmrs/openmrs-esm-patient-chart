@@ -462,23 +462,6 @@ export function useProviderRoles() {
   }));
 }
 
-export function useReferenceVisit(dueDateType: string, patientUuid: string) {
-  const referenceVisitUrl =
-    dueDateType === 'NEXT_VISIT'
-      ? `${restBaseUrl}/visit?patient=${patientUuid}&v=custom:(uuid)&includeInactive=true&limit=1`
-      : null;
-  const {
-    data: referenceVisitResponse,
-    isLoading: isReferenceVisitLoading,
-    error: referenceVisitError,
-  } = useSWR<FetchResponse<{ results: Array<{ uuid: string }> }>>(referenceVisitUrl, openmrsFetch);
-  return {
-    data: referenceVisitResponse?.data,
-    isLoading: isReferenceVisitLoading,
-    error: referenceVisitError,
-  };
-}
-
 // PlanDefinition types for system tasks
 export interface PlanDefinition {
   resourceType: 'PlanDefinition';

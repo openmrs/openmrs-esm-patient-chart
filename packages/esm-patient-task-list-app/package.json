@@ -39,11 +39,13 @@
   "dependencies": {
     "@carbon/react": "^1.83.0",
     "@hookform/resolvers": "^3.3.1",
+    "@openmrs/esm-patient-common-lib": "next",
     "react-hook-form": "^7.52.0",
     "zod": "^3.23.8"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-patient-common-lib": "12.x",
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "16.x",
@@ -52,6 +54,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-patient-common-lib": "workspace:*",
     "openmrs": "next"
   }
 }

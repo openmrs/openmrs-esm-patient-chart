@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +22,7 @@ import {
   useLayoutType,
   useConfig,
   parseDate,
-  useVisit,
+  type Visit,
   OpenmrsDatePicker,
   getCoreTranslation,
 } from '@openmrs/esm-framework';
@@ -40,14 +40,14 @@ import {
   type Task,
   type SystemTask,
   useFetchProviders,
-  useReferenceVisit,
   useTask,
   useSystemTasks,
 } from './task-list.resource';
 
 export interface AddTaskFormProps {
   patientUuid: string;
-  onBack: () => void;
+  activeVisit?: Visit;
+  onClose: () => void;
   editTaskUuid?: string;
 }
 
@@ -56,14 +56,13 @@ const optionSchema = z.object({
   label: z.string().optional(),
 });
 
-const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTaskUuid }) => {
+const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onClose, editTaskUuid }) => {
   const { t } = useTranslation();
   const isEditMode = Boolean(editTaskUuid);
 
   const { allowAssigningProviderRole } = useConfig<Config>();
 
   const { task: existingTask, isLoading: isTaskLoading } = useTask(editTaskUuid ?? '');
-  const { activeVisit, isLoading: isVisitLoading } = useVisit(patientUuid);
   const { providers, setProviderQuery, isLoading: isLoadingProviders } = useFetchProviders();
   const { systemTasks, isLoading: isSystemTasksLoading } = useSystemTasks();
 
@@ -162,13 +161,6 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
 
   const selectedDueDateType = watch('dueDateType');
 
-  // Fetch current or last visit for NEXT_VISIT
-  const {
-    data: referenceVisitData,
-    isLoading: isReferenceVisitLoading,
-    error: referenceVisitError,
-  } = useReferenceVisit(selectedDueDateType, patientUuid);
-
   const providerOptions = useMemo(
     () =>
       providers.map((provider) => ({
@@ -179,80 +171,118 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
   );
   const providerRoleOptions = useProviderRoles();
 
-  const handleFormSubmission = async (data: z.infer<typeof schema>) => {
-    try {
-      // Get visit UUID if THIS_VISIT or NEXT_VISIT is selected
-      let visitUuid: string | undefined;
-      if (data.dueDateType === 'THIS_VISIT') {
-        visitUuid = activeVisit?.uuid;
-      } else if (data.dueDateType === 'NEXT_VISIT') {
-        visitUuid = referenceVisitData?.results?.[0]?.uuid;
-      }
+  const handleSystemTaskSelected = useCallback(
+    (task: SystemTask) => {
+      setSelectedSystemTask(task);
+      setIsCustomTaskName(false);
+      setCustomInputValue('');
+      setValue('priority', task.priority ?? undefined);
+      setValue('rationale', task.rationale ?? '');
+      setValue(
+        'assigneeRole',
+        task.defaultAssigneeRoleUuid
+          ? { id: task.defaultAssigneeRoleUuid, label: task.defaultAssigneeRoleDisplay }
+          : undefined,
+      );
+      setValue('assignee', undefined);
+    },
+    [setValue],
+  );
 
-      const assignee = data.assignee
-        ? { uuid: data.assignee.id, display: data.assignee.label, type: 'person' as const }
-        : data.assigneeRole
-          ? { uuid: data.assigneeRole.id, display: data.assigneeRole.label, type: 'role' as const }
+  const handleCustomInput = useCallback(
+    (inputValue: string) => {
+      setSelectedSystemTask(null);
+      setIsCustomTaskName(inputValue.length > 0);
+      setCustomInputValue(inputValue);
+      setValue('priority', undefined);
+      setValue('rationale', '');
+      setValue('assigneeRole', undefined);
+      setValue('assignee', undefined);
+    },
+    [setValue],
+  );
+
+  const priorityItems = useMemo(
+    () => [
+      { id: 'high', label: t('priorityHigh', 'High') },
+      { id: 'medium', label: t('priorityMedium', 'Medium') },
+      { id: 'low', label: t('priorityLow', 'Low') },
+    ],
+    [t],
+  );
+
+  const handleFormSubmission = useCallback(
+    async (data: z.infer<typeof schema>) => {
+      try {
+        // For visit-based due dates, anchor to the current active visit
+        const visitUuid =
+          data.dueDateType === 'THIS_VISIT' || data.dueDateType === 'NEXT_VISIT' ? activeVisit?.uuid : undefined;
+
+        const assignee = data.assignee
+          ? { uuid: data.assignee.id, display: data.assignee.label, type: 'person' as const }
+          : data.assigneeRole
+            ? { uuid: data.assigneeRole.id, display: data.assigneeRole.label, type: 'role' as const }
+            : undefined;
+
+        // For visit-based due dates in edit mode, preserve the original reference visit
+        // to avoid re-anchoring the task to a different visit
+        const existingVisitUuid =
+          isEditMode &&
+          existingTask?.dueDate?.type === data.dueDateType &&
+          (data.dueDateType === 'THIS_VISIT' || data.dueDateType === 'NEXT_VISIT')
+            ? (existingTask.dueDate as { referenceVisitUuid?: string }).referenceVisitUuid
+            : undefined;
+
+        const dueDate: Task['dueDate'] = data.dueDateType
+          ? data.dueDateType === 'DATE'
+            ? { type: 'DATE', date: parseDate(data.dueDate!) }
+            : { type: data.dueDateType, referenceVisitUuid: existingVisitUuid ?? visitUuid }
           : undefined;
 
-      // For visit-based due dates in edit mode, preserve the original reference visit
-      // to avoid re-anchoring the task to a different visit
-      const existingVisitUuid =
-        isEditMode &&
-        existingTask?.dueDate?.type === data.dueDateType &&
-        (data.dueDateType === 'THIS_VISIT' || data.dueDateType === 'NEXT_VISIT')
-          ? (existingTask.dueDate as { referenceVisitUuid?: string }).referenceVisitUuid
-          : undefined;
+        if (isEditMode && existingTask) {
+          const updatedTask: Task = {
+            ...existingTask,
+            name: data.taskName.trim(),
+            dueDate,
+            rationale: data.rationale?.trim() || undefined,
+            assignee,
+            priority: data.priority,
+            systemTaskUuid: existingTask.systemTaskUuid,
+          };
 
-      const dueDate: Task['dueDate'] = data.dueDateType
-        ? data.dueDateType === 'DATE'
-          ? { type: 'DATE', date: parseDate(data.dueDate!) }
-          : { type: data.dueDateType, referenceVisitUuid: existingVisitUuid ?? visitUuid }
-        : undefined;
+          await updateTask(patientUuid, updatedTask);
+          await mutate(taskListSWRKey(patientUuid));
+          showSnackbar({
+            title: t('taskUpdated', 'Task updated'),
+            kind: 'success',
+          });
+        } else {
+          const payload: TaskInput = {
+            name: data.taskName.trim(),
+            dueDate,
+            rationale: data.rationale?.trim() || undefined,
+            assignee,
+            priority: data.priority,
+            systemTaskUuid: selectedSystemTask?.uuid,
+          };
 
-      if (isEditMode && existingTask) {
-        const updatedTask: Task = {
-          ...existingTask,
-          name: data.taskName.trim(),
-          dueDate,
-          rationale: data.rationale?.trim() || undefined,
-          assignee,
-          priority: data.priority,
-          // Preserve systemTaskUuid from existing task (cannot be changed during edit)
-          systemTaskUuid: existingTask.systemTaskUuid,
-        };
-
-        await updateTask(patientUuid, updatedTask);
-        await mutate(taskListSWRKey(patientUuid));
+          await saveTask(patientUuid, payload);
+          await mutate(taskListSWRKey(patientUuid));
+          showSnackbar({
+            title: t('taskAdded', 'Task added'),
+            kind: 'success',
+          });
+        }
+        onClose();
+      } catch (error) {
         showSnackbar({
-          title: t('taskUpdated', 'Task updated'),
-          kind: 'success',
-        });
-      } else {
-        const payload: TaskInput = {
-          name: data.taskName.trim(),
-          dueDate,
-          rationale: data.rationale?.trim() || undefined,
-          assignee,
-          priority: data.priority,
-          systemTaskUuid: selectedSystemTask?.uuid,
-        };
-
-        await saveTask(patientUuid, payload);
-        await mutate(taskListSWRKey(patientUuid));
-        showSnackbar({
-          title: t('taskAdded', 'Task added'),
-          kind: 'success',
+          title: isEditMode ? t('taskUpdateFailed', 'Unable to update task') : t('taskAddFailed', 'Task add failed'),
+          kind: 'error',
         });
       }
-      onBack();
-    } catch (error) {
-      showSnackbar({
-        title: isEditMode ? t('taskUpdateFailed', 'Unable to update task') : t('taskAddFailed', 'Task add failed'),
-        kind: 'error',
-      });
-    }
-  };
+    },
+    [activeVisit, isEditMode, existingTask, patientUuid, mutate, t, selectedSystemTask, onClose],
+  );
 
   if (isEditMode && isTaskLoading) {
     return <Loader />;
@@ -279,29 +309,8 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
                     selectedSystemTask={selectedSystemTask}
                     isCustomTaskName={isCustomTaskName}
                     customInputValue={customInputValue}
-                    onSystemTaskSelected={(task) => {
-                      setSelectedSystemTask(task);
-                      setIsCustomTaskName(false);
-                      setCustomInputValue('');
-                      if (task.priority) {
-                        setValue('priority', task.priority);
-                      }
-                      if (task.rationale) {
-                        setValue('rationale', task.rationale);
-                      }
-                      if (task.defaultAssigneeRoleUuid) {
-                        setValue('assigneeRole', {
-                          id: task.defaultAssigneeRoleUuid,
-                          label: task.defaultAssigneeRoleDisplay,
-                        });
-                        setValue('assignee', undefined);
-                      }
-                    }}
-                    onCustomInput={(inputValue) => {
-                      setSelectedSystemTask(null);
-                      setIsCustomTaskName(inputValue.length > 0);
-                      setCustomInputValue(inputValue);
-                    }}
+                    onSystemTaskSelected={handleSystemTaskSelected}
+                    onCustomInput={handleCustomInput}
                   />
                 )}
               />
@@ -314,7 +323,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
                   control={control}
                   render={({ field: { onChange, value } }) => {
                     const dueDateOptions = ['NONE', 'NEXT_VISIT', 'THIS_VISIT', 'DATE'] as const;
-                    const idx = dueDateOptions.indexOf((value as (typeof dueDateOptions)[number]) ?? 'NONE');
+                    const idx = dueDateOptions.indexOf(value ?? 'NONE');
                     const selectedIndex = idx >= 0 ? idx : 0;
 
                     return (
@@ -334,16 +343,8 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
                         size="md"
                       >
                         <Switch name="NONE" text={t('none', 'None')} />
-                        <Switch
-                          name="NEXT_VISIT"
-                          text={t('nextVisit', 'Next visit')}
-                          disabled={isReferenceVisitLoading || !!referenceVisitError}
-                        />
-                        <Switch
-                          name="THIS_VISIT"
-                          text={t('thisVisit', 'This visit')}
-                          disabled={isVisitLoading || !activeVisit}
-                        />
+                        <Switch name="NEXT_VISIT" text={t('nextVisit', 'Next visit')} disabled={!activeVisit} />
+                        <Switch name="THIS_VISIT" text={t('thisVisit', 'This visit')} disabled={!activeVisit} />
                         <Switch name="DATE" text={t('date', 'Date')} />
                       </ContentSwitcher>
                     );
@@ -438,11 +439,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
                     id="priority"
                     titleText={t('priorityLabel', 'Priority')}
                     placeholder={t('priorityPlaceholder', 'Select priority (optional)')}
-                    items={[
-                      { id: 'high', label: t('priorityHigh', 'High') },
-                      { id: 'medium', label: t('priorityMedium', 'Medium') },
-                      { id: 'low', label: t('priorityLow', 'Low') },
-                    ]}
+                    items={priorityItems}
                     itemToString={(item) => item?.label ?? ''}
                     selectedItem={
                       field.value
@@ -485,7 +482,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, onBack, editTask
         </Form>
       </div>
       <ButtonSet className={styles.bottomButtons}>
-        <Button kind="secondary" onClick={onBack} size="xl">
+        <Button kind="secondary" onClick={onClose} size="xl">
           {isEditMode ? getCoreTranslation('cancel') : t('discard', 'Discard')}
         </Button>
         <Button kind="primary" size="xl" onClick={handleSubmit(handleFormSubmission)}>

@@ -20,11 +20,11 @@ jest.mock('./task-list-view.component', () => {
 });
 
 jest.mock('./add-task-form.component', () => {
-  return function MockAddTaskForm({ onBack, editTaskUuid }: { onBack: () => void; editTaskUuid?: string }) {
+  return function MockAddTaskForm({ onClose, editTaskUuid }: { onClose: () => void; editTaskUuid?: string }) {
     return (
       <div data-testid={editTaskUuid ? 'edit-task-form' : 'add-task-form'}>
         <span>{editTaskUuid ? 'Editing task' : 'Adding task'}</span>
-        <button onClick={onBack}>Form back</button>
+        <button onClick={onClose}>Form back</button>
       </div>
     );
   };
@@ -43,7 +43,7 @@ jest.mock('./task-details-view.component', () => {
 });
 
 const defaultProps = {
-  groupProps: { patientUuid: 'patient-uuid-123' },
+  groupProps: { patientUuid: 'patient-uuid-123', visitContext: { uuid: 'visit-uuid' } },
 };
 
 describe('TaskListWorkspace', () => {

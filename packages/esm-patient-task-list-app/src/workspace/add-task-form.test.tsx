@@ -1,17 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, showSnackbar, useVisit, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import AddTaskForm from './add-task-form.component';
 import {
-  useTask,
-  saveTask,
-  updateTask,
-  useFetchProviders,
-  useProviderRoles,
-  useReferenceVisit,
-  type Task,
-} from './task-list.resource';
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  type Visit,
+} from '@openmrs/esm-framework';
+import AddTaskForm from './add-task-form.component';
+import { useTask, saveTask, updateTask, useFetchProviders, useProviderRoles, type Task } from './task-list.resource';
 import { configSchema, type Config } from '../config-schema';
 
 const emptySystemTasks: never[] = [];
@@ -22,7 +20,6 @@ jest.mock('./task-list.resource', () => ({
   taskListSWRKey: jest.fn((patientUuid) => `tasks-${patientUuid}`),
   useFetchProviders: jest.fn(),
   useProviderRoles: jest.fn(),
-  useReferenceVisit: jest.fn(),
   getPriorityLabel: jest.fn((priority) => priority),
   useSystemTasks: jest.fn(() => ({ systemTasks: emptySystemTasks, isLoading: false })),
 }));
@@ -32,13 +29,14 @@ const mockSaveTask = jest.mocked(saveTask);
 const mockUpdateTask = jest.mocked(updateTask);
 const mockUseFetchProviders = jest.mocked(useFetchProviders);
 const mockUseProviderRoles = jest.mocked(useProviderRoles);
-const mockUseReferenceVisit = jest.mocked(useReferenceVisit);
 const mockShowSnackbar = jest.mocked(showSnackbar);
 const mockUseConfig = jest.mocked(useConfig<Config>);
 
+const mockActiveVisit = { uuid: 'active-visit-uuid' } as Visit;
+
 describe('AddTaskForm', () => {
   const patientUuid = 'patient-uuid-123';
-  const mockOnBack = jest.fn();
+  const mockOnClose = jest.fn();
 
   const baseTask: Task = {
     uuid: 'task-uuid-456',
@@ -82,19 +80,13 @@ describe('AddTaskForm', () => {
 
     mockUseProviderRoles.mockReturnValue([]);
 
-    mockUseReferenceVisit.mockReturnValue({
-      data: { results: [{ uuid: 'reference-visit-uuid' }] },
-      isLoading: false,
-      error: null,
-    });
-
     mockSaveTask.mockResolvedValue({} as any);
     mockUpdateTask.mockResolvedValue({} as any);
   });
 
   describe('Create mode (no editTaskUuid)', () => {
     it('should render the form with empty fields', () => {
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} />);
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
 
       expect(screen.getByLabelText(/task name/i)).toHaveValue('');
       expect(screen.getByText(/add task/i)).toBeInTheDocument();
@@ -104,7 +96,7 @@ describe('AddTaskForm', () => {
     it('should call saveTask when submitting in create mode', async () => {
       const user = userEvent.setup();
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} />);
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
 
       const taskNameInput = screen.getByLabelText(/task name/i);
       await user.type(taskNameInput, 'New Task');
@@ -128,13 +120,13 @@ describe('AddTaskForm', () => {
           kind: 'success',
         }),
       );
-      expect(mockOnBack).toHaveBeenCalled();
+      expect(mockOnClose).toHaveBeenCalled();
     });
 
     it('should default to "None" due date and submit without a dueDate', async () => {
       const user = userEvent.setup();
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} />);
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
 
       // "None" tab should be selected by default
       const noneTab = screen.getByRole('tab', { name: /^none$/i });
@@ -170,7 +162,14 @@ describe('AddTaskForm', () => {
         mutate: jest.fn(),
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -184,7 +183,7 @@ describe('AddTaskForm', () => {
       const user = userEvent.setup();
       mockSaveTask.mockRejectedValue(new Error('Network error'));
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} />);
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
 
       const taskNameInput = screen.getByLabelText(/task name/i);
       await user.type(taskNameInput, 'New Task');
@@ -201,7 +200,7 @@ describe('AddTaskForm', () => {
         );
       });
 
-      expect(mockOnBack).not.toHaveBeenCalled();
+      expect(mockOnClose).not.toHaveBeenCalled();
     });
   });
 
@@ -218,7 +217,14 @@ describe('AddTaskForm', () => {
     });
 
     it('should render the form with "Save task" and "Cancel" buttons', async () => {
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid={editTaskUuid} />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid={editTaskUuid}
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /save task/i })).toBeInTheDocument();
@@ -229,7 +235,14 @@ describe('AddTaskForm', () => {
     });
 
     it('should pre-populate form fields with existing task data', async () => {
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid={editTaskUuid} />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid={editTaskUuid}
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -257,7 +270,14 @@ describe('AddTaskForm', () => {
     it('should call updateTask when submitting in edit mode', async () => {
       const user = userEvent.setup();
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid={editTaskUuid} />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid={editTaskUuid}
+        />,
+      );
 
       // Wait for form to be populated
       await waitFor(() => {
@@ -289,14 +309,21 @@ describe('AddTaskForm', () => {
           kind: 'success',
         }),
       );
-      expect(mockOnBack).toHaveBeenCalled();
+      expect(mockOnClose).toHaveBeenCalled();
     });
 
     it('should show error snackbar when updateTask fails', async () => {
       const user = userEvent.setup();
       mockUpdateTask.mockRejectedValue(new Error('Network error'));
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid={editTaskUuid} />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid={editTaskUuid}
+        />,
+      );
 
       // Wait for form to be populated
       await waitFor(() => {
@@ -315,13 +342,20 @@ describe('AddTaskForm', () => {
         );
       });
 
-      expect(mockOnBack).not.toHaveBeenCalled();
+      expect(mockOnClose).not.toHaveBeenCalled();
     });
 
     it('should preserve existing task properties when updating', async () => {
       const user = userEvent.setup();
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid={editTaskUuid} />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid={editTaskUuid}
+        />,
+      );
 
       // Wait for form to be populated
       await waitFor(() => {
@@ -363,7 +397,14 @@ describe('AddTaskForm', () => {
         mutate: jest.fn(),
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -402,7 +443,14 @@ describe('AddTaskForm', () => {
         mutate: jest.fn(),
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -438,7 +486,14 @@ describe('AddTaskForm', () => {
         mutate: jest.fn(),
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -472,7 +527,14 @@ describe('AddTaskForm', () => {
         mutate: jest.fn(),
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');
@@ -517,7 +579,14 @@ describe('AddTaskForm', () => {
         allowAssigningProviderRole: true,
       });
 
-      render(<AddTaskForm patientUuid={patientUuid} onBack={mockOnBack} editTaskUuid="task-uuid-456" />);
+      render(
+        <AddTaskForm
+          patientUuid={patientUuid}
+          activeVisit={mockActiveVisit}
+          onClose={mockOnClose}
+          editTaskUuid="task-uuid-456"
+        />,
+      );
 
       await waitFor(() => {
         expect(screen.getByLabelText(/task name/i)).toHaveValue('Existing Task');

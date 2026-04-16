@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, ArrowLeft } from '@carbon/react/icons';
-import { Workspace2, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { Workspace2, type Visit } from '@openmrs/esm-framework';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { type Task } from './task-list.resource';
 import AddTaskForm from './add-task-form.component';
 import TaskListView from './task-list-view.component';
@@ -11,9 +12,8 @@ import styles from './task-list.scss';
 
 type View = 'list' | 'form' | 'details' | 'edit';
 
-const TaskListWorkspace: React.FC<Workspace2DefinitionProps<{}, {}, { patientUuid: string }>> = ({ groupProps }) => {
-  // groupProps is always provided when this workspace is opened from the patient-chart group
-  const patientUuid = groupProps?.patientUuid ?? '';
+const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({ groupProps }) => {
+  const { patientUuid, visitContext } = groupProps ?? { patientUuid: '', visitContext: undefined as unknown as Visit };
   const { t } = useTranslation();
   const [view, setView] = useState<View>('list');
   const [selectedTaskUuid, setSelectedTaskUuid] = useState<string | null>(null);
@@ -59,7 +59,9 @@ const TaskListWorkspace: React.FC<Workspace2DefinitionProps<{}, {}, { patientUui
             </Button>
           </div>
         )}
-        {view === 'form' && <AddTaskForm patientUuid={patientUuid} onBack={() => setView('list')} />}
+        {view === 'form' && (
+          <AddTaskForm patientUuid={patientUuid} activeVisit={visitContext} onClose={() => setView('list')} />
+        )}
         {view === 'list' && <TaskListView patientUuid={patientUuid} onTaskClick={handleTaskClick} />}
         {view === 'list' && (
           <div className={styles.addTaskButtonContainer}>
@@ -82,7 +84,12 @@ const TaskListWorkspace: React.FC<Workspace2DefinitionProps<{}, {}, { patientUui
           />
         )}
         {view === 'edit' && selectedTaskUuid && (
-          <AddTaskForm patientUuid={patientUuid} onBack={handleEditComplete} editTaskUuid={selectedTaskUuid} />
+          <AddTaskForm
+            patientUuid={patientUuid}
+            activeVisit={visitContext}
+            onClose={handleEditComplete}
+            editTaskUuid={selectedTaskUuid}
+          />
         )}
       </div>
     </Workspace2>
