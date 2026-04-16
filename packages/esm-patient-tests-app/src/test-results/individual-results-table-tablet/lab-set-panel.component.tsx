@@ -27,7 +27,7 @@ interface LabSetPanelProps {
 
 const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActivePanel }) => {
   const { t } = useTranslation();
-  const date = new Date(panel.date);
+  const date = panel.entries[0]?.obsDatetime ? parseDate(panel.entries[0].obsDatetime) : new Date(panel.date);
   const layout = useLayoutType();
 
   const getColumnClass = (columnKey: string) => styles[`col-${columnKey}`];
@@ -115,9 +115,8 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, activePanel, setActive
           <p className={styles.subtitleText}>
             {formatDate(date, {
               mode: 'wide',
-              time: false,
-            })}{' '}
-            &bull; {`${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`}
+              time: true,
+            })}
           </p>
         </div>
         <DataTable rows={rowsData} headers={headers} useZebraStyles>
