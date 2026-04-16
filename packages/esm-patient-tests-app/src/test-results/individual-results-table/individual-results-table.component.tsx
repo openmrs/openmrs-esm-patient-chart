@@ -82,7 +82,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
 
   const tableHeaders = useMemo(() => {
     return [
-      { key: 'testName', header: t('testName', 'Test Name') },
+      { key: 'testName', header: t('testName', 'Test name') },
       { key: 'resultDate', header: t('resultDate', 'Result date') },
       {
         key: 'value',

@@ -14,10 +14,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { formatDate, isDesktop, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { formatRangeWithUnits } from '../grouped-timeline/reference-range-helpers';
+import { formatResultDate } from '../helpers';
 import { getClass } from './helper';
 import type { GroupedObservation } from '../../types';
 import styles from './lab-set-panel.scss';
-import { formatResultDate } from '../helpers';
 
 interface LabSetPanelProps {
   panel: GroupedObservation;
