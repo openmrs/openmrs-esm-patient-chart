@@ -312,12 +312,12 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some((selectedDiagnosis) =>
       diagnosis.uuid
         ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
-        : diagnosis.display.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded.toLocaleLowerCase(),
+        : diagnosis.display?.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded?.toLocaleLowerCase(),
     );
     const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some((selectedDiagnosis) =>
       diagnosis.uuid
         ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
-        : diagnosis.display.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded.toLocaleLowerCase(),
+        : diagnosis.display?.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded?.toLocaleLowerCase(),
     );
 
     return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
@@ -857,8 +857,8 @@ function DiagnosesDisplay({
           // if the searchResults doesn't contain the exact search term,
           // still allow proposing adding it as a custom free-text diagnosis
           !searchResults
-            .map((diagnosis) => diagnosis.display.toLocaleLowerCase())
-            .includes(value.toLocaleLowerCase()) && (
+            .map((diagnosis) => diagnosis.display?.toLocaleLowerCase())
+            .includes(value?.toLocaleLowerCase()) && (
             <li className={styles.diagnosis} role="menuitem">
               <Button
                 size="md"
