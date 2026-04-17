@@ -1,0 +1,111 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.taskList {
+  padding: layout.$spacing-03;
+  display: grid;
+  gap: layout.$spacing-02;
+}
+
+.errorText {
+  margin: layout.$spacing-05 0;
+}
+
+.taskTile {
+  padding: 0;
+  border: 1px solid $grey-2;
+  display: flex;
+  flex-direction: row;
+}
+
+.tabletTaskTile {
+  &:not(:last-of-type) {
+    margin-bottom: layout.$spacing-04;
+  }
+}
+
+.taskTileCheckbox {
+  padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  min-width: 0;
+}
+
+.taskTileContentButton {
+  padding: layout.$spacing-03 layout.$spacing-05;
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  min-width: 0;
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  flex: 1;
+  transition: background-color 1s ease-in-out;
+}
+
+.taskTileContentButton:hover {
+  background-color: rgba(colors.$gray-100, 0.03);
+}
+
+.completedTile {
+  opacity: 0.65;
+}
+
+.taskNameWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  flex: 1;
+  min-width: 0;
+}
+
+.taskRationalePreview {
+  font-size: 0.875rem;
+  color: $text-02;
+  line-height: 1.4;
+}
+
+.taskAssignee {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.taskTags {
+  display: flex;
+  gap: layout.$spacing-02;
+  flex-shrink: 0;
+}
+
+.checkboxWrapper {
+  :global(.cds--checkbox-label) {
+    font-weight: 600;
+  }
+}
+
+.completedCheckbox {
+  :global(.cds--checkbox-label) {
+    text-decoration: line-through;
+    color: $text-02;
+  }
+}
+
+.emptyStateTile {
+  padding: layout.$spacing-06 0;
+}
+
+.emptyStateTileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
