@@ -5720,6 +5720,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-patient-task-list-app@workspace:packages/esm-patient-task-list-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-patient-task-list-app@workspace:packages/esm-patient-task-list-app"
+  dependencies:
+    "@carbon/react": "npm:^1.83.0"
+    "@hookform/resolvers": "npm:^3.3.1"
+    "@openmrs/esm-patient-common-lib": "workspace:*"
+    openmrs: "npm:next"
+    react-hook-form: "npm:^7.52.0"
+    zod: "npm:^3.23.8"
+  peerDependencies:
+    "@openmrs/esm-framework": 9.x
+    "@openmrs/esm-patient-common-lib": 12.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 16.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-patient-tests-app@workspace:packages/esm-patient-tests-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-tests-app@workspace:packages/esm-patient-tests-app"
@@ -20496,11 +20518,11 @@ __metadata:
   linkType: hard
 
 "react-hook-form@npm:^7.46.2, react-hook-form@npm:^7.52.0":
-  version: 7.52.2
-  resolution: "react-hook-form@npm:7.52.2"
+  version: 7.72.0
+  resolution: "react-hook-form@npm:7.72.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10/91a738881d9463fb73794374a5aec17b3fac41aac92ddf64ccfa205fd2ebc211376a6a41a8c579fd256cda4aae4d64b0c1f3e872e361b9673edef5e2f0b75c35
+  checksum: 10/25268c510aa5943adfeb2cffe497f5b4b506974f60b4404b42f1b73eaa6db63a1efdb51f3e5f0fa6c0239cbd0f66a2dddf06ec45141d1894a266e77e2dbefb2d
   languageName: node
   linkType: hard
 
