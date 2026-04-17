@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "tasks": ">=1.0.0",
+    "webservices.rest": ">=3.1.0"
+  },
+  "modals": [
+    {
+      "name": "delete-task-confirmation-modal",
+      "component": "deleteTaskConfirmationModal"
+    }
+  ],
+  "workspaces2": [
+    {
+      "name": "task-list",
+      "component": "taskListWorkspace",
+      "window": "task-list"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "task-list",
+      "group": "patient-chart",
+      "icon": "taskListLaunchButton",
+      "order": 3
+    }
+  ]
+}
