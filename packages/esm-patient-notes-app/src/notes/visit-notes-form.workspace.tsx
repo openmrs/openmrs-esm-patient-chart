@@ -551,42 +551,31 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               </Row>
             )}
             <div className={styles.diagnosesText}>
-              {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-                <>
-                  {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                      type="red"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-                <>
-                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                      type="blue"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedPrimaryDiagnoses &&
-                !selectedPrimaryDiagnoses.length &&
-                selectedSecondaryDiagnoses &&
-                !selectedSecondaryDiagnoses.length && (
-                  <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-                )}
+              {selectedPrimaryDiagnoses.map((diagnosis, index) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={index}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                  type="red"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {selectedSecondaryDiagnoses.map((diagnosis, index) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={index}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                  type="blue"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {!selectedPrimaryDiagnoses.length && !selectedSecondaryDiagnoses.length && (
+                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              )}
             </div>
             <Row className={styles.row}>
               <Column sm={1}>
