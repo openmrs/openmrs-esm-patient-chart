@@ -94,6 +94,8 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
   });
 };
 
+const SEARCH_TIMEOUT_MS = 500;
+
 export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
@@ -105,7 +107,6 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
-  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -237,7 +238,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               createErrorHandler();
             });
         }
-      }, searchTimeoutInMs),
+      }, SEARCH_TIMEOUT_MS),
     [config.diagnosisConceptClass, clearErrors],
   );
 
