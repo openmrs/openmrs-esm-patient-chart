@@ -6,6 +6,7 @@ import {
   AddIcon,
   createAttachment,
   deleteAttachmentPermanently,
+  isDesktop,
   showModal,
   showSnackbar,
   type Attachment,
@@ -35,7 +36,8 @@ interface SwitchEventHandlersParams {
 type ViewType = 'grid' | 'table';
 
 const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }) => {
-  const isTablet = useLayoutType() === 'tablet';
+  const layoutType = useLayoutType();
+  const desktop = isDesktop(layoutType);
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
   const { allowedFileExtensions } = useAllowedFileExtensions();
@@ -150,7 +152,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
               <ContentSwitcher
                 onChange={(event: SwitchEventHandlersParams) => setView(event.name.toString() as ViewType)}
                 selectedIndex={view === 'grid' ? 0 : 1}
-                size={isTablet ? 'md' : 'sm'}
+                size={desktop ? 'sm' : 'md'}
               >
                 <IconSwitch name="grid" text={t('gridView', 'Grid view')}>
                   <Thumbnail_2 size={16} />
@@ -163,10 +165,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
               <Button
                 kind="ghost"
                 renderIcon={AddIcon}
-                iconDescription="Add attachment"
+                iconDescription={t('addAttachment', 'Add attachment')}
                 onClick={showAddAttachmentModal}
+                size={desktop ? 'sm' : 'md'}
+                hasIconOnly={!desktop}
               >
-                {t('add', 'Add')}
+                {desktop && t('add', 'Add')}
               </Button>
             </div>
           </CardHeader>
