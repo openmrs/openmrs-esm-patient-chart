@@ -145,7 +145,9 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
-  } | null>(null);
+  }>({
+    blockSavingForm: false,
+  });
   const { visitAttributeTypes } = useVisitAttributeTypes();
   const [visitFormCallbacks, setVisitFormCallbacks] = useVisitFormCallbacks();
   const [extraVisitInfo, setExtraVisitInfo] = useState<ExtraVisitInfo | null>(null);
@@ -537,6 +539,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                         <VisitFormExtensionSlot
                           name="visit-form-top-slot"
                           patientUuid={patientUuid}
+                          visitStatus={visitStatus}
                           visitFormOpenedFrom={openedFrom}
                           setVisitFormCallbacks={setVisitFormCallbacks}
                         />
@@ -562,9 +565,15 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                           render={({ field: { onChange } }) => (
                             <RadioButtonGroup
                               orientation="vertical"
-                              onChange={(uuid: string) =>
-                                onChange(activePatientEnrollment.find(({ program }) => program.uuid === uuid)?.uuid)
-                              }
+                              onChange={(selection: string | number | undefined) => {
+                                if (typeof selection !== 'string') {
+                                  return;
+                                }
+
+                                onChange(
+                                  activePatientEnrollment.find(({ program }) => program.uuid === selection)?.uuid,
+                                );
+                              }}
                               name="program-type-radio-group"
                             >
                               {activePatientEnrollment.map(({ uuid, display, program }) => (
@@ -644,13 +653,14 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
                     </div>
                   </section>
 
-                  {/* Queue location and queue fields. These get shown when config.showServiceQueueFields is true,
-                      or when the form is opened from the queues app */}
+                  {/* Queue location and queue fields are rendered by the queue extension itself.
+                      Pass the current visit status so the extension can opt out for retrospective visits. */}
                   <section>
                     <div className={styles.sectionField}>
                       <VisitFormExtensionSlot
                         name="visit-form-bottom-slot"
                         patientUuid={patientUuid}
+                        visitStatus={visitStatus}
                         visitFormOpenedFrom={openedFrom}
                         setVisitFormCallbacks={setVisitFormCallbacks}
                       />
@@ -705,12 +715,14 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 interface VisitFormExtensionSlotProps {
   name: string;
   patientUuid: string;
+  visitStatus: VisitFormData['visitStatus'];
   visitFormOpenedFrom: string;
   setVisitFormCallbacks: React.Dispatch<React.SetStateAction<Map<string, VisitFormCallbacks>>>;
 }
 
 type VisitFormExtensionState = {
   patientUuid: string;
+  visitStatus: VisitFormData['visitStatus'];
 
   /**
    * This function allows an extension to register callbacks for visit form submission.
@@ -719,14 +731,14 @@ type VisitFormExtensionState = {
    * @param callback
    * @returns
    */
-  setVisitFormCallbacks(callbacks: VisitFormCallbacks);
+  setVisitFormCallbacks(callbacks: VisitFormCallbacks): void;
 
   visitFormOpenedFrom: string;
   patientChartConfig: ChartConfig;
 };
 
 const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo(
-  ({ name, patientUuid, visitFormOpenedFrom, setVisitFormCallbacks }) => {
+  ({ name, patientUuid, visitStatus, visitFormOpenedFrom, setVisitFormCallbacks }) => {
     const config = useConfig<ChartConfig>();
 
     return (
@@ -734,6 +746,7 @@ const VisitFormExtensionSlot: React.FC<VisitFormExtensionSlotProps> = React.memo
         {(extension: AssignedExtension) => {
           const state: VisitFormExtensionState = {
             patientUuid,
+            visitStatus,
             setVisitFormCallbacks: (callbacks) => {
               setVisitFormCallbacks((old) => {
                 return new Map(old).set(extension.id, callbacks);
