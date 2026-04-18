@@ -813,20 +813,16 @@ function DiagnosesDisplay({
   if (!isSearching && searchResults?.length > 0) {
     return (
       <ul className={styles.diagnosisList}>
-        {searchResults.map((diagnosis, index) => {
-          if (isDiagnosisNotSelected(diagnosis)) {
-            return (
-              <li
-                className={styles.diagnosis}
-                key={index}
-                onClick={() => onAddDiagnosis(diagnosis, fieldName)}
-                role="menuitem"
-              >
-                {diagnosis.display}
-              </li>
-            );
-          }
-        })}
+        {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
+          <li
+            className={styles.diagnosis}
+            key={diagnosis.uuid}
+            onClick={() => onAddDiagnosis(diagnosis, fieldName)}
+            role="menuitem"
+          >
+            {diagnosis.display}
+          </li>
+        ))}
       </ul>
     );
   }
