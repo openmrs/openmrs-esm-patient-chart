@@ -1,212 +1,314 @@
-:wave: **New to our project?** Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.atlassian.net/wiki/x/IABBHg) :teacher:
-
-![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)
-
 # OpenMRS ESM Patient Chart
 
-The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It contains various microfrontends that constitute widgets in a patient dashboard. These widgets include:
+[![OpenMRS CI](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml/badge.svg)](https://github.com/openmrs/openmrs-esm-patient-chart/actions/workflows/ci.yml)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
-- [Allergies](packages/esm-patient-allergies-app/README.md)
-- [Attachments](packages/esm-patient-attachments-app/README.md)
-- [Conditions](packages/esm-patient-conditions-app/README.md)
-- [Flags](packages/esm-patient-flags-app/README.md)
-- [Forms](packages/esm-patient-forms-app/README.md)
-- [Immunizations](packages/esm-patient-immunizations-app/README.md)
-- [Lists](packages/esm-patient-lists-app/README.md)
-- [Medications](packages/esm-patient-medications-app/README.md)
-- [Notes](packages/esm-patient-notes-app/README.md)
-- [Orders](packages/esm-patient-orders-app/README.md)
-- [Patient banner](packages/esm-patient-banner-app/README.md)
-- [Programs](packages/esm-patient-programs-app/README.md)
-- [Tests](packages/esm-patient-tests-app/README.md)
-- [Vitals and Biometrics](packages/esm-patient-vitals-app/README.md)
+> New to the project? Start with the [OpenMRS 3 Frontend Developer Documentation](https://om.rs/dev3docs).
 
-In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
+A frontend monorepo for the [OpenMRS 3](https://openmrs.org/) Single Page Application (SPA). This package provides the patient chart experience - a collection of microfrontend widgets that together form a comprehensive, extensible patient dashboard.
 
-- [Common lib](packages/esm-patient-common-lib/README.md)
-- [Patient chart](packages/esm-patient-chart-app/README.md)
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Microfrontends](#microfrontends)
+- [Layout](#layout)
+- [Setup](#setup)
+- [Development](#development)
+- [Testing](#testing)
+- [End-to-End Tests](#end-to-end-e2e-tests)
+- [Design Patterns](#design-patterns)
+- [Configuration](#configuration)
+- [Deployment](#deployment)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+
+---
+
+## Overview
+
+`openmrs-esm-patient-chart` is a [Turborepo](https://turbo.build/repo)-based monorepo that uses [Yarn](https://yarnpkg.com/) as its package manager. It groups multiple clinical microfrontends that are rendered together as a unified patient chart in the OpenMRS SPA.
+
+---
+
+## Microfrontends
+
+### Clinical Widgets
+
+| Package | Description |
+|---|---|
+| `esm-patient-allergies-app` | Record and review patient allergies and adverse reactions |
+| `esm-patient-attachments-app` | Upload and view file attachments (e.g. images, documents) |
+| `esm-patient-conditions-app` | Manage active and historical patient conditions |
+| `esm-patient-flags-app` | Highlight important clinical flags on a patient record |
+| `esm-patient-forms-app` | Access and fill clinical forms |
+| `esm-patient-immunizations-app` | Track patient immunization history and schedules |
+| `esm-patient-lists-app` | Manage patient cohort lists |
+| `esm-patient-medications-app` | View and manage current and past medications |
+| `esm-patient-notes-app` | Record and view clinical notes and visit summaries |
+| `esm-patient-orders-app` | Create and manage patient orders |
+| `esm-patient-programs-app` | Enroll and track patients in care programs |
+| `esm-patient-test-results-app` | View laboratory and diagnostic test results |
+| `esm-patient-vitals-app` | Record and visualize vital signs |
+| `esm-patient-biometrics-app` | Track biometric measurements (height, weight, BMI, etc.) |
+
+### Cross-cutting Packages
+
+| Package | Description |
+|---|---|
+| `esm-patient-chart-app` | Core patient chart shell; handles routing, layout, and workspace |
+| `esm-patient-common-lib` | Shared utilities, types, and UI components used across widgets |
+| `esm-patient-banner-app` | Displays the patient header/banner at the top of the chart |
+
+---
+
+## Layout
+
+The patient chart is composed of the following regions:
+
+```text
++---------------------------------------------------------+
+|                     Patient Banner                      |
++----------+----------------------------------+-----------+
+|          |                                  |           |
+|   Nav    |       Chart Review / Dashboard   |   Side    |
+|   Menu   |                                  |   Menu    |
+|          |                                  |           |
+|          +----------------------------------+           |
+|          |           Workspace              |           |
++----------+----------------------------------+-----------+
+```
+
+- **Navigation Menu** - Left sidebar with links to dashboards.
+- **Patient Banner** - Displays patient demographics and toast notifications.
+- **Chart Review / Dashboards** - Main content area. A dashboard is a collection of widget tiles.
+- **Workspace** - Data entry panel. Full-screen on mobile; sidebar on desktop.
+- **Side Menu** - Access to features without dedicated pages (e.g. notifications).
+
+---
 
 ## Setup
 
-Check out the developer documentation [in the Wiki](https://openmrs.atlassian.net/wiki/x/IABBHg).
+### Prerequisites
 
-This monorepo uses [yarn](https://yarnpkg.com).
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [Yarn](https://yarnpkg.com/)
 
-To install the dependencies, run:
+### Install dependencies
 
 ```bash
 yarn
 ```
 
-To start a dev server for a specific microfrontend, run:
+---
+
+## Development
+
+### Start a dev server for a single microfrontend
 
 ```bash
-yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
+yarn start --sources 'packages/esm-patient-<package-name>-app'
 ```
 
-This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
-
-There are two approaches for working on multiple microfrontends simultaneously.
-
-You could run `yarn start` with as many `sources` arguments as you require. For example, to run the biometrics and vitals microfrontends simultaneously, you'd use:
+**Example - start the allergies app:**
 
 ```bash
-yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/esm-patient-vitals-app'
+yarn start --sources 'packages/esm-patient-allergies-app'
 ```
 
-Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](https://openmrs.atlassian.net/wiki/spaces/docs/pages/150962685/Develop+Frontend+Modules#Using-import-map-overrides).
+This uses the OpenMRS tooling to spin up a dev server running `esm-patient-chart` alongside your specified microfrontend.
 
-## Running unit and integration tests
+### Start dev servers for multiple microfrontends simultaneously
 
-To run unit and integration tests for all packages, run:
+**Option 1 - Pass multiple `--sources` flags:**
+
+```bash
+yarn start \
+  --sources 'packages/esm-patient-vitals-app' \
+  --sources 'packages/esm-patient-biometrics-app'
+```
+
+**Option 2 - Use `yarn serve` with import map overrides:**
+
+Run `yarn serve` from within individual packages, then use [import map overrides](https://github.com/single-spa/import-map-overrides) in the browser to wire them together.
+
+---
+
+## Testing
+
+This project uses [Vitest](https://vitest.dev/) for unit and integration tests, orchestrated through [Turborepo](https://turbo.build/repo).
+
+### Run all tests
 
 ```bash
 yarn turbo run test
 ```
 
-To run tests in `watch` mode, run:
+### Run tests in watch mode
 
 ```bash
 yarn turbo run test:watch
 ```
 
-To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
+### Run tests for a specific package
+
+Use the `--filter` flag with the full package name:
 
 ```bash
 yarn turbo run test --filter=@openmrs/esm-patient-conditions-app
 ```
 
-To run a specific test file, run:
+### Run a specific test file
+
+Pass a filename substring to match:
 
 ```bash
 yarn turbo run test -- visit-notes-form
 ```
 
-The above command will only run tests in the file or files that match the provided string.
+### Run a specific test file in interactive watch mode
 
-You can also run the matching tests from above in watch mode. In order to interact with the test runner, you will need to tell Turborepo to use the "tui" UI. Use the following command
-and then press "enter" in the Turbo UI to activate interactive mode.
+Turborepo's TUI (terminal UI) is required for interactive mode:
 
 ```bash
 yarn turbo run test:watch --ui tui -- visit-notes-form
 ```
 
-To generate a `coverage` report, run:
+Then press **Enter** in the Turbo UI to activate interactive mode.
+
+### Generate a coverage report
 
 ```bash
 yarn turbo run coverage
 ```
 
-By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
+### Bypass Turborepo's test cache
+
+By default, Turborepo caches test results. If you want to force a fresh run:
 
 ```bash
 yarn turbo run test --force
 ```
 
-## Running End-to-End (E2E) tests 
+---
 
-Before running the E2E tests, you need to set up the test environment. Install Playwright browsers and setup the default test environment variables by running the following commands: 
+## End-to-End (E2E) Tests
+
+E2E tests are written with [Playwright](https://playwright.dev/) and live in the `e2e/` directory (`*.spec.ts` files).
+
+### Initial setup
 
 ```bash
+# Install Playwright browsers
 npx playwright install
-cp example.env .env
 ```
 
-By default, tests run against a local backend at http://localhost:8080/openmrs. To test local changes, make sure your dev server is running before executing tests. For example, to test local changes to the Allergies app, run:
+Copy the example environment file:
 
 ```bash
-yarn start --sources packages/esm-patient-allergies-app
+# macOS / Linux
+cp example.env .env
+
+# Windows PowerShell
+Copy-Item example.env .env
 ```
 
-To test against a remote instance (such as the OpenMRS refapp hosted on dev3.openmrs.org, update the E2E_BASE_URL environment variable in your .env file:
+### Configure the test target
 
-```
+By default, tests run against a local backend at `http://localhost:8080/openmrs`.
+
+To test against a remote instance (e.g. the OpenMRS reference application), update `E2E_BASE_URL` in your `.env` file:
+
+```env
 E2E_BASE_URL=https://dev3.openmrs.org/openmrs
 ```
 
-To run E2E tests:
+### Run E2E tests
+
+| Command | Description |
+|---|---|
+| `yarn test-e2e` | Run all E2E tests in headless mode |
+| `yarn test-e2e --headed` | Run tests with a visible browser window |
+| `yarn test-e2e --ui` | Run tests in Playwright's interactive UI/debugger |
+| `yarn test-e2e --headed --ui` | Headed mode + interactive UI (recommended for development) |
+| `yarn test-e2e <test-name>` | Run a specific test file by name |
+
+**Example - test local changes to the Allergies app:**
 
 ```bash
+# 1. Start the dev server
+yarn start --sources packages/esm-patient-allergies-app
+
+# 2. In a separate terminal, run E2E tests
 yarn test-e2e
 ```
 
-This will run all the E2E tests (files in the e2e directory with the *.spec.ts extension) in headless mode. That means no browser UI will be visible.
-
-To run tests in headed mode (shows the browser while tests run) use:
-
-```bash
-yarn test-e2e --headed
-```
-
-To run tests in Playwright's UI mode (interactive debugger), use:
-
-```bash
-yarn test-e2e --ui
-```
-
-You'll most often want to run tests in both headed and UI mode:
-
-```bash
-yarn test-e2e --headed --ui
-```
-
-To run a specific test file:
-
-```bash
-yarn test-e2e <test-name>
-```
-
-Read the [e2e testing guide](https://openmrs.atlassian.net/wiki/x/K4L-C) to learn more about End-to-End tests in this project.
-
 ### Updating Playwright
 
-The Playwright version in the [Bamboo e2e Dockerfile](e2e/support/bamboo/playwright.Dockerfile#L2) and the `package.json` file must match. If you update the Playwright version in one place, you must update it in the other.
+> Warning: The Playwright version in `package.json` and in the Bamboo E2E Dockerfile **must always match**. If you update one, update the other.
 
-## Troubleshooting
+For more detail, refer to the [E2E testing guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing/e2e-tests).
 
-If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in [dev3](https://dev3.openmrs.org/openmrs/spa), you likely have outdated versions of core libraries. To update core libraries, run the following commands:
-
-```bash
-# Upgrade core libraries
-yarn up openmrs@next @openmrs/esm-framework@next
-
-# Reset version specifiers to `next`. Don't commit actual version numbers.
-git checkout package.json
-
-# Run `yarn` to recreate the lockfile
-yarn
-```
-
-## Layout
-
-The patient chart consists of the following parts:
-
-- Navigation menu
-- Patient header
-- Chart review / Dashboards
-- Workspace
-- Side menu
-
-The **navigation menu** lives on the left side of the screen and provides links to dashboards in the patient chart.
-
-The **patient header** contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
-
-The **chart review** area is the main part of the screen. It displays whatever dashboard is active.
-
-A **dashboard** is a collection of widgets.
-
-The **workspace** is where data entry takes place. On mobile devices it covers the screen; on desktop it appears in a sidebar.
-
-The **side menu** provides access to features that do not have their own pages, such as the notifications menu.
+---
 
 ## Design Patterns
 
-For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
+UI components follow the [OpenMRS 3 Design System](https://zeroheight.com/23a080e38/p/880723-introduction). Please consult the design system documentation before building new components to ensure consistency across the platform.
+
+---
 
 ## Configuration
 
-Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpage.action?pageId=224527013) for information about configuring modules.
+Module configuration is documented in the [OpenMRS Implementer Documentation](https://wiki.openmrs.org/display/projects/OpenMRS+3.x+Implementer+Documentation). Configurable options vary per microfrontend and can be set via the OpenMRS frontend config system.
+
+---
 
 ## Deployment
 
-See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.
+See [Creating a Distribution](https://wiki.openmrs.org/display/projects/Creating+a+Distribution) for guidance on bundling and including these microfrontends in an OpenMRS distribution.
+
+---
+
+## Troubleshooting
+
+### App behavior differs from `dev3` / local version appears outdated
+
+You likely have stale core library versions. Run the following to update them:
+
+```bash
+# Upgrade to the latest next versions
+yarn up openmrs@next @openmrs/esm-framework@next
+
+# If `package.json` now contains pinned versions, change them back to `next`
+# before committing.
+
+# Regenerate the lockfile
+yarn
+```
+
+### Tests are returning stale results
+
+Turborepo caches test runs. Force a fresh run:
+
+```bash
+yarn turbo run test --force
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Review the [OpenMRS Frontend Developer Documentation](https://om.rs/dev3docs) before starting.
+2. Follow the existing [Design Patterns](#design-patterns).
+3. Add or update tests for any changes.
+4. Ensure all tests pass (`yarn turbo run test`) before opening a PR.
+5. Keep the CI green - check the badge at the top of this README.
+
+For questions, join the [OpenMRS Community](https://talk.openmrs.org/) or the `#openmrs-dev` Slack channel.
+
+---
+
+*This site is open source. [Improve this page](https://github.com/openmrs/openmrs-esm-patient-chart).*
