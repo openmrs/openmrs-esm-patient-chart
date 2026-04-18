@@ -25,6 +25,15 @@
   border-bottom: none;
 }
 
+.diagnosis:has(.customDiagnosisButton) {
+  padding: 0;
+}
+
+.customDiagnosisButton {
+  width: 100%;
+  max-width: none;
+}
+
 .diagnosisList {
   background-color: white;
   max-height: 13.5rem;

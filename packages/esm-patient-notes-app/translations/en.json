@@ -1,11 +1,13 @@
 {
   "add": "Add",
+  "addCustomDiagnosis": "Add custom diagnosis",
   "addImage": "Add image",
   "addVisitNote": "Add a visit note",
   "clinicalNoteLabel": "Write your notes",
   "clinicalNotePlaceholder": "Write any notes here",
   "date": "Date",
   "diagnoses": "Diagnoses",
+  "diagnosisAlreadySelected": "Diagnosis already selected",
   "discard": "Discard",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
