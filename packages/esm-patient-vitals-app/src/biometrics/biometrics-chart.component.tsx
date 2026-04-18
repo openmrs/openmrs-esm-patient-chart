@@ -1,5 +1,6 @@
 import React, { useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabListVertical, TabPanel, TabPanels, TabsVertical } from '@carbon/react';
 import { LineChart, ScaleTypes } from '@carbon/charts-react';
@@ -76,23 +77,32 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     value: BiometricType;
   }>;
 
-  const chartData = useMemo(
-    () =>
-      patientBiometrics
-        .filter((biometrics) => biometrics[selectedBiometrics.value])
-        .slice(0, 10)
-        .sort((biometricA, biometricB) => new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime())
-        .map(
-          (biometrics) =>
-            biometrics[selectedBiometrics.value] && {
-              group: selectedBiometrics.title,
-              key: formatDate(parseDate(biometrics.date), { year: true }),
-              value: biometrics[selectedBiometrics.value],
-              date: biometrics.date,
-            },
-        ),
-    [patientBiometrics, selectedBiometrics.title, selectedBiometrics.value],
+  const monthsToShow = config?.monthsToShow ?? 12;
+  const cutoff = useMemo(() => dayjs().subtract(monthsToShow, 'month'), [monthsToShow]);
+
+  const chartData = useMemo(() => {
+    const filtered = patientBiometrics.filter(
+      (b) => b[selectedBiometrics.value],
+    );
+    const recentData = filtered.filter((b) =>
+      dayjs(b.date).isAfter(cutoff),
   );
+    const finalData =
+      recentData.length > 0 ? recentData : filtered.slice(-10);
+    return finalData
+      .sort(
+        (a, b) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime(),
+    )
+    .map(
+      (b) =>
+        b[selectedBiometrics.value] && {
+          value: b[selectedBiometrics.value],
+          group: selectedBiometrics.title,
+          date: b.date,
+        },
+    );
+}, [patientBiometrics, selectedBiometrics.value, selectedBiometrics.title, cutoff]);
 
   const chartOptions = useMemo(() => {
     return {
@@ -131,24 +141,12 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         enabled: true,
         numberOfIcons: 4,
         controls: [
-          {
-            type: 'Zoom in',
-          },
-          {
-            type: 'Zoom out',
-          },
-          {
-            type: 'Reset zoom',
-          },
-          {
-            type: 'Export as CSV',
-          },
-          {
-            type: 'Export as PNG',
-          },
-          {
-            type: 'Make fullscreen',
-          },
+          { type: 'Zoom in' },
+          { type: 'Zoom out' },
+          { type: 'Reset zoom' },
+          { type: 'Export as CSV' },
+          { type: 'Export as PNG' },
+          { type: 'Make fullscreen' },
         ],
       },
       zoomBar: {
@@ -183,8 +181,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
                     value,
                     groupName: id,
                   })
-                }
-              >
+                }>
                 {title}
               </Tab>
             ))}
