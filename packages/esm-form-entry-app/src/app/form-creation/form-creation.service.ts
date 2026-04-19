@@ -308,6 +308,7 @@ export class FormCreationService {
         form.valueProcessingInfo.patientUuid = patientUuid;
         form.valueProcessingInfo.formUuid = formUuid;
         form.valueProcessingInfo.providerUuid = session.currentProvider?.uuid;
+        form.valueProcessingInfo.visit = this.singleSpaPropsService.getProp('visit');
 
         if (formSchema.encounterType) {
           form.valueProcessingInfo.encounterTypeUuid = formSchema.encounterType.uuid;

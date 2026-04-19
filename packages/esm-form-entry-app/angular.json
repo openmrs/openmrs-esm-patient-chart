@@ -27,14 +27,25 @@
           "builder": "ngx-build-plus:browser",
           "options": {
             "allowedCommonJsDependencies": [
+              "classnames",
+              "copy-to-clipboard",
               "core-js",
               "dayjs",
               "dompurify",
+              "flatpickr/dist/l10n/index",
+              "geopattern",
               "html2canvas",
+              "invariant",
               "lodash",
               "moment",
+              "path-to-regexp",
+              "prop-types",
               "raf",
-              "rgbcolor"
+              "react-fast-compare",
+              "rgbcolor",
+              "rxjs/operators/index.js",
+              "semver",
+              "void-elements"
             ],
             "preserveSymlinks": true,
             "outputPath": "dist",
