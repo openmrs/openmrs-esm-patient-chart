@@ -151,7 +151,15 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       }
     }
 
+    // Sort descending so the first obs per concept we encounter is always the most recent
+    flattenedObs.sort(
+      (a, b) =>
+        new Date((b as MappedObservation).obsDatetime).getTime() -
+        new Date((a as MappedObservation).obsDatetime).getTime(),
+    );
+
     const groupedObs: Record<string, GroupedObservation> = {};
+    const seenConcepts: Record<string, Set<string>> = {};
 
     flattenedObs.forEach((curr: MappedObservation) => {
       const flatNameParts = curr.flatName.split('-');
@@ -169,26 +177,28 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
         groupKey = flatNameParts[0];
       }
 
-      const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
-
-      const compositeKey = `${groupKey}__${dateKey}`;
-      if (!groupedObs[compositeKey]) {
-        groupedObs[compositeKey] = {
+      // Group by panel name only (not panel+date) so all observations for the
+      // same panel are considered together. We then keep only the most recent
+      // result per individual test concept, matching what the Overtime view shows.
+      if (!groupedObs[groupKey]) {
+        const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
+        groupedObs[groupKey] = {
           key: groupKey,
           date: dateKey,
           flatName: curr.flatName,
           entries: [],
         };
+        seenConcepts[groupKey] = new Set<string>();
       }
 
-      groupedObs[compositeKey].entries.push(curr);
+      const conceptId = curr.key;
+      if (!seenConcepts[groupKey].has(conceptId)) {
+        seenConcepts[groupKey].add(conceptId);
+        groupedObs[groupKey].entries.push(curr);
+      }
     });
 
-    const resultArray = Object.values(groupedObs).sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
-
-    return resultArray;
+    return Object.values(groupedObs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [state.tests]);
 
   useEffect(() => {
