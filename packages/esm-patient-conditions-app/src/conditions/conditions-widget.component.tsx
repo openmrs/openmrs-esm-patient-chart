@@ -1,4 +1,4 @@
-import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import React, { type Dispatch, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import classNames from 'classnames';
@@ -8,6 +8,7 @@ import {
   FormGroup,
   FormLabel,
   InlineLoading,
+  InlineNotification,
   Layer,
   RadioButton,
   RadioButtonGroup,
@@ -86,6 +87,16 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
+
+  const duplicateCondition = useMemo(() => {
+    if (!selectedCondition || !conditions?.length) {
+      return null;
+    }
+    const matches = conditions.filter((c) => c.conceptId === selectedCondition.uuid);
+    return matches.find((c) => c.clinicalStatus.toLowerCase() === 'active') ?? matches[0] ?? null;
+  }, [selectedCondition, conditions]);
+
+  const isActiveDuplicate = duplicateCondition?.clinicalStatus?.toLowerCase() === 'active';
 
   const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
@@ -265,6 +276,27 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 t={t}
                 value={searchTerm}
               />
+              {selectedCondition && duplicateCondition && (
+                <InlineNotification
+                  hideCloseButton
+                  kind="warning"
+                  lowContrast
+                  className={styles.duplicateWarning}
+                  subtitle={
+                    isActiveDuplicate
+                      ? t(
+                          'duplicateActiveConditionSubtitle',
+                          "{{conditionName}} is already on this patient's active problem list. Saving will create a two records for the same condition.",
+                          { conditionName: selectedCondition.display },
+                        )
+                      : t(
+                          'duplicateInactiveConditionSubtitle',
+                          '{{conditionName}} was previously recorded but is now inactive. You may want to edit the existing record instead.',
+                          { conditionName: selectedCondition.display },
+                        )
+                  }
+                />
+              )}
             </>
           )}
         </FormGroup>
