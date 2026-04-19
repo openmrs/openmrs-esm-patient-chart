@@ -442,6 +442,50 @@ describe('Duplicate condition detection', () => {
     expect(screen.queryByText(/already on this patient.*active problem list/i)).not.toBeInTheDocument();
   });
 
+  it('shows active-duplicate warning when both active and inactive duplicates exist', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Inactive',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2019-03-12T00:00:00+00:00',
+          recordedDate: '2019-03-12T18:34:48+00:00',
+          id: 'aa111111-1111-1111-1111-111111111111',
+        },
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'bb222222-2222-2222-2222-222222222222',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn().mockResolvedValue(undefined),
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
+    expect(screen.queryByText(/was previously recorded but is now inactive/i)).not.toBeInTheDocument();
+  });
+
   it('allows saving a condition even when a duplicate warning is shown', async () => {
     const user = userEvent.setup();
 
