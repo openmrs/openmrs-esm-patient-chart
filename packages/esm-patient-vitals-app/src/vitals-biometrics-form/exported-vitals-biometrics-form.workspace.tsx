@@ -16,6 +16,7 @@ import {
 import {
   age,
   ExtensionSlot,
+  type OpenmrsResource,
   showSnackbar,
   useAbortController,
   useConfig,
@@ -148,6 +149,10 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
         conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
       );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
+    } else {
+      // Clear the BMI field when either input is missing so a stale value
+      // doesn't leak into the UI or get persisted as an obs on save.
+      setValue('computedBodyMassIndex', undefined);
     }
   }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid, showBmi]);
 
@@ -178,6 +183,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       setShowErrorMessage(true);
       setShowErrorNotification(false);
 
+      const computedBodyMassIndex = data?.computedBodyMassIndex;
       if (data?.computedBodyMassIndex) {
         delete data.computedBodyMassIndex;
       }
@@ -195,6 +201,26 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           initialFieldValuesMap,
           config.concepts,
         );
+
+        // BMI is derived from weight and height, so it doesn't go through
+        // prepareObsForSubmission (which keys off dirtyFields for user-entered values).
+        // Persist a fresh BMI obs whenever weight or height was touched, voiding any prior one.
+        const weightOrHeightChanged = Boolean(dirtyFields.weight || dirtyFields.height);
+        const existingBmiObs = initialFieldValuesMap?.get('bodyMassIndex')?.obs;
+        const newBmiObs = {
+          concept: config.concepts.bodyMassIndexUuid,
+          value: computedBodyMassIndex,
+        } as unknown as OpenmrsResource;
+        if (formContext === 'creating' && computedBodyMassIndex != null) {
+          newObs.push(newBmiObs);
+        } else if (formContext === 'editing' && weightOrHeightChanged) {
+          if (existingBmiObs) {
+            toBeVoided.push({ uuid: existingBmiObs.uuid, voided: true } as unknown as OpenmrsResource);
+          }
+          if (computedBodyMassIndex != null) {
+            newObs.push(newBmiObs);
+          }
+        }
 
         createOrUpdateVitalsAndBiometrics(
           patientUuid,

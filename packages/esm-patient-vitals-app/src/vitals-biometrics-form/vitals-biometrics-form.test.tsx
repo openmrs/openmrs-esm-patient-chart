@@ -139,6 +139,13 @@ function setupMockUseEncounterVitalsAndBiometrics() {
           obs: { uuid: '123e4567-e89b-12d3-a456-426614174009', display: 'Mid-Upper Arm Circumference: 25 cm' },
         },
       ],
+      [
+        'bodyMassIndex',
+        {
+          value: 22.5,
+          obs: { uuid: '123e4567-e89b-12d3-a456-42661417400a', display: 'BMI: 22.5 kg/m²' },
+        },
+      ],
     ]),
     encounter: null,
     error: null,
@@ -266,6 +273,7 @@ describe('VitalsBiometricsForm', () => {
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 62 },
         { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 180 },
         { concept: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 23 },
+        { concept: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 19.1 },
       ]),
       expect.objectContaining({
         signal: {
@@ -347,10 +355,12 @@ describe('VitalsBiometricsForm', () => {
         { concept: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 130 },
         { concept: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 37.5 },
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 70 },
+        { concept: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 24.2 },
         { uuid: '123e4567-e89b-12d3-a456-426614174001', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174003', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174004', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174007', voided: true },
+        { uuid: '123e4567-e89b-12d3-a456-42661417400a', voided: true },
       ]),
       expect.objectContaining({
         signal: {
