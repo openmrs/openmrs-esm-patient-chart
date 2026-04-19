@@ -295,7 +295,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     isActiveDuplicate
                       ? t(
                           'duplicateActiveConditionSubtitle',
-                          "{{conditionName}} is already on this patient's active problem list. Saving will create two records for the same condition.",
+                          "{{conditionName}} is already on this patient's active problem list. Saving will create a two records for the same condition.",
                           { conditionName: selectedCondition.display },
                         )
                       : t(
