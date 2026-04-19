@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormsDashboard from './forms-dashboard.component';
+import { FormsProvider } from '../hooks/use-forms-context';
 import styles from './forms-dashboard-workspace.scss';
 import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
@@ -29,10 +30,12 @@ const FormsDashboardWorkspace: React.FC<PatientWorkspace2DefinitionProps<object,
 
   return (
     <Workspace2 title={t('clinicalForms', 'Clinical forms')} hasUnsavedChanges={false}>
-      <div className={styles.container}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
-        <FormsDashboard {...{ patient, visitContext, handleFormOpen }} />
-      </div>
+      <FormsProvider>
+        <div className={styles.container}>
+          <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+          <FormsDashboard {...{ patient, visitContext, handleFormOpen }} />
+        </div>
+      </FormsProvider>
     </Workspace2>
   );
 };
