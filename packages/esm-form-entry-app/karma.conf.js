@@ -1,6 +1,18 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+var fs = require('fs');
+var path = require('path');
+
+var chromePathFile = path.join(__dirname, 'scripts', 'chrome-path.json');
+
+if (fs.existsSync(chromePathFile)) {
+  var executablePath = JSON.parse(fs.readFileSync(chromePathFile, 'utf8')).executablePath;
+  if (executablePath) {
+    process.env.CHROME_BIN = executablePath;
+  }
+}
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -31,7 +43,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['ChromeHeadless'],
     singleRun: false,
     restartOnFileChange: true,
   });
