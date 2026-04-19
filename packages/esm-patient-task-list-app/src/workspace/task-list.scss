@@ -1,0 +1,37 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.workspaceContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.addTaskButtonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $ui-02;
+}
+
+.backButton {
+  padding: 0 layout.$spacing-05;
+
+  button {
+    display: flex;
+
+    svg {
+      order: 1;
+      margin-right: layout.$spacing-05;
+      margin-left: 0 !important;
+      fill: currentColor !important;
+    }
+
+    span {
+      order: 2;
+
+      // Center text vertically within span
+      line-height: 2em;
+    }
+  }
+}

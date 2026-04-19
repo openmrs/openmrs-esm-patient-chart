@@ -5054,7 +5054,12 @@ export const mockFhirVitalsResponse = {
 };
 
 export const mockBiometricsConfig = {
-  concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+  concepts: {
+    heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    midUpperArmCircumferenceUuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    bodyMassIndexUuid: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
   biometrics: {
     bmiUnit: 'kg / m²',
     bmiMinimumAge: 0,
@@ -5073,6 +5078,7 @@ export const mockVitalsConfig = {
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     midUpperArmCircumferenceUuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    bodyMassIndexUuid: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     oxygenSaturationUuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     respiratoryRateUuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
