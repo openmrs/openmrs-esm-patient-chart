@@ -9,6 +9,12 @@
   font-size: 80%;
 }
 
+.heading {
+  display: block;
+  font-weight: 600;
+  margin-bottom: layout.$spacing-03;
+}
+
 .tagOverride {
   background-color: colors.$gray-80;
   color: colors.$gray-20;
