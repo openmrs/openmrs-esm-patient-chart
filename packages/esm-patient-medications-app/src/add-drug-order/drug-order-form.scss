@@ -173,7 +173,7 @@
   margin-left: calc(layout.$spacing-03 * -1);
 }
 
-/* Desktop */
+/* Tablet and Phone */
 :global(.omrs-breakpoint-lt-desktop) .gridRow {
   align-items: center;
 }
@@ -237,7 +237,7 @@
   }
 }
 
-/* Tablet */
+/* Tablet and Phone */
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
     height: 100%;

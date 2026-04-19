@@ -395,13 +395,15 @@ export function DrugOrderForm({
             />
           </div>
         )}
-        <div className={styles.patientHeader}>
-          <span className={styles.bodyShort02}>{patientName}</span>
-          <span className={classNames(styles.text02, styles.bodyShort01)}>
-            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
-          </span>
-        </div>
+        {isTablet && (
+          <div className={styles.patientHeader}>
+            <span className={styles.bodyShort02}>{patientName}</span>
+            <span className={classNames(styles.text02, styles.bodyShort01)}>
+              {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+              <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+            </span>
+          </div>
+        )}
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         <Form
           className={styles.orderForm}
