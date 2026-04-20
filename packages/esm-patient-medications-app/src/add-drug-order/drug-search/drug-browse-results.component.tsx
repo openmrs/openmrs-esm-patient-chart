@@ -38,7 +38,7 @@ export default function DrugBrowseResults({
   }
 
   if (hasErrors && !drugs.length) {
-    return <Tile>{t('errorFetchingDrugCategory', 'Error fetching drugs')}</Tile>;
+    return <Tile>{t('errorFetchingDrugs', 'Error fetching drugs')}</Tile>;
   }
 
   if (!drugs.length) {
