@@ -1,4 +1,4 @@
-import { type HtmlFormEntryForm } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 import { type Form } from '../types';
 
 const formEngineResourceName = 'formEngine';

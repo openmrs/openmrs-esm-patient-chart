@@ -5,7 +5,7 @@ import { Button, ModalBody, ModalFooter, Checkbox } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
 import { useSession, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { type Order } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import PrintableReport from '../print-preview/print-preview.component';
 import styles from './print-results-modal.scss';
 

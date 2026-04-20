@@ -1,10 +1,7 @@
 import React, { type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenuButton2, DocumentIcon } from '@openmrs/esm-framework';
-import {
-  type PatientChartWorkspaceActionButtonProps,
-  useStartVisitIfNeeded,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientChartWorkspaceActionButtonProps, useStartVisitIfNeeded } from '@openmrs/esm-patient-common-lib';
 
 /**
  * This button uses the patient chart store and MUST only be used

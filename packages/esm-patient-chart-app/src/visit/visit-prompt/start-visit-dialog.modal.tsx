@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
-import { launchPatientChartWithWorkspaceOpen } from '@arunkumar-reddy/esm-patient-common-lib';
+import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
 
 interface StartVisitDialogProps {

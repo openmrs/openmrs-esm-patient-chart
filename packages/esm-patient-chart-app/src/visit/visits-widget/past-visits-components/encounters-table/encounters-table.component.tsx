@@ -39,7 +39,7 @@ import {
   ExtensionSlot,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { jsonSchemaResourceName } from '../../../../constants';
 import {
   deleteEncounter,

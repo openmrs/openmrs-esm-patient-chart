@@ -11,11 +11,7 @@ import {
   type Workspace2DefinitionProps,
   type Encounter,
 } from '@openmrs/esm-framework';
-import {
-  type Form,
-  type FormRendererProps,
-  invalidateVisitAndEncounterData,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Form, type FormRendererProps, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type FormEntryConfigSchema } from '../config-schema';
 import { toHtmlForm } from './form-entry.resources';
 import { useForms } from '../hooks/use-forms';

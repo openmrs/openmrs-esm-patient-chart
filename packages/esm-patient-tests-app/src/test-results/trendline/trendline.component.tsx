@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonPlaceholder, SkeletonText } from '@carbon/react';
 import { LineChart, ScaleTypes, TickRotations } from '@carbon/charts-react';
 import { ArrowLeftIcon, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
-import { EmptyState, type OBSERVATION_INTERPRETATION } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState, type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { testResultsBasePath } from '../helpers';
 import { useObstreeData } from './trendline-resource';
 import { formatReferenceRange } from '../grouped-timeline/reference-range-helpers';

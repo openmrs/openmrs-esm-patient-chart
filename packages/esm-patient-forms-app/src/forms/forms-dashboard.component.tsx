@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity, type Visit } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, type Form } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyDataIllustration, type Form } from '@openmrs/esm-patient-common-lib';
 import type { FormEntryConfigSchema } from '../config-schema';
 import { useForms } from '../hooks/use-forms';
 import FormsList from './forms-list.component';

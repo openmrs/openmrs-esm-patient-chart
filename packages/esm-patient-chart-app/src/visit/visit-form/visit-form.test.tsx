@@ -31,7 +31,7 @@ import {
   useVisitFormSchemaAndDefaultValues,
 } from './visit-form.resource';
 import VisitForm, { type VisitFormProps } from './visit-form.workspace';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib/src';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
 const visitUuid = 'test_visit_uuid';
 const visitAttributes = {
@@ -103,8 +103,8 @@ const mockCreateVisitAttribute = jest.mocked(createVisitAttribute).mockResolvedV
 const mockUpdateVisitAttribute = jest.mocked(updateVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 const mockDeleteVisitAttribute = jest.mocked(deleteVisitAttribute).mockResolvedValue({} as unknown as FetchResponse);
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useActivePatientEnrollment: jest.fn().mockReturnValue({
     activePatientEnrollment: [],
     isLoading: false,

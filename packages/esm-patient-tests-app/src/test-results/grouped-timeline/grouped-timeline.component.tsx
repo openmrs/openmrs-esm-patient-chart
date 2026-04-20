@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import TimelineDataGroup from './timeline-data-group.component';
 import styles from './grouped-timeline.scss';

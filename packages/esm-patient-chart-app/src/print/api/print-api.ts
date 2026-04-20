@@ -1,5 +1,5 @@
 import { openmrsFetch, restBaseUrl, getConfig } from '@openmrs/esm-framework';
-import { careSettingUuid as defaultCareSettingUuid } from '@arunkumar-reddy/esm-patient-common-lib';
+import { careSettingUuid as defaultCareSettingUuid } from '@openmrs/esm-patient-common-lib';
 
 export interface Diagnosis {
   uuid: string;
@@ -360,7 +360,7 @@ export async function getMedications(
   orderTypeUuid?: string,
 ): Promise<MedicationOrder[]> {
   // Use provided careSettingUuid, or get from config, or default to the one from common-lib
-  const config = await getConfig('@arunkumar-reddy/esm-patient-chart-app');
+  const config = await getConfig('@openmrs/esm-patient-chart-app');
   const careSetting = careSettingUuid || config?.drugCareSettingUuid || defaultCareSettingUuid;
   const orderType = orderTypeUuid || config?.drugOrderTypeUUID || '131168f4-15f5-102d-96e4-000c29c2a5d7';
 
@@ -426,7 +426,7 @@ export async function getMedications(
 }
 
 export async function fetchPrintData(patientUuid: string): Promise<PrintData> {
-  const config = await getConfig('@arunkumar-reddy/esm-patient-chart-app');
+  const config = await getConfig('@openmrs/esm-patient-chart-app');
   const careSettingUuid = config?.drugCareSettingUuid || defaultCareSettingUuid;
   const orderTypeUuid = config?.drugOrderTypeUUID;
 

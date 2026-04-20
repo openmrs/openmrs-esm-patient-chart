@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { AccordionSkeleton, Button, DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, TreeViewAltIcon, useConfig } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import { type GroupedObservation, type viewOpts } from '../../types';
 import FilterSet, { FilterContext } from '../filter';

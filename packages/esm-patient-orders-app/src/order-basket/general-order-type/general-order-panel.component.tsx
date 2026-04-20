@@ -3,7 +3,7 @@ import { Button, Tile } from '@carbon/react';
 import classNames from 'classnames';
 import { AddIcon, ChevronDownIcon, ChevronUpIcon, MaybeIcon, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { type OrderTypeDefinition } from '../../config-schema';
 import { prepOrderPostData } from './resources';
 import OrderBasketItemTile from './order-basket-item-tile.component';

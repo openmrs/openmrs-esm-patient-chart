@@ -21,7 +21,7 @@ import {
   TrashCanIcon,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { compare, EmptyDataIllustration } from '@arunkumar-reddy/esm-patient-common-lib';
+import { compare, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { type AttachmentTableData } from '../utils';
 import styles from './attachments-table-overview.scss';
 

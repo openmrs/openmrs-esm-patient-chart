@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Workspace2DefinitionProps, type Encounter } from '@openmrs/esm-framework';
-import { type Form } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 import FormEntry from './form-entry.component';
 import { type ExportedClinicalFormsWindowProps } from './exported-forms-dashboard.workspace';
 

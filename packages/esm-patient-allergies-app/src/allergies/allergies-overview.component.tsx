@@ -14,7 +14,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { AddIcon, launchWorkspace2, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-overview.scss';

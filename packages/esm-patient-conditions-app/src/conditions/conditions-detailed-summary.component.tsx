@@ -17,7 +17,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { type Condition, type ConditionTableHeader, useConditions, useConditionsSorting } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';

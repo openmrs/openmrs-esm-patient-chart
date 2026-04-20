@@ -1,4 +1,4 @@
-import type { ObsRecord } from '@arunkumar-reddy/esm-patient-common-lib';
+import type { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { extractObservationReferenceRanges, extractObservationInterpretation } from './helpers';
 import type { FHIRObservationResource } from '../../types';
 

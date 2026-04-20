@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './current-visit-summary.scss';
 

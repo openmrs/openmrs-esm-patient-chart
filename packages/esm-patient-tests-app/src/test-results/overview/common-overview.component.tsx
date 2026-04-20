@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Button, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { Information } from '@carbon/react/icons';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { type OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, navigate } from '@openmrs/esm-framework';

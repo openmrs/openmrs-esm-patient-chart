@@ -13,7 +13,7 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderBasket, type TestOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOrderBasket, type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { prepTestOrderPostData } from '../api';
 import { createEmptyLabOrder } from './test-order';
 import { useTestTypes, type TestType } from './useTestTypes';

@@ -2,9 +2,9 @@ import React from 'react';
 import { screen, render, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFeatureFlag, useLayoutType } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
-import { orderBasketStore } from '@arunkumar-reddy/esm-patient-common-lib/src/orders/store';
+import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.component';
 
 const mockUseLayoutType = jest.mocked(useLayoutType);
@@ -16,13 +16,13 @@ const mockUseLayoutType = jest.mocked(useLayoutType);
 const mockLaunchStartVisitPrompt = jest.fn();
 const mockUseSystemVisitSetting = jest.fn();
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib/src/useSystemVisitSetting', () => {
+jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => {
   return {
     useSystemVisitSetting: () => mockUseSystemVisitSetting(),
   };
 });
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
+jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
   return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 

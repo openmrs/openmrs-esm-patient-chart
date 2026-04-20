@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useConfig } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit, usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useLaunchWorkspaceRequiringVisit, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 import { invalidateCachedVitalsAndBiometrics } from './common';

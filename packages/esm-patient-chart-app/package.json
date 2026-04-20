@@ -1,5 +1,5 @@
 {
-  "name": "@arunkumar-reddy/esm-patient-chart-app",
+  "name": "@openmrs/esm-patient-chart-app",
   "version": "12.1.5",
   "license": "MPL-2.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
@@ -43,9 +43,9 @@
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
-    "@arunkumar-reddy/esm-patient-common-lib": "*",
     "@carbon/react": "1.x",
     "@openmrs/esm-framework": "9.x",
+    "@openmrs/esm-patient-common-lib": "*",
     "dayjs": "1.x",
     "lodash-es": "4.x",
     "react": "18.x",
@@ -57,7 +57,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
-    "@arunkumar-reddy/esm-patient-common-lib": "workspace:*",
+    "@openmrs/esm-patient-common-lib": "workspace:*",
     "@types/uuid": "^9.0.4",
     "openmrs": "next"
   }

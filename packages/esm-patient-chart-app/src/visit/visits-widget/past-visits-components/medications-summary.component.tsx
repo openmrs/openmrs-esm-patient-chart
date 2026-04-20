@@ -3,7 +3,7 @@ import { capitalize } from 'lodash-es';
 import { Tag, Tooltip } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { type OrderItem } from '../visit.resource';
 import { type ChartConfig } from '../../../config-schema';
 import styles from '../visit-detail-overview.scss';

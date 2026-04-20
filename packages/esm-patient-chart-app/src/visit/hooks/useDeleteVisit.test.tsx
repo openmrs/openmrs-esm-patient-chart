@@ -5,7 +5,7 @@ import {
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   usePatientChartStore,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
@@ -22,7 +22,7 @@ jest.mock('../visits-widget/visit.resource', () => {
   };
 });
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   invalidateCurrentVisit: jest.fn(),
   invalidateVisitAndEncounterData: jest.fn(),
   usePatientChartStore: jest.fn(),

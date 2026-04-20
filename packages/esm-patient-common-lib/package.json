@@ -1,5 +1,5 @@
 {
-  "name": "@arunkumar-reddy/esm-patient-common-lib",
+  "name": "@openmrs/esm-patient-common-lib",
   "version": "12.1.5",
   "license": "MPL-2.0",
   "description": "Library for common patient chart components",

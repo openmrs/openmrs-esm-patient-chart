@@ -12,7 +12,7 @@ import {
   type DataTableSortState,
 } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
 import styles from './paginated-vitals.scss';

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   type ConfigObject,

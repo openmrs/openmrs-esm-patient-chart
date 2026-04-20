@@ -1,4 +1,4 @@
-import { type OBSERVATION_INTERPRETATION } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 
 interface Observation {

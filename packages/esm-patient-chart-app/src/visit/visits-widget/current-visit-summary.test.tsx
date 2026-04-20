@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getConfig } from '@openmrs/esm-framework';
 import { mockPatient, waitForLoadingToFinish } from 'tools';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import CurrentVisitSummary from './current-visit-summary.extension';
 
 const mockGetConfig = jest.mocked(getConfig);
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 

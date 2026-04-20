@@ -3,7 +3,7 @@ import {
   type OrderBasketWindowProps,
   type OrderBasketItem,
   type PatientWorkspace2DefinitionProps,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import AddLabOrder from './add-test-order.component';
 
 export interface AddTestOrderWorkspaceProps {

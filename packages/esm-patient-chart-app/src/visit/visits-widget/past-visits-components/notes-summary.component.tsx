@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { Note } from '../visit.resource';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {

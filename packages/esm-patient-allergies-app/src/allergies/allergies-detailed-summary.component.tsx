@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { AddIcon, formatDate, launchWorkspace2, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import { AllergiesActionMenu } from './allergies-action-menu.component';

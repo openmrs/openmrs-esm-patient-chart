@@ -25,7 +25,7 @@ import {
   isDesktop as desktopLayout,
   launchWorkspace2,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { findLastState, usePrograms } from './programs.resource';
 import { ProgramsActionMenu } from './programs-action-menu.component';
 import styles from './programs-detailed-summary.scss';

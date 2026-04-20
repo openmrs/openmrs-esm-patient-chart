@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { orderBy } from 'lodash-es';
 import { formatDate, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { PatientNote } from '../types';
 import styles from './notes-overview.scss';
 

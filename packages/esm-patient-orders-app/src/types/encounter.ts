@@ -1,5 +1,5 @@
 import { type OpenmrsResource, type Visit } from '@openmrs/esm-framework';
-import { type Order } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 
 export type ObservationValue =
   | OpenmrsResource // coded

@@ -1,4 +1,4 @@
-import { usePatientChartStore, useSystemVisitSetting } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
@@ -8,7 +8,7 @@ import { mockPatient } from 'tools';
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 const mockUseSystemVisitSetting = jest.mocked(useSystemVisitSetting);
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   usePatientChartStore: jest.fn(),
   useSystemVisitSetting: jest.fn(),
 }));

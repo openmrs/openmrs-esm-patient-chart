@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { invalidateCurrentVisit, invalidateVisitAndEncounterData } from '@arunkumar-reddy/esm-patient-common-lib';
+import { invalidateCurrentVisit, invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { markPatientAlive } from '../data.resource';
 

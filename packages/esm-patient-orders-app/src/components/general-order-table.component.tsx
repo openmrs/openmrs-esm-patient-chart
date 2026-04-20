@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Order } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { getObservationDisplayValue } from '../utils';
 import { useLabEncounter, useOrderConceptByUuid } from '../lab-results/lab-results.resource';

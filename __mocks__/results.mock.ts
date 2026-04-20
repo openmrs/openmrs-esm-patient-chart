@@ -1,4 +1,4 @@
-import { OBSERVATION_INTERPRETATION } from '@arunkumar-reddy/esm-patient-common-lib/src/types';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib/src/types';
 import { ObsRecord } from '../packages/esm-patient-tests-app/src/types';
 
 export const mockPanelData = {

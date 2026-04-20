@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';

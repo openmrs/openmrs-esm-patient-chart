@@ -10,7 +10,7 @@ import {
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { immunizationFormSub } from './utils';
 import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';

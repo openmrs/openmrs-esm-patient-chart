@@ -11,8 +11,8 @@ import {
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
 import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
-import { type PostDataPrepFunction, useOrderBasket } from '@arunkumar-reddy/esm-patient-common-lib';
-import { _resetOrderBasketStore } from '@arunkumar-reddy/esm-patient-common-lib/src/orders/store';
+import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = jest.fn();

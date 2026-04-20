@@ -6,7 +6,7 @@ import { esmPatientChartSchema, type ChartConfig } from '../config-schema';
 import { mockPatient } from 'tools';
 import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib/src';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
 const mockMarkPatientDeceased = jest.mocked(markPatientDeceased);
 const mockUseCausesOfDeath = jest.mocked(useCausesOfDeath);

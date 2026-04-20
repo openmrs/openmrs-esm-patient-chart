@@ -16,7 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { useLayoutType, isDesktop, ConfigurableLink } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { type MappedListMembers } from '../patient-lists.resource';
 import styles from './patient-list-details-table.scss';
 

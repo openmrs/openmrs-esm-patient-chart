@@ -6,7 +6,7 @@ import {
   type ConceptRecord,
   type ObsMetaInfo,
   type OBSERVATION_INTERPRETATION,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import type { FHIRObservationResource } from '../../types';
 import { type ReferenceRanges } from '../grouped-timeline/reference-range-helpers';
 

@@ -2,7 +2,7 @@ import React, { type ComponentProps, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowLeftIcon, formatDate, parseDate, Workspace2 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { type MappedList, usePatientListMembers } from '../patient-lists.resource';
 import PatientListDetailsTable from './patient-list-details-table.component';
 import styles from './patient-list-details.scss';

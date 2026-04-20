@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
-import { ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';

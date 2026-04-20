@@ -9,7 +9,7 @@ import {
   type PatientOrderFetchResponse,
   type TestOrderBasketItem,
   type TestOrderPost,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import {
   type FetchResponse,
   openmrsFetch,

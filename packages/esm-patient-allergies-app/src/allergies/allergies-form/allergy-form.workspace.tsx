@@ -43,7 +43,7 @@ import { useAllergies } from '../allergy-intolerance.resource';
 import { type AllergiesConfigObject } from '../../config-schema';
 import { ALLERGEN_TYPES, type Allergy } from '../../types';
 import styles from './allergy-form.scss';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
 interface AllergyFormData {
   allergen: Allergen;

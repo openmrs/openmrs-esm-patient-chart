@@ -1,6 +1,6 @@
 import React from 'react';
 import { launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framework';
-import { ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
@@ -15,8 +15,8 @@ const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((_, na
 });
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@arunkumar-reddy/esm-patient-common-lib');
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,

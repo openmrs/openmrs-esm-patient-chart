@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormsDashboard from './forms-dashboard.component';
 import styles from './forms-dashboard-workspace.scss';
-import { type Form, type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, Workspace2 } from '@openmrs/esm-framework';
 
 /**

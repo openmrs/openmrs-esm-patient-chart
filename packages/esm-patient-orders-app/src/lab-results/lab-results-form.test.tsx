@@ -20,7 +20,7 @@ import {
   type Order,
   type TestOrderBasketItem,
   useOrderBasket,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
@@ -42,8 +42,8 @@ jest.mock('./lab-results.resource', () => ({
   useCompletedLabResultsArray: jest.fn(),
 }));
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderBasket: jest.fn(),
 }));
 

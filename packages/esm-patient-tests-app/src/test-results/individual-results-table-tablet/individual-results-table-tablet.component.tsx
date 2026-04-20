@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
 import { CloseIcon, SearchIcon, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import FilterEmptyState from '../ui-elements/reset-filters-empty-state/filter-empty-state.component';
 import LabSetPanel from './lab-set-panel.component';

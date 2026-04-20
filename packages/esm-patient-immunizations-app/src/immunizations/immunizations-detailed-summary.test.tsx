@@ -11,7 +11,7 @@ import {
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
-import { ErrorState, usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { ErrorState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
 
@@ -19,13 +19,13 @@ jest.mock('../hooks/useImmunizations', () => ({
   useImmunizations: jest.fn(),
 }));
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 

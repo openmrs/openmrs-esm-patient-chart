@@ -15,7 +15,7 @@ import {
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import { DrugOrderForm } from './drug-order-form.component';
@@ -123,7 +123,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
            * t('updated', 'Updated')
            * t('discontinued', 'Discontinued')
            */
-          showOrderSuccessToast('@arunkumar-reddy/esm-patient-medications-app', [finalizedOrder]);
+          showOrderSuccessToast('@openmrs/esm-patient-medications-app', [finalizedOrder]);
           closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch((error) => {

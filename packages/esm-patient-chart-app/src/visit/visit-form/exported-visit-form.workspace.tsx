@@ -41,7 +41,7 @@ import {
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
   useActivePatientEnrollment,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import {
   convertToDate,

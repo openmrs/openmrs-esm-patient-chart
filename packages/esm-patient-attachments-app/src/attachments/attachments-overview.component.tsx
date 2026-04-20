@@ -14,7 +14,7 @@ import {
   useLayoutType,
   UserHasAccess,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, useAllowedFileExtensions } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { createGalleryEntry } from '../utils';
 import AttachmentPreview from './attachment-preview.component';
 import AttachmentsGridOverview from './attachments-grid-overview.component';

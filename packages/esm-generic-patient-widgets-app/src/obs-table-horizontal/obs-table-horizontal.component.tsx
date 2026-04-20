@@ -32,7 +32,7 @@ import {
   IconButton,
 } from '@carbon/react';
 import { Checkmark, Close } from '@carbon/react/icons';
-import { CardHeader, PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table-horizontal.scss';
 import { useTranslation } from 'react-i18next';

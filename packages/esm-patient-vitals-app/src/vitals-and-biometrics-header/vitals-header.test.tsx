@@ -30,8 +30,8 @@ const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name)
   return () => mockLaunchWorkspaceRequiringVisit(name);
 });
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@arunkumar-reddy/esm-patient-common-lib');
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,

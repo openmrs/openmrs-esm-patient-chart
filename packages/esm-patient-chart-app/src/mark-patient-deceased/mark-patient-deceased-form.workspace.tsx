@@ -25,7 +25,7 @@ import {
   EmptyState,
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
   useLayoutType,

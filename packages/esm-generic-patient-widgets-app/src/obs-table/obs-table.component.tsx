@@ -11,7 +11,7 @@ import {
   type DataTableSortState,
 } from '@carbon/react';
 import { usePagination, useConfig, formatDatetime, formatDate, formatTime } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
 import { useTranslation } from 'react-i18next';

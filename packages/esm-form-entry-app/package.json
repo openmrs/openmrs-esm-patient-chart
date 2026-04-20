@@ -1,5 +1,5 @@
 {
-  "name": "@arunkumar-reddy/esm-form-entry-app",
+  "name": "@openmrs/esm-form-entry-app",
   "version": "12.1.5",
   "license": "MPL-2.0",
   "description": "Angular form engine for O3",

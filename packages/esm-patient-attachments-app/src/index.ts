@@ -1,4 +1,4 @@
-import { createDashboardLink } from '@arunkumar-reddy/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { attachmentsConfigSchema } from './attachments-config-schema';
 import { dashboardMeta } from './dashboard.meta';

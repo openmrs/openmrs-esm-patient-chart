@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { type PatientData } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientData } from '@openmrs/esm-patient-common-lib';
 import loadPatientData from './loadPatientData';
 
 type LoadingState = {

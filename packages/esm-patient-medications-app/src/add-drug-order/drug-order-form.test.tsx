@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';

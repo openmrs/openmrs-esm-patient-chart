@@ -5,7 +5,7 @@ import {
   saveVisit,
   setupOfflineSync,
 } from '@openmrs/esm-framework';
-import { type OfflineVisit, visitSyncType } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OfflineVisit, visitSyncType } from '@openmrs/esm-patient-common-lib';
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({

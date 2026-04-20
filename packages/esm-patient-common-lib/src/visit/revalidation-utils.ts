@@ -25,7 +25,7 @@ import { restBaseUrl } from '@openmrs/esm-framework';
  * @example
  * ```typescript
  * import { useSWRConfig } from 'swr';
- * import { invalidateVisitHistory } from '@arunkumar-reddy/esm-patient-common-lib';
+ * import { invalidateVisitHistory } from '@openmrs/esm-patient-common-lib';
  *
  * function MyComponent({ patientUuid }) {
  *   const { mutate } = useSWRConfig();

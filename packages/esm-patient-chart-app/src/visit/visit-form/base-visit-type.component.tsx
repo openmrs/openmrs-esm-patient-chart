@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Layer, RadioButton, RadioButtonGroup, Search, StructuredListSkeleton, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
-import { PatientChartPagination } from '@arunkumar-reddy/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useDebounce, useLayoutType, usePagination, type VisitType } from '@openmrs/esm-framework';
 import { type VisitFormData } from './visit-form.resource';
 import styles from './base-visit-type.scss';

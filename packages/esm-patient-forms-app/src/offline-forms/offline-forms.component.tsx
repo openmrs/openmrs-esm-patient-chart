@@ -24,7 +24,7 @@ import {
   userHasAccess,
   useSession,
 } from '@openmrs/esm-framework';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { type Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';

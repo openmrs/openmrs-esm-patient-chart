@@ -5,7 +5,7 @@ import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAllowedFileExtensions } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import { getCoreTranslation, type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './file-review.scss';

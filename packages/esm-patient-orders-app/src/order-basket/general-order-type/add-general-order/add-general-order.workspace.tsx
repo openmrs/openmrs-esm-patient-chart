@@ -3,7 +3,7 @@ import {
   type OrderBasketItem,
   type OrderBasketWindowProps,
   type PatientWorkspace2DefinitionProps,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import AddGeneralOrder from './add-general-order.component';
 
 interface OrderableConceptSearchWorkspaceProps {

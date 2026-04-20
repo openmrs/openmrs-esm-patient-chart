@@ -5,7 +5,7 @@ import {
   getSyncLifecycle,
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@arunkumar-reddy/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './test-results/dashboard.meta';
 import { moduleName } from './constants';

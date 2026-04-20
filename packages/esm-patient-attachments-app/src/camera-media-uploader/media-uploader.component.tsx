@@ -3,7 +3,7 @@ import { FileUploaderDropContainer, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { readFileAsString } from '../utils';
-import { useAllowedFileExtensions } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './media-uploader.scss';
 

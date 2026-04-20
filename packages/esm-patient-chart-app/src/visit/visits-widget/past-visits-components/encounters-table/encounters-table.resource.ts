@@ -11,7 +11,7 @@ import {
   useOpenmrsFetchAll,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import { type Form } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 
 export interface EncountersTableProps {
   patientUuid: string;

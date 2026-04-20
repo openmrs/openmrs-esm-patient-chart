@@ -17,7 +17,7 @@ import {
   Dropdown,
 } from '@carbon/react';
 import { Download, Printer } from '@carbon/react/icons';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { showToast } from '@openmrs/esm-framework';
 import { fetchPrintData } from './api/print-api';
 import type { PrintData, Diagnosis, Observation, EncounterOrder, Visit } from './api/print-api';

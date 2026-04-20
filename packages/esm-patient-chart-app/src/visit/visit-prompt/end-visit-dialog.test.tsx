@@ -4,7 +4,7 @@ import { screen, render } from '@testing-library/react';
 import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import EndVisitDialog from './end-visit-dialog.modal';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 
 const endVisitPayload = {
   stopDatetime: expect.any(Date),
@@ -19,7 +19,7 @@ const mockUpdateVisit = jest.mocked(updateVisit);
 const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
 const mockSetVisitContext = jest.fn();
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   usePatientChartStore: jest.fn(),
 }));
 

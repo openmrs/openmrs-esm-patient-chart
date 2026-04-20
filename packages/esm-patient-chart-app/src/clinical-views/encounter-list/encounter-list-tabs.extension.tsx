@@ -7,7 +7,7 @@ import { getMenuItemTabsConfiguration } from '../utils/encounter-list-config-bui
 import styles from './encounter-list-tabs.scss';
 import { filter } from '../utils/helpers';
 import { type Encounter } from '../types';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib/src';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib/src';
 
 interface EncounterListTabsComponentProps {
   patientUuid: string;

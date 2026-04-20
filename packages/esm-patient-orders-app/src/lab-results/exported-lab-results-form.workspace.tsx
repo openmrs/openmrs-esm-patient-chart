@@ -15,7 +15,7 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderBasket, type Order, type OrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
 import {

@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-context-header.scss';
 import VisitContextInfo from './visit-context-info.component';
-import { usePatientChartStore, useSystemVisitSetting } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 interface VisitContextHeaderProps {
   patientUuid: string;

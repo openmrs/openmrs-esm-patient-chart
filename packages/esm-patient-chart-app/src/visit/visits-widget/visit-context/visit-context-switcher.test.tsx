@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSystemVisitSetting } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextSwitcherModal from './visit-context-switcher.modal';
@@ -24,7 +24,7 @@ const mockUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
   nextUri: '',
 });
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
+jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
   useSystemVisitSetting: () => mockUseSystemVisitSetting(),
 }));
 
@@ -33,8 +33,8 @@ jest.mock('../visit.resource', () => ({
 }));
 
 const mockSetVisitContext = jest.fn();
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(() => ({
     visitContext: null,
     setVisitContext: mockSetVisitContext,

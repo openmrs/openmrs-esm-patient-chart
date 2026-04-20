@@ -7,7 +7,7 @@ import {
   type OrderBasketItem,
   type ReferenceRanges,
   type TestOrderBasketItem,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { type Observation, type ObservationValue } from '../types/encounter';
 import { type LabOrderConcept } from '../lab-results/lab-results.resource';
 

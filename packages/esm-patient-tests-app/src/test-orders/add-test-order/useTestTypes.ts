@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useOrderableConceptSets } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOrderableConceptSets } from '@openmrs/esm-patient-common-lib';
 
 export interface TestType {
   label: string;

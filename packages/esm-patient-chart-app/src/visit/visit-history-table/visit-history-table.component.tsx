@@ -16,7 +16,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';

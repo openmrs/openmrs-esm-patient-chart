@@ -11,7 +11,7 @@ import {
   useOnVisible,
   type Visit,
 } from '@openmrs/esm-framework';
-import { invalidateVisitByUuid, usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { invalidateVisitByUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextInfo from './visit-context-info.component';
 import styles from './visit-context-switcher.scss';

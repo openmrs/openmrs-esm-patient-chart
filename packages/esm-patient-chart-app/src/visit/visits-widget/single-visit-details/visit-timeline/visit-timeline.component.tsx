@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { formatDate } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useEncountersByVisit } from '../../../../clinical-views/hooks/useEncountersByVisit';
 import styles from './visit-timeline.scss';
 

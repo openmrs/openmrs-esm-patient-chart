@@ -4,7 +4,7 @@ import { forkJoin, Observable, of, from } from 'rxjs';
 import { catchError, mergeMap, switchMap } from 'rxjs/operators';
 import { EncounterAdapter, Form, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
 import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
-import { Form as ReactForm } from '@arunkumar-reddy/esm-patient-common-lib';
+import { Form as ReactForm } from '@openmrs/esm-patient-common-lib';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';

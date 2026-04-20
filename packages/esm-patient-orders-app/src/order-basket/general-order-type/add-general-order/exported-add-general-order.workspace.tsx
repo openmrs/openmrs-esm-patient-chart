@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type ExportedOrderBasketWindowProps, type OrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type ExportedOrderBasketWindowProps, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import AddGeneralOrder from './add-general-order.component';
 
 interface OrderableConceptSearchWorkspaceProps {

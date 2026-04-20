@@ -1,6 +1,6 @@
 import { ComboBox } from '@carbon/react';
 import { useConfig, useDebounce, type Visit } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplates } from './drug-search.resource';
 import { type ConfigObject } from '../../config-schema';

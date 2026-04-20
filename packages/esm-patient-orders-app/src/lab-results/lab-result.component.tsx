@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type Order } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useCompletedLabResults, useOrderConceptByUuid } from './lab-results.resource';
 import TestOrder from '../components/test-order.component';
 

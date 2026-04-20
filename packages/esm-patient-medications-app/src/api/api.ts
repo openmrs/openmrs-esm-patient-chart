@@ -10,7 +10,7 @@ import {
   type PostDataPrepFunction,
   careSettingUuid,
   type OrderAction,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 
 const customRepresentation =

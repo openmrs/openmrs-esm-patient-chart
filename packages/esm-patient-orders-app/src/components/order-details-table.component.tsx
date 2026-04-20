@@ -44,9 +44,9 @@ import {
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
-} from '@arunkumar-reddy/esm-patient-common-lib';
-import { prepMedicationOrderPostData } from '@arunkumar-reddy/esm-patient-medications-app/src/api/api';
-import { prepTestOrderPostData } from '@arunkumar-reddy/esm-patient-tests-app/src/test-orders/api';
+} from '@openmrs/esm-patient-common-lib';
+import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
+import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
 import { prepOrderPostData } from '../order-basket/general-order-type/resources';
 import {
   AddIcon,

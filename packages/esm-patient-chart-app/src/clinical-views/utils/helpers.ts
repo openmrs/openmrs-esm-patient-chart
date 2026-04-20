@@ -1,5 +1,5 @@
 import { age, formatDate, launchWorkspace2, parseDate, type Visit } from '@openmrs/esm-framework';
-import { launchStartVisitPrompt } from '@arunkumar-reddy/esm-patient-common-lib';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import type {
   ConfigConcepts,
   Encounter,

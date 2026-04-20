@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { useOrderType } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOrderType } from '@openmrs/esm-patient-common-lib';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import type { OrderBasketExtensionProps, TestOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import type { OrderBasketExtensionProps, TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 import { mockPatient } from 'tools';
@@ -13,8 +13,8 @@ const mockUseOrderBasket = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseOrderType = jest.mocked(useOrderType);
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderBasket: () => mockUseOrderBasket(),
   useOrderType: jest.fn(),
 }));

@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
-import { _resetOrderBasketStore } from '@arunkumar-reddy/esm-patient-common-lib/src/orders/store';
+import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { type PostDataPrepLabOrderFunction } from '../api';
 import {
   age,
@@ -11,7 +11,7 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -51,8 +51,8 @@ jest.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useOrderType: jest.fn(),
 }));
 

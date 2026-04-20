@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
-import { type ExportedOrderBasketWindowProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type ExportedOrderBasketWindowProps } from '@openmrs/esm-patient-common-lib';
 import OrderBasket from './order-basket.component';
 import { createOrderBasketExtensionProps } from './order-basket.utils';
 

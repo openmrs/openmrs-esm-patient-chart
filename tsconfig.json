@@ -19,7 +19,6 @@
     "noEmit": true,
     "paths": {
       "@openmrs/*": ["./node_modules/@openmrs/*"],
-      "@arunkumar-reddy/*": ["./node_modules/@arunkumar-reddy/*"],
       "__mocks__": ["./__mocks__"],
       "tools": ["./tools"]
     },

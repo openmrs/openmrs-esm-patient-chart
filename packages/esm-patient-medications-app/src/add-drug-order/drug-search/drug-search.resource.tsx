@@ -6,7 +6,7 @@ import {
   type DrugOrderBasketItem,
   type DrugOrderTemplate,
   type OrderTemplate,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 
 export interface DrugSearchResult {
   uuid: string;

@@ -1,5 +1,5 @@
 import { validator, Type, validators } from '@openmrs/esm-framework';
-import { type HtmlFormEntryForm } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type HtmlFormEntryForm } from '@openmrs/esm-patient-common-lib';
 
 export const configSchema = {
   htmlFormEntryForms: {

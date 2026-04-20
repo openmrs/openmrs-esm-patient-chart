@@ -25,7 +25,7 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOptimisticVisitMutations } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOptimisticVisitMutations } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import {
   calculateBodyMassIndex,

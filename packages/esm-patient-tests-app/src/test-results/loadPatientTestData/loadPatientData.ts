@@ -5,7 +5,7 @@ import {
   type ConceptUuid,
   type ObsUuid,
   type ObsMetaInfo,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import {
   addUserDataToCache,
   assessValue,

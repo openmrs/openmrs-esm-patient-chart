@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react';
 import { launchWorkspace2, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { type Order } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import styles from './edit-lab-results.scss';
 
 type EditLabResultModalProps = {

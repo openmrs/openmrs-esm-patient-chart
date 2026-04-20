@@ -10,7 +10,7 @@ import {
   useOpenmrsFetchAll,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useSystemVisitSetting } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
 
 export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {
   return openmrsFetch(`${restBaseUrl}/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {

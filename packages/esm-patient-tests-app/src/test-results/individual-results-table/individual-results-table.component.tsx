@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-framework';
-import { type OBSERVATION_INTERPRETATION } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
 

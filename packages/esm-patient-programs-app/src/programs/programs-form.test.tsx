@@ -18,7 +18,7 @@ import {
 } from './programs.resource';
 import ProgramsForm, { type ProgramsFormProps } from './programs-form.workspace';
 import { type ConfigObject, configSchema } from '../config-schema';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
 const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
 const mockUseEnrollments = jest.mocked(useEnrollments);

@@ -11,7 +11,7 @@ import {
   useFeatureFlag,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockEncountersAlice, mockEncounterTypes, mockFhirPatient, mockPatientAlice } from '__mocks__';
@@ -59,8 +59,8 @@ jest.mock('./encounters-table.resource', () => ({
   useEncounterTypes: () => mockUseEncounterTypes(),
 }));
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@arunkumar-reddy/esm-patient-common-lib'),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   usePatientChartStore: jest.fn(),
 }));
 

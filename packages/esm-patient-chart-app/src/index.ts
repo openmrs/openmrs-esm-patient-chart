@@ -1,6 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import * as Framework from '@openmrs/esm-framework';
-import { createDashboardLink } from '@arunkumar-reddy/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';

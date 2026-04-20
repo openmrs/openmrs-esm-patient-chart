@@ -1,5 +1,5 @@
 import React from 'react';
-import { type Form, type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type Form, type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import FormEntry from './form-entry.component';
 
 interface FormEntryWorkspaceProps {

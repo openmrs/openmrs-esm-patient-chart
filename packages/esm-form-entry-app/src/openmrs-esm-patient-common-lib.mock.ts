@@ -1,5 +1,5 @@
 /**
- * Mock for @arunkumar-reddy/esm-patient-common-lib used in tests.
+ * Mock for @openmrs/esm-patient-common-lib used in tests.
  * This prevents the Angular test compiler from trying to compile the React-based common lib.
  */
 

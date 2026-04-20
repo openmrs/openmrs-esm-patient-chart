@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, MenuButton, MenuItem } from '@carbon/react';
 import { AddIcon, type Visit } from '@openmrs/esm-framework';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import styles from './active-visit-buttons.scss';
 
 export interface ActiveVisitActionsInterface {

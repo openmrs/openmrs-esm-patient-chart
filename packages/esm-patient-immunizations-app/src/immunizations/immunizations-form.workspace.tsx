@@ -16,7 +16,7 @@ import {
   useSession,
   Workspace2,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { DoseInput } from './components/dose-input.component';
 import { immunizationFormSub } from './utils';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';

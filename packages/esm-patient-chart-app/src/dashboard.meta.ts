@@ -1,4 +1,4 @@
-import { type DashboardLinkConfig } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type DashboardLinkConfig } from '@openmrs/esm-patient-common-lib';
 
 export const summaryDashboardMeta: DashboardLinkConfig & { slot: string } = {
   slot: 'patient-chart-summary-dashboard-slot',

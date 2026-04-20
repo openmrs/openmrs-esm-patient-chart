@@ -26,7 +26,7 @@ import {
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';

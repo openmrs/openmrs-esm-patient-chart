@@ -13,7 +13,7 @@ import {
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
-import type { ExternalOverviewProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import { type Note, type Order, type OrderItem } from '../visit.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';

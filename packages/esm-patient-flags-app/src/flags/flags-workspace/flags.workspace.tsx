@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { orderBy } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Dropdown, Form, InlineLoading, Search, Tile, Toggle, Stack } from '@carbon/react';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import {
   useLayoutType,
   showSnackbar,

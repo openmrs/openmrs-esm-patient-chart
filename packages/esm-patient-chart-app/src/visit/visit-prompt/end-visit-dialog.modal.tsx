@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar, updateVisit, useVisit } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@arunkumar-reddy/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {

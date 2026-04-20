@@ -1,5 +1,5 @@
 import React from 'react';
-import { type PatientWorkspace2DefinitionProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import ExportedVitalsAndBiometricsForm from './exported-vitals-biometrics-form.workspace';
 
 export interface VitalsAndBiometricsFormProps {

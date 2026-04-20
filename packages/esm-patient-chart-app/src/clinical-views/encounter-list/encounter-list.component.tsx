@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { Button, Link, OverflowMenu, OverflowMenuItem, DataTableSkeleton, Pagination } from '@carbon/react';
 import { AddIcon, navigate, showModal, showSnackbar, useConfig, type Visit } from '@openmrs/esm-framework';
-import { EmptyState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { EncounterListDataTable } from './table.component';
 import { type LaunchAction, launchEncounterForm } from '../utils/helpers';
 import { deleteEncounter } from '../utils/encounter-list.resource';

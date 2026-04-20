@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FormError from './form-error.component';
 
-jest.mock('@arunkumar-reddy/esm-patient-common-lib', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   launchWorkspace: jest.fn(),
 }));
 

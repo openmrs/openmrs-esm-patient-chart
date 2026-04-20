@@ -3,7 +3,7 @@ import {
   type DrugOrderBasketItem,
   type OrderBasketWindowProps,
   type PatientWorkspace2DefinitionProps,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import AddDrugOrder from './add-drug-order.component';
 
 export interface AddDrugOrderWorkspaceProps {

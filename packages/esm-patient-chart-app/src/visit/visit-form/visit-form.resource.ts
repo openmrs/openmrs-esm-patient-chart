@@ -16,7 +16,7 @@ import {
   useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
-import { time12HourFormatRegex, type amPm } from '@arunkumar-reddy/esm-patient-common-lib';
+import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
 import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { type ChartConfig } from '../../config-schema';

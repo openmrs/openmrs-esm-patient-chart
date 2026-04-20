@@ -2,7 +2,7 @@ import React, { type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { CardHeader, EmptyState, ErrorState } from '@arunkumar-reddy/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 import { type ConfigObjectSwitchable } from '../config-schema-obs-switchable';

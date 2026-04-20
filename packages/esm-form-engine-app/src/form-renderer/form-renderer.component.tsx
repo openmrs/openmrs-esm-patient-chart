@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { FormEngine } from '@openmrs/esm-form-engine-lib';
 import { showModal, type Visit, type Encounter } from '@openmrs/esm-framework';
-import { type FormRendererProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type FormRendererProps } from '@openmrs/esm-patient-common-lib';
 import FormError from './form-error.component';
 import useFormSchema from '../hooks/useFormSchema';
 import styles from './form-renderer.scss';

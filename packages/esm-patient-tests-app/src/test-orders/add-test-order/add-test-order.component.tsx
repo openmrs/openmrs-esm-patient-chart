@@ -15,7 +15,7 @@ import {
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { useOrderType, type OrderBasketItem, type TestOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { useOrderType, type OrderBasketItem, type TestOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import { LabOrderForm } from './test-order-form.component';
 import { TestTypeSearch } from './test-type-search.component';

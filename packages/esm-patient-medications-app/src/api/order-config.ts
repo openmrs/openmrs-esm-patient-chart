@@ -7,7 +7,7 @@ import {
   type MedicationFrequency,
   type MedicationRoute,
   type QuantityUnit,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 
 export interface ConceptName {
   uuid: string;

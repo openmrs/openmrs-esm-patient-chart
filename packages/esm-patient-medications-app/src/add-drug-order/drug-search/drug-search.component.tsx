@@ -10,7 +10,7 @@ import {
   type Workspace2DefinitionProps,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type DrugOrderBasketItem } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../../config-schema';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 import styles from './order-basket-search.scss';

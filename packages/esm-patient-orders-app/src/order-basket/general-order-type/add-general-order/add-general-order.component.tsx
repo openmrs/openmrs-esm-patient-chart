@@ -11,7 +11,7 @@ import {
   Workspace2,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type OrderBasketItem, useOrderBasket, useOrderType } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OrderBasketItem, useOrderBasket, useOrderType } from '@openmrs/esm-patient-common-lib';
 import { OrderForm } from '../general-order-form/general-order-form.component';
 import { prepOrderPostData } from '../resources';
 import { type ConfigObject } from '../../../config-schema';

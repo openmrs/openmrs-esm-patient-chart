@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
-import { EmptyDataIllustration } from '@arunkumar-reddy/esm-patient-common-lib';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-form.scss';
 

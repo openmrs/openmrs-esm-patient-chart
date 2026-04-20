@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
-import { type PatientWorkspaceGroupProps } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type PatientWorkspaceGroupProps } from '@openmrs/esm-patient-common-lib';
 import { type VisitFormProps } from '../visit/visit-form/visit-form.workspace';
 import styles from './action-button.scss';
 

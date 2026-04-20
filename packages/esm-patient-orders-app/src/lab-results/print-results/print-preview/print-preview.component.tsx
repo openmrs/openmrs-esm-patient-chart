@@ -18,7 +18,7 @@ import {
   type OBSERVATION_INTERPRETATION,
   ReferenceRangeDisplay,
   useReferenceRanges,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { useLabEncounter, useOrderConceptByUuid } from '../../lab-results.resource';
 import { getConceptUuids, getEffectiveRanges, getInterpretationClass, interpretObservation } from '../../../utils';
 import styles from './print-preview.scss';

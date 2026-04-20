@@ -26,7 +26,7 @@ import {
   postOrder,
   useMutatePatientOrders,
   showOrderSuccessToast,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import {
   ExtensionSlot,
   OpenmrsDatePicker,
@@ -200,7 +200,7 @@ export function LabOrderForm({
            * t('updated', 'Updated')
            * t('discontinued', 'Discontinued')
            */
-          showOrderSuccessToast('@arunkumar-reddy/esm-patient-tests-app', [finalizedOrder]);
+          showOrderSuccessToast('@openmrs/esm-patient-tests-app', [finalizedOrder]);
           closeWorkspace({ discardUnsavedChanges: true });
         })
         .catch((error) => {

@@ -8,7 +8,7 @@ import {
   type ExternalOverviewProps,
   type PanelFilterProps,
   type PatientData,
-} from '@arunkumar-reddy/esm-patient-common-lib';
+} from '@openmrs/esm-patient-common-lib';
 import { parseSingleEntry, type OverviewPanelEntry } from './useOverviewData';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import CommonOverview from './common-overview.component';

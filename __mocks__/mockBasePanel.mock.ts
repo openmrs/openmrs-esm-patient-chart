@@ -1,4 +1,4 @@
-import { type OBSERVATION_INTERPRETATION } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { GroupedObservation } from '../packages/esm-patient-tests-app/src/types';
 
 export const mockBasePanel: GroupedObservation = {

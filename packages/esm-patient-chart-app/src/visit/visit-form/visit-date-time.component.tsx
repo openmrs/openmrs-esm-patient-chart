@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { type Control, Controller, type FieldPath, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
-import { type amPm } from '@arunkumar-reddy/esm-patient-common-lib';
+import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { convertToDate, type VisitFormData } from './visit-form.resource';
 import styles from './visit-form.scss';
