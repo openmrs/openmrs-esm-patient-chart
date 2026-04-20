@@ -186,7 +186,7 @@ export function useVitalsOrBiometricsConcepts(mode: VitalsAndBiometricsMode) {
   const { concepts } = useConfig<ConfigObject>();
 
   const conceptUuids = useMemo(() => {
-    const biometricsKeys = ['heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
+    const biometricsKeys = ['bodyMassIndexUuid', 'heightUuid', 'midUpperArmCircumferenceUuid', 'weightUuid'];
     // These keys are not individual observation concepts for the FHIR query:
     // generalPatientNoteUuid is fetched separately to avoid note-only encounters
     // polluting the vitals list; vitalSignsConceptSetUuid is a concept set, not an obs concept.
@@ -286,11 +286,14 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
           return 'weight';
         case concepts.midUpperArmCircumferenceUuid:
           return 'muac';
+        case concepts.bodyMassIndexUuid:
+          return 'bmi';
         default:
           return ''; // or throw an error for unknown conceptUuid
       }
     },
     [
+      concepts.bodyMassIndexUuid,
       concepts.heightUuid,
       concepts.midUpperArmCircumferenceUuid,
       concepts.systolicBloodPressureUuid,
@@ -356,7 +359,11 @@ export function useVitalsAndBiometrics(patientUuid: string, mode: VitalsAndBiome
       };
 
       if (mode === 'both' || mode === 'biometrics') {
-        result.bmi = calculateBodyMassIndex(Number(vitalSigns.weight), Number(vitalSigns.height));
+        // Prefer the persisted BMI obs (value + interpretation from the backend) when present.
+        // Fall back to client-side calculation for historical encounters that don't have one.
+        if (vitalSigns.bmi == null) {
+          result.bmi = calculateBodyMassIndex(Number(vitalSigns.weight), Number(vitalSigns.height));
+        }
       }
 
       if (mode === 'both' || mode === 'vitals') {
