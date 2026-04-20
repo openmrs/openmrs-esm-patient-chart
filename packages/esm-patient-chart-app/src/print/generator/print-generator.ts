@@ -149,7 +149,7 @@ export class PDFGenerator {
     this.doc.setFontSize(10);
     let yPos = currentY + 5;
 
-    this.doc.text(`Name: ${patient.display}`, 8, yPos);
+    this.doc.text(`Name: ${patient.person.preferredName.display}`, 8, yPos);
     yPos += 6;
 
     this.doc.text(`Gender: ${patient.person.gender}`, 8, yPos);
@@ -679,11 +679,6 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
           th {
             background-color: #f2f2f2;
           }
-          .meta-info {
-            font-size: 12px;
-            color: #666;
-            margin-top: 30px;
-          }
           .empty-state {
             color: #666;
             font-style: italic;
@@ -696,7 +691,7 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
           <div class="patient-grid">
             <div class="patient-grid-item">
               <span class="patient-grid-label">Name:</span>
-              <span class="patient-grid-value">${patient.display}</span>
+              <span class="patient-grid-value">${patient.person.preferredName.display}</span>
             </div>
             <div class="patient-grid-item">
               <span class="patient-grid-label">Patient ID:</span>
@@ -981,9 +976,6 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
           </table>
         </div>
 
-        <div class="meta-info">
-          <p>Printed from OpenMRS Patient Chart</p>
-        </div>
       </body>
     </html>
   `;
