@@ -462,12 +462,6 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
           }
           .section {
             margin-bottom: 12px;
-            page-break-inside: avoid;
-          }
-          h1 {
-            color: #000;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
           }
           h2 {
             color: #444;
@@ -527,9 +521,6 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
         </style>
       </head>
       <body>
-        <h1>Patient Information</h1>
-        <p>Generated on: ${formatDateTime(generatedAt)}</p>
-        
         <div class="section">
           <h2>Patient Details</h2>
           <div class="patient-grid">
