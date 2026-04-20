@@ -286,32 +286,39 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
       <div id={containerId} className={styles.previewContent}>
         <Tile className={styles.card}>
           <h3>{t('patientDetails', 'Patient Details')}</h3>
-          <div className={styles.patientInfo}>
-            <p>
-              <strong>{t('name', 'Name')}:</strong> {patient.person.preferredName.display}
-            </p>
-            <p>
-              <strong>{t('patientId', 'Patient ID')}:</strong>{' '}
-              {patient.identifiers
-                .find((id) => id.display.includes('OpenMRS ID'))
-                ?.display.replace(/.*[=:]/, '')
-                .trim() || '-'}
-            </p>
-            <p>
-              <strong>{t('gender', 'Gender')}:</strong> {patient.person.gender}
-            </p>
-            <p>
-              <strong>{t('age', 'Age')}:</strong> {patient.person.age}
-            </p>
-            <p>
-              <strong>{t('birthDate', 'Birth Date')}:</strong> {formatBirthDate(patient.person.birthdate)}
-            </p>
+          <div className={styles.patientGrid}>
+            <div className={styles.patientGridItem}>
+              <span className={styles.patientGridLabel}>{t('name', 'Name')}:</span>
+              <span className={styles.patientGridValue}>{patient.person.preferredName.display}</span>
+            </div>
+            <div className={styles.patientGridItem}>
+              <span className={styles.patientGridLabel}>{t('patientId', 'Patient ID')}:</span>
+              <span className={styles.patientGridValue}>
+                {patient.identifiers
+                  .find((id) => id.display.includes('OpenMRS ID'))
+                  ?.display.replace(/.*[=:]/, '')
+                  .trim() || '-'}
+              </span>
+            </div>
+            <div className={styles.patientGridItem}>
+              <span className={styles.patientGridLabel}>{t('gender', 'Gender')}:</span>
+              <span className={styles.patientGridValue}>{patient.person.gender}</span>
+            </div>
+            <div className={styles.patientGridItem}>
+              <span className={styles.patientGridLabel}>{t('age', 'Age')}:</span>
+              <span className={styles.patientGridValue}>{patient.person.age}</span>
+            </div>
+            <div className={styles.patientGridItem}>
+              <span className={styles.patientGridLabel}>{t('birthDate', 'Birth Date')}:</span>
+              <span className={styles.patientGridValue}>{formatBirthDate(patient.person.birthdate)}</span>
+            </div>
             {patient.identifiers
               .filter((identifier) => !identifier.display.includes('OpenMRS ID'))
               .map((identifier, index) => (
-                <p key={index}>
-                  <strong>{identifier.display}:</strong> {identifier.display}
-                </p>
+                <div key={index} className={styles.patientGridItem}>
+                  <span className={styles.patientGridLabel}>{identifier.display}:</span>
+                  <span className={styles.patientGridValue}>{identifier.display}</span>
+                </div>
               ))}
           </div>
         </Tile>

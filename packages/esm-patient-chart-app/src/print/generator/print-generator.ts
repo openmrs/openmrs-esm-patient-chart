@@ -63,23 +63,28 @@ export class PDFGenerator {
     const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
     this.doc.text(`Generated on: ${formattedDate}`, 14, 30);
 
-    this.addPatientSection(patient);
-    this.addVisitsSection(visits);
-    this.addDiagnosesSection(allDiagnoses);
-    this.addObservationsSection(allObservations);
-    this.addOrdersSection(allOrders);
-    this.addMedicationsSection(medications);
+    let yPos = 45;
+    yPos = this.addPatientSection(patient, yPos);
+    yPos = this.addVisitsSection(visits, yPos);
+    yPos = this.addDiagnosesSection(allDiagnoses, yPos);
+    yPos = this.addObservationsSection(allObservations, yPos);
+    yPos = this.addOrdersSection(allOrders, yPos);
+    yPos = this.addMedicationsSection(medications, yPos);
 
     return this.doc;
   }
 
-  private addPatientSection(patient: Patient) {
+  private addPatientSection(patient: Patient, startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Patient Details', 14, 40);
+    this.doc.text('Patient Details', 14, currentY);
 
     this.doc.setFontSize(10);
-    const startY = 45;
-    let yPos = startY;
+    let yPos = currentY + 5;
 
     this.doc.text(`Name: ${patient.display}`, 8, yPos);
     yPos += 6;
@@ -104,20 +109,25 @@ export class PDFGenerator {
       }
     });
 
-    this.doc.addPage();
+    return yPos;
   }
 
-  private addVisitsSection(visits: Visit[]) {
+  private addVisitsSection(visits: Visit[], startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Most Recent Visit', 14, 20);
+    this.doc.text('Most Recent Visit', 14, currentY);
 
     this.doc.setFontSize(10);
-    let yPos = 25;
+    let yPos = currentY + 5;
 
     visits.forEach((visit, index) => {
       if (index > 0 && yPos > 250) {
         this.doc.addPage();
-        yPos = 20;
+        yPos = currentY + 5;
       }
 
       this.doc.text(`Visit Type: ${visit.visitType?.name || '-'}`, 14, yPos);
@@ -132,29 +142,33 @@ export class PDFGenerator {
       yPos += 4;
     });
 
-    this.doc.addPage();
+    return yPos;
   }
 
-  private addDiagnosesSection(diagnoses: any[]) {
+  private addDiagnosesSection(diagnoses: any[], startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Diagnoses', 14, 20);
+    this.doc.text('Diagnoses', 14, currentY);
 
     this.doc.setFontSize(10);
-    let yPos = 25;
+    let yPos = currentY + 5;
 
     // Sort diagnoses by rank
     const sortedDiagnoses = [...diagnoses].sort((a, b) => a.rank - b.rank);
 
     if (sortedDiagnoses.length === 0) {
       this.doc.text('No diagnoses recorded', 14, yPos);
-      this.doc.addPage();
-      return;
+      return yPos;
     }
 
     sortedDiagnoses.forEach((diagnosis, index) => {
       if (index > 0 && yPos > 250) {
         this.doc.addPage();
-        yPos = 20;
+        yPos = currentY + 5;
       }
 
       const diagnosisText = this.getDiagnosisDisplay(diagnosis);
@@ -168,26 +182,30 @@ export class PDFGenerator {
       yPos += 2;
     });
 
-    this.doc.addPage();
+    return yPos;
   }
 
-  private addObservationsSection(observations: any[]) {
+  private addObservationsSection(observations: any[], startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Observations', 14, 20);
+    this.doc.text('Observations', 14, currentY);
 
     this.doc.setFontSize(10);
-    let yPos = 25;
+    let yPos = currentY + 5;
 
     if (observations.length === 0) {
       this.doc.text('No observations recorded', 14, yPos);
-      this.doc.addPage();
-      return;
+      return yPos;
     }
 
     observations.forEach((obs, index) => {
       if (index > 0 && yPos > 250) {
         this.doc.addPage();
-        yPos = 20;
+        yPos = currentY + 5;
       }
 
       this.doc.text(`Concept: ${obs.concept.display}`, 14, yPos);
@@ -204,26 +222,30 @@ export class PDFGenerator {
       yPos += 2;
     });
 
-    this.doc.addPage();
+    return yPos;
   }
 
-  private addOrdersSection(orders: any[]) {
+  private addOrdersSection(orders: any[], startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Orders', 14, 20);
+    this.doc.text('Orders', 14, currentY);
 
     this.doc.setFontSize(10);
-    let yPos = 25;
+    let yPos = currentY + 5;
 
     if (orders.length === 0) {
       this.doc.text('No orders recorded', 14, yPos);
-      this.doc.addPage();
-      return;
+      return yPos;
     }
 
     orders.forEach((order, index) => {
       if (index > 0 && yPos > 250) {
         this.doc.addPage();
-        yPos = 20;
+        yPos = currentY + 5;
       }
 
       this.doc.text(`Concept: ${order.concept?.display || 'Unknown'}`, 14, yPos);
@@ -268,20 +290,25 @@ export class PDFGenerator {
       yPos += 2;
     });
 
-    this.doc.addPage();
+    return yPos;
   }
 
-  private addMedicationsSection(medications: MedicationOrder[]) {
+  private addMedicationsSection(medications: MedicationOrder[], startY: number): number {
+    let currentY = startY;
+    if (currentY > 250) {
+      this.doc.addPage();
+      currentY = 20;
+    }
     this.doc.setFontSize(14);
-    this.doc.text('Medications', 14, 20);
+    this.doc.text('Medications', 14, currentY);
 
     this.doc.setFontSize(10);
-    let yPos = 25;
+    let yPos = currentY + 5;
 
     medications.forEach((medication, index) => {
       if (index > 0 && yPos > 250) {
         this.doc.addPage();
-        yPos = 20;
+        yPos = currentY + 5;
       }
 
       this.doc.text(`Medication: ${medication.concept?.display || 'Unknown'}`, 14, yPos);
@@ -297,6 +324,8 @@ export class PDFGenerator {
 
       yPos += 4;
     });
+
+    return yPos;
   }
 
   savePDF(filename: string): void {
@@ -432,7 +461,7 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
             color: #333;
           }
           .section {
-            margin-bottom: 30px;
+            margin-bottom: 12px;
             page-break-inside: avoid;
           }
           h1 {
@@ -445,10 +474,33 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
             border-bottom: 1px solid #ccc;
             padding-bottom: 5px;
           }
-          .patient-info {
+          .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px 20px;
+            padding: 10px 12px;
             background-color: #f5f5f5;
-            padding: 15px;
             border-radius: 5px;
+            margin-top: 4px;
+          }
+          .patient-grid-item {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 8px;
+          }
+          .patient-grid-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #777;
+            flex-shrink: 0;
+          }
+          .patient-grid-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            word-break: break-word;
           }
           table {
             width: 100%;
@@ -480,14 +532,43 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
         
         <div class="section">
           <h2>Patient Details</h2>
-          <div class="patient-info">
-            <p><strong>Name:</strong> ${patient.display}</p>
-            <p><strong>Gender:</strong> ${patient.person.gender}</p>
-            <p><strong>Age:</strong> ${patient.person.age}</p>
-            <p><strong>Birth Date:</strong> ${formatBirthDate(patient.person.birthdate)}</p>
+          <div class="patient-grid">
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Name:</span>
+              <span class="patient-grid-value">${patient.display}</span>
+            </div>
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Patient ID:</span>
+              <span class="patient-grid-value">
+                ${
+                  patient.identifiers
+                    .find((id) => id.display.includes('OpenMRS ID'))
+                    ?.display.replace(/.*[=:]/, '')
+                    .trim() || '-'
+                }
+              </span>
+            </div>
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Gender:</span>
+              <span class="patient-grid-value">${patient.person.gender}</span>
+            </div>
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Age:</span>
+              <span class="patient-grid-value">${patient.person.age}</span>
+            </div>
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Birth Date:</span>
+              <span class="patient-grid-value">${formatBirthDate(patient.person.birthdate)}</span>
+            </div>
             ${patient.identifiers
-              .filter((id) => !id.display.includes('OpenMRS ID'))
-              .map((id) => `<p><strong>${id.display}:</strong> ${id.display}</p>`)
+              .filter((identifier) => !identifier.display.includes('OpenMRS ID'))
+              .map(
+                (identifier) => `
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">${identifier.display}:</span>
+              <span class="patient-grid-value">${identifier.display}</span>
+            </div>`,
+              )
               .join('')}
           </div>
         </div>
@@ -528,7 +609,6 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
                 <th>Rank</th>
                 <th>Diagnosis</th>
                 <th>Certainty</th>
-                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -541,12 +621,11 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
                   <td>${diagnosis.rank}</td>
                   <td>${getDiagnosisDisplay(diagnosis)}</td>
                   <td>${diagnosis.certainty || '-'}</td>
-                  <td>${diagnosis.voided ? 'Voided' : 'Active'}</td>
                 </tr>
               `,
                       )
                       .join('')
-                  : '<tr><td colspan="4" class="empty-state">No diagnoses recorded</td></tr>'
+                  : '<tr><td colspan="3" class="empty-state">No diagnoses recorded</td></tr>'
               }
             </tbody>
           </table>
@@ -557,10 +636,8 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
           <table>
             <thead>
               <tr>
-                <th>Concept</th>
-                <th>Value</th>
-                <th>Date & Time</th>
-                <th>Group Members</th>
+                <th>Observation</th>
+                <th style="text-align: center;">Value</th>
               </tr>
             </thead>
             <tbody>
@@ -571,14 +648,12 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
                         (obs) => `
                 <tr>
                   <td>${obs.concept.display}</td>
-                  <td>${formatObservationValue(obs)}</td>
-                  <td>${formatDateTime(obs.obsDatetime)}</td>
-                  <td>${obs.groupMembers?.length || 0}</td>
+                  <td style="text-align: center;">${formatObservationValue(obs)}</td>
                 </tr>
               `,
                       )
                       .join('')
-                  : '<tr><td colspan="4" class="empty-state">No observations recorded</td></tr>'
+                  : '<tr><td colspan="2" class="empty-state">No observations recorded</td></tr>'
               }
             </tbody>
           </table>

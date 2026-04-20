@@ -33,16 +33,41 @@
   margin-bottom: layout.$spacing-01;
 }
 
-.patientInfo {
-  background-color: colors.$gray-10;
-  padding: layout.$spacing-04 layout.$spacing-04 layout.$spacing-04 layout.$spacing-01;
-  border-radius: layout.$spacing-01;
+.patientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: layout.$spacing-03 layout.$spacing-05;
+  padding: layout.$spacing-03 layout.$spacing-03;
   margin-top: layout.$spacing-02;
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-01;
 
-  p {
-    @include type.type-style('body-compact-01');
-    margin-bottom: layout.$spacing-02;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
+}
+
+.patientGridItem {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: layout.$spacing-03;
+}
+
+.patientGridLabel {
+  @include type.type-style('label-02');
+  color: colors.$gray-70;
+  text-transform: uppercase;
+  letter-spacing: layout.$spacing-01;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.patientGridValue {
+  @include type.type-style('body-short-01');
+  color: colors.$gray-90;
+  font-weight: 500;
+  word-break: break-word;
 }
 
 .tableContainer {
