@@ -16,12 +16,12 @@ import {
   Section,
   Dropdown,
 } from '@carbon/react';
-import { Download, Printer } from '@carbon/react/icons';
+import { Printer } from '@carbon/react/icons';
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { showToast } from '@openmrs/esm-framework';
 import { fetchPrintData } from './api/print-api';
 import type { PrintData, Diagnosis, Observation, EncounterOrder, Visit, Vitals } from './api/print-api';
-import { PDFGenerator, printViaBrowser, generatePrintableHTML } from './generator/print-generator';
+import { printViaBrowser, generatePrintableHTML } from './generator/print-generator';
 import styles from './print-preview.scss';
 
 interface PrintPreviewProps {
@@ -249,41 +249,6 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
         title: errorMessage,
         description: errorMessage,
       });
-      setGenerating(false);
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    if (!printData || !selectedVisit) return;
-
-    setGenerating(true);
-    try {
-      // Create filtered print data for the selected visit
-      const filteredPrintData = {
-        ...printData,
-        visits: [selectedVisit],
-        encounters: selectedVisit.encounters,
-        allDiagnoses: filteredDiagnoses,
-        allObservations: filteredObservations,
-        allOrders: filteredOrders,
-      };
-
-      const generator = new PDFGenerator();
-      const pdf = generator.generatePDF(filteredPrintData);
-      pdf.save(`patient-info-${patientUuid}.pdf`);
-      showToast({
-        kind: 'success',
-        title: t('downloadPdf', 'PDF downloaded successfully'),
-        description: t('downloadPdf', 'PDF downloaded successfully'),
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'PDF generation failed';
-      showToast({
-        kind: 'error',
-        title: errorMessage,
-        description: errorMessage,
-      });
-    } finally {
       setGenerating(false);
     }
   };
@@ -730,12 +695,9 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
         </Tile>
       </div>
 
-      <div className={styles.actions} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+      <div className={styles.actions}>
         <Button onClick={handlePrintBrowser} disabled={generating} renderIcon={Printer}>
           {generating ? t('printing', 'Printing...') : t('printBrowser', 'Print (Browser)')}
-        </Button>
-        <Button onClick={handleDownloadPDF} disabled={generating} renderIcon={Download} kind="secondary">
-          {t('downloadPdf', 'Download PDF')}
         </Button>
       </div>
     </div>
