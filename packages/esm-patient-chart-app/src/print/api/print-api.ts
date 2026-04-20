@@ -291,6 +291,19 @@ export interface Patient {
   resourceVersion: string;
 }
 
+export interface Vitals {
+  bloodPressure?: {
+    systolic: number;
+    diastolic: number;
+  };
+  pulse?: number;
+  temperature?: number;
+  height?: number;
+  weight?: number;
+  respiratoryRate?: number;
+  bmi?: number;
+}
+
 export interface PrintData {
   patient: Patient;
   visits: Visit[];
