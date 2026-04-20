@@ -125,8 +125,7 @@ export class PDFGenerator {
     this.doc.text(`Generated on: ${formattedDate}`, 14, 30);
 
     let yPos = 45;
-    yPos = this.addPatientSection(patient, yPos);
-    yPos = this.addVisitsSection(visits, yPos);
+    yPos = this.addPatientSection(patient, visits, yPos);
     const vitals = this.extractVitals(allObservations);
     yPos = this.addVitalsSection(vitals, yPos);
     yPos = this.addDiagnosesSection(allDiagnoses, yPos);
@@ -138,7 +137,7 @@ export class PDFGenerator {
     return this.doc;
   }
 
-  private addPatientSection(patient: Patient, startY: number): number {
+  private addPatientSection(patient: Patient, visits: Visit[], startY: number): number {
     let currentY = startY;
     if (currentY > 250) {
       this.doc.addPage();
@@ -173,38 +172,13 @@ export class PDFGenerator {
       }
     });
 
-    return yPos;
-  }
-
-  private addVisitsSection(visits: Visit[], startY: number): number {
-    let currentY = startY;
-    if (currentY > 250) {
-      this.doc.addPage();
-      currentY = 20;
+    // Add visit start date if visits are available
+    if (visits.length > 0) {
+      const visitDate = new Date(visits[0].startDatetime);
+      const formattedVisitDate = `${String(visitDate.getDate()).padStart(2, '0')}/${String(visitDate.getMonth() + 1).padStart(2, '0')}/${visitDate.getFullYear()}`;
+      this.doc.text(`Visit Date: ${formattedVisitDate}`, 8, yPos);
+      yPos += 6;
     }
-    this.doc.setFontSize(14);
-    this.doc.text('Most Recent Visit', 14, currentY);
-
-    this.doc.setFontSize(10);
-    let yPos = currentY + 5;
-
-    visits.forEach((visit, index) => {
-      if (index > 0 && yPos > 250) {
-        this.doc.addPage();
-        yPos = currentY + 5;
-      }
-
-      this.doc.text(`Visit Type: ${visit.visitType?.name || '-'}`, 14, yPos);
-      yPos += 6;
-      this.doc.text(`Location: ${visit.location?.display || '-'}`, 14, yPos);
-      yPos += 6;
-      this.doc.text(`Start: ${this.formatDateTime(visit.startDatetime)}`, 14, yPos);
-      yPos += 6;
-      this.doc.text(`End: ${visit.stopDatetime ? this.formatDateTime(visit.stopDatetime) : 'Ongoing'}`, 14, yPos);
-      yPos += 6;
-
-      yPos += 4;
-    });
 
     return yPos;
   }
@@ -757,35 +731,16 @@ export async function generatePrintableHTML(printData: PrintData): Promise<strin
             </div>`,
               )
               .join('')}
+            ${
+              selectedVisit
+                ? `
+            <div class="patient-grid-item">
+              <span class="patient-grid-label">Visit Date:</span>
+              <span class="patient-grid-value">${formatDateTime(selectedVisit.startDatetime)}</span>
+            </div>`
+                : ''
+            }
           </div>
-        </div>
-
-        <div class="section">
-          <h2>Visit</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Location</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${
-                selectedVisit
-                  ? `
-                <tr>
-                  <td>${selectedVisit.visitType?.name || '-'}</td>
-                  <td>${selectedVisit.location?.display || '-'}</td>
-                  <td>${formatDateTime(selectedVisit.startDatetime)}</td>
-                  <td>${selectedVisit.stopDatetime ? formatDateTime(selectedVisit.stopDatetime) : 'Ongoing'}</td>
-                </tr>
-              `
-                  : '<tr><td colspan="4" class="empty-state">No visits recorded</td></tr>'
-              }
-            </tbody>
-          </table>
         </div>
 
         <div class="section">

@@ -590,12 +590,10 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
               <DataTable
                 rows={filteredDiagnoses.map((d) => ({
                   id: d.uuid,
-                  rank: d.rank,
                   diagnosis: getDiagnosisDisplay(d),
                   certainty: d.certainty || '-',
                 }))}
                 headers={[
-                  { key: 'rank', header: t('rank', 'Rank') },
                   { key: 'diagnosis', header: t('diagnosis', 'Diagnosis') },
                   { key: 'certainty', header: t('certainty', 'Certainty') },
                 ]}
