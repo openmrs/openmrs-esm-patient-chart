@@ -39,17 +39,6 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
 
   const containerId = 'print-preview-container';
 
-  // Format date as DD/MM/YYYY HH:MM
-  const formatGeneratedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
-
   // Format birth date as DD/MM/YYYY
   const formatBirthDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -295,11 +284,6 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
   return (
     <div className={styles.container}>
       <div id={containerId} className={styles.previewContent}>
-        <h1 className={styles.title}>{t('patientInfo', 'Patient Information')}</h1>
-        <p className={styles.generatedAt}>
-          {t('generatedOn', 'Generated on:') + ' ' + formatGeneratedDate(printData.generatedAt)}
-        </p>
-
         <Tile className={styles.card}>
           <h3>{t('patientDetails', 'Patient Details')}</h3>
           <div className={styles.patientInfo}>
@@ -422,13 +406,11 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
                   rank: d.rank,
                   diagnosis: getDiagnosisDisplay(d),
                   certainty: d.certainty || '-',
-                  voided: d.voided ? t('voided', 'Voided') : t('active', 'Active'),
                 }))}
                 headers={[
                   { key: 'rank', header: t('rank', 'Rank') },
                   { key: 'diagnosis', header: t('diagnosis', 'Diagnosis') },
                   { key: 'certainty', header: t('certainty', 'Certainty') },
-                  { key: 'voided', header: t('status', 'Status') },
                 ]}
               >
                 {({ rows, headers, getHeaderProps, getRowProps }) => (
@@ -467,18 +449,16 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
           {filteredObservations.length > 0 ? (
             <div className={styles.tableContainer}>
               <DataTable
-                rows={filteredObservations.map((obs) => ({
-                  id: obs.uuid,
-                  concept: obs.concept.display,
-                  value: formatObservationValue(obs),
-                  datetime: formatDateTime(obs.obsDatetime),
-                  groupMembers: obs.groupMembers?.length || 0,
-                }))}
+                rows={filteredObservations
+                  .filter((obs) => obs.value !== null && obs.value !== undefined && formatObservationValue(obs) !== '-')
+                  .map((obs) => ({
+                    id: obs.uuid,
+                    observation: obs.concept.display,
+                    value: formatObservationValue(obs),
+                  }))}
                 headers={[
-                  { key: 'concept', header: t('concept', 'Concept') },
+                  { key: 'observation', header: t('observation', 'Observation') },
                   { key: 'value', header: t('value', 'Value') },
-                  { key: 'datetime', header: t('obsDatetime', 'Date & Time') },
-                  { key: 'groupMembers', header: t('groupMembers', 'Group Members') },
                 ]}
               >
                 {({ rows, headers, getHeaderProps, getRowProps }) => (
@@ -487,7 +467,11 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
                       <TableRow>
                         {headers.map((header) => (
                           <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                            {header.header}
+                            <span
+                              style={{ display: 'block', textAlign: header.key === 'value' ? 'center' : undefined }}
+                            >
+                              {header.header}
+                            </span>
                           </TableHeader>
                         ))}
                       </TableRow>
@@ -495,8 +479,10 @@ const PrintPreview: React.FC<PrintPreviewProps> = ({ patientUuid, onClose }) => 
                     <TableBody>
                       {rows.map((row) => (
                         <TableRow key={row.id} {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          {row.cells.map((cell, index) => (
+                            <TableCell key={cell.id} style={{ textAlign: index === 1 ? 'center' : undefined }}>
+                              {cell.value}
+                            </TableCell>
                           ))}
                         </TableRow>
                       ))}
