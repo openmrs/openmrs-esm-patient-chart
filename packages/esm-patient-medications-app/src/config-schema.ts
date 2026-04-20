@@ -52,6 +52,15 @@ export const configSchema = {
       '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
     },
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -65,4 +74,5 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
+  drugCategoryConceptSets: Array<string>;
 }

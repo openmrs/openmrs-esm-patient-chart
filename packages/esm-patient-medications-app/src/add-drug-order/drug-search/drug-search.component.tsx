@@ -79,8 +79,11 @@ export default function DrugSearch({
       />
       {isTablet && (
         <div className={styles.separatorContainer}>
-          <p className={styles.separator}>{t('or', 'or')}</p>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
+          <Button
+            iconDescription={t('returnToOrderBasket', 'Return to order basket')}
+            kind="ghost"
+            onClick={() => closeWorkspace()}
+          >
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

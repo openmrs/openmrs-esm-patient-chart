@@ -23,6 +23,22 @@ export interface DrugSearchResult {
   };
 }
 
+export interface ConceptTreeNode {
+  uuid: string;
+  display: string;
+  isSet: boolean;
+  setMembers?: Array<ConceptTreeNode>;
+}
+
+export interface ConceptSet {
+  uuid: string;
+  display: string;
+}
+
+interface ConceptFetchResponse {
+  [uuid: string]: ConceptSet;
+}
+
 interface OrderTemplateResource {
   uuid: string;
   drug: Drug;
@@ -30,16 +46,23 @@ interface OrderTemplateResource {
   template: string;
 }
 
+interface DrugListFetchResult {
+  drugs: Array<DrugSearchResult>;
+  errors: Array<Error>;
+}
+
+const maxConceptsPerRequest = 20;
+const drugPageSize = 50;
+const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
+
 /**
- * Search for a list of drugs based on the given query string
+ * Search for a list of drugs based on the given query string or concepts (uuid/name/mapping)
  * @param query
  * @returns
  */
 export function useDrugSearch(query: string) {
   const { data, ...rest } = useSWRImmutable<FetchResponse<{ results: Array<DrugSearchResult> }>, Error>(
-    query
-      ? `${restBaseUrl}/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
-      : null,
+    query ? `${restBaseUrl}/drug?q=${query}&v=${drugSearchRepresentation}` : null,
     openmrsFetch,
   );
 
@@ -52,6 +75,94 @@ export function useDrugSearch(query: string) {
   );
 
   return results;
+}
+
+export function useConceptTree(conceptUuid: string) {
+  const fetcher = (url: string) => openmrsFetch<ConceptTreeNode>(url).then((res) => res.data);
+
+  const { data, error, isLoading } = useSWRImmutable<ConceptTreeNode, Error>(
+    conceptUuid ? `${restBaseUrl}/concepttree?concept=${conceptUuid}` : null,
+    fetcher,
+  );
+
+  return useMemo(
+    () => ({
+      tree: data,
+      isLoading,
+      error,
+    }),
+    [data, isLoading, error],
+  );
+}
+
+export function useDrugsByConcepts(concepts: string[]) {
+  const shouldFetch = concepts && concepts.length > 0;
+  const sortedConcepts = [...concepts].sort();
+  const cacheKey = shouldFetch ? ['drugs-by-uuids', ...sortedConcepts] : null;
+
+  const { data, isLoading } = useSWRImmutable<DrugListFetchResult, Error>(cacheKey, async () => {
+    const drugs: Array<DrugSearchResult> = [];
+    const errors: Array<Error> = [];
+
+    for (let start = 0; start < concepts.length; start += maxConceptsPerRequest) {
+      const batch = concepts.slice(start, start + maxConceptsPerRequest);
+      const conceptsParam = batch.join(',');
+      try {
+        let startIndex = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+          const response = await openmrsFetch<{ results: Array<DrugSearchResult> }>(
+            `${restBaseUrl}/drug?concepts=${conceptsParam}&v=${drugSearchRepresentation}&limit=${drugPageSize}&startIndex=${startIndex}`,
+          );
+          const results = response.data?.results ?? [];
+          drugs.push(...results);
+          hasMore = results.length === drugPageSize;
+          startIndex += drugPageSize;
+        }
+      } catch (e) {
+        console.error(`Failed to fetch drugs for concepts: ${conceptsParam}`, e);
+        errors.push(e instanceof Error ? e : new Error(String(e)));
+      }
+    }
+
+    const deduped = Array.from(new Map(drugs.map((drug) => [drug.uuid, drug])).values());
+
+    return { drugs: deduped, errors };
+  });
+
+  return useMemo(
+    () => ({
+      drugs: data?.drugs ?? [],
+      errors: data?.errors ?? [],
+      isLoading,
+    }),
+    [data, isLoading],
+  );
+}
+
+export function useConceptSets(conceptSetUuids: string[] = []) {
+  const url =
+    conceptSetUuids.length > 0
+      ? `${restBaseUrl}/conceptreferences?references=${conceptSetUuids.join(',')}&v=custom:(uuid,display)`
+      : null;
+
+  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptFetchResponse }, Error>(url, openmrsFetch);
+
+  return useMemo(() => {
+    const conceptSets: ConceptSet[] = data?.data
+      ? Object.values(data.data).map((concept) => ({
+          uuid: concept.uuid,
+          display: concept.display,
+        }))
+      : [];
+
+    return {
+      conceptSets,
+      isLoading,
+      error,
+    };
+  }, [data, isLoading, error]);
 }
 
 /**

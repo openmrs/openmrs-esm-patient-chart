@@ -1,9 +1,12 @@
 import React, { type ComponentProps, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
+import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
   ArrowLeftIcon,
+  SearchIcon,
+  ListCheckedIcon,
   showSnackbar,
+  useConfig,
   type Visit,
   type Workspace2DefinitionProps,
   useLayoutType,
@@ -16,9 +19,13 @@ import {
   useMutatePatientOrders,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
+
+import { type ConfigObject } from '../config-schema';
 import { prepMedicationOrderPostData } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
+import { useConceptSets } from './drug-search/drug-search.resource';
 import { DrugOrderForm } from './drug-order-form.component';
+import DrugBrowse from './drug-search/drug-browse.component';
 import DrugSearch from './drug-search/drug-search.component';
 import styles from './add-drug-order.scss';
 
@@ -67,6 +74,13 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
+
+  const { drugCategoryConceptSets } = useConfig<ConfigObject>();
+  const {
+    conceptSets,
+    isLoading: isLoadingConceptSets,
+    error: conceptSetsError,
+  } = useConceptSets(drugCategoryConceptSets);
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -159,14 +173,50 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
             </Button>
           </div>
         )}
-        <DrugSearch
-          patient={patient}
-          visit={visitContext}
-          closeWorkspace={closeWorkspace}
-          openOrderForm={openOrderForm}
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-        />
+        {drugCategoryConceptSets?.length > 0 ? (
+          <Tabs>
+            <TabList contained fullWidth>
+              <Tab renderIcon={SearchIcon}>{t('search', 'Search')}</Tab>
+              <Tab renderIcon={ListCheckedIcon}>{t('browse', 'Browse')}</Tab>
+            </TabList>
+            <div className={styles.tabPanelsWrapper}>
+              <TabPanels>
+                <TabPanel>
+                  <DrugSearch
+                    patient={patient}
+                    visit={visitContext}
+                    closeWorkspace={closeWorkspace}
+                    openOrderForm={openOrderForm}
+                    searchTerm={searchTerm}
+                    onSearchTermChange={setSearchTerm}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <DrugBrowse
+                    conceptSets={conceptSets}
+                    isLoadingConceptSets={isLoadingConceptSets}
+                    conceptSetsError={conceptSetsError}
+                    patient={patient}
+                    visit={visitContext}
+                    closeWorkspace={closeWorkspace}
+                    openOrderForm={openOrderForm}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </div>
+          </Tabs>
+        ) : (
+          <div className={styles.tabPanelsWrapper}>
+            <DrugSearch
+              patient={patient}
+              visit={visitContext}
+              closeWorkspace={closeWorkspace}
+              openOrderForm={openOrderForm}
+              searchTerm={searchTerm}
+              onSearchTermChange={setSearchTerm}
+            />
+          </div>
+        )}
       </Workspace2>
     );
   } else {
