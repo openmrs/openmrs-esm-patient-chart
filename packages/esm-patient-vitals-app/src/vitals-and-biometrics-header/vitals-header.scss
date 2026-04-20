@@ -149,6 +149,7 @@
 
 .referenceRangeContent {
   min-width: 14rem;
+  padding-inline: layout.$spacing-04;
 }
 
 .referenceRangeHeading {
@@ -157,20 +158,25 @@
 }
 
 .referenceRangeTable {
-  width: 100%;
-  border-collapse: collapse;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.referenceRangeRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: layout.$spacing-03;
 }
 
 .referenceRangeLabel {
   @include type.type-style('body-compact-01');
-  padding: layout.$spacing-02 layout.$spacing-03 layout.$spacing-02 0;
   color: colors.$gray-30;
   white-space: nowrap;
 }
 
 .referenceRangeValue {
   @include type.type-style('body-compact-01');
-  padding: layout.$spacing-02 0 layout.$spacing-02 layout.$spacing-05;
   font-weight: 600;
   white-space: nowrap;
   text-align: right;
