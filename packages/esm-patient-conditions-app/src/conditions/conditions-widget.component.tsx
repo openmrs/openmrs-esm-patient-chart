@@ -93,11 +93,15 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     if (!selectedCondition || !conditions?.length) {
       return null;
     }
-    const matches = conditions.filter((c) => c.conceptId === selectedCondition.uuid);
-    return matches.find((c) => c.clinicalStatus.toLowerCase() === 'active') ?? matches[0] ?? null;
+    const uuid = selectedCondition.uuid;
+    return (
+      conditions.find((c) => c.conceptId === uuid && c.clinicalStatus.toLowerCase() === 'active') ??
+      conditions.find((c) => c.conceptId === uuid) ??
+      null
+    );
   }, [selectedCondition, conditions]);
 
-  const isActiveDuplicate = duplicateCondition?.clinicalStatus?.toLowerCase() === 'active';
+  const isActiveDuplicate = duplicateCondition?.clinicalStatus.toLowerCase() === 'active';
 
   const handleConditionChange = useCallback(
     (selectedCondition: CodedCondition) => {
@@ -295,12 +299,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     isActiveDuplicate
                       ? t(
                           'duplicateActiveConditionSubtitle',
-                          "{{conditionName}} is already on this patient's active problem list. Saving will create a two records for the same condition.",
+                          "{{conditionName}} is already on this patient's active problem list. Saving will create two records for the same condition.",
                           { conditionName: selectedCondition.display },
                         )
                       : t(
                           'duplicateInactiveConditionSubtitle',
-                          '{{conditionName}} was previously recorded but is now inactive. You may want to edit the existing record instead.',
+                          '{{conditionName}} was previously recorded but is now inactive. You may want to edit the existing record to reactivate it instead.',
                           { conditionName: selectedCondition.display },
                         )
                   }

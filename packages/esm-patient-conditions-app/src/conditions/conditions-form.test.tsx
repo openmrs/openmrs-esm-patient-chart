@@ -344,7 +344,6 @@ describe('Duplicate condition detection', () => {
     await user.type(conditionSearchInput, 'Hypertension');
     await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
 
-    expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
     expect(screen.getByText(/hypertension is already on this patient's active problem list/i)).toBeInTheDocument();
 
     // Save button should still be enabled (non-blocking)
@@ -384,7 +383,7 @@ describe('Duplicate condition detection', () => {
     await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
 
     expect(screen.getByText(/was previously recorded but is now inactive/i)).toBeInTheDocument();
-    expect(screen.getByText(/you may want to edit the existing record instead/i)).toBeInTheDocument();
+    expect(screen.getByText(/you may want to edit the existing record to reactivate it instead/i)).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
   });
