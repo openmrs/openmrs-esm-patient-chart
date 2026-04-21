@@ -22,7 +22,7 @@ const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStick
       showSnackbar({
         kind: 'success',
         title: t('stickyNoteDeleted', 'Sticky note deleted'),
-        subtitle: t('stickyNoteDeletedSuccessfully', 'The sticky note has been deleted successfully'),
+        subtitle: t('stickyNoteDeletedSuccessfully', 'The sticky note was deleted successfully'),
       });
       mutate();
       close();
@@ -39,7 +39,7 @@ const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStick
   }, [noteUuid, mutate, close, onClose, t]);
   return (
     <>
-      <ModalHeader closeModal={close}>{t('confirmDeleteStickyNote', 'Confirm Delete Sticky Note')}</ModalHeader>
+      <ModalHeader closeModal={close}>{t('confirmDeleteStickyNote', 'Confirm delete sticky note')}</ModalHeader>
       <ModalBody>
         <p>{t('confirmDeleteStickyNoteMessage', 'Are you sure you want to delete this sticky note?')}</p>
       </ModalBody>

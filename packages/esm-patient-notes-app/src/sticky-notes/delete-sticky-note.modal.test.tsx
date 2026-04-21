@@ -46,7 +46,7 @@ describe('DeleteStickyNoteModal', () => {
     expect(mockDeleteStickyNote).toHaveBeenCalledWith(defaultProps.noteUuid);
     expect(mockDeleteStickyNote).toHaveBeenCalledTimes(1);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
-      subtitle: 'The sticky note has been deleted successfully',
+      subtitle: 'The sticky note was deleted successfully',
       title: 'Sticky note deleted',
       kind: 'success',
     });
