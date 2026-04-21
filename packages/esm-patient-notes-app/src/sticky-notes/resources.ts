@@ -1,84 +1,73 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
-import { fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { type FHIRNoteObservation } from '../types';
 
-export const useStickyNotes = (patientUuid: string) => {
+const stickyNoteRepresentation = 'custom:(uuid,value,obsDatetime,auditInfo:(creator:(display)))';
+
+export interface StickyNoteObs {
+  uuid: string;
+  value: string;
+  obsDatetime: string;
+  auditInfo?: {
+    creator?: {
+      display?: string;
+    };
+  };
+}
+
+interface StickyNoteResponse {
+  results: Array<StickyNoteObs>;
+}
+
+export const useStickyNote = (patientUuid: string) => {
   const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
-  const url = stickyNoteConceptUuid
-    ? `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${stickyNoteConceptUuid}&_sort=-date`
-    : null;
+  const url =
+    patientUuid && stickyNoteConceptUuid
+      ? `${restBaseUrl}/obs?patient=${patientUuid}&concept=${stickyNoteConceptUuid}&v=${stickyNoteRepresentation}`
+      : null;
 
-  const { data, error, isLoading, mutate } = useSWR<{ data: fhir.Bundle }, Error>(url, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<{ data: StickyNoteResponse }, Error>(url, openmrsFetch);
+
+  const note = useMemo(
+    () =>
+      data?.data?.results
+        ?.slice()
+        .sort((a, b) => new Date(b.obsDatetime).getTime() - new Date(a.obsDatetime).getTime())[0],
+    [data?.data?.results],
+  );
+
   return {
-    notes: data?.data?.entry?.map((entry) => entry.resource) || [],
+    note,
     isLoading,
-    isError: error,
+    error,
     mutate,
   };
 };
 
-export const createStickyNote = (patientUuid: string, note: string, stickyNoteConceptUuid: string) => {
-  const stickyNotePayload: FHIRNoteObservation = {
-    resourceType: 'Observation',
-    status: 'final',
-    code: {
-      coding: [
-        {
-          code: stickyNoteConceptUuid,
-        },
-      ],
-    },
-    subject: {
-      reference: `Patient/${patientUuid}`,
-    },
-    effectiveDateTime: new Date().toISOString(),
-    valueString: note,
-  };
-
-  return openmrsFetch(`${fhirBaseUrl}/Observation`, {
+export const createStickyNote = (patientUuid: string, value: string, conceptUuid: string) => {
+  return openmrsFetch(`${restBaseUrl}/obs`, {
     method: 'POST',
-    body: stickyNotePayload,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      person: patientUuid,
+      concept: conceptUuid,
+      value,
+      obsDatetime: new Date().toISOString(),
+    }),
   });
 };
 
-export const updateStickyNote = (
-  stickyNoteUuid: string,
-  note: string,
-  stickyNoteConceptUuid: string,
-  patientUuid: string,
-) => {
-  const stickyNotePayload: FHIRNoteObservation = {
-    resourceType: 'Observation',
-    id: stickyNoteUuid,
-    status: 'final',
-    code: {
-      coding: [
-        {
-          code: stickyNoteConceptUuid,
-        },
-      ],
-    },
-    subject: {
-      reference: `Patient/${patientUuid}`,
-    },
-    effectiveDateTime: new Date().toISOString(),
-    valueString: note,
-  };
-
-  return openmrsFetch(`${fhirBaseUrl}/Observation/${stickyNoteUuid}`, {
-    method: 'PUT',
-    body: stickyNotePayload,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+export const updateStickyNote = (obsUuid: string, value: string) => {
+  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ value }),
   });
 };
-export const deleteStickyNote = (stickyNoteUuid: string) => {
-  return openmrsFetch(`${fhirBaseUrl}/Observation/${stickyNoteUuid}`, {
+
+export const deleteStickyNote = (obsUuid: string) => {
+  return openmrsFetch(`${restBaseUrl}/obs/${obsUuid}`, {
     method: 'DELETE',
   });
 };

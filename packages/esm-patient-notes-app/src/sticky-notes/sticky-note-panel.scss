@@ -12,7 +12,6 @@
     0 2px 10px 1px rgba(0, 0, 0, 0.12),
     0 2px 6px 1px rgba(171, 198, 213, 0.12);
   background-color: $ui-background;
-  border-color: black;
 }
 
 .noteContent {
@@ -39,16 +38,4 @@
 .noteActions {
   display: flex;
   gap: layout.$spacing-02;
-}
-
-.editContainer {
-  padding: layout.$spacing-04;
-}
-
-.buttonSet {
-  display: flex;
-  width: 100%;
-  :global(.cds--btn) {
-    width: 50%;
-  }
 }

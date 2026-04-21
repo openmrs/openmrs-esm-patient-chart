@@ -24,6 +24,10 @@
     {
       "name": "delete-sticky-note-modal",
       "component": "deleteStickyNoteModal"
+    },
+    {
+      "name": "sticky-note-modal",
+      "component": "stickyNoteModal"
     }
   ],
   "workspaces2": [

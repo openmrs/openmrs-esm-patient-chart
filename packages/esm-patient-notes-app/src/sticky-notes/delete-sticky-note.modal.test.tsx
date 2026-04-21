@@ -1,23 +1,13 @@
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { type ConfigObject } from '../config-schema';
-import DeleteStickyNoteModal from './delete-sticky-note.modal';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { deleteStickyNote } from './resources';
-
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+import DeleteStickyNoteModal from './delete-sticky-note.modal';
 
 jest.mock('./resources', () => ({
-  ...jest.requireActual('./resources'),
   deleteStickyNote: jest.fn(),
 }));
-
-beforeEach(() => {
-  mockUseConfig.mockReturnValue({
-    stickyNoteConceptUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  } as ConfigObject);
-});
 
 const mockDeleteStickyNote = jest.mocked(deleteStickyNote);
 const mockShowSnackbar = jest.mocked(showSnackbar);

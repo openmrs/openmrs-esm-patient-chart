@@ -1,23 +1,35 @@
-import { Button } from '@carbon/react';
-import { DocumentIcon } from '@openmrs/esm-framework';
 import React, { useCallback, useState } from 'react';
+import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useStickyNotes } from './resources';
-import styles from './sticky-note-header-button.scss';
+import { DocumentIcon, showModal } from '@openmrs/esm-framework';
+import { useStickyNote } from './resources';
 import StickyNotePanel from './sticky-note-panel.component';
+import styles from './sticky-note-header-button.scss';
 
 interface StickyNoteHeaderButtonProps {
   patientUuid: string;
 }
 
-const StickyNoteHeaderButton = ({ patientUuid }: StickyNoteHeaderButtonProps) => {
+const StickyNoteHeaderButton: React.FC<StickyNoteHeaderButtonProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const [showStickyNotes, setShowStickyNotes] = useState(false);
-  const { notes: stickyNotes } = useStickyNotes(patientUuid);
+  const [showPanel, setShowPanel] = useState(false);
+  const { note, isLoading, error, mutate } = useStickyNote(patientUuid);
 
   const handleClose = useCallback(() => {
-    setShowStickyNotes(false);
+    setShowPanel(false);
   }, []);
+
+  const handleClick = useCallback(() => {
+    if (note) {
+      setShowPanel((prev) => !prev);
+    } else {
+      const dispose = showModal('sticky-note-modal', {
+        close: () => dispose(),
+        mutate,
+        patientUuid,
+      });
+    }
+  }, [mutate, note, patientUuid]);
 
   return (
     <>
@@ -28,23 +40,27 @@ const StickyNoteHeaderButton = ({ patientUuid }: StickyNoteHeaderButtonProps) =>
           renderIcon={(props) => (
             <div>
               <DocumentIcon {...props} />
-              {stickyNotes && stickyNotes.length > 0 && (
-                <span className={styles.notificationBadge}>{stickyNotes.length}</span>
-              )}
+              {note && <span className={styles.notificationBadge}>1</span>}
             </div>
           )}
-          onClick={() => {
-            setShowStickyNotes(!showStickyNotes);
-          }}
+          onClick={handleClick}
         >
-          {t('stickyNotes', 'Sticky notes')}
+          {t('stickyNote', 'Sticky note')}
         </Button>
-        {showStickyNotes && (
-          <StickyNotePanel key={stickyNotes[0]?.id} patientUuid={patientUuid} onClose={handleClose} />
+        {showPanel && (
+          <StickyNotePanel
+            error={error}
+            isLoading={isLoading}
+            mutate={mutate}
+            note={note}
+            onClose={handleClose}
+            patientUuid={patientUuid}
+          />
         )}
       </div>
       <div style={{ clear: 'both' }} />
     </>
   );
 };
+
 export default StickyNoteHeaderButton;

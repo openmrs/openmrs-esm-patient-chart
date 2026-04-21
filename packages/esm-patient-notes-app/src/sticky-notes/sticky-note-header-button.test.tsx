@@ -1,63 +1,70 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockStickyNotesData } from '__mocks__';
-import React from 'react';
-import { useStickyNotes } from './resources';
+import { showModal } from '@openmrs/esm-framework';
+import { mockStickyNote } from '__mocks__';
+import { useStickyNote } from './resources';
 import StickyNoteHeaderButton from './sticky-note-header-button.component';
 
 jest.mock('./resources', () => ({
-  useStickyNotes: jest.fn(),
+  useStickyNote: jest.fn(),
 }));
 
 jest.mock('./sticky-note-panel.component', () => () => <div data-testid="sticky-note-panel" />);
 
-const mockUseStickyNotes = useStickyNotes as jest.Mock;
+const mockUseStickyNote = useStickyNote as jest.Mock;
+const mockShowModal = showModal as jest.Mock;
 
 describe('StickyNoteHeaderButton', () => {
   const patientUuid = '3355bd93-3c83-414d-87b1-c87e608ca85a';
 
-  it('renders button with sticky notes label', () => {
-    mockUseStickyNotes.mockReturnValue({
-      notes: mockStickyNotesData,
-    });
+  it('renders a button labelled "Sticky note"', () => {
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
-    expect(screen.getByRole('button', { name: /Sticky notes/i })).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /sticky note/i })).toBeInTheDocument();
   });
 
-  it('shows notification badge with note count when notes exist', () => {
-    mockUseStickyNotes.mockReturnValue({
-      notes: mockStickyNotesData,
-    });
+  it('shows a "1" badge when a note exists', () => {
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+
     expect(screen.getByText('1')).toBeInTheDocument();
   });
 
-  it('does not show notification badge when no notes exist', () => {
-    mockUseStickyNotes.mockReturnValue({
-      notes: [],
-    });
+  it('does not show a badge when no note exists', () => {
+    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: false, error: undefined, mutate: jest.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
+
+    expect(screen.queryByText('1')).not.toBeInTheDocument();
   });
 
-  it('shows sticky note panel when clicked', async () => {
+  it('toggles the panel on click when a note exists', async () => {
     const user = userEvent.setup();
-    mockUseStickyNotes.mockReturnValue({
-      notes: mockStickyNotesData,
-    });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+    const button = screen.getByRole('button', { name: /sticky note/i });
 
     expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
-
-    const button = screen.getByRole('button', { name: /Sticky notes/i });
-
     await user.click(button);
     expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
     await user.click(button);
+    expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
+  });
+
+  it('opens the create modal on click when no note exists', async () => {
+    const user = userEvent.setup();
+    const mutate = jest.fn();
+    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: false, error: undefined, mutate });
+
+    render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+
+    expect(mockShowModal).toHaveBeenCalledWith('sticky-note-modal', expect.objectContaining({ patientUuid, mutate }));
     expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
   });
 });
