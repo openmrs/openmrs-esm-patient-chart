@@ -24,7 +24,13 @@ const DeleteStickyNote: React.FC<DeleteStickyNoteProps> = ({ noteUuid, mutate, o
     });
   };
   return (
-    <IconButton label={t('deleteStickyNote', 'Delete sticky note')} onClick={handleDelete} kind="ghost" size="sm">
+    <IconButton
+      label={t('deleteStickyNote', 'Delete sticky note')}
+      onClick={handleDelete}
+      kind="ghost"
+      size="sm"
+      align="top-right"
+    >
       <TrashCanIcon className={styles.deleteIcon} />
     </IconButton>
   );

@@ -11,7 +11,13 @@ const EditStickyNote: React.FC<EditStickyNoteProps> = ({ onEdit }) => {
   const { t } = useTranslation();
 
   return (
-    <IconButton label={t('editStickyNote', 'Edit sticky note')} onClick={onEdit} kind="ghost" size="sm">
+    <IconButton
+      label={t('editStickyNote', 'Edit sticky note')}
+      onClick={onEdit}
+      kind="ghost"
+      size="sm"
+      align="top-right"
+    >
       <EditIcon />
     </IconButton>
   );

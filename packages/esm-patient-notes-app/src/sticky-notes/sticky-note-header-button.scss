@@ -4,10 +4,10 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .content {
-  margin-inline-end: layout.$spacing-03;
-  margin-top: layout.$spacing-03;
-  float: right;
   display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-inline-start: auto;
   position: relative;
 }
 

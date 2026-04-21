@@ -32,34 +32,31 @@ const StickyNoteHeaderButton: React.FC<StickyNoteHeaderButtonProps> = ({ patient
   }, [mutate, note, patientUuid]);
 
   return (
-    <>
-      <div className={styles.content}>
-        <Button
-          kind="ghost"
-          size="sm"
-          renderIcon={(props) => (
-            <div>
-              <DocumentIcon {...props} />
-              {note && <span className={styles.notificationBadge}>1</span>}
-            </div>
-          )}
-          onClick={handleClick}
-        >
-          {t('stickyNote', 'Sticky note')}
-        </Button>
-        {showPanel && (
-          <StickyNotePanel
-            error={error}
-            isLoading={isLoading}
-            mutate={mutate}
-            note={note}
-            onClose={handleClose}
-            patientUuid={patientUuid}
-          />
+    <div className={styles.content}>
+      <Button
+        kind="ghost"
+        size="sm"
+        renderIcon={(props) => (
+          <div>
+            <DocumentIcon {...props} />
+            {note && <span className={styles.notificationBadge}>1</span>}
+          </div>
         )}
-      </div>
-      <div style={{ clear: 'both' }} />
-    </>
+        onClick={handleClick}
+      >
+        {t('stickyNote', 'Sticky note')}
+      </Button>
+      {showPanel && (
+        <StickyNotePanel
+          error={error}
+          isLoading={isLoading}
+          mutate={mutate}
+          note={note}
+          onClose={handleClose}
+          patientUuid={patientUuid}
+        />
+      )}
+    </div>
   );
 };
 
