@@ -24,6 +24,45 @@ function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: strin
   return orders;
 }
 
+/**
+ * Groups all pending basket orders by their resolved encounter type UUID.
+ * Orders whose grouping key is not present in `encounterTypeMap` fall back to `defaultEncounterType`.
+ */
+function getOrdersGroupedByEncounterType(
+  patientUuid: string,
+  ordererUuid: string,
+  defaultEncounterType: string,
+  encounterTypeMap: Array<{ orderBasketGrouping: string; encounterTypeUuid: string }>,
+): Map<string, Array<OrderPost>> {
+  const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
+  const patientItems = items[patientUuid] ?? {};
+  const groupingToEncounterType = new Map(
+    encounterTypeMap.map(({ orderBasketGrouping, encounterTypeUuid }) => [orderBasketGrouping, encounterTypeUuid]),
+  );
+
+  const result = new Map<string, Array<OrderPost>>();
+
+  Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
+    const encounterType = groupingToEncounterType.get(grouping) ?? defaultEncounterType;
+
+    if (!result.has(encounterType)) {
+      result.set(encounterType, []);
+    }
+
+    const dataPrepFn = postDataPrepFunctions[grouping];
+    if (typeof dataPrepFn !== 'function') {
+      console.warn(`The postDataPrep function registered for ${grouping} orders is not a function`);
+      return;
+    }
+
+    groupOrders.forEach((order) => {
+      result.get(encounterType).push(dataPrepFn(order, patientUuid, null, ordererUuid));
+    });
+  });
+
+  return result;
+}
+
 export async function postOrdersOnNewEncounter(
   patientUuid: string,
   orderEncounterType: string,
@@ -62,6 +101,77 @@ export async function postOrdersOnNewEncounter(
 
   return postEncounter(encounterPostData, abortController);
 }
+export interface PostOrdersOnNewEncountersByTypeOptions {
+  patientUuid: string;
+  defaultOrderEncounterType: string;
+  currentVisit: Visit | null;
+  orderLocationUuid: string;
+  ordererUuid: string;
+  /** Maps order basket grouping keys to encounter type UUIDs. Defaults to `[]` (single encounter). */
+  orderTypeEncounterTypeMap?: Array<{ orderBasketGrouping: string; encounterTypeUuid: string }>;
+  abortController?: AbortController;
+  /**
+   * If not specified, the encounterDate will either be set to `now` if currentVisit is active,
+   * or the start of the visit.
+   */
+  encounterDate?: Date;
+}
+
+/**
+ * Like {@link postOrdersOnNewEncounter} but supports a per-order-type encounter type mapping.
+ *
+ * When `orderTypeEncounterTypeMap` is non-empty, basket orders are grouped by their store
+ * grouping key and each unique encounter type gets its own encounter POST.  Orders whose
+ * grouping is not listed in the map fall back to `defaultOrderEncounterType`.
+ *
+ * When `orderTypeEncounterTypeMap` is empty (the default), all orders are placed in a single
+ * encounter using `defaultOrderEncounterType`, preserving the original behaviour.
+ *
+ * @returns All created encounters (one per unique encounter type that received at least one order).
+ */
+export async function postOrdersOnNewEncountersByType({
+  patientUuid,
+  defaultOrderEncounterType,
+  currentVisit,
+  orderLocationUuid,
+  ordererUuid,
+  orderTypeEncounterTypeMap = [],
+  abortController,
+  encounterDate,
+}: PostOrdersOnNewEncountersByTypeOptions): Promise<Array<Encounter>> {
+  if (!encounterDate) {
+    if (currentVisit?.stopDatetime) {
+      encounterDate = parseDate(currentVisit.startDatetime);
+    } else {
+      encounterDate = null;
+    }
+  }
+
+  const ordersByEncounterType = getOrdersGroupedByEncounterType(
+    patientUuid,
+    ordererUuid,
+    defaultOrderEncounterType,
+    orderTypeEncounterTypeMap,
+  );
+
+  const encounterPromises = Array.from(ordersByEncounterType.entries())
+    .filter(([, orders]) => orders.length > 0)
+    .map(([encounterTypeUuid, orders]) => {
+      const encounterPostData: EncounterPost = {
+        patient: patientUuid,
+        location: orderLocationUuid,
+        encounterType: encounterTypeUuid,
+        ...(encounterDate ? { encounterDatetime: encounterDate } : {}),
+        visit: currentVisit?.uuid,
+        obs: [],
+        orders,
+      };
+      return postEncounter(encounterPostData, abortController);
+    });
+
+  return Promise.all(encounterPromises);
+}
+
 interface ObsPayload {
   concept: Concept | string;
   value?: string | OpenmrsResource;

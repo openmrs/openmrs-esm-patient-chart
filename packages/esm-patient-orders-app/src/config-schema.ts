@@ -68,6 +68,24 @@ export const configSchema = {
     _description:
       'Controls whether users can add extra tests while entering lab results in the test-results workspace.',
   },
+  orderTypeEncounterTypeMap: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      orderBasketGrouping: {
+        _type: Type.String,
+        _description:
+          'The order basket store grouping key. For general order types this is the orderTypeUuid. For drug orders this is "medications".',
+      },
+      encounterTypeUuid: {
+        _type: Type.UUID,
+        _description: 'The encounter type UUID to use for orders in this grouping.',
+      },
+    },
+    _description:
+      'Maps order basket grouping keys to specific encounter type UUIDs, enabling a separate encounter per order type. Orders whose grouping is not listed here fall back to orderEncounterType. Leave empty (the default) to preserve the original single-encounter behaviour.',
+    _default: [],
+  },
   ordererProviderRoles: {
     _type: Type.Array,
     _description:
@@ -101,6 +119,12 @@ export interface OrderTypeDefinition {
   accentColor?: AccentColor;
 }
 
+export interface OrderTypeEncounterTypeMapping {
+  /** The order basket store grouping key (e.g. the orderTypeUuid for general orders, 'medications' for drug orders). */
+  orderBasketGrouping: string;
+  encounterTypeUuid: string;
+}
+
 export interface ConfigObject {
   orderEncounterType: string;
   careSettingUuid: string;
@@ -108,6 +132,7 @@ export interface ConfigObject {
   orderTypes: Array<OrderTypeDefinition>;
   showReferenceNumberField: boolean;
   enableAddTestsDuringResultEntry: boolean;
+  orderTypeEncounterTypeMap: Array<OrderTypeEncounterTypeMapping>;
   ordererProviderRoles: Array<string>;
   orderLocationTagName: string;
   enableDrugOrderFavorites: boolean;

@@ -23,7 +23,7 @@ import {
   type OrderBasketExtensionProps,
   type OrderBasketItem,
   postOrders,
-  postOrdersOnNewEncounter,
+  postOrdersOnNewEncountersByType,
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
@@ -56,7 +56,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orderTypes, orderEncounterType, ordererProviderRoles, orderLocationTagName } = useConfig<ConfigObject>();
+  const { orderTypes, orderEncounterType, orderTypeEncounterTypeMap, ordererProviderRoles, orderLocationTagName } =
+    useConfig<ConfigObject>();
   const {
     currentProvider: _currentProvider,
     sessionLocation,
@@ -112,14 +113,15 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     // If orderEncounterUuid is present, then just post the orders to that encounter.
     if (!orderEncounterUuid) {
       try {
-        const postedEncounter = await postOrdersOnNewEncounter(
+        const postedEncounters = await postOrdersOnNewEncountersByType({
           patientUuid,
-          orderEncounterType,
-          visitContext,
+          defaultOrderEncounterType: orderEncounterType,
+          currentVisit: visitContext,
           orderLocationUuid,
-          orderer.uuid,
+          ordererUuid: orderer.uuid,
+          orderTypeEncounterTypeMap,
           abortController,
-        );
+        });
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
         // Only revalidate current visit since orders create new encounters
@@ -127,7 +129,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
         invalidateVisitAndEncounterData(mutate, patientUuid);
         clearOrders();
         await mutateOrders();
-        onOrderBasketSubmitted?.(postedEncounter.uuid, postedEncounter.orders);
+        const allPostedOrders = postedEncounters.flatMap((e) => e.orders ?? []);
+        onOrderBasketSubmitted?.(postedEncounters[0]?.uuid, allPostedOrders);
 
         /* Translation keys used by showOrderSuccessToast:
          * t('discontinued', 'Discontinued')
@@ -188,6 +191,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     clearOrders,
     closeWorkspace,
     orderEncounterType,
+    orderTypeEncounterTypeMap,
     orderEncounterUuid,
     mutateEncounterUuid,
     mutateOrders,
