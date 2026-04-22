@@ -134,11 +134,13 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
 
   if (!attachments.length) {
     return (
-      <EmptyState
-        displayText={t('attachmentsInLowerCase', 'attachments')}
-        headerTitle={t('attachmentsInProperFormat', 'Attachments')}
-        launchForm={showAddAttachmentModal}
-      />
+      <UserHasAccess privilege="Create Attachments">
+        <EmptyState
+          displayText={t('attachmentsInLowerCase', 'attachments')}
+          headerTitle={t('attachmentsInProperFormat', 'Attachments')}
+          launchForm={showAddAttachmentModal}
+        />
+      </UserHasAccess>
     );
   }
 
@@ -162,16 +164,18 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
                 </IconSwitch>
               </ContentSwitcher>
               <div className={styles.divider} />
-              <Button
-                kind="ghost"
-                renderIcon={AddIcon}
-                iconDescription={t('addAttachment', 'Add attachment')}
-                onClick={showAddAttachmentModal}
-                size={desktop ? 'sm' : 'md'}
-                hasIconOnly={!desktop}
-              >
-                {desktop && t('add', 'Add')}
-              </Button>
+              <UserHasAccess privilege="Create Attachments">
+                <Button
+                  kind="ghost"
+                  renderIcon={AddIcon}
+                  iconDescription={t('addAttachment', 'Add attachment')}
+                  onClick={showAddAttachmentModal}
+                  size={desktop ? 'sm' : 'md'}
+                  hasIconOnly={!desktop}
+                >
+                  {desktop && t('add', 'Add')}
+                </Button>
+              </UserHasAccess>
             </div>
           </CardHeader>
           {view === 'grid' ? (
