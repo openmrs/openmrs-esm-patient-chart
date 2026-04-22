@@ -65,7 +65,7 @@ describe('<DeleteConditionModal />', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
 
-    mockDeleteCondition.mockRejectedValue(new Error('Internal server error'));
+    mockDeleteCondition.mockRejectedValue({ message: 'Internal server error', status: 500 });
 
     render(<DeleteConditionModal {...defaultProps} />);
 

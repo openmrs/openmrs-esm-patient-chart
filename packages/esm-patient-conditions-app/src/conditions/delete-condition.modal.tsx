@@ -8,7 +8,7 @@ import styles from './delete-condition.scss';
 interface DeleteConditionModalProps {
   closeDeleteModal: () => void;
   conditionId: string;
-  patientUuid: string;
+  patientUuid?: string;
 }
 
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
@@ -17,6 +17,11 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
+    if (!patientUuid) {
+      console.error('DeleteConditionModal opened without patientUuid');
+      return;
+    }
+
     setIsDeleting(true);
 
     try {
@@ -34,12 +39,12 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingCondition', 'Error deleting condition'),
-        subtitle: error instanceof Error ? error.message : undefined,
+        subtitle: error?.message,
       });
     } finally {
       setIsDeleting(false);
     }
-  }, [closeDeleteModal, conditionId, mutate, t]);
+  }, [closeDeleteModal, conditionId, mutate, patientUuid, t]);
 
   return (
     <div>
