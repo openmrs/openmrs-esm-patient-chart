@@ -42,10 +42,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 
 describe('VisitContextSwitcherModal', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should display a list of past visits', () => {
     mockUseSystemVisitSetting.mockReturnValueOnce({
       systemVisitEnabled: false,

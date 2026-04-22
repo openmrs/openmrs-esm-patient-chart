@@ -3,7 +3,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, NumericObservation, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formattedBiometrics, mockBiometricsConfig, mockConceptUnits } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
@@ -196,6 +196,55 @@ describe('Biometrics Overview', () => {
     expect(screen.getByRole('columnheader', { name: /weight/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /height/i })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: /muac/i })).toBeInTheDocument();
+  });
+
+  it('passes interpretation and concept UUID to NumericObservation for each biometric cell', async () => {
+    const mockNumericObservation = jest.mocked(NumericObservation);
+    mockNumericObservation.mockClear();
+
+    const defaults = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
+
+    mockUseConfig.mockReturnValue({
+      ...defaults,
+      ...mockBiometricsConfig,
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        {
+          id: 'enc-1',
+          date: '2021-08-12T00:00:00.000Z',
+          weight: 90,
+          height: 186,
+          bmi: 17,
+          bmiRenderInterpretation: 'critically_low',
+          muac: 17,
+        },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} />);
+    await waitForLoadingToFinish();
+    await screen.findByRole('table', { name: /biometrics/i });
+
+    expect(mockNumericObservation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: 17,
+        interpretation: 'critically_low',
+        conceptUuid: defaults.concepts.bodyMassIndexUuid,
+        variant: 'cell',
+        patientUuid: mockPatient.id,
+      }),
+      expect.anything(),
+    );
+    expect(mockNumericObservation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: 90,
+        conceptUuid: defaults.concepts.weightUuid,
+        variant: 'cell',
+      }),
+      expect.anything(),
+    );
   });
 
   it('shows BMI column for a 20-month-old patient when bmiMinimumAge is 1', async () => {

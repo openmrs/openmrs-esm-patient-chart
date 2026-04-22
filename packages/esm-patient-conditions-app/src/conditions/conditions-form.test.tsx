@@ -246,6 +246,28 @@ describe('Conditions form', () => {
     });
   });
 
+  it('requires selecting a condition result before submitting typed search text', async () => {
+    const user = userEvent.setup();
+
+    mockCreateCondition.mockClear();
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: [],
+      error: null,
+      isSearching: false,
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.type(conditionSearchInput, 'Definitely not a condition');
+    await user.click(submitButton);
+
+    expect(await screen.findByText(/a condition is required/i)).toBeInTheDocument();
+    expect(mockCreateCondition).not.toHaveBeenCalled();
+  });
+
   it('launching the form with an existing condition prepopulates the form with the condition details', async () => {
     const user = userEvent.setup();
 
