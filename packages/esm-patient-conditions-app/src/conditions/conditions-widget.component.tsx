@@ -248,7 +248,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       }}
                       placeholder={t('searchConditions', 'Search conditions')}
                       ref={searchInputRef}
-                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
+                      renderIcon={errors?.conditionUuid && ((props) => <WarningFilled fill="red" {...props} />)}
                       value={selectedCondition?.display ?? value ?? ''}
                     />
                   </ResponsiveWrapper>
