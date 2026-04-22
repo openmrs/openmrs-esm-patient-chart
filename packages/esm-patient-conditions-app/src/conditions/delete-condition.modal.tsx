@@ -26,8 +26,7 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
 
     try {
       await deleteCondition(conditionId);
-      await mutate();
-
+      void mutate();
       closeDeleteModal();
       showSnackbar({
         isLowContrast: true,
@@ -36,17 +35,16 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
       });
     } catch (error) {
       console.error('Error deleting condition: ', error);
-
       showSnackbar({
         isLowContrast: false,
         kind: 'error',
         title: t('errorDeletingCondition', 'Error deleting condition'),
-        subtitle: error && typeof error === 'object' && 'message' in error ? (error as any).message : String(error),
+        subtitle: (error as { message?: string } | undefined)?.message,
       });
     } finally {
       setIsDeleting(false);
     }
-  }, [closeDeleteModal, conditionId, mutate, t, patientUuid]);
+  }, [closeDeleteModal, conditionId, mutate, patientUuid, t]);
 
   return (
     <div>
@@ -65,7 +63,6 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
             <span>{t('delete', 'Delete')}</span>
           )}
         </Button>
-        {isDeleting && <div style={{ display: 'none' }} data-testid="delete-in-progress" />}
       </ModalFooter>
     </div>
   );
