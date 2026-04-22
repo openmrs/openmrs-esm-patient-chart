@@ -240,15 +240,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       placeholder={t('searchConditions', 'Search conditions')}
                       ref={searchInputRef}
                       renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
-                      value={(() => {
-                        if (selectedCondition) {
-                          return selectedCondition.display;
-                        }
-                        if (debouncedSearchTerm) {
-                          return value;
-                        }
-                        return '';
-                      })()}
+                      value={selectedCondition?.display ?? value ?? ''}
                     />
                   </ResponsiveWrapper>
                 )}
