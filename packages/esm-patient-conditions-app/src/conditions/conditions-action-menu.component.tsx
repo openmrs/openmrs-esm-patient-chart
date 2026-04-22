@@ -7,7 +7,7 @@ import styles from './conditions-action-menu.scss';
 
 interface conditionsActionMenuProps {
   condition: Condition;
-  patientUuid?: string;
+  patientUuid: string;
 }
 
 export const ConditionsActionMenu = ({ condition, patientUuid }: conditionsActionMenuProps) => {
