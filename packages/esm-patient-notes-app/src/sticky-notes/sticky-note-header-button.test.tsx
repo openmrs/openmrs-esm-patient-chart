@@ -1,8 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal, useOnClickOutside } from '@openmrs/esm-framework';
+import { showModal, useConfig, useOnClickOutside } from '@openmrs/esm-framework';
 import { mockStickyNote } from '__mocks__';
+import { mockPatient } from 'tools';
+import { type ConfigObject } from '../config-schema';
 import { useStickyNote } from './sticky-note.resource';
 import StickyNoteHeaderButton from './sticky-note-header-button.component';
 
@@ -15,6 +17,7 @@ jest.mock('./sticky-note-panel.component', () => () => <div data-testid="sticky-
 const mockUseStickyNote = useStickyNote as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
 const mockUseOnClickOutside = useOnClickOutside as jest.Mock;
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 // The framework's jest mock of useOnClickOutside is a no-op. Swap in a minimal real
 // implementation so the "closes on outside click" test can exercise the wiring.
@@ -33,7 +36,21 @@ const useRealOnClickOutside = <T extends HTMLElement>(handler: (e: MouseEvent) =
 };
 
 describe('StickyNoteHeaderButton', () => {
-  const patientUuid = '3355bd93-3c83-414d-87b1-c87e608ca85a';
+  const patientUuid = mockPatient.id;
+
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({ stickyNoteConceptUuid: 'concept-uuid' } as ConfigObject);
+  });
+
+  it('does not render when stickyNoteConceptUuid is disabled via empty string', () => {
+    mockUseConfig.mockReturnValue({ stickyNoteConceptUuid: '' } as ConfigObject);
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+
+    const { container } = render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('button', { name: /sticky note/i })).not.toBeInTheDocument();
+  });
 
   it('renders a button labelled "Sticky note"', () => {
     mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });

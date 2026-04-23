@@ -3,12 +3,13 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal } from '@openmrs/esm-framework';
 import { mockStickyNote } from '__mocks__';
+import { mockPatient } from 'tools';
 import StickyNotePanel from './sticky-note-panel.component';
 
 const mockShowModal = showModal as jest.Mock;
 
 describe('StickyNotePanel', () => {
-  const patientUuid = 'patient-uuid';
+  const patientUuid = mockPatient.id;
   const onClose = jest.fn();
   const mutate = jest.fn();
 

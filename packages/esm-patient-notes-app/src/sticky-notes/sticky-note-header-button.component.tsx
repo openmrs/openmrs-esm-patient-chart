@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { DocumentIcon, showModal, useOnClickOutside } from '@openmrs/esm-framework';
+import { DocumentIcon, showModal, useConfig, useOnClickOutside } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { useStickyNote } from './sticky-note.resource';
 import StickyNotePanel from './sticky-note-panel.component';
 import styles from './sticky-note-header-button.scss';
@@ -86,4 +87,14 @@ const StickyNoteHeaderButton: React.FC<StickyNoteHeaderButtonProps> = ({ patient
   );
 };
 
-export default StickyNoteHeaderButton;
+// Gate the button on config so distros that don't configure a concept don't see a feature that
+// would silently fail on save. When unconfigured, nothing renders — no button, no SWR request.
+const StickyNoteHeaderButtonGate: React.FC<StickyNoteHeaderButtonProps> = (props) => {
+  const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
+  if (!stickyNoteConceptUuid) {
+    return null;
+  }
+  return <StickyNoteHeaderButton {...props} />;
+};
+
+export default StickyNoteHeaderButtonGate;

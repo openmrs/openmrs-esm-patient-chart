@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockStickyNote } from '__mocks__';
+import { mockPatient } from 'tools';
 import { type ConfigObject } from '../config-schema';
 import { createStickyNote, updateStickyNote } from './sticky-note.resource';
 import StickyNoteModal from './sticky-note.modal';
@@ -18,7 +19,7 @@ const mockCreateStickyNote = jest.mocked(createStickyNote);
 const mockUpdateStickyNote = jest.mocked(updateStickyNote);
 
 describe('StickyNoteModal', () => {
-  const patientUuid = 'patient-uuid';
+  const patientUuid = mockPatient.id;
   const defaultProps = {
     close: jest.fn(),
     mutate: jest.fn(),
