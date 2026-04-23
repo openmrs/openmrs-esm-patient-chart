@@ -39,3 +39,16 @@
   display: flex;
   gap: layout.$spacing-02;
 }
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: layout.$spacing-06 layout.$spacing-05;
+  gap: layout.$spacing-03;
+}
+
+.errorTitle {
+  @include type.type-style('body-short-01');
+}

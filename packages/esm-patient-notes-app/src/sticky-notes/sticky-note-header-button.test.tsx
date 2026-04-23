@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useOnClickOutside } from '@openmrs/esm-framework';
 import { mockStickyNote } from '__mocks__';
-import { useStickyNote } from './resources';
+import { useStickyNote } from './sticky-note.resource';
 import StickyNoteHeaderButton from './sticky-note-header-button.component';
 
-jest.mock('./resources', () => ({
+jest.mock('./sticky-note.resource', () => ({
   useStickyNote: jest.fn(),
 }));
 
@@ -14,6 +14,23 @@ jest.mock('./sticky-note-panel.component', () => () => <div data-testid="sticky-
 
 const mockUseStickyNote = useStickyNote as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
+const mockUseOnClickOutside = useOnClickOutside as jest.Mock;
+
+// The framework's jest mock of useOnClickOutside is a no-op. Swap in a minimal real
+// implementation so the "closes on outside click" test can exercise the wiring.
+const useRealOnClickOutside = <T extends HTMLElement>(handler: (e: MouseEvent) => void, active: boolean) => {
+  const ref = React.useRef<T>(null);
+  React.useEffect(() => {
+    if (!active) return;
+    const listener = (e: MouseEvent) => {
+      if (ref.current && e.target instanceof Node && ref.current.contains(e.target)) return;
+      handler(e);
+    };
+    window.addEventListener('mousedown', listener);
+    return () => window.removeEventListener('mousedown', listener);
+  }, [handler, active]);
+  return ref;
+};
 
 describe('StickyNoteHeaderButton', () => {
   const patientUuid = '3355bd93-3c83-414d-87b1-c87e608ca85a';
@@ -66,5 +83,82 @@ describe('StickyNoteHeaderButton', () => {
 
     expect(mockShowModal).toHaveBeenCalledWith('sticky-note-modal', expect.objectContaining({ patientUuid, mutate }));
     expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
+  });
+
+  it('opens the panel (not the create modal) while loading', async () => {
+    const user = userEvent.setup();
+    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: true, error: undefined, mutate: jest.fn() });
+
+    render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+
+    expect(mockShowModal).not.toHaveBeenCalled();
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
+  });
+
+  it('opens the panel (not the create modal) when the fetch failed', async () => {
+    const user = userEvent.setup();
+    mockUseStickyNote.mockReturnValue({
+      note: undefined,
+      isLoading: false,
+      error: new Error('Failed'),
+      mutate: jest.fn(),
+    });
+
+    render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+
+    expect(mockShowModal).not.toHaveBeenCalled();
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
+  });
+
+  it('closes the panel on Escape', async () => {
+    const user = userEvent.setup();
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+
+    render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
+  });
+
+  it('closes the panel on outside click', async () => {
+    const user = userEvent.setup();
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
+
+    render(
+      <div>
+        <StickyNoteHeaderButton patientUuid={patientUuid} />
+        <button type="button">Outside</button>
+      </div>,
+    );
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /outside/i }));
+    expect(screen.queryByTestId('sticky-note-panel')).not.toBeInTheDocument();
+  });
+
+  it('ignores outside clicks that land inside an open modal', async () => {
+    const user = userEvent.setup();
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
+
+    render(
+      <div>
+        <StickyNoteHeaderButton patientUuid={patientUuid} />
+        <div role="dialog">
+          <button type="button">In modal</button>
+        </div>
+      </div>,
+    );
+    await user.click(screen.getByRole('button', { name: /sticky note/i }));
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /in modal/i }));
+    expect(screen.getByTestId('sticky-note-panel')).toBeInTheDocument();
   });
 });

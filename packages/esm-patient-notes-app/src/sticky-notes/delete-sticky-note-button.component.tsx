@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconButton } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
 import { showModal, TrashCanIcon } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 import styles from './delete-sticky-note-button.scss';
 
 interface DeleteStickyNoteProps {
@@ -29,7 +29,7 @@ const DeleteStickyNote: React.FC<DeleteStickyNoteProps> = ({ noteUuid, mutate, o
       onClick={handleDelete}
       kind="ghost"
       size="sm"
-      align="top-right"
+      align="top-end"
     >
       <TrashCanIcon className={styles.deleteIcon} />
     </IconButton>

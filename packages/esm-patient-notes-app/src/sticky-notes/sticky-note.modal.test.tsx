@@ -4,10 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { mockStickyNote } from '__mocks__';
 import { type ConfigObject } from '../config-schema';
-import { createStickyNote, updateStickyNote } from './resources';
+import { createStickyNote, updateStickyNote } from './sticky-note.resource';
 import StickyNoteModal from './sticky-note.modal';
 
-jest.mock('./resources', () => ({
+jest.mock('./sticky-note.resource', () => ({
   createStickyNote: jest.fn(),
   updateStickyNote: jest.fn(),
 }));
@@ -35,6 +35,26 @@ describe('StickyNoteModal', () => {
     render(<StickyNoteModal {...defaultProps} />);
 
     expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+  });
+
+  it('keeps Save disabled when the input is only whitespace', async () => {
+    const user = userEvent.setup();
+    render(<StickyNoteModal {...defaultProps} />);
+
+    await user.type(screen.getByRole('textbox'), '   ');
+
+    expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+  });
+
+  it('keeps Save disabled in edit mode when the value is cleared to whitespace', async () => {
+    const user = userEvent.setup();
+    render(<StickyNoteModal {...defaultProps} existingNote={mockStickyNote} />);
+
+    const textarea = screen.getByRole('textbox');
+    await user.clear(textarea);
+    await user.type(textarea, '   ');
+
     expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
   });
 

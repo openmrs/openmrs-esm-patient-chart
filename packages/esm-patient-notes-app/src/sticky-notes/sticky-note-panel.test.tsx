@@ -26,10 +26,14 @@ describe('StickyNotePanel', () => {
     expect(screen.queryByText(/simple notes/i)).not.toBeInTheDocument();
   });
 
-  it('shows an error state when the fetch fails', () => {
+  it('shows an inline error with a retry button when the fetch fails', async () => {
+    const user = userEvent.setup();
     render(<StickyNotePanel {...defaultProps} error={new Error('Failed')} note={undefined} />);
 
-    expect(screen.getByText(/error state/i)).toBeInTheDocument();
+    expect(screen.getByText(/couldn't load sticky note/i)).toBeInTheDocument();
+    const retry = screen.getByRole('button', { name: /retry/i });
+    await user.click(retry);
+    expect(mutate).toHaveBeenCalledTimes(1);
   });
 
   it('renders nothing when no note exists and not loading', () => {

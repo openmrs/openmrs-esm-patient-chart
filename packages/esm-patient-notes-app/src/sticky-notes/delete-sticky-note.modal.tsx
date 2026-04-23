@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
-import { deleteStickyNote } from './resources';
+import { deleteStickyNote } from './sticky-note.resource';
 
 interface DeleteStickyNoteModalProps {
   close: () => void;
@@ -44,10 +44,10 @@ const DeleteStickyNoteModal = ({ close, noteUuid, mutate, onClose }: DeleteStick
         <p>{t('confirmDeleteStickyNoteMessage', 'Are you sure you want to delete this sticky note?')}</p>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={close}>
+        <Button kind="secondary" onClick={close} disabled={isDeleting}>
           {getCoreTranslation('cancel')}
         </Button>
-        <Button kind="danger" onClick={confirmDelete}>
+        <Button kind="danger" onClick={confirmDelete} disabled={isDeleting}>
           {isDeleting ? (
             <InlineLoading description={t('deleting', 'Deleting') + '...'} />
           ) : (

@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { DocumentIcon, showModal } from '@openmrs/esm-framework';
-import { useStickyNote } from './resources';
+import { DocumentIcon, showModal, useOnClickOutside } from '@openmrs/esm-framework';
+import { useStickyNote } from './sticky-note.resource';
 import StickyNotePanel from './sticky-note-panel.component';
 import styles from './sticky-note-header-button.scss';
 
@@ -19,20 +19,46 @@ const StickyNoteHeaderButton: React.FC<StickyNoteHeaderButtonProps> = ({ patient
     setShowPanel(false);
   }, []);
 
-  const handleClick = useCallback(() => {
-    if (note) {
-      setShowPanel((prev) => !prev);
-    } else {
-      const dispose = showModal('sticky-note-modal', {
-        close: () => dispose(),
-        mutate,
-        patientUuid,
-      });
+  const handleOutsideClick = useCallback((event: MouseEvent) => {
+    // Ignore clicks inside any open Carbon modal so opening the edit/delete modal doesn't dismiss the panel.
+    if ((event.target as HTMLElement | null)?.closest('[role="dialog"]')) {
+      return;
     }
-  }, [mutate, note, patientUuid]);
+    setShowPanel(false);
+  }, []);
+
+  const containerRef = useOnClickOutside<HTMLDivElement>(handleOutsideClick, showPanel);
+
+  const handleClick = useCallback(() => {
+    // Any state other than "definitely no note" shows the panel, which already renders skeleton / error / note.
+    if (isLoading || error || note) {
+      setShowPanel((prev) => !prev);
+      return;
+    }
+    const dispose = showModal('sticky-note-modal', {
+      close: () => dispose(),
+      mutate,
+      patientUuid,
+    });
+  }, [error, isLoading, mutate, note, patientUuid]);
+
+  useEffect(() => {
+    if (!showPanel) {
+      return;
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowPanel(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showPanel]);
 
   return (
-    <div className={styles.content}>
+    <div className={styles.content} ref={containerRef}>
       <Button
         kind="ghost"
         size="sm"

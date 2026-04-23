@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { deleteStickyNote } from './resources';
+import { deleteStickyNote } from './sticky-note.resource';
 import DeleteStickyNoteModal from './delete-sticky-note.modal';
 
-jest.mock('./resources', () => ({
+jest.mock('./sticky-note.resource', () => ({
   deleteStickyNote: jest.fn(),
 }));
 

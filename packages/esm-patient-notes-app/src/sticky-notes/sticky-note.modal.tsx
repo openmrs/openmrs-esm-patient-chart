@@ -3,7 +3,7 @@ import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, TextArea } 
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { createStickyNote, type StickyNoteObs, updateStickyNote } from './resources';
+import { createStickyNote, type StickyNoteObs, updateStickyNote } from './sticky-note.resource';
 import styles from './sticky-note.modal.scss';
 
 const MAX_NOTE_LENGTH = 300;
@@ -61,7 +61,7 @@ const StickyNoteModal: React.FC<StickyNoteModalProps> = ({ close, existingNote, 
       <ModalBody>
         <TextArea
           id="sticky-note-text"
-          labelText=""
+          labelText={t('stickyNote', 'Sticky note')}
           hideLabel
           value={value}
           onChange={(e) => setValue(e.target.value)}

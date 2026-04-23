@@ -3,12 +3,15 @@ import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 
-const stickyNoteRepresentation = 'custom:(uuid,value,obsDatetime,auditInfo:(creator:(display)))';
+const stickyNoteRepresentation =
+  'custom:(uuid,value,obsDatetime,encounter:(uuid),formNamespaceAndPath,auditInfo:(creator:(display)))';
 
 export interface StickyNoteObs {
   uuid: string;
   value: string;
   obsDatetime: string;
+  encounter?: { uuid: string } | null;
+  formNamespaceAndPath?: string | null;
   auditInfo?: {
     creator?: {
       display?: string;
@@ -19,6 +22,11 @@ export interface StickyNoteObs {
 interface StickyNoteResponse {
   results: Array<StickyNoteObs>;
 }
+
+// Exclude obs attached to an encounter or created by a form engine. The sticky-note UI only
+// writes standalone obs, so this guards against another feature (e.g. the visit note) writing
+// to the same concept UUID.
+export const isStandaloneStickyNote = (obs: StickyNoteObs) => !obs.encounter && !obs.formNamespaceAndPath;
 
 export const useStickyNote = (patientUuid: string) => {
   const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
@@ -32,7 +40,8 @@ export const useStickyNote = (patientUuid: string) => {
   const note = useMemo(
     () =>
       data?.data?.results
-        ?.slice()
+        ?.filter(isStandaloneStickyNote)
+        .slice()
         .sort((a, b) => new Date(b.obsDatetime).getTime() - new Date(a.obsDatetime).getTime())[0],
     [data?.data?.results],
   );
