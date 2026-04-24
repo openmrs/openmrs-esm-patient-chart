@@ -135,7 +135,7 @@ const FilterNodeParent = ({ root, itemNumber }: FilterNodeParentProps) => {
   return (
     <div>
       <div className={classNames(styles.treeNodeHeader, { [styles.treeNodeHeaderTablet]: tablet })}>
-        <h5>{t(root.display)}</h5>
+        <h4>{t(root.display)}</h4>
         {hasChildren && (
           <Button
             className={styles.button}

@@ -13,7 +13,7 @@ const OfflineFormsOverviewCard: React.FC = () => {
     <Layer>
       <Tile className={styles.overviewCard}>
         <div className={styles.headerContainer}>
-          <h3 className={styles.heading}>{t('forms', 'Forms')}</h3>
+          <h2 className={styles.heading}>{t('forms', 'Forms')}</h2>
           <Button
             className={styles.viewButton}
             kind="ghost"
@@ -46,7 +46,7 @@ export interface HeaderedQuickInfoProps {
 const HeaderedQuickInfo: React.FC<HeaderedQuickInfoProps> = ({ header, children, isLoading = false }) => {
   return (
     <div>
-      <h4 className={styles.label}>{header}</h4>
+      <h3 className={styles.label}>{header}</h3>
       {isLoading ? <SkeletonText heading /> : <span className={styles.heading}>{children}</span>}
     </div>
   );

@@ -38,7 +38,7 @@
 }
 
 .desktopTile .container {
-  h4 {
+  h2 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
   }
@@ -47,7 +47,7 @@
 .tabletTile .container {
   padding: layout.$spacing-03;
 
-  h4 {
+  h2 {
     @include type.type-style('heading-03');
     color: $ui-05;
   }

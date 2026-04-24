@@ -28,7 +28,7 @@ const ActiveVisitTag: React.FC<ActiveVisitTagProps> = ({ activeVisit }) => {
       </ToggletipButton>
       <ToggletipContent>
         <div role="tooltip">
-          <h6 className={styles.heading}>{activeVisit?.visitType?.display}</h6>
+          <span className={styles.heading}>{activeVisit?.visitType?.display}</span>
           <span>
             <span className={styles.tooltipSmallText}>{t('started', 'Started')}: </span>
             <span>{formatDatetime(parseDate(activeVisit?.startDatetime), { mode: 'wide' })}</span>

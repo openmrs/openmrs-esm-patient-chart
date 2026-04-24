@@ -430,7 +430,7 @@ export function DrugOrderForm({
             <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
                 <Column lg={12} md={6} sm={4}>
-                  <h3 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h3>
+                  <h2 className={styles.sectionHeader}>{t('dosageInstructions', 'Dosage instructions')}</h2>
                 </Column>
                 <Column className={styles.freeTextDosageToggle} lg={4} md={2} sm={4}>
                   <ControlledFieldInput
@@ -583,7 +583,7 @@ export function DrugOrderForm({
               )}
             </section>
             <section className={styles.formSection}>
-              <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
+              <h2 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h2>
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 {/* TODO: This input does nothing */}
                 <Column lg={16} md={4} sm={4}>
@@ -649,7 +649,7 @@ export function DrugOrderForm({
               </Grid>
             </section>
             <section className={styles.formSection}>
-              <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
+              <h2 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h2>
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>

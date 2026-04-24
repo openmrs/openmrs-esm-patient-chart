@@ -78,7 +78,7 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
     <ResponsiveWrapper>
       {sectionName && (
         <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t(sectionName)}</h4>
+          <h2>{t(sectionName)}</h2>
         </div>
       )}
       <FormsTable
