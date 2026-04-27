@@ -226,6 +226,7 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                   )}
                   title={t('customDrugCalloutTitle', 'Add as free-text drug?')}
                   // lowContrast
+                  style={{ maxWidth: 'none' }}
                 />
                 <br />
               </>
