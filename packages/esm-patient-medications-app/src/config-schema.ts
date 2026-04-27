@@ -18,6 +18,12 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+  orderTypeUuid: {
+    _type: Type.UUID,
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
   showPrintButton: {
     _type: Type.Boolean,
     _default: false,
@@ -56,6 +62,15 @@ export const configSchema = {
     // Using aspirin temporarily as a supposedly non-coded drug till the above is resolved
     _default: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -64,9 +79,11 @@ export interface ConfigObject {
     display: string;
   };
   drugOrderTypeUUID: string;
+  orderTypeUuid: string;
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
   drugNonCodedUUID: string;
+  drugCategoryConceptSets: Array<string>;
 }

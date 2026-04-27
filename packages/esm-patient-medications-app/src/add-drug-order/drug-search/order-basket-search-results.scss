@@ -43,6 +43,16 @@
   padding: layout.$spacing-03 layout.$spacing-05;
 }
 
+.drugNameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+}
+
+.drugNameText {
+  flex: 1;
+}
+
 .searchResultActions {
   border-top: 1px solid $grey-2;
   padding: 0 layout.$spacing-05;

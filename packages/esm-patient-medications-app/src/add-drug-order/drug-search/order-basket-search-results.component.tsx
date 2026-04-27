@@ -6,6 +6,7 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { type DrugOrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
+  ExtensionSlot,
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
@@ -146,7 +147,7 @@ export default function OrderBasketSearchResults({
   );
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
+export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   patient,
   drug,
   openOrderForm,
@@ -229,11 +230,14 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                 <br />
               </>
             )}
-            <p>
-              <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
-              {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
-              {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
-            </p>
+            <div className={styles.drugNameRow}>
+              <p className={styles.drugNameText}>
+                <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
+                {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+              </p>
+              <ExtensionSlot name="drug-search-result-actions-slot" state={{ drug, orderItem }} />
+            </div>
             <UserHasAccess privilege="Manage OrderTemplates">
               {fetchingDrugOrderTemplatesError ? (
                 <p>

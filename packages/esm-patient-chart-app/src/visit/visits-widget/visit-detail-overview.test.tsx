@@ -10,10 +10,17 @@ import { usePaginatedVisits } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
+  useAllEncounters,
 } from './past-visits-components/encounters-table/encounters-table.resource';
 
 const mockGetConfig = getConfig as jest.Mock;
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
+
+const mockUseAllEncounters = jest.fn(useAllEncounters).mockReturnValue({
+  data: [],
+  isLoading: false,
+  error: undefined,
+} as any);
 
 const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   data: visitOverviewDetailMockData.data.results,
@@ -71,6 +78,7 @@ const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
 jest.mock('./past-visits-components/encounters-table/encounters-table.resource', () => ({
   ...jest.requireActual('./past-visits-components/encounters-table/encounters-table.resource'),
   usePaginatedEncounters: () => mockUsePaginatedEncounters('patient-uuid', null, 10),
+  useAllEncounters: () => mockUseAllEncounters('patient-uuid', null),
   useEncounterTypes: () => mockUseEncounterTypes(),
 }));
 

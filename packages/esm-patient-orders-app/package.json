@@ -17,7 +17,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/**/*.hook.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/**/*.hook.tsx' 'src/**/*.resource.ts' 'src/order-favorites/use*.ts' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -39,7 +39,7 @@
   "dependencies": {
     "@carbon/react": "^1.83.0",
     "@openmrs/esm-patient-common-lib": "next",
-    "lodash-es": "^4.17.23"
+    "lodash-es": "^4.18.1"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "9.x",

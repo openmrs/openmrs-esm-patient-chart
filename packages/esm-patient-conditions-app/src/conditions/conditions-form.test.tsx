@@ -74,7 +74,7 @@ describe('Conditions form', () => {
     expect(screen.getByRole('searchbox', { name: /enter condition/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/^active/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^active/i)).not.toBeChecked();
+    expect(screen.getByLabelText(/^active/i)).toBeChecked();
     expect(screen.getByLabelText(/inactive/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/inactive/i)).not.toBeChecked();
 
@@ -227,15 +227,10 @@ describe('Conditions form', () => {
     await user.click(submitButton);
 
     expect(screen.getByText(/a condition is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
+    expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
-    await user.click(submitButton);
-
-    expect(screen.getByText(/a clinical status is required/i)).toBeInTheDocument();
-
-    await user.click(screen.getByLabelText(/^active/i));
     await user.click(submitButton);
 
     expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();
@@ -249,6 +244,28 @@ describe('Conditions form', () => {
       subtitle: 'It is now visible on the Conditions page',
       title: 'Condition saved',
     });
+  });
+
+  it('requires selecting a condition result before submitting typed search text', async () => {
+    const user = userEvent.setup();
+
+    mockCreateCondition.mockClear();
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: [],
+      error: null,
+      isSearching: false,
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.type(conditionSearchInput, 'Definitely not a condition');
+    await user.click(submitButton);
+
+    expect(await screen.findByText(/a condition is required/i)).toBeInTheDocument();
+    expect(mockCreateCondition).not.toHaveBeenCalled();
   });
 
   it('launching the form with an existing condition prepopulates the form with the condition details', async () => {

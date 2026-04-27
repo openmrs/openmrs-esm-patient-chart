@@ -34,7 +34,7 @@ export default function DrugSearch({
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { debounceDelayInMs } = useConfig<ConfigObject>();
+  const { debounceDelayInMs, daysDurationUnit } = useConfig<ConfigObject>();
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
   const searchInputRef = useRef(null);
 
@@ -65,6 +65,10 @@ export default function DrugSearch({
           value={searchTerm}
         />
       </ResponsiveWrapper>
+      <ExtensionSlot
+        name="drug-search-slot"
+        state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm), visit, daysDurationUnit }}
+      />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}
         closeWorkspace={closeWorkspace}
@@ -75,8 +79,11 @@ export default function DrugSearch({
       />
       {isTablet && (
         <div className={styles.separatorContainer}>
-          <p className={styles.separator}>{t('or', 'or')}</p>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
+          <Button
+            iconDescription={t('returnToOrderBasket', 'Return to order basket')}
+            kind="ghost"
+            onClick={() => closeWorkspace()}
+          >
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

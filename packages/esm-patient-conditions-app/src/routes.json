@@ -29,7 +29,7 @@
       "order": 7,
       "meta": {
         "slot": "patient-chart-conditions-dashboard-slot",
-        "path": "Conditions"
+        "path": "conditions"
       }
     },
     {

@@ -73,9 +73,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     formState: { errors },
     getValues,
     watch,
+    setValue,
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
-  const searchInputRef = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -87,12 +88,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
 
-  const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
-    setSelectedCondition(selectedCondition);
-  }, []);
+  const handleConditionChange = useCallback(
+    (selectedCondition: CodedCondition) => {
+      setSelectedCondition(selectedCondition);
+      setValue('conditionUuid', selectedCondition.uuid, { shouldValidate: true });
+    },
+    [setValue],
+  );
 
   const handleCreate = useCallback(async () => {
     if (!selectedCondition) {
+      setIsSubmittingForm(false);
       return;
     }
 
@@ -189,7 +195,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   };
 
   useEffect(() => {
-    if (errors?.conditionName) {
+    if (errors?.conditionUuid) {
       focusOnSearchInput();
     }
     if (isSubmittingForm) {
@@ -222,39 +228,35 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     <Search
                       autoFocus
                       className={classNames({
-                        [styles.conditionsError]: errors?.conditionName,
+                        [styles.conditionsError]: errors?.conditionUuid,
                       })}
                       disabled={isEditing}
                       id="conditionsSearch"
-                      aria-labelledby={errors?.conditionName ? 'conditionsSearchError' : undefined}
+                      aria-labelledby={errors?.conditionUuid ? 'conditionsSearchError' : undefined}
                       labelText={t('enterCondition', 'Enter condition')}
                       onChange={(event) => {
                         const val = event.target.value;
                         onChange(val);
+                        setSelectedCondition(null);
+                        setValue('conditionUuid', '');
                         handleSearchTermChange(val);
                       }}
                       onClear={() => {
                         setSearchTerm('');
                         setSelectedCondition(null);
+                        setValue('conditionUuid', '');
                       }}
                       placeholder={t('searchConditions', 'Search conditions')}
                       ref={searchInputRef}
-                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
-                      value={(() => {
-                        if (selectedCondition) {
-                          return selectedCondition.display;
-                        }
-                        if (debouncedSearchTerm) {
-                          return value;
-                        }
-                      })()}
+                      renderIcon={errors?.conditionUuid && ((props) => <WarningFilled fill="red" {...props} />)}
+                      value={selectedCondition?.display ?? value ?? ''}
                     />
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && (
+              {errors?.conditionUuid && (
                 <p id="conditionsSearchError" className={styles.errorMessage}>
-                  {errors.conditionName.message}
+                  {errors.conditionUuid.message}
                 </p>
               )}
               <SearchResults

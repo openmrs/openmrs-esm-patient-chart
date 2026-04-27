@@ -54,6 +54,13 @@
   padding: layout.$spacing-05;
   margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.medicationInfoText {
+  flex: 1;
 }
 
 .inlineNotification {
