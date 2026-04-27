@@ -13,15 +13,16 @@ export function usePinToggle(drug: Drug | undefined) {
   const { favorites, isLoading, deleteMultipleFavorites, persistFavorites } = useFavoritesActions();
   const [isSaving, setIsSaving] = useState(false);
 
-  const isPinned = isDrugFavorite(favorites, drug?.uuid);
+  const drugId = drug?.drugNonCoded?.trim().toLocaleLowerCase() ?? drug?.uuid;
+  const isPinned = isDrugFavorite(favorites, drugId);
 
   const toggle = useCallback(async () => {
-    if (!drug?.uuid) {
+    if (!drugId) {
       return;
     }
 
     if (isPinned) {
-      const favorite = getDrugFavorite(favorites, drug.uuid);
+      const favorite = getDrugFavorite(favorites, drugId);
       if (favorite) {
         setIsSaving(true);
         await deleteMultipleFavorites([favorite]);
@@ -52,7 +53,7 @@ export function usePinToggle(drug: Drug | undefined) {
       });
       setIsSaving(false);
     }
-  }, [drug, isPinned, favorites, deleteMultipleFavorites, persistFavorites, maxPinnedDrugOrders, t]);
+  }, [drug, drugId, isPinned, favorites, deleteMultipleFavorites, persistFavorites, maxPinnedDrugOrders, t]);
 
   return { isPinned, isSaving, isLoading, isEnabled: Boolean(drug && enableDrugOrderFavorites), toggle };
 }

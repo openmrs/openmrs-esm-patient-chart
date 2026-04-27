@@ -17,6 +17,7 @@ export function createDrugFromFavorite(favorite: DrugFavoriteOrder): Drug {
     concept: favorite.conceptUuid
       ? { uuid: favorite.conceptUuid, display: favorite.conceptName || favorite.displayName }
       : undefined,
+    drugNonCoded: favorite.drugNonCoded,
   } as Drug;
 }
 
@@ -62,5 +63,6 @@ export function buildFavoriteOrder(drug: Drug): DrugFavoriteOrder {
       dosageFormDisplay: drug.dosageForm?.display,
       dosageFormUuid: drug.dosageForm?.uuid,
     },
+    drugNonCoded: drug.drugNonCoded,
   };
 }
