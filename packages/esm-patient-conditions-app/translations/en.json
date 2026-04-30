@@ -24,7 +24,7 @@
   "duplicateActiveConditionSubtitle": "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "Edit",
-  "editCondition": "Edit a Condition",
+  "editCondition": "Edit condition",
   "endDate": "End date",
   "enterCondition": "Enter condition",
   "errorCreatingCondition": "Error creating condition",

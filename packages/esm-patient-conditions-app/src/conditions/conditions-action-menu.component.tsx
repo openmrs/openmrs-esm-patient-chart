@@ -17,7 +17,7 @@ export const ConditionsActionMenu = ({ condition, patientUuid }: conditionsActio
   const launchEditConditionsForm = useCallback(
     () =>
       launchWorkspace2('conditions-form-workspace', {
-        workspaceTitle: t('editCondition', 'Edit a Condition'),
+        workspaceTitle: t('editCondition', 'Edit condition'),
         condition,
         formContext: 'editing',
       }),
