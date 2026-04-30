@@ -295,16 +295,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                   kind="warning"
                   lowContrast
                   className={styles.duplicateWarning}
+                  title={t('possibleDuplicate', 'Possible duplicate')}
                   subtitle={
                     isActiveDuplicate
                       ? t(
                           'duplicateActiveConditionSubtitle',
-                          "{{conditionName}} is already on this patient's active problem list. Saving will create two records for the same condition.",
+                          "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
                           { conditionName: selectedCondition.display },
                         )
                       : t(
                           'duplicateInactiveConditionSubtitle',
-                          '{{conditionName}} was previously recorded but is now inactive. You may want to edit the existing record to reactivate it instead.',
+                          '{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.',
                           { conditionName: selectedCondition.display },
                         )
                   }

@@ -382,8 +382,10 @@ describe('Duplicate condition detection', () => {
     await user.type(conditionSearchInput, 'Hypertension');
     await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
 
-    expect(screen.getByText(/was previously recorded but is now inactive/i)).toBeInTheDocument();
-    expect(screen.getByText(/you may want to edit the existing record to reactivate it instead/i)).toBeInTheDocument();
+    expect(screen.getByText(/was previously recorded and is now inactive/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/consider reactivating the existing record instead of creating a new one/i),
+    ).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
   });
@@ -421,7 +423,7 @@ describe('Duplicate condition detection', () => {
     await user.click(screen.getByRole('menuitem', { name: /headache/i }));
 
     expect(screen.queryByText(/already on this patient.*active problem list/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/was previously recorded but is now inactive/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
   });
 
   it('removes the duplicate warning when the search input is cleared', async () => {
@@ -504,7 +506,7 @@ describe('Duplicate condition detection', () => {
     await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
 
     expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
-    expect(screen.queryByText(/was previously recorded but is now inactive/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
   });
 
   it('allows saving a condition even when a duplicate warning is shown', async () => {
