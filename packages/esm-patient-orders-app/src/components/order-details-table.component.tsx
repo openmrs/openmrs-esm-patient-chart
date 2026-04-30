@@ -628,8 +628,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const handleCancelOrder = useCallback(() => {
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       getDrugOrderByUuid(orderItem.uuid)
-        .then((res) => {
-          const medicationOrder = res.data;
+        .then((medicationOrder) => {
           const discontinueItem = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
           setOrders([...orders, discontinueItem]);
           launchWorkspace2('order-basket', {}, windowProps, groupProps);
@@ -656,8 +655,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       // all order types and including the drug field in the custom rep will
       // yield an error)
       getDrugOrderByUuid(orderItem.uuid)
-        .then((res) => {
-          const medicationOrder = res.data;
+        .then((medicationOrder) => {
           launchWorkspace2(
             'add-drug-order',
             { order: buildMedicationOrder(medicationOrder, 'REVISE'), orderToEditOrdererUuid: orderItem.orderer.uuid },

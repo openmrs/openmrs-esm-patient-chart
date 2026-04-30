@@ -44,8 +44,7 @@ export const EncounterListDataTable: React.FC<EncounterListDataTableProps> = ({ 
                 <TableRow key={row.id}>
                   {row.cells.map((cell) => {
                     const cellContent = cell.value?.content ?? cell.value;
-                    const isNumericObs =
-                      isValidElement(cellContent) && cellContent.type === NumericObservation;
+                    const isNumericObs = isValidElement(cellContent) && cellContent.type === NumericObservation;
                     return (
                       <TableCell key={cell.id} className={isNumericObs ? styles.numericObsCell : undefined}>
                         {cellContent}

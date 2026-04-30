@@ -48,7 +48,7 @@ import {
   useAllowedFileExtensions,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
-import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
+import type { Concept, Diagnosis, DiagnosisPayload, FreeConcept, VisitNotePayload } from '../types';
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
@@ -65,10 +65,10 @@ type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images
 
 interface DiagnosesDisplayProps {
   fieldName: string;
-  isDiagnosisNotSelected: (diagnosis: Concept) => boolean;
+  isDiagnosisNotSelected: (diagnosis: FreeConcept) => boolean;
   isLoading: boolean;
   isSearching: boolean;
-  onAddDiagnosis: (diagnosis: Concept, searchInputField: string) => void;
+  onAddDiagnosis: (diagnosis: FreeConcept, searchInputField: string) => void;
   searchResults: Array<Concept>;
   t: TFunction;
   value: string;
@@ -179,6 +179,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
           patient: patientUuid,
           diagnosis: {
             coded: d.diagnosis.coded?.uuid,
+            nonCoded: d.diagnosis.nonCoded,
           },
           certainty: d.certainty,
           rank: d.rank,
@@ -253,12 +254,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   );
 
   const createDiagnosis = useCallback(
-    (concept: Concept) => ({
+    (concept: FreeConcept) => ({
       certainty: 'PROVISIONAL',
       display: concept.display,
-      diagnosis: {
-        coded: concept.uuid,
-      },
+      diagnosis: concept.uuid ? { coded: concept.uuid } : { nonCoded: concept.display }, // Fallback to nonCoded if no UUID
       patient: patientUuid,
       rank: 2,
     }),
@@ -266,7 +265,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   );
 
   const handleAddDiagnosis = useCallback(
-    (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
+    (conceptDiagnosisToAdd: FreeConcept, searchInputField: string) => {
       const newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
       if (searchInputField === 'primaryDiagnosisSearch') {
         newDiagnosis.rank = 1;
@@ -288,30 +287,42 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
     (diagnosisToRemove: Diagnosis, searchInputField) => {
       if (searchInputField === 'primaryInputSearch') {
         setSelectedPrimaryDiagnoses(
-          selectedPrimaryDiagnoses.filter(
-            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
+          selectedPrimaryDiagnoses.filter((diagnosis) =>
+            diagnosis.diagnosis.coded
+              ? diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded
+              : diagnosis.diagnosis.nonCoded !== diagnosisToRemove.diagnosis.nonCoded,
           ),
         );
       } else if (searchInputField === 'secondaryInputSearch') {
         setSelectedSecondaryDiagnoses(
-          selectedSecondaryDiagnoses.filter(
-            (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
+          selectedSecondaryDiagnoses.filter((diagnosis) =>
+            diagnosis.diagnosis.coded
+              ? diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded
+              : diagnosis.diagnosis.nonCoded !== diagnosisToRemove.diagnosis.nonCoded,
           ),
         );
       }
       setCombinedDiagnoses(
-        combinedDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
+        combinedDiagnoses.filter((diagnosis) =>
+          diagnosis.diagnosis.coded
+            ? diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded
+            : diagnosis.diagnosis.nonCoded !== diagnosisToRemove.diagnosis.nonCoded,
+        ),
       );
     },
     [combinedDiagnoses, selectedPrimaryDiagnoses, selectedSecondaryDiagnoses],
   );
 
-  const isDiagnosisNotSelected = (diagnosis: Concept) => {
-    const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some(
-      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+  const isDiagnosisNotSelected = (diagnosis: Concept | FreeConcept) => {
+    const isPrimaryDiagnosisSelected = selectedPrimaryDiagnoses.some((selectedDiagnosis) =>
+      diagnosis.uuid
+        ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
+        : diagnosis.display?.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded?.toLocaleLowerCase(),
     );
-    const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some(
-      (selectedDiagnosis) => diagnosis.uuid === selectedDiagnosis.diagnosis.coded,
+    const isSecondaryDiagnosisSelected = selectedSecondaryDiagnoses.some((selectedDiagnosis) =>
+      diagnosis.uuid
+        ? diagnosis.uuid === selectedDiagnosis.diagnosis.coded
+        : diagnosis.display?.toLocaleLowerCase() === selectedDiagnosis.diagnosis.nonCoded?.toLocaleLowerCase(),
     );
 
     return !isPrimaryDiagnosisSelected && !isSecondaryDiagnosisSelected;
@@ -425,6 +436,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
                 condition: null,
                 diagnosis: {
                   coded: diagnosis.diagnosis.coded,
+                  nonCoded: diagnosis.diagnosis.nonCoded,
                 },
                 certainty: diagnosis.certainty,
                 rank: diagnosis.rank,
@@ -810,8 +822,10 @@ function DiagnosesDisplay({
   onAddDiagnosis,
   searchResults,
   t,
-  value,
+  value: rawValue,
 }: DiagnosesDisplayProps) {
+  const value = rawValue?.trim();
+
   if (!value) {
     return null;
   }
@@ -821,6 +835,18 @@ function DiagnosesDisplay({
   }
 
   if (!isSearching && searchResults?.length > 0) {
+    if (
+      searchResults?.length === 1 &&
+      !isDiagnosisNotSelected(searchResults[0]) &&
+      searchResults[0]?.display?.toLocaleLowerCase() === value?.toLocaleLowerCase()
+    )
+      return (
+        <Tile className={styles.emptyResults}>
+          <span>
+            {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+          </span>
+        </Tile>
+      );
     return (
       <ul className={styles.diagnosisList}>
         {searchResults.map((diagnosis, index) => {
@@ -837,6 +863,38 @@ function DiagnosesDisplay({
             );
           }
         })}
+
+        {isDiagnosisNotSelected({ display: value }) ? (
+          // if the searchResults doesn't contain the exact search term,
+          // still allow proposing adding it as a custom free-text diagnosis
+          !searchResults
+            .map((diagnosis) => diagnosis.display?.toLocaleLowerCase())
+            .includes(value?.toLocaleLowerCase()) && (
+            <li className={styles.diagnosis} role="menuitem">
+              <Button
+                size="md"
+                kind="ghost"
+                onClick={() =>
+                  onAddDiagnosis(
+                    {
+                      display: value,
+                    },
+                    fieldName,
+                  )
+                }
+                className={styles.customDiagnosisButton}
+              >
+                {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
+              </Button>
+            </li>
+          )
+        ) : (
+          <Tile className={styles.emptyResults}>
+            <span>
+              {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+            </span>
+          </Tile>
+        )}
       </ul>
     );
   }
@@ -844,11 +902,40 @@ function DiagnosesDisplay({
   if (searchResults?.length === 0) {
     return (
       <ResponsiveWrapper>
-        <Tile className={styles.emptyResults}>
-          <span>
-            {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{value}"</strong>
-          </span>
-        </Tile>
+        {isDiagnosisNotSelected({ display: value }) ? (
+          <>
+            <Tile className={styles.emptyResults}>
+              <span>
+                {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{value}"</strong>
+              </span>
+            </Tile>
+            <ul className={styles.diagnosisList}>
+              <li className={styles.diagnosis} role="menuitem">
+                <Button
+                  size="md"
+                  kind="ghost"
+                  onClick={() =>
+                    onAddDiagnosis(
+                      {
+                        display: value,
+                      },
+                      fieldName,
+                    )
+                  }
+                  className={styles.customDiagnosisButton}
+                >
+                  {t('addCustomDiagnosis', 'Add custom diagnosis')} <strong> "{value}"</strong>
+                </Button>
+              </li>
+            </ul>
+          </>
+        ) : (
+          <Tile className={styles.emptyResults}>
+            <span>
+              {t('diagnosisAlreadySelected', 'Diagnosis already selected')}: <strong>"{value}"</strong>
+            </span>
+          </Tile>
+        )}
       </ResponsiveWrapper>
     );
   }

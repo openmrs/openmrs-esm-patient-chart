@@ -20,7 +20,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
   showPrintButton: {
@@ -52,6 +53,15 @@ export const configSchema = {
       '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
     },
   },
+  drugNonCodedUUID: {
+    _type: Type.UUID,
+    _description:
+      "UUID for the 'Drug, non-coded' concept for custom free-text other drug when placing a medication order",
+    // TODO: Add this CIEL:163101 "Drug, non-coded" to OpenMRS Basic Drug List OCL collection
+    // _default: '163101AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    // Using aspirin temporarily as a supposedly non-coded drug till the above is resolved
+    _default: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
   drugCategoryConceptSets: {
     _type: Type.Array,
     _description:
@@ -74,5 +84,6 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
+  drugNonCodedUUID: string;
   drugCategoryConceptSets: Array<string>;
 }

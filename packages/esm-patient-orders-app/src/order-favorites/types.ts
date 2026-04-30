@@ -5,6 +5,7 @@ export interface DrugFavoriteOrder {
   conceptName?: string;
   displayName: string;
   attributes: DrugFavoriteAttributes;
+  drugNonCoded?: string;
 }
 
 export interface DrugFavoriteAttributes {

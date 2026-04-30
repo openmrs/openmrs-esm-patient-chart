@@ -8,15 +8,70 @@ export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 const patientChartAppModuleName = '@openmrs/esm-patient-chart-app';
 
 export const drugCustomRepresentation =
-  'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
+  'custom:(uuid,drugNonCoded,dosingType,orderNumber,accessionNumber,' +
   'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
   'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
-  'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+  'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
 export const orderCustomRepresentation =
   'custom:(uuid,display,orderNumber,accessionNumber,patient,concept,action,careSetting,previousOrder,dateActivated,scheduledDate,dateStopped,autoExpireDate,encounter:(uuid,display,visit),orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,fulfillerStatus)';
+
+/**
+ * Ensures a drug order has a display name, even if it is non-coded.
+ *
+ * @param order The order to normalize.
+ * @returns The order with patched drug display objects.
+ */
+export function normalizeDrugOrder(order: Order): Order {
+  // If there is no coded drug but there is a non-coded drug name
+  if (!order.drug && order.drugNonCoded) {
+    return {
+      ...order,
+      drug: {
+        drugNonCoded: order.drugNonCoded,
+        display: order.drugNonCoded,
+        concept: {
+          uuid: order.concept.uuid,
+        },
+      },
+    };
+  }
+  return order;
+}
+
+/**
+ * Ensures drug orders have a display name, even if they are non-coded.
+ *
+ * @param orders The orders to normalize.
+ * @returns The orders with patched drug display objects.
+ */
+export function normalizeDrugOrders(orders: Order[]): Order[] {
+  return orders?.map(normalizeDrugOrder);
+}
+
+/**
+ * Ensures orders have a display name, even if they are non-coded.
+ *
+ * @param orders The orders to normalize.
+ * @param ordersType The type of the orders.
+ * @returns The orders with patched order display objects.
+ */
+function normalizeOrders(orders: Order[], ordersType?: string): Order[] {
+  switch (ordersType) {
+    case 'drugorder':
+      return normalizeDrugOrders(orders);
+
+    case 'testorder':
+      // TODO: implement normalizeTestOrders
+      // return normalizeTestOrders(orders);
+      return orders;
+
+    default:
+      return orders;
+  }
+}
 
 export function usePatientOrders(
   patientUuid: string,
@@ -51,11 +106,14 @@ export function usePatientOrders(
   const orders = useMemo(
     () =>
       data?.data?.results
-        ? [...data.data.results]?.sort(
-            (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+        ? normalizeOrders(
+            [...data.data.results]?.sort(
+              (a, b) => new Date(b.dateActivated).getTime() - new Date(a.dateActivated).getTime(),
+            ),
+            orderType,
           )
         : null,
-    [data],
+    [data, orderType],
   );
 
   return {
@@ -68,7 +126,9 @@ export function usePatientOrders(
 }
 
 export function getDrugOrderByUuid(orderUuid: string) {
-  return openmrsFetch<Order>(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`);
+  return openmrsFetch<Order>(`${restBaseUrl}/order/${orderUuid}?v=${drugCustomRepresentation}`).then((response) =>
+    normalizeDrugOrder(response.data),
+  );
 }
 
 export function useDrugOrderByUuid(orderUuid: string) {
@@ -77,8 +137,10 @@ export function useDrugOrderByUuid(orderUuid: string) {
     openmrsFetch,
   );
 
+  const drugOrder = useMemo(() => (data?.data ? normalizeDrugOrder(data?.data) : null), [data]);
+
   return {
-    data: data?.data ?? null,
+    data: drugOrder,
     error,
     isLoading,
   };

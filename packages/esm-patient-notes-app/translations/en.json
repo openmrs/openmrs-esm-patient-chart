@@ -1,5 +1,6 @@
 {
   "add": "Add",
+  "addCustomDiagnosis": "Add custom diagnosis",
   "addImage": "Add image",
   "addVisitNote": "Add a visit note",
   "clinicalNoteLabel": "Write your notes",
@@ -10,6 +11,7 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "Diagnoses",
+  "diagnosisAlreadySelected": "Diagnosis already selected",
   "discard": "Discard",
   "editStickyNote": "Edit sticky note",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",

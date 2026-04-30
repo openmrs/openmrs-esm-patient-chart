@@ -58,11 +58,22 @@ export function removeDrugFavorite(currentFavorites: DrugFavoriteOrder[], id: st
   return currentFavorites.filter((f) => f.id !== id);
 }
 
-export function isDrugFavorite(favorites: DrugFavoriteOrder[], drugUuid?: string): boolean {
-  if (!drugUuid) return false;
-  return favorites.some((f) => f.drugUuid === drugUuid);
+export function isDrugFavorite(favorites: DrugFavoriteOrder[], drugUuidOrNonCodedName?: string): boolean {
+  if (!drugUuidOrNonCodedName) return false;
+  return favorites.some((f) =>
+    f.drugNonCoded
+      ? f.drugNonCoded.trim().toLocaleLowerCase() === drugUuidOrNonCodedName?.trim().toLocaleLowerCase()
+      : f.drugUuid === drugUuidOrNonCodedName,
+  );
 }
 
-export function getDrugFavorite(favorites: DrugFavoriteOrder[], drugUuid: string): DrugFavoriteOrder | undefined {
-  return favorites.find((f) => f.drugUuid === drugUuid);
+export function getDrugFavorite(
+  favorites: DrugFavoriteOrder[],
+  drugUuidOrNonCodedName: string,
+): DrugFavoriteOrder | undefined {
+  return favorites.find((f) =>
+    f.drugNonCoded
+      ? f.drugNonCoded.trim().toLocaleLowerCase() === drugUuidOrNonCodedName?.trim().toLocaleLowerCase()
+      : f.drugUuid === drugUuidOrNonCodedName,
+  );
 }

@@ -77,11 +77,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
             </TableHead>
             <TableBody>
               {rows.map((row, i) => (
-                <TypedTableRow
-                  key={row.id}
-                  interpretation={data[i]?.interpretation}
-                  {...getRowProps({ row })}
-                >
+                <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     return cell.value?.interpretation ? (
                       <TableCell
