@@ -60,7 +60,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
         <Button
           kind="ghost"
           renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-          iconDescription="Add visit note"
+          iconDescription={t('addVisitNote', 'Add a visit note')}
           onClick={launchVisitNoteForm}
         >
           {t('add', 'Add')}
