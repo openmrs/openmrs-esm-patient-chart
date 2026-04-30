@@ -1,0 +1,49 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.formContainer {
+  padding: 0 layout.$spacing-05;
+  height: 100%;
+}
+
+.formSection {
+  margin-bottom: layout.$spacing-07;
+}
+
+.formSectionHeader {
+  margin-bottom: layout.$spacing-05;
+}
+
+.field {
+  margin-bottom: layout.$spacing-05;
+}
+
+.bottomButtons {
+  :global(.cds--btn) {
+    width: 50%;
+    max-width: unset;
+  }
+}
+
+.datePickerWrapper {
+  margin-top: layout.$spacing-03;
+}
+
+// System task selection styling
+.systemTaskSelected {
+  :global(.cds--combo-box) {
+    :global(.cds--text-input) {
+      background-color: colors.$blue-10;
+      border-color: colors.$blue-60;
+    }
+  }
+}
+
+.systemTaskNotification {
+  margin-bottom: layout.$spacing-04;
+}
+
+.customTaskNotification {
+  margin-top: layout.$spacing-03;
+}

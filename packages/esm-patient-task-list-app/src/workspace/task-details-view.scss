@@ -1,0 +1,61 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.taskDetailsContainer {
+  padding: 0 layout.$spacing-05;
+}
+
+.taskDetailsBox {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-06;
+  flex: 1;
+  background-color: $ui-01;
+  padding: layout.$spacing-05;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.detailRow {
+  padding-bottom: layout.$spacing-05;
+}
+
+.detailLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  padding-bottom: layout.$spacing-02;
+}
+
+.actionButtons {
+  display: flex;
+  gap: layout.$spacing-03;
+  padding-top: layout.$spacing-05;
+
+  :global(.cds--btn) {
+    width: auto;
+    flex-grow: 1;
+  }
+}
+
+.errorText {
+  margin: layout.$spacing-05 0;
+  color: $danger;
+}
