@@ -576,8 +576,12 @@ describe('Immunizations Form', () => {
     // Should NOT show duplicate error — we're editing the same record
     expect(screen.queryByText(/has already been recorded/i)).not.toBeInTheDocument();
 
-    // Should allow save
-    expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
+    // Should allow save with the edit UUID
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.anything(),
+      'existing-uuid',
+      expect.any(AbortController),
+    );
   });
 });
 

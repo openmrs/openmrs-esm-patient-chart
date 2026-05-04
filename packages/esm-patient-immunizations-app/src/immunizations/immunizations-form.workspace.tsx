@@ -54,6 +54,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
         })
         .refine(
           (date) => {
+            // Normalize both dates to start of day in local timezone
             const inputDate = dayjs(date).startOf('day');
             const today = dayjs().startOf('day');
             return inputDate.isSame(today) || inputDate.isBefore(today);
@@ -62,6 +63,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
             message: t('vaccinationDateCannotBeInTheFuture', 'Vaccination date cannot be in the future'),
           },
         ),
+      // null means unset; when provided, must be an integer ≥ 1
       doseNumber: z.union([z.number({ coerce: true }).int().min(1), z.null()]).optional(),
       note: z.string().trim().max(255).optional(),
       nextDoseDate: z.date().nullable().optional(),
@@ -92,11 +94,16 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
     handleSubmit,
     reset,
     setError,
+    clearErrors,
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
   const vaccinationDate = watch('vaccinationDate');
   const vaccineUuid = watch('vaccineUuid');
+  // Clear stale duplicate-dose error when the user switches vaccine
+  useEffect(() => {
+    clearErrors('doseNumber');
+  }, [vaccineUuid, clearErrors]);
 
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
@@ -124,6 +131,9 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
+      // Note: existingImmunizations is undefined while loading, so this check
+      // silently no-ops in that window. The disabled Save button (isLoadingImmunizations)
+      // prevents submission during loading, keeping this safe.
       const isDuplicate = existingImmunizations?.some((group) => {
         if (group.vaccineUuid !== data.vaccineUuid) return false;
         return group.existingDoses.some(
