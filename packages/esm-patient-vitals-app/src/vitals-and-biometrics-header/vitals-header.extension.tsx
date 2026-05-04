@@ -121,7 +121,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
           ? `≥ ${range.lowNormal}`
           : range.hiNormal != null
             ? `≤ ${range.hiNormal}`
-            : '—';
+            : '–';
 
     const sysRange = conceptRangeMap?.get(config.concepts.systolicBloodPressureUuid);
     const diaRange = conceptRangeMap?.get(config.concepts.diastolicBloodPressureUuid);
@@ -156,56 +156,52 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({
                 >
                   <Information size={16} />
                 </ToggletipButton>
-                <ToggletipContent>
-                  <div className={styles.referenceRangeContent}>
-                    <p className={styles.referenceRangeHeading}>{t('normalRanges', 'Normal ranges')}</p>
-                    <table className={styles.referenceRangeTable}>
-                      <tbody>
-                        {sysRange && diaRange && (
-                          <tr key="bp">
-                            <td className={styles.referenceRangeLabel}>{t('bloodPressureAbbreviated', 'BP')}</td>
-                            <td className={styles.referenceRangeValue}>
-                              {`${formatRange(sysRange)} / ${formatRange(diaRange)} ${bpUnit ?? ''}`}
-                            </td>
-                          </tr>
-                        )}
-                        {[
-                          {
-                            label: t('heartRate', 'Heart rate'),
-                            uuid: config.concepts.pulseUuid,
-                            unit: conceptUnits.get(config.concepts.pulseUuid),
-                          },
-                          {
-                            label: t('respiratoryRate', 'R. rate'),
-                            uuid: config.concepts.respiratoryRateUuid,
-                            unit: conceptUnits.get(config.concepts.respiratoryRateUuid),
-                          },
-                          {
-                            label: t('spo2', 'SpO2'),
-                            uuid: config.concepts.oxygenSaturationUuid,
-                            unit: conceptUnits.get(config.concepts.oxygenSaturationUuid),
-                          },
-                          {
-                            label: t('temperatureAbbreviated', 'Temp'),
-                            uuid: config.concepts.temperatureUuid,
-                            unit: conceptUnits.get(config.concepts.temperatureUuid),
-                          },
-                        ]
-                          .filter(({ uuid }) => uuid && conceptRangeMap?.get(uuid))
-                          .map(({ label, uuid, unit }) => {
-                            const rangeValue = formatRange(conceptRangeMap.get(uuid));
-                            return (
-                              <tr key={uuid}>
-                                <td className={styles.referenceRangeLabel}>{label}</td>
-                                <td className={styles.referenceRangeValue}>
-                                  {unit ? `${rangeValue} ${unit}` : rangeValue}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </div>
+                <ToggletipContent className={styles.referenceRangeContent}>
+                  <p className={styles.referenceRangeHeading}>{t('normalRanges', 'Normal ranges')}</p>
+                  <dl className={styles.referenceRangeEntries}>
+                    {sysRange && diaRange && (
+                      <div className={styles.referenceRangeRow}>
+                        <dt className={styles.referenceRangeLabel}>{t('bloodPressureAbbreviated', 'BP')}</dt>
+                        <dd className={styles.referenceRangeValue}>
+                          {`${formatRange(sysRange)} / ${formatRange(diaRange)} ${bpUnit ?? ''}`}
+                        </dd>
+                      </div>
+                    )}
+                    {[
+                      {
+                        label: t('heartRate', 'Heart rate'),
+                        uuid: config.concepts.pulseUuid,
+                        unit: conceptUnits.get(config.concepts.pulseUuid),
+                      },
+                      {
+                        label: t('respiratoryRate', 'R. rate'),
+                        uuid: config.concepts.respiratoryRateUuid,
+                        unit: conceptUnits.get(config.concepts.respiratoryRateUuid),
+                      },
+                      {
+                        label: t('spo2', 'SpO2'),
+                        uuid: config.concepts.oxygenSaturationUuid,
+                        unit: conceptUnits.get(config.concepts.oxygenSaturationUuid),
+                      },
+                      {
+                        label: t('temperatureAbbreviated', 'Temp'),
+                        uuid: config.concepts.temperatureUuid,
+                        unit: conceptUnits.get(config.concepts.temperatureUuid),
+                      },
+                    ]
+                      .filter(({ uuid }) => uuid && conceptRangeMap?.get(uuid))
+                      .map(({ label, uuid, unit }) => {
+                        const rangeValue = formatRange(conceptRangeMap.get(uuid));
+                        return (
+                          <div key={uuid} className={styles.referenceRangeRow}>
+                            <dt className={styles.referenceRangeLabel}>{label}</dt>
+                            <dd className={styles.referenceRangeValue}>
+                              {unit ? `${rangeValue} ${unit}` : rangeValue}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                  </dl>
                 </ToggletipContent>
               </Toggletip>
             )}
