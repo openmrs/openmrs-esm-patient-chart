@@ -125,7 +125,7 @@ export interface FilterContextProps extends ReducerState {
 }
 
 export interface obsShape {
-  [key: string]: any;
+  [key: string]: string | number | boolean | null | undefined | ObservationData | Array<ObservationData>;
 }
 
 export interface RowData extends TreeNode {

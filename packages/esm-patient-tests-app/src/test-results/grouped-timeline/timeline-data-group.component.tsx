@@ -24,7 +24,7 @@ const TimeSlots: React.FC<{
   </div>
 );
 
-function usePanelDates(subRows: any[]) {
+function usePanelDates(subRows: Array<{ entries?: Array<{ obsDatetime: string }> }>) {
   return useMemo(() => {
     const allTimes = [
       ...new Set(
@@ -183,12 +183,12 @@ const TimelineCell: React.FC<TimelineCellProps> = ({ text, interpretation = 'NOR
 
 const GridItems = React.memo<{
   sortedTimes: Array<string>;
-  obs: any;
+  obs: Array<{ obsDatetime: string; value: string; interpretation?: string }>;
   zebra: boolean;
 }>(({ sortedTimes, obs, zebra }) => (
   <>
     {sortedTimes.map((time, i) => {
-      const entry = obs.find((o: any) => o?.obsDatetime === time);
+      const entry = obs.find((o) => o?.obsDatetime === time);
       if (!entry) {
         return <TimelineCell key={i} text={''} zebra={zebra} />;
       }
