@@ -50,8 +50,8 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   });
 
   const handleSorting = (
-    _cellA: any,
-    _cellB: any,
+    _cellA: VitalsTableRow,
+    _cellB: VitalsTableRow,
     { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {

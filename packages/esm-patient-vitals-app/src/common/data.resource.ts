@@ -101,7 +101,13 @@ export function useVitalsConceptMetadata(patientUuid: string) {
 
   const apiUrl = `${restBaseUrl}/conceptreferencerange/?patient=${patientUuid}&concept=${systolicBloodPressureUuid},${diastolicBloodPressureUuid},${pulseUuid},${temperatureUuid},${oxygenSaturationUuid},${respiratoryRateUuid}&v=full`;
 
-  const { data, error, isLoading } = useSWRImmutable<{ data: any }, Error>(patientUuid ? apiUrl : null, openmrsFetch);
+  interface ConceptReferenceRangeResponse {
+    results: Array<ConceptRange>;
+  }
+  const { data, error, isLoading } = useSWRImmutable<{ data: ConceptReferenceRangeResponse }, Error>(
+    patientUuid ? apiUrl : null,
+    openmrsFetch,
+  );
 
   const conceptMetadata = data?.data?.results;
 
