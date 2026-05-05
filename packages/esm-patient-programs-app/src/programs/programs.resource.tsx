@@ -5,6 +5,11 @@ import type { PatientProgram, Program, ProgramWorkflowState, ProgramsFetchRespon
 
 export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
 
+/**
+ * Fetches all program enrollments for a patient.
+ * Results are sorted by dateEnrolled descending (most recent first) so the active
+ * enrollment appears at the top of the list in the UI without additional sorting.
+ */
 export function useEnrollments(patientUuid: string) {
   const enrollmentsUrl = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: ProgramsFetchResponse }, Error>(

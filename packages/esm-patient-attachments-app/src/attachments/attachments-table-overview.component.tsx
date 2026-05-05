@@ -137,7 +137,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
     <DataTable rows={rows} headers={headers} overflowMenuOnHover={isDesktop} size={responsiveSize} sortRow={sortRow}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
         <TableContainer>
-          <Table {...getTableProps()} useZebraStyles>
+          <Table aria-label={t('attachmentsTable', 'Patient attachments table')} {...getTableProps()} useZebraStyles>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
