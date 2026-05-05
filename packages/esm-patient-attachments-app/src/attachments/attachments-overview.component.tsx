@@ -163,7 +163,8 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
               <Button
                 kind="ghost"
                 renderIcon={AddIcon}
-                iconDescription="Add attachment"
+                iconDescription={t('addAttachmentIconDescription', 'Upload a new file attachment or capture photo')}
+                aria-label={t('addAttachmentButton', 'Add attachment')}
                 onClick={showAddAttachmentModal}
               >
                 {t('add', 'Add')}
