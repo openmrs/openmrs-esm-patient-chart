@@ -104,18 +104,21 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <div className={styles.backgroundDataFetchingIndicator}>
-            <span>{isValidating ? <InlineLoading /> : null}</span>
+            <span aria-live="polite" aria-label={isValidating ? t('updatingBiometrics', 'Updating biometrics data') : undefined}>
+              {isValidating ? <InlineLoading /> : null}
+            </span>
           </div>
           <div className={styles.biometricsHeaderActionItems}>
             <ContentSwitcher
               onChange={(evt) => setChartView(evt.name === 'chartView')}
               size={isTablet ? 'md' : 'sm'}
               selectedIndex={chartView ? 1 : 0}
+              aria-label={t('biometricsViewSwitcher', 'Switch between table and chart view for biometrics')}
             >
-              <IconSwitch name="tableView" text="Table view">
+              <IconSwitch name="tableView" text={t('tableView', 'Table view')}>
                 <Table size={16} />
               </IconSwitch>
-              <IconSwitch name="chartView" text="Chart view">
+              <IconSwitch name="chartView" text={t('chartView', 'Chart view')}>
                 <Analytics size={16} />
               </IconSwitch>
             </ContentSwitcher>
@@ -124,7 +127,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
               <Button
                 kind="ghost"
                 renderIcon={(props) => <Add size={16} {...props} />}
-                iconDescription="Add biometrics"
+                iconDescription={t('addBiometricsIconDescription', 'Add a new biometrics measurement')}
                 onClick={launchBiometricsForm}
               >
                 {t('add', 'Add')}
