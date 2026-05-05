@@ -28,7 +28,7 @@ export interface ImmunizationsOverviewProps {
 const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, patientUuid, basePath }) => {
   const { t } = useTranslation();
   const immunizationsCount = 5;
-  const displayText = t('immunizations__lower', 'immunizations');
+  const displayText = t('immunizations__lower', 'immunization or vaccine administration records');
   const headerTitle = t('immunizations', 'Immunizations');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/immunizations';
