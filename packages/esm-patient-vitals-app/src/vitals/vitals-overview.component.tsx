@@ -194,7 +194,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
             <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
                 <div className={styles.backgroundDataFetchingIndicator}>
-                  <span>{isValidating ? <InlineLoading /> : null}</span>
+                  <span
+                    aria-live="polite"
+                    aria-label={isValidating ? t('updatingVitals', 'Updating vitals data') : undefined}
+                  >
+                    {isValidating ? <InlineLoading /> : null}
+                  </span>
                 </div>
                 <div className={styles.vitalsHeaderActionItems}>
                   <ContentSwitcher
@@ -203,11 +208,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     }
                     size={isTablet ? 'md' : 'sm'}
                     selectedIndex={chartView ? 1 : 0}
+                    aria-label={t('vitalsViewSwitcher', 'Switch between table and chart view for vitals')}
                   >
-                    <IconSwitch name="tableView" text="Table view">
+                    <IconSwitch name="tableView" text={t('tableView', 'Table view')}>
                       <Table size={16} />
                     </IconSwitch>
-                    <IconSwitch name="chartView" text="Chart view">
+                    <IconSwitch name="chartView" text={t('chartView', 'Chart view')}>
                       <Analytics size={16} />
                     </IconSwitch>
                   </ContentSwitcher>
