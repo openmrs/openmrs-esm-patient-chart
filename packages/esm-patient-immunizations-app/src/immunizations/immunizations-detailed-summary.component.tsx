@@ -170,10 +170,15 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span
+            aria-live="polite"
+            aria-label={isValidating ? t('updatingImmunizations', 'Updating immunization data') : undefined}
+          >
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           <Button
             data-testid="add-immunizations-button"
-            iconDescription={t('addImmunizations', 'Add immunizations')}
+            iconDescription={t('addImmunizationsDescription', 'Record a new vaccine administration for this patient')}
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
             onClick={launchImmunizationsForm}
@@ -193,7 +198,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
             getExpandHeaderProps,
           }) => (
             <TableContainer>
-              <Table aria-label="immunizations summary" size={isTablet ? 'md' : 'sm'} {...getTableProps()}>
+              <Table aria-label={t('immunizationsDetailedTable', 'Immunizations detailed summary table')} size={isTablet ? 'md' : 'sm'} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
