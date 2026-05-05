@@ -46,8 +46,8 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   });
 
   const handleSorting = (
-    cellA: any,
-    cellB: any,
+    _cellA: BiometricsTableRow,
+    _cellB: BiometricsTableRow,
     { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
     if (sortDirection === 'NONE') {
