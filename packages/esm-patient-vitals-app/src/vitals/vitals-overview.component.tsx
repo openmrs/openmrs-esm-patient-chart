@@ -34,7 +34,7 @@ interface VitalsOverviewProps {
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const displayText = t('vitalSigns', 'vital signs');
+  const displayText = t('vitalSigns', 'vital signs (blood pressure, temperature, pulse, SpO2, and respiratory rate)');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
