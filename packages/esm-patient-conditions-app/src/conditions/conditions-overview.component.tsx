@@ -145,7 +145,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span aria-live="polite" aria-label={isValidating ? t('updatingConditions', 'Updating conditions data') : undefined}>
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           <div className={styles.rightMostFlexContainer}>
             <div className={styles.filterContainer}>
               <Dropdown
@@ -168,7 +170,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-              iconDescription="Add conditions"
+              iconDescription={t('addConditionIconDescription', 'Add a new patient condition or diagnosis')}
               onClick={launchConditionsForm}
             >
               {t('add', 'Add')}
