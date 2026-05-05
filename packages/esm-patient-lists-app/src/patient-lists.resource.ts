@@ -31,7 +31,7 @@ export interface Cohort {
 
 export interface CohortResponse<T> {
   results: Array<T>;
-  error: any;
+  error: Error | null;
   totalCount: number;
 }
 
