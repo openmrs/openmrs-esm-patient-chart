@@ -21,7 +21,7 @@ interface FilterNodeParentProps extends Pick<FilterNodeProps, 'root'> {
   itemNumber: number;
 }
 
-function filterTreeNode(inputValue: string, treeNode: any): boolean {
+function filterTreeNode(inputValue: string, treeNode: { display: string; subSets?: Array<unknown> }): boolean {
   if (!treeNode) {
     return false;
   }
@@ -42,20 +42,20 @@ const FilterSet: React.FC<FilterSetProps> = () => {
     const configuredConceptUuids = config?.resultsViewerConcepts?.map((c) => c.conceptUuid) ?? [];
 
     // Helper to check if a node or its children match configured concepts
-    const isConfiguredNode = (node: any): boolean => {
+    const isConfiguredNode = (node: { conceptUuid?: string; subSets?: Array<{ conceptUuid?: string }> }): boolean => {
       // Check if the node itself has a matching conceptUuid
       if (node.conceptUuid && configuredConceptUuids.includes(node.conceptUuid)) {
         return true;
       }
       // Check if any direct child has a matching conceptUuid
       return (
-        node.subSets?.some((child: any) => child.conceptUuid && configuredConceptUuids.includes(child.conceptUuid)) ??
+        node.subSets?.some((child) => child.conceptUuid && configuredConceptUuids.includes(child.conceptUuid)) ??
         false
       );
     };
 
     // Filter the tree data, ensuring only parent categories (with subSets) are at root level
-    const filteredData = (roots as any[]).filter((node) => {
+    const filteredData = roots.filter((node) => {
       // Only include nodes that have subSets (are parent categories)
       if (!node.subSets || !Array.isArray(node.subSets)) {
         return false;
