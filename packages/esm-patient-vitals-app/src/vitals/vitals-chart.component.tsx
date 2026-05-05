@@ -41,7 +41,9 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '',
   });
 
-  const vitalSigns: { id: string; label: string; title: string; value: VitalSignKey; unit: string }[] = [
+  // Memoize the vitalSigns array so it's not recreated on every render.
+  // conceptUnits and config are stable references from SWR / config cache.
+  const vitalSigns: { id: string; label: string; title: string; value: VitalSignKey; unit: string }[] = useMemo(() => [
     {
       id: 'bloodPressure',
       label: t('bp', 'BP'),
@@ -77,7 +79,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       value: 'pulse',
       unit: conceptUnits.get(config.concepts.pulseUuid) ?? '',
     },
-  ];
+  ], [conceptUnits, config.concepts, t]);
 
   const chartData = useMemo((): Array<ChartDataPoint | Array<ChartDataPoint>> => {
     return patientVitals
