@@ -186,7 +186,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
           case 'Numeric': {
             const decimalPlaces: number | undefined = config.data.find(
-              (ele: any) => ele.concept === obs.conceptUuid,
+              (ele) => ele.concept === obs.conceptUuid,
             )?.decimalPlaces;
 
             const rawValue = obs.valueQuantity?.value;
