@@ -38,7 +38,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       mutate(
         visitListPattern,
-        (current: any) => {
+        (current: { data?: { results?: Array<Visit> } } | undefined) => {
           if (!current?.data?.results) return current;
           return {
             ...current,
@@ -67,7 +67,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       mutate(
         visitListPattern,
-        (current: any) => {
+        (current: { data?: { results?: Array<Visit> } } | undefined) => {
           if (!current?.data?.results) return current;
           return {
             ...current,
@@ -99,7 +99,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
 
       mutate(
         visitListPattern,
-        (current: any) => {
+        (current: { data?: { results?: Array<Visit> } } | undefined) => {
           if (!current?.data?.results) return current;
           return {
             ...current,
@@ -116,7 +116,7 @@ export function useOptimisticVisitMutations(patientUuid: string) {
       if (!newVisit.stopDatetime) {
         mutate(
           `${restBaseUrl}/visit?patient=${patientUuid}&v=custom`,
-          (current: any) => ({
+          (current: { data?: Visit } | undefined) => ({
             ...current,
             data: newVisit,
           }),
