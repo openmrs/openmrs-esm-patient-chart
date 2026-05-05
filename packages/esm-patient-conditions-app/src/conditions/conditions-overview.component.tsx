@@ -190,7 +190,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer className={styles.tableContainer}>
-                <Table {...getTableProps()} className={styles.table}>
+                <Table aria-label={t('conditionsTable', 'Conditions overview table')} {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
                       {(headers as Array<DataTableHeader & ConditionTableHeader>).map((header) => (

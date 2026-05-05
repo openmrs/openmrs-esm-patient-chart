@@ -37,7 +37,7 @@ const PatientListDetailsWorkspace: React.FC<
           <Button
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-            iconDescription="Back to patient lists"
+            iconDescription={t('backToPatientListsDescription', 'Go back to the patient lists overview')}
             size="sm"
             onClick={closeListDetailsWorkspace}
           >

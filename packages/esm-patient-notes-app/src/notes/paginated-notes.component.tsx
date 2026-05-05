@@ -111,7 +111,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
           rows,
         }) => (
           <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()}>
+            <Table aria-label={t('visitNotesTable', 'Visit notes table')} {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
