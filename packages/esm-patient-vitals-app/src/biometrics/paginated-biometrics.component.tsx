@@ -9,10 +9,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
   type DataTableSortState,
 } from '@carbon/react';
 import { NumericObservation, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { getBMICategory, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
 import styles from './paginated-biometrics.scss';
@@ -127,6 +128,17 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                         const interpretation = biometricsObj?.[interpretationKey];
                         const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
                         const rawValue = cell.value?.content ?? cell.value;
+                        const isBmiCell = cell.info.header === 'bmiRender';
+                        const bmiNumeric = isBmiCell && biometricsObj?.bmi ? Number(biometricsObj.bmi) : null;
+                        const bmiCategory = bmiNumeric ? getBMICategory(bmiNumeric) : null;
+
+                        // Color-coded BMI category badge (green=normal, yellow=overweight, red=obese/underweight)
+                        const bmiTagType: Record<string, 'green' | 'yellow' | 'red' | 'magenta'> = {
+                          normal: 'green',
+                          overweight: 'yellow',
+                          obese: 'red',
+                          underweight: 'magenta',
+                        };
 
                         return (
                           <TableCell key={cell.id} className={styles.numericObsCell}>
@@ -137,6 +149,15 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                               patientUuid={patientUuid}
                               variant="cell"
                             />
+                            {isBmiCell && bmiCategory && (
+                              <Tag
+                                size="sm"
+                                type={bmiTagType[bmiCategory] ?? 'gray'}
+                                title={t('bmiCategory', 'BMI category')}
+                              >
+                                {t(`bmiCategory_${bmiCategory}`, bmiCategory.charAt(0).toUpperCase() + bmiCategory.slice(1))}
+                              </Tag>
+                            )}
                           </TableCell>
                         );
                       })}
