@@ -200,6 +200,30 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
       content: (
         <div className={styles.startDateColumn}>
           <span>{formatDate(new Date(medication.dateActivated))}</span>
+          {/* Show "X days remaining" for active medications with a duration and no stop date */}
+          {medication.duration && !medication.dateStopped && (() => {
+            const durationInDays =
+              medication.durationUnits?.display?.toLowerCase().includes('day') ? medication.duration :
+              medication.durationUnits?.display?.toLowerCase().includes('week') ? medication.duration * 7 :
+              medication.durationUnits?.display?.toLowerCase().includes('month') ? medication.duration * 30 :
+              medication.duration;
+            const endDate = dayjs(medication.dateActivated).add(durationInDays, 'day');
+            const daysRemaining = endDate.diff(dayjs(), 'day');
+            if (daysRemaining > 0) {
+              return (
+                <span className={styles.daysRemaining}>
+                  {t('daysRemaining', '{{count}} days remaining', { count: daysRemaining })}
+                </span>
+              );
+            } else if (daysRemaining < 0) {
+              return (
+                <span className={styles.overdue}>
+                  {t('completedNDaysAgo', 'Completed {{count}} days ago', { count: Math.abs(daysRemaining) })}
+                </span>
+              );
+            }
+            return null;
+          })()}
           {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),
