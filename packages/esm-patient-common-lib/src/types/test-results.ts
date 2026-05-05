@@ -10,17 +10,22 @@ export interface ObsRecord {
     reference: string;
     type: string;
   };
-  [_: string]: any;
+  // Index signature allows arbitrary FHIR Observation fields
+  [_: string]: string | number | boolean | null | undefined | object | Array<unknown>;
 }
 
 export interface ObsMetaInfo {
-  [_: string]: any;
   assessValue?: (value: string) => OBSERVATION_INTERPRETATION;
+  // Additional metadata fields from the test results viewer
+  [_: string]: string | number | boolean | null | undefined | ((value: string) => OBSERVATION_INTERPRETATION);
 }
 
 export interface ConceptRecord {
   uuid: ConceptUuid;
-  [_: string]: any;
+  display?: string;
+  datatype?: string;
+  // Index signature allows arbitrary concept fields from the FHIR concept dictionary
+  [_: string]: string | number | boolean | null | undefined | object | Array<unknown>;
 }
 
 export interface PatientData {
