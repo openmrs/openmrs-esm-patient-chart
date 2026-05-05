@@ -269,6 +269,17 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={title}>
+        {/* Medication count badge for quick triage awareness */}
+        {medications?.length > 0 && (
+          <Tag
+            size="sm"
+            type="blue"
+            title={t('medicationCount', 'Total medications')}
+            aria-label={t('medicationCountLabel', '{{count}} medications', { count: medications.length })}
+          >
+            {medications.length}
+          </Tag>
+        )}
         {isValidating ? (
           <span aria-live="polite" aria-label={t('updatingMedications', 'Updating medications data')}>
             <InlineLoading />
