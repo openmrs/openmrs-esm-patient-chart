@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Tag } from '@carbon/react';
+import { Tag, Tooltip } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import type { VitalSeverity } from '../utils/clinical-utils';
 import styles from './vital-status-badge.scss';
@@ -43,15 +43,23 @@ export const VitalStatusBadge: React.FC<VitalStatusBadgeProps> = memo(({ severit
 
   const displayLabel = label ?? defaultLabelMap[severity];
 
+  const colorGuideText = t(
+    'vitalColorGuide',
+    'Color guide: Green = Normal, Magenta = Low, Gray = High, Red = Critical. Based on WHO/JNC 8 clinical reference ranges.',
+  );
+
   return (
-    <Tag
-      className={styles.badge}
-      type={tagTypeMap[severity]}
-      title={`${t('vitalStatus', 'Vital status')}: ${displayLabel}`}
-      size="sm"
-    >
-      {showLabel ? displayLabel : null}
-    </Tag>
+    <Tooltip label={colorGuideText} align="top">
+      <Tag
+        className={styles.badge}
+        type={tagTypeMap[severity]}
+        title={`${t('vitalStatus', 'Vital status')}: ${displayLabel}`}
+        size="sm"
+        role="status"
+      >
+        {showLabel ? displayLabel : null}
+      </Tag>
+    </Tooltip>
   );
 });
 
