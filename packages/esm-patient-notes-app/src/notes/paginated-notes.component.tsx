@@ -69,7 +69,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
       sortStates,
     }: {
       sortDirection: string;
-      sortStates: any;
+      sortStates: Record<string, string>;
       locale: string;
     },
   ) {
