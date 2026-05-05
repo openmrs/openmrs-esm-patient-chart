@@ -23,6 +23,14 @@ interface VitalsChartData {
   unit: string;
 }
 
+/** Represents a single data point rendered in the Carbon Charts line chart */
+interface ChartDataPoint {
+  group: string;
+  key: string;
+  value: number | undefined;
+  date: string | Date;
+}
+
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
   const labelId = useId();
@@ -71,7 +79,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
   ];
 
-  const chartData = useMemo(() => {
+  const chartData = useMemo((): Array<ChartDataPoint | Array<ChartDataPoint>> => {
     return patientVitals
       .filter((vitals) => vitals[selectedVitalsSign.value])
       .slice(0, 10)
