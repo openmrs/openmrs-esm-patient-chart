@@ -2,6 +2,7 @@ export * from './cards';
 export * from './compare';
 export * from './utils/clinical-utils';
 export * from './utils/normal-ranges';
+export * from './vital-status-badge';
 export * from './dashboards/createDashboardLink';
 export * from './empty-state';
 export * from './error-state';
