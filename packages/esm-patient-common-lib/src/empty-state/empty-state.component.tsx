@@ -11,7 +11,11 @@ export interface EmptyStateProps {
   launchForm?(): void;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = (props) => {
+/**
+ * Standard empty state component rendered when a patient chart widget has no data.
+ * Wrapped in React.memo since props rarely change once the widget reaches the empty state.
+ */
+export const EmptyState: React.FC<EmptyStateProps> = React.memo(function EmptyState(props) {
   const { t } = useTranslation('@openmrs/esm-patient-chart-app');
   const isTablet = useLayoutType() === 'tablet';
 
@@ -37,4 +41,4 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
       </Tile>
     </Layer>
   );
-};
+});
