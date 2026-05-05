@@ -104,7 +104,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       >
         {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
           <TableContainer className={styles.tableContainer}>
-            <Table aria-label="vitals" className={styles.table} {...getTableProps()}>
+            <Table
+              aria-label={t('vitalsTableLabel', 'Vitals table showing patient vital sign measurements with date, temperature, blood pressure, pulse, respiratory rate, and SpO2')}
+              className={styles.table}
+              {...getTableProps()}
+            >
               <TableHead>
                 <TableRow>
                   {hasAnyNotes && <TableExpandHeader {...getExpandHeaderProps()} />}
@@ -129,8 +133,15 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                           const interpretation = vitalsObj?.[interpretationKey];
                           const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
 
-                          return (
-                            <TableCell key={`styled-cell-${cell.id}`} className={styles.numericObsCell}>
+                          const interpretationLabel = interpretation
+                          ? t('vitalInterpretation', 'Interpretation: {{interpretation}}', { interpretation })
+                          : undefined;
+                        return (
+                            <TableCell
+                              key={`styled-cell-${cell.id}`}
+                              className={styles.numericObsCell}
+                              aria-label={interpretationLabel}
+                            >
                               <NumericObservation
                                 value={cell.value?.content ?? cell.value}
                                 interpretation={interpretation}
