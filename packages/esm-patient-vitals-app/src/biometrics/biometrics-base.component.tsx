@@ -79,12 +79,24 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
   const tableRows: Array<BiometricsTableRow> = useMemo(
     () =>
       biometrics?.map((biometricsData, index) => {
+        // Calculate BMI trend indicator by comparing with the previous reading
+        const prevBmi = index + 1 < biometrics.length ? biometrics[index + 1].bmi : null;
+        const currentBmi = biometricsData.bmi;
+        const bmiTrend: '↑' | '↓' | '' =
+          currentBmi != null && prevBmi != null
+            ? currentBmi > prevBmi ? '↑' : currentBmi < prevBmi ? '↓' : ''
+            : '';
+
         return {
           ...biometricsData,
           dateRender: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
           weightRender: biometricsData.weight ?? '--',
           heightRender: biometricsData.height ?? '--',
-          bmiRender: showBmi ? biometricsData.bmi ?? '--' : '--',
+          bmiRender: showBmi
+            ? biometricsData.bmi != null
+              ? `${biometricsData.bmi} ${bmiTrend}`.trim()
+              : '--'
+            : '--',
           muacRender: biometricsData.muac ?? '--',
         };
       }),
