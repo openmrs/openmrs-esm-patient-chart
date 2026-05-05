@@ -73,11 +73,16 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span
+            aria-live="polite"
+            aria-label={isValidating ? t('updatingImmunizations', 'Updating immunizations data') : undefined}
+          >
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           <Button
             kind="ghost"
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-            iconDescription="Add immunizations"
+            iconDescription={t('addImmunizationIconDescription', 'Record a new vaccine administration for this patient')}
             onClick={launchImmunizationsForm}
           >
             {t('add', 'Add')}
@@ -86,7 +91,10 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
         <DataTable headers={tableHeaders} rows={tableRows} isSortable size="sm" useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()}>
+              <Table
+                {...getTableProps()}
+                aria-label={t('immunizationsTableLabel', 'Immunizations overview table showing recent vaccinations and dates')}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
