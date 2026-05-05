@@ -1,6 +1,7 @@
 import { ExtensionSlot, useLeftNav } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { spaBasePath } from '../constants';
 import Loader from '../loader/loader.component';
@@ -28,15 +29,37 @@ const WrappedPatientChart: React.FC<WrappedPatientChartProps> = ({ patientUuid, 
   const [layoutMode, setLayoutMode] = useState<LayoutMode>();
   const state = usePatientChartPatientAndVisit(patientUuid);
   const { isLoadingPatient, patient } = state;
+  const { t } = useTranslation();
 
   const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
 
   useLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
 
+  const handleSkipToContent = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const mainContent = document.getElementById('patient-chart-main-content');
+    if (mainContent) {
+      mainContent.focus();
+      mainContent.scrollIntoView();
+    }
+  }, []);
+
   return (
     <>
+      {/* Skip-to-content link for keyboard users */}
+      <a
+        href="#patient-chart-main-content"
+        className={styles.skipToContent}
+        onClick={handleSkipToContent}
+      >
+        {t('skipToMainContent', 'Skip to main content')}
+      </a>
       <SideMenuPanel />
-      <main className={classNames('omrs-main-content', styles.chartContainer)}>
+      <main
+        id="patient-chart-main-content"
+        tabIndex={-1}
+        className={classNames('omrs-main-content', styles.chartContainer)}
+      >
         <>
           <div className={classNames(styles.innerChartContainer)}>
             {isLoadingPatient ? (

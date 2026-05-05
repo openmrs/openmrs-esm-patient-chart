@@ -2,6 +2,25 @@
 @use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+// Skip-to-content link: hidden by default, visible on focus for keyboard users
+.skipToContent {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  background-color: colors.$blue-60;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:focus {
+    top: 0;
+    outline: 3px solid colors.$blue-80;
+    outline-offset: 2px;
+  }
+}
+
 $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
 $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
