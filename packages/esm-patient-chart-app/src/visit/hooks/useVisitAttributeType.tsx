@@ -15,7 +15,8 @@ interface VisitAttributeType {
     | 'org.openmrs.customdatatype.datatype.FreeTextDatatype'
     | 'org.openmrs.customdatatype.datatype.DateDatatype';
   datatypeConfig: string;
-  preferredHandlerClassname: any;
+  /** The handler class name is an arbitrary Java class name string from the OpenMRS REST API */
+  preferredHandlerClassname: string | null;
   retired: boolean;
 }
 
