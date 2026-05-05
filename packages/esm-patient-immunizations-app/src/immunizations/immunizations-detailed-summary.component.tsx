@@ -49,7 +49,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 }) => {
   const { t } = useTranslation();
   const { immunizationsConfig } = useConfig();
-  const displayText = t('immunizations__lower', 'immunizations');
+  const displayText = t('immunizations__lower', 'vaccine administration records or immunization history');
   const headerTitle = t('immunizations', 'Immunizations');
   const { visitContext } = usePatientChartStore(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
