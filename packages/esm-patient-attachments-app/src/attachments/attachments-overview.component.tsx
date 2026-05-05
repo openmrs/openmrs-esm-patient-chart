@@ -133,7 +133,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   if (!attachments.length) {
     return (
       <EmptyState
-        displayText={t('attachmentsInLowerCase', 'attachments')}
+        displayText={t('attachmentsInLowerCase', 'attachments (lab results, images, consent forms, or other documents)')}
         headerTitle={t('attachmentsInProperFormat', 'Attachments')}
         launchForm={showAddAttachmentModal}
       />
