@@ -91,7 +91,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = () => {
                   />
                 </Layer>
               </div>
-              <Table {...getTableProps()} isSortable useZebraStyles>
+              <Table aria-label={t('offlineFormsTable', 'Offline available forms table')} {...getTableProps()} isSortable useZebraStyles>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

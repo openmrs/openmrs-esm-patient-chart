@@ -108,7 +108,7 @@ const PatientListDetailsTable: React.FC<PatientListDetailsTableProps> = ({ listM
           >
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer>
-                <Table {...getTableProps()}>
+                <Table aria-label={t('patientListMembersTable', 'Patient list members table')} {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
