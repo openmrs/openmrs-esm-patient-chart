@@ -16,6 +16,16 @@ interface PatientBannerProps {
   hideActionsOverflow?: boolean;
 }
 
+/**
+ * Displays a persistent banner at the top of the patient chart showing identity,
+ * photo, and optionally the patient's contact details.
+ *
+ * Uses ResizeObserver rather than CSS media queries to detect the tablet breakpoint
+ * because the banner may be rendered inside a narrowed workspace panel that doesn't
+ * span the full viewport width. A CSS media query would fire at viewport width, but
+ * ResizeObserver fires at the element's actual rendered width — giving us the correct
+ * layout regardless of how the panel is sized.
+ */
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const patientBannerRef = useRef(null);
   const [isTabletViewport, setIsTabletViewport] = useState(false);
