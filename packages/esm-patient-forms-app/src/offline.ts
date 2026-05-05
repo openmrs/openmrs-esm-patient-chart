@@ -73,7 +73,7 @@ async function syncEncounter(associatedOfflineVisit: Visit, encounter?: Encounte
   });
 }
 
-async function syncPersonUpdate(personUuid?: string, personUpdate?: any) {
+async function syncPersonUpdate(personUuid?: string, personUpdate?: Record<string, unknown>) {
   if (!personUuid || !personUpdate) {
     return;
   }
