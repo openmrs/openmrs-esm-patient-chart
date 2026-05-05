@@ -168,7 +168,11 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   };
 
   return (
-    <div className={styles.vitalsChartContainer}>
+    <div
+      className={styles.vitalsChartContainer}
+      aria-label={t('vitalsChartDescription', 'Interactive chart showing vital sign trends over time. Use the tabs on the left to switch between different vital signs.')}
+      role="region"
+    >
       <div className={styles.vitalSignsArea}>
         <label className={styles.vitalsSignLabel} id={labelId}>
           {t('vitalSignDisplayed', 'Vital sign displayed')}
