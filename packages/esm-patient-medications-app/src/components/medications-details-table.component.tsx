@@ -270,7 +270,7 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
     <div className={styles.widgetCard}>
       <CardHeader title={title}>
         {isValidating ? (
-          <span>
+          <span aria-live="polite" aria-label={t('updatingMedications', 'Updating medications data')}>
             <InlineLoading />
           </span>
         ) : null}
@@ -312,7 +312,11 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-label="medications" className={styles.table} {...getTableProps()}>
+              <Table
+                aria-label={t('medicationsTableLabel', 'Medications table listing active prescriptions with start date and dosing details')}
+                className={styles.table}
+                {...getTableProps()}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
