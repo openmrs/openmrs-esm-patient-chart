@@ -1,5 +1,6 @@
 export * from './cards';
 export * from './compare';
+export * from './utils/clinical-utils';
 export * from './dashboards/createDashboardLink';
 export * from './empty-state';
 export * from './error-state';
