@@ -48,6 +48,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     },
   ];
 
+  // Memoize tableRows: the reactions string involves a sort + join which is
+  // moderately expensive when rendering large allergy lists. We depend only on
+  // paginatedAllergies — adding a locale dep would cause unnecessary re-renders
+  // every time the component tree re-renders with the same locale.
   const tableRows = useMemo(() => {
     return paginatedAllergies?.map((allergy) => ({
       ...allergy,
