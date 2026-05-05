@@ -1,6 +1,21 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Computes pagination metadata for the PatientChartPagination component.
+ *
+ * @param pageSize - Number of items per page
+ * @param totalItems - Total number of items across all pages
+ * @param pageNumber - Current page number (1-indexed)
+ * @param currentItems - Number of items on the current page
+ *
+ * @returns
+ * - `pageSizes` — array of cumulative page sizes for the page size selector
+ * - `itemsDisplayed` — formatted "X / Y items" string for screen readers and sighted users
+ *
+ * The `itemsDisplayed` string is translated via i18n so clinicians using
+ * the system in non-English languages also see localized pagination labels.
+ */
 export function usePaginationInfo(pageSize: number, totalItems: number, pageNumber: number, currentItems: number) {
   const { t } = useTranslation('@openmrs/esm-patient-chart-app');
 
