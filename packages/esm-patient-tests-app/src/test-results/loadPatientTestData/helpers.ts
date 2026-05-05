@@ -160,7 +160,7 @@ export function loadPresentConcepts(entries: Array<ObsRecord>): Promise<Array<Co
  * @param args any
  * @returns {boolean}
  */
-export function exist(...args: any[]): boolean {
+export function exist(...args: Array<unknown>): boolean {
   for (const y of args) {
     if (y === null || y === undefined) {
       return false;

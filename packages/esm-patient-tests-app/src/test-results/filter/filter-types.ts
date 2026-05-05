@@ -23,7 +23,8 @@ export interface TreeNode {
   obs?: Array<ObservationData>;
   units?: string;
   range?: string;
-  [x: string]: any;
+  // Index signature allows arbitrary concept/node fields from the OpenMRS concept dictionary
+  [x: string]: string | number | boolean | null | undefined | Array<unknown> | object;
 }
 
 export interface FilterNodeProps {
