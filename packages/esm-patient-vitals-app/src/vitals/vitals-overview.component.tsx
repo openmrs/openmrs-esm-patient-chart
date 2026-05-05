@@ -47,6 +47,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const { conceptUnits } = useConceptUnits();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
+  // Memoize patientDetails: this object is passed to the print component and
+  // depends on `patient` (FHIR resource), `t` (stable per locale), and
+  // `excludePatientIdentifierCodeTypes` (stable config value). Without memoization,
+  // this would re-compute on every poll cycle when SWR background-validates.
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
