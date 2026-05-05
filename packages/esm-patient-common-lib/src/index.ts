@@ -17,6 +17,7 @@ export * from './programs/usePatientProgramEnrollment';
 export * from './store/patient-chart-store';
 export * from './time-helper';
 export * from './types';
+export * from './hooks/useDebounce';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
 export * from './visit';
