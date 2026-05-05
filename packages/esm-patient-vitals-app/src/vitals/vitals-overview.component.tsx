@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, NetworkErrorState } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   PrinterIcon,
@@ -186,7 +186,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
         }
 
         if (error) {
-          return <ErrorState error={error} headerTitle={headerTitle} />;
+          return (
+            <NetworkErrorState
+              headerTitle={headerTitle}
+              onRetry={() => window.location.reload()}
+            />
+          );
         }
 
         if (vitals?.length) {
