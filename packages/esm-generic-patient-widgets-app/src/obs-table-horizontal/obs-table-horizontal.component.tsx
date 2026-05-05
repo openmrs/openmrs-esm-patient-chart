@@ -487,7 +487,7 @@ const Cell: React.FC<{
               id={cellKey}
               size="sm"
               value={editingValue}
-              onChange={(e: any, data: any) => setEditingValue(data.value ?? '')}
+              onChange={(_e: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => setEditingValue(data.value ?? '')}
               onKeyDown={(e) => handleKeyDown(e)}
               autoFocus
               hideSteppers
