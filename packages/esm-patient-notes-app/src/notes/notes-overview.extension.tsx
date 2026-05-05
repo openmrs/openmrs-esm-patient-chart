@@ -29,7 +29,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
   const urlLabel = t('seeAll', 'See all');
 
   const { visitContext } = usePatientChartStore(patientUuid);
-  const displayText = t('visitNotes', 'Visit notes');
+  const displayText = t('visitNotes', 'visit notes or clinical encounter summaries');
   const headerTitle = t('visitNotes', 'Visit notes');
   const { visitNotes, error, isLoading, isValidating } = useVisitNotes(patientUuid);
   const layout = useLayoutType();
