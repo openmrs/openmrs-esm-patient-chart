@@ -41,7 +41,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const programsCount = 5;
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const displayText = t('programEnrollmentsLower', 'program enrollments');
+  const displayText = t('programEnrollmentsLower', 'care program enrollments or active care plans');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/programs`;
@@ -116,12 +116,17 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span
+            aria-live="polite"
+            aria-label={isValidating ? t('updatingPrograms', 'Updating care programs data') : undefined}
+          >
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           {config.hideAddProgramButton ? null : (
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-              iconDescription="Add programs"
+              iconDescription={t('addProgramDescription', 'Enroll this patient in a new care program')}
               onClick={launchProgramsForm}
               disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
             >
