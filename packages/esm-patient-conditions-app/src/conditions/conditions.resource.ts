@@ -303,7 +303,11 @@ export function useConditionsSorting(tableHeaders: Array<ConditionTableHeader>, 
     sortDirection: DataTableSortState;
   }>({ key: '', sortDirection: 'NONE' });
 
-  const sortRow = (cellA, cellB, { key, sortDirection }) => {
+  const sortRow = (
+    cellA: ConditionTableRow,
+    cellB: ConditionTableRow,
+    { key, sortDirection }: { key: ConditionTableHeader['key']; sortDirection: DataTableSortState },
+  ): number => {
     setSortParams({ key, sortDirection });
     return 0;
   };
