@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { CardHeader, EmptyState, ErrorState, NetworkErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, NetworkErrorState, isVitalInNormalRange } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   PrinterIcon,
@@ -14,6 +14,7 @@ import {
   useConfig,
   useLayoutType,
 } from '@openmrs/esm-framework';
+import { Tag } from '@carbon/react';
 import type { ConfigObject } from '../config-schema';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
@@ -199,9 +200,31 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
         }
 
         if (vitals?.length) {
+          // Count abnormal vitals in the most recent reading for quick triage
+          const latestVitals = vitals[0];
+          const abnormalCount = [
+            latestVitals.systolic != null && !isVitalInNormalRange('systolic', latestVitals.systolic).isNormal,
+            latestVitals.diastolic != null && !isVitalInNormalRange('diastolic', latestVitals.diastolic).isNormal,
+            latestVitals.pulse != null && !isVitalInNormalRange('pulse', latestVitals.pulse).isNormal,
+            latestVitals.spo2 != null && !isVitalInNormalRange('spo2', latestVitals.spo2).isNormal,
+            latestVitals.temperature != null && !isVitalInNormalRange('temperature', latestVitals.temperature).isNormal,
+            latestVitals.respiratoryRate != null && !isVitalInNormalRange('respiratoryRate', latestVitals.respiratoryRate).isNormal,
+          ].filter(Boolean).length;
+
           return (
             <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
+                {/* Out-of-range vitals summary badge — alerts clinicians at a glance */}
+                {abnormalCount > 0 && (
+                  <Tag
+                    type="red"
+                    size="sm"
+                    title={t('abnormalVitalsTitle', 'Abnormal vital signs in latest reading')}
+                    aria-label={t('abnormalVitalsLabel', '{{count}} abnormal vital signs', { count: abnormalCount })}
+                  >
+                    {t('abnormalCount', '{{count}} abnormal', { count: abnormalCount })}
+                  </Tag>
+                )}
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span
                     aria-live="polite"
