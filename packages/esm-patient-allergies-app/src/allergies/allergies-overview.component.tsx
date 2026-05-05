@@ -75,7 +75,8 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
           <Button
             kind="ghost"
             renderIcon={(props) => <AddIcon size={16} {...props} />}
-            iconDescription="Add allergies"
+            iconDescription={t('addAllergiesIconDescription', 'Add a new allergy or intolerance record')}
+            aria-describedby="allergies-add-description"
             onClick={launchAllergiesForm}
           >
             {t('add', 'Add')}
@@ -84,7 +85,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table aria-label="allergies overview" {...getTableProps()}>
+              <Table
+                aria-label={t('allergiesOverviewTable', 'Allergies overview table listing allergy name and reactions')}
+                {...getTableProps()}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
