@@ -26,7 +26,7 @@ interface AllergiesOverviewProps {
 
 const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('allergyIntolerances', 'allergy intolerances');
+  const displayText = t('allergyIntolerances', 'allergy intolerances or NKDA (No Known Drug Allergies)');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/allergies`;
