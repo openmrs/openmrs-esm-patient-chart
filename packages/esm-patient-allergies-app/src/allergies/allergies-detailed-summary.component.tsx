@@ -72,11 +72,16 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span
+            aria-live="polite"
+            aria-label={isValidating ? t('updatingAllergies', 'Updating allergy data') : undefined}
+          >
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           <Button
             kind="ghost"
             renderIcon={(props) => <AddIcon size={16} {...props} />}
-            iconDescription="Add allergies"
+            iconDescription={t('addAllergyDescription', 'Record a new allergy or intolerance for this patient')}
             onClick={launchAllergiesForm}
           >
             {t('add', 'Add')}
