@@ -1,6 +1,14 @@
 /**
  * Normal range constants for vital signs, based on WHO and JNC 8 clinical guidelines.
  *
+ * IMPLEMENTATION NOTES:
+ * - These are adult reference ranges. Paediatric adjustments are handled in
+ *   the interpretation helper functions (clinical-utils.ts) using patient age.
+ * - All temperature values are in Celsius. If a deployment uses Fahrenheit,
+ *   the UI layer should convert before calling interpretation helpers.
+ * - The 'criticalHigh' and 'criticalLow' thresholds indicate values requiring
+ *   immediate clinical attention (not just monitoring).
+ *
  * WHY these ranges matter:
  * In resource-limited settings, clinicians see dozens of patients per shift and cannot
  * always mentally recall all normal ranges. Centralising these constants ensures
