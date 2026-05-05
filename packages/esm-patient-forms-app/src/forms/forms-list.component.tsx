@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton } from '@carbon/react';
 import { formatDatetime, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useDebounce } from '@openmrs/esm-patient-common-lib';
 import type { CompletedFormInfo, Form } from '../types';
 import FormsTable from './forms-table.component';
 import styles from './forms-list.scss';
@@ -22,10 +22,12 @@ export type FormsListProps = {
 
 const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handleFormOpen }) => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [rawSearchTerm, setRawSearchTerm] = useState('');
+  // Debounce the search term to avoid filtering on every keypress — 300ms is the standard
+  // threshold for interactive search in clinical applications (fast enough to feel responsive,
+  // slow enough to avoid excessive re-renders during rapid typing).
+  const searchTerm = useDebounce(rawSearchTerm, 300);
   const isTablet = useLayoutType() === 'tablet';
-
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
@@ -85,7 +87,7 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
         tableHeaders={tableHeaders}
         tableRows={tableRows}
         isTablet={isTablet}
-        handleSearch={handleSearch}
+        handleSearch={setRawSearchTerm}
         handleFormOpen={handleFormOpen}
       />
     </ResponsiveWrapper>
