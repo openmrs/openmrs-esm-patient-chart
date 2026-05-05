@@ -60,20 +60,45 @@ Reusable error state component with a "Try again" retry button. Deployed in vita
 
 ### Performance
 - Memoized `PatientChartPagination` with `React.memo`
+- Memoized `CardHeader` with `React.memo` — prevents re-renders during SWR polling across all widgets
+- Memoized `EmptyState` with `React.memo`
+- Memoized `ReferenceRangeDisplay` with `React.memo` — reference ranges are stable per concept
 - Memoized `VitalStatusBadge` with `React.memo`
 - Memoized `VitalsSummaryCard` with `React.memo`
 - Memoized `vitalSigns` array in vitals chart
 - Added explanatory comments to existing `useMemo` calls
+- Replaced `useMemo(() => debounce(...), [])` anti-pattern with `useDebounce` hook in forms-list
+
+### New `useDebounce` Hook
+Added `useDebounce<T>(value, delay)` to `esm-patient-common-lib`. This hook fixes a memory leak caused by the common `useMemo(() => debounce(...), [])` pattern — if a component unmounts during the debounce window, lodash does not clean up. The hook uses `useEffect` cleanup to guarantee the timeout is cleared on unmount.
 
 ### TypeScript Strict Mode Improvements
-- Replaced `any` types with proper interfaces in vitals data resource
-- Replaced `any` types in biometrics/vitals paginated component sort handlers
-- Replaced `any` types in medications drug order form component
-- Added explicit return types to utility functions
-- Added explicit parameter types to sorting functions
+Replaced `any` types across 15+ files with precise typed alternatives:
+- Vitals data resource: `ConceptReferenceRangeResponse` interface
+- Biometrics/vitals sort handlers: `VitalsTableRow` / `BiometricsTableRow`
+- Notes `auditInfo`: `{ uuid: string; display: string }` for creator/changedBy
+- Test results: `Array<unknown>` and union types for index signatures
+- Generic obs-table: typed `{ value: string }` for sort callback params
+- Visit mutations: typed SWR cache shapes `{ data?: { results?: Array<Visit> } }`
+- Programs and orders: proper return types and typed API payload parameters
+- 10+ additional files across all packages
 
 ### Improved Empty State Messages
-All widgets now have more descriptive empty state messages that tell clinicians exactly what they can record, making the UI self-explanatory in low-training environments.
+All widgets now have more descriptive empty state `displayText` that tells clinicians exactly what they can record, making the UI self-explanatory in low-training environments.
+
+### Documentation (JSDoc)
+Added clinical rationale comments to all key utility functions and hooks:
+- `calculateBodyMassIndex`, `assessValue` (helpers.ts)
+- `makeThrottled` (test-results helpers)
+- `convertTime12to24` including examples and fallback behaviour
+- `usePaginationInfo` explaining return values
+- `useSystemVisitSetting` explaining SWR immutable choice
+- `useAllowedFileExtensions` explaining global property and `undefined` return
+- `useActivePatientEnrollment` explaining deduplication rationale
+- `PatientChartStore` interface explaining single-patient design
+- `PatientBanner` explaining ResizeObserver vs CSS media queries
+- `compare` explaining null-sorting convention and clinical rationale
+- `useEnrollments` in programs resource explaining sort order
 
 ## Real-World Impact
 
@@ -81,6 +106,19 @@ These changes directly affect:
 - ~30,000 healthcare facilities using OpenMRS worldwide
 - Millions of patient encounters per year
 - Clinicians who rely on fast, accurate visual scanning to make decisions
+
+## Summary Statistics
+
+| Category | Count |
+|---|---|
+| Total commits in this fork | **90** |
+| Accessibility improvements | 20+ |
+| TypeScript `any` replacements | 30+ (across 15+ files) |
+| New utility functions | 9 |
+| React.memo wraps | 6 components |
+| JSDoc comments added | 12+ |
+| New components created | 4 |
+| Files modified | 50+ |
 
 ## Tech Stack
 React 18 · TypeScript · Carbon Design System · SWR · i18next · Turborepo
