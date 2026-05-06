@@ -18,11 +18,11 @@ const sourceTypeToRestParam: Record<Exclude<ConceptSourceType, 'any'>, string> =
 };
 
 function buildConceptSearchUrl(query: string, source: ConceptSource): string {
-  const params = new URLSearchParams({
-    name: query,
-    searchType: 'fuzzy',
-    v: 'custom:(uuid,display)',
-  });
+  const params = new URLSearchParams({ v: 'custom:(uuid,display)' });
+  if (query) {
+    params.set('name', query);
+    params.set('searchType', 'fuzzy');
+  }
   if (source.uuid && source.sourceType !== 'any') {
     params.set(sourceTypeToRestParam[source.sourceType], source.uuid);
   }
@@ -36,7 +36,8 @@ export function useProcedureTypes() {
 }
 
 export function useConceptSearch(query: string, source: ConceptSource) {
-  const url = query ? buildConceptSearchUrl(query, source) : null;
+  const hasSourceFilter = Boolean(source.uuid) && source.sourceType !== 'any';
+  const url = query || hasSourceFilter ? buildConceptSearchUrl(query, source) : null;
   const { data, error, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
   return { searchResults: data?.data?.results ?? [], isSearching: isLoading };
 }

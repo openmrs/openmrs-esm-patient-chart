@@ -43,9 +43,8 @@ mockUseConfig.mockReturnValue({
   bodySiteConceptSourceType: 'any',
   statusConceptUuid: '',
   statusConceptSourceType: 'any',
-  durationUnitMinutesConceptUuid: 'minutes-uuid',
-  durationUnitHoursConceptUuid: 'hours-uuid',
-  durationUnitDaysConceptUuid: 'days-uuid',
+  durationUnitConceptUuid: '',
+  durationUnitConceptSourceType: 'any',
 });
 
 const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object> = {
@@ -317,13 +316,13 @@ describe('ProceduresForm', () => {
     await user.type(durationInput, '30');
 
     const unitSelect = screen.getByLabelText(/duration unit/i);
-    await user.selectOptions(unitSelect, 'minutes-uuid');
+    await user.selectOptions(unitSelect, 'proc-concept-uuid-1');
 
     await user.click(screen.getByRole('button', { name: /save & close/i }));
 
     await waitFor(() =>
       expect(mockSaveProcedure).toHaveBeenCalledWith(
-        expect.objectContaining({ duration: 30, durationUnit: 'minutes-uuid' }),
+        expect.objectContaining({ duration: 30, durationUnit: 'proc-concept-uuid-1' }),
       ),
     );
   });
