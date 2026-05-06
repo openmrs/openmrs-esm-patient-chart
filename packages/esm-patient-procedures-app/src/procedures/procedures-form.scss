@@ -1,0 +1,106 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.resultItem {
+  padding: layout.$spacing-04;
+  border-top: 0.0625rem solid $grey-2;
+
+  &:first-of-type {
+    border-top: none;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.resultsList {
+  background-color: $ui-02;
+  max-height: 14rem;
+  overflow-y: auto;
+  border: 1px solid $ui-03;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li:hover {
+    background-color: $ui-03;
+    cursor: pointer;
+  }
+}
+
+.emptyResults {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  min-height: layout.$spacing-05;
+  border: 1px solid $ui-03;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.formContainer {
+  margin: layout.$spacing-05;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0;
+}
+
+.loader {
+  padding: layout.$spacing-05 layout.$spacing-03;
+}
+
+.errorContainer {
+  margin: layout.$spacing-05;
+}
+
+.errorMessage {
+  @include type.type-style('label-02');
+  color: $danger;
+  margin-top: layout.$spacing-03;
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
+}
+
+.required {
+  color: colors.$red-60;
+  margin-left: layout.$spacing-01;
+}
+
+.durationFieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: layout.$spacing-05;
+  align-items: end;
+}
+
+.dateTimeFieldGroup {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: layout.$spacing-05;
+  align-items: end;
+}
