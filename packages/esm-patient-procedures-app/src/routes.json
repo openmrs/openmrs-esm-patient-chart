@@ -10,7 +10,8 @@
   "workspaceWindows2": [
     {
       "name": "procedures-form-window",
-      "group": "patient-chart"
+      "group": "patient-chart",
+      "width": "wider"
     }
   ],
   "extensions": [
