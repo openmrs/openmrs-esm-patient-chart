@@ -55,7 +55,7 @@
       "order": 3,
       "meta": {
         "slot": "patient-chart-medications-dashboard-slot",
-        "path": "Medications"
+        "path": "medications"
       }
     },
     {

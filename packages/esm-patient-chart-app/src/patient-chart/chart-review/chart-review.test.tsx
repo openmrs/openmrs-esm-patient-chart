@@ -19,7 +19,7 @@ jest.mock('react-router-dom', () => ({
   useMatch: jest.fn().mockReturnValue({
     params: {
       url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
-      view: 'Patient Summary',
+      view: 'patient-summary',
     },
   }),
 }));
@@ -42,7 +42,7 @@ describe('ChartReview', () => {
               name: 'charts-summary-dashboard',
               meta: {
                 slot: 'patient-chart-summary-dashboard-slot',
-                path: 'Patient Summary',
+                path: 'patient-summary',
                 title: 'Patient Summary',
               },
             },
@@ -67,7 +67,7 @@ describe('ChartReview', () => {
 
     render(
       <BrowserRouter>
-        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="Patient Summary" />
+        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="patient-summary" />
       </BrowserRouter>,
     );
 

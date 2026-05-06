@@ -1,3 +1,4 @@
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { dashboardMeta } from './dashboard.meta';
 
 export const makeThrottled = <T extends (...args: any[]) => any>(
@@ -29,3 +30,7 @@ export const makeThrottled = <T extends (...args: any[]) => any>(
 };
 
 export const testResultsBasePath = (basePath: string) => `${window.spaBase}${basePath}/${dashboardMeta.path}`;
+
+export function formatResultDate(obsDatetime?: string) {
+  return obsDatetime ? formatDate(parseDate(obsDatetime), { mode: 'standard', time: true }) : '--';
+}

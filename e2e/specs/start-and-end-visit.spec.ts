@@ -135,7 +135,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail with no visit', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see a modal to prompt for starting a visit', async () => {
@@ -155,7 +155,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail again with no visit', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
@@ -230,7 +230,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
@@ -252,7 +252,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see a modal to prompt for starting a visit', async () => {

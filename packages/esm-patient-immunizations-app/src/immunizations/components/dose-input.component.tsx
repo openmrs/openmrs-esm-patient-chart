@@ -11,7 +11,7 @@ export const DoseInput: React.FC<{
   control: Control;
 }> = ({ vaccine, sequences, control }) => {
   const { t } = useTranslation();
-  const { field } = useController({ name: 'doseNumber', control });
+  const { field, fieldState } = useController({ name: 'doseNumber', control });
 
   const vaccineSequences = useMemo(
     () => sequences?.find((sequence) => sequence.vaccineConceptUuid === vaccine)?.sequences || [],
@@ -32,6 +32,8 @@ export const DoseInput: React.FC<{
       {vaccineSequences.length ? (
         <Dropdown
           id="sequence"
+          invalid={!!fieldState.error}
+          invalidText={fieldState.error?.message}
           items={vaccineSequences?.map((sequence) => sequence.sequenceNumber) || []}
           itemToString={(item) => vaccineSequences.find((s) => s.sequenceNumber === item)?.sequenceLabel}
           label={t('pleaseSelect', 'Please select')}
@@ -45,6 +47,8 @@ export const DoseInput: React.FC<{
           disableWheel
           hideSteppers
           id="doseNumber"
+          invalid={!!fieldState.error}
+          invalidText={fieldState.error?.message}
           label={t('doseNumberWithinSeries', 'Dose number within series')}
           min={1}
           onChange={handleChange}

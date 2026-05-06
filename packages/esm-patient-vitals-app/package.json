@@ -40,7 +40,7 @@
     "@carbon/charts-react": "^1.27.0",
     "@carbon/react": "^1.83.0",
     "@openmrs/esm-patient-common-lib": "next",
-    "lodash-es": "^4.17.23"
+    "lodash-es": "^4.18.1"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "9.x",

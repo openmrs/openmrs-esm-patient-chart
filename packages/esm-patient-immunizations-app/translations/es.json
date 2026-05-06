@@ -8,6 +8,7 @@
   "doseNumberWithinSeries": "Número de dosis dentro de la serie",
   "doses": "Doses",
   "due": "Due",
+  "duplicateDoseError": "Dose {{dose}} has already been recorded for this vaccine",
   "error": "Error",
   "errorSaving": "Error al guardar la vacunación",
   "expirationDate": "Fecha de Vencimiento",
