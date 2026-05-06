@@ -141,12 +141,17 @@ describe('prepMedicationOrderPostData', () => {
 });
 
 describe('buildMedicationOrder', () => {
-  it.each(['RENEW', 'REVISE', 'DISCONTINUE'] as const)(
-    'preserves the original activation date when building a %s basket item',
+  it('preserves the original activation date when building a DISCONTINUE basket item', () => {
+    const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
+    expect(result.startDate).toBe(medicationOrder.dateActivated);
+  });
+
+  it.each(['RENEW', 'REVISE'] as const)(
+    'does not inherit the original activation date when building a %s basket item',
     (action) => {
       const result = buildMedicationOrder(medicationOrder, action);
-
-      expect(result.startDate).toBe(medicationOrder.dateActivated);
+      expect(result.startDate).toBeInstanceOf(Date);
+      expect(result.startDate).not.toBe(medicationOrder.dateActivated);
     },
   );
 });

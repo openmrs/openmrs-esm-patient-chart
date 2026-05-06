@@ -585,7 +585,6 @@ export function DrugOrderForm({
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
-                {/* TODO: This input does nothing */}
                 <Column lg={16} md={4} sm={4}>
                   <div className={styles.fullWidthDatePickerContainer}>
                     <InputWrapper>
