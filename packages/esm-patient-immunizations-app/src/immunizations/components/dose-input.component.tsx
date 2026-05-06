@@ -9,9 +9,11 @@ export const DoseInput: React.FC<{
   vaccine: string;
   sequences: ImmunizationSequenceDefinition[];
   control: Control;
-}> = ({ vaccine, sequences, control }) => {
+  warningMessage?: string;
+}> = ({ vaccine, sequences, control, warningMessage }) => {
   const { t } = useTranslation();
   const { field, fieldState } = useController({ name: 'doseNumber', control });
+  const showWarning = !!warningMessage && !fieldState.error;
 
   const vaccineSequences = useMemo(
     () => sequences?.find((sequence) => sequence.vaccineConceptUuid === vaccine)?.sequences || [],
@@ -34,6 +36,8 @@ export const DoseInput: React.FC<{
           id="sequence"
           invalid={!!fieldState.error}
           invalidText={fieldState.error?.message}
+          warn={showWarning}
+          warnText={warningMessage}
           items={vaccineSequences?.map((sequence) => sequence.sequenceNumber) || []}
           itemToString={(item) => vaccineSequences.find((s) => s.sequenceNumber === item)?.sequenceLabel}
           label={t('pleaseSelect', 'Please select')}
@@ -49,6 +53,8 @@ export const DoseInput: React.FC<{
           id="doseNumber"
           invalid={!!fieldState.error}
           invalidText={fieldState.error?.message}
+          warn={showWarning}
+          warnText={warningMessage}
           label={t('doseNumberWithinSeries', 'Dose number within series')}
           min={1}
           onChange={handleChange}

@@ -93,17 +93,31 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
     control,
     handleSubmit,
     reset,
-    setError,
-    clearErrors,
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = formProps;
   const vaccinationDate = watch('vaccinationDate');
   const vaccineUuid = watch('vaccineUuid');
-  // Clear stale duplicate-dose error when the user switches vaccine
-  useEffect(() => {
-    clearErrors('doseNumber');
-  }, [vaccineUuid, clearErrors]);
+  const doseNumber = watch('doseNumber');
+
+  const duplicateDoseWarning = useMemo(() => {
+    if (!vaccineUuid || doseNumber == null) return undefined;
+    const isDuplicate = existingImmunizations?.some((group) => {
+      if (group.vaccineUuid !== vaccineUuid) {
+        return false;
+      }
+
+      return group.existingDoses.some(
+        (dose) =>
+          dose.doseNumber != null &&
+          Number(dose.doseNumber) === Number(doseNumber) &&
+          dose.immunizationObsUuid !== immunizationToEditMeta?.immunizationObsUuid,
+      );
+    });
+    return isDuplicate
+      ? t('duplicateDoseWarning', 'Dose {{dose}} has already been recorded for this vaccine', { dose: doseNumber })
+      : undefined;
+  }, [vaccineUuid, doseNumber, existingImmunizations, immunizationToEditMeta, t]);
 
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => {
@@ -131,30 +145,6 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
 
   const onSubmit = useCallback(
     async (data: ImmunizationFormInputData) => {
-      // Note: existingImmunizations is undefined while loading, so this check
-      // silently no-ops in that window. The disabled Save button (isLoadingImmunizations)
-      // prevents submission during loading, keeping this safe.
-      const isDuplicate = existingImmunizations?.some((group) => {
-        if (group.vaccineUuid !== data.vaccineUuid) return false;
-        return group.existingDoses.some(
-          (dose) =>
-            dose.doseNumber != null &&
-            data.doseNumber != null &&
-            Number(dose.doseNumber) === Number(data.doseNumber) &&
-            dose.immunizationObsUuid !== immunizationToEditMeta?.immunizationObsUuid,
-        );
-      });
-
-      if (isDuplicate) {
-        setError('doseNumber', {
-          type: 'manual',
-          message: t('duplicateDoseError', 'Dose {{dose}} has already been recorded for this vaccine', {
-            dose: data.doseNumber,
-          }),
-        });
-        return;
-      }
-
       try {
         const {
           vaccineUuid,
@@ -215,8 +205,6 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       visitContext?.uuid,
       immunizationToEditMeta,
       immunizationsConceptSet,
-      existingImmunizations,
-      setError,
       closeWorkspace,
       t,
       mutate,
@@ -269,7 +257,12 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
             </ResponsiveWrapper>
             {vaccineUuid && (
               <ResponsiveWrapper>
-                <DoseInput vaccine={vaccineUuid} sequences={config.sequenceDefinitions} control={control} />
+                <DoseInput
+                  vaccine={vaccineUuid}
+                  sequences={config.sequenceDefinitions}
+                  control={control}
+                  warningMessage={duplicateDoseWarning}
+                />
               </ResponsiveWrapper>
             )}
             <div className={styles.vaccineBatchHeading}>
