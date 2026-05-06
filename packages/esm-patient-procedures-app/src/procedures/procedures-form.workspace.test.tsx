@@ -37,9 +37,12 @@ const mockUseProcedureTypes = jest.mocked(useProcedureTypes);
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   procedurePageSize: 5,
-  procedureCodedConceptClassUuid: '',
-  bodySiteConceptClassUuid: '',
-  statusConceptClassUuid: '',
+  procedureConceptUuid: '',
+  procedureConceptSourceType: 'any',
+  bodySiteConceptUuid: '',
+  bodySiteConceptSourceType: 'any',
+  statusConceptUuid: '',
+  statusConceptSourceType: 'any',
   durationUnitMinutesConceptUuid: 'minutes-uuid',
   durationUnitHoursConceptUuid: 'hours-uuid',
   durationUnitDaysConceptUuid: 'days-uuid',
@@ -91,7 +94,7 @@ beforeEach(() => {
   mockUseConceptSearchField.mockImplementation(() => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [selectedConcept, setSelectedConcept] = React.useState<ConceptReference | null>(null);
-    const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, '');
+    const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
     return {
       searchTerm,
       setSearchTerm,

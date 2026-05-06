@@ -57,9 +57,12 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
 }) => {
   const { t } = useTranslation();
   const {
-    procedureCodedConceptClassUuid,
-    bodySiteConceptClassUuid,
-    statusConceptClassUuid,
+    procedureConceptUuid,
+    procedureConceptSourceType,
+    bodySiteConceptUuid,
+    bodySiteConceptSourceType,
+    statusConceptUuid,
+    statusConceptSourceType,
     durationUnitMinutesConceptUuid,
     durationUnitHoursConceptUuid,
     durationUnitDaysConceptUuid,
@@ -100,9 +103,18 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     { value: '12', label: 'December' },
   ];
 
-  const procedureField = useConceptSearchField(procedureCodedConceptClassUuid, getValues('procedureCoded'));
-  const bodySiteField = useConceptSearchField(bodySiteConceptClassUuid, getValues('bodySite'));
-  const statusField = useConceptSearchField(statusConceptClassUuid, getValues('status'));
+  const procedureField = useConceptSearchField(
+    { uuid: procedureConceptUuid, sourceType: procedureConceptSourceType },
+    getValues('procedureCoded'),
+  );
+  const bodySiteField = useConceptSearchField(
+    { uuid: bodySiteConceptUuid, sourceType: bodySiteConceptSourceType },
+    getValues('bodySite'),
+  );
+  const statusField = useConceptSearchField(
+    { uuid: statusConceptUuid, sourceType: statusConceptSourceType },
+    getValues('status'),
+  );
 
   const [errorSaving, setErrorSaving] = useState(null);
 

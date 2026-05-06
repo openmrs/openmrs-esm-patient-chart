@@ -1,6 +1,7 @@
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
+import { type ConceptSourceType } from '../config-schema';
 import {
   type ConceptReference,
   type ProcedureApiResponse,
@@ -8,19 +9,35 @@ import {
   type RawProcedure,
 } from '../types';
 
+export type ConceptSource = { uuid: string; sourceType: ConceptSourceType };
+
+const sourceTypeToRestParam: Record<Exclude<ConceptSourceType, 'any'>, string> = {
+  conceptClass: 'class',
+  conceptSet: 'memberOf',
+  answerTo: 'answerTo',
+};
+
+function buildConceptSearchUrl(query: string, source: ConceptSource): string {
+  const params = new URLSearchParams({
+    name: query,
+    searchType: 'fuzzy',
+    v: 'custom:(uuid,display)',
+  });
+  if (source.uuid && source.sourceType !== 'any') {
+    params.set(sourceTypeToRestParam[source.sourceType], source.uuid);
+  }
+  return `${restBaseUrl}/concept?${params.toString()}`;
+}
+
 export function useProcedureTypes() {
   const url = `${restBaseUrl}/proceduretype?v=full`;
   const { data, error, isLoading } = useSWR<{ data: ProcedureTypeApiResponse }, Error>(url, openmrsFetch);
   return { procedureTypes: data?.data?.results ?? [], isLoading };
 }
 
-export function useConceptSearch(query: string, conceptClassUuid: string) {
-  const classParam = conceptClassUuid ? `&class=${conceptClassUuid}` : '';
-  const url = `${restBaseUrl}/concept?name=${query}&searchType=fuzzy${classParam}&v=custom:(uuid,display)`;
-  const { data, error, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(
-    query ? url : null,
-    openmrsFetch,
-  );
+export function useConceptSearch(query: string, source: ConceptSource) {
+  const url = query ? buildConceptSearchUrl(query, source) : null;
+  const { data, error, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
   return { searchResults: data?.data?.results ?? [], isSearching: isLoading };
 }
 
@@ -77,13 +94,13 @@ export function useConceptById(uuid: string) {
   return data?.data ?? null;
 }
 
-export function useConceptSearchField(conceptClassUuid: string, initialValue: string) {
+export function useConceptSearchField(source: ConceptSource, initialValue: string) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConcept, setSelectedConcept] = useState<ConceptReference | null>(null);
 
   const debouncedSearchTerm = useDebounce(searchTerm);
 
-  const { searchResults, isSearching } = useConceptSearch(debouncedSearchTerm, conceptClassUuid);
+  const { searchResults, isSearching } = useConceptSearch(debouncedSearchTerm, source);
 
   const initialConceptData = useConceptById(initialValue);
 
