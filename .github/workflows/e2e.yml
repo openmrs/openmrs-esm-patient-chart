@@ -2,11 +2,9 @@ name: E2E Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, 'patch/*', 'feat/procedure-history']
   pull_request:
-    branches:
-      - main
+    branches: [main, 'feat/procedure-history']
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
