@@ -8,7 +8,7 @@
   "doseNumberWithinSeries": "Numarul dozei in serie",
   "doses": "Doze",
   "due": "Due",
-  "duplicateDoseError": "Dose {{dose}} has already been recorded for this vaccine",
+  "duplicateDoseWarning": "Dose {{dose}} has already been recorded for this vaccine",
   "error": "Eroare",
   "errorSaving": "Eroare la salvarea vaccinarii",
   "expirationDate": "Data expirarii",
