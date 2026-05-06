@@ -62,6 +62,43 @@ export async function postOrdersOnNewEncounter(
 
   return postEncounter(encounterPostData, abortController);
 }
+
+/**
+ * Posts a single order on a freshly created encounter. Use this when you have a
+ * pre-built OrderPost (e.g. from a direct edit flow that bypasses the order basket)
+ * and want the encounter's encounterDatetime to track the order's dateActivated so
+ * the backend's `dateActivated >= encounterDatetime` constraint holds.
+ */
+export async function postOrderOnNewEncounter(
+  order: OrderPost,
+  patientUuid: string,
+  orderEncounterType: string,
+  currentVisit: Visit | null,
+  orderLocationUuid: string,
+  abortController?: AbortController,
+  encounterDate?: Date,
+) {
+  if (!encounterDate) {
+    if (currentVisit?.stopDatetime) {
+      encounterDate = parseDate(currentVisit.startDatetime);
+    } else {
+      encounterDate = null;
+    }
+  }
+
+  const encounterPostData: EncounterPost = {
+    patient: patientUuid,
+    location: orderLocationUuid,
+    encounterType: orderEncounterType,
+    ...(encounterDate ? { encounterDatetime: encounterDate } : {}),
+    visit: currentVisit?.uuid,
+    obs: [],
+    orders: [order],
+  };
+
+  return postEncounter(encounterPostData, abortController);
+}
+
 interface ObsPayload {
   concept: Concept | string;
   value?: string | OpenmrsResource;
