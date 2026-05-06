@@ -58,7 +58,15 @@ describe('ProceduresOverview', () => {
   it("renders a paginated overview of the patient's procedures", async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockResolvedValueOnce({ data: mockProceduresResponse } as FetchResponse);
+    // Page 1: first 5 results, totalCount tells the component there are 6 total
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      data: { results: mockProceduresResponse.results.slice(0, 5), links: [], totalCount: 6 },
+    } as FetchResponse);
+
+    // Page 2: last 1 result
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      data: { results: mockProceduresResponse.results.slice(5), links: [], totalCount: 6 },
+    } as FetchResponse);
 
     renderWithSwr(<ProceduresOverview patientUuid={mockPatient.id} />);
 
@@ -83,6 +91,8 @@ describe('ProceduresOverview', () => {
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
     await user.click(nextPageButton);
+
+    await waitForLoadingToFinish();
 
     // Second page: 1 row
     expect(screen.getByRole('row', { name: /mri brain/i })).toBeInTheDocument();

@@ -38,7 +38,6 @@ import { type ProcedureType, type ConceptReference, type Procedure } from '../ty
 
 interface ProceduresFormComponentProps {
   closeWorkspaceWithSavedChanges: () => void;
-  isSubmittingForm: boolean;
   procedure?: Procedure;
   patientUuid: string;
 }

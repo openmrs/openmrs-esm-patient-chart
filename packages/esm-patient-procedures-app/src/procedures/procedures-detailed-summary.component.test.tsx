@@ -1,7 +1,14 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  getDefaultsFromConfigSchema,
+  launchWorkspace2,
+  openmrsFetch,
+  useConfig,
+} from '@openmrs/esm-framework';
+import { type ConfigObject, configSchema } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProceduresDetailedSummary from './procedures-detailed-summary.component';
 import { mockProceduresResponse } from '__mocks__';
@@ -10,8 +17,14 @@ jest.mock('./procedures-action-menu.component', () => ({
   ProceduresActionMenu: jest.fn().mockReturnValue(null),
 }));
 
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+
+mockUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  procedurePageSize: 20,
+});
 
 describe('ProceduresDetailedSummary', () => {
   it('renders an empty state view if procedures data is unavailable', async () => {

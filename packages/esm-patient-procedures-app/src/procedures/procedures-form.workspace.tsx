@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,7 +51,6 @@ const ProceduresForm: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormPr
   workspaceProps: { procedure, formContext },
 }) => {
   const { t } = useTranslation();
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
   const methods = useForm<ProceduresFormSchema>({
     mode: 'all',
@@ -84,7 +83,6 @@ const ProceduresForm: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormPr
       <FormProvider {...methods}>
         <ProceduresFormComponent
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          isSubmittingForm={isSubmittingForm}
           patientUuid={patientUuid}
           procedure={procedure}
         />

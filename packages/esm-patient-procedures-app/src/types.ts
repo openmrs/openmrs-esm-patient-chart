@@ -50,6 +50,7 @@ export type Procedure = {
 export interface ProcedureApiResponse {
   results: Array<Procedure>;
   links: Array<{ rel: string; uri: string }>;
+  totalCount?: number;
 }
 
 export interface ProcedureTypeApiResponse {
