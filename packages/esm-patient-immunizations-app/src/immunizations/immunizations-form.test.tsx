@@ -470,7 +470,7 @@ describe('Immunizations Form', () => {
     );
   });
 
-  it('should prevent saving a duplicate dose for the same vaccine', async () => {
+  it('should warn (without blocking save) when a duplicate dose is entered for the same vaccine', async () => {
     const user = userEvent.setup();
 
     mockUseImmunizations.mockReturnValue({
@@ -499,6 +499,12 @@ describe('Immunizations Form', () => {
       mutate: jest.fn(),
     });
 
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: { id: 'new-immunization-id' },
+    });
+
     render(<ImmunizationsForm {...testProps} />);
 
     const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
@@ -508,13 +514,13 @@ describe('Immunizations Form', () => {
     await user.clear(doseField);
     await user.type(doseField, '1');
 
+    // Inline warning is shown on the form (not in a snackbar) once the duplicate is detected
+    expect(screen.getByText(/Dose 1 has already been recorded for this vaccine/i)).toBeInTheDocument();
+
     await user.click(screen.getByRole('button', { name: /Save/i }));
 
-    // Should NOT save — duplicate blocked
-    expect(mockSavePatientImmunization).not.toHaveBeenCalled();
-
-    // Should show inline error on dose field (not a snackbar)
-    expect(screen.getByText(/Dose 1 has already been recorded for this vaccine/i)).toBeInTheDocument();
+    // Save proceeds — the warning is non-blocking
+    expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
   });
 
   it('should allow re-saving when editing an existing immunization record', async () => {
