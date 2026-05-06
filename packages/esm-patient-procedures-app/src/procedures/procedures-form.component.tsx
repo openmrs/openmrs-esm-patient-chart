@@ -111,10 +111,10 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     { uuid: bodySiteConceptUuid, sourceType: bodySiteConceptSourceType },
     getValues('bodySite'),
   );
-  const statusField = useConceptSearchField(
-    { uuid: statusConceptUuid, sourceType: statusConceptSourceType },
-    getValues('status'),
-  );
+  const { searchResults: statusOptions } = useConceptSearch('', {
+    uuid: statusConceptUuid,
+    sourceType: statusConceptSourceType,
+  });
   const { searchResults: durationUnitOptions } = useConceptSearch('', {
     uuid: durationUnitConceptUuid,
     sourceType: durationUnitConceptSourceType,
@@ -144,7 +144,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
       bodySite: bodySiteField.selectedConcept!.uuid,
       startDateTime: isStartDateKnown && startDateTime ? dayjs(startDateTime).format() : null,
       endDateTime: endDateTime ? dayjs(endDateTime).format() : null,
-      status: statusField.selectedConcept?.uuid,
+      status: getValues('status'),
       notes: notes,
       estimatedStartDate: estimatedStartDate || null,
       duration: hasDuration ? duration : null,
@@ -178,7 +178,6 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     mutate,
     patientUuid,
     procedureField.selectedConcept,
-    statusField.selectedConcept,
     procedure?.uuid,
     t,
   ]);
@@ -341,11 +340,24 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
           </FormGroup>
 
           <FormGroup legendText={<RequiredFieldLabel label={t('status', 'Status')} />}>
-            <ConceptSearchField
-              label={t('enterStatus', 'Enter status')}
-              placeholder={t('searchStatus', 'Search status')}
-              field={statusField}
-              onChange={(selectedConcept) => setValue('status', selectedConcept.uuid)}
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <ResponsiveWrapper>
+                  <ComboBox
+                    id="status"
+                    titleText=""
+                    placeholder={t('selectStatus', 'Select status')}
+                    items={statusOptions}
+                    itemToString={(item: ConceptReference) => item?.display ?? ''}
+                    selectedItem={statusOptions.find((option) => option.uuid === field.value) ?? null}
+                    onChange={({ selectedItem }: { selectedItem: ConceptReference | null }) =>
+                      field.onChange(selectedItem?.uuid ?? null)
+                    }
+                  />
+                </ResponsiveWrapper>
+              )}
             />
             {errors.status && <p className={styles.errorMessage}>{errors.status.message}</p>}
           </FormGroup>
