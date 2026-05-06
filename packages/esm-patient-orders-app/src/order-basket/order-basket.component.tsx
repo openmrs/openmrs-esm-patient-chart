@@ -31,6 +31,7 @@ import {
 import { type ConfigObject } from '../config-schema';
 import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
+import { getEarliestStartDate } from './order-basket.utils';
 import styles from './order-basket.scss';
 
 interface OrderBasketProps {
@@ -112,6 +113,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     // If orderEncounterUuid is present, then just post the orders to that encounter.
     if (!orderEncounterUuid) {
       try {
+        // Backend rejects orders whose dateActivated is before the encounter's encounterDatetime,
+        // so set encounterDatetime to the earliest startDate among basket items.
+        const encounterDate = getEarliestStartDate(orders);
+
         const postedEncounter = await postOrdersOnNewEncounter(
           patientUuid,
           orderEncounterType,
@@ -119,6 +124,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           orderLocationUuid,
           orderer.uuid,
           abortController,
+          encounterDate,
         );
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
