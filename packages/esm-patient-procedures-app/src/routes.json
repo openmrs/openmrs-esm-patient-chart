@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "workspaces2": [
+    {
+      "name": "procedures-form-workspace",
+      "component": "proceduresFormWorkspace",
+      "window": "procedures-form-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "procedures-form-window",
+      "group": "patient-chart"
+    }
+  ],
+  "extensions": [
+    {
+      "name": "procedures-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "component": "proceduresOverview",
+      "order": 4,
+      "meta": { "fullWidth": false }
+    },
+    {
+      "name": "procedures-details-widget",
+      "slot": "patient-chart-procedures-dashboard-slot",
+      "component": "proceduresDetailedSummary",
+      "meta": { "fullWidth": false }
+    },
+    {
+      "name": "procedures-summary-dashboard",
+      "component": "proceduresDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 8,
+      "meta": {
+        "slot": "patient-chart-procedures-dashboard-slot",
+        "path": "Procedures"
+      }
+    },
+    {
+      "name": "procedure-delete-confirmation-dialog",
+      "component": "procedureDeleteConfirmationDialog"
+    }
+  ]
+}
