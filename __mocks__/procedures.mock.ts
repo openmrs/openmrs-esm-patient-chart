@@ -85,4 +85,5 @@ export const mockProceduresResponse = {
     }),
   ],
   links: [],
+  totalCount: 6,
 };

@@ -14,7 +14,7 @@ export const ProceduresActionMenu = ({ procedure, patientUuid }: ProceduresActio
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const launchEditConditionsForm = useCallback(
+  const launchEditProcedureForm = useCallback(
     () =>
       launchWorkspace2('procedures-form-workspace', {
         procedure,
@@ -23,7 +23,7 @@ export const ProceduresActionMenu = ({ procedure, patientUuid }: ProceduresActio
     [procedure],
   );
 
-  const launchDeleteConditionDialog = (procedureUuid: string) => {
+  const launchDeleteProcedureDialog = (procedureUuid: string) => {
     const dispose = showModal('procedure-delete-confirmation-dialog', {
       closeDeleteModal: () => dispose(),
       procedureUuid,
@@ -33,18 +33,18 @@ export const ProceduresActionMenu = ({ procedure, patientUuid }: ProceduresActio
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu aria-label="Edit or delete condition" align="left" size={isTablet ? 'lg' : 'sm'} flipped>
+      <OverflowMenu aria-label="Edit or delete procedure" align="left" size={isTablet ? 'lg' : 'sm'} flipped>
         <OverflowMenuItem
           className={styles.menuItem}
-          id="editCondition"
-          onClick={launchEditConditionsForm}
+          id="editProcedure"
+          onClick={launchEditProcedureForm}
           itemText={t('edit', 'Edit')}
         />
         <OverflowMenuItem
           className={styles.menuItem}
-          id="deleteCondition"
+          id="deleteProcedure"
           itemText={t('delete', 'Delete')}
-          onClick={() => launchDeleteConditionDialog(procedure.uuid)}
+          onClick={() => launchDeleteProcedureDialog(procedure.uuid)}
           isDelete
           hasDivider
         />

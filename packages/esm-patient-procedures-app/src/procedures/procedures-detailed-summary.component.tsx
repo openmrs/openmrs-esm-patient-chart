@@ -23,6 +23,7 @@ import {
   isDesktop as isDesktopLayout,
   launchWorkspace2,
   parseDate,
+  useConfig,
   useLayoutType,
   CardHeader,
   EmptyCard,
@@ -31,10 +32,9 @@ import {
 } from '@openmrs/esm-framework';
 import { useProcedures } from './procedures.resource';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './procedures-overview.scss';
+import styles from './procedures-detailed-summary.scss';
 import { ProceduresActionMenu } from './procedures-action-menu.component';
-
-const DEFAULT_PAGE_SIZE = 20;
+import { type ConfigObject } from '../config-schema';
 
 type ProceduresDetailedSummaryProps = {
   patient: fhir.Patient;
@@ -54,6 +54,7 @@ type ProcedureTableRow = {
 
 function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) {
   const { t } = useTranslation();
+  const { procedurePageSize } = useConfig<ConfigObject>();
   const headerTitle = t('procedures', 'Procedures');
   const displayText = t('procedures_lower', 'procedures');
   const layout = useLayoutType();
@@ -63,9 +64,14 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
     [],
   );
 
-  const { procedures, error, isLoading, isValidating } = useProcedures(patient.id);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const startIndex = (currentPage - 1) * procedurePageSize;
+
+  const { procedures, totalCount, error, isLoading, isValidating } = useProcedures(
+    patient.id,
+    startIndex,
+    procedurePageSize,
+  );
 
   const headers = useMemo(
     () => [
@@ -79,7 +85,7 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
     [t],
   );
 
-  const allRows: ProcedureTableRow[] = useMemo(
+  const tableRows: ProcedureTableRow[] = useMemo(
     () =>
       procedures?.map((p) => ({
         id: p.uuid,
@@ -95,11 +101,6 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
     [procedures],
   );
 
-  const tableRows = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return allRows?.slice(start, start + pageSize);
-  }, [allRows, currentPage, pageSize]);
-
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" zebra />;
   }
@@ -108,7 +109,7 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (procedures?.length) {
+  if (totalCount > 0 || procedures?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -127,7 +128,7 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
           headers={headers}
           isSortable
           overflowMenuOnHover={isDesktop}
-          rows={tableRows}
+          rows={tableRows ?? []}
           size={isDesktop ? 'sm' : 'lg'}
           useZebraStyles
         >
@@ -199,13 +200,10 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
               ) : null}
               <PatientChartPagination
                 currentItems={rows.length}
-                totalItems={allRows?.length ?? 0}
+                totalItems={totalCount}
                 pageNumber={currentPage}
-                pageSize={pageSize}
-                onPageNumberChange={({ page, pageSize: newPageSize }: { page: number; pageSize: number }) => {
-                  setCurrentPage(page);
-                  setPageSize(newPageSize);
-                }}
+                pageSize={procedurePageSize}
+                onPageNumberChange={({ page }: { page: number }) => setCurrentPage(page)}
               />
             </>
           )}

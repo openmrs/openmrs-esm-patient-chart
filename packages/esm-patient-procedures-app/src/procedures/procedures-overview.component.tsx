@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -22,7 +22,6 @@ import {
   parseDate,
   useConfig,
   useLayoutType,
-  usePagination,
   CardHeader,
   EmptyCard,
   ErrorState,
@@ -48,7 +47,14 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
   const layout = useLayoutType();
   const isDesktop = isDesktopLayout(layout);
 
-  const { procedures, error, isLoading, isValidating } = useProcedures(patientUuid);
+  const [currentPage, setCurrentPage] = useState(1);
+  const startIndex = (currentPage - 1) * procedurePageSize;
+
+  const { procedures, totalCount, error, isLoading, isValidating } = useProcedures(
+    patientUuid,
+    startIndex,
+    procedurePageSize,
+  );
 
   const headers = useMemo(
     () => [
@@ -70,8 +76,6 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
     [procedures],
   );
 
-  const { results: paginatedProcedures, goTo, currentPage } = usePagination(tableRows ?? [], procedurePageSize);
-
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" zebra />;
   }
@@ -80,7 +84,7 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
-  if (procedures?.length) {
+  if (totalCount > 0 || procedures?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -98,7 +102,7 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
           aria-label="procedures overview"
           headers={headers}
           overflowMenuOnHover={isDesktop}
-          rows={paginatedProcedures}
+          rows={tableRows ?? []}
           size={isDesktop ? 'sm' : 'lg'}
           useZebraStyles
         >
@@ -130,11 +134,11 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
           )}
         </DataTable>
         <PatientChartPagination
-          currentItems={paginatedProcedures.length}
-          onPageNumberChange={({ page }) => goTo(page)}
+          currentItems={tableRows?.length ?? 0}
+          onPageNumberChange={({ page }) => setCurrentPage(page)}
           pageNumber={currentPage}
           pageSize={procedurePageSize}
-          totalItems={procedures.length}
+          totalItems={totalCount}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}
         />
