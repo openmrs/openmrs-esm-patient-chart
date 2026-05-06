@@ -46,13 +46,19 @@ export function useMutatePatientProcedures(patientUuid: string) {
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/procedure?patient=${patientUuid}`));
 }
 
-export function useProcedures(patientUuid: string) {
-  const url = `${restBaseUrl}/procedure?patient=${patientUuid}&v=full&limit=100`;
+export function useProcedures(patientUuid: string, startIndex = 0, limit = 100) {
+  const url = `${restBaseUrl}/procedure?patient=${patientUuid}&v=full&startIndex=${startIndex}&limit=${limit}&totalCount=true`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: ProcedureApiResponse }, Error>(
     patientUuid ? url : null,
     openmrsFetch,
   );
-  return { procedures: data ? (data.data?.results ?? []) : null, error, isLoading, isValidating };
+  return {
+    procedures: data ? data.data?.results ?? [] : null,
+    totalCount: data?.data?.totalCount ?? 0,
+    error,
+    isLoading,
+    isValidating,
+  };
 }
 
 export async function deleteProcedure(procedureId: string) {
