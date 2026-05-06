@@ -8,7 +8,7 @@
   "doseNumberWithinSeries": "Nomor dosis dalam seri",
   "doses": "Doses",
   "due": "Due",
-  "duplicateDoseError": "Dose {{dose}} has already been recorded for this vaccine",
+  "duplicateDoseWarning": "Dose {{dose}} has already been recorded for this vaccine",
   "error": "Error",
   "errorSaving": "Kesalahan menyimpan vaksinasi",
   "expirationDate": "Tanggal Kedaluwarsa",

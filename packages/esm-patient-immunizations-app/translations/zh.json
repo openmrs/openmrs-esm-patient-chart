@@ -8,7 +8,7 @@
   "doseNumberWithinSeries": "接种系列中的剂量编号",
   "doses": "剂次",
   "due": "到期",
-  "duplicateDoseError": "Dose {{dose}} has already been recorded for this vaccine",
+  "duplicateDoseWarning": "Dose {{dose}} has already been recorded for this vaccine",
   "error": "错误",
   "errorSaving": "保存疫苗接种时出现错误",
   "expirationDate": "过期日期",
