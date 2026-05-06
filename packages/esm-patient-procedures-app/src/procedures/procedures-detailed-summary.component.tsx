@@ -157,7 +157,7 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
                             {row.cells.map((cell) => {
                               if (cell.info.header === 'startDateTimeRender') {
                                 const display = matchingRow?.estimatedStartDate
-                                  ? `${formatPartialDate(matchingRow.estimatedStartDate, { mode: 'wide' })}*`
+                                  ? `${formatPartialDate(matchingRow.estimatedStartDate, { mode: 'wide' })}`
                                   : formatDate(parseDate(cell.value), { mode: 'wide', time: true });
                                 return <TableCell key={cell.id}>{display}</TableCell>;
                               }
