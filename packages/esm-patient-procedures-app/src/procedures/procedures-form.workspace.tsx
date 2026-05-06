@@ -24,7 +24,7 @@ const schema = z
     notes: z.string().optional(),
     estimatedStartDate: z.string().optional(),
     duration: z.number().int().positive('Duration must be a positive number').nullable().optional(),
-    durationUnit: z.string().optional(),
+    durationUnit: z.string().optional().nullable(),
   })
   .refine(
     (data) => {

@@ -321,17 +321,17 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 control={control}
                 render={({ field }) => (
                   <ResponsiveWrapper>
-                    <Select
+                    <ComboBox
                       id="durationUnit"
-                      labelText={t('durationUnit', 'Duration unit')}
-                      value={field.value ?? ''}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => field.onChange(e.target.value)}
-                    >
-                      <SelectItem value="" text={t('selectDurationUnit', 'Select unit')} />
-                      {durationUnitOptions.map((option) => (
-                        <SelectItem key={option.uuid} value={option.uuid} text={option.display} />
-                      ))}
-                    </Select>
+                      titleText={t('durationUnit', 'Duration unit')}
+                      placeholder={t('selectDurationUnit', 'Select unit')}
+                      items={durationUnitOptions}
+                      itemToString={(item: ConceptReference) => item?.display ?? ''}
+                      selectedItem={durationUnitOptions.find((option) => option.uuid === field.value) ?? null}
+                      onChange={({ selectedItem }: { selectedItem: ConceptReference | null }) =>
+                        field.onChange(selectedItem?.uuid ?? null)
+                      }
+                    />
                   </ResponsiveWrapper>
                 )}
               />
