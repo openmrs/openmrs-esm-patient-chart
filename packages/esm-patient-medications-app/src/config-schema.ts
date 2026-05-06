@@ -20,7 +20,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
   showPrintButton: {
@@ -61,6 +62,13 @@ export const configSchema = {
       _type: Type.String,
     },
   },
+  // TODO: hoist this and esm-patient-orders-app's matching `orderEncounterType` into a
+  // shared schema in esm-patient-common-lib so admins configure it once.
+  orderEncounterType: {
+    _type: Type.UUID,
+    _description: 'The encounter type used when creating a new encounter for a renewed drug order.',
+    _default: '39da3525-afe4-45ff-8977-c53b7b359158',
+  },
 };
 
 export interface ConfigObject {
@@ -75,4 +83,5 @@ export interface ConfigObject {
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
   drugCategoryConceptSets: Array<string>;
+  orderEncounterType: string;
 }

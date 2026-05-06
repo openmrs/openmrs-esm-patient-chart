@@ -7,6 +7,7 @@ import {
   ListCheckedIcon,
   showSnackbar,
   useConfig,
+  useSession,
   type Visit,
   type Workspace2DefinitionProps,
   useLayoutType,
@@ -15,6 +16,7 @@ import {
 import {
   type DrugOrderBasketItem,
   postOrder,
+  postOrderOnNewEncounter,
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
@@ -75,7 +77,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
-  const { drugCategoryConceptSets } = useConfig<ConfigObject>();
+  const { drugCategoryConceptSets, orderEncounterType } = useConfig<ConfigObject>();
+  const session = useSession();
   const {
     conceptSets,
     isLoading: isLoadingConceptSets,
@@ -115,41 +118,75 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   );
 
   // If editing an existing order, on save, we directly submit the modified order to the server
-  // and do not save it to the order basket.
+  // and do not save it to the order basket. RENEW creates a fresh encounter (per backend
+  // semantics: a renewal is a new prescription event), while REVISE and DISCONTINUE post
+  // against the existing order's encounter.
   const submitDrugOrderToServer = useCallback(
     async (finalizedOrder: DrugOrderBasketItem) => {
-      postOrder(
+      const handleSuccess = () => {
+        clearOrders();
+        mutateOrders();
+
+        /* Translation keys used by showOrderSuccessToast:
+         * t('ordersCompleted', 'Orders completed')
+         * t('orderPlaced', 'Order placed')
+         * t('ordersPlaced', 'Orders placed')
+         * t('orderUpdated', 'Order updated')
+         * t('ordersUpdated', 'Orders updated')
+         * t('orderDiscontinued', 'Order discontinued')
+         * t('ordersDiscontinued', 'Orders discontinued')
+         * t('orderedFor', 'Placed order for')
+         * t('updated', 'Updated')
+         * t('discontinued', 'Discontinued')
+         */
+        showOrderSuccessToast('@openmrs/esm-patient-medications-app', [finalizedOrder]);
+        closeWorkspace({ discardUnsavedChanges: true });
+      };
+
+      const handleError = (error: { message?: string }) => {
+        showSnackbar({
+          isLowContrast: false,
+          kind: 'error',
+          title: t('errorSavingDrugOrder', 'Error saving drug order'),
+          subtitle: error.message,
+        });
+      };
+
+      if (finalizedOrder.action === 'RENEW') {
+        const orderPost = prepMedicationOrderPostData(finalizedOrder, patientUuid, null, orderToEditOrdererUuid);
+        const encounterDate = finalizedOrder.startDate
+          ? new Date(finalizedOrder.startDate as string | Date)
+          : new Date();
+        return postOrderOnNewEncounter(
+          orderPost,
+          patientUuid,
+          orderEncounterType,
+          visitContext,
+          session?.sessionLocation?.uuid,
+          undefined,
+          encounterDate,
+        )
+          .then(handleSuccess)
+          .catch(handleError);
+      }
+
+      return postOrder(
         prepMedicationOrderPostData(finalizedOrder, patientUuid, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
       )
-        .then(() => {
-          clearOrders();
-          mutateOrders();
-
-          /* Translation keys used by showOrderSuccessToast:
-           * t('ordersCompleted', 'Orders completed')
-           * t('orderPlaced', 'Order placed')
-           * t('ordersPlaced', 'Orders placed')
-           * t('orderUpdated', 'Order updated')
-           * t('ordersUpdated', 'Orders updated')
-           * t('orderDiscontinued', 'Order discontinued')
-           * t('ordersDiscontinued', 'Orders discontinued')
-           * t('orderedFor', 'Placed order for')
-           * t('updated', 'Updated')
-           * t('discontinued', 'Discontinued')
-           */
-          showOrderSuccessToast('@openmrs/esm-patient-medications-app', [finalizedOrder]);
-          closeWorkspace({ discardUnsavedChanges: true });
-        })
-        .catch((error) => {
-          showSnackbar({
-            isLowContrast: false,
-            kind: 'error',
-            title: t('errorSavingDrugOrder', 'Error saving drug order'),
-            subtitle: error.message,
-          });
-        });
+        .then(handleSuccess)
+        .catch(handleError);
     },
-    [clearOrders, closeWorkspace, mutateOrders, patientUuid, t, orderToEditOrdererUuid],
+    [
+      clearOrders,
+      closeWorkspace,
+      mutateOrders,
+      patientUuid,
+      t,
+      orderToEditOrdererUuid,
+      orderEncounterType,
+      visitContext,
+      session,
+    ],
   );
 
   const workspaceTitle =

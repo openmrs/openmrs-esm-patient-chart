@@ -48,7 +48,12 @@ import {
 import { useActivePatientOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { durationToDays, type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
+import {
+  durationToDays,
+  getStartDateMinimum,
+  type MedicationOrderFormData,
+  useDrugOrderForm,
+} from './drug-order-form.resource';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
@@ -134,6 +139,17 @@ export function DrugOrderForm({
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
+
+  const startDateMin = useMemo(
+    () =>
+      getStartDateMinimum(
+        initialOrderBasketItem?.action,
+        initialOrderBasketItem?.previousOrderDateActivated,
+        visitContext?.startDatetime,
+      ),
+    [initialOrderBasketItem?.action, initialOrderBasketItem?.previousOrderDateActivated, visitContext?.startDatetime],
+  );
+
   const {
     control,
     formState: { isDirty, isSubmitting },
@@ -594,6 +610,7 @@ export function DrugOrderForm({
                         render={({ field, fieldState }) => (
                           <OpenmrsDatePicker
                             {...field}
+                            minDate={startDateMin}
                             maxDate={new Date()}
                             id="startDatePicker"
                             labelText={t('startDate', 'Start date')}

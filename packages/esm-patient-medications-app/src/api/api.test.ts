@@ -154,4 +154,17 @@ describe('buildMedicationOrder', () => {
       expect(result.startDate).not.toBe(medicationOrder.dateActivated);
     },
   );
+
+  it('captures the previous order dateActivated when building a REVISE basket item', () => {
+    const result = buildMedicationOrder(medicationOrder, 'REVISE');
+    expect(result.previousOrderDateActivated).toBe(medicationOrder.dateActivated);
+  });
+
+  it.each(['NEW', 'RENEW', 'DISCONTINUE'] as const)(
+    'does not set previousOrderDateActivated when building a %s basket item',
+    (action) => {
+      const result = buildMedicationOrder(medicationOrder, action);
+      expect(result.previousOrderDateActivated).toBeUndefined();
+    },
+  );
 });

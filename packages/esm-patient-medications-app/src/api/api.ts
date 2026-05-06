@@ -140,6 +140,10 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
+  // Only forward dateActivated when the user has explicitly selected one. Omitted lets
+  // the backend default to "now"; an explicit value gets the encounter backdated upstream.
+  const dateActivatedFragment = order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {};
+
   if (order.action === 'NEW') {
     return {
       action: 'NEW',
@@ -165,7 +169,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
-      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -194,7 +198,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
-      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -223,7 +227,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
-      ...(order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -304,6 +308,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
         }
       : null,
     encounterUuid: order.encounter?.uuid,
+    previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
     visit: order.encounter.visit,
   };
 }
