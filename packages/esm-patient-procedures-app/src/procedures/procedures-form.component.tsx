@@ -27,6 +27,7 @@ import { type ConfigObject } from '../config-schema';
 import {
   saveProcedure,
   updateProcedure,
+  useConceptSearch,
   useConceptSearchField,
   useMutatePatientProcedures,
   useProcedureTypes,
@@ -63,9 +64,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     bodySiteConceptSourceType,
     statusConceptUuid,
     statusConceptSourceType,
-    durationUnitMinutesConceptUuid,
-    durationUnitHoursConceptUuid,
-    durationUnitDaysConceptUuid,
+    durationUnitConceptUuid,
+    durationUnitConceptSourceType,
   } = useConfig<ConfigObject>();
   const mutate = useMutatePatientProcedures(patientUuid);
 
@@ -115,6 +115,10 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     { uuid: statusConceptUuid, sourceType: statusConceptSourceType },
     getValues('status'),
   );
+  const { searchResults: durationUnitOptions } = useConceptSearch('', {
+    uuid: durationUnitConceptUuid,
+    sourceType: durationUnitConceptSourceType,
+  });
 
   const [errorSaving, setErrorSaving] = useState(null);
 
@@ -324,9 +328,9 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                       onChange={(e: React.ChangeEvent<HTMLSelectElement>) => field.onChange(e.target.value)}
                     >
                       <SelectItem value="" text={t('selectDurationUnit', 'Select unit')} />
-                      <SelectItem value={durationUnitMinutesConceptUuid} text={t('minutes', 'Minutes')} />
-                      <SelectItem value={durationUnitHoursConceptUuid} text={t('hours', 'Hours')} />
-                      <SelectItem value={durationUnitDaysConceptUuid} text={t('days', 'Days')} />
+                      {durationUnitOptions.map((option) => (
+                        <SelectItem key={option.uuid} value={option.uuid} text={option.display} />
+                      ))}
                     </Select>
                   </ResponsiveWrapper>
                 )}

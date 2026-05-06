@@ -52,20 +52,17 @@ export const configSchema = {
     _default: 'any',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
-  durationUnitMinutesConceptUuid: {
+  durationUnitConceptUuid: {
     _type: Type.UUID,
-    _description: 'Concept UUID representing the "minutes" duration unit',
-    _default: '1733AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _description:
+      'UUID used to constrain the duration-unit concept search. Its meaning is determined by `durationUnitConceptSourceType`.',
+    _default: '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
-  durationUnitHoursConceptUuid: {
-    _type: Type.UUID,
-    _description: 'Concept UUID representing the "hours" duration unit',
-    _default: '1822AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  },
-  durationUnitDaysConceptUuid: {
-    _type: Type.UUID,
-    _description: 'Concept UUID representing the "days" duration unit',
-    _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  durationUnitConceptSourceType: {
+    _type: Type.String,
+    _description: sourceTypeDescription,
+    _default: 'answerTo',
+    _validators: [validators.oneOf(conceptSourceTypes)],
   },
 };
 
@@ -77,7 +74,6 @@ export interface ConfigObject {
   bodySiteConceptSourceType: ConceptSourceType;
   statusConceptUuid: string;
   statusConceptSourceType: ConceptSourceType;
-  durationUnitMinutesConceptUuid: string;
-  durationUnitHoursConceptUuid: string;
-  durationUnitDaysConceptUuid: string;
+  durationUnitConceptUuid: string;
+  durationUnitConceptSourceType: ConceptSourceType;
 }
