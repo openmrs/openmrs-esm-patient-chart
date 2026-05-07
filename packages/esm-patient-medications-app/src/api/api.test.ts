@@ -178,7 +178,6 @@ describe('buildMedicationOrder', () => {
       expect((result.startDate as Date).getTime()).toBeGreaterThanOrEqual(before);
       expect((result.startDate as Date).getTime()).toBeLessThanOrEqual(after);
       expect(result.startDate).not.toBe(medicationOrder.dateActivated);
-      expect(result.startDateChanged).toBe(false);
     },
   );
 
@@ -208,6 +207,5 @@ describe('buildMedicationOrder', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 
     expect(result.startDate).toBe(medicationOrder.dateActivated);
-    expect(result.startDateChanged).toBe(false);
   });
 });

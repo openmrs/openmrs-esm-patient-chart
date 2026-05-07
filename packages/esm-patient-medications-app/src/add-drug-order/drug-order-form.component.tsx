@@ -201,7 +201,6 @@ export function DrugOrderForm({
   const [isManualOverride, setIsManualOverride] = useState(
     initialOrderBasketItem?.isQuantityManual ?? (isExistingOrder && initialOrderBasketItem?.pillsDispensed != null),
   );
-  const [startDateChanged, setStartDateChanged] = useState(initialOrderBasketItem?.startDateChanged ?? false);
 
   const calculatedQuantity = useMemo(() => {
     if (watchedIsFreeText || watchedAsNeeded) {
@@ -295,7 +294,6 @@ export function DrugOrderForm({
       indication: data.indication,
       frequency: data.frequency,
       startDate: data.startDate,
-      startDateChanged,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
@@ -619,10 +617,6 @@ export function DrugOrderForm({
                             size={isTablet ? 'lg' : 'sm'}
                             invalid={Boolean(fieldState?.error?.message)}
                             invalidText={fieldState?.error?.message}
-                            onChange={(date) => {
-                              setStartDateChanged(true);
-                              field.onChange(date);
-                            }}
                           />
                         )}
                       />

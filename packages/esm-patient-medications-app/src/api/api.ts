@@ -140,12 +140,11 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
-  // Preserve an explicitly chosen activation date for active-order flows while still
-  // letting DISCONTINUE rely on the original order's existing dateActivated semantics.
-  const dateActivatedFragment =
-    order.action !== 'DISCONTINUE' && order.startDate
-      ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) }
-      : {};
+  // Only forward dateActivated when the user has explicitly selected one. Omitted lets
+  // the backend default to "now"; an explicit value gets the encounter backdated upstream.
+  // The DISCONTINUE branch below doesn't spread this fragment, so a guard against
+  // action === 'DISCONTINUE' here would be redundant.
+  const dateActivatedFragment = order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {};
 
   if (order.action === 'NEW') {
     return {
@@ -296,7 +295,6 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     // Default follow-up actions to "now" so renew/revise flows do not silently backdate
     // themselves to the original order's activation timestamp.
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
-    startDateChanged: false,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
