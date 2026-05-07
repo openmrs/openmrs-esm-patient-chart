@@ -3,8 +3,4 @@
 
 set -e  # die on error
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-YARN_CMD="node \"$ROOT_DIR/.yarn/releases/yarn-4.10.3.cjs\""
-
-# Use the repo's checked-in Yarn binary so GUI Git clients and Git hooks share the same toolchain.
-eval "$YARN_CMD verify"
+yarn verify
