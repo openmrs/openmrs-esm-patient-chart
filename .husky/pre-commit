@@ -3,5 +3,9 @@
 
 set -e  # die on error
 
-yarn lint-staged --no-stash
-yarn turbo run extract-translations
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+YARN_CMD="node \"$ROOT_DIR/.yarn/releases/yarn-4.10.3.cjs\""
+
+# Use the repo's checked-in Yarn binary so commits work from GUI Git clients too.
+eval "$YARN_CMD lint-staged --no-stash"
+eval "$YARN_CMD turbo run extract-translations"

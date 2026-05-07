@@ -128,9 +128,13 @@ const medicationOrder = {
 } as unknown as Order;
 
 describe('prepMedicationOrderPostData', () => {
-  it('includes the selected start date for NEW orders only when the user changed it', () => {
+  it.each(['NEW', 'RENEW', 'REVISE'] as const)('includes the selected start date for %s orders', (action) => {
     const result = prepMedicationOrderPostData(
-      { ...drugOrderBasketItem, startDateChanged: true },
+      {
+        ...drugOrderBasketItem,
+        action,
+        previousOrder: action === 'NEW' ? undefined : 'previous-order-uuid',
+      },
       'patient-uuid',
       'encounter-uuid',
       'provider-uuid',
@@ -139,9 +143,9 @@ describe('prepMedicationOrderPostData', () => {
     expect(result.dateActivated).toBe(toOmrsIsoString(startDate));
   });
 
-  it('does not include dateActivated for NEW orders when the start date was untouched', () => {
+  it('does not include dateActivated when a start date is unavailable', () => {
     const result = prepMedicationOrderPostData(
-      { ...drugOrderBasketItem, startDateChanged: false },
+      { ...drugOrderBasketItem, startDate: undefined as unknown as Date } as DrugOrderBasketItem,
       'patient-uuid',
       'encounter-uuid',
       'provider-uuid',
@@ -150,9 +154,9 @@ describe('prepMedicationOrderPostData', () => {
     expect(result).not.toHaveProperty('dateActivated');
   });
 
-  it.each(['RENEW', 'REVISE'] as const)('does not include dateActivated for %s orders', (action) => {
+  it('does not include dateActivated for DISCONTINUE orders', () => {
     const result = prepMedicationOrderPostData(
-      { ...drugOrderBasketItem, action, previousOrder: 'previous-order-uuid', startDateChanged: true },
+      { ...drugOrderBasketItem, action: 'DISCONTINUE', previousOrder: 'previous-order-uuid' },
       'patient-uuid',
       'encounter-uuid',
       'provider-uuid',
@@ -164,7 +168,7 @@ describe('prepMedicationOrderPostData', () => {
 
 describe('buildMedicationOrder', () => {
   it.each(['RENEW', 'REVISE'] as const)(
-    'does not inherit the original activation date when building a %s basket item',
+    'defaults %s basket items to now instead of the previous activation date',
     (action) => {
       const before = Date.now();
       const result = buildMedicationOrder(medicationOrder, action);
@@ -175,6 +179,15 @@ describe('buildMedicationOrder', () => {
       expect((result.startDate as Date).getTime()).toBeLessThanOrEqual(after);
       expect(result.startDate).not.toBe(medicationOrder.dateActivated);
       expect(result.startDateChanged).toBe(false);
+    },
+  );
+
+  it.each(['RENEW', 'REVISE'] as const)(
+    'prevents silent backdating by not pre-filling %s with the original activation date',
+    (action) => {
+      const result = buildMedicationOrder(medicationOrder, action);
+
+      expect(result.startDate).not.toEqual(medicationOrder.dateActivated);
     },
   );
 

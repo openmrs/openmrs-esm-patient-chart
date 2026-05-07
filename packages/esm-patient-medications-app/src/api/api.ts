@@ -140,7 +140,12 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
-  const shouldIncludeDateActivated = order.action === 'NEW' && order.startDateChanged && order.startDate;
+  // Preserve an explicitly chosen activation date for active-order flows while still
+  // letting DISCONTINUE rely on the original order's existing dateActivated semantics.
+  const dateActivatedFragment =
+    order.action !== 'DISCONTINUE' && order.startDate
+      ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) }
+      : {};
 
   if (order.action === 'NEW') {
     return {
@@ -167,7 +172,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
-      ...(shouldIncludeDateActivated ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -196,6 +201,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -224,6 +230,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -286,6 +293,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
+    // Default follow-up actions to "now" so renew/revise flows do not silently backdate
+    // themselves to the original order's activation timestamp.
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
     startDateChanged: false,
     duration: order.duration,

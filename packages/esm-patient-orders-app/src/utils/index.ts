@@ -71,6 +71,8 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
+    // Default follow-up actions to "now" so renew/revise flows do not silently backdate
+    // themselves to the original order's activation timestamp.
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
     duration: order.duration,
     durationUnit: order.durationUnits
