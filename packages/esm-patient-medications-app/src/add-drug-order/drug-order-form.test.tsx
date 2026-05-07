@@ -48,14 +48,12 @@ jest.mock('../api/api', () => ({
 }));
 
 function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
-  const onSave = jest.fn();
-
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
       patient={mockPatient}
       visitContext={null}
-      onSave={onSave}
+      onSave={jest.fn()}
       saveButtonText="Save order"
       onCancel={jest.fn()}
       workspaceTitle="Add drug order"
