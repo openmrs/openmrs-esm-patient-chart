@@ -140,9 +140,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
-  // Only forward dateActivated when the user has explicitly selected one. Omitted lets
-  // the backend default to "now"; an explicit value gets the encounter backdated upstream.
-  const dateActivatedFragment = order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {};
+  const shouldIncludeDateActivated = order.action === 'NEW' && order.startDateChanged && order.startDate;
 
   if (order.action === 'NEW') {
     return {
@@ -169,7 +167,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
-      ...dateActivatedFragment,
+      ...(shouldIncludeDateActivated ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {}),
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -198,7 +196,6 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
-      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -227,7 +224,6 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
-      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -291,6 +287,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    startDateChanged: false,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {

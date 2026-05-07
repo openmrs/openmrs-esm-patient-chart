@@ -243,6 +243,7 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   asNeeded: boolean;
   asNeededCondition: string | null;
   startDate: Date | string;
+  startDateChanged?: boolean;
   durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;

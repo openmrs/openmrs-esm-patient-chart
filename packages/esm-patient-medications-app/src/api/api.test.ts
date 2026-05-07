@@ -128,9 +128,9 @@ const medicationOrder = {
 } as unknown as Order;
 
 describe('prepMedicationOrderPostData', () => {
-  it.each(['NEW', 'RENEW', 'REVISE'] as const)('includes the selected start date for %s orders', (action) => {
+  it('includes the selected start date for NEW orders only when the user changed it', () => {
     const result = prepMedicationOrderPostData(
-      { ...drugOrderBasketItem, action, previousOrder: action === 'NEW' ? undefined : 'previous-order-uuid' },
+      { ...drugOrderBasketItem, startDateChanged: true },
       'patient-uuid',
       'encounter-uuid',
       'provider-uuid',
@@ -138,20 +138,43 @@ describe('prepMedicationOrderPostData', () => {
 
     expect(result.dateActivated).toBe(toOmrsIsoString(startDate));
   });
+
+  it('does not include dateActivated for NEW orders when the start date was untouched', () => {
+    const result = prepMedicationOrderPostData(
+      { ...drugOrderBasketItem, startDateChanged: false },
+      'patient-uuid',
+      'encounter-uuid',
+      'provider-uuid',
+    );
+
+    expect(result).not.toHaveProperty('dateActivated');
+  });
+
+  it.each(['RENEW', 'REVISE'] as const)('does not include dateActivated for %s orders', (action) => {
+    const result = prepMedicationOrderPostData(
+      { ...drugOrderBasketItem, action, previousOrder: 'previous-order-uuid', startDateChanged: true },
+      'patient-uuid',
+      'encounter-uuid',
+      'provider-uuid',
+    );
+
+    expect(result).not.toHaveProperty('dateActivated');
+  });
 });
 
 describe('buildMedicationOrder', () => {
-  it('preserves the original activation date when building a DISCONTINUE basket item', () => {
-    const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
-    expect(result.startDate).toBe(medicationOrder.dateActivated);
-  });
-
   it.each(['RENEW', 'REVISE'] as const)(
     'does not inherit the original activation date when building a %s basket item',
     (action) => {
+      const before = Date.now();
       const result = buildMedicationOrder(medicationOrder, action);
+      const after = Date.now();
+
       expect(result.startDate).toBeInstanceOf(Date);
+      expect((result.startDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+      expect((result.startDate as Date).getTime()).toBeLessThanOrEqual(after);
       expect(result.startDate).not.toBe(medicationOrder.dateActivated);
+      expect(result.startDateChanged).toBe(false);
     },
   );
 
@@ -167,4 +190,11 @@ describe('buildMedicationOrder', () => {
       expect(result.previousOrderDateActivated).toBeUndefined();
     },
   );
+
+  it('preserves the original activation date when building a DISCONTINUE basket item', () => {
+    const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
+
+    expect(result.startDate).toBe(medicationOrder.dateActivated);
+    expect(result.startDateChanged).toBe(false);
+  });
 });

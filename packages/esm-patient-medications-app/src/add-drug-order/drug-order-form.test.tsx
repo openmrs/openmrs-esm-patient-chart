@@ -48,12 +48,14 @@ jest.mock('../api/api', () => ({
 }));
 
 function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
+  const onSave = jest.fn();
+
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
       patient={mockPatient}
       visitContext={null}
-      onSave={jest.fn()}
+      onSave={onSave}
       saveButtonText="Save order"
       onCancel={jest.fn()}
       workspaceTitle="Add drug order"
@@ -582,6 +584,56 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     await waitFor(() => {
       const quantityUnitCombobox = screen.getByRole('combobox', { name: /quantity unit/i });
       expect(quantityUnitCombobox).toHaveValue('Tablet');
+    });
+  });
+});
+
+describe('DrugOrderForm - start date behavior', () => {
+  it('does not mark the start date as changed when the field is untouched', async () => {
+    const user = userEvent.setup();
+    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+      requireOutpatientQuantity: false,
+      error: null,
+      isLoading: false,
+    });
+
+    const initialOrderBasketItem = createNewOrderBasketItem({
+      indication: '',
+      dosage: 1,
+      route: { valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Oral' },
+      frequency: { valueCoded: 'once-daily-uuid', value: 'Once daily', frequencyPerDay: 1.0 },
+    });
+    const onSave = jest.fn();
+
+    render(
+      <DrugOrderForm
+        initialOrderBasketItem={initialOrderBasketItem}
+        patient={mockPatient}
+        visitContext={null}
+        onSave={onSave}
+        saveButtonText="Save order"
+        onCancel={jest.fn()}
+        workspaceTitle="Add drug order"
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox', { name: /indication/i }), 'Hypertension');
+    await user.click(screen.getByRole('button', { name: /save order/i }));
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          startDate: expect.any(Date),
+          startDateChanged: false,
+          indication: 'Hypertension',
+        }),
+      );
+    });
+
+    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
     });
   });
 });
