@@ -585,6 +585,29 @@ describe('OrderDetailsTable', () => {
 
     expect(screen.getByRole('button', { name: /options/i })).toBeInTheDocument();
   });
+
+  it('disables modify and cancel actions when an order has no visit context', async () => {
+    const orderWithoutVisitContext = {
+      ...mockOrders[0],
+      encounter: null,
+    };
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [orderWithoutVisitContext] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: jest.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: /options/i }));
+
+    expect(screen.getByText(/modify order/i).closest('button')).toBeDisabled();
+    expect(screen.getByText(/cancel order/i).closest('button')).toBeDisabled();
+  });
 });
 
 function renderOrderDetailsTable() {
