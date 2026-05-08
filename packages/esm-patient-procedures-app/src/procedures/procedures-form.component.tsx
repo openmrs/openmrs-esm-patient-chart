@@ -381,7 +381,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
           </FormGroup>
         </Stack>
       </div>
-      <div>
+      <div className={styles.submitButtons}>
         {errorSaving ? (
           <div className={styles.errorContainer}>
             <InlineNotification
