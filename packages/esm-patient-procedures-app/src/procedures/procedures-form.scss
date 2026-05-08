@@ -104,3 +104,9 @@
   gap: layout.$spacing-05;
   align-items: end;
 }
+
+.submitButtons {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
