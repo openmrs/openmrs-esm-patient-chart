@@ -7,7 +7,6 @@ import {
   ListCheckedIcon,
   showSnackbar,
   useConfig,
-  useSession,
   type Visit,
   type Workspace2DefinitionProps,
   useLayoutType,
@@ -16,7 +15,6 @@ import {
 import {
   type DrugOrderBasketItem,
   postOrder,
-  postOrderOnNewEncounter,
   showOrderSuccessToast,
   useMutatePatientOrders,
   useOrderBasket,
@@ -77,8 +75,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   const isEditingExistingOrder = currentOrder?.action === 'REVISE' || initialOrder != null;
   const { mutate: mutateOrders } = useMutatePatientOrders(patientUuid);
 
-  const { drugCategoryConceptSets, orderEncounterType } = useConfig<ConfigObject>();
-  const session = useSession();
+  const { drugCategoryConceptSets } = useConfig<ConfigObject>();
+
   const {
     conceptSets,
     isLoading: isLoadingConceptSets,
@@ -117,10 +115,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     [orders, setOrders, closeWorkspace],
   );
 
-  // If editing an existing order, on save, we directly submit the modified order to the server
-  // and do not save it to the order basket. RENEW creates a fresh encounter (per backend
-  // semantics: a renewal is a new prescription event), while REVISE and DISCONTINUE post
-  // against the existing order's encounter.
+  // For REVISE, submit directly to the server against the previous order's encounter.
+  // RENEW flows through the order basket and is signed via postOrdersOnNewEncounter.
   const submitDrugOrderToServer = useCallback(
     async (finalizedOrder: DrugOrderBasketItem) => {
       const handleSuccess = () => {
@@ -152,41 +148,13 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         });
       };
 
-      if (finalizedOrder.action === 'RENEW') {
-        const orderPost = prepMedicationOrderPostData(finalizedOrder, patientUuid, null, orderToEditOrdererUuid);
-        const encounterDate = finalizedOrder.startDate
-          ? new Date(finalizedOrder.startDate as string | Date)
-          : new Date();
-        return postOrderOnNewEncounter(
-          orderPost,
-          patientUuid,
-          orderEncounterType,
-          visitContext,
-          session?.sessionLocation?.uuid,
-          undefined,
-          encounterDate,
-        )
-          .then(handleSuccess)
-          .catch(handleError);
-      }
-
       return postOrder(
         prepMedicationOrderPostData(finalizedOrder, patientUuid, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
       )
         .then(handleSuccess)
         .catch(handleError);
     },
-    [
-      clearOrders,
-      closeWorkspace,
-      mutateOrders,
-      patientUuid,
-      t,
-      orderToEditOrdererUuid,
-      orderEncounterType,
-      visitContext,
-      session,
-    ],
+    [clearOrders, closeWorkspace, mutateOrders, patientUuid, t, orderToEditOrdererUuid],
   );
 
   const workspaceTitle =
