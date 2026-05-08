@@ -78,8 +78,9 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
   await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
 
-  await user.type(screen.getByRole('searchbox', { name: /enter status/i }), 'Done');
-  await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+  const statusGroup = screen.getByRole('group', { name: /^status/i });
+  await user.click(within(statusGroup).getByRole('combobox'));
+  await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
   const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
   await user.click(within(procedureTypeGroup).getByRole('combobox'));
@@ -315,8 +316,9 @@ describe('ProceduresForm', () => {
     const durationInput = screen.getByRole('spinbutton', { name: /^duration$/i });
     await user.type(durationInput, '30');
 
-    const unitSelect = screen.getByLabelText(/duration unit/i);
-    await user.selectOptions(unitSelect, 'proc-concept-uuid-1');
+    const unitCombobox = screen.getByRole('combobox', { name: /duration unit/i });
+    await user.click(unitCombobox);
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
     await user.click(screen.getByRole('button', { name: /save & close/i }));
 
@@ -390,8 +392,9 @@ describe('ProceduresForm', () => {
     await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
     await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
     await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
-    await user.type(screen.getByRole('searchbox', { name: /enter status/i }), 'Done');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    const statusGroup = screen.getByRole('group', { name: /^status/i });
+    await user.click(within(statusGroup).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
     const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
     await user.click(within(procedureTypeGroup).getByRole('combobox'));
