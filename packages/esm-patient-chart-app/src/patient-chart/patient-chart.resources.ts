@@ -6,10 +6,13 @@ import {
   openmrsFetch,
   restBaseUrl,
   usePatient,
-  useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspaceGroupProps,
+  usePatientChartStore,
+  useCombinedVisit,
+} from '@openmrs/esm-patient-common-lib';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -68,7 +71,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     activeVisit,
     isValidating: isValidatingActiveVisit,
     mutate: mutateActiveVisit,
-  } = useVisit(isVisitContextValid ? null : patientUuid);
+  } = useCombinedVisit(isVisitContextValid ? null : patientUuid);
 
   const isWorkspaceGroupLaunched = useRef(false);
 
