@@ -126,6 +126,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [errorSaving, setErrorSaving] = useState(null);
 
   const handleSave = useCallback(async () => {
+    setIsSubmittingForm(true);
     const procedureType = getValues('procedureType');
     const startDateTime = getValues('startDateTime');
     const endDateTime = getValues('endDateTime');
