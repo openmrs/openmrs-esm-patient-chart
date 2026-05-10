@@ -1,6 +1,23 @@
 import { type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type OrderBasketItem, type OrderBasketExtensionProps } from '@openmrs/esm-patient-common-lib';
 
+/**
+ * Returns the earliest startDate among basket items (drug orders), or `now`
+ * when no item has a startDate set. Used to backdate the encounter created
+ * in postOrdersOnNewEncounter so the backend's
+ * `dateActivated >= encounterDatetime` constraint holds.
+ */
+export function getEarliestStartDate(orders: ReadonlyArray<OrderBasketItem>, now: Date = new Date()): Date {
+  return orders.reduce<Date>((earliest, order) => {
+    const startDateValue = (order as { startDate?: Date | string }).startDate;
+    if (!startDateValue) {
+      return earliest;
+    }
+    const startDate = startDateValue instanceof Date ? startDateValue : new Date(startDateValue);
+    return startDate < earliest ? startDate : earliest;
+  }, now);
+}
+
 export interface CreateOrderBasketExtensionPropsArguments {
   patient: fhir.Patient;
   drugOrderWorkspaceName?: string;
