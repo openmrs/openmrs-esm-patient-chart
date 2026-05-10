@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -140,6 +140,12 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
+  // Only forward dateActivated when the user has explicitly selected one. Omitted lets
+  // the backend default to "now"; an explicit value gets the encounter backdated upstream.
+  // The DISCONTINUE branch below doesn't spread this fragment, so a guard against
+  // action === 'DISCONTINUE' here would be redundant.
+  const dateActivatedFragment = order.startDate ? { dateActivated: toOmrsIsoString(new Date(order.startDate)) } : {};
+
   if (order.action === 'NEW') {
     return {
       action: 'NEW',
@@ -165,6 +171,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
@@ -193,6 +200,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -221,6 +229,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
+      ...dateActivatedFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -283,6 +292,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
+    // Default follow-up actions to "now" so renew/revise flows do not silently backdate
+    // themselves to the original order's activation timestamp.
     startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
     duration: order.duration,
     durationUnit: order.durationUnits
@@ -301,6 +312,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
         }
       : null,
     encounterUuid: order.encounter?.uuid,
+    previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
     visit: order.encounter.visit,
   };
 }
