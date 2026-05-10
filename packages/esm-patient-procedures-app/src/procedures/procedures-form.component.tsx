@@ -214,7 +214,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   itemToString={(item: ProcedureType) => item?.name ?? ''}
                   initialSelectedItem={procedureTypes.find((pt) => pt.uuid === getValues('procedureType')) ?? null}
                   onChange={({ selectedItem }: { selectedItem: ProcedureType | null }) =>
-                    setValue('procedureType', selectedItem.uuid)
+                    setValue('procedureType', selectedItem?.uuid ?? '')
                   }
                 />
               </ResponsiveWrapper>
