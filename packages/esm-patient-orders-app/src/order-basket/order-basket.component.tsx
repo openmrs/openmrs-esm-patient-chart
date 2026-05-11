@@ -114,8 +114,9 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     if (!orderEncounterUuid) {
       try {
         // Backend rejects orders whose dateActivated is before the encounter's encounterDatetime,
-        // so set encounterDatetime to the earliest startDate among basket items.
-        const encounterDate = getEarliestStartDate(orders);
+        // so set encounterDatetime to the earliest startDate among basket items. Floor the result
+        // to the visit's start so the encounter also satisfies Encounter.datetimeShouldBeInVisitDatesRange.
+        const encounterDate = getEarliestStartDate(orders, new Date(), visitContext?.startDatetime);
 
         const postedEncounter = await postOrdersOnNewEncounter(
           patientUuid,

@@ -27,8 +27,8 @@ export function getStartDateMinimum(
   return visitStartDatetime ? parseDate(visitStartDatetime) : undefined;
 }
 
-export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
-  const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
+export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, startDateMin?: Date) {
+  const medicationOrderFormSchema = useCreateMedicationOrderFormSchema(startDateMin);
 
   const defaultValues = useMemo(() => {
     const defaultStartDate =
@@ -70,10 +70,11 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
   };
 }
 
-function useCreateMedicationOrderFormSchema() {
+function useCreateMedicationOrderFormSchema(startDateMin?: Date) {
   const { t } = useTranslation();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
   const { requireIndication } = useConfig<ConfigObject>();
+  const startDateMinTime = startDateMin?.getTime();
 
   const schema = useMemo(() => {
     const comboSchema = {
@@ -141,9 +142,14 @@ function useCreateMedicationOrderFormSchema() {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
         : z.string().nullish(),
-      startDate: z.date().refine((value) => value <= new Date(), {
-        message: t('startDateCannotBeInFuture', 'Start date cannot be in the future'),
-      }),
+      startDate: z
+        .date()
+        .refine((value) => value <= new Date(), {
+          message: t('startDateCannotBeInFuture', 'Start date cannot be in the future'),
+        })
+        .refine((value) => startDateMinTime == null || value.getTime() >= startDateMinTime, {
+          message: t('startDateBeforeMinimum', 'Start date is earlier than the minimum allowed'),
+        }),
       frequency: z.object(
         { ...frequencySchema },
         {
@@ -215,7 +221,7 @@ function useCreateMedicationOrderFormSchema() {
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
-  }, [requireIndication, requireOutpatientQuantity, t]);
+  }, [requireIndication, requireOutpatientQuantity, startDateMinTime, t]);
 
   return schema;
 }

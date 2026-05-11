@@ -10,18 +10,37 @@ import {
 import { type OrderBasketStore, orderBasketStore } from './store';
 import type { ExtractedOrderErrorObject, Order, OrderBasketItem, OrderErrorObject, OrderPost } from './types';
 
-function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string) {
+function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string, encounterDate?: Date) {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
   const orders: Array<OrderPost> = [];
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {
-      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null, ordererUuid));
+      const preppedOrder = encounterDate ? floorOrderStartDate(order, encounterDate) : order;
+      orders.push(postDataPrepFunctions[grouping](preppedOrder, patientUuid, null, ordererUuid));
     });
   });
 
   return orders;
+}
+
+/**
+ * Returns a shallow copy of the basket item with `startDate` floored to `encounterDate`.
+ * The backend enforces `dateActivated >= encounterDatetime`, so if a user-selected
+ * startDate fell before the encounter date (e.g. because it was earlier than the visit
+ * start), it must be raised to match.
+ */
+function floorOrderStartDate<T extends OrderBasketItem>(order: T, encounterDate: Date): T {
+  const startDateValue = (order as { startDate?: Date | string }).startDate;
+  if (!startDateValue) {
+    return order;
+  }
+  const startDate = startDateValue instanceof Date ? startDateValue : new Date(startDateValue);
+  if (startDate < encounterDate) {
+    return { ...order, startDate: encounterDate } as T;
+  }
+  return order;
 }
 
 export async function postOrdersOnNewEncounter(
@@ -46,7 +65,16 @@ export async function postOrdersOnNewEncounter(
     }
   }
 
-  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
+  // Defense in depth: floor the encounter datetime to the visit's start so the backend's
+  // Encounter.datetimeShouldBeInVisitDatesRange constraint holds even if a caller forgot.
+  if (encounterDate && currentVisit?.startDatetime) {
+    const visitStart = parseDate(currentVisit.startDatetime);
+    if (encounterDate < visitStart) {
+      encounterDate = visitStart;
+    }
+  }
+
+  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid, encounterDate ?? undefined);
 
   const encounterPostData: EncounterPost = {
     patient: patientUuid,

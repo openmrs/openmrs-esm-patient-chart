@@ -6,16 +6,32 @@ import { type OrderBasketItem, type OrderBasketExtensionProps } from '@openmrs/e
  * when no item has a startDate set. Used to backdate the encounter created
  * in postOrdersOnNewEncounter so the backend's
  * `dateActivated >= encounterDatetime` constraint holds.
+ *
+ * When `visitStartDatetime` is supplied, the returned date is floored to it so
+ * the resulting encounterDatetime stays within the visit window (the backend
+ * also enforces `Encounter.datetimeShouldBeInVisitDatesRange`).
  */
-export function getEarliestStartDate(orders: ReadonlyArray<OrderBasketItem>, now: Date = new Date()): Date {
-  return orders.reduce<Date>((earliest, order) => {
+export function getEarliestStartDate(
+  orders: ReadonlyArray<OrderBasketItem>,
+  now: Date = new Date(),
+  visitStartDatetime?: Date | string,
+): Date {
+  const earliest = orders.reduce<Date>((acc, order) => {
     const startDateValue = (order as { startDate?: Date | string }).startDate;
     if (!startDateValue) {
-      return earliest;
+      return acc;
     }
     const startDate = startDateValue instanceof Date ? startDateValue : new Date(startDateValue);
-    return startDate < earliest ? startDate : earliest;
+    return startDate < acc ? startDate : acc;
   }, now);
+
+  if (visitStartDatetime) {
+    const visitStart = visitStartDatetime instanceof Date ? visitStartDatetime : new Date(visitStartDatetime);
+    if (earliest < visitStart) {
+      return visitStart;
+    }
+  }
+  return earliest;
 }
 
 export interface CreateOrderBasketExtensionPropsArguments {

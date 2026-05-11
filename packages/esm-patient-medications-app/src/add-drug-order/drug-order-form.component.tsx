@@ -138,8 +138,6 @@ export function DrugOrderForm({
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
-  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
-
   const startDateMin = useMemo(
     () =>
       getStartDateMinimum(
@@ -149,6 +147,8 @@ export function DrugOrderForm({
       ),
     [initialOrderBasketItem?.action, initialOrderBasketItem?.previousOrderDateActivated, visitContext?.startDatetime],
   );
+
+  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, startDateMin);
 
   const {
     control,
