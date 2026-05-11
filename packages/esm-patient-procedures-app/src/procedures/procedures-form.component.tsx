@@ -262,7 +262,6 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
           {isStartDateKnown && (
             <FormGroup legendText={t('startDateAndTime', 'Start date and time')}>
               <DateTimeField name="startDateTime" idPrefix="startDateTime" control={control} />
-              {errors.startDateTime && <p className={styles.errorMessage}>{errors.startDateTime.message}</p>}
             </FormGroup>
           )}
 
@@ -302,7 +301,6 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
 
           <FormGroup legendText={t('endDateAndTime', 'End date and time')}>
             <DateTimeField name="endDateTime" idPrefix="endDateTime" control={control} />
-            {errors.endDateTime && <p className={styles.errorMessage}>{errors.endDateTime.message}</p>}
           </FormGroup>
 
           <FormGroup legendText={t('duration', 'Duration')}>
