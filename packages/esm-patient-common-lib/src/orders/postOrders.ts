@@ -62,6 +62,7 @@ export async function postOrdersOnNewEncounter(
 
   return postEncounter(encounterPostData, abortController);
 }
+
 interface ObsPayload {
   concept: Concept | string;
   value?: string | OpenmrsResource;
