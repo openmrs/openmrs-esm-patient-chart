@@ -26,10 +26,18 @@ const schema = z
     duration: z.number().int().positive('Duration must be a positive number').nullable().optional(),
     durationUnit: z.string().optional().nullable(),
   })
+  .refine((data) => Boolean(data.startDateTime) || Boolean(data.estimatedStartDate), {
+    message: 'Start date is required',
+    path: ['startDateTime'],
+  })
   .refine(
     (data) => {
-      if (data.startDateTime && data.endDateTime) {
+      if (!data.endDateTime) return true;
+      if (data.startDateTime) {
         return data.endDateTime >= data.startDateTime;
+      }
+      if (data.estimatedStartDate) {
+        return data.endDateTime >= new Date(data.estimatedStartDate);
       }
       return true;
     },

@@ -86,6 +86,18 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [estimatedYear, setEstimatedYear] = useState(initialEstimatedDate?.split('-')[0] ?? '');
   const [estimatedMonth, setEstimatedMonth] = useState(initialEstimatedDate?.split('-')[1] ?? '');
 
+  React.useEffect(() => {
+    if (isStartDateKnown) {
+      setValue('estimatedStartDate', '');
+    } else if (estimatedYear) {
+      setValue('estimatedStartDate', estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear, {
+        shouldValidate: true,
+      });
+    } else {
+      setValue('estimatedStartDate', '');
+    }
+  }, [isStartDateKnown, estimatedYear, estimatedMonth, setValue]);
+
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
     id: String(currentYear - i),
@@ -284,6 +296,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   />
                 </ResponsiveWrapper>
               </div>
+              {errors.startDateTime && <p className={styles.errorMessage}>{errors.startDateTime.message}</p>}
             </FormGroup>
           )}
 

@@ -85,6 +85,10 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
   await user.click(within(procedureTypeGroup).getByRole('combobox'));
   await user.click(screen.getByRole('option', { name: /surgery/i }));
+
+  const startGroup = screen.getByRole('group', { name: /start date and time/i });
+  await user.click(within(startGroup).getByLabelText(/^date$/i));
+  await user.paste('2026-04-27');
 }
 
 beforeEach(() => {
@@ -227,7 +231,7 @@ describe('ProceduresForm', () => {
         procedureCoded: 'proc-concept-uuid-1',
         procedureType: 'pt-uuid-1',
         bodySite: 'proc-concept-uuid-1',
-        startDateTime: null,
+        startDateTime: expect.stringMatching(/^2026-04-27T/),
         endDateTime: null,
         status: 'proc-concept-uuid-1',
         notes: '',
@@ -428,8 +432,6 @@ describe('ProceduresForm', () => {
     await fillRequiredFields(user);
 
     const startGroup = screen.getByRole('group', { name: /start date and time/i });
-    await user.click(within(startGroup).getByLabelText(/^date$/i));
-    await user.paste('2026-04-27');
     await user.type(within(startGroup).getByLabelText(/^time$/i), '09:15');
 
     await user.click(screen.getByRole('button', { name: /save & close/i }));
