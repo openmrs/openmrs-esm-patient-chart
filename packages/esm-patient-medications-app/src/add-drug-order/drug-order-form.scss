@@ -120,51 +120,10 @@
   }
 }
 
-.fullWidthDatePickerContainer {
-  :global .cds--date-picker {
-    width: 100%;
-
-    :global .cds--date-picker-container {
-      width: 100%;
-
-      :global .cds--date-picker-input__wrapper {
-        width: 100%;
-
-        :global .cds--date-picker__input {
-          width: 100%;
-        }
-      }
-    }
-  }
-}
-
 .numberInput {
   :global(.cds--number__input-wrapper) input {
     min-width: unset !important;
     padding-right: layout.$spacing-05;
-  }
-}
-
-.backButton {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  margin: layout.$spacing-03 0;
-
-  button {
-    display: flex;
-    padding-left: 0 !important;
-
-    svg {
-      order: 1;
-      margin-right: layout.$spacing-03;
-      margin-left: 0 !important;
-      fill: currentColor !important;
-    }
-
-    span {
-      order: 2;
-    }
   }
 }
 

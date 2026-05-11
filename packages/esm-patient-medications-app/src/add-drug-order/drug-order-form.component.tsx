@@ -602,26 +602,24 @@ export function DrugOrderForm({
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={16} md={4} sm={4}>
-                  <div className={styles.fullWidthDatePickerContainer}>
-                    <InputWrapper>
-                      <Controller
-                        name="startDate"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <OpenmrsDatePicker
-                            {...field}
-                            minDate={startDateMin}
-                            maxDate={new Date()}
-                            id="startDatePicker"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                            invalid={Boolean(fieldState?.error?.message)}
-                            invalidText={fieldState?.error?.message}
-                          />
-                        )}
-                      />
-                    </InputWrapper>
-                  </div>
+                  <InputWrapper>
+                    <Controller
+                      name="startDate"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          {...field}
+                          minDate={startDateMin}
+                          maxDate={new Date()}
+                          id="startDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'md' : 'sm'}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
+                      )}
+                    />
+                  </InputWrapper>
                 </Column>
                 <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
@@ -768,11 +766,10 @@ export function DrugOrderForm({
             }}
           />
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+            <Button kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}
             </Button>
             <Button
-              className={styles.button}
               kind="primary"
               type="submit"
               size="xl"
@@ -821,7 +818,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   };
 
   return (
-    <div className={styles.customElement}>
+    <div>
       <span className="cds--label" id={`${name}-label`}>
         {labelText}
       </span>
