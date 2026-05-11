@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Se requiere especificar la vía de administración",
   "selectUnitErrorMessage": "Es obligatorio especificar la unidad de dosificación",
   "startDate": "Fecha de inicio",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "Tomar según sea necesario",
   "tryReopeningTheForm": "Por favor, intente abrir el formulario nuevamente",

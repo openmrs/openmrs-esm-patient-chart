@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "途径为必填项",
   "selectUnitErrorMessage": "单位为必填项",
   "startDate": "开始日期",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "按需用药",
   "tryReopeningTheForm": "请尝试重新启动表单",
