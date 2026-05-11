@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Route is required",
   "selectUnitErrorMessage": "Dose unit is required",
   "startDate": "დაწყების თარიღი",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "მიღება, როცა საჭიროა",
   "tryReopeningTheForm": "Please try launching the form again",
