@@ -255,7 +255,13 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               size="md"
               selectedIndex={isStartDateKnown ? 0 : 1}
               onChange={({ index }: { index: number }) => {
-                setIsStartDateKnown(index === 0);
+                const isKnown = index === 0;
+                setIsStartDateKnown(isKnown);
+
+                if (!isKnown) {
+                  setValue('startDateTime', null, { shouldValidate: true });
+                }
+
                 setEstimatedYear('');
                 setEstimatedMonth('');
               }}
