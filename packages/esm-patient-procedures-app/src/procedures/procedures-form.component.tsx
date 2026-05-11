@@ -14,8 +14,6 @@ import {
   Layer,
   NumberInput,
   Search,
-  Select,
-  SelectItem,
   Stack,
   Switch,
   TextArea,

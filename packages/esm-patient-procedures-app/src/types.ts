@@ -18,8 +18,9 @@ export interface RawProcedure {
   procedureCoded?: string;
   procedureType?: string;
   bodySite?: string;
-  startDateTime?: string;
-  endDateTime?: string;
+  startDateTime?: string | null;
+  estimatedStartDate?: string | null;
+  endDateTime?: string | null;
   status?: string;
   notes?: string;
   duration?: number;
