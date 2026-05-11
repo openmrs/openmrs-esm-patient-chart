@@ -37,7 +37,9 @@ const schema = z
         return data.endDateTime >= data.startDateTime;
       }
       if (data.estimatedStartDate) {
-        return data.endDateTime >= new Date(data.estimatedStartDate);
+        const [year, month] = data.estimatedStartDate.split('-').map(Number);
+        const start = new Date(year, Number.isFinite(month) ? month - 1 : 0, 1);
+        return data.endDateTime >= start;
       }
       return true;
     },
