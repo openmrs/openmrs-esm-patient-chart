@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -86,7 +86,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [estimatedYear, setEstimatedYear] = useState(initialEstimatedDate?.split('-')[0] ?? '');
   const [estimatedMonth, setEstimatedMonth] = useState(initialEstimatedDate?.split('-')[1] ?? '');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isStartDateKnown) {
       setValue('estimatedStartDate', '');
     } else if (estimatedYear) {
@@ -98,25 +98,31 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     }
   }, [isStartDateKnown, estimatedYear, estimatedMonth, setValue]);
 
-  const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
-    id: String(currentYear - i),
-    label: String(currentYear - i),
-  }));
-  const monthOptions = [
-    { id: '01', label: 'January' },
-    { id: '02', label: 'February' },
-    { id: '03', label: 'March' },
-    { id: '04', label: 'April' },
-    { id: '05', label: 'May' },
-    { id: '06', label: 'June' },
-    { id: '07', label: 'July' },
-    { id: '08', label: 'August' },
-    { id: '09', label: 'September' },
-    { id: '10', label: 'October' },
-    { id: '11', label: 'November' },
-    { id: '12', label: 'December' },
-  ];
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
+      id: String(currentYear - i),
+      label: String(currentYear - i),
+    }));
+  }, []);
+
+  const monthOptions = useMemo(
+    () => [
+      { id: '01', label: t('january', 'January') },
+      { id: '02', label: t('february', 'February') },
+      { id: '03', label: t('march', 'March') },
+      { id: '04', label: t('april', 'April') },
+      { id: '05', label: t('may', 'May') },
+      { id: '06', label: t('june', 'June') },
+      { id: '07', label: t('july', 'July') },
+      { id: '08', label: t('august', 'August') },
+      { id: '09', label: t('september', 'September') },
+      { id: '10', label: t('october', 'October') },
+      { id: '11', label: t('november', 'November') },
+      { id: '12', label: t('december', 'December') },
+    ],
+    [t],
+  );
 
   const procedureField = useConceptSearchField(
     { uuid: procedureConceptUuid, sourceType: procedureConceptSourceType },
