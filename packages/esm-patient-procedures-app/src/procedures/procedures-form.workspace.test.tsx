@@ -123,7 +123,7 @@ describe('ProceduresForm', () => {
     expect(screen.getByRole('group', { name: /body site/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /start date and time/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /end date and time/i })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: /^duration$/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /^length of procedure$/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /^status/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /notes/i })).toBeInTheDocument();
   });
@@ -474,6 +474,11 @@ describe('ProceduresForm', () => {
     await user.click(screen.getByRole('button', { name: /save & close/i }));
 
     expect(screen.getByText(/start date is required/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: /year/i }));
+    await user.click(screen.getByRole('option', { name: '2023' }));
+
+    expect(screen.queryByText(/start date is required/i)).not.toBeInTheDocument();
   });
 
   it('saves an estimated start date when "Is start date known?" is "No"', async () => {

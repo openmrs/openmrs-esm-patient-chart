@@ -70,9 +70,10 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     getValues,
     setValue,
+    trigger,
   } = useFormContext<ProceduresFormSchema>();
 
   const { procedureTypes, isLoading: isLoadingProcedureTypes } = useProcedureTypes();
@@ -85,16 +86,13 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [estimatedMonth, setEstimatedMonth] = useState(initialEstimatedDate?.split('-')[1] ?? '');
 
   useEffect(() => {
-    if (isStartDateKnown) {
-      setValue('estimatedStartDate', '');
-    } else if (estimatedYear) {
-      setValue('estimatedStartDate', estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear, {
-        shouldValidate: true,
-      });
-    } else {
-      setValue('estimatedStartDate', '');
+    const value =
+      !isStartDateKnown && estimatedYear ? (estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear) : '';
+    setValue('estimatedStartDate', value);
+    if (isSubmitted) {
+      trigger('startDateTime');
     }
-  }, [isStartDateKnown, estimatedYear, estimatedMonth, setValue]);
+  }, [isStartDateKnown, estimatedYear, estimatedMonth, setValue, isSubmitted, trigger]);
 
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
@@ -150,11 +148,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     const duration = getValues('duration');
     const durationUnit = getValues('durationUnit');
 
-    let estimatedStartDate: string | undefined;
-    if (!isStartDateKnown && estimatedYear) {
-      estimatedStartDate = estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear;
-    }
-
+    const estimatedStartDate = getValues('estimatedStartDate');
     const hasDuration = typeof duration === 'number' && !Number.isNaN(duration);
 
     const payload = {
@@ -162,7 +156,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
       procedureCoded: procedureField.selectedConcept!.uuid,
       procedureType: procedureType,
       bodySite: bodySiteField.selectedConcept!.uuid,
-      startDateTime: isStartDateKnown && startDateTime ? dayjs(startDateTime).format() : null,
+      startDateTime: startDateTime ? dayjs(startDateTime).format() : null,
       endDateTime: endDateTime ? dayjs(endDateTime).format() : null,
       status: getValues('status'),
       notes: notes,
@@ -191,10 +185,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   }, [
     bodySiteField.selectedConcept,
     closeWorkspaceWithSavedChanges,
-    estimatedMonth,
-    estimatedYear,
     getValues,
-    isStartDateKnown,
     mutate,
     patientUuid,
     procedureField.selectedConcept,
@@ -257,7 +248,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 setIsStartDateKnown(isKnown);
 
                 if (!isKnown) {
-                  setValue('startDateTime', null, { shouldValidate: true });
+                  setValue('startDateTime', null);
                 }
 
                 setEstimatedYear('');
@@ -313,7 +304,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
             <DateTimeField name="endDateTime" idPrefix="endDateTime" control={control} />
           </FormGroup>
 
-          <FormGroup legendText={t('duration', 'Duration')}>
+          <FormGroup legendText={t('length', 'Length of procedure')}>
             <div className={styles.twoColumnGroup}>
               <Controller
                 name="duration"
