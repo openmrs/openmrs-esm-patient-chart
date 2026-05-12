@@ -123,7 +123,7 @@ describe('ProceduresForm', () => {
     expect(screen.getByRole('group', { name: /body site/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /start date and time/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /end date and time/i })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: /^length of procedure$/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /^procedure duration$/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /^status/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /notes/i })).toBeInTheDocument();
   });

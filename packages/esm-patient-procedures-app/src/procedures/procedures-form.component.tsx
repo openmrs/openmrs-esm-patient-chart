@@ -304,7 +304,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
             <DateTimeField name="endDateTime" idPrefix="endDateTime" control={control} />
           </FormGroup>
 
-          <FormGroup legendText={t('length', 'Length of procedure')}>
+          <FormGroup legendText={t('procedure duration', 'Procedure duration')}>
             <div className={styles.twoColumnGroup}>
               <Controller
                 name="duration"
