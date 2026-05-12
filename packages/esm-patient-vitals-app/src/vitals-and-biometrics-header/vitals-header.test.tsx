@@ -1,4 +1,5 @@
 import React from 'react';
+import type * as I18next from 'i18next';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
@@ -320,7 +321,7 @@ describe('VitalsHeader', () => {
   });
 
   it('resolves plural translation keys correctly', async () => {
-    const { createInstance } = (await vi.importActual('i18next')) as object;
+    const { createInstance } = (await vi.importActual('i18next')) as typeof I18next;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const translations = require('../../translations/en.json');
     const i18n = createInstance();

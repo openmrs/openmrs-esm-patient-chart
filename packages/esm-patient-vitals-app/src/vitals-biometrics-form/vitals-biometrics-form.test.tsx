@@ -224,7 +224,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm();
@@ -321,7 +321,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm('editing', 'encounter-uuid');
