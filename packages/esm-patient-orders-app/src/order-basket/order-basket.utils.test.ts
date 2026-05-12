@@ -48,31 +48,4 @@ describe('getEarliestStartDate', () => {
     const result = getEarliestStartDate([makeOrderItem({ startDate: future })], now);
     expect(result).toBe(now);
   });
-
-  it('floors the result to visitStartDatetime when the earliest startDate is before it', () => {
-    const earlierThanVisit = new Date('2026-05-04T08:00:00.000Z');
-    const visitStart = new Date('2026-05-05T09:00:00.000Z');
-    const result = getEarliestStartDate([makeOrderItem({ startDate: earlierThanVisit })], now, visitStart);
-    expect(result).toEqual(visitStart);
-  });
-
-  it('accepts visitStartDatetime as an ISO string', () => {
-    const earlierThanVisit = new Date('2026-05-04T08:00:00.000Z');
-    const visitStart = '2026-05-05T09:00:00.000Z';
-    const result = getEarliestStartDate([makeOrderItem({ startDate: earlierThanVisit })], now, visitStart);
-    expect(result.toISOString()).toEqual(new Date(visitStart).toISOString());
-  });
-
-  it('returns the earliest startDate when it falls within the visit window', () => {
-    const visitStart = new Date('2026-05-03T00:00:00.000Z');
-    const startDate = new Date('2026-05-04T08:00:00.000Z');
-    const result = getEarliestStartDate([makeOrderItem({ startDate })], now, visitStart);
-    expect(result).toEqual(startDate);
-  });
-
-  it('floors "now" to visitStartDatetime when no item has a startDate and the visit started later', () => {
-    const visitStart = new Date('2026-05-06T13:00:00.000Z');
-    const result = getEarliestStartDate([makeOrderItem()], now, visitStart);
-    expect(result).toEqual(visitStart);
-  });
 });

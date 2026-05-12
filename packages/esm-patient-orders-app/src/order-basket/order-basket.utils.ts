@@ -7,31 +7,18 @@ import { type OrderBasketItem, type OrderBasketExtensionProps } from '@openmrs/e
  * in postOrdersOnNewEncounter so the backend's
  * `dateActivated >= encounterDatetime` constraint holds.
  *
- * When `visitStartDatetime` is supplied, the returned date is floored to it so
- * the resulting encounterDatetime stays within the visit window (the backend
- * also enforces `Encounter.datetimeShouldBeInVisitDatesRange`).
+ * Backend visit-bounds enforcement (`Encounter.datetimeShouldBeInVisitDatesRange`)
+ * is the posting layer's responsibility — see `postOrdersOnNewEncounter`.
  */
-export function getEarliestStartDate(
-  orders: ReadonlyArray<OrderBasketItem>,
-  now: Date = new Date(),
-  visitStartDatetime?: Date | string,
-): Date {
-  const earliest = orders.reduce<Date>((acc, order) => {
+export function getEarliestStartDate(orders: ReadonlyArray<OrderBasketItem>, now: Date = new Date()): Date {
+  return orders.reduce<Date>((earliest, order) => {
     const startDateValue = (order as { startDate?: Date | string }).startDate;
     if (!startDateValue) {
-      return acc;
+      return earliest;
     }
     const startDate = startDateValue instanceof Date ? startDateValue : new Date(startDateValue);
-    return startDate < acc ? startDate : acc;
+    return startDate < earliest ? startDate : earliest;
   }, now);
-
-  if (visitStartDatetime) {
-    const visitStart = visitStartDatetime instanceof Date ? visitStartDatetime : new Date(visitStartDatetime);
-    if (earliest < visitStart) {
-      return visitStart;
-    }
-  }
-  return earliest;
 }
 
 export interface CreateOrderBasketExtensionPropsArguments {

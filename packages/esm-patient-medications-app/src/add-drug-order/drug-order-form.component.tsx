@@ -274,9 +274,8 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
-    // The picker is date-only and resolves selections to local midnight, while the schema floor
-    // (visit.startDatetime for NEW/RENEW, previous.dateActivated + 1s for REVISE) is at datetime
-    // precision. Snap same-day underflow up to the floor so the backend's strict comparisons hold.
+    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
+    // minimum; snap them up before saving.
     const startDate = startDateMin && data.startDate < startDateMin ? startDateMin : data.startDate;
 
     const newBasketItem = {
