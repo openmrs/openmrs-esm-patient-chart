@@ -274,6 +274,10 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
+    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
+    // minimum; snap them up before saving.
+    const startDate = startDateMin && data.startDate < startDateMin ? startDateMin : data.startDate;
+
     const newBasketItem = {
       ...initialOrderBasketItem,
       drug: data.drug,
@@ -293,7 +297,7 @@ export function DrugOrderForm({
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      startDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
