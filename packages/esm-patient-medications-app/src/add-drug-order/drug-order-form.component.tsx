@@ -138,6 +138,8 @@ export function DrugOrderForm({
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
+  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
+
   const startDateMin = useMemo(
     () =>
       getStartDateMinimum(
@@ -147,8 +149,6 @@ export function DrugOrderForm({
       ),
     [initialOrderBasketItem?.action, initialOrderBasketItem?.previousOrderDateActivated, visitContext?.startDatetime],
   );
-
-  const drugOrderForm = useDrugOrderForm(initialOrderBasketItem, startDateMin);
 
   const {
     control,
@@ -274,6 +274,11 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
+    // The picker is date-only and resolves selections to local midnight, while the schema floor
+    // (visit.startDatetime for NEW/RENEW, previous.dateActivated + 1s for REVISE) is at datetime
+    // precision. Snap same-day underflow up to the floor so the backend's strict comparisons hold.
+    const startDate = startDateMin && data.startDate < startDateMin ? startDateMin : data.startDate;
+
     const newBasketItem = {
       ...initialOrderBasketItem,
       drug: data.drug,
@@ -293,7 +298,7 @@ export function DrugOrderForm({
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      startDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
