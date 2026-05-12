@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import DrugSearchComboBox from './drug-search-combobox.component';
 import { useDrugSearch, useDrugTemplates } from './drug-search.resource';

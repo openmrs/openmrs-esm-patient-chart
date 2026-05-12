@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AttachmentsOverview from './attachments-overview.component';
 import { useAttachments } from '@openmrs/esm-framework';

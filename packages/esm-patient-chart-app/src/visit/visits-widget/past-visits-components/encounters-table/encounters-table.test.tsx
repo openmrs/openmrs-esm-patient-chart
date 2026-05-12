@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
 /* Please re-enable this ESLint rule if you are able to find a practical way to test the overflow menu buttons
    without using parentElement and the expanded row functionality without using nextElementSibling. */
 

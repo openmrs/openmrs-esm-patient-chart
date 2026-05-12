@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
 import { ExtensionSlot, openmrsFetch, useConnectivity } from '@openmrs/esm-framework';

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type FormEntryConfigSchema } from '../config-schema';

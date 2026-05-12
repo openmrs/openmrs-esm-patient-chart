@@ -1,4 +1,5 @@
 import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';

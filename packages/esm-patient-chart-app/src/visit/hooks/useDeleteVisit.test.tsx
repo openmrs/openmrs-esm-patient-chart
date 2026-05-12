@@ -1,4 +1,5 @@
 import { useSWRConfig } from 'swr';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { showSnackbar, type Visit } from '@openmrs/esm-framework';
 import {

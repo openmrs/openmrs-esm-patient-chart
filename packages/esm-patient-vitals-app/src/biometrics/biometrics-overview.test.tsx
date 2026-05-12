@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { vi, describe, it, expect } from 'vitest';
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';

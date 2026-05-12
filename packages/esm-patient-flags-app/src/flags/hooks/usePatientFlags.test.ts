@@ -1,4 +1,5 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { disablePatientFlag, enablePatientFlag } from './usePatientFlags';
 
 const mockOpenmrsFetch = openmrsFetch as unknown as Mock;

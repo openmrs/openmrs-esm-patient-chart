@@ -1,4 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useGetManyObstreeData, useGetObstreeData, type ObsTreeNode } from './useObstreeData';
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, it, expect, type Mock } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import PatientListDetailsWorkspace, { type PatientListDetailsWorkspaceProps } from './patient-list-details.workspace';

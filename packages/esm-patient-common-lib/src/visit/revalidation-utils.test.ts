@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, test } from 'vitest';
 import {
   invalidateVisitHistory,
   invalidatePatientEncounters,

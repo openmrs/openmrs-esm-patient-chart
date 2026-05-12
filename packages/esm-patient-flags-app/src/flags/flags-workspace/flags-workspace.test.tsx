@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, it, expect, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from 'tools';

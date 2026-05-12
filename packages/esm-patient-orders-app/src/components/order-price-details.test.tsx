@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import OrderPriceDetailsComponent from './order-price-details.component';
 import { useOrderPrice } from '../hooks/useOrderPrice';

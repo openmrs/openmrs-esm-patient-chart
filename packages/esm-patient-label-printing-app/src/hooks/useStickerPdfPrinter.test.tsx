@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, test, beforeEach, afterEach, type Mock } from 'vitest';
 import { useStickerPdfPrinter } from './useStickerPdfPrinter';
 
 describe('useStickerPdfPrinter', () => {

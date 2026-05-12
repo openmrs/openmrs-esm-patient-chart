@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
 
 const mockUseOpenmrsFetchAll = vi.fn();

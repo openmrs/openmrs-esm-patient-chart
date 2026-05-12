@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import SideMenu from './side-menu.component';

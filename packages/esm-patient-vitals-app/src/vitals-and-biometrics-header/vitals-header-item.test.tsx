@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { NumericObservation } from '@openmrs/esm-framework';
 import VitalsHeaderItem from './vitals-header-item.component';
