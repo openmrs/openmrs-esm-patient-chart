@@ -52,8 +52,9 @@ export async function postOrdersOnNewEncounter(
   abortController?: AbortController,
 
   /**
-   * If not specified, the encounterDate will either be set to
-   * `now` if currentVisit is active, or the start of the visit
+   * Desired encounter datetime. Clamped to the visit window before posting.
+   * When omitted: if the visit is stopped, falls back to `visit.startDatetime`;
+   * otherwise the field is dropped from the POST so the server defaults to now.
    */
   encounterDate?: Date,
 ) {
