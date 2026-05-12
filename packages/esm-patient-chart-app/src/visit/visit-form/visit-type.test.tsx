@@ -68,7 +68,7 @@ describe('VisitTypeOverview', () => {
     render(<BaseVisitType visitTypes={mockVisitTypes} />);
   };
 
-  it('should be able to search for a visit type', () => {
+  it('should be able to search for a visit type', async () => {
     const user = userEvent.setup();
 
     renderVisitTypeOverview();
@@ -80,7 +80,7 @@ describe('VisitTypeOverview', () => {
     expect(hivVisit).toBeInTheDocument();
 
     const searchInput = screen.getByRole('searchbox');
-    user.type(searchInput, 'HIV');
+    await user.type(searchInput, 'HIV');
 
     expect(outpatientVisit).toBeEmptyDOMElement();
     expect(hivVisit).toBeInTheDocument();
