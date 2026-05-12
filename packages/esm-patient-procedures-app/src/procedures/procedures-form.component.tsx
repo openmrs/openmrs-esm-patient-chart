@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -14,8 +14,6 @@ import {
   Layer,
   NumberInput,
   Search,
-  Select,
-  SelectItem,
   Stack,
   Switch,
   TextArea,
@@ -72,9 +70,10 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     getValues,
     setValue,
+    trigger,
   } = useFormContext<ProceduresFormSchema>();
 
   const { procedureTypes, isLoading: isLoadingProcedureTypes } = useProcedureTypes();
@@ -86,22 +85,40 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [estimatedYear, setEstimatedYear] = useState(initialEstimatedDate?.split('-')[0] ?? '');
   const [estimatedMonth, setEstimatedMonth] = useState(initialEstimatedDate?.split('-')[1] ?? '');
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => String(currentYear - i));
-  const months = [
-    { value: '01', label: 'January' },
-    { value: '02', label: 'February' },
-    { value: '03', label: 'March' },
-    { value: '04', label: 'April' },
-    { value: '05', label: 'May' },
-    { value: '06', label: 'June' },
-    { value: '07', label: 'July' },
-    { value: '08', label: 'August' },
-    { value: '09', label: 'September' },
-    { value: '10', label: 'October' },
-    { value: '11', label: 'November' },
-    { value: '12', label: 'December' },
-  ];
+  useEffect(() => {
+    const value =
+      !isStartDateKnown && estimatedYear ? (estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear) : '';
+    setValue('estimatedStartDate', value);
+    if (isSubmitted) {
+      trigger('startDateTime');
+    }
+  }, [isStartDateKnown, estimatedYear, estimatedMonth, setValue, isSubmitted, trigger]);
+
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
+      id: String(currentYear - i),
+      label: String(currentYear - i),
+    }));
+  }, []);
+
+  const monthOptions = useMemo(
+    () => [
+      { id: '01', label: t('january', 'January') },
+      { id: '02', label: t('february', 'February') },
+      { id: '03', label: t('march', 'March') },
+      { id: '04', label: t('april', 'April') },
+      { id: '05', label: t('may', 'May') },
+      { id: '06', label: t('june', 'June') },
+      { id: '07', label: t('july', 'July') },
+      { id: '08', label: t('august', 'August') },
+      { id: '09', label: t('september', 'September') },
+      { id: '10', label: t('october', 'October') },
+      { id: '11', label: t('november', 'November') },
+      { id: '12', label: t('december', 'December') },
+    ],
+    [t],
+  );
 
   const procedureField = useConceptSearchField(
     { uuid: procedureConceptUuid, sourceType: procedureConceptSourceType },
@@ -123,6 +140,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [errorSaving, setErrorSaving] = useState(null);
 
   const handleSave = useCallback(async () => {
+    setIsSubmittingForm(true);
     const procedureType = getValues('procedureType');
     const startDateTime = getValues('startDateTime');
     const endDateTime = getValues('endDateTime');
@@ -130,11 +148,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     const duration = getValues('duration');
     const durationUnit = getValues('durationUnit');
 
-    let estimatedStartDate: string | undefined;
-    if (!isStartDateKnown && estimatedYear) {
-      estimatedStartDate = estimatedMonth ? `${estimatedYear}-${estimatedMonth}` : estimatedYear;
-    }
-
+    const estimatedStartDate = getValues('estimatedStartDate');
     const hasDuration = typeof duration === 'number' && !Number.isNaN(duration);
 
     const payload = {
@@ -142,7 +156,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
       procedureCoded: procedureField.selectedConcept!.uuid,
       procedureType: procedureType,
       bodySite: bodySiteField.selectedConcept!.uuid,
-      startDateTime: isStartDateKnown && startDateTime ? dayjs(startDateTime).format() : null,
+      startDateTime: startDateTime ? dayjs(startDateTime).format() : null,
       endDateTime: endDateTime ? dayjs(endDateTime).format() : null,
       status: getValues('status'),
       notes: notes,
@@ -171,10 +185,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   }, [
     bodySiteField.selectedConcept,
     closeWorkspaceWithSavedChanges,
-    estimatedMonth,
-    estimatedYear,
     getValues,
-    isStartDateKnown,
     mutate,
     patientUuid,
     procedureField.selectedConcept,
@@ -211,7 +222,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   itemToString={(item: ProcedureType) => item?.name ?? ''}
                   initialSelectedItem={procedureTypes.find((pt) => pt.uuid === getValues('procedureType')) ?? null}
                   onChange={({ selectedItem }: { selectedItem: ProcedureType | null }) =>
-                    setValue('procedureType', selectedItem.uuid)
+                    setValue('procedureType', selectedItem?.uuid ?? '')
                   }
                 />
               </ResponsiveWrapper>
@@ -233,7 +244,13 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               size="md"
               selectedIndex={isStartDateKnown ? 0 : 1}
               onChange={({ index }: { index: number }) => {
-                setIsStartDateKnown(index === 0);
+                const isKnown = index === 0;
+                setIsStartDateKnown(isKnown);
+
+                if (!isKnown) {
+                  setValue('startDateTime', null);
+                }
+
                 setEstimatedYear('');
                 setEstimatedMonth('');
               }}
@@ -246,48 +263,49 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
           {isStartDateKnown && (
             <FormGroup legendText={t('startDateAndTime', 'Start date and time')}>
               <DateTimeField name="startDateTime" idPrefix="startDateTime" control={control} />
-              {errors.startDateTime && <p className={styles.errorMessage}>{errors.startDateTime.message}</p>}
             </FormGroup>
           )}
 
           {!isStartDateKnown && (
             <FormGroup legendText={t('estimatedStartDate', 'Estimated start date')}>
-              <ResponsiveWrapper>
-                <Select
-                  id="estimatedYear"
-                  labelText={<RequiredFieldLabel label={t('year', 'Year')} />}
-                  value={estimatedYear}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setEstimatedYear(e.target.value)}
-                >
-                  <SelectItem value="" text={t('selectYear', 'Select year')} />
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year} text={year} />
-                  ))}
-                </Select>
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Select
-                  id="estimatedMonth"
-                  labelText={t('monthOptional', 'Month (optional)')}
-                  value={estimatedMonth}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setEstimatedMonth(e.target.value)}
-                >
-                  <SelectItem value="" text={t('selectMonth', 'Select month (optional)')} />
-                  {months.map((month) => (
-                    <SelectItem key={month.value} value={month.value} text={month.label} />
-                  ))}
-                </Select>
-              </ResponsiveWrapper>
+              <div className={styles.twoColumnGroup}>
+                <ResponsiveWrapper>
+                  <ComboBox
+                    id="estimatedYear"
+                    titleText={<RequiredFieldLabel label={t('year', 'Year')} />}
+                    placeholder={t('selectYear', 'Select year')}
+                    items={yearOptions}
+                    itemToString={(item: { id: string; label: string }) => item?.label ?? ''}
+                    selectedItem={yearOptions.find((y) => y.id === estimatedYear) ?? null}
+                    onChange={({ selectedItem }: { selectedItem: { id: string; label: string } | null }) =>
+                      setEstimatedYear(selectedItem?.id ?? '')
+                    }
+                  />
+                </ResponsiveWrapper>
+                <ResponsiveWrapper>
+                  <ComboBox
+                    id="estimatedMonth"
+                    titleText={t('monthOptional', 'Month (optional)')}
+                    placeholder={t('selectMonth', 'Select month (optional)')}
+                    items={monthOptions}
+                    itemToString={(item: { id: string; label: string }) => item?.label ?? ''}
+                    selectedItem={monthOptions.find((m) => m.id === estimatedMonth) ?? null}
+                    onChange={({ selectedItem }: { selectedItem: { id: string; label: string } | null }) =>
+                      setEstimatedMonth(selectedItem?.id ?? '')
+                    }
+                  />
+                </ResponsiveWrapper>
+              </div>
+              {errors.startDateTime && <p className={styles.errorMessage}>{errors.startDateTime.message}</p>}
             </FormGroup>
           )}
 
           <FormGroup legendText={t('endDateAndTime', 'End date and time')}>
             <DateTimeField name="endDateTime" idPrefix="endDateTime" control={control} />
-            {errors.endDateTime && <p className={styles.errorMessage}>{errors.endDateTime.message}</p>}
           </FormGroup>
 
-          <FormGroup legendText={t('duration', 'Duration')}>
-            <div className={styles.durationFieldGroup}>
+          <FormGroup legendText={t('procedureDuration', 'Procedure duration')}>
+            <div className={styles.twoColumnGroup}>
               <Controller
                 name="duration"
                 control={control}

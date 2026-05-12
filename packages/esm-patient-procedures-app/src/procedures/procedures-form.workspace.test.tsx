@@ -85,6 +85,10 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
   await user.click(within(procedureTypeGroup).getByRole('combobox'));
   await user.click(screen.getByRole('option', { name: /surgery/i }));
+
+  const startGroup = screen.getByRole('group', { name: /start date and time/i });
+  await user.click(within(startGroup).getByLabelText(/^date$/i));
+  await user.paste('2026-04-27');
 }
 
 beforeEach(() => {
@@ -119,7 +123,7 @@ describe('ProceduresForm', () => {
     expect(screen.getByRole('group', { name: /body site/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /start date and time/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /end date and time/i })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: /^duration$/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /^procedure duration$/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /^status/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /notes/i })).toBeInTheDocument();
   });
@@ -227,7 +231,7 @@ describe('ProceduresForm', () => {
         procedureCoded: 'proc-concept-uuid-1',
         procedureType: 'pt-uuid-1',
         bodySite: 'proc-concept-uuid-1',
-        startDateTime: null,
+        startDateTime: expect.stringMatching(/^2026-04-27T/),
         endDateTime: null,
         status: 'proc-concept-uuid-1',
         notes: '',
@@ -428,8 +432,6 @@ describe('ProceduresForm', () => {
     await fillRequiredFields(user);
 
     const startGroup = screen.getByRole('group', { name: /start date and time/i });
-    await user.click(within(startGroup).getByLabelText(/^date$/i));
-    await user.paste('2026-04-27');
     await user.type(within(startGroup).getByLabelText(/^time$/i), '09:15');
 
     await user.click(screen.getByRole('button', { name: /save & close/i }));
@@ -457,5 +459,58 @@ describe('ProceduresForm', () => {
 
     await screen.findByText(/error saving procedure/i);
     expect(screen.getByText(/internal server error/i)).toBeInTheDocument();
+  });
+
+  it('clears exact start date and requires estimated date when toggled to unknown', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+
+    const noSwitch = screen.getByRole('tab', { name: /^no$/i });
+    await user.click(noSwitch);
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(screen.getByText(/start date is required/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: /year/i }));
+    await user.click(screen.getByRole('option', { name: '2023' }));
+
+    expect(screen.queryByText(/start date is required/i)).not.toBeInTheDocument();
+  });
+
+  it('saves an estimated start date when "Is start date known?" is "No"', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
+    renderProceduresForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
+    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
+    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    const statusGroup = screen.getByRole('group', { name: /^status/i });
+    await user.click(within(statusGroup).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
+    const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
+    await user.click(within(procedureTypeGroup).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /surgery/i }));
+
+    const known = screen.getByRole('group', { name: /is start date known/i });
+    await user.click(within(known).getByRole('tab', { name: /^no$/i }));
+
+    await user.click(screen.getByRole('combobox', { name: /year/i }));
+    await user.click(screen.getByRole('option', { name: '2023' }));
+    await user.click(screen.getByRole('combobox', { name: /month/i }));
+    await user.click(screen.getByRole('option', { name: /may/i }));
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+    await waitFor(() =>
+      expect(mockSaveProcedure).toHaveBeenCalledWith(
+        expect.objectContaining({ startDateTime: null, estimatedStartDate: '2023-05' }),
+      ),
+    );
   });
 });
