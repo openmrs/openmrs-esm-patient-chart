@@ -6,6 +6,9 @@ import { type OrderBasketItem, type OrderBasketExtensionProps } from '@openmrs/e
  * when no item has a startDate set. Used to backdate the encounter created
  * in postOrdersOnNewEncounter so the backend's
  * `dateActivated >= encounterDatetime` constraint holds.
+ *
+ * Backend visit-bounds enforcement (`Encounter.datetimeShouldBeInVisitDatesRange`)
+ * is the posting layer's responsibility — see `postOrdersOnNewEncounter`.
  */
 export function getEarliestStartDate(orders: ReadonlyArray<OrderBasketItem>, now: Date = new Date()): Date {
   return orders.reduce<Date>((earliest, order) => {
