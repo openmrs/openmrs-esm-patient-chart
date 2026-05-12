@@ -10,14 +10,14 @@ import { useRequireOutpatientQuantity } from '../api/api';
 import { getTemplateOrderBasketItem } from './drug-search/drug-search.resource';
 import DrugOrderForm from './drug-order-form.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseSession = vi.mocked(useSession);
 
 mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
-jest.mock('../api/order-config', () => ({
-  useOrderConfig: jest.fn().mockReturnValue({
+vi.mock('../api/order-config', () => ({
+  useOrderConfig: vi.fn().mockReturnValue({
     orderConfigObject: {
       drugRoutes: [{ valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Oral' }],
       drugDosingUnits: [{ valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' }],
@@ -39,10 +39,10 @@ jest.mock('../api/order-config', () => ({
   }),
 }));
 
-jest.mock('../api/api', () => ({
-  ...jest.requireActual('../api/api'),
-  useActivePatientOrders: jest.fn().mockReturnValue({ isLoading: false, data: [] }),
-  useRequireOutpatientQuantity: jest
+vi.mock('../api/api', async () => ({
+  ...((await vi.importActual('../api/api')) as object),
+  useActivePatientOrders: vi.fn().mockReturnValue({ isLoading: false, data: [] }),
+  useRequireOutpatientQuantity: vi
     .fn()
     .mockReturnValue({ requireOutpatientQuantity: true, error: null, isLoading: false }),
 }));
@@ -53,9 +53,9 @@ function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
       initialOrderBasketItem={initialOrderBasketItem}
       patient={mockPatient}
       visitContext={null}
-      onSave={jest.fn()}
+      onSave={vi.fn()}
       saveButtonText="Save order"
-      onCancel={jest.fn()}
+      onCancel={vi.fn()}
       workspaceTitle="Add drug order"
     />,
   );
@@ -520,7 +520,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
 
   it('does not auto-calculate when requireOutpatientQuantity is false', async () => {
     const user = userEvent.setup();
-    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+    (useRequireOutpatientQuantity as Mock).mockReturnValue({
       requireOutpatientQuantity: false,
       error: null,
       isLoading: false,
@@ -551,7 +551,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
 
     // Restore default mock
-    (useRequireOutpatientQuantity as jest.Mock).mockReturnValue({
+    (useRequireOutpatientQuantity as Mock).mockReturnValue({
       requireOutpatientQuantity: true,
       error: null,
       isLoading: false,

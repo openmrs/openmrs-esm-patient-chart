@@ -8,28 +8,28 @@ import OrderBasket from './order-basket.component';
 const procedureOrderTypeUuid = '67890-procedure-uuid';
 const labOrderTypeUuid = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
 
-jest.mock('../api/api', () => ({
-  useOrderEncounterForSystemWithVisitDisabled: jest.fn().mockReturnValue({
+vi.mock('../api/api', () => ({
+  useOrderEncounterForSystemWithVisitDisabled: vi.fn().mockReturnValue({
     visitRequired: false,
     isLoading: false,
     encounterUuid: null,
     error: null,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   }),
-  useProviders: jest.fn().mockReturnValue({
+  useProviders: vi.fn().mockReturnValue({
     providers: [],
     isLoading: false,
     error: null,
   }),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useOrderType: jest.fn().mockReturnValue({
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  useOrderType: vi.fn().mockReturnValue({
     orderType: { display: 'Order', javaClassName: 'org.openmrs.Order' },
     isLoadingOrderType: false,
   }),
-  useMutatePatientOrders: jest.fn().mockReturnValue({ mutate: jest.fn() }),
+  useMutatePatientOrders: vi.fn().mockReturnValue({ mutate: vi.fn() }),
 }));
 
 const mockSession = {
@@ -41,9 +41,9 @@ const mockSession = {
 function renderOrderBasket(visibleOrderPanels?: string[]) {
   const orderBasketExtensionProps: OrderBasketExtensionProps = {
     patient: mockPatient,
-    launchDrugOrderForm: jest.fn(),
-    launchLabOrderForm: jest.fn(),
-    launchGeneralOrderForm: jest.fn(),
+    launchDrugOrderForm: vi.fn(),
+    launchLabOrderForm: vi.fn(),
+    launchGeneralOrderForm: vi.fn(),
     visibleOrderPanels,
   };
 
@@ -52,15 +52,15 @@ function renderOrderBasket(visibleOrderPanels?: string[]) {
       patientUuid={mockPatient.id}
       patient={mockPatient}
       visitContext={null}
-      mutateVisitContext={jest.fn()}
-      closeWorkspace={jest.fn().mockResolvedValue(true)}
+      mutateVisitContext={vi.fn()}
+      closeWorkspace={vi.fn().mockResolvedValue(true)}
       orderBasketExtensionProps={orderBasketExtensionProps}
     />,
   );
 }
 
 beforeEach(() => {
-  jest.mocked(useConfig).mockReturnValue({
+  vi.mocked(useConfig).mockReturnValue({
     orderTypes: [
       { orderTypeUuid: procedureOrderTypeUuid, label: 'Procedure orders', icon: '' },
       { orderTypeUuid: labOrderTypeUuid, label: 'Lab orders', icon: '' },
@@ -69,8 +69,8 @@ beforeEach(() => {
     ordererProviderRoles: [],
     orderLocationTagName: '',
   });
-  jest.mocked(useSession).mockReturnValue(mockSession as any);
-  jest.mocked(useLayoutType).mockReturnValue('small-desktop');
+  vi.mocked(useSession).mockReturnValue(mockSession as any);
+  vi.mocked(useLayoutType).mockReturnValue('small-desktop');
 });
 
 describe('Order basket panel filtering', () => {

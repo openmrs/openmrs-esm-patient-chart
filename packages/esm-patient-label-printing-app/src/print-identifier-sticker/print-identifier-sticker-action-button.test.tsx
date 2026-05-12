@@ -8,13 +8,13 @@ import { useStickerPdfPrinter } from '../hooks/useStickerPdfPrinter';
 import { configSchema, type ConfigObject } from '../config-schema';
 import PrintIdentifierStickerOverflowMenuItem from './print-identifier-sticker-action-button.component';
 
-jest.mock('../hooks/useStickerPdfPrinter');
+vi.mock('../hooks/useStickerPdfPrinter');
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseStickerPdfPrinter = jest.mocked(useStickerPdfPrinter);
-const mockUserHasAccess = jest.mocked(UserHasAccess);
-const mockPrintPdf = jest.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseStickerPdfPrinter = vi.mocked(useStickerPdfPrinter);
+const mockUserHasAccess = vi.mocked(UserHasAccess);
+const mockPrintPdf = vi.fn();
 
 describe('PrintIdentifierStickerOverflowMenuItem', () => {
   beforeEach(() => {

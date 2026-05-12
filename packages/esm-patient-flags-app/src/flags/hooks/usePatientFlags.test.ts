@@ -1,7 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { disablePatientFlag, enablePatientFlag } from './usePatientFlags';
 
-const mockOpenmrsFetch = openmrsFetch as unknown as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as unknown as Mock;
 
 describe('usePatientFlags resource helpers', () => {
   beforeEach(() => {

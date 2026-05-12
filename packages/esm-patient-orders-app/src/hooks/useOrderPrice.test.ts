@@ -4,7 +4,7 @@ import { type OrderPriceData } from '../types/order';
 import { useOrderPrice } from './useOrderPrice';
 import { mockOrderPriceData } from '__mocks__';
 
-const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockedOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('useOrderPrice', () => {
   beforeEach(() => {

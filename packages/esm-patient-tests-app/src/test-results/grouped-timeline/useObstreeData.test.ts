@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useGetManyObstreeData, useGetObstreeData, type ObsTreeNode } from './useObstreeData';
 
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('useObstreeData', () => {
   describe('augmentObstreeData via useGetObstreeData', () => {

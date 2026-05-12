@@ -7,23 +7,23 @@ import { formattedBiometrics, mockBiometricsConfig, mockVitalsSignsConcepts } fr
 import { useVitalsAndBiometrics } from '../../common';
 import WeightTile from './weight-tile.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcepts.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
 
-jest.mock('../../common', () => {
-  const originalModule = jest.requireActual('../../common');
+vi.mock('../../common', async () => {
+  const originalModule = (await vi.importActual('../../common')) as object;
 
   return {
     ...originalModule,
-    useConceptUnits: jest.fn().mockImplementation(() => ({
+    useConceptUnits: vi.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,
       isLoading: false,
     })),
-    useVitalsAndBiometrics: jest.fn(),
+    useVitalsAndBiometrics: vi.fn(),
   };
 });
 

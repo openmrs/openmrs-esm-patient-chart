@@ -6,10 +6,10 @@ import { mockResults } from '__mocks__';
 import { FilterProvider, type Roots } from '../filter/filter-context';
 import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 
-const mockIsDesktop = jest.mocked(isDesktop);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
-jest.mock('./usePanelData');
+vi.mock('./usePanelData');
 
 describe('PanelView', () => {
   beforeEach(() => {

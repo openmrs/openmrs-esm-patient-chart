@@ -7,15 +7,15 @@ import { deletePatientImmunization } from '../hooks/useImmunizations';
 import { type ImmunizationConfigObject } from '../config-schema';
 import DeleteImmunizationModal from './delete-immunization.modal';
 
-const mockUseConfig = jest.mocked(useConfig<ImmunizationConfigObject>);
+const mockUseConfig = vi.mocked(useConfig<ImmunizationConfigObject>);
 
-jest.mock('../hooks/useImmunizations', () => ({
-  ...jest.requireActual('../hooks/useImmunizations'),
-  deletePatientImmunization: jest.fn(),
-  useImmunizations: jest.fn().mockReturnValue({ mutate: jest.fn() }),
+vi.mock('../hooks/useImmunizations', async () => ({
+  ...((await vi.importActual('../hooks/useImmunizations')) as object),
+  deletePatientImmunization: vi.fn(),
+  useImmunizations: vi.fn().mockReturnValue({ mutate: vi.fn() }),
 }));
 
-jest.mock('../hooks/useImmunizationsConceptSet', () => ({
+vi.mock('../hooks/useImmunizationsConceptSet', () => ({
   useImmunizationsConceptSet: () => ({
     immunizationsConceptSet: {
       answers: [
@@ -35,11 +35,11 @@ beforeEach(() => {
   });
 });
 
-const mockDeleteImmunization = jest.mocked(deletePatientImmunization);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockDeleteImmunization = vi.mocked(deletePatientImmunization);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
 const defaultProps = {
-  close: jest.fn(),
+  close: vi.fn(),
   doseNumber: 1,
   immunizationId: 'de195ad6-0887-4b09-bd4a-6e37d7d8db63',
   patientUuid: mockPatient.id,

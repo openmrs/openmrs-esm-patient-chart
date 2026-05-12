@@ -5,8 +5,8 @@ import { mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import VisitCompletedFormsTable from './visit-completed-forms-table.component';
 
-jest.mock('./encounters-table.component', () => {
-  return function MockedEncountersTable(props: any) {
+vi.mock('./encounters-table.component', () => ({
+  default: function MockedEncountersTable(props: any) {
     return (
       <div
         data-testid="encounters-table"
@@ -19,8 +19,8 @@ jest.mock('./encounters-table.component', () => {
         EncountersTable
       </div>
     );
-  };
-});
+  },
+}));
 
 describe('VisitCompletedFormsTable', () => {
   const mockVisit: Visit = {

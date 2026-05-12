@@ -6,9 +6,9 @@ import React from 'react';
 
 import DeleteVisitDialog from './delete-visit-dialog.modal';
 
-const mockCloseModal = jest.fn();
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockCloseModal = vi.fn();
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
 describe('Delete visit', () => {
   it('voids the visit and voids its associated encounters', async () => {

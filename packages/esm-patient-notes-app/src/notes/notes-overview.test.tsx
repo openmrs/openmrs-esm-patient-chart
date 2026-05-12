@@ -13,11 +13,11 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseVisitNotes = jest.mocked(useVisitNotes);
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseVisitNotes = vi.mocked(useVisitNotes);
+const mockUseConfig = vi.mocked(useConfig);
 
-jest.mock('./visit-notes.resource', () => {
-  return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+vi.mock('./visit-notes.resource', () => {
+  return { useVisitNotes: vi.fn().mockReturnValue([{}]) };
 });
 
 describe('NotesOverview', () => {
@@ -31,7 +31,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
@@ -57,7 +57,7 @@ describe('NotesOverview', () => {
       error: error,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
@@ -72,7 +72,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);

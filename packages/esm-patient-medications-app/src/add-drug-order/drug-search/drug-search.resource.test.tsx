@@ -5,7 +5,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockDrugSearchResultApiData } from '__mocks__';
 import { useConceptSets, useConceptTree, useDrugsByConcepts } from './drug-search.resource';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as Mock;
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SWRConfig value={{ dedupingInterval: 0, provider: () => new Map() }}>{children}</SWRConfig>

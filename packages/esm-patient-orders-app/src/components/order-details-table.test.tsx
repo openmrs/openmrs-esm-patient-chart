@@ -21,42 +21,42 @@ import { mockOrders, mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import OrderDetailsTable from './order-details-table.component';
 
-const mockUsePatientOrders = jest.mocked(usePatientOrders);
-const mockUseOrderTypes = jest.mocked(useOrderTypes);
-const mockUseOrderBasket = jest.mocked(useOrderBasket);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseReactToPrint = jest.mocked(useReactToPrint);
+const mockUsePatientOrders = vi.mocked(usePatientOrders);
+const mockUseOrderTypes = vi.mocked(useOrderTypes);
+const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseReactToPrint = vi.mocked(useReactToPrint);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
-mockOpenmrsFetch.mockImplementation(jest.fn());
+mockOpenmrsFetch.mockImplementation(vi.fn());
 
-jest.mock('react-to-print', () => ({
-  ...jest.requireActual('react-to-print'),
-  useReactToPrint: jest.fn(),
+vi.mock('react-to-print', async () => ({
+  ...((await vi.importActual('react-to-print')) as object),
+  useReactToPrint: vi.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    usePatientOrders: jest.fn(),
-    useOrderTypes: jest.fn(),
-    usePatient: jest.fn(),
-    useOrderBasket: jest.fn(),
+    usePatientOrders: vi.fn(),
+    useOrderTypes: vi.fn(),
+    usePatient: vi.fn(),
+    useOrderBasket: vi.fn(),
   };
 });
 
-jest.mock('./general-order-table.component', () => ({
+vi.mock('./general-order-table.component', () => ({
   __esModule: true,
   default: function MockGeneralOrderTable() {
     return 'General order details';
   },
 }));
 
-jest.mock('./medication-record.component', () => ({
+vi.mock('./medication-record.component', () => ({
   __esModule: true,
   default: function MockMedicationRecord() {
     return 'Medication details';
@@ -118,8 +118,8 @@ describe('OrderDetailsTable', () => {
   beforeEach(() => {
     mockUseOrderBasket.mockReturnValue({
       orders: [],
-      setOrders: jest.fn(),
-      clearOrders: jest.fn(),
+      setOrders: vi.fn(),
+      clearOrders: vi.fn(),
     });
     mockUseOrderTypes.mockReturnValue({
       data: [drugOrderType, testOrderType],
@@ -132,7 +132,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
   });
 
@@ -148,7 +148,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: true,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -179,7 +179,7 @@ describe('OrderDetailsTable', () => {
       error: error,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -247,7 +247,7 @@ describe('OrderDetailsTable', () => {
   });
 
   it('prints the orders in the list when the print button is clicked', async () => {
-    const mockHandlePrint = jest.fn();
+    const mockHandlePrint = vi.fn();
     mockUseReactToPrint.mockReturnValue(mockHandlePrint);
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
@@ -285,7 +285,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -310,7 +310,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -329,7 +329,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -354,7 +354,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -373,7 +373,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -395,7 +395,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -426,7 +426,7 @@ describe('OrderDetailsTable', () => {
         error: undefined,
         isLoading: false,
         isValidating: false,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       };
     });
 
@@ -497,7 +497,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -518,7 +518,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: true,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -542,7 +542,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -559,7 +559,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
@@ -576,7 +576,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();

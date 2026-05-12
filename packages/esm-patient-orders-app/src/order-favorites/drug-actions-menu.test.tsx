@@ -7,12 +7,12 @@ import DrugActionsMenu from './drug-actions-menu.component';
 import { useFavoritesActions } from './useFavoritesActions';
 import type { DrugFavoriteOrder } from './types';
 
-jest.mock('./useFavoritesActions', () => ({
-  useFavoritesActions: jest.fn(),
+vi.mock('./useFavoritesActions', () => ({
+  useFavoritesActions: vi.fn(),
 }));
 
-const mockUseFavoritesActions = jest.mocked(useFavoritesActions);
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseFavoritesActions = vi.mocked(useFavoritesActions);
+const mockUseConfig = vi.mocked(useConfig);
 
 const mockDrug: Drug = {
   uuid: 'drug-1',
@@ -22,18 +22,18 @@ const mockDrug: Drug = {
 } as Drug;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockUseConfig.mockReturnValue({ enableDrugOrderFavorites: true, maxPinnedDrugOrders: 50 });
-  jest.mocked(useLayoutType).mockReturnValue('small-desktop');
+  vi.mocked(useLayoutType).mockReturnValue('small-desktop');
 });
 
 describe('DrugActionsMenu', () => {
   it('pins a drug directly when clicking the pin icon', async () => {
-    const mockPersistFavorites = jest.fn().mockResolvedValue(true);
+    const mockPersistFavorites = vi.fn().mockResolvedValue(true);
     mockUseFavoritesActions.mockReturnValue({
       favorites: [] as DrugFavoriteOrder[],
       isLoading: false,
-      deleteMultipleFavorites: jest.fn(),
+      deleteMultipleFavorites: vi.fn(),
       persistFavorites: mockPersistFavorites,
       error: undefined,
     });

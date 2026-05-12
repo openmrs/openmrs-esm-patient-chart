@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { EmptyState } from '.';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 describe('EmptyState', () => {
   it('renders an empty state widget card', () => {

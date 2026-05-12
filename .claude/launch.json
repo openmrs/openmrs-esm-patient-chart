@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "procedures-app",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["workspace", "@openmrs/esm-patient-procedures-app", "start", "--port", "8080"],
+      "port": 8080
+    },
+    {
+      "name": "medications-app",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["workspace", "@openmrs/esm-patient-medications-app", "start", "--port", "8081"],
+      "port": 8081
+    }
+  ]
+}

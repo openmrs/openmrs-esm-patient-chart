@@ -15,19 +15,19 @@ import {
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
 import AllergyForm, { type AllergyFormWorkspaceProps } from './allergy-form.workspace';
 
-const mockSaveAllergy = jest.mocked(saveAllergy);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUpdatePatientAllergy = jest.mocked(updatePatientAllergy);
-const mockUseAllergens = jest.mocked(useAllergens);
-const mockUseAllergicReactions = jest.mocked(useAllergicReactions);
-const mockUseConfig = jest.mocked(useConfig<AllergiesConfigObject>);
+const mockSaveAllergy = vi.mocked(saveAllergy);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUpdatePatientAllergy = vi.mocked(updatePatientAllergy);
+const mockUseAllergens = vi.mocked(useAllergens);
+const mockUseAllergicReactions = vi.mocked(useAllergicReactions);
+const mockUseConfig = vi.mocked(useConfig<AllergiesConfigObject>);
 
-jest.mock('./allergy-form.resource', () => ({
-  ...jest.requireActual('./allergy-form.resource'),
-  saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
-  updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
-  useAllergens: jest.fn(),
-  useAllergicReactions: jest.fn(),
+vi.mock('./allergy-form.resource', async () => ({
+  ...((await vi.importActual('./allergy-form.resource')) as object),
+  saveAllergy: vi.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
+  updatePatientAllergy: vi.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
+  useAllergens: vi.fn(),
+  useAllergicReactions: vi.fn(),
 }));
 
 const mockConcepts = {
@@ -210,8 +210,8 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
       visitContext: null,
       mutateVisitContext: null,
     },
-    closeWorkspace: jest.fn(),
-    launchChildWorkspace: jest.fn(),
+    closeWorkspace: vi.fn(),
+    launchChildWorkspace: vi.fn(),
     windowProps: {},
     workspaceName: '',
     windowName: '',

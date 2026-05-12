@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { useTask, type Task } from './task-list.resource';
 import TaskDetailsView from './task-details-view.component';
 
-jest.mock('./task-list.resource');
+vi.mock('./task-list.resource');
 
-const mockUseTask = jest.mocked(useTask);
+const mockUseTask = vi.mocked(useTask);
 
 // Helper to check if a date-like value is displayed (contains digits and date separators)
 function expectDateToBeDisplayed() {
@@ -14,8 +14,8 @@ function expectDateToBeDisplayed() {
 }
 
 describe('TaskDetailsView', () => {
-  const mockOnBack = jest.fn();
-  const mockOnEdit = jest.fn();
+  const mockOnBack = vi.fn();
+  const mockOnEdit = vi.fn();
   const patientUuid = 'patient-uuid-123';
   const taskUuid = 'task-uuid-456';
 
@@ -29,12 +29,12 @@ describe('TaskDetailsView', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2024-01-15T10:00:00Z'));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2024-01-15T10:00:00Z'));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Loading and error states', () => {
@@ -43,7 +43,7 @@ describe('TaskDetailsView', () => {
         task: null,
         isLoading: true,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -56,7 +56,7 @@ describe('TaskDetailsView', () => {
         task: null,
         isLoading: false,
         error: new Error('Failed to load'),
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -66,12 +66,12 @@ describe('TaskDetailsView', () => {
     });
 
     it('calls onBack callback when back button is clicked in error state', async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       mockUseTask.mockReturnValue({
         task: null,
         isLoading: false,
         error: new Error('Failed to load'),
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -99,7 +99,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -127,7 +127,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -152,10 +152,10 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
-        jest.setSystemTime(new Date('2024-01-12T10:00:00Z'));
+        vi.setSystemTime(new Date('2024-01-12T10:00:00Z'));
 
         render(
           <TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} onEdit={mockOnEdit} />,
@@ -182,7 +182,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -210,7 +210,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -235,7 +235,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -263,7 +263,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -287,7 +287,7 @@ describe('TaskDetailsView', () => {
           task,
           isLoading: false,
           error: null,
-          mutate: jest.fn(),
+          mutate: vi.fn(),
         });
 
         render(
@@ -302,7 +302,7 @@ describe('TaskDetailsView', () => {
 
   describe('User interactions', () => {
     it('calls onEdit callback with task when edit button is clicked', async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       const task: Task = {
         ...baseTask,
       };
@@ -311,7 +311,7 @@ describe('TaskDetailsView', () => {
         task,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} onEdit={mockOnEdit} />);
@@ -332,7 +332,7 @@ describe('TaskDetailsView', () => {
         task,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -358,7 +358,7 @@ describe('TaskDetailsView', () => {
         task,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -378,7 +378,7 @@ describe('TaskDetailsView', () => {
         task,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);
@@ -396,7 +396,7 @@ describe('TaskDetailsView', () => {
         task,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(<TaskDetailsView patientUuid={patientUuid} taskUuid={taskUuid} onBack={mockOnBack} />);

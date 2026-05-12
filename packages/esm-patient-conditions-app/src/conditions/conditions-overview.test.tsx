@@ -14,9 +14,9 @@ import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),

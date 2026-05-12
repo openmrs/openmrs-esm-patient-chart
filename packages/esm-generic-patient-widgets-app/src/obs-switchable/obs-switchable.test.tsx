@@ -7,13 +7,13 @@ import ObsSwitchable from './obs-switchable.component';
 import { useObs, type ObsResult } from '../resources/useObs';
 import { configSchemaSwitchable } from '../config-schema-obs-switchable';
 
-jest.mock('../resources/useObs', () => ({
-  useObs: jest.fn(),
+vi.mock('../resources/useObs', () => ({
+  useObs: vi.fn(),
 }));
 
-const mockLineChart = jest.mocked(LineChart);
+const mockLineChart = vi.mocked(LineChart);
 
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseConfig = vi.mocked(useConfig);
 
 // Make sure this respects the sort order of useObs
 const mockObsData = [
@@ -79,10 +79,10 @@ const mockEncounters = [
   { reference: 'Encounter/234', display: 'Outpatient Visit', encounterTypeUuid: 'encounter-type-uuid-1' },
 ];
 
-const mockUseObs = jest.mocked(useObs);
+const mockUseObs = vi.mocked(useObs);
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(async () => {
@@ -97,7 +97,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
@@ -197,7 +197,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
@@ -252,7 +252,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockUseConfig.mockReturnValue({
@@ -277,7 +277,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
@@ -311,7 +311,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
@@ -366,7 +366,7 @@ describe('ObsSwitchable', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),

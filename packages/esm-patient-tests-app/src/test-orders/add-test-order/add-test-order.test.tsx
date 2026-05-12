@@ -18,11 +18,11 @@ import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
-const mockCloseWorkspace = closeWorkspace as jest.Mock;
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseOrderType = jest.mocked(useOrderType);
+const mockCloseWorkspace = closeWorkspace as Mock;
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseOrderType = vi.mocked(useOrderType);
 
 const mockTestTypes = [
   // {
@@ -41,19 +41,19 @@ const mockTestTypes = [
   //   synonyms: ['HEMOGLOBIN', 'HGB'],
   // },
 ];
-const mockUseTestTypes = jest.fn().mockReturnValue({
+const mockUseTestTypes = vi.fn().mockReturnValue({
   testTypes: mockTestTypes,
   isLoading: false,
   error: null,
 });
 
-jest.mock('./useTestTypes', () => ({
+vi.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useOrderType: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  useOrderType: vi.fn(),
 }));
 
 function renderAddLabOrderWorkspace() {
@@ -71,7 +71,7 @@ function renderAddLabOrderWorkspace() {
         mutateVisitContext: null,
       }}
       workspaceName={''}
-      launchChildWorkspace={jest.fn()}
+      launchChildWorkspace={vi.fn()}
       windowName={''}
       windowProps={{ encounterUuid: '' }}
       isRootWorkspace={false}
@@ -244,7 +244,7 @@ describe('AddLabOrder', () => {
           mutateVisitContext: null,
         }}
         workspaceName={''}
-        launchChildWorkspace={jest.fn()}
+        launchChildWorkspace={vi.fn()}
         windowName={''}
         windowProps={{ encounterUuid: '' }}
         isRootWorkspace={false}
@@ -310,7 +310,7 @@ describe('AddLabOrder', () => {
           mutateVisitContext: null,
         }}
         workspaceName={''}
-        launchChildWorkspace={jest.fn()}
+        launchChildWorkspace={vi.fn()}
         windowName={''}
         windowProps={{ encounterUuid: '' }}
         isRootWorkspace={false}

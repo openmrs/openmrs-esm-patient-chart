@@ -8,7 +8,7 @@
   "source": true,
   "scripts": {
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test": "yarn run -T vitest run --passWithNoTests",
     "typescript": "tsc"
   },
   "browserslist": [

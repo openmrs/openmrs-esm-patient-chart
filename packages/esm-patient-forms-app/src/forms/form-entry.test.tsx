@@ -18,14 +18,14 @@ const defaultProps: FormEntryProps = {
   patient: mockPatient,
   visitContext: null,
   mutateVisitContext: null,
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
 };
 
-const mockFormEntrySub = jest.fn();
-const mockUseConnectivity = jest.mocked(useConnectivity);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockFormEntrySub = vi.fn();
+const mockUseConnectivity = vi.mocked(useConnectivity);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-const mockExtensionSlot = jest.mocked(ExtensionSlot);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 
 describe('FormEntry', () => {
   beforeEach(() => {

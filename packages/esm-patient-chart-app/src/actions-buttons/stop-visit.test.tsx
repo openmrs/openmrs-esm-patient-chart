@@ -6,8 +6,8 @@ import { showModal, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 
-const mockUseVisit = jest.mocked(useVisit);
-const mockShowModal = jest.mocked(showModal);
+const mockUseVisit = vi.mocked(useVisit);
+const mockShowModal = vi.mocked(showModal);
 
 describe('StopVisitOverflowMenuItem', () => {
   it('should be able to stop active visit', async () => {

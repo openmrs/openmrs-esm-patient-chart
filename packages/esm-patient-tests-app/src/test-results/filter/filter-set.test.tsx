@@ -7,8 +7,8 @@ import { FilterProvider, type Roots } from './filter-context';
 import { type TreeNode } from './filter-types';
 import FilterSet from './filter-set.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 // Create mock data with actual observations for testing
 // This structure has nested parent-child relationships where CBC is a category with sub-panels

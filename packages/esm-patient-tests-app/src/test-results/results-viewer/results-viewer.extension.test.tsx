@@ -10,8 +10,8 @@ import { type FilterContextProps } from '../filter/filter-types';
 import FilterContext from '../filter/filter-context';
 import TreeView from '../tree-view/tree-view.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseGetManyObstreeData = jest.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseGetManyObstreeData = vi.fn();
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -29,8 +29,8 @@ mockUseConfig.mockReturnValue({
   labTestsWithOrderReasons: [],
 });
 
-jest.mock('../grouped-timeline', () => ({
-  ...jest.requireActual('../grouped-timeline'),
+vi.mock('../grouped-timeline', async () => ({
+  ...((await vi.importActual('../grouped-timeline')) as object),
   useGetManyObstreeData: () => mockUseGetManyObstreeData(),
 }));
 
@@ -61,19 +61,19 @@ const mockFilterContext: FilterContextProps = {
   lowestParents: mockGroupedResults['lowestParents'],
   totalResultsCount: 0,
   isLoading: false,
-  initialize: jest.fn(),
-  toggleVal: jest.fn(),
-  updateParent: jest.fn(),
-  resetTree: jest.fn(),
+  initialize: vi.fn(),
+  toggleVal: vi.fn(),
+  updateParent: vi.fn(),
+  resetTree: vi.fn(),
   roots: mockResults,
   tests: {},
   filteredResultsCount: 0,
 };
 
-global.IntersectionObserver = jest.fn(function (callback, options) {
-  this.observe = jest.fn();
-  this.unobserve = jest.fn();
-  this.disconnect = jest.fn();
+global.IntersectionObserver = vi.fn(function (callback, options) {
+  this.observe = vi.fn();
+  this.unobserve = vi.fn();
+  this.disconnect = vi.fn();
   this.trigger = (entries) => callback(entries, this);
   this.options = options;
 }) as any;

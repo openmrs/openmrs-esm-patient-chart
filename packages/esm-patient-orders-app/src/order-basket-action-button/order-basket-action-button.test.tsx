@@ -7,28 +7,28 @@ import { mockPatient } from 'tools';
 import { orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import OrderBasketActionButton from './order-basket-action-button.component';
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 // This pattern of mocking seems to be required: defining the mocked function here and
-// then assigning it with an arrow function wrapper in jest.mock. It is very particular.
+// then assigning it with an arrow function wrapper in vi.mock. It is very particular.
 // I think it is related to this: https://github.com/swc-project/jest/issues/14#issuecomment-1238621942
 
-const mockLaunchStartVisitPrompt = jest.fn();
-const mockUseSystemVisitSetting = jest.fn();
+const mockLaunchStartVisitPrompt = vi.fn();
+const mockUseSystemVisitSetting = vi.fn();
 
-jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => {
+vi.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => {
   return {
     useSystemVisitSetting: () => mockUseSystemVisitSetting(),
   };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
+vi.mock('@openmrs/esm-patient-common-lib/src/launchStartVisitPrompt', () => {
   return { launchStartVisitPrompt: () => mockLaunchStartVisitPrompt() };
 });
 
 mockUseSystemVisitSetting.mockReturnValue({ systemVisitEnabled: false });
 
-const mockedUseFeatureFlag = jest.mocked(useFeatureFlag);
+const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 describe('<OrderBasketActionButton/>', () => {
   beforeAll(() => {

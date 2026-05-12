@@ -6,8 +6,8 @@ import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-mockOpenmrsFetch.mockImplementation(jest.fn());
+const mockOpenmrsFetch = openmrsFetch as Mock;
+mockOpenmrsFetch.mockImplementation(vi.fn());
 
 describe('AllergiesDetailedSummary', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {

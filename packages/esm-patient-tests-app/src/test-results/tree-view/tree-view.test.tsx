@@ -11,13 +11,13 @@ import { FilterProvider, type Roots } from '../filter/filter-context';
 import { type ObsTreeNode } from '../grouped-timeline/useObstreeData';
 import TreeView from './tree-view.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseGetManyObstreeData = jest.mocked(useGetManyObstreeData);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseGetManyObstreeData = vi.mocked(useGetManyObstreeData);
 
-jest.mock('../grouped-timeline', () => ({
-  ...jest.requireActual('../grouped-timeline'),
-  useGetManyObstreeData: jest.fn(),
+vi.mock('../grouped-timeline', async () => ({
+  ...((await vi.importActual('../grouped-timeline')) as object),
+  useGetManyObstreeData: vi.fn(),
 }));
 
 const mockProps = {

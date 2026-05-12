@@ -4,17 +4,17 @@ import { mockPatient } from 'tools';
 import FormRenderer from './form-renderer.component';
 import useFormSchema from '../hooks/useFormSchema';
 
-const mockUseFormSchema = jest.mocked(useFormSchema);
+const mockUseFormSchema = vi.mocked(useFormSchema);
 
-jest.mock('@openmrs/esm-form-engine-lib', () => ({
-  FormEngine: jest
+vi.mock('@openmrs/esm-form-engine-lib', () => ({
+  FormEngine: vi
     .fn()
     .mockImplementation(() => React.createElement('div', { 'data-testid': 'openmrs form' }, 'FORM ENGINE LIB')),
 }));
 
-jest.mock('../hooks/useFormSchema', () => ({
+vi.mock('../hooks/useFormSchema', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }));
 
 describe('FormRenderer', () => {
@@ -22,10 +22,10 @@ describe('FormRenderer', () => {
     formUuid: 'test-form-uuid',
     patientUuid: mockPatient.id,
     patient: mockPatient,
-    closeWorkspace: jest.fn(),
-    closeWorkspaceWithSavedChanges: jest.fn(),
-    promptBeforeClosing: jest.fn(),
-    setTitle: jest.fn(),
+    closeWorkspace: vi.fn(),
+    closeWorkspaceWithSavedChanges: vi.fn(),
+    promptBeforeClosing: vi.fn(),
+    setTitle: vi.fn(),
     visitContext: null,
     mutateVisitContext: null,
   };

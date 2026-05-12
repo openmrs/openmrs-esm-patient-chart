@@ -5,7 +5,7 @@ import { mockPatient, renderWithSwr } from 'tools';
 import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import AllergiesTile from './allergies-tile.extension';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as Mock;
 
 describe('AllergiesTile', () => {
   it('renders an empty state when allergy data is not available', async () => {

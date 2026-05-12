@@ -26,44 +26,44 @@ const testProps: EncountersTableProps = {
   paginatedEncounters: mockEncountersAlice,
   totalCount: mockEncountersAlice.length,
   currentPage: 1,
-  goTo: jest.fn(),
+  goTo: vi.fn(),
   isLoading: false,
   showVisitType: true,
   showEncounterTypeFilter: false,
   pageSize: 10,
-  setPageSize: jest.fn(),
+  setPageSize: vi.fn(),
   isSelectable: true,
   canPrintEncounters: true,
 };
 
-const mockShowModal = jest.mocked(showModal);
-const mockUserHasAccess = jest.mocked(userHasAccess).mockReturnValue(true);
-const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
-const mockExtensionSlot = jest.mocked(ExtensionSlot);
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+const mockShowModal = vi.mocked(showModal);
+const mockUserHasAccess = vi.mocked(userHasAccess).mockReturnValue(true);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
-const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
+const mockUseEncounterTypes = vi.fn(useEncounterTypes).mockReturnValue({
   data: mockEncounterTypes,
   totalCount: mockEncounterTypes.length,
   hasMore: false,
-  loadMore: jest.fn(),
+  loadMore: vi.fn(),
   error: undefined,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   isValidating: false,
   isLoading: false,
   nextUri: '',
 });
 
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseConfig = vi.mocked(useConfig);
 
-jest.mock('./encounters-table.resource', () => ({
-  ...jest.requireActual('./encounters-table.resource'),
+vi.mock('./encounters-table.resource', async () => ({
+  ...((await vi.importActual('./encounters-table.resource')) as object),
   useEncounterTypes: () => mockUseEncounterTypes(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(),
 }));
 
 beforeEach(() => {
@@ -72,9 +72,9 @@ beforeEach(() => {
     patientUuid: mockPatientAlice.uuid,
     patient: mockFhirPatient,
     visitContext: null,
-    mutateVisitContext: jest.fn(),
-    setPatient: jest.fn(),
-    setVisitContext: jest.fn(),
+    mutateVisitContext: vi.fn(),
+    setPatient: vi.fn(),
+    setVisitContext: vi.fn(),
   } as any);
 });
 
@@ -208,15 +208,23 @@ describe('EncountersTable', () => {
 });
 
 describe('Encounter editability', () => {
+  let dateNowSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
-    jest.spyOn(Date, 'now').mockImplementation(() => new Date('2022-01-18T20:00:00.000Z').getTime());
+    dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => new Date('2022-01-18T20:00:00.000Z').getTime());
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    dateNowSpy.mockRestore();
   });
 
   it('displays edit and delete encounter buttons by default', async () => {
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
     mockUserHasAccess.mockImplementation((privilege) => privilege == null);
     const user = userEvent.setup();
 
@@ -238,7 +246,7 @@ describe('Encounter editability', () => {
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     const expandedRow = row.nextElementSibling as HTMLElement;
     expect(within(expandedRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(within(expandedRow).getByRole('button', { name: /danger Delete this encounter/i })).toBeInTheDocument();
+    expect(within(expandedRow).getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
   });
 
   it('displays edit and delete encounter buttons only if the encounter is within the editable duration', async () => {
@@ -276,7 +284,9 @@ describe('Encounter editability', () => {
     const expandedTodayRow = todayRow.nextElementSibling as HTMLElement;
     await user.click(within(expandedTodayRow).getByRole('button', { name: /edit this encounter/i }));
     expect(within(expandedTodayRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(within(expandedTodayRow).getByRole('button', { name: /danger Delete this encounter/i })).toBeInTheDocument();
+    expect(
+      within(expandedTodayRow).getByRole('button', { name: /danger\s*Delete this encounter/i }),
+    ).toBeInTheDocument();
 
     // Check old encounter -- should not be editable
     const oldRow = screen.getByRole('row', {
@@ -287,7 +297,7 @@ describe('Encounter editability', () => {
     const expandedOldRow = oldRow.nextElementSibling as HTMLElement;
     expect(within(expandedOldRow).queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
     expect(
-      within(expandedOldRow).queryByRole('button', { name: /danger Delete this encounter/i }),
+      within(expandedOldRow).queryByRole('button', { name: /danger\s*Delete this encounter/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -325,7 +335,7 @@ describe('Encounter editability', () => {
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
     const expandedOldRow = oldRow.nextElementSibling as HTMLElement;
     expect(within(expandedOldRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(within(expandedOldRow).getByRole('button', { name: /danger Delete this encounter/i })).toBeInTheDocument();
+    expect(within(expandedOldRow).getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
   });
 });
 
@@ -354,7 +364,7 @@ describe('Delete Encounter', () => {
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     const expandedRow = row.nextElementSibling as HTMLElement;
-    await user.click(within(expandedRow).getByRole('button', { name: /danger Delete this encounter/i }));
+    await user.click(within(expandedRow).getByRole('button', { name: /danger\s*Delete this encounter/i }));
 
     expect(mockShowModal).toHaveBeenCalledTimes(1);
     expect(mockShowModal).toHaveBeenCalledWith(

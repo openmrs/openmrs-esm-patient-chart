@@ -5,9 +5,9 @@ import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framewo
 import { mockPatient } from 'tools';
 import { ProgramsActionMenu } from './programs-action-menu.component';
 
-const mockShowModal = jest.mocked(showModal);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockShowModal = vi.mocked(showModal);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 const testProps = {
   programEnrollmentId: '123',

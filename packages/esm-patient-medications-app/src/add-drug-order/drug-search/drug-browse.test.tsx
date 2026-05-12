@@ -7,22 +7,22 @@ import DrugBrowse from './drug-browse.component';
 import { useConceptTree, useDrugsByConcepts } from './drug-search.resource';
 import { type ConceptSet } from './drug-search.resource';
 
-const mockUseConceptTree = jest.mocked(useConceptTree);
-const mockUseDrugsByConcepts = jest.mocked(useDrugsByConcepts);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockUseConceptTree = vi.mocked(useConceptTree);
+const mockUseDrugsByConcepts = vi.mocked(useDrugsByConcepts);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
-jest.mock('./drug-search.resource', () => ({
-  ...jest.requireActual('./drug-search.resource'),
-  useConceptTree: jest.fn(),
-  useDrugsByConcepts: jest.fn(),
+vi.mock('./drug-search.resource', async () => ({
+  ...((await vi.importActual('./drug-search.resource')) as object),
+  useConceptTree: vi.fn(),
+  useDrugsByConcepts: vi.fn(),
 }));
 
-jest.mock('./order-basket-search-results.component', () => ({
+vi.mock('./order-basket-search-results.component', () => ({
   DrugSearchResultItem: ({ drug }) => <div data-testid={`drug-item-${drug.uuid}`}>{drug.display}</div>,
 }));
 
-const mockCloseWorkspace = jest.fn();
-const mockOpenOrderForm = jest.fn();
+const mockCloseWorkspace = vi.fn();
+const mockOpenOrderForm = vi.fn();
 
 const mockConceptSets: ConceptSet[] = [
   { uuid: 'set-1-uuid', display: 'Analgesics' },

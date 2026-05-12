@@ -4,14 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { usePatientLists } from '../patient-lists.resource';
 import PatientListsWorkspace from './patient-lists.workspace';
 
-const mockUsePatientLists = jest.mocked(usePatientLists);
+const mockUsePatientLists = vi.mocked(usePatientLists);
 
-jest.mock('../patient-lists.resource', () => {
-  const original = jest.requireActual('../patient-lists.resource');
+vi.mock('../patient-lists.resource', async () => {
+  const original = (await vi.importActual('../patient-lists.resource')) as object;
 
   return {
     ...original,
-    usePatientLists: jest.fn(),
+    usePatientLists: vi.fn(),
   };
 });
 
@@ -20,7 +20,7 @@ it('renders an empty state if patient list data is unavailable', async () => {
     isLoading: false,
     error: null,
     patientLists: [],
-    mutate: jest.fn(),
+    mutate: vi.fn(),
     isValidating: false,
   });
   renderPatientListWorkspace();
@@ -47,7 +47,7 @@ it('renders a tabular overview of the available patient lists', async () => {
         type: 'My List',
       },
     ],
-    mutate: jest.fn(),
+    mutate: vi.fn(),
     isValidating: false,
   });
 
@@ -79,12 +79,12 @@ function renderPatientListWorkspace() {
   render(
     <PatientListsWorkspace
       workspaceName={''}
-      launchChildWorkspace={jest.fn()}
-      closeWorkspace={jest.fn()}
+      launchChildWorkspace={vi.fn()}
+      closeWorkspace={vi.fn()}
       workspaceProps={{}}
       windowProps={{}}
       groupProps={{
-        mutateVisitContext: jest.fn(),
+        mutateVisitContext: vi.fn(),
         patient: null,
         patientUuid: null,
         visitContext: null,

@@ -13,9 +13,9 @@
     "build": "rspack --mode=production",
     "analyze": "rspack --mode=production --env analyze=true",
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
-    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
-    "coverage": "yarn test --coverage",
+    "test": "yarn run -T vitest run --passWithNoTests",
+    "test:watch": "yarn run -T vitest watch",
+    "coverage": "yarn run -T vitest run --coverage --passWithNoTests",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/**/*.hook.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },

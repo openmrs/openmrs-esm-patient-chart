@@ -8,7 +8,7 @@ import { type FilterContextProps } from '../filter/filter-types';
 import FilterContext from '../filter/filter-context';
 import GroupedTimeline from './grouped-timeline.component';
 
-const mockShowModal = jest.mocked(showModal);
+const mockShowModal = vi.mocked(showModal);
 
 describe('GroupedTimeline', () => {
   const mockFilterContext: FilterContextProps = {
@@ -22,10 +22,10 @@ describe('GroupedTimeline', () => {
     lowestParents: mockGroupedResults['lowestParents'],
     totalResultsCount: 0,
     isLoading: false,
-    initialize: jest.fn(),
-    toggleVal: jest.fn(),
-    updateParent: jest.fn(),
-    resetTree: jest.fn(),
+    initialize: vi.fn(),
+    toggleVal: vi.fn(),
+    updateParent: vi.fn(),
+    resetTree: vi.fn(),
     roots: [],
     tests: {},
     filteredResultsCount: 0,

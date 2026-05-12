@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { renderWithSwr } from 'tools';
 import FormsList, { type FormsListProps } from './forms-list.component';
 
-jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
+vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
 const defaultProps: FormsListProps & { reset: () => void } = {
   forms: [],
-  handleFormOpen: jest.fn(),
+  handleFormOpen: vi.fn(),
   reset() {
     this.completedForms = [];
   },

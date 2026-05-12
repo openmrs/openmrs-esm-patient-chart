@@ -7,8 +7,8 @@ import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 it('renders an empty state view if conditions data is unavailable', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });

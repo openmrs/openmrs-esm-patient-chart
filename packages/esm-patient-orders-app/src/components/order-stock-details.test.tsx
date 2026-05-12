@@ -6,10 +6,10 @@ import { renderWithSwr } from 'tools';
 import { useOrderStockInfo } from '../hooks/useOrderStockInfo';
 import OrderStockDetailsComponent from './order-stock-details.component';
 
-const mockUseOrderStockInfo = jest.mocked(useOrderStockInfo);
+const mockUseOrderStockInfo = vi.mocked(useOrderStockInfo);
 
-jest.mock('../hooks/useOrderStockInfo', () => ({
-  useOrderStockInfo: jest.fn(),
+vi.mock('../hooks/useOrderStockInfo', () => ({
+  useOrderStockInfo: vi.fn(),
 }));
 
 describe('OrderStockDetailsComponent', () => {

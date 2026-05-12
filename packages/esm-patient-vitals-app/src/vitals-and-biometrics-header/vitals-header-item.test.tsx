@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { NumericObservation } from '@openmrs/esm-framework';
 import VitalsHeaderItem from './vitals-header-item.component';
 
-const mockNumericObservation = jest.mocked(NumericObservation);
+const mockNumericObservation = vi.mocked(NumericObservation);
 const testProps = { unitName: 'Temp', value: '36.5', unitSymbol: '°C', patientUuid: 'test-patient-uuid' };
 
 describe('VitalsHeaderItem', () => {

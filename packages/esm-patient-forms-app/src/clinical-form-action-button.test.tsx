@@ -4,8 +4,8 @@ import { ActionMenuButton2, useLayoutType } from '@openmrs/esm-framework';
 import ClinicalFormActionButton from './clinical-form-action-button.component';
 import { mockPatient } from 'tools';
 
-const mockActionMenuButton = jest.mocked(ActionMenuButton2);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockActionMenuButton = vi.mocked(ActionMenuButton2);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 mockActionMenuButton.mockImplementation(({ label, tagContent }) => (
   <button>
@@ -13,12 +13,12 @@ mockActionMenuButton.mockImplementation(({ label, tagContent }) => (
   </button>
 ));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useStartVisitIfNeeded: jest.fn(() => () => Promise.resolve(true)),
+    useStartVisitIfNeeded: vi.fn(() => () => Promise.resolve(true)),
   };
 });
 

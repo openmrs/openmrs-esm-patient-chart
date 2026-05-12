@@ -3,35 +3,35 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TaskListWorkspace from './task-list.workspace';
 
-jest.mock('./task-list.resource', () => ({
-  useTaskList: jest.fn(),
-  useTask: jest.fn(() => ({ task: null, isLoading: false, error: null, mutate: jest.fn() })),
+vi.mock('./task-list.resource', () => ({
+  useTaskList: vi.fn(),
+  useTask: vi.fn(() => ({ task: null, isLoading: false, error: null, mutate: vi.fn() })),
 }));
 
 // Mock child components to avoid heavy dependency chains
-jest.mock('./task-list-view.component', () => {
-  return function MockTaskListView({ onTaskClick }: { onTaskClick?: (task: any) => void }) {
+vi.mock('./task-list-view.component', () => ({
+  default: function MockTaskListView({ onTaskClick }: { onTaskClick?: (task: any) => void }) {
     return (
       <div data-testid="task-list-view">
         <button onClick={() => onTaskClick?.({ uuid: 'task-1', name: 'Mock Task' })}>Mock Task</button>
       </div>
     );
-  };
-});
+  },
+}));
 
-jest.mock('./add-task-form.component', () => {
-  return function MockAddTaskForm({ onClose, editTaskUuid }: { onClose: () => void; editTaskUuid?: string }) {
+vi.mock('./add-task-form.component', () => ({
+  default: function MockAddTaskForm({ onClose, editTaskUuid }: { onClose: () => void; editTaskUuid?: string }) {
     return (
       <div data-testid={editTaskUuid ? 'edit-task-form' : 'add-task-form'}>
         <span>{editTaskUuid ? 'Editing task' : 'Adding task'}</span>
         <button onClick={onClose}>Form back</button>
       </div>
     );
-  };
-});
+  },
+}));
 
-jest.mock('./task-details-view.component', () => {
-  return function MockTaskDetailsView({ onBack, onEdit }: { onBack: () => void; onEdit?: (task: any) => void }) {
+vi.mock('./task-details-view.component', () => ({
+  default: function MockTaskDetailsView({ onBack, onEdit }: { onBack: () => void; onEdit?: (task: any) => void }) {
     return (
       <div data-testid="task-details-view">
         <span>Task details</span>
@@ -39,8 +39,8 @@ jest.mock('./task-details-view.component', () => {
         {onEdit && <button onClick={() => onEdit({ uuid: 'task-1', name: 'Mock Task' })}>Edit</button>}
       </div>
     );
-  };
-});
+  },
+}));
 
 const defaultProps = {
   groupProps: { patientUuid: 'patient-uuid-123', visitContext: { uuid: 'visit-uuid' } },

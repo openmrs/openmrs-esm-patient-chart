@@ -5,7 +5,7 @@ import {
   invalidateCurrentVisit,
 } from './revalidation-utils';
 
-const mockMutate = jest.fn();
+const mockMutate = vi.fn();
 
 describe('revalidation-utils', () => {
   describe('invalidateVisitHistory', () => {

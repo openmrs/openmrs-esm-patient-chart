@@ -22,37 +22,37 @@ const testProps = {
   patient: mockPatient,
 };
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockNumericObservation = jest.mocked(NumericObservation);
-const mockUseVitalsConceptMetadata = jest.mocked(useVitalsConceptMetadata);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
+const mockNumericObservation = vi.mocked(NumericObservation);
+const mockUseVitalsConceptMetadata = vi.mocked(useVitalsConceptMetadata);
 
-const mockLaunchWorkspaceRequiringVisit = jest.fn();
-const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+const mockLaunchWorkspaceRequiringVisit = vi.fn();
+const mockUseLaunchWorkspaceRequiringVisit = vi.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
 });
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
+    useLaunchWorkspaceRequiringVisit: vi.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
-jest.mock('../common/data.resource', () => {
-  const originalModule = jest.requireActual('../common/data.resource');
+vi.mock('../common/data.resource', async () => {
+  const originalModule = (await vi.importActual('../common/data.resource')) as object;
 
   return {
     ...originalModule,
-    useConceptUnits: jest.fn().mockImplementation(() => ({
+    useConceptUnits: vi.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,
       isLoading: false,
     })),
-    useVitalsConceptMetadata: jest.fn(),
-    useVitalsAndBiometrics: jest.fn(),
+    useVitalsConceptMetadata: vi.fn(),
+    useVitalsAndBiometrics: vi.fn(),
   };
 });
 
@@ -319,7 +319,7 @@ describe('VitalsHeader', () => {
   });
 
   it('resolves plural translation keys correctly', async () => {
-    const { createInstance } = jest.requireActual('i18next');
+    const { createInstance } = (await vi.importActual('i18next')) as object;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const translations = require('../../translations/en.json');
     const i18n = createInstance();

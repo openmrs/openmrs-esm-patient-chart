@@ -8,21 +8,21 @@ import { type ConfigObject } from '../config-schema';
 import { createStickyNote, updateStickyNote } from './sticky-note.resource';
 import StickyNoteModal from './sticky-note.modal';
 
-jest.mock('./sticky-note.resource', () => ({
-  createStickyNote: jest.fn(),
-  updateStickyNote: jest.fn(),
+vi.mock('./sticky-note.resource', () => ({
+  createStickyNote: vi.fn(),
+  updateStickyNote: vi.fn(),
 }));
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockCreateStickyNote = jest.mocked(createStickyNote);
-const mockUpdateStickyNote = jest.mocked(updateStickyNote);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockCreateStickyNote = vi.mocked(createStickyNote);
+const mockUpdateStickyNote = vi.mocked(updateStickyNote);
 
 describe('StickyNoteModal', () => {
   const patientUuid = mockPatient.id;
   const defaultProps = {
-    close: jest.fn(),
-    mutate: jest.fn(),
+    close: vi.fn(),
+    mutate: vi.fn(),
     patientUuid,
   };
 

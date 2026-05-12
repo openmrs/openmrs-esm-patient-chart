@@ -5,7 +5,7 @@ import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import StartVisitButton from './start-visit-button.component';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 describe('StartVisitButton', () => {
   it('renders the start visit button', () => {

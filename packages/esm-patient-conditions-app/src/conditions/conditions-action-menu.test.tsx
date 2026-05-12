@@ -5,9 +5,9 @@ import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framewo
 import { type Condition } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
-const mockShowModal = jest.mocked(showModal);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
+const mockShowModal = vi.mocked(showModal);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 const mockCondition: Condition = {
   clinicalStatus: 'active',

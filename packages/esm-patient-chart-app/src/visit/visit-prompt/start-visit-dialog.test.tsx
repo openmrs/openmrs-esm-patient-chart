@@ -6,11 +6,11 @@ import StartVisitDialog from './start-visit-dialog.modal';
 
 const defaultProps = {
   patientUuid: 'some-uuid',
-  closeModal: jest.fn(),
+  closeModal: vi.fn(),
   visitType: null,
 };
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 describe('StartVisit', () => {
   test('should launch start visit form', async () => {
