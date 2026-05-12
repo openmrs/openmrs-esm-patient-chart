@@ -65,12 +65,18 @@ export async function postOrdersOnNewEncounter(
     }
   }
 
-  // Floor the encounter datetime to the visit's start so the backend's
-  // Encounter.datetimeShouldBeInVisitDatesRange constraint holds.
+  // Clamp the encounter datetime to the visit window so the backend's
+  // Encounter.datetimeShouldBeInVisitDatesRange constraint holds at both ends.
   if (encounterDate && currentVisit?.startDatetime) {
     const visitStart = parseDate(currentVisit.startDatetime);
     if (encounterDate < visitStart) {
       encounterDate = visitStart;
+    }
+  }
+  if (encounterDate && currentVisit?.stopDatetime) {
+    const visitStop = parseDate(currentVisit.stopDatetime);
+    if (encounterDate > visitStop) {
+      encounterDate = visitStop;
     }
   }
 
