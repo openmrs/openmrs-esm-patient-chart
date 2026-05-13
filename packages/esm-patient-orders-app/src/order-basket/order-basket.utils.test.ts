@@ -1,4 +1,5 @@
 import type { OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect } from 'vitest';
 import { getEarliestStartDate } from './order-basket.utils';
 
 const now = new Date('2026-05-06T12:00:00.000Z');

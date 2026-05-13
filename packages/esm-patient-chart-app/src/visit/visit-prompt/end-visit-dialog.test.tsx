@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { showSnackbar, updateVisit, useVisit, type Visit, type FetchResponse } from '@openmrs/esm-framework';
@@ -10,25 +11,25 @@ const endVisitPayload = {
   stopDatetime: expect.any(Date),
 };
 
-const mockCloseModal = jest.fn();
-const mockMutate = jest.fn();
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseVisit = jest.mocked(useVisit);
-const mockUpdateVisit = jest.mocked(updateVisit);
+const mockCloseModal = vi.fn();
+const mockMutate = vi.fn();
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseVisit = vi.mocked(useVisit);
+const mockUpdateVisit = vi.mocked(updateVisit);
 
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
-const mockSetVisitContext = jest.fn();
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
+const mockSetVisitContext = vi.fn();
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', () => ({
+  usePatientChartStore: vi.fn(),
 }));
 
 mockUsePatientChartStore.mockReturnValue({
   patientUuid: 'patient-123',
   patient: null,
   visitContext: mockCurrentVisit,
-  mutateVisitContext: jest.fn(),
-  setPatient: jest.fn(),
+  mutateVisitContext: vi.fn(),
+  setPatient: vi.fn(),
   setVisitContext: mockSetVisitContext,
 });
 

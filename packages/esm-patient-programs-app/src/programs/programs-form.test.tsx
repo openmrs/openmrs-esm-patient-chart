@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen } from '@testing-library/react';
 import {
@@ -20,14 +21,14 @@ import ProgramsForm, { type ProgramsFormProps } from './programs-form.workspace'
 import { type ConfigObject, configSchema } from '../config-schema';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
-const mockUseEnrollments = jest.mocked(useEnrollments);
-const mockCreateProgramEnrollment = jest.mocked(createProgramEnrollment);
-const mockUpdateProgramEnrollment = jest.mocked(updateProgramEnrollment);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseLocations = jest.mocked(useLocations);
-const mockCloseWorkspace = jest.fn();
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseAvailablePrograms = vi.mocked(useAvailablePrograms);
+const mockUseEnrollments = vi.mocked(useEnrollments);
+const mockCreateProgramEnrollment = vi.mocked(createProgramEnrollment);
+const mockUpdateProgramEnrollment = vi.mocked(updateProgramEnrollment);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseLocations = vi.mocked(useLocations);
+const mockCloseWorkspace = vi.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
@@ -38,7 +39,7 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {},
   windowProps: {},
   windowName: '',
@@ -46,12 +47,12 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   showActionMenu: true,
 };
 
-jest.mock('./programs.resource', () => ({
-  createProgramEnrollment: jest.fn(),
-  updateProgramEnrollment: jest.fn(),
-  useAvailablePrograms: jest.fn(),
-  useEnrollments: jest.fn(),
-  findLastState: jest.fn(),
+vi.mock('./programs.resource', () => ({
+  createProgramEnrollment: vi.fn(),
+  updateProgramEnrollment: vi.fn(),
+  useAvailablePrograms: vi.fn(),
+  useEnrollments: vi.fn(),
+  findLastState: vi.fn(),
 }));
 
 mockUseLocations.mockReturnValue(mockLocationsResponse);
@@ -69,7 +70,7 @@ mockUseEnrollments.mockReturnValue({
   isLoading: false,
   isValidating: false,
   activeEnrollments: [],
-  mutateEnrollments: jest.fn(),
+  mutateEnrollments: vi.fn(),
 });
 
 mockCreateProgramEnrollment.mockResolvedValue({

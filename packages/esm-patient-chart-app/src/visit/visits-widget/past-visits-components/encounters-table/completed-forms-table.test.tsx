@@ -1,17 +1,18 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { mockPatientAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useAllEncounters } from './encounters-table.resource';
 import CompletedFormsTable from './completed-forms-table.component';
 
-jest.mock('./encounters-table.resource', () => ({
-  ...jest.requireActual('./encounters-table.resource'),
-  useAllEncounters: jest.fn(),
+vi.mock('./encounters-table.resource', async () => ({
+  ...((await vi.importActual('./encounters-table.resource')) as object),
+  useAllEncounters: vi.fn(),
 }));
 
-jest.mock('./encounters-table.component', () => {
-  return function MockedEncountersTable(props: any) {
+vi.mock('./encounters-table.component', () => ({
+  default: function MockedEncountersTable(props: any) {
     return (
       <div
         data-testid="encounters-table"
@@ -23,10 +24,10 @@ jest.mock('./encounters-table.component', () => {
         EncountersTable
       </div>
     );
-  };
-});
+  },
+}));
 
-const mockUseAllEncounters = jest.mocked(useAllEncounters);
+const mockUseAllEncounters = vi.mocked(useAllEncounters);
 
 describe('CompletedFormsTable', () => {
   it('renders loading state when encounters are loading', () => {

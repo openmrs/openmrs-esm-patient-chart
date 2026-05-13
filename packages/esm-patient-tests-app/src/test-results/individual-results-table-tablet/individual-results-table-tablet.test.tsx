@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
@@ -6,10 +7,10 @@ import { mockResults } from '__mocks__';
 import { FilterProvider, type Roots } from '../filter/filter-context';
 import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 
-const mockIsDesktop = jest.mocked(isDesktop);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
-jest.mock('./usePanelData');
+vi.mock('./usePanelData');
 
 describe('PanelView', () => {
   beforeEach(() => {

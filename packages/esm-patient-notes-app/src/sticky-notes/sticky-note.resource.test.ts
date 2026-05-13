@@ -1,4 +1,5 @@
 import { isStandaloneStickyNote, type StickyNoteObs } from './sticky-note.resource';
+import { vi, describe, it, expect } from 'vitest';
 
 const baseObs: StickyNoteObs = {
   uuid: 'uuid',

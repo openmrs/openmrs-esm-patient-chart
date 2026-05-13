@@ -8,7 +8,7 @@
   "source": true,
   "scripts": {
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test": "vitest run --passWithNoTests",
     "typescript": "tsc"
   },
   "browserslist": [
@@ -39,6 +39,7 @@
     "single-spa": "6.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

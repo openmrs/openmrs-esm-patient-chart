@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -13,7 +14,7 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
@@ -21,7 +22,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {
     condition: null,
     formContext: 'creating' as 'creating' | 'editing',
@@ -43,18 +44,18 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
   render(<ConditionsForm {...props} />);
 }
 
-const mockCreateCondition = jest.mocked(createCondition);
-const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
-const mockUseConditions = jest.mocked(useConditions);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockCreateCondition = vi.mocked(createCondition);
+const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
+const mockUseConditions = vi.mocked(useConditions);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('./conditions.resource', () => ({
-  ...jest.requireActual('./conditions.resource'),
-  createCondition: jest.fn(),
-  editCondition: jest.fn(),
-  useConditions: jest.fn(),
-  useConditionsSearch: jest.fn(),
+vi.mock('./conditions.resource', async () => ({
+  ...((await vi.importActual('./conditions.resource')) as object),
+  createCondition: vi.fn(),
+  editCondition: vi.fn(),
+  useConditions: vi.fn(),
+  useConditionsSearch: vi.fn(),
 }));
 
 mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
@@ -63,7 +64,7 @@ mockUseConditions.mockReturnValue({
   error: null,
   isLoading: false,
   isValidating: false,
-  mutate: jest.fn().mockResolvedValue(undefined),
+  mutate: vi.fn().mockResolvedValue(undefined),
 });
 mockUseConditionsSearch.mockReturnValue({
   searchResults: [],
@@ -335,7 +336,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -367,7 +368,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     mockUseConditionsSearch.mockReturnValue({
@@ -413,7 +414,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -449,7 +450,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -496,7 +497,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -518,7 +519,7 @@ describe('Duplicate condition detection', () => {
       isSearching: false,
     });
 
-    const mockMutate = jest.fn().mockResolvedValue(undefined);
+    const mockMutate = vi.fn().mockResolvedValue(undefined);
     mockUseConditions.mockReturnValue({
       conditions: [
         {

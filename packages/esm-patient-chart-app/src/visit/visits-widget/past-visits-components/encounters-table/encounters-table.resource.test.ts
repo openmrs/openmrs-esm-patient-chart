@@ -1,10 +1,11 @@
 import { renderHook } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useAllEncounters, encounterHasJsonSchemaForm } from './encounters-table.resource';
 
-const mockUseOpenmrsFetchAll = jest.fn();
+const mockUseOpenmrsFetchAll = vi.fn();
 
-jest.mock('@openmrs/esm-framework', () => ({
-  makeUrl: jest.fn((path: string) => `http://localhost/${path}`),
+vi.mock('@openmrs/esm-framework', () => ({
+  makeUrl: vi.fn((path: string) => `http://localhost/${path}`),
   restBaseUrl: '/ws/rest/v1',
   useOpenmrsFetchAll: (...args: unknown[]) => mockUseOpenmrsFetchAll(...args),
 }));
@@ -98,7 +99,7 @@ describe('encounterHasJsonSchemaForm', () => {
 
 describe('useAllEncounters', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('calls useOpenmrsFetchAll with correct URL when patientUuid is provided', () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
@@ -30,37 +31,37 @@ const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProp
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
-  closeWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
+  closeWorkspace: vi.fn(),
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
 };
 
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockCreateOrUpdateVitalsAndBiometrics = jest.mocked(createOrUpdateVitalsAndBiometrics);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseEncounterVitalsAndBiometrics = jest.mocked(useEncounterVitalsAndBiometrics);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockCreateOrUpdateVitalsAndBiometrics = vi.mocked(createOrUpdateVitalsAndBiometrics);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseEncounterVitalsAndBiometrics = vi.mocked(useEncounterVitalsAndBiometrics);
 
-jest.mock('../common', () => ({
-  assessValue: jest.fn(),
-  getReferenceRangesForConcept: jest.fn(),
-  generatePlaceholder: jest.fn(),
-  interpretBloodPressure: jest.fn(),
-  invalidateCachedVitalsAndBiometrics: jest.fn(),
-  createOrUpdateVitalsAndBiometrics: jest.fn(),
-  useVitalsAndBiometrics: jest.fn(),
-  useConceptUnits: jest.fn().mockImplementation(() => ({
+vi.mock('../common', () => ({
+  assessValue: vi.fn(),
+  getReferenceRangesForConcept: vi.fn(),
+  generatePlaceholder: vi.fn(),
+  interpretBloodPressure: vi.fn(),
+  invalidateCachedVitalsAndBiometrics: vi.fn(),
+  createOrUpdateVitalsAndBiometrics: vi.fn(),
+  useVitalsAndBiometrics: vi.fn(),
+  useConceptUnits: vi.fn().mockImplementation(() => ({
     conceptUnits: mockConceptUnits,
     error: null,
     isLoading: false,
   })),
-  useEncounterVitalsAndBiometrics: jest.fn().mockImplementation(() => ({
+  useEncounterVitalsAndBiometrics: vi.fn().mockImplementation(() => ({
     isLoading: false,
     vitalsAndBiometrics: null,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   })),
-  useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
+  useVitalsConceptMetadata: vi.fn().mockImplementation(() => mockVitalsConceptMetadata),
 }));
 
 mockUseConfig.mockReturnValue({
@@ -149,7 +150,7 @@ function setupMockUseEncounterVitalsAndBiometrics() {
     ]),
     encounter: null,
     error: null,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
     getRefinedInitialValues: () => ({
       height: 170,
       weight: 65,
@@ -223,7 +224,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm();
@@ -320,7 +321,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm('editing', 'encounter-uuid');
