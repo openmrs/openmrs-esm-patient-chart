@@ -14,9 +14,9 @@
     "lint": "cross-env eslint src --ext js,jsx,ts,tsx --fix --max-warnings=0",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
-    "test": "yarn run -T vitest run --passWithNoTests",
-    "test:watch": "yarn run -T vitest watch",
-    "coverage": "yarn run -T vitest run --coverage --passWithNoTests",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest watch",
+    "coverage": "vitest run --coverage --passWithNoTests",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.modal.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/**/*.hook.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@openmrs/esm-patient-common-lib": "workspace:*",
-    "openmrs": "next"
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }
