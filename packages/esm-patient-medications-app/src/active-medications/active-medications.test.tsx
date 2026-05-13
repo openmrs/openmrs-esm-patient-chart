@@ -58,6 +58,10 @@ describe('ActiveMedications', () => {
     expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Active medications' }), {});
   });
 
+  // TODO: Re-enable. Carbon DataTable renders columns differently under jsdom +
+  // @testing-library/react@16, so the row/column assertions below no longer find
+  // the expected cells. Needs the query to switch from cell-text matching to
+  // role-based DataTable column queries.
   test.skip('renders a tabular overview of the active medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
