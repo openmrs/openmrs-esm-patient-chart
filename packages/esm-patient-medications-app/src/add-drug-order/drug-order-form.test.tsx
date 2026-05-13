@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeAll, type Mock } from 'vitest';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
@@ -73,12 +73,6 @@ function createNewOrderBasketItem(overrides?: Partial<DrugOrderBasketItem>): Dru
 }
 
 describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
-  // userEvent-heavy tests complete in 300-600ms locally but take 5-6s on GitHub
-  // Actions runners; raise the per-test ceiling for this file only.
-  beforeAll(() => {
-    vi.setConfig({ testTimeout: 30000 });
-  });
-
   it('auto-calculates quantity when dose, frequency, and duration are filled', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
