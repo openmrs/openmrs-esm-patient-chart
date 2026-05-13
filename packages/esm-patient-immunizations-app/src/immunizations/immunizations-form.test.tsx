@@ -1,3 +1,10 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` instances do not satisfy `instanceof Date` against
+ * the host realm's `Date` constructor, which breaks `expect.objectContaining`
+ * matchers on form payloads that production code builds with `new Date()`.
+ */
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import dayjs from 'dayjs';
