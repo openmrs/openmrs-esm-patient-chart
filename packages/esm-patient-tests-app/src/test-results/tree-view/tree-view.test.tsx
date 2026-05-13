@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, test, beforeAll, beforeEach, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -36,6 +36,13 @@ const renderTreeViewWithMockContext = () => {
 };
 
 describe('TreeView', () => {
+  // Carbon DataTable checkbox lookups (getAllByRole('checkbox', { name: /.../i }))
+  // are ~1s locally but 15-18s on GitHub Actions runners; raise the per-test
+  // ceiling for this file only.
+  beforeAll(() => {
+    vi.setConfig({ testTimeout: 30000 });
+  });
+
   beforeEach(() => {
     mockUseLayoutType.mockReturnValue('small-desktop');
 

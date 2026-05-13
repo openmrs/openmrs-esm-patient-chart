@@ -10,7 +10,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     clearMocks: true,
-    testTimeout: 30000,
     setupFiles: [new URL('./tools/setup-tests.ts', import.meta.url).pathname],
     exclude: ['**/node_modules/**', '**/e2e/**', '**/dist/**', '**/packages/esm-form-entry-app/**'],
     coverage: {

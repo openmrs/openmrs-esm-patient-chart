@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -43,6 +43,12 @@ const mockConcepts = {
 };
 
 describe('AllergyForm', () => {
+  // userEvent-heavy tests complete in 300-700ms locally but take 5-7s on GitHub
+  // Actions runners; raise the per-test ceiling for this file only.
+  beforeAll(() => {
+    vi.setConfig({ testTimeout: 30000 });
+  });
+
   beforeEach(() => {
     mockUseAllergens.mockReturnValue({
       isLoading: false,
