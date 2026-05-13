@@ -51,14 +51,12 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
 });
 
 vi.mock('./general-order-table.component', () => ({
-  __esModule: true,
   default: function MockGeneralOrderTable() {
     return 'General order details';
   },
 }));
 
 vi.mock('./medication-record.component', () => ({
-  __esModule: true,
   default: function MockMedicationRecord() {
     return 'Medication details';
   },

@@ -14,7 +14,6 @@ vi.mock('@openmrs/esm-form-engine-lib', () => ({
 }));
 
 vi.mock('../hooks/useFormSchema', () => ({
-  __esModule: true,
   default: vi.fn(),
 }));
 
