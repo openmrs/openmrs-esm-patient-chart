@@ -43,7 +43,6 @@ export default defineConfig({
       ],
     },
     alias: [
-      { find: '@openmrs/esm-framework/src/internal', replacement: '@openmrs/esm-framework/mock' },
       { find: /^@openmrs\/esm-framework$/, replacement: '@openmrs/esm-framework/mock' },
       { find: 'react-i18next', replacement: new URL('./__mocks__/react-i18next.js', import.meta.url).pathname },
       {
