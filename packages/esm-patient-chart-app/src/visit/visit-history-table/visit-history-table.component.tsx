@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { usePaginatedVisits } from '../visits-widget/visit.resource';
+import { useLightweightVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
@@ -31,14 +31,16 @@ interface VisitHistoryTableProps {
 }
 
 /**
- * This show a list of visit histories in the visit tab in patient chart
+ * This shows a list of visit histories in the visit tab in patient chart.
+ * Uses the lightweight emrapi endpoint for initial load (only basic details + diagnoses + notes).
+ * Full visit data is fetched on-demand when a row is expanded (handled by VisitSummary).
  */
 const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
+  const { visits, currentPage, error, isLoading, totalCount, goTo } = useLightweightVisits(patientUuid, pageSize);
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -110,6 +112,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
+                            {/* VisitSummary will fetch full visit data on-demand */}
                             <VisitSummary visit={visit} patientUuid={patientUuid} />
                           </TableExpandedRow>
                         ) : (
