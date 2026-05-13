@@ -1,3 +1,10 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `AbortController` instances are not the host realm's
+ * `AbortController`, so `toHaveBeenCalledWith(new AbortController(), ...)`
+ * fails the cross-realm equality check used here.
+ */
 import React from 'react';
 import { vi, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
