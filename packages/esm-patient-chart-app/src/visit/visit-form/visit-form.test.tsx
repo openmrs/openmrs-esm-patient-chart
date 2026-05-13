@@ -4,6 +4,7 @@ import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library
 import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
+  ExtensionSlot,
   getDefaultsFromConfigSchema,
   saveVisit,
   showSnackbar,
@@ -86,6 +87,7 @@ const mockUseDefaultVisitLocation = jest.fn().mockReturnValue(defaultVisitLocati
 
 const mockSaveVisit = jest.mocked(saveVisit);
 const mockUpdateVisit = jest.mocked(updateVisit);
+const mockExtensionSlot = jest.mocked(ExtensionSlot);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = jest.mocked(useVisitAttributeType);
 const mockUseVisit = jest.mocked(useVisit);
@@ -216,6 +218,8 @@ mockSaveVisit.mockResolvedValue({
 
 describe('Visit form', () => {
   beforeEach(() => {
+    mockExtensionSlot.mockReset();
+    mockExtensionSlot.mockImplementation(() => null);
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       visitAttributeTypes: [
@@ -928,6 +932,23 @@ describe('Visit form', () => {
 
     expect(screen.queryByText(/This patient already has an active visit/i)).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
+  });
+
+  it('passes the current visit status to the visit-form-bottom-slot for retrospective visits', () => {
+    let capturedBottomSlotState: { visitStatus: Visit['visitStatus'] } | undefined;
+
+    mockExtensionSlot.mockImplementation(({ name, children }) => {
+      if (name === 'visit-form-bottom-slot' && typeof children === 'function') {
+        const renderedExtension = children({ id: 'test-extension-id' } as any) as React.ReactElement;
+        capturedBottomSlotState = renderedExtension.props.state;
+      }
+
+      return null;
+    });
+
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    expect(capturedBottomSlotState?.visitStatus).toBe('past');
   });
 });
 
