@@ -7,10 +7,13 @@ interface Props {
 }
 
 const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {
-  const diagnoses = visit.encounters
-    .flatMap((encounter) => encounter.diagnoses)
-    .filter((diagnosis) => !diagnosis.voided)
-    .sort((a, b) => a.rank - b.rank);
+  const diagnoses =
+    (visit as any).diagnoses ||
+    visit.encounters
+      ?.flatMap((encounter) => encounter.diagnoses)
+      .filter((diagnosis) => !diagnosis.voided)
+      .sort((a, b) => a.rank - b.rank) ||
+    [];
 
   return <DiagnosisTags diagnoses={diagnoses} />;
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -39,6 +39,20 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
+
+  const normalizedVisits = useMemo(() => {
+    return visits?.map((entry: any) => {
+      if (entry.visit) {
+        return {
+          ...entry.visit,
+          diagnoses: entry.diagnoses,
+          visitNotes: entry.visitNotes,
+        };
+      }
+      return entry;
+    });
+  }, [visits]);
+
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -52,7 +66,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
 
   const layout = useLayoutType();
 
-  const rowData = visits?.map((visit) => {
+  const rowData = normalizedVisits?.map((visit) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
       row[key] = <CellComponent key={key} visit={visit} patient={patient} />;
@@ -68,7 +82,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
     return <ErrorState error={error} headerTitle={t('pastVisits', 'Past visits')} />;
   }
 
-  if (visits.length === 0) {
+  if (normalizedVisits?.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
         <EmptyState headerTitle={t('pastVisits', 'Past visits')} displayText={t('visits', 'visits')} />
@@ -100,7 +114,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => {
-                    const visit = visits[i];
+                    const visit = normalizedVisits[i];
                     return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>

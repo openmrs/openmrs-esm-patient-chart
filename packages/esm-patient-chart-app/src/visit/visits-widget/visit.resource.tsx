@@ -7,23 +7,28 @@ import {
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
 
-const customRepresentation =
+export const customRepresentation =
   'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
-export function useInfiniteVisits(
-  patientUuid: string,
-  params: Record<string, number | string> = {},
-  rep: string = customRepresentation,
-) {
+export interface VisitWithNotesAndDiagnoses {
+  visit: Visit;
+  diagnoses: Array<Diagnosis>;
+  visitNotes: Array<OpenmrsResource & { value: string; obsDatetime: string }>;
+}
+
+export function useInfiniteVisits(patientUuid: string, params: Record<string, number | string> = {}, rep?: string) {
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
+    `${window.openmrsBase}/${restBaseUrl}/emrapi/patient/${patientUuid}/visitWithDiagnosesAndNotes`,
     window.location.toString(),
   );
+  if (rep) {
+    url.searchParams.set('v', rep);
+  }
   for (const key in params) {
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const { data, mutate, ...rest } = useOpenmrsInfinite<Visit>(patientUuid ? url : null);
+  const { data, mutate, ...rest } = useOpenmrsInfinite<VisitWithNotesAndDiagnoses | Visit>(patientUuid ? url : null);
 
   return { visits: data, mutate, ...rest };
 }
@@ -34,14 +39,14 @@ export function usePaginatedVisits(
   params: Record<string, number | string> = {},
 ) {
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    `${window.openmrsBase}/${restBaseUrl}/emrapi/patient/${patientUuid}/visitWithDiagnosesAndNotes`,
     window.location.toString(),
   );
   for (const key in params) {
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const ret = useOpenmrsPagination<Visit>(url, pageSize);
+  const ret = useOpenmrsPagination<VisitWithNotesAndDiagnoses | Visit>(url, pageSize);
 
   return ret;
 }

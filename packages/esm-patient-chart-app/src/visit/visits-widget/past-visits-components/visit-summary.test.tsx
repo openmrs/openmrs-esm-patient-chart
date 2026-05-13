@@ -5,12 +5,19 @@ import { ExtensionSlot, getConfig, getDefaultsFromConfigSchema, useConfig } from
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
 import { mockPatient } from 'tools';
 import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
+import { useVisitByUuid } from '../../../patient-chart/patient-chart.resources';
 import VisitSummary from './visit-summary.component';
 
 const mockExtensionSlot = ExtensionSlot as jest.Mock;
 const mockGetConfig = jest.mocked(getConfig);
 const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
+
+jest.mock('../../../patient-chart/patient-chart.resources', () => ({
+  useVisitByUuid: jest.fn(),
+}));
+
+const mockUseVisitByUuid = useVisitByUuid as jest.Mock;
 
 describe('VisitSummary', () => {
   beforeEach(() => {
@@ -20,6 +27,7 @@ describe('VisitSummary', () => {
       notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
       visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     });
+    mockUseVisitByUuid.mockReturnValue({ visit: null, isLoading: false });
   });
 
   it('should display empty state for notes, test and medication summary', async () => {
@@ -100,5 +108,18 @@ describe('VisitSummary', () => {
     await user.click(testsTab);
 
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+  });
+
+  it('should trigger full visit fetch when switching to Tests tab', async () => {
+    const user = userEvent.setup();
+    const mockVisit = visitOverviewDetailMockData.data.results[0];
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    expect(mockUseVisitByUuid).toHaveBeenCalledWith(null, expect.any(String));
+
+    const testsTab = screen.getByRole('tab', { name: /Tests/i });
+    await user.click(testsTab);
+
+    expect(mockUseVisitByUuid).toHaveBeenCalledWith(mockVisit.uuid, expect.any(String));
   });
 });

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
@@ -15,8 +15,9 @@ import {
 } from '@openmrs/esm-framework';
 import type { ChartConfig } from '../../../config-schema';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import type { Note, Order, OrderItem } from '../visit.resource';
+import { customRepresentation, type Note, type Order, type OrderItem } from '../visit.resource';
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
+import { useVisitByUuid } from '../../../patient-chart/patient-chart.resources';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -36,6 +37,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
+  const [shouldFetchFullVisit, setShouldFetchFullVisit] = useState(false);
+  const { visit: fullVisit } = useVisitByUuid(shouldFetchFullVisit ? visit.uuid : null, customRepresentation);
+
+  const activeVisit = fullVisit || visit;
 
   const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -45,7 +50,25 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     // Notes Tab
     const notes: Array<Note> = [];
 
-    visit?.encounters?.forEach((enc) => {
+    if ((activeVisit as any).diagnoses) {
+      diagnoses.push(...(activeVisit as any).diagnoses);
+    }
+
+    if ((activeVisit as any).visitNotes) {
+      (activeVisit as any).visitNotes.forEach((obs) => {
+        notes.push({
+          note: obs.value as string,
+          provider: {
+            name: '', // Lightweight API doesn't provide provider for notes directly
+            role: '',
+          },
+          time: obs.obsDatetime ? formatTime(parseDate(obs.obsDatetime)) : '',
+          concept: obs.concept,
+        });
+      });
+    }
+
+    activeVisit?.encounters?.forEach((enc) => {
       if (enc.hasOwnProperty('orders')) {
         medications.push(
           ...enc.orders.map((order: Order) => ({
@@ -62,7 +85,12 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       if (enc.hasOwnProperty('diagnoses')) {
         if (enc.diagnoses.length > 0) {
           const validDiagnoses = enc.diagnoses.filter((diagnosis) => !diagnosis.voided);
-          diagnoses.push(...validDiagnoses);
+          // Avoid duplicates if we already have diagnoses from the visit object
+          validDiagnoses.forEach((diag) => {
+            if (!diagnoses.some((d) => d.uuid === diag.uuid)) {
+              diagnoses.push(diag as any);
+            }
+          });
         }
       }
 
@@ -70,16 +98,20 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       if (enc.hasOwnProperty('obs')) {
         enc.obs.forEach((obs) => {
           if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
-            // Putting all notes in a single array.
-            notes.push({
-              note: obs.value as string, // TODO: add better typing check
-              provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-              },
-              time: enc.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
-              concept: obs.concept,
-            });
+            const isDuplicate = notes.some(
+              (n) => n.note === obs.value && n.time === formatTime(parseDate(enc.encounterDatetime)),
+            );
+            if (!isDuplicate) {
+              notes.push({
+                note: obs.value as string,
+                provider: {
+                  name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                  role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+                },
+                time: enc.encounterDatetime ? formatTime(parseDate(enc.encounterDatetime)) : '',
+                concept: obs.concept,
+              });
+            }
           }
         });
       }
@@ -92,9 +124,12 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
 
     return [diagnoses, notes, medications];
-  }, [config.notesConceptUuids, visit?.encounters]);
+  }, [config.notesConceptUuids, activeVisit]);
 
-  const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
+  const encounterIds = useMemo(
+    () => activeVisit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [],
+    [activeVisit?.encounters],
+  );
 
   const testsFilter = useMemo<ExternalOverviewProps['filter']>(
     () =>
@@ -104,8 +139,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   );
 
   const hasCompletedForms = useMemo(
-    () => visit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
-    [visit?.encounters],
+    () => activeVisit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
+    [activeVisit?.encounters],
   );
 
   return (
@@ -120,7 +155,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <Tabs>
+      <Tabs
+        onChange={({ selectedIndex }) => {
+          if (selectedIndex >= 2) {
+            setShouldFetchFullVisit(true);
+          }
+        }}
+      >
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
             {t('timeline', 'Timeline')}
@@ -132,23 +173,31 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" disabled={encounterIds.length === 0 && config.disableEmptyTabs}>
+          <Tab
+            className={styles.tab}
+            id="tests-tab"
+            disabled={shouldFetchFullVisit && encounterIds.length === 0 && config.disableEmptyTabs}
+          >
             {t('tests', 'Tests')}
           </Tab>
           <Tab
             className={styles.tab}
             id="medications-tab"
-            disabled={medications.length <= 0 && config.disableEmptyTabs}
+            disabled={shouldFetchFullVisit && medications.length <= 0 && config.disableEmptyTabs}
           >
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="completed-forms-tab" disabled={!hasCompletedForms && config.disableEmptyTabs}>
+          <Tab
+            className={styles.tab}
+            id="completed-forms-tab"
+            disabled={shouldFetchFullVisit && !hasCompletedForms && config.disableEmptyTabs}
+          >
             {t('completedForms', 'Completed forms')}
           </Tab>
           <Tab
             className={styles.tab}
             id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            disabled={shouldFetchFullVisit && (activeVisit?.encounters?.length ?? 0) <= 0 && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
@@ -163,26 +212,26 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            <VisitTimeline visitUuid={activeVisit.uuid} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
+            <TestsSummary patientUuid={patientUuid} encounters={activeVisit?.encounters} />
           </TabPanel>
           <TabPanel>
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
+            <VisitCompletedFormsTable visit={activeVisit} patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+            <VisitEncountersTable visit={activeVisit} patientUuid={patientUuid} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
-              <Extension state={{ patientUuid, visit }} />
+              <Extension state={{ patientUuid, visit: activeVisit }} />
             </TabPanel>
           </ExtensionSlot>
         </TabPanels>
