@@ -31,7 +31,8 @@ interface VisitHistoryTableProps {
 }
 
 /**
- * This show a list of visit histories in the visit tab in patient chart
+ * This shows a list of visit histories in the visit tab in patient chart.
+ * Full visit data is fetched on-demand when a row is expanded (handled by VisitSummary).
  */
 const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
@@ -110,6 +111,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
+                            {/* VisitSummary will fetch full visit data on-demand */}
                             <VisitSummary visit={visit} patientUuid={patientUuid} />
                           </TableExpandedRow>
                         ) : (
