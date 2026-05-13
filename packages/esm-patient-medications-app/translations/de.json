@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Die Route ist erforderlich",
   "selectUnitErrorMessage": "Dosierungseinheit ist erforderlich",
   "startDate": "Startdatum",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Kategorien",
   "takeAsNeeded": "Nach Bedarf einnehmen",
   "tryReopeningTheForm": "Bitte versuchen Sie erneut, das Formular zu öffnen",

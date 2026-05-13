@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Route is required",
   "selectUnitErrorMessage": "Dose unit is required",
   "startDate": "تاريخ البداية",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "خذ حسب الحاجة",
   "tryReopeningTheForm": "يرجى محاولة فتح النموذج مرة أخرى",
