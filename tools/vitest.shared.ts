@@ -7,7 +7,7 @@ export default defineConfig({
     alias: [{ find: /^.*\.s?css$/, replacement: 'identity-obj-proxy' }],
   },
   test: {
-    environment: 'jsdom',
+    environment: 'happy-dom',
     globals: true,
     clearMocks: true,
     testTimeout: 30000,

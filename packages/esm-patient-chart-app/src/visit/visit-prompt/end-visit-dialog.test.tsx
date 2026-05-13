@@ -1,3 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` and `AbortController` instances do not satisfy
+ * `instanceof` against the host realm's constructors, which breaks
+ * `expect.any(Date)` and `toHaveBeenCalledWith(new AbortController(), ...)`
+ * matchers used here. Run under jsdom (which shares the host realm's globals).
+ */
 import React from 'react';
 import { vi, describe, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';

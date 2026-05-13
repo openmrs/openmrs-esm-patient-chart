@@ -1,3 +1,10 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` instances do not satisfy `instanceof Date` against
+ * the host realm's `Date` constructor, which breaks `expect.any(Date)`
+ * matchers on order payloads built with `new Date()` in production code.
+ */
 /* eslint-disable testing-library/no-node-access */
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import React from 'react';
