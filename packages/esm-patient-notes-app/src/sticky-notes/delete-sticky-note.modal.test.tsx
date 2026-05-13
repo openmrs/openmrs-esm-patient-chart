@@ -1,22 +1,23 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { deleteStickyNote } from './sticky-note.resource';
 import DeleteStickyNoteModal from './delete-sticky-note.modal';
 
-jest.mock('./sticky-note.resource', () => ({
-  deleteStickyNote: jest.fn(),
+vi.mock('./sticky-note.resource', () => ({
+  deleteStickyNote: vi.fn(),
 }));
 
-const mockDeleteStickyNote = jest.mocked(deleteStickyNote);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockDeleteStickyNote = vi.mocked(deleteStickyNote);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
 const defaultProps = {
-  close: jest.fn(),
+  close: vi.fn(),
   noteUuid: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-  mutate: jest.fn(),
-  onClose: jest.fn(),
+  mutate: vi.fn(),
+  onClose: vi.fn(),
 };
 
 describe('DeleteStickyNoteModal', () => {

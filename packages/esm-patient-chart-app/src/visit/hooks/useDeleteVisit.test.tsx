@@ -1,4 +1,5 @@
 import { useSWRConfig } from 'swr';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { showSnackbar, type Visit } from '@openmrs/esm-framework';
 import {
@@ -9,34 +10,34 @@ import {
 import { useDeleteVisit } from './useDeleteVisit';
 import { deleteVisit, restoreVisit } from '../visits-widget/visit.resource';
 
-jest.mock('swr', () => ({
-  useSWRConfig: jest.fn(),
+vi.mock('swr', () => ({
+  useSWRConfig: vi.fn(),
 }));
 
-jest.mock('../visits-widget/visit.resource', () => {
-  const original = jest.requireActual('../visits-widget/visit.resource');
+vi.mock('../visits-widget/visit.resource', async () => {
+  const original = (await vi.importActual('../visits-widget/visit.resource')) as object;
   return {
     ...original,
-    deleteVisit: jest.fn(),
-    restoreVisit: jest.fn(),
+    deleteVisit: vi.fn(),
+    restoreVisit: vi.fn(),
   };
 });
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  invalidateCurrentVisit: jest.fn(),
-  invalidateVisitAndEncounterData: jest.fn(),
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', () => ({
+  invalidateCurrentVisit: vi.fn(),
+  invalidateVisitAndEncounterData: vi.fn(),
+  usePatientChartStore: vi.fn(),
 }));
 
-const mockDeleteVisit = jest.mocked(deleteVisit);
-const mockRestoreVisit = jest.mocked(restoreVisit);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseSWRConfig = jest.mocked(useSWRConfig);
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
-const mockInvalidateVisitAndEncounterData = jest.mocked(invalidateVisitAndEncounterData);
+const mockDeleteVisit = vi.mocked(deleteVisit);
+const mockRestoreVisit = vi.mocked(restoreVisit);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseSWRConfig = vi.mocked(useSWRConfig);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
+const mockInvalidateVisitAndEncounterData = vi.mocked(invalidateVisitAndEncounterData);
 
-const mockGlobalMutate = jest.fn();
-const mockSetVisitContext = jest.fn();
+const mockGlobalMutate = vi.fn();
+const mockSetVisitContext = vi.fn();
 
 const mockVisitType = {
   uuid: 'visit-type-123',
@@ -64,8 +65,8 @@ describe('useDeleteVisit', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: jest.fn(),
-      setPatient: jest.fn(),
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
 
@@ -77,7 +78,7 @@ describe('useDeleteVisit', () => {
 
   it('should delete visit successfully and trigger revalidation', async () => {
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
-    const onVisitDelete = jest.fn();
+    const onVisitDelete = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
 
@@ -103,7 +104,7 @@ describe('useDeleteVisit', () => {
 
   it('should handle delete error and trigger revalidation', async () => {
     mockDeleteVisit.mockRejectedValue(new Error('Delete failed'));
-    const onVisitDelete = jest.fn();
+    const onVisitDelete = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
 
@@ -124,7 +125,7 @@ describe('useDeleteVisit', () => {
 
   it('should restore visit successfully when undo is clicked', async () => {
     mockRestoreVisit.mockResolvedValue({ data: {} } as any);
-    const onVisitRestore = jest.fn();
+    const onVisitRestore = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
@@ -138,13 +139,13 @@ describe('useDeleteVisit', () => {
     const restoreFunction = mockShowSnackbar.mock.calls[0][0].onActionButtonClick;
 
     // Clear mocks to test restore independently
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: jest.fn(),
-      setPatient: jest.fn(),
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
     mockUseSWRConfig.mockReturnValue({
@@ -171,7 +172,7 @@ describe('useDeleteVisit', () => {
 
   it('should handle restore error and trigger revalidation', async () => {
     mockRestoreVisit.mockRejectedValue(new Error('Restore failed'));
-    const onVisitRestore = jest.fn();
+    const onVisitRestore = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
@@ -184,13 +185,13 @@ describe('useDeleteVisit', () => {
     const restoreFunction = mockShowSnackbar.mock.calls[0][0].onActionButtonClick;
 
     // Clear mocks to test restore independently
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: jest.fn(),
-      setPatient: jest.fn(),
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
       setVisitContext: mockSetVisitContext,
     });
     mockUseSWRConfig.mockReturnValue({

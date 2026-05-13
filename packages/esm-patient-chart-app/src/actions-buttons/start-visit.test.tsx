@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
@@ -6,7 +7,7 @@ import { mockPatient } from 'tools';
 import StartVisitOverflowMenuItem from './start-visit.component';
 import { object } from 'zod';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 describe('StartVisitOverflowMenuItem', () => {
   it('should launch the start visit form', async () => {

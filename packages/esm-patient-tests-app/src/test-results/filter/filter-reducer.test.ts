@@ -1,4 +1,5 @@
 import reducer from './filter-reducer';
+import { vi, describe, it, expect } from 'vitest';
 import { ReducerActionType, type ReducerState, type TreeNode } from './filter-types';
 
 describe('filterReducer', () => {
