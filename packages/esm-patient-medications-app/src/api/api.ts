@@ -176,7 +176,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
     };
   } else if (order.action === 'RENEW') {
     return {
-      action: 'NEW',
+      action: 'RENEW',
       previousOrder: order.previousOrder,
       patient: patientUuid,
       type: 'drugorder',
