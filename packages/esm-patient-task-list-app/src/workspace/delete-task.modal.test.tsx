@@ -1,16 +1,17 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { deleteTask, type Task } from './task-list.resource';
 import DeleteTaskModal from './delete-task.modal';
 
-const mockDeleteTask = jest.mocked(deleteTask);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockDeleteTask = vi.mocked(deleteTask);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
-jest.mock('./task-list.resource', () => ({
-  deleteTask: jest.fn(),
-  taskListSWRKey: jest.fn((patientUuid) => `tasks-${patientUuid}`),
+vi.mock('./task-list.resource', () => ({
+  deleteTask: vi.fn(),
+  taskListSWRKey: vi.fn((patientUuid) => `tasks-${patientUuid}`),
 }));
 
 const baseTask: Task = {
@@ -23,15 +24,15 @@ const baseTask: Task = {
 };
 
 const defaultProps = {
-  closeModal: jest.fn(),
+  closeModal: vi.fn(),
   task: baseTask,
   patientUuid: 'patient-uuid-123',
-  onDeleted: jest.fn(),
+  onDeleted: vi.fn(),
 };
 
 describe('DeleteTaskModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the modal with correct elements', () => {
@@ -75,7 +76,7 @@ describe('DeleteTaskModal', () => {
   });
 
   it('shows error snackbar when delete fails', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
     mockDeleteTask.mockRejectedValue(new Error('Network error'));
 

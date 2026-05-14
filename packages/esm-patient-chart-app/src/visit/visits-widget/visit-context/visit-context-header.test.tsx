@@ -1,16 +1,17 @@
 import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { mockCurrentVisit } from '__mocks__';
 import React from 'react';
 import VisitContextHeader from './visit-context-header.extension';
 import { mockPatient } from 'tools';
 
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
-const mockUseSystemVisitSetting = jest.mocked(useSystemVisitSetting);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
+const mockUseSystemVisitSetting = vi.mocked(useSystemVisitSetting);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  usePatientChartStore: jest.fn(),
-  useSystemVisitSetting: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', () => ({
+  usePatientChartStore: vi.fn(),
+  useSystemVisitSetting: vi.fn(),
 }));
 
 describe('VisitContextHeader', () => {
@@ -33,8 +34,8 @@ describe('VisitContextHeader', () => {
       patient: mockPatient,
       visitContext: null,
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
 
     render(<VisitContextHeader patientUuid="some-uuid" />);
@@ -47,8 +48,8 @@ describe('VisitContextHeader', () => {
       patient: mockPatient,
       visitContext: mockCurrentVisit,
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
 
     render(<VisitContextHeader patientUuid={mockPatient.id} />);

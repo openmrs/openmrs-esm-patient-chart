@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, useConfig, useOnClickOutside } from '@openmrs/esm-framework';
@@ -8,16 +9,16 @@ import { type ConfigObject } from '../config-schema';
 import { useStickyNote } from './sticky-note.resource';
 import StickyNoteHeaderButton from './sticky-note-header-button.component';
 
-jest.mock('./sticky-note.resource', () => ({
-  useStickyNote: jest.fn(),
+vi.mock('./sticky-note.resource', () => ({
+  useStickyNote: vi.fn(),
 }));
 
-jest.mock('./sticky-note-panel.component', () => () => <div data-testid="sticky-note-panel" />);
+vi.mock('./sticky-note-panel.component', () => ({ default: () => <div data-testid="sticky-note-panel" /> }));
 
-const mockUseStickyNote = useStickyNote as jest.Mock;
-const mockShowModal = showModal as jest.Mock;
-const mockUseOnClickOutside = useOnClickOutside as jest.Mock;
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseStickyNote = useStickyNote as Mock;
+const mockShowModal = showModal as Mock;
+const mockUseOnClickOutside = useOnClickOutside as Mock;
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 // The framework's jest mock of useOnClickOutside is a no-op. Swap in a minimal real
 // implementation so the "closes on outside click" test can exercise the wiring.
@@ -44,7 +45,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('does not render when stickyNoteConceptUuid is disabled via empty string', () => {
     mockUseConfig.mockReturnValue({ stickyNoteConceptUuid: '' } as ConfigObject);
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
 
     const { container } = render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
 
@@ -53,7 +54,7 @@ describe('StickyNoteHeaderButton', () => {
   });
 
   it('renders a button labelled "Sticky note"', () => {
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
 
@@ -61,7 +62,7 @@ describe('StickyNoteHeaderButton', () => {
   });
 
   it('shows a "1" badge when a note exists', () => {
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
 
@@ -69,7 +70,7 @@ describe('StickyNoteHeaderButton', () => {
   });
 
   it('does not show a badge when no note exists', () => {
-    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: false, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
 
@@ -78,7 +79,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('toggles the panel on click when a note exists', async () => {
     const user = userEvent.setup();
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
     const button = screen.getByRole('button', { name: /sticky note/i });
@@ -92,7 +93,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('opens the create modal on click when no note exists', async () => {
     const user = userEvent.setup();
-    const mutate = jest.fn();
+    const mutate = vi.fn();
     mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: false, error: undefined, mutate });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
@@ -104,7 +105,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('opens the panel (not the create modal) while loading', async () => {
     const user = userEvent.setup();
-    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: true, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: undefined, isLoading: true, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
     await user.click(screen.getByRole('button', { name: /sticky note/i }));
@@ -119,7 +120,7 @@ describe('StickyNoteHeaderButton', () => {
       note: undefined,
       isLoading: false,
       error: new Error('Failed'),
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
@@ -131,7 +132,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('closes the panel on Escape', async () => {
     const user = userEvent.setup();
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
 
     render(<StickyNoteHeaderButton patientUuid={patientUuid} />);
     await user.click(screen.getByRole('button', { name: /sticky note/i }));
@@ -143,7 +144,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('closes the panel on outside click', async () => {
     const user = userEvent.setup();
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
     mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
 
     render(
@@ -161,7 +162,7 @@ describe('StickyNoteHeaderButton', () => {
 
   it('ignores outside clicks that land inside an open modal', async () => {
     const user = userEvent.setup();
-    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: jest.fn() });
+    mockUseStickyNote.mockReturnValue({ note: mockStickyNote, isLoading: false, error: undefined, mutate: vi.fn() });
     mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
 
     render(

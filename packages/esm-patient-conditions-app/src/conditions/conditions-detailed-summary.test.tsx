@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, it, expect, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
@@ -7,8 +8,8 @@ import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 it('renders an empty state view if conditions data is unavailable', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });

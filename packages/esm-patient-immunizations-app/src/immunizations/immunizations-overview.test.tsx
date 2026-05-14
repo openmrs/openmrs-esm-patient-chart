@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import { useFhirFetchAll } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -12,7 +13,7 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseFhirFetchAll = useFhirFetchAll as jest.Mock;
+const mockUseFhirFetchAll = useFhirFetchAll as Mock;
 
 describe('ImmunizationOverview', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
@@ -43,7 +44,7 @@ describe('ImmunizationOverview', () => {
       error,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderWithSwr(<ImmunizationsOverview {...testProps} />);

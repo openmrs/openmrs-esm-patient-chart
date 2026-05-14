@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -13,30 +14,30 @@ import { useTask, saveTask, updateTask, useFetchProviders, useProviderRoles, typ
 import { configSchema, type Config } from '../config-schema';
 
 const emptySystemTasks: never[] = [];
-jest.mock('./task-list.resource', () => ({
-  useTask: jest.fn(),
-  saveTask: jest.fn(),
-  updateTask: jest.fn(),
-  taskListSWRKey: jest.fn((patientUuid) => `tasks-${patientUuid}`),
-  useFetchProviders: jest.fn(),
-  useProviderRoles: jest.fn(),
-  getPriorityLabel: jest.fn((priority) => priority),
-  useSystemTasks: jest.fn(() => ({ systemTasks: emptySystemTasks, isLoading: false })),
+vi.mock('./task-list.resource', () => ({
+  useTask: vi.fn(),
+  saveTask: vi.fn(),
+  updateTask: vi.fn(),
+  taskListSWRKey: vi.fn((patientUuid) => `tasks-${patientUuid}`),
+  useFetchProviders: vi.fn(),
+  useProviderRoles: vi.fn(),
+  getPriorityLabel: vi.fn((priority) => priority),
+  useSystemTasks: vi.fn(() => ({ systemTasks: emptySystemTasks, isLoading: false })),
 }));
 
-const mockUseTask = jest.mocked(useTask);
-const mockSaveTask = jest.mocked(saveTask);
-const mockUpdateTask = jest.mocked(updateTask);
-const mockUseFetchProviders = jest.mocked(useFetchProviders);
-const mockUseProviderRoles = jest.mocked(useProviderRoles);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked(useConfig<Config>);
+const mockUseTask = vi.mocked(useTask);
+const mockSaveTask = vi.mocked(saveTask);
+const mockUpdateTask = vi.mocked(updateTask);
+const mockUseFetchProviders = vi.mocked(useFetchProviders);
+const mockUseProviderRoles = vi.mocked(useProviderRoles);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig<Config>);
 
 const mockActiveVisit = { uuid: 'active-visit-uuid' } as Visit;
 
 describe('AddTaskForm', () => {
   const patientUuid = 'patient-uuid-123';
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
 
   const baseTask: Task = {
     uuid: 'task-uuid-456',
@@ -68,12 +69,12 @@ describe('AddTaskForm', () => {
       task: null,
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockUseFetchProviders.mockReturnValue({
       providers: [],
-      setProviderQuery: jest.fn(),
+      setProviderQuery: vi.fn(),
       isLoading: false,
       error: null,
     });
@@ -159,7 +160,7 @@ describe('AddTaskForm', () => {
         task: taskWithNoDueDate,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(
@@ -212,7 +213,7 @@ describe('AddTaskForm', () => {
         task: baseTask,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
     });
 
@@ -394,7 +395,7 @@ describe('AddTaskForm', () => {
         task: baseTask, // baseTask has dueDate.type = 'DATE'
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(
@@ -440,7 +441,7 @@ describe('AddTaskForm', () => {
         task: taskWithThisVisit,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(
@@ -483,7 +484,7 @@ describe('AddTaskForm', () => {
         task: taskWithNextVisit,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(
@@ -524,7 +525,7 @@ describe('AddTaskForm', () => {
         task: taskWithThisVisit,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       render(
@@ -571,7 +572,7 @@ describe('AddTaskForm', () => {
         task: taskWithRoleAssignee,
         isLoading: false,
         error: null,
-        mutate: jest.fn(),
+        mutate: vi.fn(),
       });
 
       mockUseConfig.mockReturnValue({
