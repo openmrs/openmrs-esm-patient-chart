@@ -33,10 +33,16 @@ const VisitContextSwitcherModal: React.FC<VisitContextSwitcherProps> = ({
   const maxStartDateDebounced = useDebounce(maxStartDate);
 
   const rep = 'custom:(uuid,display,visitType,startDatetime,stopDatetime,location,patient)';
-  const { visits, isLoading, error, hasMore, loadMore } = useInfiniteVisits(
-    patientUuid,
-    { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() },
-    rep,
+  const {
+    visits: rawVisits,
+    isLoading,
+    error,
+    hasMore,
+    loadMore,
+  } = useInfiniteVisits(patientUuid, { toStartDate: dayjs(maxStartDateDebounced).endOf('day').toISOString() }, rep);
+  const visits = React.useMemo(
+    () => rawVisits?.map((v) => ('visit' in v ? (v.visit as Visit) : (v as Visit))),
+    [rawVisits],
   );
   const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
   const [selectedVisitUuid, setSelectedVisitUuid] = useState<string>(visitContext?.uuid ?? null);

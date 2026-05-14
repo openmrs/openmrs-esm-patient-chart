@@ -8,20 +8,20 @@ import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from
 import { useVisitByUuid } from '../../../patient-chart/patient-chart.resources';
 import VisitSummary from './visit-summary.component';
 
-const mockExtensionSlot = ExtensionSlot as jest.Mock;
-const mockGetConfig = jest.mocked(getConfig);
-const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
+const mockExtensionSlot = ExtensionSlot as any;
+const mockGetConfig = (jest as any).mocked(getConfig);
+const mockUseConfig = (jest as any).mocked(useConfig<ChartConfig>);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 jest.mock('../../../patient-chart/patient-chart.resources', () => ({
   useVisitByUuid: jest.fn(),
 }));
 
-const mockUseVisitByUuid = useVisitByUuid as jest.Mock;
+const mockUseVisitByUuid = useVisitByUuid as any;
 
 describe('VisitSummary', () => {
   beforeEach(() => {
-    mockExtensionSlot.mockImplementation((ext) => ext.name);
+    mockExtensionSlot.mockImplementation((ext: any) => ext.name);
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
