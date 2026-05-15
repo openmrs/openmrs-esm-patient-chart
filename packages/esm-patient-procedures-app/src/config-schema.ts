@@ -29,10 +29,10 @@ export const configSchema = {
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   bodySiteConceptUuid: {
-    _type: Type.String,
+    _type: Type.UUID,
     _description:
-      'UUID or concept class name used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
-    _default: 'Anatomy',
+      'UUID used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
+    _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f',
   },
   bodySiteConceptSourceType: {
     _type: Type.String,

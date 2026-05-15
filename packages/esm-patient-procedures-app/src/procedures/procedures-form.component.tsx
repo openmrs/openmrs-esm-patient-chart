@@ -132,6 +132,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     uuid: statusConceptUuid,
     sourceType: statusConceptSourceType,
   });
+  // Deduplicate results by UUID. The OpenMRS REST API can sometimes return duplicate concepts in searches.
+  // This prevents Carbon ComboBox from throwing key errors.
   const statusOptions = useMemo(() => {
     const map = new Map<string, ConceptReference>();
     rawStatusOptions.forEach((option) => map.set(option.uuid, option));
@@ -142,6 +144,8 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     uuid: durationUnitConceptUuid,
     sourceType: durationUnitConceptSourceType,
   });
+
+  // Deduplicate duration unit results identically to statusOptions above
   const durationUnitOptions = useMemo(() => {
     const map = new Map<string, ConceptReference>();
     rawDurationUnitOptions.forEach((option) => map.set(option.uuid, option));
