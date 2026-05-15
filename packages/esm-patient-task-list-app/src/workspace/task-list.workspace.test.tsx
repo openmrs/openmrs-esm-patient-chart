@@ -133,4 +133,63 @@ describe('TaskListWorkspace', () => {
 
     expect(screen.getByTestId('task-details-view')).toBeInTheDocument();
   });
+
+  it('renders the add-task-form (not edit-task-form) in create mode', async () => {
+    const user = userEvent.setup();
+
+    render(<TaskListWorkspace {...(defaultProps as any)} />);
+
+    await user.click(screen.getByRole('button', { name: /add task/i }));
+
+    expect(screen.getByTestId('add-task-form')).toBeInTheDocument();
+    expect(screen.queryByTestId('edit-task-form')).not.toBeInTheDocument();
+  });
+
+  it('returns to list when AddTaskForm calls onClose from the form view', async () => {
+    const user = userEvent.setup();
+
+    render(<TaskListWorkspace {...(defaultProps as any)} />);
+
+    await user.click(screen.getByRole('button', { name: /add task/i }));
+    expect(screen.getByTestId('add-task-form')).toBeInTheDocument();
+
+    // The mock add-task-form exposes a "Form back" button wired to onClose
+    await user.click(screen.getByRole('button', { name: 'Form back' }));
+
+    expect(screen.getByTestId('task-list-view')).toBeInTheDocument();
+    expect(screen.queryByTestId('add-task-form')).not.toBeInTheDocument();
+  });
+
+  it('returns to list when TaskDetailsView calls onBack', async () => {
+    const user = userEvent.setup();
+
+    render(<TaskListWorkspace {...(defaultProps as any)} />);
+
+    await user.click(screen.getByText('Mock Task'));
+    expect(screen.getByTestId('task-details-view')).toBeInTheDocument();
+
+    // The mock task-details-view exposes a "Details back" button wired to onBack
+    await user.click(screen.getByRole('button', { name: 'Details back' }));
+
+    expect(screen.getByTestId('task-list-view')).toBeInTheDocument();
+    expect(screen.queryByTestId('task-details-view')).not.toBeInTheDocument();
+  });
+
+  it('returns to details when the edit form calls onClose', async () => {
+    const user = userEvent.setup();
+
+    render(<TaskListWorkspace {...(defaultProps as any)} />);
+
+    // Navigate to edit: list -> details -> edit
+    await user.click(screen.getByText('Mock Task'));
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByTestId('edit-task-form')).toBeInTheDocument();
+
+    // The mock add-task-form exposes a "Form back" button wired to onClose;
+    // in edit mode the workspace's handleEditComplete returns to the details view
+    await user.click(screen.getByRole('button', { name: 'Form back' }));
+
+    expect(screen.getByTestId('task-details-view')).toBeInTheDocument();
+    expect(screen.queryByTestId('edit-task-form')).not.toBeInTheDocument();
+  });
 });
