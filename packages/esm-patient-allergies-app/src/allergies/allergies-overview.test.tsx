@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -6,7 +7,7 @@ import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AllergiesOverview from './allergies-overview.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as Mock;
 
 describe('AllergiesOverview', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {

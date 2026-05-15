@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Route is required",
   "selectUnitErrorMessage": "Dose unit is required",
   "startDate": "תאריך התחלה",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "לקחת כפי הצורך",
   "tryReopeningTheForm": "נסה לפתוח את הטופס שוב",

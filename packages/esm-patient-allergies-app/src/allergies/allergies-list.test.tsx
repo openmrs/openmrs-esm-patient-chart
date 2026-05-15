@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
@@ -6,15 +7,15 @@ import AllergyList from './allergies-list.extension';
 import { patientAllergiesFormWorkspace } from '../constants';
 import { type Allergy } from '../types';
 
-const mockUseAllergies = jest.fn();
-const mockLaunchWorkspace2 = launchWorkspace2 as jest.Mock;
+const mockUseAllergies = vi.fn();
+const mockLaunchWorkspace2 = launchWorkspace2 as Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  launchWorkspace2: jest.fn(),
+vi.mock('@openmrs/esm-framework', async () => ({
+  ...((await vi.importActual('@openmrs/esm-framework')) as object),
+  launchWorkspace2: vi.fn(),
 }));
 
-jest.mock('./allergy-intolerance.resource', () => ({
+vi.mock('./allergy-intolerance.resource', () => ({
   useAllergies: (...args) => mockUseAllergies(...args),
 }));
 
@@ -70,7 +71,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: true,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
@@ -83,7 +84,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
@@ -98,7 +99,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
@@ -115,7 +116,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
@@ -134,7 +135,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 
@@ -155,7 +156,7 @@ describe('AllergyList', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<AllergyList patientUuid="patient-uuid" />);
 

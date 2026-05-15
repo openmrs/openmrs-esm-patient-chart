@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { type GroupedObservation } from '../../types';
 import IndividualResultsTable from './individual-results-table.component';

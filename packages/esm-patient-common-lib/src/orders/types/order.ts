@@ -252,6 +252,12 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   isFreeTextDosage: boolean;
   freeTextDosage: string;
   previousOrder?: string;
+  /**
+   * The dateActivated of the order being revised. Set by buildMedicationOrder for
+   * REVISE so the form can enforce dateActivated > previousOrderDateActivated (the
+   * backend computes previous.dateStopped = new.dateActivated - 1s).
+   */
+  previousOrderDateActivated?: string;
   template?: OrderTemplate;
 }
 

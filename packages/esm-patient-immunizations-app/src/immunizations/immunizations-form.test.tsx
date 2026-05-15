@@ -1,7 +1,15 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` instances do not satisfy `instanceof Date` against
+ * the host realm's `Date` constructor, which breaks `expect.objectContaining`
+ * matchers on form payloads that production code builds with `new Date()`.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -17,20 +25,24 @@ import { mockCurrentVisit, mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { savePatientImmunization } from './immunizations.resource';
 import { FHIR_NEXT_DOSE_DATE_EXTENSION_URL } from './immunization-mapper';
+import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsForm from './immunizations-form.workspace';
 
-const mockCloseWorkspace = jest.fn();
-const mockCloseWorkspaceWithSavedChanges = jest.fn();
-const mockPromptBeforeClosing = jest.fn();
-const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
-const mockSetTitle = jest.fn();
-const mockUseConfig = jest.mocked<() => ImmunizationConfigObject>(useConfig);
-const mockUseSession = jest.mocked(useSession);
-const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
-const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
+const mockCloseWorkspace = vi.fn();
+const mockSavePatientImmunization = savePatientImmunization as Mock;
+const mockUseConfig = vi.mocked<() => ImmunizationConfigObject>(useConfig);
+const mockUseSession = vi.mocked(useSession);
+const mockToOmrsIsoString = vi.mocked(toOmrsIsoString);
+const mockToDateObjectStrict = vi.mocked(toDateObjectStrict);
 
-jest.mock('../hooks/useImmunizationsConceptSet', () => ({
-  useImmunizationsConceptSet: jest.fn(() => ({
+vi.mock('../hooks/useImmunizations', () => ({
+  useImmunizations: vi.fn(),
+}));
+
+const mockUseImmunizations = vi.mocked(useImmunizations);
+
+vi.mock('../hooks/useImmunizationsConceptSet', () => ({
+  useImmunizationsConceptSet: vi.fn(() => ({
     immunizationsConceptSet: {
       uuid: '984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       display: 'Immunizations',
@@ -61,8 +73,8 @@ jest.mock('../hooks/useImmunizationsConceptSet', () => ({
   })),
 }));
 
-jest.mock('./immunizations.resource', () => ({
-  savePatientImmunization: jest.fn(),
+vi.mock('./immunizations.resource', () => ({
+  savePatientImmunization: vi.fn(),
 }));
 
 const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
@@ -74,7 +86,7 @@ const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {},
   windowProps: {},
   windowName: '',
@@ -109,6 +121,13 @@ describe('Immunizations Form', () => {
   beforeEach(() => {
     mockToOmrsIsoString.mockReturnValue(mockVaccinationDate.toISOString());
     mockToDateObjectStrict.mockImplementation((dateString) => dayjs(dateString, isoFormat).toDate());
+    mockUseImmunizations.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
   });
 
   it('should render ImmunizationsForm component', async () => {
@@ -455,6 +474,123 @@ describe('Immunizations Form', () => {
         expirationDate: '2026-06-15', // Date-only format, not ISO string with time/timezone
       }),
       immunizationToEdit.immunizationId,
+      expect.any(AbortController),
+    );
+  });
+
+  it('should warn (without blocking save) when a duplicate dose is entered for the same vaccine', async () => {
+    const user = userEvent.setup();
+
+    mockUseImmunizations.mockReturnValue({
+      data: [
+        {
+          vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          vaccineName: 'Hepatitis B vaccination',
+          existingDoses: [
+            {
+              immunizationObsUuid: 'existing-uuid',
+              occurrenceDateTime: '2026-04-24T00:00:00.000Z',
+              doseNumber: 1,
+              note: [],
+              visitUuid: 'visit-uuid',
+              expirationDate: null,
+              nextDoseDate: null,
+              lotNumber: '',
+              manufacturer: '',
+            },
+          ],
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: { id: 'new-immunization-id' },
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+    await selectOption(vaccineField, 'Hepatitis B vaccination');
+
+    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+    await user.clear(doseField);
+    await user.type(doseField, '1');
+
+    // Inline warning is shown on the form (not in a snackbar) once the duplicate is detected
+    expect(screen.getByText(/Dose 1 has already been recorded for this vaccine/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Save/i }));
+
+    // Save proceeds — the warning is non-blocking
+    expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
+  });
+
+  it('should allow re-saving when editing an existing immunization record', async () => {
+    const user = userEvent.setup();
+
+    mockUseImmunizations.mockReturnValue({
+      data: [
+        {
+          vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          vaccineName: 'Hepatitis B vaccination',
+          existingDoses: [
+            {
+              immunizationObsUuid: 'existing-uuid',
+              occurrenceDateTime: '2026-04-24T00:00:00.000Z',
+              doseNumber: 1,
+              note: [],
+              visitUuid: 'visit-uuid',
+              expirationDate: null,
+              nextDoseDate: null,
+              lotNumber: '',
+              manufacturer: '',
+            },
+          ],
+        },
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    mockSavePatientImmunization.mockResolvedValue({
+      status: 201,
+      ok: true,
+      data: { id: 'existing-uuid' },
+    });
+
+    // Simulate editing the existing record — same UUID as existing dose
+    immunizationFormSub.next({
+      immunizationId: 'existing-uuid',
+      visitId: 'visit-uuid',
+      vaccineUuid: '782AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      vaccinationDate: '2026-04-24',
+      doseNumber: 1,
+      note: '',
+      expirationDate: null,
+      nextDoseDate: null,
+      lotNumber: '',
+      manufacturer: '',
+    });
+
+    render(<ImmunizationsForm {...testProps} />);
+
+    await user.click(screen.getByRole('button', { name: /Save/i }));
+
+    // Should NOT show duplicate error — we're editing the same record
+    expect(screen.queryByText(/has already been recorded/i)).not.toBeInTheDocument();
+
+    // Should allow save with the edit UUID
+    expect(mockSavePatientImmunization).toHaveBeenCalledWith(
+      expect.anything(),
+      'existing-uuid',
       expect.any(AbortController),
     );
   });

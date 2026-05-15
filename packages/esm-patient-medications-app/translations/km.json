@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Route is required",
   "selectUnitErrorMessage": "Dose unit is required",
   "startDate": "ថ្ងៃចាប់ផ្តើម",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "យកតាមតម្រូវការ",
   "tryReopeningTheForm": "សូមព្យាយាមបើកទម្រង់នេះម្តងទៀត",

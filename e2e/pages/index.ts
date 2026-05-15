@@ -8,5 +8,6 @@ export * from './orders-page';
 export * from './program-page';
 export * from './mark-patient-deceased-page';
 export * from './results-viewer-page';
+export * from './task-list-page';
 export * from './visits-page';
 export * from './vitals-and-biometrics-page';

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { renderTag } from './tag.component';
 import { type ConfigConcepts, type Encounter, type Observation } from '../types';
