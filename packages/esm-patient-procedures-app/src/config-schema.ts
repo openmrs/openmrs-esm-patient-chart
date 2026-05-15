@@ -29,29 +29,27 @@ export const configSchema = {
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   bodySiteConceptUuid: {
-    _type: Type.UUID,
+    _type: Type.String,
     _description:
-      'UUID used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
-    _default: '',
+      'UUID or concept class name used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
+    _default: 'Anatomy',
   },
   bodySiteConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'any',
+    _default: 'conceptClass',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
-  // TODO: Update the following value once the concept set is available, currently using
-  //  https://app.openconceptlab.org/#/orgs/CIEL/sources/CIEL/concepts/168857/ for demo
   statusConceptUuid: {
     _type: Type.UUID,
     _description:
       'UUID used to constrain the procedure-status concept search. Its meaning is determined by `statusConceptSourceType`.',
-    _default: '365b8d02-2786-4ac4-a8b6-2bb4f22e4bc2',
+    _default: '167157AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   statusConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'answerTo',
+    _default: 'conceptSet',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   durationUnitConceptUuid: {

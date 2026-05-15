@@ -128,14 +128,25 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     { uuid: bodySiteConceptUuid, sourceType: bodySiteConceptSourceType },
     getValues('bodySite'),
   );
-  const { searchResults: statusOptions } = useConceptSearch('', {
+  const { searchResults: rawStatusOptions } = useConceptSearch('', {
     uuid: statusConceptUuid,
     sourceType: statusConceptSourceType,
   });
-  const { searchResults: durationUnitOptions } = useConceptSearch('', {
+  const statusOptions = useMemo(() => {
+    const map = new Map<string, ConceptReference>();
+    rawStatusOptions.forEach((option) => map.set(option.uuid, option));
+    return Array.from(map.values());
+  }, [rawStatusOptions]);
+
+  const { searchResults: rawDurationUnitOptions } = useConceptSearch('', {
     uuid: durationUnitConceptUuid,
     sourceType: durationUnitConceptSourceType,
   });
+  const durationUnitOptions = useMemo(() => {
+    const map = new Map<string, ConceptReference>();
+    rawDurationUnitOptions.forEach((option) => map.set(option.uuid, option));
+    return Array.from(map.values());
+  }, [rawDurationUnitOptions]);
 
   const [errorSaving, setErrorSaving] = useState(null);
 
