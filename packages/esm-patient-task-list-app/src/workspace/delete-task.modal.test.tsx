@@ -1,17 +1,22 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
 import { deleteTask, type Task } from './task-list.resource';
 import DeleteTaskModal from './delete-task.modal';
 
 const mockDeleteTask = vi.mocked(deleteTask);
 const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockSWRMutate = vi.fn();
 
 vi.mock('./task-list.resource', () => ({
   deleteTask: vi.fn(),
   taskListSWRKey: vi.fn((patientUuid) => `tasks-${patientUuid}`),
+}));
+
+vi.mock('swr', () => ({
+  useSWRConfig: () => ({ mutate: mockSWRMutate }),
 }));
 
 const baseTask: Task = {
@@ -96,5 +101,44 @@ describe('DeleteTaskModal', () => {
     expect(defaultProps.onDeleted).not.toHaveBeenCalled();
 
     consoleSpy.mockRestore();
+  });
+
+  it('mutates the SWR cache after successful deletion', async () => {
+    const user = userEvent.setup();
+    mockDeleteTask.mockResolvedValue({} as any);
+
+    render(<DeleteTaskModal {...defaultProps} />);
+
+    await user.click(screen.getByRole('button', { name: new RegExp(getCoreTranslation('delete'), 'i') }));
+
+    await waitFor(() => {
+      expect(mockSWRMutate).toHaveBeenCalledWith(`tasks-${defaultProps.patientUuid}`);
+    });
+  });
+
+  it('shows a loading state while deletion is in progress', async () => {
+    const user = userEvent.setup();
+    // Return a promise that never resolves to keep the loading state visible
+    mockDeleteTask.mockReturnValue(new Promise(() => {}));
+
+    render(<DeleteTaskModal {...defaultProps} />);
+
+    await user.click(screen.getByRole('button', { name: new RegExp(getCoreTranslation('delete'), 'i') }));
+
+    expect(await screen.findByText(/deleting/i)).toBeInTheDocument();
+  });
+
+  it('disables the Delete button while deletion is in progress', async () => {
+    const user = userEvent.setup();
+    mockDeleteTask.mockReturnValue(new Promise(() => {}));
+
+    render(<DeleteTaskModal {...defaultProps} />);
+
+    const deleteButton = screen.getByRole('button', { name: new RegExp(getCoreTranslation('delete'), 'i') });
+    await user.click(deleteButton);
+
+    await waitFor(() => {
+      expect(deleteButton).toBeDisabled();
+    });
   });
 });

@@ -244,4 +244,80 @@ describe('TaskListView', () => {
       );
     });
   });
+
+  it('falls back to the assignee uuid when display is missing', () => {
+    const taskWithMissingDisplay: Task = {
+      ...baseTasks[0],
+      assignee: { uuid: 'prov-uuid-only', display: undefined, type: 'person' },
+    };
+
+    mockUseTaskList.mockReturnValue({
+      tasks: [taskWithMissingDisplay],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<TaskListView patientUuid={patientUuid} />);
+
+    expect(screen.getByText('prov-uuid-only')).toBeInTheDocument();
+  });
+
+  it('does not render a priority tag when the task has no priority', () => {
+    mockUseTaskList.mockReturnValue({
+      tasks: [baseTasks[1]], // baseTasks[1] has no priority
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<TaskListView patientUuid={patientUuid} />);
+
+    expect(screen.queryByText('high')).not.toBeInTheDocument();
+    expect(screen.queryByText('medium')).not.toBeInTheDocument();
+    expect(screen.queryByText('low')).not.toBeInTheDocument();
+  });
+
+  it('does not show the overdue tag for tasks due today', () => {
+    const dueTodayTask: Task = {
+      ...baseTasks[0],
+      dueDate: {
+        type: 'DATE',
+        // The system clock is set to 2024-01-15T12:00:00Z in beforeEach
+        date: new Date('2024-01-15T00:00:00Z'),
+      },
+    };
+
+    mockUseTaskList.mockReturnValue({
+      tasks: [dueTodayTask],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<TaskListView patientUuid={patientUuid} />);
+
+    expect(screen.queryByText(/overdue/i)).not.toBeInTheDocument();
+  });
+
+  it('unchecks a completed task when its checkbox is toggled', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const completedTask: Task = { ...baseTasks[0], completed: true };
+    mockSetTaskStatusCompleted.mockResolvedValue({} as any);
+
+    mockUseTaskList.mockReturnValue({
+      tasks: [completedTask],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+
+    render(<TaskListView patientUuid={patientUuid} />);
+
+    await user.click(screen.getByRole('checkbox'));
+
+    await waitFor(() => {
+      expect(mockSetTaskStatusCompleted).toHaveBeenCalledWith(patientUuid, completedTask, false);
+    });
+  });
 });
