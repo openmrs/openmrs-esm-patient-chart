@@ -294,12 +294,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                       ? t(
                           'duplicateActiveConditionSubtitle',
                           "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
-                          { conditionName: selectedCondition.display },
+                          { conditionName: selectedCondition.display, interpolation: { escapeValue: false } },
                         )
                       : t(
                           'duplicateInactiveConditionSubtitle',
                           '{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.',
-                          { conditionName: selectedCondition.display },
+                          { conditionName: selectedCondition.display, interpolation: { escapeValue: false } },
                         )
                   }
                 />
