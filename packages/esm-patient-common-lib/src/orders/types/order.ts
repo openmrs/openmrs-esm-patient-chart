@@ -237,8 +237,8 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   quantityUnits: QuantityUnit | null;
   patientInstructions: string | null;
   asNeeded: boolean;
-  asNeededCondition: string;
-  durationUnit: DurationUnit;
+  asNeededCondition: string | null;
+  durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
   numRefills: number | null;
