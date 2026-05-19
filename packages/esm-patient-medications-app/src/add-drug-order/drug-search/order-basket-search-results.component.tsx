@@ -14,7 +14,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { prepMedicationOrderPostData, usePatientOrders } from '../../api';
+import { prepMedicationOrderPostData, useMedicationOrders } from '../../api';
 import { ordersEqual } from './helpers';
 import {
   type DrugSearchResult,
@@ -147,7 +147,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   );
   // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { activeOrders, futureOrders, isLoading: isLoadingOrders } = usePatientOrders(patient.id);
+  const { activeOrders, futureOrders, isLoading: isLoadingOrders } = useMedicationOrders(patient.id);
   const allOrders = activeOrders.concat(futureOrders);
   const drugAlreadyPrescribed = useMemo(
     () => allOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
@@ -240,6 +240,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                   <ShoppingCartArrowDownIcon size={16} {...props} />
                 )}
                 onClick={() => addToBasket(orderItem)}
+                disabled={drugAlreadyPrescribed}
               >
                 {t('directlyAddToBasket', 'Add to basket')}
               </Button>
@@ -248,6 +249,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
               onClick={() => openOrderForm(orderItem)}
+              disabled={drugAlreadyPrescribed}
             >
               {t('goToDrugOrderForm', 'Order form')}
             </Button>

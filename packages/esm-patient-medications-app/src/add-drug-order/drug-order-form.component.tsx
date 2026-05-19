@@ -49,7 +49,6 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { usePatientOrders } from '../api';
 import styles from './drug-order-form.scss';
 import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
