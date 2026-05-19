@@ -41,7 +41,7 @@ function sortOrdersByScheduledDate(orders: Order[]) {
  *
  * @param patientUuid The UUID of the patient whoose orders should be fetched.
  */
-export function usePatientOrders(patientUuid: string) {
+export function useMedicationOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
   const ordersUrl = useMemo(
     () =>

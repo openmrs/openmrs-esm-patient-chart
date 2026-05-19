@@ -16,7 +16,7 @@ import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orde
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 // Import the hooks to be mocked from the api directory
-import { usePatientOrders, useRequireOutpatientQuantity } from '../api';
+import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 
 const mockCloseWorkspace = jest.fn();
 const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
@@ -28,11 +28,11 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 // Mock the API module to provide controlled responses for the drug order form
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
-  usePatientOrders: jest.fn(),
+  useMedicationOrders: jest.fn(),
   useRequireOutpatientQuantity: jest.fn(),
 }));
 
-const mockUsePatientOrders = usePatientOrders as jest.Mock;
+const mockUseMedicationOrders = useMedicationOrders as jest.Mock;
 const mockUseRequireOutpatientQuantity = useRequireOutpatientQuantity as jest.Mock;
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -70,8 +70,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
       error: null,
     }));
 
-    // Supply the required response structure for usePatientOrders
-    mockUsePatientOrders.mockReturnValue({
+    // Supply the required response structure for useMedicationOrders
+    mockUseMedicationOrders.mockReturnValue({
       futureOrders: [],
       activeOrders: [],
       pastOrders: [],
@@ -111,9 +111,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('div')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
-  test('visual cue if the medication is already prescribed', async () => {
-    // Override usePatientOrders to simulate an existing active order
-    mockUsePatientOrders.mockReturnValue({
+  test('shows a visual cue and disables actions if the medication is already prescribed', async () => {
+    mockUseMedicationOrders.mockReturnValue({
       futureOrders: [],
       activeOrders: [mockPatientDrugOrdersApiData[0]],
       pastOrders: [],
@@ -130,6 +129,8 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(screen.getAllByRole('listitem').length).toEqual(3);
     const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('div').parentElement;
     expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
+    expect(within(aspirin162Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
+    expect(within(aspirin162Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
   });
 
   test('can add items directly to the basket', async () => {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { usePatientOrders } from '../api';
+import { useMedicationOrders } from '../api';
 
 interface PastMedicationsProps {
   patient: fhir.Patient;
@@ -15,7 +15,7 @@ const PastMedications: React.FC<PastMedicationsProps> = ({ patient }) => {
   const displayText = t('pastMedicationsDisplayText', 'past medications');
   const launchOrderBasket = useLaunchWorkspaceRequiringVisit(patient.id, 'order-basket');
 
-  const { pastOrders, error, isLoading, isValidating } = usePatientOrders(patient?.id);
+  const { pastOrders, error, isLoading, isValidating } = useMedicationOrders(patient?.id);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
