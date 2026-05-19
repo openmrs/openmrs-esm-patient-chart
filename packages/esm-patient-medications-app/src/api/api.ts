@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -129,7 +129,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
-      scheduledDate: order.scheduledDate,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
       urgency: 'ON_SCHEDULED_DATE',
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
@@ -159,6 +159,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
+      urgency: 'ON_SCHEDULED_DATE',
       concept: order.drug.concept.uuid,
       orderReasonNonCoded: order.indication,
     };
@@ -187,7 +189,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
-      scheduledDate: order.scheduledDate,
+      scheduledDate: order.scheduledDate ? toOmrsIsoString(order.scheduledDate) : null,
       urgency: 'ON_SCHEDULED_DATE',
       concept: order?.drug?.concept?.uuid,
       orderReasonNonCoded: order.indication,
