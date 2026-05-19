@@ -12,9 +12,9 @@ import {
 export type ConceptSource = { uuid: string; sourceType: ConceptSourceType };
 
 const sourceTypeToRestParam: Record<Exclude<ConceptSourceType, 'any'>, string> = {
-  conceptClass: 'class',
-  conceptSet: 'memberOf',
-  answerTo: 'answerTo',
+  'Concept class': 'class',
+  'Concept set': 'memberOf',
+  'Answer to': 'answerTo',
 };
 
 function buildConceptSearchUrl(query: string, source: ConceptSource): string {
