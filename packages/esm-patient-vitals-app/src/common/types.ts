@@ -22,8 +22,8 @@ export type MappedVitals = {
   code: string;
   interpretation: ObservationInterpretation;
   recordedDate: string | Date;
-  value: number;
   encounterId: string;
+  value: number;
 };
 
 export type FHIRInterpretation = 'Critically Low' | 'Critically High' | 'High' | 'Low' | 'Normal';
@@ -97,6 +97,7 @@ export interface FHIRObservationResource {
 export interface PatientVitalsAndBiometrics {
   id: string;
   date: string;
+  note?: string;
   systolic?: number;
   systolicRenderInterpretation?: ObservationInterpretation;
   diastolic?: number;
@@ -109,11 +110,15 @@ export interface PatientVitalsAndBiometrics {
   spo2?: number;
   spo2RenderInterpretation?: ObservationInterpretation;
   height?: number;
+  heightRenderInterpretation?: ObservationInterpretation;
   weight?: number;
+  weightRenderInterpretation?: ObservationInterpretation;
   bmi?: number | null;
+  bmiRenderInterpretation?: ObservationInterpretation;
   respiratoryRate?: number;
   respiratoryRateRenderInterpretation?: ObservationInterpretation;
   muac?: number;
+  muacRenderInterpretation?: ObservationInterpretation;
 }
 
 export interface VitalsResponse {

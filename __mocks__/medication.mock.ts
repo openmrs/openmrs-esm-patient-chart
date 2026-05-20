@@ -80,6 +80,7 @@ export const mockDrugOrderTemplateApiData = {
             {
               value: 'twice daily',
               valueCoded: '160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+              frequencyPerDay: 2.0,
               default: true,
             },
           ],
@@ -138,6 +139,7 @@ export const mockDrugOrderTemplateApiData = {
             {
               value: 'once daily',
               valueCoded: '160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+              frequencyPerDay: 1.0,
               default: true,
             },
           ],

@@ -6,6 +6,7 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { type DrugOrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
   ArrowRightIcon,
+  ExtensionSlot,
   ShoppingCartArrowDownIcon,
   useConfig,
   useLayoutType,
@@ -128,7 +129,7 @@ export default function OrderBasketSearchResults({
   );
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
+export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   patient,
   drug,
   openOrderForm,
@@ -193,16 +194,19 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
           })}
         >
           <div className={classNames(styles.searchResultTileContent, styles.text02)}>
-            <p>
-              <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
-              {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
-              {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+            <div className={styles.drugNameRow}>
+              <p className={styles.drugNameText}>
+                <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
+                {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
+              </p>
               {drugAlreadyPrescribed && (
-                <Tag className={styles.tag} type="green" size="sm">
-                  <p>{t('drugAlreadyPrescribed', 'Already prescribed')}</p>
+                <Tag type="green" size="sm">
+                  {t('drugAlreadyPrescribed', 'Already prescribed')}
                 </Tag>
               )}
-            </p>
+              <ExtensionSlot name="drug-search-result-actions-slot" state={{ drug, orderItem }} />
+            </div>
             <UserHasAccess privilege="Manage OrderTemplates">
               {fetchingDrugOrderTemplatesError ? (
                 <p>
@@ -240,7 +244,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                   <ShoppingCartArrowDownIcon size={16} {...props} />
                 )}
                 onClick={() => addToBasket(orderItem)}
-                disabled={drugAlreadyPrescribed}
+                disabled={isLoadingOrders || drugAlreadyPrescribed}
               >
                 {t('directlyAddToBasket', 'Add to basket')}
               </Button>
@@ -249,7 +253,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
               onClick={() => openOrderForm(orderItem)}
-              disabled={drugAlreadyPrescribed}
+              disabled={isLoadingOrders || drugAlreadyPrescribed}
             >
               {t('goToDrugOrderForm', 'Order form')}
             </Button>

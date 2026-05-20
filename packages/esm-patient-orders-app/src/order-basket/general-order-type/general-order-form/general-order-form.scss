@@ -52,14 +52,6 @@
   }
 }
 
-.errorContainer {
-  margin: layout.$spacing-05;
-}
-
-.errorNotification {
-  margin: layout.$spacing-03 0;
-}
-
 .testTypeLabel {
   @include type.type-style('label-01');
   color: $text-02;
@@ -75,11 +67,6 @@
   .buttonSet {
     padding: layout.$spacing-06 layout.$spacing-05;
     background-color: $ui-02;
-  }
-
-  .errorContainer {
-    margin: layout.$spacing-05;
-    margin-bottom: calc(var(--bottom-nav-height) + layout.$spacing-05);
   }
 }
 

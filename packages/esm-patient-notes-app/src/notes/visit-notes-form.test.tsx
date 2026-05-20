@@ -1,4 +1,12 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `AbortController` instances are not the host realm's
+ * `AbortController`, so `toHaveBeenCalledWith(new AbortController(), ...)`
+ * fails the cross-realm equality check used here.
+ */
 import React from 'react';
+import { vi, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import {
@@ -7,6 +15,7 @@ import {
   showSnackbar,
   useConfig,
   useSession,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
@@ -22,7 +31,7 @@ import { mockPatient, getByTextWithMarkup } from 'tools';
 import VisitNotesForm, { type VisitNotesFormProps } from './visit-notes-form.workspace';
 
 const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   workspaceProps: {
     formContext: 'creating' as const,
   },
@@ -32,7 +41,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = 
     visitContext: null,
     mutateVisitContext: null,
   },
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   windowProps: {},
   workspaceName: '',
   windowName: '',
@@ -48,27 +57,28 @@ function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {})
   render(<VisitNotesForm {...props} />);
 }
 
-const mockFetchDiagnosisConceptsByName = jest.mocked(fetchDiagnosisConceptsByName);
-const mockSaveVisitNote = jest.mocked(saveVisitNote);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUpdateVisitNote = jest.mocked(updateVisitNote);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseSession = jest.mocked(useSession);
+const mockFetchDiagnosisConceptsByName = vi.mocked(fetchDiagnosisConceptsByName);
+const mockSaveVisitNote = vi.mocked(saveVisitNote);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUpdateVisitNote = vi.mocked(updateVisitNote);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseSession = vi.mocked(useSession);
+const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
-jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
+vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
-jest.mock('./visit-notes.resource', () => ({
-  fetchDiagnosisConceptsByName: jest.fn(),
-  updateVisitNote: jest.fn(),
-  useLocationUuid: jest.fn().mockImplementation(() => ({
+vi.mock('./visit-notes.resource', () => ({
+  fetchDiagnosisConceptsByName: vi.fn(),
+  updateVisitNote: vi.fn(),
+  useLocationUuid: vi.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
   })),
-  useProviderUuid: jest.fn().mockImplementation(() => ({
+  useProviderUuid: vi.fn().mockImplementation(() => ({
     data: mockFetchProviderByUuidResponse.data.uuid,
   })),
-  saveVisitNote: jest.fn(),
-  useVisitNotes: jest.fn().mockImplementation(() => ({
-    mutateVisitNotes: jest.fn(),
+  saveVisitNote: vi.fn(),
+  useVisitNotes: vi.fn().mockImplementation(() => ({
+    mutateVisitNotes: vi.fn(),
   })),
 }));
 
@@ -78,12 +88,29 @@ mockUseConfig.mockReturnValue({
   ...ConfigMock,
 });
 
+beforeEach(() => {
+  mockedUseFeatureFlag.mockReturnValue(false);
+});
+
+test('does not render the date picker when RDE is disabled', () => {
+  renderVisitNotesForm();
+
+  expect(screen.queryByLabelText(/visit date/i)).not.toBeInTheDocument();
+});
+
+test('renders the date picker when RDE is enabled', () => {
+  mockedUseFeatureFlag.mockReturnValue(true);
+
+  renderVisitNotesForm();
+
+  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
+});
+
 test('renders the visit notes form with all the relevant fields and values', () => {
   mockFetchDiagnosisConceptsByName.mockResolvedValue([]);
 
   renderVisitNotesForm();
 
-  expect(screen.getByLabelText(/visit date/i)).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /enter secondary diagnoses/i })).toBeInTheDocument();
@@ -146,7 +173,7 @@ test('closes the form and the workspace when the cancel button is clicked', asyn
 
 test('renders a success snackbar upon successfully recording a visit note', async () => {
   const user = userEvent.setup();
-  const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+  const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
   const successPayload = {
     encounterProviders: expect.arrayContaining([
@@ -168,8 +195,8 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
     encounterDatetime: undefined,
   };
 
-  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as ReturnType<
-    typeof saveVisitNote
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
   >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
@@ -242,6 +269,8 @@ test('renders an error snackbar if there was a problem recording a condition', a
 });
 
 test('initializes form with existing encounter data when in edit mode', () => {
+  mockedUseFeatureFlag.mockReturnValue(true);
+
   const mockEncounter = {
     id: '123',
     uuid: '123',
@@ -329,8 +358,8 @@ test('updates existing visit note when in edit mode', async () => {
   };
 
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
-  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200, body: 'Visit note updated' } as unknown as ReturnType<
-    typeof updateVisitNote
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200, body: 'Visit note updated' } as unknown as Awaited<
+    ReturnType<typeof updateVisitNote>
   >);
 
   renderVisitNotesForm({
@@ -431,8 +460,8 @@ test('allows saving visit note without primary diagnosis when isPrimaryDiagnosis
     encounterDatetime: undefined,
   };
 
-  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as ReturnType<
-    typeof saveVisitNote
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Visit note created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
   >);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 

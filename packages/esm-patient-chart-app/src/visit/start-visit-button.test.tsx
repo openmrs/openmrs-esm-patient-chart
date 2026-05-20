@@ -1,11 +1,12 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import StartVisitButton from './start-visit-button.component';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 describe('StartVisitButton', () => {
   it('renders the start visit button', () => {

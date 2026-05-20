@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
@@ -18,11 +19,11 @@ import { mockPatient } from 'tools';
 import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
-const mockCloseWorkspace = closeWorkspace as jest.Mock;
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseOrderType = jest.mocked(useOrderType);
+const mockCloseWorkspace = closeWorkspace as Mock;
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseOrderType = vi.mocked(useOrderType);
 
 const mockTestTypes = [
   // {
@@ -41,19 +42,19 @@ const mockTestTypes = [
   //   synonyms: ['HEMOGLOBIN', 'HGB'],
   // },
 ];
-const mockUseTestTypes = jest.fn().mockReturnValue({
+const mockUseTestTypes = vi.fn().mockReturnValue({
   testTypes: mockTestTypes,
   isLoading: false,
   error: null,
 });
 
-jest.mock('./useTestTypes', () => ({
+vi.mock('./useTestTypes', () => ({
   useTestTypes: () => mockUseTestTypes(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useOrderType: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  useOrderType: vi.fn(),
 }));
 
 function renderAddLabOrderWorkspace() {
@@ -71,7 +72,7 @@ function renderAddLabOrderWorkspace() {
         mutateVisitContext: null,
       }}
       workspaceName={''}
-      launchChildWorkspace={jest.fn()}
+      launchChildWorkspace={vi.fn()}
       windowName={''}
       windowProps={{ encounterUuid: '' }}
       isRootWorkspace={false}
@@ -185,10 +186,101 @@ describe('AddLabOrder', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
+  test('discarding a new order returns to test type search', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('preserves search term when navigating back from order form', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(screen.getByRole('searchbox')).toHaveValue('cd4');
+  });
+
+  test('discarding an edited order closes the workspace', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AddTestOrderWorkspace
+        closeWorkspace={mockCloseWorkspace}
+        workspaceProps={{
+          orderTypeUuid: 'test-lab-order-type-uuid',
+          orderToEditOrdererUuid: '',
+          order: {
+            ...createEmptyLabOrder(mockTestTypes[0], mockSessionDataResponse.data.currentProvider.uuid, null),
+            action: 'REVISE',
+          },
+        }}
+        groupProps={{
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          visitContext: null,
+          mutateVisitContext: null,
+        }}
+        workspaceName={''}
+        launchChildWorkspace={vi.fn()}
+        windowName={''}
+        windowProps={{ encounterUuid: '' }}
+        isRootWorkspace={false}
+        showActionMenu={true}
+      />,
+    );
+
+    // Should render the order form directly (no search view)
+    expect(screen.getByText('Test type')).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /discard/i }));
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
+  });
+
+  test('save order button is disabled while submitting', async () => {
+    const user = userEvent.setup();
+
+    renderAddLabOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+
+    const cd4OrderButton = screen.getByRole('button', { name: /order form/i });
+    await user.click(cd4OrderButton);
+
+    const saveButton = screen.getByRole('button', { name: /save order/i });
+    expect(saveButton).toBeEnabled();
+  });
+
   test('back to order basket', async () => {
     const user = userEvent.setup();
     renderAddLabOrderWorkspace();
-    const back = screen.getByText('Back');
+    const back = screen.getByText('Back to order basket');
     expect(back).toBeInTheDocument();
     await user.click(back);
     expect(mockCloseWorkspace).toHaveBeenCalled();
@@ -219,7 +311,7 @@ describe('AddLabOrder', () => {
           mutateVisitContext: null,
         }}
         workspaceName={''}
-        launchChildWorkspace={jest.fn()}
+        launchChildWorkspace={vi.fn()}
         windowName={''}
         windowProps={{ encounterUuid: '' }}
         isRootWorkspace={false}

@@ -1,0 +1,38 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// When the gate returns null (no concept configured) the framework still leaves an empty
+// <div data-extension-id="sticky-notes-button"> wrapper in the patient-info-slot. The slot's
+// own `> div:not(:last-child) { border-bottom }` rule paints a border on that empty wrapper,
+// stacking a second 1px line just below the banner's own border-bottom. Collapse the empty
+// wrapper so it takes no space and paints nothing.
+:global([data-extension-id='sticky-notes-button']):empty {
+  display: none;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-inline-start: auto;
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: calc(layout.$spacing-02 * -1);
+  right: layout.$spacing-03;
+  background-color: $danger;
+  color: white;
+  border-radius: 50%;
+  width: layout.$spacing-05;
+  height: layout.$spacing-05;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid white;
+}

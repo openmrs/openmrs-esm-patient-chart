@@ -18,6 +18,33 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   return parts.join('/');
 }
 
+/**
+ * Maps old dashboard URL path segments to their new lowercase/hyphenated equivalents.
+ * This ensures that existing bookmarks, shared links, and external references
+ * continue to resolve to the correct dashboard after the path rename.
+ */
+const legacyPathAliases: Record<string, string> = {
+  'Patient Summary': 'patient-summary',
+  'Vitals & Biometrics': 'vitals-and-biometrics',
+  'Vitals %26 Biometrics': 'vitals-and-biometrics',
+  Allergies: 'allergies',
+  Appointments: 'appointments',
+  Attachments: 'attachments',
+  'Billing history': 'billing-history',
+  Conditions: 'conditions',
+  Encounters: 'encounters',
+  Immunizations: 'immunizations',
+  Medications: 'medications',
+  Orders: 'orders',
+  Programs: 'programs',
+  Results: 'results',
+  Visits: 'visits',
+};
+
+function resolveView(view: string): string {
+  return legacyPathAliases[view] ?? view;
+}
+
 function isDashboardConfig(obj: unknown): obj is DashboardConfig {
   return (
     typeof obj === 'object' &&
@@ -76,9 +103,10 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
     .filter(Boolean);
 
   const defaultDashboard = dashboards.filter((dashboard) => Boolean(dashboard.path))?.[0];
+  const resolvedView = resolveView(view);
   const dashboard = useMemo(() => {
-    return dashboards.find((dashboard) => dashboard.path === view);
-  }, [dashboards, view]);
+    return dashboards.find((dashboard) => dashboard.path === resolvedView);
+  }, [dashboards, resolvedView]);
 
   useEffect(() => {
     const activeDashboard = dashboard ?? defaultDashboard;

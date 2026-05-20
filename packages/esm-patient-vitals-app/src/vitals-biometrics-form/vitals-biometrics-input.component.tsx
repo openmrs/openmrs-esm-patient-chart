@@ -75,7 +75,7 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
   const hasAbnormalValue = !isFocused && interpretation && abnormalValues.includes(interpretation as AbnormalValue);
 
   function checkValidity(value, onChange) {
-    setInvalid(!(Number(value) || value === ''));
+    setInvalid(value !== '' && isNaN(Number(value)));
 
     if (!invalid) {
       onChange(value === '' ? undefined : Number(value));

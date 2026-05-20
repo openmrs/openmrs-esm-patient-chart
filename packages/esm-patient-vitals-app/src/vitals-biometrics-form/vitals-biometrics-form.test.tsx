@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar, useConfig, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
@@ -30,43 +31,47 @@ const defaultProps: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProp
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
-  closeWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
+  closeWorkspace: vi.fn(),
   windowName: '',
   isRootWorkspace: false,
   showActionMenu: true,
 };
 
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockCreateOrUpdateVitalsAndBiometrics = jest.mocked(createOrUpdateVitalsAndBiometrics);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseEncounterVitalsAndBiometrics = jest.mocked(useEncounterVitalsAndBiometrics);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockCreateOrUpdateVitalsAndBiometrics = vi.mocked(createOrUpdateVitalsAndBiometrics);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseEncounterVitalsAndBiometrics = vi.mocked(useEncounterVitalsAndBiometrics);
 
-jest.mock('../common', () => ({
-  assessValue: jest.fn(),
-  getReferenceRangesForConcept: jest.fn(),
-  generatePlaceholder: jest.fn(),
-  interpretBloodPressure: jest.fn(),
-  invalidateCachedVitalsAndBiometrics: jest.fn(),
-  createOrUpdateVitalsAndBiometrics: jest.fn(),
-  useVitalsAndBiometrics: jest.fn(),
-  useConceptUnits: jest.fn().mockImplementation(() => ({
+vi.mock('../common', () => ({
+  assessValue: vi.fn(),
+  getReferenceRangesForConcept: vi.fn(),
+  generatePlaceholder: vi.fn(),
+  interpretBloodPressure: vi.fn(),
+  invalidateCachedVitalsAndBiometrics: vi.fn(),
+  createOrUpdateVitalsAndBiometrics: vi.fn(),
+  useVitalsAndBiometrics: vi.fn(),
+  useConceptUnits: vi.fn().mockImplementation(() => ({
     conceptUnits: mockConceptUnits,
     error: null,
     isLoading: false,
   })),
-  useEncounterVitalsAndBiometrics: jest.fn().mockImplementation(() => ({
+  useEncounterVitalsAndBiometrics: vi.fn().mockImplementation(() => ({
     isLoading: false,
     vitalsAndBiometrics: null,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   })),
-  useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
+  useVitalsConceptMetadata: vi.fn().mockImplementation(() => mockVitalsConceptMetadata),
 }));
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockVitalsConfig,
-});
+  biometrics: {
+    ...getDefaultsFromConfigSchema(configSchema).biometrics,
+    ...mockVitalsConfig.biometrics,
+  },
+} as ConfigObject);
 
 function setupMockUseEncounterVitalsAndBiometrics() {
   mockUseEncounterVitalsAndBiometrics.mockReturnValue({
@@ -135,10 +140,17 @@ function setupMockUseEncounterVitalsAndBiometrics() {
           obs: { uuid: '123e4567-e89b-12d3-a456-426614174009', display: 'Mid-Upper Arm Circumference: 25 cm' },
         },
       ],
+      [
+        'bodyMassIndex',
+        {
+          value: 22.5,
+          obs: { uuid: '123e4567-e89b-12d3-a456-42661417400a', display: 'BMI: 22.5 kg/m²' },
+        },
+      ],
     ]),
     encounter: null,
     error: null,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
     getRefinedInitialValues: () => ({
       height: 170,
       weight: 65,
@@ -212,7 +224,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm();
@@ -262,6 +274,7 @@ describe('VitalsBiometricsForm', () => {
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 62 },
         { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 180 },
         { concept: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 23 },
+        { concept: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 19.1 },
       ]),
       expect.objectContaining({
         signal: {
@@ -308,7 +321,7 @@ describe('VitalsBiometricsForm', () => {
     };
 
     mockCreateOrUpdateVitalsAndBiometrics.mockResolvedValue(
-      response as ReturnType<typeof createOrUpdateVitalsAndBiometrics>,
+      response as Awaited<ReturnType<typeof createOrUpdateVitalsAndBiometrics>>,
     );
 
     renderVitalsAndBiometricsForm('editing', 'encounter-uuid');
@@ -343,10 +356,12 @@ describe('VitalsBiometricsForm', () => {
         { concept: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 130 },
         { concept: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 37.5 },
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 70 },
+        { concept: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 24.2 },
         { uuid: '123e4567-e89b-12d3-a456-426614174001', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174003', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174004', voided: true },
         { uuid: '123e4567-e89b-12d3-a456-426614174007', voided: true },
+        { uuid: '123e4567-e89b-12d3-a456-42661417400a', voided: true },
       ]),
       expect.objectContaining({
         signal: {
@@ -411,6 +426,42 @@ describe('VitalsBiometricsForm', () => {
       subtitle: 'Some of the values entered are invalid',
       title: 'Error saving Vitals and Biometrics',
     });
+  });
+
+  it('hides BMI field when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      birthDate: '2020-01-01',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockVitalsConfig,
+      biometrics: {
+        ...getDefaultsFromConfigSchema(configSchema).biometrics,
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const props: PatientWorkspace2DefinitionProps<VitalsAndBiometricsFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        patient: minorPatient,
+      },
+    };
+
+    render(<VitalsAndBiometricsForm {...props} />);
+
+    // BMI field should not be present
+    expect(screen.queryByText(/bmi \(calc.\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /bmi/i })).not.toBeInTheDocument();
+
+    // Other biometrics fields should still be present
+    expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /height/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
   });
 });
 

@@ -16,6 +16,7 @@ import {
 import {
   age,
   ExtensionSlot,
+  type OpenmrsResource,
   showSnackbar,
   useAbortController,
   useConfig,
@@ -42,7 +43,7 @@ import {
   useConceptUnits,
   useEncounterVitalsAndBiometrics,
 } from '../common';
-import { prepareObsForSubmission } from '../common/helpers';
+import { prepareObsForSubmission, shouldShowBmi } from '../common/helpers';
 import { useVitalsConceptMetadata } from '../common/data.resource';
 import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
@@ -85,6 +86,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
   const { invalidateVisitRelatedData } = useOptimisticVisitMutations(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const isLoadingInitialValues = useMemo(
     () => (formContext === 'creating' ? false : isLoadingEncounter),
@@ -134,6 +136,11 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   }, [watch, patient?.birthDate, midUpperArmCircumference]);
 
   useEffect(() => {
+    if (!showBmi) {
+      setValue('computedBodyMassIndex', undefined);
+      return;
+    }
+
     if (height && weight) {
       const computedBodyMassIndex = calculateBodyMassIndex(
         weight,
@@ -142,8 +149,12 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
         conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
       );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
+    } else {
+      // Clear the BMI field when either input is missing so a stale value
+      // doesn't leak into the UI or get persisted as an obs on save.
+      setValue('computedBodyMassIndex', undefined);
     }
-  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid]);
+  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid, showBmi]);
 
   function onError(err) {
     if (err?.oneFieldRequired) {
@@ -172,12 +183,13 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       setShowErrorMessage(true);
       setShowErrorNotification(false);
 
+      const computedBodyMassIndex = data?.computedBodyMassIndex;
       if (data?.computedBodyMassIndex) {
         delete data.computedBodyMassIndex;
       }
 
       const allFieldsAreValid = Object.entries(formData)
-        .filter(([, value]) => Boolean(value))
+        .filter(([, value]) => value != null && value !== '')
         .every(([key, value]) => isValueWithinReferenceRange(conceptRanges, config.concepts[`${key}Uuid`], value));
 
       if (allFieldsAreValid) {
@@ -189,6 +201,26 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           initialFieldValuesMap,
           config.concepts,
         );
+
+        // BMI is derived from weight and height, so it doesn't go through
+        // prepareObsForSubmission (which keys off dirtyFields for user-entered values).
+        // Persist a fresh BMI obs whenever weight or height was touched, voiding any prior one.
+        const weightOrHeightChanged = Boolean(dirtyFields.weight || dirtyFields.height);
+        const existingBmiObs = initialFieldValuesMap?.get('bodyMassIndex')?.obs;
+        const newBmiObs = {
+          concept: config.concepts.bodyMassIndexUuid,
+          value: computedBodyMassIndex,
+        } as unknown as OpenmrsResource;
+        if (formContext === 'creating' && computedBodyMassIndex != null) {
+          newObs.push(newBmiObs);
+        } else if (formContext === 'editing' && weightOrHeightChanged) {
+          if (existingBmiObs) {
+            toBeVoided.push({ uuid: existingBmiObs.uuid, voided: true } as unknown as OpenmrsResource);
+          }
+          if (computedBodyMassIndex != null) {
+            newObs.push(newBmiObs);
+          }
+        }
 
         createOrUpdateVitalsAndBiometrics(
           patientUuid,
@@ -322,14 +354,15 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    temperature &&
-                    assessValue(
-                      temperature,
-                      getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
-                    )
+                    temperature != null
+                      ? assessValue(
+                          temperature,
+                          getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    temperature
+                    temperature != null
                       ? isValueWithinReferenceRange(conceptRanges, config.concepts['temperatureUuid'], temperature)
                       : true
                   }
@@ -359,28 +392,28 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    systolicBloodPressure &&
-                    diastolicBloodPressure &&
-                    interpretBloodPressure(
-                      systolicBloodPressure,
-                      diastolicBloodPressure,
-                      config.concepts,
-                      conceptRanges,
-                    )
+                    systolicBloodPressure != null && diastolicBloodPressure != null
+                      ? interpretBloodPressure(
+                          systolicBloodPressure,
+                          diastolicBloodPressure,
+                          config.concepts,
+                          conceptRanges,
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    systolicBloodPressure &&
-                    diastolicBloodPressure &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts.systolicBloodPressureUuid,
-                      systolicBloodPressure,
-                    ) &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts.diastolicBloodPressureUuid,
-                      diastolicBloodPressure,
-                    )
+                    systolicBloodPressure != null && diastolicBloodPressure != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts.systolicBloodPressureUuid,
+                          systolicBloodPressure,
+                        ) &&
+                        isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts.diastolicBloodPressureUuid,
+                          diastolicBloodPressure,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('bloodPressure', 'Blood pressure')}
@@ -400,10 +433,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    pulse && assessValue(pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
+                    pulse != null
+                      ? assessValue(pulse, getReferenceRangesForConcept(config.concepts.pulseUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    pulse && isValueWithinReferenceRange(conceptRanges, config.concepts['pulseUuid'], pulse)
+                    pulse != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['pulseUuid'], pulse)
+                      : true
                   }
                   label={t('heartRate', 'Heart rate')}
                   showErrorMessage={showErrorMessage}
@@ -423,15 +460,21 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    respiratoryRate &&
-                    assessValue(
-                      respiratoryRate,
-                      getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
-                    )
+                    respiratoryRate != null
+                      ? assessValue(
+                          respiratoryRate,
+                          getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    respiratoryRate &&
-                    isValueWithinReferenceRange(conceptRanges, config.concepts['respiratoryRateUuid'], respiratoryRate)
+                    respiratoryRate != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['respiratoryRateUuid'],
+                          respiratoryRate,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('respirationRate', 'Respiration rate')}
@@ -451,19 +494,21 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    oxygenSaturation &&
-                    assessValue(
-                      oxygenSaturation,
-                      getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
-                    )
+                    oxygenSaturation != null
+                      ? assessValue(
+                          oxygenSaturation,
+                          getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptRanges),
+                        )
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    oxygenSaturation &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts['oxygenSaturationUuid'],
-                      oxygenSaturation,
-                    )
+                    oxygenSaturation != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['oxygenSaturationUuid'],
+                          oxygenSaturation,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('spo2', 'SpO2')}
@@ -508,11 +553,14 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    weight &&
-                    assessValue(weight, getReferenceRangesForConcept(config.concepts.weightUuid, conceptRanges))
+                    weight != null
+                      ? assessValue(weight, getReferenceRangesForConcept(config.concepts.weightUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    height && isValueWithinReferenceRange(conceptRanges, config.concepts['weightUuid'], weight)
+                    weight != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['weightUuid'], weight)
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('weight', 'Weight')}
@@ -532,32 +580,37 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     },
                   ]}
                   interpretation={
-                    height &&
-                    assessValue(height, getReferenceRangesForConcept(config.concepts.heightUuid, conceptRanges))
+                    height != null
+                      ? assessValue(height, getReferenceRangesForConcept(config.concepts.heightUuid, conceptRanges))
+                      : undefined
                   }
                   isValueWithinReferenceRange={
-                    weight && isValueWithinReferenceRange(conceptRanges, config.concepts['heightUuid'], height)
+                    height != null
+                      ? isValueWithinReferenceRange(conceptRanges, config.concepts['heightUuid'], height)
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('height', 'Height')}
                   unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
                 />
               </Column>
-              <Column>
-                <VitalsAndBiometricsInput
-                  control={control}
-                  fieldProperties={[
-                    {
-                      name: t('bmi', 'BMI'),
-                      type: 'number',
-                      id: 'computedBodyMassIndex',
-                    },
-                  ]}
-                  readOnly
-                  label={t('calculatedBmi', 'BMI (calc.)')}
-                  unitSymbol={biometricsUnitsSymbols['bmiUnit']}
-                />
-              </Column>
+              {showBmi && (
+                <Column>
+                  <VitalsAndBiometricsInput
+                    control={control}
+                    fieldProperties={[
+                      {
+                        name: t('bmi', 'BMI'),
+                        type: 'number',
+                        id: 'computedBodyMassIndex',
+                      },
+                    ]}
+                    readOnly
+                    label={t('calculatedBmi', 'BMI (calc.)')}
+                    unitSymbol={biometricsUnitsSymbols['bmiUnit']}
+                  />
+                </Column>
+              )}
               <Column>
                 <VitalsAndBiometricsInput
                   control={control}
@@ -572,13 +625,13 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                   ]}
                   muacColorCode={muacColorCode}
                   isValueWithinReferenceRange={
-                    height &&
-                    weight &&
-                    isValueWithinReferenceRange(
-                      conceptRanges,
-                      config.concepts['midUpperArmCircumferenceUuid'],
-                      midUpperArmCircumference,
-                    )
+                    midUpperArmCircumference != null
+                      ? isValueWithinReferenceRange(
+                          conceptRanges,
+                          config.concepts['midUpperArmCircumferenceUuid'],
+                          midUpperArmCircumference,
+                        )
+                      : true
                   }
                   showErrorMessage={showErrorMessage}
                   label={t('muac', 'MUAC')}

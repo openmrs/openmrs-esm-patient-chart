@@ -86,6 +86,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
     },
     {
       key: 'temperatureRender',
+      conceptUuid: config.concepts.temperatureUuid,
       header: withUnit(t('temperatureAbbreviated', 'Temp'), conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) =>
@@ -107,12 +108,14 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
     },
     {
       key: 'pulseRender',
+      conceptUuid: config.concepts.pulseUuid,
       header: withUnit(t('pulse', 'Pulse'), conceptUnits.get(config.concepts.pulseUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.pulse && valueB.pulse ? valueA.pulse - valueB.pulse : 0),
     },
     {
       key: 'respiratoryRateRender',
+      conceptUuid: config.concepts.respiratoryRateUuid,
       header: withUnit(
         t('respiratoryRateAbbreviated', 'R. Rate'),
         conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '',
@@ -123,6 +126,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
     },
     {
       key: 'spo2Render',
+      conceptUuid: config.concepts.oxygenSaturationUuid,
       header: withUnit(t('spo2', 'SpO2'), conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
       isSortable: true,
       sortFunc: (valueA, valueB) => (valueA.spo2 && valueB.spo2 ? valueA.spo2 - valueB.spo2 : 0),
@@ -240,6 +244,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     isPrinting={isPrinting}
                     pageSize={pageSize}
                     pageUrl={pageUrl}
+                    patientUuid={patientUuid}
                     tableHeaders={tableHeaders}
                     tableRows={tableRows}
                     urlLabel={urlLabel}

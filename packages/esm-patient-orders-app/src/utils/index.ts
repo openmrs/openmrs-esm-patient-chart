@@ -56,6 +56,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
       ? {
           valueCoded: order.frequency.uuid,
           value: order.frequency.display,
+          frequencyPerDay: null,
         }
       : null,
     route: order.route
@@ -88,6 +89,7 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
         }
       : null,
     encounterUuid: order.encounter?.uuid,
+    previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
     visit: order.encounter.visit,
   };
 }

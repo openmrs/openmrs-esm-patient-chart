@@ -45,14 +45,16 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as TestOrderBasketItem);
+  const [searchTerm, setSearchTerm] = useState('');
   const { additionalTestOrderTypes, orders } = useConfig<ConfigObject>();
   const resolvedOrderTypeUuid = orderTypeUuid ?? orders.labOrderTypeUuid;
   const { orderType } = useOrderType(resolvedOrderTypeUuid);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const isEditingExistingOrder = currentLabOrder?.action === 'REVISE' || initialOrder != null;
 
   const title = useMemo(() => {
     if (orderType) {
-      if (initialOrder?.action == 'REVISE') {
+      if (initialOrder?.action === 'REVISE') {
         return t(`editOrderableForOrderType`, 'Edit {{orderTypeDisplay}}', {
           orderTypeDisplay: orderType.display.toLocaleLowerCase(),
         });
@@ -99,11 +101,11 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}
-              iconDescription={t('back', 'Back')}
+              iconDescription={t('backToOrderBasket', 'Back to order basket')}
               size="sm"
               onClick={() => closeWorkspace()}
             >
-              <span>{t('back', 'Back')}</span>
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
             </Button>
           </div>
         )}
@@ -112,6 +114,14 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
             initialOrder={currentLabOrder}
             orderToEditOrdererUuid={orderToEditOrdererUuid}
             closeWorkspace={closeWorkspace}
+            onCancel={
+              isEditingExistingOrder
+                ? closeWorkspace
+                : () => {
+                    setCurrentLabOrder(undefined);
+                    setHasUnsavedChanges(false);
+                  }
+            }
             setHasUnsavedChanges={setHasUnsavedChanges}
             orderTypeUuid={resolvedOrderTypeUuid}
             orderableConceptSets={orderableConceptSets}
@@ -125,6 +135,8 @@ const AddLabOrder: React.FC<AddLabOrderProps> = ({
             closeWorkspace={closeWorkspace}
             patient={patient}
             visit={visitContext}
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
           />
         )}
       </div>

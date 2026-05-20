@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
@@ -26,12 +26,19 @@ export interface TestTypeSearchProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
   visit: Visit;
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
 }
 
-interface TestTypeSearchResultsProps extends TestTypeSearchProps {
+interface TestTypeSearchResultsProps {
   searchTerm: string;
   focusAndClearSearchInput: () => void;
+  openLabForm: (searchResult: TestOrderBasketItem) => void;
+  orderTypeUuid: string;
+  orderableConceptSets: Array<string>;
+  closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   patient: fhir.Patient;
+  visit: Visit;
 }
 
 interface TestTypeSearchResultItemProps {
@@ -50,22 +57,23 @@ export function TestTypeSearch({
   orderTypeUuid,
   orderableConceptSets,
   closeWorkspace,
+  searchTerm,
+  onSearchTermChange,
 }: TestTypeSearchProps) {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const searchInputRef = useRef(null);
 
   const focusAndClearSearchInput = useCallback(() => {
-    setSearchTerm('');
+    onSearchTermChange('');
     searchInputRef.current?.focus();
-  }, [setSearchTerm]);
+  }, [onSearchTermChange]);
 
   const handleSearchTermChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(event.target.value ?? '');
+      onSearchTermChange(event.target.value ?? '');
     },
-    [setSearchTerm],
+    [onSearchTermChange],
   );
 
   return (
@@ -165,11 +173,11 @@ function TestTypeSearchResults({
           <div className={styles.separatorContainer}>
             <p className={styles.separator}>{t('or', 'or')}</p>
             <Button
-              iconDescription="Return to order basket"
+              iconDescription={t('returnToOrderBasket', 'Return to order basket')}
               kind="ghost"
               onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
             >
-              {t('back', 'Back')}
+              {t('returnToOrderBasket', 'Return to order basket')}
             </Button>
           </div>
         )}

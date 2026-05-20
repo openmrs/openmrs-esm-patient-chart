@@ -23,6 +23,7 @@ export interface VitalsTableHeader {
     | 'pulseRender'
     | 'respiratoryRateRender'
     | 'spo2Render';
+  conceptUuid?: string;
   header: string;
   isSortable?: boolean;
   sortFunc: (valueA: VitalsTableRow, valueB: VitalsTableRow) => number;

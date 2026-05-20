@@ -34,7 +34,7 @@
       "order": 6,
       "meta": {
         "slot": "patient-chart-allergies-dashboard-slot",
-        "path": "Allergies"
+        "path": "allergies"
       }
     }
   ],

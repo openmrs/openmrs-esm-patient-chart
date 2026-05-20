@@ -114,7 +114,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
     (data) => {
       const { causeOfDeath, deathDate, nonCodedCauseOfDeath } = data;
 
-      markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
+      return markPatientDeceased(deathDate, patientUuid, causeOfDeath, nonCodedCauseOfDeath)
         .then(() => {
           globalMutate((key) => Array.isArray(key) && key[0] === 'patient' && key[1] === patientUuid);
           invalidateCurrentVisit(globalMutate, patientUuid);

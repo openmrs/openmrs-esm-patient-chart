@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import {
@@ -11,35 +12,35 @@ import {
 import { configSchema, type ImmunizationConfigObject } from '../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockCurrentVisit } from '__mocks__';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { ErrorState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsDetailedSummary from './immunizations-detailed-summary.component';
 
-jest.mock('../hooks/useImmunizations', () => ({
-  useImmunizations: jest.fn(),
+vi.mock('../hooks/useImmunizations', () => ({
+  useImmunizations: vi.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(),
 }));
 
-const mockUseImmunizations = jest.mocked(useImmunizations);
-const mockLaunchWorkspace = launchWorkspace2 as jest.Mock;
-const mockUseVisit = jest.mocked(useVisit);
-const mockUseConfig = jest.mocked(useConfig<ImmunizationConfigObject>);
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+const mockUseImmunizations = vi.mocked(useImmunizations);
+const mockLaunchWorkspace = launchWorkspace2 as Mock;
+const mockUseVisit = vi.mocked(useVisit);
+const mockUseConfig = vi.mocked(useConfig<ImmunizationConfigObject>);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
 mockUseConfig.mockReturnValue({
   immunizationsConfig: getDefaultsFromConfigSchema(configSchema) as ImmunizationConfigObject,
 } as any);
 
-mockLaunchWorkspace.mockImplementation(jest.fn());
+mockLaunchWorkspace.mockImplementation(vi.fn());
 
 mockUseConfig.mockReturnValue({
   immunizationsConfig: {
@@ -101,9 +102,9 @@ describe('ImmunizationsDetailedSummary', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: null,
-      mutateVisitContext: jest.fn(),
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
   });
 
@@ -113,10 +114,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
@@ -141,21 +142,15 @@ describe('ImmunizationsDetailedSummary', () => {
       error,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Immunizations' }), {});
   });
 
   it('displays immunization records in a table when data is available', async () => {
@@ -164,10 +159,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
     expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
@@ -184,10 +179,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: true,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -199,20 +194,20 @@ describe('ImmunizationsDetailedSummary', () => {
       patientUuid: 'patient-123',
       patient: null,
       visitContext: mockCurrentVisit,
-      mutateVisitContext: jest.fn(),
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
 
     const user = userEvent.setup();
-    const mockLaunchStartVisitPrompt = jest.fn();
+    const mockLaunchStartVisitPrompt = vi.fn();
     mockUseVisit.mockReturnValue({ currentVisit: { uuid: 'visit-uuid' } } as VisitReturnType);
     mockUseImmunizations.mockReturnValue({
       data: mockImmunizationData,
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderWithSwr(
@@ -230,21 +225,21 @@ describe('ImmunizationsDetailedSummary', () => {
 
   it('prompts to start visit when add button is clicked without an active visit', async () => {
     const user = userEvent.setup();
-    const mockLaunchStartVisitPrompt = jest.fn();
+    const mockLaunchStartVisitPrompt = vi.fn();
     mockUsePatientChartStore.mockReturnValue({
       patientUuid: mockPatient.id,
       patient: mockPatient,
       visitContext: null,
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
     mockUseImmunizations.mockReturnValueOnce({
       data: mockImmunizationData,
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderWithSwr(
@@ -303,10 +298,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
@@ -339,10 +334,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
@@ -378,10 +373,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
@@ -415,10 +410,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 
@@ -439,10 +434,10 @@ describe('ImmunizationsDetailedSummary', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={jest.fn()} />);
+    renderWithSwr(<ImmunizationsDetailedSummary patientUuid={mockPatient.id} launchStartVisitPrompt={vi.fn()} />);
 
     await waitForLoadingToFinish();
 

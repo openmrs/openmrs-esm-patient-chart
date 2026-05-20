@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
@@ -6,15 +7,15 @@ import { mockPatient } from 'tools';
 import { deleteProgramEnrollment, useEnrollments } from './programs.resource';
 import DeleteProgramModal from './delete-program.modal';
 
-jest.mock('./programs.resource', () => ({
-  deleteProgramEnrollment: jest.fn(),
-  useEnrollments: jest.fn(),
+vi.mock('./programs.resource', () => ({
+  deleteProgramEnrollment: vi.fn(),
+  useEnrollments: vi.fn(),
 }));
 
-const mockDeleteProgramEnrollment = jest.mocked(deleteProgramEnrollment);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseEnrollments = jest.mocked(useEnrollments);
-const mockMutateEnrollments = jest.fn();
+const mockDeleteProgramEnrollment = vi.mocked(deleteProgramEnrollment);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseEnrollments = vi.mocked(useEnrollments);
+const mockMutateEnrollments = vi.fn();
 
 mockUseEnrollments.mockImplementation(
   () =>
@@ -28,7 +29,7 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const closeDeleteModalMock = jest.fn();
+const closeDeleteModalMock = vi.fn();
 
 const renderDeleteProgramModal = () => {
   return render(

@@ -1,15 +1,17 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, launchWorkspace2, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { type ConfigObject, configSchema } from '../config-schema';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = openmrsFetch as Mock;
 
 describe('ProgramsDetailedSummary', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
@@ -39,12 +41,7 @@ describe('ProgramsDetailedSummary', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Care Programs' }), {});
   });
 
   it('renders a detailed tabular summary of the patient program enrollments', async () => {

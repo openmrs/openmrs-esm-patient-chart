@@ -35,6 +35,7 @@ import {
   showModal,
   showSnackbar,
   useConfig,
+  useFeatureFlag,
   useLayoutType,
   useSession,
   Workspace2,
@@ -83,15 +84,17 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction) => {
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
   return z.object({
-    noteDate: z.date(),
+    noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     primaryDiagnosisSearch: z.string(),
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
   });
 };
+
+const SEARCH_TIMEOUT_MS = 500;
 
 export interface VisitNotesFormProps {
   encounter?: Encounter;
@@ -104,7 +107,6 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
-  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -123,8 +125,12 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
+  const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
-  const visitNoteFormSchema = useMemo(() => createSchema(t), [t]);
+  const visitNoteFormSchema = useMemo(
+    () => createSchema(t, isRetrospectiveDataEntryEnabled),
+    [t, isRetrospectiveDataEntryEnabled],
+  );
 
   const customResolver = useCallback(
     async (data, context, options) => {
@@ -232,7 +238,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               createErrorHandler();
             });
         }
-      }, searchTimeoutInMs),
+      }, SEARCH_TIMEOUT_MS),
     [config.diagnosisConceptClass, clearErrors],
   );
 
@@ -357,6 +363,10 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
+
+      // When RDE is off, the datepicker is hidden and noteDate defaults to new Date().
+      // This always falls within the 30-minute window, so encounterDatetime is intentionally
+      // omitted from the payload -> letting the server attach the correct timestamp.
       if (finalNoteDate.diff(now, 'minute') <= 30) {
         finalNoteDate = null;
       }
@@ -392,7 +402,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         ? updateVisitNote(abortController, encounter.id, visitNotePayload)
         : saveVisitNote(abortController, visitNotePayload);
 
-      savePromise
+      return savePromise
         .then((response) => {
           if (response.status === 201 || response.status === 200) {
             const encounterUuid = encounter?.id || response.data.uuid;
@@ -513,68 +523,59 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         <div className={styles.formContainer}>
           <Stack gap={2}>
             {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
-            <Row className={styles.row}>
-              <Column sm={1}>
-                <span className={styles.columnLabel}>{t('date', 'Date')}</span>
-              </Column>
-              <Column sm={3}>
-                <Controller
-                  name="noteDate"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <ResponsiveWrapper>
-                      <OpenmrsDatePicker
-                        {...field}
-                        data-testid="visitDateTimePicker"
-                        id="visitDateTimePicker"
-                        invalid={Boolean(fieldState?.error?.message)}
-                        invalidText={fieldState?.error?.message}
-                        isDisabled={isEditing}
-                        labelText={t('visitDate', 'Visit date')}
-                        maxDate={new Date()}
-                      />
-                    </ResponsiveWrapper>
-                  )}
-                />
-              </Column>
-            </Row>
+            {isRetrospectiveDataEntryEnabled && (
+              <Row className={styles.row}>
+                <Column sm={1}>
+                  <span className={styles.columnLabel}>{t('date', 'Date')}</span>
+                </Column>
+                <Column sm={3}>
+                  <Controller
+                    name="noteDate"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <ResponsiveWrapper>
+                        <OpenmrsDatePicker
+                          {...field}
+                          data-testid="visitDateTimePicker"
+                          id="visitDateTimePicker"
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                          isDisabled={isEditing}
+                          labelText={t('visitDate', 'Visit date')}
+                          maxDate={new Date()}
+                        />
+                      </ResponsiveWrapper>
+                    )}
+                  />
+                </Column>
+              </Row>
+            )}
             <div className={styles.diagnosesText}>
-              {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-                <>
-                  {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                      type="red"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-                <>
-                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                      type="blue"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedPrimaryDiagnoses &&
-                !selectedPrimaryDiagnoses.length &&
-                selectedSecondaryDiagnoses &&
-                !selectedSecondaryDiagnoses.length && (
-                  <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-                )}
+              {selectedPrimaryDiagnoses.map((diagnosis) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={diagnosis.diagnosis.coded}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                  type="red"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {selectedSecondaryDiagnoses.map((diagnosis) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={diagnosis.diagnosis.coded}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                  type="blue"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {!selectedPrimaryDiagnoses.length && !selectedSecondaryDiagnoses.length && (
+                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              )}
             </div>
             <Row className={styles.row}>
               <Column sm={1}>
@@ -723,12 +724,11 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
           <Button
             className={styles.button}
             kind="primary"
-            onClick={() => handleSubmit}
             disabled={!hasUserUnsavedChanges || isSubmitting}
             type="submit"
           >
             {isSubmitting ? (
-              <InlineLoading description={t('saving', 'Saving') + '...'} />
+              <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
             ) : (
               <span>{t('saveAndClose', 'Save and close')}</span>
             )}
@@ -813,20 +813,16 @@ function DiagnosesDisplay({
   if (!isSearching && searchResults?.length > 0) {
     return (
       <ul className={styles.diagnosisList}>
-        {searchResults.map((diagnosis, index) => {
-          if (isDiagnosisNotSelected(diagnosis)) {
-            return (
-              <li
-                className={styles.diagnosis}
-                key={index}
-                onClick={() => onAddDiagnosis(diagnosis, fieldName)}
-                role="menuitem"
-              >
-                {diagnosis.display}
-              </li>
-            );
-          }
-        })}
+        {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
+          <li
+            className={styles.diagnosis}
+            key={diagnosis.uuid}
+            onClick={() => onAddDiagnosis(diagnosis, fieldName)}
+            role="menuitem"
+          >
+            {diagnosis.display}
+          </li>
+        ))}
       </ul>
     );
   }

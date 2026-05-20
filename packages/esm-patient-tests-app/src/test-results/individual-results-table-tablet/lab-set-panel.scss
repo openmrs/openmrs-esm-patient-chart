@@ -124,18 +124,22 @@
   table-layout: fixed;
   width: 100%;
 
-  td {
-    border-bottom: none !important;
+  tbody .col-testName {
+    color: colors.$blue-60;
   }
 }
 
 .tableWithRange {
   .col-testName {
-    width: 50%;
+    width: 36%;
+  }
+
+  .col-resultDate {
+    width: 22%;
   }
 
   .col-value {
-    width: 25%;
+    width: 17%;
   }
 
   .col-referenceRange {
@@ -145,10 +149,14 @@
 
 .tableWithoutRange {
   .col-testName {
-    width: 60%;
+    width: 50%;
+  }
+
+  .col-resultDate {
+    width: 22%;
   }
 
   .col-value {
-    width: 40%;
+    width: 28%;
   }
 }

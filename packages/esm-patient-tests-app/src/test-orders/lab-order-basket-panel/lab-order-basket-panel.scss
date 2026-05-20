@@ -1,6 +1,5 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
-@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .desktopContainer {
@@ -54,22 +53,6 @@
 
 .tabletTile.collapsedTile {
   border-bottom: 1px solid $grey-2;
-}
-
-.desktopTile .container {
-  h4 {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
-}
-
-.tabletTile .container {
-  padding: layout.$spacing-03;
-
-  h4 {
-    @include type.type-style('heading-03');
-    color: $ui-05;
-  }
 }
 
 .heading {

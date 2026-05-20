@@ -1,6 +1,8 @@
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockVisitNotes, ConfigMock } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr } from 'tools';
 import { useVisitNotes } from './visit-notes.resource';
@@ -12,11 +14,11 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseVisitNotes = jest.mocked(useVisitNotes);
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseVisitNotes = vi.mocked(useVisitNotes);
+const mockUseConfig = vi.mocked(useConfig);
 
-jest.mock('./visit-notes.resource', () => {
-  return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+vi.mock('./visit-notes.resource', () => {
+  return { useVisitNotes: vi.fn().mockReturnValue([{}]) };
 });
 
 describe('NotesOverview', () => {
@@ -30,7 +32,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
@@ -56,19 +58,13 @@ describe('NotesOverview', () => {
       error: error,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Visit notes' }), {});
   });
 
   test("renders a tabular overview of the patient's visit notes when present", async () => {
@@ -77,7 +73,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);

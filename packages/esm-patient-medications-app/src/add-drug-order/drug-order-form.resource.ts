@@ -4,9 +4,28 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { parseDate, useConfig } from '@openmrs/esm-framework';
-import { type Drug, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type Drug, type DrugOrderBasketItem, type OrderAction } from '@openmrs/esm-patient-common-lib';
 import { useRequireOutpatientQuantity } from '../api';
 import { type ConfigObject } from '../config-schema';
+
+/**
+ * Returns the earliest selectable Start date for the drug order form. For REVISE,
+ * the new order's dateActivated must be strictly after the previous order's
+ * dateActivated (the backend computes previous.dateStopped = new.dateActivated - 1s),
+ * so the floor is previous + 1s. For NEW/RENEW/DISCONTINUE the floor is the visit
+ * start so the encounter the form ultimately writes to can hold the chosen
+ * dateActivated.
+ */
+export function getStartDateMinimum(
+  action: OrderAction | undefined,
+  previousOrderDateActivated: string | undefined,
+  visitStartDatetime: string | undefined,
+): Date | undefined {
+  if (action === 'REVISE' && previousOrderDateActivated) {
+    return new Date(new Date(previousOrderDateActivated).getTime() + 1000);
+  }
+  return visitStartDatetime ? parseDate(visitStartDatetime) : undefined;
+}
 
 export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
@@ -66,6 +85,11 @@ function useCreateMedicationOrderFormSchema() {
       valueCoded: z.string(),
     };
 
+    const frequencySchema = {
+      ...comboSchema,
+      frequencyPerDay: z.number().nullish(),
+    };
+
     const baseSchemaFields = {
       drug: z
         .object(
@@ -93,9 +117,11 @@ function useCreateMedicationOrderFormSchema() {
       freeTextDosage: z.string().refine((value) => !!value, {
         message: t('freeDosageErrorMessage', 'Add free dosage note'),
       }),
-      dosage: z.number({
-        invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
-      }),
+      dosage: z
+        .number({
+          invalid_type_error: t('dosageRequiredErrorMessage', 'Dosage is required'),
+        })
+        .gt(0, { message: t('dosageGreaterThanZeroErrorMessage', 'Dose must be greater than 0') }),
       unit: z.object(
         { ...comboSchema },
         {
@@ -120,7 +146,7 @@ function useCreateMedicationOrderFormSchema() {
         : z.string().nullish(),
       scheduledDate: z.date(),
       frequency: z.object(
-        { ...comboSchema },
+        { ...frequencySchema },
         {
           invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
         },
@@ -186,7 +212,7 @@ function useCreateMedicationOrderFormSchema() {
       dosage: z.number().nullable(),
       unit: z.object(comboSchema).nullable(),
       route: z.object(comboSchema).nullable(),
-      frequency: z.object(comboSchema).nullable(),
+      frequency: z.object(frequencySchema).nullable(),
     });
 
     return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
@@ -196,3 +222,18 @@ function useCreateMedicationOrderFormSchema() {
 }
 
 export type MedicationOrderFormData = z.infer<ReturnType<typeof useCreateMedicationOrderFormSchema>>;
+
+export function durationToDays(
+  duration: number | null,
+  durationUnitUuid: string | null,
+  durationUnitsDaysMap: Record<string, number>,
+): number | null {
+  if (duration == null || !durationUnitUuid) {
+    return null;
+  }
+  const multiplier = durationUnitsDaysMap[durationUnitUuid];
+  if (multiplier == null) {
+    return null;
+  }
+  return duration * multiplier;
+}

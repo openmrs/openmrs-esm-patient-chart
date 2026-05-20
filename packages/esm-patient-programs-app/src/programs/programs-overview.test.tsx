@@ -1,13 +1,15 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnrolledProgramsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsOverview from './programs-overview.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 const testProps = {
   basePath: `/patient/${mockPatient.id}/chart`,
@@ -41,8 +43,7 @@ describe('ProgramsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sorry, there was a problem displaying this information./)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Care Programs' }), {});
   });
 
   it("renders a tabular overview of the patient's active program enrollments when available", async () => {

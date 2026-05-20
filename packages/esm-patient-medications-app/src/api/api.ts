@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -105,6 +105,13 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
+  const orderStartDate = order.scheduledDate ? new Date(order.scheduledDate) : null;
+  const startDateFragment = orderStartDate
+    ? orderStartDate > new Date()
+      ? { scheduledDate: toOmrsIsoString(orderStartDate), urgency: 'ON_SCHEDULED_DATE' as const }
+      : { dateActivated: toOmrsIsoString(orderStartDate) }
+    : {};
+
   if (order.action === 'NEW') {
     return {
       action: 'NEW',
@@ -129,14 +136,13 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
-      scheduledDate: order.scheduledDate,
-      urgency: 'ON_SCHEDULED_DATE',
       concept: order.drug.concept.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
     return {
-      action: 'NEW',
+      action: 'RENEW',
       previousOrder: order.previousOrder,
       patient: patientUuid,
       type: 'drugorder',
@@ -160,6 +166,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -187,9 +194,8 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         ? 'org.openmrs.FreeTextDosingInstructions'
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
-      scheduledDate: order.scheduledDate,
-      urgency: 'ON_SCHEDULED_DATE',
       concept: order?.drug?.concept?.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -236,6 +242,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
       ? {
           valueCoded: order.frequency.uuid,
           value: order.frequency.display,
+          // Not available from the Order resource; auto-calc requires the user to re-select a frequency
+          frequencyPerDay: null,
         }
       : null,
     route: order.route
@@ -250,7 +258,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    scheduledDate: action == 'RENEW' ? new Date() : order.scheduledDate || order.dateActivated,
+    scheduledDate: action === 'RENEW' ? new Date() : order.scheduledDate || order.dateActivated,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
@@ -268,6 +276,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
         }
       : null,
     encounterUuid: order.encounter?.uuid,
+    previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
     visit: order.encounter.visit,
   };
 }
