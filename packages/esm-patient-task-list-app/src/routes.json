@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "tasks": ">=2.0.0",
+    "tasks": ">=1.1.0-SNAPSHOT",
     "webservices.rest": ">=3.1.0"
   },
   "modals": [
