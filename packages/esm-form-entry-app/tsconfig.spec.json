@@ -17,9 +17,7 @@
   },
   "files": [
     "src/test.ts",
-    "src/polyfills.ts",
-    "src/compat/angular-cdk-portal.ts",
-    "src/compat/ngx-file-uploader.ts"
+    "src/polyfills.ts"
   ],
   "include": [
     "src/**/*.spec.ts",

@@ -115,6 +115,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
+            "preserveSymlinks": true,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -122,8 +123,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [],
-            "extraWebpackConfig": "webpack.test.config.js"
+            "scripts": []
           }
         },
         "e2e": {
