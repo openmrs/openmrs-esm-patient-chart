@@ -71,9 +71,22 @@ const ConceptSearchResults = ({
 
   if (searchResults?.length > 0) {
     return (
-      <ul className={styles.resultsList}>
+      <ul className={styles.resultsList} role="listbox">
         {searchResults.map((result) => (
-          <li className={styles.resultItem} key={result.uuid} onClick={() => onSelect(result)} role="menuitem">
+          <li
+            aria-selected={false}
+            className={styles.resultItem}
+            key={result.uuid}
+            onClick={() => onSelect(result)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelect(result);
+              }
+            }}
+            role="option"
+            tabIndex={0}
+          >
             {result.display}
           </li>
         ))}

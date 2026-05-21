@@ -71,13 +71,13 @@ const renderProceduresForm = () => {
 
 const fillRequiredFields = async (user: ReturnType<typeof userEvent.setup>) => {
   // The shared mockUseConceptSearch returns the same searchedProcedure mock
-  // for every concept search field, so each "Appendectomy" menuitem matches the
+  // for every concept search field, so each "Appendectomy" option matches the
   // currently-typed-in field — only one results list is visible at a time.
   await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
-  await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+  await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
   await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
-  await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+  await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
   const statusGroup = screen.getByRole('group', { name: /^status/i });
   await user.click(within(statusGroup).getByRole('combobox'));
@@ -166,7 +166,7 @@ describe('ProceduresForm', () => {
 
     await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
 
-    expect(screen.getByRole('menuitem', { name: /appendectomy/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /appendectomy/i })).toBeInTheDocument();
   });
 
   it('shows a "No results" tile when a search yields no matches', async () => {
@@ -342,7 +342,7 @@ describe('ProceduresForm', () => {
     renderProceduresForm();
 
     await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
 
     const durationInput = screen.getByRole('spinbutton', { name: /^duration$/i });
     await user.type(durationInput, '5');
@@ -394,9 +394,9 @@ describe('ProceduresForm', () => {
     renderProceduresForm();
 
     await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
     await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
     const statusGroup = screen.getByRole('group', { name: /^status/i });
     await user.click(within(statusGroup).getByRole('combobox'));
     await user.click(screen.getByRole('option', { name: /appendectomy/i }));
@@ -489,9 +489,9 @@ describe('ProceduresForm', () => {
     renderProceduresForm();
 
     await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
     await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
-    await user.click(screen.getByRole('menuitem', { name: /appendectomy/i }));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
     const statusGroup = screen.getByRole('group', { name: /^status/i });
     await user.click(within(statusGroup).getByRole('combobox'));
     await user.click(screen.getByRole('option', { name: /appendectomy/i }));
