@@ -35,6 +35,7 @@ const DeleteProcedureModal: React.FC<DeleteProcedureModalProps> = ({
         title: t('procedureDeleted', 'Procedure deleted'),
       });
     } catch (error) {
+      setIsDeleting(false);
       console.error('Error deleting procedure: ', error);
 
       showSnackbar({
