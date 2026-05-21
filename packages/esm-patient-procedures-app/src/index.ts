@@ -14,9 +14,9 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export function startupApp() {
+export const startupApp = () => {
   defineConfigSchema(moduleName, configSchema);
-}
+};
 
 // Extensions
 export const proceduresOverview = getSyncLifecycle(ProceduresOverview, options);

@@ -17,7 +17,7 @@ const sourceTypeToRestParam: Record<Exclude<ConceptSourceType, 'any'>, string> =
   'Answer to': 'answerTo',
 };
 
-function buildConceptSearchUrl(query: string, source: ConceptSource): string {
+const buildConceptSearchUrl = (query: string, source: ConceptSource): string => {
   const params = new URLSearchParams({ v: 'custom:(uuid,display)' });
   if (query) {
     params.set('name', query);
@@ -27,15 +27,15 @@ function buildConceptSearchUrl(query: string, source: ConceptSource): string {
     params.set(sourceTypeToRestParam[source.sourceType], source.uuid);
   }
   return `${restBaseUrl}/concept?${params.toString()}`;
-}
+};
 
-export function useProcedureTypes() {
+export const useProcedureTypes = () => {
   const url = `${restBaseUrl}/proceduretype?v=full`;
   const { data, isLoading } = useSWR<{ data: ProcedureTypeApiResponse }, Error>(url, openmrsFetch);
   return { procedureTypes: data?.data?.results ?? [], isLoading };
-}
+};
 
-export function useConceptSearch(query: string, source: ConceptSource) {
+export const useConceptSearch = (query: string, source: ConceptSource) => {
   const hasSourceFilter = Boolean(source.uuid) && source.sourceType !== 'any';
   const url = query || hasSourceFilter ? buildConceptSearchUrl(query, source) : null;
   const { data, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
@@ -46,31 +46,31 @@ export function useConceptSearch(query: string, source: ConceptSource) {
   const uniqueSearchResults = Array.from(new Map(results.map((concept) => [concept.uuid, concept])).values());
 
   return { searchResults: uniqueSearchResults, isSearching: isLoading };
-}
+};
 
-export async function saveProcedure(payload: RawProcedure) {
+export const saveProcedure = async (payload: RawProcedure) => {
   return openmrsFetch(`${restBaseUrl}/procedure`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: payload,
   });
-}
+};
 
-export async function updateProcedure(procedureUuid: string, payload: RawProcedure) {
+export const updateProcedure = async (procedureUuid: string, payload: RawProcedure) => {
   return openmrsFetch(`${restBaseUrl}/procedure/${procedureUuid}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: payload,
   });
-}
+};
 
-export function useMutatePatientProcedures(patientUuid: string) {
+export const useMutatePatientProcedures = (patientUuid: string) => {
   const { mutate } = useSWRConfig();
   return () =>
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/procedure?patient=${patientUuid}`));
-}
+};
 
-export function useProcedures(patientUuid: string, startIndex = 0, limit = 100) {
+export const useProcedures = (patientUuid: string, startIndex = 0, limit = 100) => {
   const url = `${restBaseUrl}/procedure?patient=${patientUuid}&v=full&startIndex=${startIndex}&limit=${limit}&totalCount=true`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: ProcedureApiResponse }, Error>(
     patientUuid ? url : null,
@@ -83,9 +83,9 @@ export function useProcedures(patientUuid: string, startIndex = 0, limit = 100) 
     isLoading,
     isValidating,
   };
-}
+};
 
-export async function deleteProcedure(procedureId: string) {
+export const deleteProcedure = async (procedureId: string) => {
   const controller = new AbortController();
   const url = `${restBaseUrl}/procedure/${procedureId}`;
 
@@ -93,15 +93,15 @@ export async function deleteProcedure(procedureId: string) {
     method: 'DELETE',
     signal: controller.signal,
   });
-}
+};
 
-export function useConceptById(uuid: string) {
+export const useConceptById = (uuid: string) => {
   const url = uuid ? `${restBaseUrl}/concept/${uuid}?v=custom:(uuid,display)` : null;
   const { data } = useSWR<{ data: ConceptReference }, Error>(url, openmrsFetch);
   return data?.data ?? null;
-}
+};
 
-export function useConceptSearchField(source: ConceptSource, initialValue: string) {
+export const useConceptSearchField = (source: ConceptSource, initialValue: string) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConcept, setSelectedConcept] = useState<ConceptReference | null>(null);
 
@@ -131,4 +131,4 @@ export function useConceptSearchField(source: ConceptSource, initialValue: strin
     isSearching,
     clear,
   };
-}
+};

@@ -6,22 +6,22 @@ import styles from './date-time-field.scss';
 
 const TIME_PATTERN = /^(1[0-2]|0?[1-9]):([0-5]\d)$/;
 
-function formatTime(date: Date | null | undefined): string {
+const formatTime = (date: Date | null | undefined): string => {
   if (!date) return '';
   const hours24 = date.getHours();
   const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
   return `${String(hours12).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
+};
 
-function getMeridiem(date: Date | null | undefined): 'AM' | 'PM' {
+const getMeridiem = (date: Date | null | undefined): 'AM' | 'PM' => {
   if (!date) return 'AM';
   return date.getHours() >= 12 ? 'PM' : 'AM';
-}
+};
 
-function to24Hour(hours12: number, meridiem: 'AM' | 'PM'): number {
+const to24Hour = (hours12: number, meridiem: 'AM' | 'PM'): number => {
   if (meridiem === 'AM') return hours12 === 12 ? 0 : hours12;
   return hours12 === 12 ? 12 : hours12 + 12;
-}
+};
 
 interface DateTimeFieldProps {
   idPrefix: string;
@@ -31,7 +31,7 @@ interface DateTimeFieldProps {
   invalidText?: string;
 }
 
-export function DateTimeField({ idPrefix, value, onChange, invalid, invalidText }: DateTimeFieldProps) {
+export const DateTimeField = ({ idPrefix, value, onChange, invalid, invalidText }: DateTimeFieldProps) => {
   const { t } = useTranslation();
   const dateValue = value ?? null;
   const meridiem = getMeridiem(dateValue);
@@ -105,4 +105,4 @@ export function DateTimeField({ idPrefix, value, onChange, invalid, invalidText 
       </TimePicker>
     </div>
   );
-}
+};

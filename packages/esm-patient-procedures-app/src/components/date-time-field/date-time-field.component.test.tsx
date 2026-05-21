@@ -9,7 +9,7 @@ interface HarnessProps {
   idPrefix?: string;
 }
 
-function Harness({ defaultValue = null, idPrefix = 'start' }: HarnessProps) {
+const Harness = ({ defaultValue = null, idPrefix = 'start' }: HarnessProps) => {
   const [value, setValue] = useState<Date | null>(defaultValue);
   return (
     <div>
@@ -19,13 +19,13 @@ function Harness({ defaultValue = null, idPrefix = 'start' }: HarnessProps) {
       <output data-testid="minutes">{value ? String(value.getMinutes()) : ''}</output>
     </div>
   );
-}
+};
 
-async function pickDate(user: ReturnType<typeof userEvent.setup>, date = '2026-04-27') {
+const pickDate = async (user: ReturnType<typeof userEvent.setup>, date = '2026-04-27') => {
   const dateInput = screen.getByLabelText(/^date$/i);
   await user.click(dateInput);
   await user.paste(date);
-}
+};
 
 describe('DateTimeField', () => {
   it('renders date, time, and AM/PM controls', () => {

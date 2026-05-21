@@ -52,7 +52,7 @@ type ProcedureTableRow = {
   notes?: string;
 };
 
-function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) {
+const ProceduresDetailedSummary = ({ patient }: ProceduresDetailedSummaryProps) => {
   const { t } = useTranslation();
   const { procedurePageSize } = useConfig<ConfigObject>();
   const headerTitle = t('procedures', 'Procedures');
@@ -213,6 +213,6 @@ function ProceduresDetailedSummary({ patient }: ProceduresDetailedSummaryProps) 
   }
 
   return <EmptyCard displayText={displayText} headerTitle={headerTitle} launchForm={launchProceduresForm} />;
-}
+};
 
 export default ProceduresDetailedSummary;

@@ -443,7 +443,7 @@ const ProceduresForm: React.FC<ProceduresFormComponentProps> = ({
   );
 };
 
-function RequiredFieldLabel({ label }: { label: string }) {
+const RequiredFieldLabel = ({ label }: { label: string }) => {
   const { t } = useTranslation();
   return (
     <span>
@@ -453,6 +453,6 @@ function RequiredFieldLabel({ label }: { label: string }) {
       </span>
     </span>
   );
-}
+};
 
 export default ProceduresForm;

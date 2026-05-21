@@ -65,11 +65,11 @@ const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object
   showActionMenu: true,
 };
 
-function renderProceduresForm() {
+const renderProceduresForm = () => {
   render(<ProceduresFormWorkspace {...defaultProps} />);
-}
+};
 
-async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
+const fillRequiredFields = async (user: ReturnType<typeof userEvent.setup>) => {
   // The shared mockUseConceptSearch returns the same searchedProcedure mock
   // for every concept search field, so each "Appendectomy" menuitem matches the
   // currently-typed-in field — only one results list is visible at a time.
@@ -90,7 +90,7 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   const startGroup = screen.getByRole('group', { name: /start date and time/i });
   await user.click(within(startGroup).getByLabelText(/^date$/i));
   await user.paste('2026-04-27');
-}
+};
 
 beforeEach(() => {
   mockUseProcedureTypes.mockReturnValue({ procedureTypes: mockProcedureTypes, isLoading: false });
