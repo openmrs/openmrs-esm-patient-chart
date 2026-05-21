@@ -71,6 +71,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
   const isWorkspaceGroupLaunched = useRef(false);
+  const launchedVisitContextUuid = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
     if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
@@ -100,9 +101,13 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
       setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
 
-      if (!isWorkspaceGroupLaunched.current) {
+      const visitContextUuid = groupProps.visitContext?.uuid ?? null;
+      const visitContextChanged = visitContextUuid !== launchedVisitContextUuid.current;
+
+      if (!isWorkspaceGroupLaunched.current || visitContextChanged) {
         launchWorkspaceGroup2('patient-chart', groupProps);
         isWorkspaceGroupLaunched.current = true;
+        launchedVisitContextUuid.current = visitContextUuid;
       }
     }
   }, [
