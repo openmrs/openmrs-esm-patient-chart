@@ -1,16 +1,17 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { mockBasePanel } from '__mocks__';
 import LabSetPanel from './lab-set-panel.component';
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockIsDesktop = jest.mocked(isDesktop);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
 
 describe('LabSetPanel', () => {
   const user = userEvent.setup();
-  const mockSetActivePanel = jest.fn();
+  const mockSetActivePanel = vi.fn();
 
   it('renders the panel header, columns, and observations when provided', () => {
     render(<LabSetPanel activePanel={null} panel={mockBasePanel} setActivePanel={mockSetActivePanel} />);

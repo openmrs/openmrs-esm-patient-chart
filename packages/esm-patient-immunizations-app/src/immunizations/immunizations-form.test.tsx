@@ -1,4 +1,12 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` instances do not satisfy `instanceof Date` against
+ * the host realm's `Date` constructor, which breaks `expect.objectContaining`
+ * matchers on form payloads that production code builds with `new Date()`.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
@@ -20,21 +28,21 @@ import { FHIR_NEXT_DOSE_DATE_EXTENSION_URL } from './immunization-mapper';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsForm from './immunizations-form.workspace';
 
-const mockCloseWorkspace = jest.fn();
-const mockSavePatientImmunization = savePatientImmunization as jest.Mock;
-const mockUseConfig = jest.mocked<() => ImmunizationConfigObject>(useConfig);
-const mockUseSession = jest.mocked(useSession);
-const mockToOmrsIsoString = jest.mocked(toOmrsIsoString);
-const mockToDateObjectStrict = jest.mocked(toDateObjectStrict);
+const mockCloseWorkspace = vi.fn();
+const mockSavePatientImmunization = savePatientImmunization as Mock;
+const mockUseConfig = vi.mocked<() => ImmunizationConfigObject>(useConfig);
+const mockUseSession = vi.mocked(useSession);
+const mockToOmrsIsoString = vi.mocked(toOmrsIsoString);
+const mockToDateObjectStrict = vi.mocked(toDateObjectStrict);
 
-jest.mock('../hooks/useImmunizations', () => ({
-  useImmunizations: jest.fn(),
+vi.mock('../hooks/useImmunizations', () => ({
+  useImmunizations: vi.fn(),
 }));
 
-const mockUseImmunizations = jest.mocked(useImmunizations);
+const mockUseImmunizations = vi.mocked(useImmunizations);
 
-jest.mock('../hooks/useImmunizationsConceptSet', () => ({
-  useImmunizationsConceptSet: jest.fn(() => ({
+vi.mock('../hooks/useImmunizationsConceptSet', () => ({
+  useImmunizationsConceptSet: vi.fn(() => ({
     immunizationsConceptSet: {
       uuid: '984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       display: 'Immunizations',
@@ -65,8 +73,8 @@ jest.mock('../hooks/useImmunizationsConceptSet', () => ({
   })),
 }));
 
-jest.mock('./immunizations.resource', () => ({
-  savePatientImmunization: jest.fn(),
+vi.mock('./immunizations.resource', () => ({
+  savePatientImmunization: vi.fn(),
 }));
 
 const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
@@ -78,7 +86,7 @@ const testProps: PatientWorkspace2DefinitionProps<{}, {}> = {
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {},
   windowProps: {},
   windowName: '',
@@ -118,7 +126,7 @@ describe('Immunizations Form', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
   });
 
@@ -496,7 +504,7 @@ describe('Immunizations Form', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockSavePatientImmunization.mockResolvedValue({
@@ -549,7 +557,7 @@ describe('Immunizations Form', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockSavePatientImmunization.mockResolvedValue({

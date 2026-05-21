@@ -118,6 +118,7 @@
   "selectRouteErrorMessage": "Voie d'administration requise",
   "selectUnitErrorMessage": "L'unité de mesure de la dose est requise",
   "startDate": "Date de début",
+  "startDateCannotBeInFuture": "Start date cannot be in the future",
   "subCategories": "Categories",
   "takeAsNeeded": "Si besoin",
   "tryReopeningTheForm": "Veuillez essayer d'ouvrir à nouveau le formulaire",

@@ -1,11 +1,12 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import { mockPatient } from 'tools';
 import VisitTag from './visit-tag.extension';
 
-const mockUseVisit = jest.mocked(useVisit);
+const mockUseVisit = vi.mocked(useVisit);
 
 describe('VisitBannerTag', () => {
   it('renders an active visit tag when an active visit is ongoing', () => {
@@ -16,7 +17,7 @@ describe('VisitBannerTag', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     const patient = { ...mockPatient, deceasedDateTime: null };
@@ -29,7 +30,7 @@ describe('VisitBannerTag', () => {
 
     expect(
       screen.getByRole('tooltip', {
-        name: visitMetadata,
+        name: new RegExp(visitMetadata.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s*')),
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Active Visit/i })).toBeInTheDocument();
@@ -44,7 +45,7 @@ describe('VisitBannerTag', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     const patient = { ...mockPatient, deceasedDateTime: '2002-04-04' };

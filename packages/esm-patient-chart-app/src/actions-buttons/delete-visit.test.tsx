@@ -1,12 +1,13 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { showModal, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import DeleteVisitOverflowMenuItem from './delete-visit.component';
 
-const mockUseVisit = jest.mocked(useVisit);
-const mockShowModal = jest.mocked(showModal);
+const mockUseVisit = vi.mocked(useVisit);
+const mockShowModal = vi.mocked(showModal);
 
 describe('DeleteVisitOverflowMenuItem', () => {
   it('should launch delete visit dialog modal', async () => {

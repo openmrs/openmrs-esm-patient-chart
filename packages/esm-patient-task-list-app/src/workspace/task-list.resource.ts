@@ -198,7 +198,7 @@ function createTaskFromCarePlan(carePlan: CarePlan): Task {
     status,
     createdDate: parseDate(carePlan.created),
     dueDate: taskDueDate,
-    rationale: carePlan.description ?? undefined,
+    rationale: detail?.reasonCode?.[0]?.text ?? carePlan.description ?? undefined,
     createdBy,
     completed: status === 'completed',
     priority,
@@ -255,6 +255,10 @@ function buildCarePlan(patientUuid: string, task: Partial<Task>) {
     description: task.name,
   };
 
+  if (task.rationale) {
+    detail.reasonCode = [{ text: task.rationale }];
+  }
+
   if (performer.length > 0) {
     detail.performer = performer;
   }
@@ -304,7 +308,6 @@ function buildCarePlan(patientUuid: string, task: Partial<Task>) {
     resourceType: 'CarePlan',
     status: task.completed ? 'completed' : 'active',
     intent: 'plan',
-    description: task.rationale,
     subject: {
       reference: `Patient/${patientUuid}`,
     },

@@ -1,7 +1,9 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
@@ -13,7 +15,7 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
@@ -21,7 +23,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {
     condition: null,
     formContext: 'creating' as 'creating' | 'editing',
@@ -43,18 +45,18 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
   render(<ConditionsForm {...props} />);
 }
 
-const mockCreateCondition = jest.mocked(createCondition);
-const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
-const mockUseConditions = jest.mocked(useConditions);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockCreateCondition = vi.mocked(createCondition);
+const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
+const mockUseConditions = vi.mocked(useConditions);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('./conditions.resource', () => ({
-  ...jest.requireActual('./conditions.resource'),
-  createCondition: jest.fn(),
-  editCondition: jest.fn(),
-  useConditions: jest.fn(),
-  useConditionsSearch: jest.fn(),
+vi.mock('./conditions.resource', async () => ({
+  ...((await vi.importActual('./conditions.resource')) as object),
+  createCondition: vi.fn(),
+  editCondition: vi.fn(),
+  useConditions: vi.fn(),
+  useConditionsSearch: vi.fn(),
 }));
 
 mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
@@ -63,7 +65,7 @@ mockUseConditions.mockReturnValue({
   error: null,
   isLoading: false,
   isValidating: false,
-  mutate: jest.fn().mockResolvedValue(undefined),
+  mutate: vi.fn().mockResolvedValue(undefined),
 });
 mockUseConditionsSearch.mockReturnValue({
   searchResults: [],
@@ -335,7 +337,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -348,6 +350,58 @@ describe('Duplicate condition detection', () => {
 
     // Save button should still be enabled (non-blocking)
     expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
+  });
+
+  it('does not escape apostrophes in duplicate warning condition names', async () => {
+    const user = userEvent.setup();
+    const translationMock = useTranslation();
+    const tSpy = vi.spyOn(translationMock, 't');
+    const huntingtonCondition = {
+      display: "Huntington's chorea",
+      uuid: '1234567890AAAAAAAAAAAAAAAAAAAAAAAAAA',
+    };
+
+    try {
+      mockUseConditionsSearch.mockReturnValue({
+        searchResults: [huntingtonCondition],
+        error: null,
+        isSearching: false,
+      });
+
+      mockUseConditions.mockReturnValue({
+        conditions: [
+          {
+            clinicalStatus: 'Active',
+            conceptId: huntingtonCondition.uuid,
+            display: huntingtonCondition.display,
+            onsetDateTime: '2020-08-19T00:00:00+00:00',
+            recordedDate: '2020-08-19T18:34:48+00:00',
+            id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+          },
+        ],
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: vi.fn().mockResolvedValue(undefined),
+      });
+
+      renderConditionsForm();
+
+      const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+      await user.type(conditionSearchInput, "Huntington's");
+      await user.click(screen.getByRole('menuitem', { name: /huntington's chorea/i }));
+
+      expect(
+        screen.getByText(/huntington's chorea is already on this patient's active problem list/i),
+      ).toBeInTheDocument();
+      expect(tSpy).toHaveBeenCalledWith(
+        'duplicateActiveConditionSubtitle',
+        "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
+        { conditionName: huntingtonCondition.display, interpolation: { escapeValue: false } },
+      );
+    } finally {
+      tSpy.mockRestore();
+    }
   });
 
   it('shows a different warning when selecting a condition that exists as inactive', async () => {
@@ -367,7 +421,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     mockUseConditionsSearch.mockReturnValue({
@@ -413,7 +467,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -449,7 +503,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -496,7 +550,7 @@ describe('Duplicate condition detection', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn().mockResolvedValue(undefined),
+      mutate: vi.fn().mockResolvedValue(undefined),
     });
 
     renderConditionsForm();
@@ -518,7 +572,7 @@ describe('Duplicate condition detection', () => {
       isSearching: false,
     });
 
-    const mockMutate = jest.fn().mockResolvedValue(undefined);
+    const mockMutate = vi.fn().mockResolvedValue(undefined);
     mockUseConditions.mockReturnValue({
       conditions: [
         {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal } from '@openmrs/esm-framework';
@@ -6,12 +7,12 @@ import { mockStickyNote } from '__mocks__';
 import { mockPatient } from 'tools';
 import StickyNotePanel from './sticky-note-panel.component';
 
-const mockShowModal = showModal as jest.Mock;
+const mockShowModal = showModal as Mock;
 
 describe('StickyNotePanel', () => {
   const patientUuid = mockPatient.id;
-  const onClose = jest.fn();
-  const mutate = jest.fn();
+  const onClose = vi.fn();
+  const mutate = vi.fn();
 
   const defaultProps = {
     error: undefined,

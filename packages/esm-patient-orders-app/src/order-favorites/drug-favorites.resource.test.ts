@@ -1,4 +1,5 @@
 import type { DrugFavoriteOrder } from './types';
+import { vi, describe, it, expect } from 'vitest';
 import { addDrugFavorite, removeDrugFavorite } from './drug-favorites.resource';
 
 const makeFavorite = (overrides: Partial<DrugFavoriteOrder> = {}): DrugFavoriteOrder =>

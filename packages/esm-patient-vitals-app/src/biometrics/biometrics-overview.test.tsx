@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { vi, describe, it, expect } from 'vitest';
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
@@ -19,20 +20,20 @@ const testProps = {
   mutateVisitContext: null,
 };
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
 
-jest.mock('../common', () => {
-  const originalModule = jest.requireActual('../common');
+vi.mock('../common', async () => {
+  const originalModule = (await vi.importActual('../common')) as object;
 
   return {
     ...originalModule,
-    useConceptUnits: jest.fn().mockImplementation(() => ({
+    useConceptUnits: vi.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,
       isLoading: false,
     })),
-    useVitalsAndBiometrics: jest.fn(),
+    useVitalsAndBiometrics: vi.fn(),
   };
 });
 
@@ -199,7 +200,7 @@ describe('Biometrics Overview', () => {
   });
 
   it('passes interpretation and concept UUID to NumericObservation for each biometric cell', async () => {
-    const mockNumericObservation = jest.mocked(NumericObservation);
+    const mockNumericObservation = vi.mocked(NumericObservation);
     mockNumericObservation.mockClear();
 
     const defaults = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
