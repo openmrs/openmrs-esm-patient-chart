@@ -11,3 +11,4 @@ export * from './results-viewer-page';
 export * from './task-list-page';
 export * from './visits-page';
 export * from './vitals-and-biometrics-page';
+export * from './procedures-page';
