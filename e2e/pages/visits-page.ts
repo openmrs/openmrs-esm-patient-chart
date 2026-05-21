@@ -4,6 +4,6 @@ export class VisitsPage {
   constructor(readonly page: Page) {}
 
   async goTo(patientUuid: string) {
-    await this.page.goto(`patient/${patientUuid}/chart/Visits`);
+    await this.page.goto(`patient/${patientUuid}/chart/visits`);
   }
 }

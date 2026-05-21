@@ -1,11 +1,13 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
-import { createCondition, useConditionsSearch } from './conditions.resource';
+import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
 import ConditionsForm, { type ConditionFormProps } from './conditions-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
@@ -13,7 +15,7 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object> = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
@@ -21,7 +23,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ConditionFormProps, object>
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {
     condition: null,
     formContext: 'creating' as 'creating' | 'editing',
@@ -43,19 +45,28 @@ function renderConditionsForm(workspaceProps?: ConditionFormProps) {
   render(<ConditionsForm {...props} />);
 }
 
-const mockCreateCondition = jest.mocked(createCondition);
-const mockUseConditionsSearch = jest.mocked(useConditionsSearch);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockCreateCondition = vi.mocked(createCondition);
+const mockUseConditionsSearch = vi.mocked(useConditionsSearch);
+const mockUseConditions = vi.mocked(useConditions);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
-jest.mock('./conditions.resource', () => ({
-  ...jest.requireActual('./conditions.resource'),
-  createCondition: jest.fn(),
-  editCondition: jest.fn(),
-  useConditionsSearch: jest.fn(),
+vi.mock('./conditions.resource', async () => ({
+  ...((await vi.importActual('./conditions.resource')) as object),
+  createCondition: vi.fn(),
+  editCondition: vi.fn(),
+  useConditions: vi.fn(),
+  useConditionsSearch: vi.fn(),
 }));
 
 mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+mockUseConditions.mockReturnValue({
+  conditions: [],
+  error: null,
+  isLoading: false,
+  isValidating: false,
+  mutate: vi.fn().mockResolvedValue(undefined),
+});
 mockUseConditionsSearch.mockReturnValue({
   searchResults: [],
   error: null,
@@ -246,6 +257,28 @@ describe('Conditions form', () => {
     });
   });
 
+  it('requires selecting a condition result before submitting typed search text', async () => {
+    const user = userEvent.setup();
+
+    mockCreateCondition.mockClear();
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: [],
+      error: null,
+      isSearching: false,
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
+
+    await user.type(conditionSearchInput, 'Definitely not a condition');
+    await user.click(submitButton);
+
+    expect(await screen.findByText(/a condition is required/i)).toBeInTheDocument();
+    expect(mockCreateCondition).not.toHaveBeenCalled();
+  });
+
   it('launching the form with an existing condition prepopulates the form with the condition details', async () => {
     const user = userEvent.setup();
 
@@ -270,5 +303,310 @@ describe('Conditions form', () => {
 
     await user.click(inactiveStatusInput);
     await user.click(submitButton);
+  });
+});
+
+describe('Duplicate condition detection', () => {
+  const hypertensionSearchResult = [
+    {
+      display: 'Hypertension',
+      uuid: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  ];
+
+  it('shows a warning when selecting a condition that already exists as active', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/hypertension is already on this patient's active problem list/i)).toBeInTheDocument();
+
+    // Save button should still be enabled (non-blocking)
+    expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
+  });
+
+  it('does not escape apostrophes in duplicate warning condition names', async () => {
+    const user = userEvent.setup();
+    const translationMock = useTranslation();
+    const tSpy = vi.spyOn(translationMock, 't');
+    const huntingtonCondition = {
+      display: "Huntington's chorea",
+      uuid: '1234567890AAAAAAAAAAAAAAAAAAAAAAAAAA',
+    };
+
+    try {
+      mockUseConditionsSearch.mockReturnValue({
+        searchResults: [huntingtonCondition],
+        error: null,
+        isSearching: false,
+      });
+
+      mockUseConditions.mockReturnValue({
+        conditions: [
+          {
+            clinicalStatus: 'Active',
+            conceptId: huntingtonCondition.uuid,
+            display: huntingtonCondition.display,
+            onsetDateTime: '2020-08-19T00:00:00+00:00',
+            recordedDate: '2020-08-19T18:34:48+00:00',
+            id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+          },
+        ],
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: vi.fn().mockResolvedValue(undefined),
+      });
+
+      renderConditionsForm();
+
+      const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+      await user.type(conditionSearchInput, "Huntington's");
+      await user.click(screen.getByRole('menuitem', { name: /huntington's chorea/i }));
+
+      expect(
+        screen.getByText(/huntington's chorea is already on this patient's active problem list/i),
+      ).toBeInTheDocument();
+      expect(tSpy).toHaveBeenCalledWith(
+        'duplicateActiveConditionSubtitle',
+        "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
+        { conditionName: huntingtonCondition.display, interpolation: { escapeValue: false } },
+      );
+    } finally {
+      tSpy.mockRestore();
+    }
+  });
+
+  it('shows a different warning when selecting a condition that exists as inactive', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Inactive',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-07-01T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:35:08+00:00',
+          id: 'b1bc2101-e322-4bbe-a651-200bd0d4e1ad',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/was previously recorded and is now inactive/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/consider reactivating the existing record instead of creating a new one/i),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
+  });
+
+  it('does not show a duplicate warning when selecting a condition not on the patient problem list', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
+      error: null,
+      isSearching: false,
+    });
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Headache');
+    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+
+    expect(screen.queryByText(/already on this patient.*active problem list/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
+  });
+
+  it('removes the duplicate warning when the search input is cleared', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /clear search input/i }));
+
+    expect(screen.queryByText(/already on this patient.*active problem list/i)).not.toBeInTheDocument();
+  });
+
+  it('shows active-duplicate warning when both active and inactive duplicates exist', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Inactive',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2019-03-12T00:00:00+00:00',
+          recordedDate: '2019-03-12T18:34:48+00:00',
+          id: 'aa111111-1111-1111-1111-111111111111',
+        },
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'bb222222-2222-2222-2222-222222222222',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn().mockResolvedValue(undefined),
+    });
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
+    expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
+  });
+
+  it('allows saving a condition even when a duplicate warning is shown', async () => {
+    const user = userEvent.setup();
+
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: hypertensionSearchResult,
+      error: null,
+      isSearching: false,
+    });
+
+    const mockMutate = vi.fn().mockResolvedValue(undefined);
+    mockUseConditions.mockReturnValue({
+      conditions: [
+        {
+          clinicalStatus: 'Active',
+          conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Hypertension',
+          onsetDateTime: '2020-08-19T00:00:00+00:00',
+          recordedDate: '2020-08-19T18:34:48+00:00',
+          id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+        },
+      ],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+
+    mockCreateCondition.mockResolvedValue({ status: 201, body: 'Condition created' } as unknown as FetchResponse);
+
+    renderConditionsForm();
+
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+    await user.type(conditionSearchInput, 'Hypertension');
+    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+
+    expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
+
+    const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
+    await user.click(onsetDateInput);
+    await user.paste('2020-05-05');
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() => {
+      expect(mockCreateCondition).toHaveBeenCalled();
+    });
   });
 });

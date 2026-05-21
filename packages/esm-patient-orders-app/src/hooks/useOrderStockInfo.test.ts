@@ -1,10 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { type OrderStockData } from '../types/order';
 import { useOrderStockInfo } from './useOrderStockInfo';
 import { mockOrderStockData } from '../../../../__mocks__/order-stock-data.mock';
 
-const mockedOpenmrsFetch = jest.mocked(openmrsFetch);
+const mockedOpenmrsFetch = vi.mocked(openmrsFetch);
 
 describe('useOrderStockInfo', () => {
   beforeEach(() => {

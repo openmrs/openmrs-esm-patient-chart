@@ -20,7 +20,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
   showPrintButton: {
@@ -52,6 +53,15 @@ export const configSchema = {
       '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
     },
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -65,4 +75,5 @@ export interface ConfigObject {
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
+  drugCategoryConceptSets: Array<string>;
 }

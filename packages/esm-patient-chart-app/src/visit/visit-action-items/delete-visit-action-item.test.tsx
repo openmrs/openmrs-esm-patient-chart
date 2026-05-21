@@ -1,11 +1,12 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showModal, type Visit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '__mocks__';
 import DeleteVisitActionItem from './delete-visit-action-item.component';
 
-const mockShowModal = jest.mocked(showModal);
+const mockShowModal = vi.mocked(showModal);
 
 describe('DeleteVisitActionItem', () => {
   it('renders a delete visit button when the visit has no encounters', () => {
@@ -33,7 +34,7 @@ describe('DeleteVisitActionItem', () => {
 
   it('opens the delete visit modal with the visit when clicked', async () => {
     const user = userEvent.setup();
-    mockShowModal.mockReturnValue(jest.fn());
+    mockShowModal.mockReturnValue(vi.fn());
 
     render(<DeleteVisitActionItem patientUuid="some-uuid" visit={mockCurrentVisit} />);
 

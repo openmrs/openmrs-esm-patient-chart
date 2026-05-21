@@ -1,17 +1,18 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { type Order, useDrugOrderByUuid } from '@openmrs/esm-patient-common-lib';
 import { renderWithSwr } from 'tools';
 import MedicationRecord from './medication-record.component';
 
-const mockUseDrugOrderByUuid = jest.mocked(useDrugOrderByUuid);
+const mockUseDrugOrderByUuid = vi.mocked(useDrugOrderByUuid);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useDrugOrderByUuid: jest.fn(),
+    useDrugOrderByUuid: vi.fn(),
   };
 });
 

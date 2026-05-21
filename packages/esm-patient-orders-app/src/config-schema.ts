@@ -1,5 +1,8 @@
 import { Type, validators } from '@openmrs/esm-framework';
 
+export const accentColors = ['purple', 'cyan', 'teal', 'magenta', 'orange', 'red', 'green', 'gray'] as const;
+export type AccentColor = (typeof accentColors)[number];
+
 export const configSchema = {
   orderEncounterType: {
     _type: Type.UUID,
@@ -42,6 +45,12 @@ export const configSchema = {
         _type: Type.String,
         _description: 'Icon to be shown for the order type. Icons are from the OpenMRS icon library.',
         _default: '',
+      },
+      accentColor: {
+        _type: Type.String,
+        _description: `Accent color applied to the order type's tile: icon backdrop, left border, and top border. Must be one of: ${accentColors.join(', ')}.`,
+        _default: 'purple',
+        _validators: [validators.oneOf(accentColors)],
       },
     },
     _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
@@ -89,6 +98,7 @@ export interface OrderTypeDefinition {
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
   icon?: string;
+  accentColor?: AccentColor;
 }
 
 export interface ConfigObject {

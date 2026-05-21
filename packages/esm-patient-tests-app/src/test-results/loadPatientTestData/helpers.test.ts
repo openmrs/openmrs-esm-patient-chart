@@ -1,4 +1,5 @@
 import type { ObsRecord } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect, test } from 'vitest';
 import { extractObservationReferenceRanges, extractObservationInterpretation } from './helpers';
 import type { FHIRObservationResource } from '../../types';
 

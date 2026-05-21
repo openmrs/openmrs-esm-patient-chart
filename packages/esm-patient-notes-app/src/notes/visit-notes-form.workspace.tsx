@@ -94,6 +94,8 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
   });
 };
 
+const SEARCH_TIMEOUT_MS = 500;
+
 export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
@@ -105,7 +107,6 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   groupProps: { patientUuid, patient },
 }) => {
   const isEditing: boolean = Boolean(formContext === 'editing' && encounter?.id);
-  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -237,7 +238,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               createErrorHandler();
             });
         }
-      }, searchTimeoutInMs),
+      }, SEARCH_TIMEOUT_MS),
     [config.diagnosisConceptClass, clearErrors],
   );
 
@@ -550,42 +551,31 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               </Row>
             )}
             <div className={styles.diagnosesText}>
-              {selectedPrimaryDiagnoses && selectedPrimaryDiagnoses.length ? (
-                <>
-                  {selectedPrimaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
-                      type="red"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-                <>
-                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      className={styles.tag}
-                      filter
-                      key={index}
-                      onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                      type="blue"
-                    >
-                      {diagnosis.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : null}
-              {selectedPrimaryDiagnoses &&
-                !selectedPrimaryDiagnoses.length &&
-                selectedSecondaryDiagnoses &&
-                !selectedSecondaryDiagnoses.length && (
-                  <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-                )}
+              {selectedPrimaryDiagnoses.map((diagnosis) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={diagnosis.diagnosis.coded}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
+                  type="red"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {selectedSecondaryDiagnoses.map((diagnosis) => (
+                <Tag
+                  className={styles.tag}
+                  filter
+                  key={diagnosis.diagnosis.coded}
+                  onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                  type="blue"
+                >
+                  {diagnosis.display}
+                </Tag>
+              ))}
+              {!selectedPrimaryDiagnoses.length && !selectedSecondaryDiagnoses.length && (
+                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              )}
             </div>
             <Row className={styles.row}>
               <Column sm={1}>
@@ -823,20 +813,16 @@ function DiagnosesDisplay({
   if (!isSearching && searchResults?.length > 0) {
     return (
       <ul className={styles.diagnosisList}>
-        {searchResults.map((diagnosis, index) => {
-          if (isDiagnosisNotSelected(diagnosis)) {
-            return (
-              <li
-                className={styles.diagnosis}
-                key={index}
-                onClick={() => onAddDiagnosis(diagnosis, fieldName)}
-                role="menuitem"
-              >
-                {diagnosis.display}
-              </li>
-            );
-          }
-        })}
+        {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
+          <li
+            className={styles.diagnosis}
+            key={diagnosis.uuid}
+            onClick={() => onAddDiagnosis(diagnosis, fieldName)}
+            role="menuitem"
+          >
+            {diagnosis.display}
+          </li>
+        ))}
       </ul>
     );
   }

@@ -129,6 +129,67 @@
   color: $interactive-01;
 }
 
+// HACK: Targets Carbon's inner toggletip wrapper which has a hardcoded max-inline-size: 18rem.
+// className on ToggletipContent lands on the outer element, so we need :global() here
+// to reach the inner shell. cds--toggletip-content is stable within a Carbon major version.
+.referenceRangeToggletip {
+  align-self: center;
+
+  :global(.cds--toggletip-content) {
+    max-inline-size: 24rem;
+  }
+}
+
+.referenceRangeButton {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: $text-02;
+
+  &:hover {
+    color: $interactive-01;
+  }
+}
+
+.referenceRangeContent {
+  min-width: 14rem;
+  padding-inline: layout.$spacing-02;
+}
+
+.referenceRangeHeading {
+  @include type.type-style('heading-compact-01');
+  margin-bottom: layout.$spacing-03;
+}
+
+.referenceRangeEntries {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.referenceRangeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: start;
+  column-gap: layout.$spacing-03;
+}
+
+.referenceRangeLabel {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-30;
+  white-space: normal;
+}
+
+.referenceRangeValue {
+  @include type.type-style('body-compact-01');
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .container {

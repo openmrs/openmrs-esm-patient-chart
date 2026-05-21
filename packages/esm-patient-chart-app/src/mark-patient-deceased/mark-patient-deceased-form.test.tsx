@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterAll } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -8,15 +9,15 @@ import { markPatientDeceased, useCausesOfDeath } from '../data.resource';
 import MarkPatientDeceasedForm from './mark-patient-deceased-form.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib/src';
 
-const mockMarkPatientDeceased = jest.mocked(markPatientDeceased);
-const mockUseCausesOfDeath = jest.mocked(useCausesOfDeath);
-const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockCloseWorkspace = jest.fn();
+const mockMarkPatientDeceased = vi.mocked(markPatientDeceased);
+const mockUseCausesOfDeath = vi.mocked(useCausesOfDeath);
+const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockCloseWorkspace = vi.fn();
 
-jest.mock('../data.resource', () => ({
-  markPatientDeceased: jest.fn().mockResolvedValue({}),
-  useCausesOfDeath: jest.fn(),
+vi.mock('../data.resource', () => ({
+  markPatientDeceased: vi.fn().mockResolvedValue({}),
+  useCausesOfDeath: vi.fn(),
 }));
 
 describe('MarkPatientDeceasedForm', () => {
@@ -25,7 +26,7 @@ describe('MarkPatientDeceasedForm', () => {
   const defaultProps: PatientWorkspace2DefinitionProps<{}, {}> = {
     closeWorkspace: mockCloseWorkspace,
     workspaceName: null,
-    launchChildWorkspace: jest.fn(),
+    launchChildWorkspace: vi.fn(),
     windowProps: {},
     workspaceProps: {},
     groupProps: {
@@ -76,7 +77,7 @@ describe('MarkPatientDeceasedForm', () => {
   });
 
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('renders the cause of death form', () => {
@@ -117,7 +118,7 @@ describe('MarkPatientDeceasedForm', () => {
   });
 
   it('selecting "Other" as the cause of death requires the user to enter a non-coded cause of death', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
 
     render(<MarkPatientDeceasedForm {...defaultProps} />);
@@ -166,7 +167,7 @@ describe('MarkPatientDeceasedForm', () => {
   });
 
   it('renders an error message when saving the cause of death fails', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
     const mockError = new Error('API Error');
 

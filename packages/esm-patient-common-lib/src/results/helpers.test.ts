@@ -1,4 +1,5 @@
 import { type ReferenceRanges } from '../types';
+import { vi, describe, it, expect } from 'vitest';
 import { exist, formatReferenceRange, assessValue } from './helpers';
 
 describe('exist', () => {

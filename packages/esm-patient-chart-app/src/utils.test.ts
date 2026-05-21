@@ -1,4 +1,5 @@
 import { isDesktop } from './utils';
+import { vi, describe, it, expect } from 'vitest';
 
 describe('isDesktop', () => {
   it('is true when layout = tablet', () => {
