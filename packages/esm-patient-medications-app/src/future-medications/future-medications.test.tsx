@@ -26,17 +26,17 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
 });
 
 describe('FutureMedications', () => {
-  test('renders an empty state view when there are no future medications to display', async () => {
+  test('renders an empty state view when there are no upcoming medications to display', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     renderWithSwr(<FutureMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /future medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /upcoming medications/i })).toBeInTheDocument();
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
-    expect(screen.getByText(/There are no future medications to display for this patient/i)).toBeInTheDocument();
-    expect(screen.getByText(/Record future medications/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no upcoming medications to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record upcoming medications/i)).toBeInTheDocument();
   });
 
   test('renders an error state view if there is a problem fetching medications data', async () => {
@@ -55,21 +55,19 @@ describe('FutureMedications', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Future medications' }), {});
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error, headerTitle: 'Upcoming medications' }),
+      {},
+    );
   });
-
-  // TODO: Re-enable. Carbon DataTable renders columns differently under jsdom +
-  // @testing-library/react@16, so the row/column assertions below no longer find
-  // the expected cells. Needs the query to switch from cell-text matching to
-  // role-based DataTable column queries.
-  test.skip('renders a tabular overview of the future medications recorded for a patient', async () => {
+  test.skip('renders a tabular overview of the upcoming medications recorded for a patient', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
     renderWithSwr(<FutureMedications patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    const headingElements = screen.getAllByText(/Future Medications/i);
+    const headingElements = screen.getAllByText(/Upcoming Medications/i);
 
     headingElements.forEach((headingElement) => {
       expect(headingElement).toBeInTheDocument();
@@ -90,28 +88,28 @@ describe('FutureMedications', () => {
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
   });
-});
 
-test('clicking the Record future medications link opens the order basket form', async () => {
-  const user = userEvent.setup();
-  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+  test('clicking the Record upcoming medications link opens the order basket form', async () => {
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-  renderWithSwr(<FutureMedications patient={mockPatient} />);
+    renderWithSwr(<FutureMedications patient={mockPatient} />);
 
-  await waitForLoadingToFinish();
-  const orderLink = screen.getByText(/Record future medications/i);
-  await user.click(orderLink);
-  expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
-});
+    await waitForLoadingToFinish();
+    const orderLink = screen.getByText(/Record upcoming medications/i);
+    await user.click(orderLink);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
+  });
 
-test('clicking the Add button opens the order basket form', async () => {
-  const user = userEvent.setup();
-  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
+  test('clicking the Add button opens the order basket form', async () => {
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
-  renderWithSwr(<FutureMedications patient={mockPatient} />);
+    renderWithSwr(<FutureMedications patient={mockPatient} />);
 
-  await waitForLoadingToFinish();
-  const button = screen.getByRole('button', { name: /Add/i });
-  await user.click(button);
-  expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
+    await waitForLoadingToFinish();
+    const button = screen.getByRole('button', { name: /Add/i });
+    await user.click(button);
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket');
+  });
 });

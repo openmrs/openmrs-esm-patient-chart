@@ -28,33 +28,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
   } = useMedicationOrders(patient?.id);
 
   return (
-    <div>
-      <section className={styles.medicationsSummaryContainer}>
-        {(() => {
-          const headerTitle = t('futureMedicationsHeaderTitle', 'Future medications');
-          const displayText = t('futureMedicationsDisplayText', 'future medications');
-
-          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-
-          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
-
-          if (futureOrders?.length) {
-            return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingOrders}
-                title={t('futureMedicationsTableTitle', 'Future Medications')}
-                medications={futureOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showRenewButton={false}
-                patient={patient}
-              />
-            );
-          }
-
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
-        })()}
-      </section>
+    <>
       <section className={styles.medicationsSummaryContainer}>
         {(() => {
           const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
@@ -81,6 +55,32 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
       </section>
+      <section className={styles.medicationsSummaryContainer}>
+        {(() => {
+          const headerTitle = t('futureMedicationsHeaderTitle', 'Upcoming medications');
+          const displayText = t('futureMedicationsDisplayText', 'upcoming medications');
+
+          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+
+          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
+
+          if (futureOrders?.length) {
+            return (
+              <MedicationsDetailsTable
+                isValidating={isValidatingOrders}
+                title={t('futureMedicationsTableTitle', 'Upcoming Medications')}
+                medications={futureOrders}
+                showDiscontinueButton={true}
+                showModifyButton={true}
+                showRenewButton={false}
+                patient={patient}
+              />
+            );
+          }
+
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
+        })()}
+      </section>
       <section>
         {(() => {
           const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
@@ -96,7 +96,7 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
                 isValidating={isValidatingOrders}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
-                showAddButton={true}
+                showAddButton={false}
                 showDiscontinueButton={false}
                 showModifyButton={false}
                 showRenewButton={true}
@@ -108,6 +108,6 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
         })()}
       </section>
-    </div>
+    </>
   );
 }

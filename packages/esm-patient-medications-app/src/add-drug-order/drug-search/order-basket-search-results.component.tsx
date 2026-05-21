@@ -149,10 +149,9 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
   const { activeOrders, futureOrders, isLoading: isLoadingOrders } = useMedicationOrders(patient.id);
-  const allOrders = activeOrders.concat(futureOrders);
   const drugAlreadyPrescribed = useMemo(
-    () => allOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [allOrders, drug?.uuid],
+    () => activeOrders.concat(futureOrders).some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid],
   );
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);

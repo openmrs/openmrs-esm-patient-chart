@@ -69,6 +69,15 @@ export interface DrugOrderFormProps {
   workspaceTitle: string;
 }
 
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+  const selectedStartDate = isToday ? now : selectedDate;
+  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+}
+
 function MedicationInfoHeader({
   drug,
   routeValue,
@@ -276,13 +285,7 @@ export function DrugOrderForm({
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
     // minimum; snap them up before saving.
-    const now = new Date();
-    const isToday =
-      data.scheduledDate.getFullYear() === now.getFullYear() &&
-      data.scheduledDate.getMonth() === now.getMonth() &&
-      data.scheduledDate.getDate() === now.getDate();
-    const selectedStartDate = isToday ? now : data.scheduledDate;
-    const scheduledDate = startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin);
 
     const newBasketItem = {
       ...initialOrderBasketItem,

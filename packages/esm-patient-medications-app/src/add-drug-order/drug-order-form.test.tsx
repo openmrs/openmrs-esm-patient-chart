@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
@@ -8,7 +8,7 @@ import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { getTemplateOrderBasketItem } from './drug-search/drug-search.resource';
-import DrugOrderForm from './drug-order-form.component';
+import DrugOrderForm, { getOrderStartDateForSubmission } from './drug-order-form.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
@@ -58,13 +58,13 @@ vi.mock('../api', async () => ({
   useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
-function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
+function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn()) {
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
       patient={mockPatient}
       visitContext={null}
-      onSave={vi.fn()}
+      onSave={onSave}
       saveButtonText="Save order"
       onCancel={vi.fn()}
       workspaceTitle="Add drug order"
@@ -83,6 +83,37 @@ function createNewOrderBasketItem(overrides?: Partial<DrugOrderBasketItem>): Dru
 }
 
 describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
+  beforeEach(() => {
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it('snaps same-day date-only start dates to the current wall-clock time before saving', () => {
+    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
+    const now = new Date('2026-05-21T12:34:56.000Z');
+
+    expect(getOrderStartDateForSubmission(selectedDate, undefined, now)).toBe(now);
+  });
+
+  it('keeps applying the minimum start date after snapping same-day start dates', () => {
+    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
+    const now = new Date('2026-05-21T12:34:56.000Z');
+    const startDateMin = new Date('2026-05-21T13:00:00.000Z');
+
+    expect(getOrderStartDateForSubmission(selectedDate, startDateMin, now)).toBe(startDateMin);
+  });
+
   it('auto-calculates quantity when dose, frequency, and duration are filled', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());

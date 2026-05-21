@@ -128,6 +128,28 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(within(aspirin162Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
   });
 
+  test('shows a visual cue and disables actions if the medication is already scheduled for later', async () => {
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [mockPatientDrugOrdersApiData[0]],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    expect(screen.getAllByRole('listitem').length).toEqual(3);
+    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('[role="listitem"]') as HTMLElement;
+    expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
+    expect(within(aspirin162Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
+    expect(within(aspirin162Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
+  });
+
   test('can add items directly to the basket', async () => {
     const user = userEvent.setup();
 

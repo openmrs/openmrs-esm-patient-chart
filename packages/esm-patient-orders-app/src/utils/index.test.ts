@@ -85,11 +85,17 @@ describe('buildMedicationOrder', () => {
     expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
   });
 
-  it('preserves the existing scheduled date when building a REVISE basket item', () => {
+  it('defaults REVISE basket items to now instead of the previous activation or scheduled date', () => {
+    const before = Date.now();
     const scheduledDate = '2026-05-01T00:00:00.000+0000';
     const result = buildMedicationOrder({ ...medicationOrder, scheduledDate } as Order, 'REVISE');
+    const after = Date.now();
 
-    expect(result.scheduledDate).toBe(scheduledDate);
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+    expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+    expect(result.scheduledDate).not.toBe(scheduledDate);
+    expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
   });
 
   it('uses the original activation date when building a DISCONTINUE basket item', () => {

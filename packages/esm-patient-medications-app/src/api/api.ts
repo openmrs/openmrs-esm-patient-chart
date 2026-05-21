@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useMemo } from 'react';
+import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
@@ -22,8 +22,8 @@ const customRepresentation =
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
 /**
- * Sorts orders by scheduled in descending order.
- * With a fallback to dateActivated for backward-compatibility
+ * Sorts orders by scheduledDate in descending order.
+ * Falls back to dateActivated for backward compatibility.
  *
  * @param orders The orders to sort.
  * @returns The sorted orders.
@@ -36,10 +36,36 @@ function sortOrdersByScheduledDate(orders: Order[]) {
   );
 }
 
+export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, now = new Date()) {
+  const futureOrders: Order[] = [];
+  const activeOrders: Order[] = [];
+  const pastOrders: Order[] = [];
+
+  if (!drugOrders) {
+    return { futureOrders, activeOrders, pastOrders };
+  }
+
+  drugOrders.forEach((order) => {
+    const dateStopped = order.dateStopped ? new Date(order.dateStopped) : null;
+    const autoExpireDate = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
+    const dateScheduled = order.scheduledDate ? new Date(order.scheduledDate) : null;
+
+    if (dateScheduled && dateScheduled > now && !dateStopped) {
+      futureOrders.push(order);
+    } else if ((autoExpireDate && autoExpireDate <= now) || (dateStopped && dateStopped <= now)) {
+      pastOrders.push(order);
+    } else {
+      activeOrders.push(order);
+    }
+  });
+
+  return { futureOrders, activeOrders, pastOrders };
+}
+
 /**
  * SWR-based data fetcher for patient orders.
  *
- * @param patientUuid The UUID of the patient whoose orders should be fetched.
+ * @param patientUuid The UUID of the patient whose orders should be fetched.
  */
 export function useMedicationOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
@@ -58,33 +84,7 @@ export function useMedicationOrders(patientUuid: string) {
 
   const drugOrders = useMemo(() => sortOrdersByScheduledDate(data?.data?.results) ?? null, [data]);
 
-  const { futureOrders, activeOrders, pastOrders } = useMemo(() => {
-    const future: any[] = [];
-    const active: any[] = [];
-    const past: any[] = [];
-
-    if (!drugOrders) {
-      return { futureOrders: future, activeOrders: active, pastOrders: past };
-    }
-
-    const time_now = new Date();
-
-    drugOrders.forEach((order) => {
-      const dateStopped = order.dateStopped ? new Date(order.dateStopped) : null;
-      const autoExpireDate = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
-      const dateScheduled = order.scheduledDate ? new Date(order.scheduledDate) : null;
-
-      if (dateScheduled && dateScheduled > time_now && !dateStopped) {
-        future.push(order);
-      } else if ((autoExpireDate && autoExpireDate <= time_now) || (dateStopped && dateStopped <= time_now)) {
-        past.push(order);
-      } else {
-        active.push(order);
-      }
-    });
-
-    return { futureOrders: future, activeOrders: active, pastOrders: past };
-  }, [drugOrders]);
+  const { futureOrders, activeOrders, pastOrders } = useMemo(() => bucketMedicationOrders(drugOrders), [drugOrders]);
 
   return {
     futureOrders,
@@ -258,7 +258,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    scheduledDate: action === 'RENEW' ? new Date() : order.scheduledDate || order.dateActivated,
+    scheduledDate: action === 'RENEW' || action === 'REVISE' ? new Date() : order.scheduledDate || order.dateActivated,
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
