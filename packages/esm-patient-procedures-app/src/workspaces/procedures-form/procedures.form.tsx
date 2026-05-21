@@ -252,8 +252,20 @@ const ProceduresForm: React.FC<ProceduresFormComponentProps> = ({
           </FormGroup>
 
           {isStartDateKnown && (
-            <FormGroup legendText={t('startDateAndTime', 'Start date and time')}>
-              <DateTimeField name="startDateTime" idPrefix="startDateTime" control={control} />
+            <FormGroup legendText={<RequiredFieldLabel label={t('startDateAndTime', 'Start date and time')} />}>
+              <Controller
+                name="startDateTime"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <DateTimeField
+                    idPrefix="startDateTime"
+                    value={field.value}
+                    onChange={field.onChange}
+                    invalid={Boolean(fieldState.error?.message)}
+                    invalidText={fieldState.error?.message}
+                  />
+                )}
+              />
             </FormGroup>
           )}
 
@@ -292,7 +304,19 @@ const ProceduresForm: React.FC<ProceduresFormComponentProps> = ({
           )}
 
           <FormGroup legendText={t('endDateAndTime', 'End date and time')}>
-            <DateTimeField name="endDateTime" idPrefix="endDateTime" control={control} />
+            <Controller
+              name="endDateTime"
+              control={control}
+              render={({ field, fieldState }) => (
+                <DateTimeField
+                  idPrefix="endDateTime"
+                  value={field.value}
+                  onChange={field.onChange}
+                  invalid={Boolean(fieldState.error?.message)}
+                  invalidText={fieldState.error?.message}
+                />
+              )}
+            />
           </FormGroup>
 
           <FormGroup legendText={t('procedureDuration', 'Procedure duration')}>

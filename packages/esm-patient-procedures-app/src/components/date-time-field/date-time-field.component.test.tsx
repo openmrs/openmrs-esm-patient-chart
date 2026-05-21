@@ -1,28 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useForm, useWatch } from 'react-hook-form';
 import { DateTimeField } from './date-time-field.component';
-import { type ProceduresFormSchema } from '../../workspaces/procedures-form/procedures-form.workspace';
 
 interface HarnessProps {
   defaultValue?: Date | null;
-  fieldName?: 'startDateTime' | 'endDateTime';
   idPrefix?: string;
 }
 
-function Harness({ defaultValue = null, fieldName = 'startDateTime', idPrefix = 'start' }: HarnessProps) {
-  const { control } = useForm<ProceduresFormSchema>({
-    defaultValues: { [fieldName]: defaultValue } as Partial<ProceduresFormSchema>,
-  });
-  const value = useWatch({ control, name: fieldName });
+function Harness({ defaultValue = null, idPrefix = 'start' }: HarnessProps) {
+  const [value, setValue] = useState<Date | null>(defaultValue);
   return (
     <div>
-      <DateTimeField name={fieldName} idPrefix={idPrefix} control={control} />
-      <output data-testid="iso">{value ? (value as Date).toISOString() : ''}</output>
-      <output data-testid="hours">{value ? String((value as Date).getHours()) : ''}</output>
-      <output data-testid="minutes">{value ? String((value as Date).getMinutes()) : ''}</output>
+      <DateTimeField idPrefix={idPrefix} value={value} onChange={setValue} />
+      <output data-testid="iso">{value ? value.toISOString() : ''}</output>
+      <output data-testid="hours">{value ? String(value.getHours()) : ''}</output>
+      <output data-testid="minutes">{value ? String(value.getMinutes()) : ''}</output>
     </div>
   );
 }
@@ -121,7 +115,7 @@ describe('DateTimeField', () => {
   });
 
   it('uses the idPrefix prop for the rendered control ids', () => {
-    render(<Harness fieldName="endDateTime" idPrefix="end" />);
+    render(<Harness idPrefix="end" />);
 
     expect(screen.getByLabelText(/^date$/i)).toHaveAttribute('id', 'end-date');
     expect(screen.getByLabelText(/^time$/i)).toHaveAttribute('id', 'end-time');
