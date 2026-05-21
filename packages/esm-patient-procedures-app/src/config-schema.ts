@@ -32,12 +32,12 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept classs`, provide the concept class name.',
-    _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f',
+    _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f', // Anatomy concept class
   },
   bodySiteConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'Concept set',
+    _default: 'Concept class',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   // TODO: Update the following value once the concept set is available for procedure status, currently using
