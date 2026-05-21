@@ -111,7 +111,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('When I click on the `End Visit` button to confirm', async () => {
-    await chartPage.page.getByRole('button', { name: 'danger End Visit' }).click();
+    await chartPage.page.getByRole('button', { name: /end visit/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
@@ -213,7 +213,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click on the "Delete visit" button', async () => {
-    await page.getByRole('button', { name: 'danger Delete visit' }).click();
+    await page.getByRole('button', { name: /delete visit/i }).click();
   });
 
   await test.step('Then I should see a confirmation toast and active visit tag removed', async () => {
