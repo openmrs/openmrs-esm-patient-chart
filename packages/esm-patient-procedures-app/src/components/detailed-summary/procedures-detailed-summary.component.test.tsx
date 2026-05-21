@@ -8,7 +8,7 @@ import {
   openmrsFetch,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type ConfigObject, configSchema } from '../config-schema';
+import { type ConfigObject, configSchema } from '../../config-schema';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProceduresDetailedSummary from './procedures-detailed-summary.component';
 import { mockProceduresResponse } from '__mocks__';

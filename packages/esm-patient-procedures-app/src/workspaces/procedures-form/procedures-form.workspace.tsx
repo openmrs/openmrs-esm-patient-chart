@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import ProceduresFormComponent from './procedures-form.component';
-import { type Procedure } from '../types';
+import { type Procedure } from '../../types';
 
 export type ProceduresFormProps = {
   procedure?: Procedure;

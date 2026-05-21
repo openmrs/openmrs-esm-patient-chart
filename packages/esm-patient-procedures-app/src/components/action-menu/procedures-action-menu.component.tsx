@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import styles from './procedures-action-menu.scss';
-import { type Procedure } from '../types';
+import { type Procedure } from '../../types';
 
 interface ProceduresActionMenuProps {
   procedure: Procedure;

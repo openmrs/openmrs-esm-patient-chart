@@ -21,7 +21,7 @@ import {
 } from '@carbon/react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { ResponsiveWrapper, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../../config-schema';
 import {
   saveProcedure,
   updateProcedure,
@@ -29,11 +29,11 @@ import {
   useConceptSearchField,
   useMutatePatientProcedures,
   useProcedureTypes,
-} from './procedures.resource';
+} from '../../procedures.resource';
 import { type ProceduresFormSchema } from './procedures-form.workspace';
-import { DateTimeField } from './date-time-field.component';
+import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
 import styles from './procedures-form.scss';
-import { type ProcedureType, type ConceptReference, type Procedure } from '../types';
+import { type ProcedureType, type ConceptReference, type Procedure } from '../../types';
 
 interface ProceduresFormComponentProps {
   closeWorkspaceWithSavedChanges: () => void;

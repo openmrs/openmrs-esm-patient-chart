@@ -2,9 +2,9 @@ import { getAsyncLifecycle, getSyncLifecycle, defineConfigSchema } from '@openmr
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import proceduresOverviewComponent from './procedures/procedures-overview.component';
-import proceduresDetailedSummaryComponent from './procedures/procedures-detailed-summary.component';
-import proceduresFormWorkspaceComponent from './procedures/procedures-form.workspace';
+import proceduresOverviewComponent from './components/procedures-overview.component';
+import proceduresDetailedSummaryComponent from './components/procedures-detailed-summary.component';
+import proceduresFormWorkspaceComponent from './components/procedures-form.workspace';
 import { moduleName } from './constants';
 
 const options = {
@@ -30,6 +30,6 @@ export const proceduresDashboardLink =
 export const proceduresFormWorkspace = getSyncLifecycle(proceduresFormWorkspaceComponent, options);
 
 export const procedureDeleteConfirmationDialog = getAsyncLifecycle(
-  () => import('./procedures/delete-procedure.modal'),
+  () => import('./components/delete-procedure.modal'),
   options,
 );

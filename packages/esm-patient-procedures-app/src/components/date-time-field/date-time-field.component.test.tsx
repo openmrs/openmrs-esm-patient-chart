@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useForm, useWatch } from 'react-hook-form';
 import { DateTimeField } from './date-time-field.component';
-import { type ProceduresFormSchema } from './procedures-form.workspace';
+import { type ProceduresFormSchema } from '../../workspaces/procedures-form/procedures-form.workspace';
 
 interface HarnessProps {
   defaultValue?: Date | null;

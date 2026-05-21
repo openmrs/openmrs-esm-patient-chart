@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { Controller, type Control } from 'react-hook-form';
 import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
-import { type ProceduresFormSchema } from './procedures-form.workspace';
+import { type ProceduresFormSchema } from '../../workspaces/procedures-form/procedures-form.workspace';
 import styles from './procedures-form.scss';
 
 const TIME_PATTERN = /^(1[0-2]|0?[1-9]):([0-5]\d)$/;

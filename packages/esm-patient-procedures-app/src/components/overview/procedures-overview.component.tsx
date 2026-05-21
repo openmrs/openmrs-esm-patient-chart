@@ -27,8 +27,8 @@ import {
   ErrorState,
   formatPartialDate,
 } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
-import { useProcedures } from './procedures.resource';
+import { type ConfigObject } from '../../config-schema';
+import { useProcedures } from '../../procedures.resource';
 import styles from './procedures-overview.scss';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 
