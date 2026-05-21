@@ -23,7 +23,10 @@ export const ConceptSearchField = ({
         <Search
           labelText={label}
           placeholder={placeholder}
-          onChange={(e) => field.setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            field.setSearchTerm(e.target.value);
+            field.setSelectedConcept(null);
+          }}
           onClear={field.clear}
           value={field.selectedConcept ? field.selectedConcept.display : field.searchTerm}
         />
