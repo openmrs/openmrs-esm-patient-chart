@@ -12,7 +12,7 @@
     "ci:prepublish-patch": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag patch",
     "ci:bump-form-engine-lib": "yarn up @openmrs/esm-form-engine-lib@latest",
     "release": "yarn workspaces foreach --all --topological version",
-    "verify": "turbo run lint typescript test --color",
+    "verify": "turbo run lint typescript test --color --concurrency=5",
     "test": "turbo run test --color",
     "coverage": "turbo run coverage --color",
     "postinstall": "husky install",
