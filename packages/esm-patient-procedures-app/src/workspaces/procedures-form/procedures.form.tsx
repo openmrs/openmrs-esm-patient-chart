@@ -34,6 +34,7 @@ import { type ProceduresFormSchema } from './procedures-form.workspace';
 import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
 import styles from './procedures-form.scss';
 import { type ProcedureType, type ConceptReference, type Procedure } from '../../types';
+import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 
 interface ProceduresFormComponentProps {
   closeWorkspaceWithSavedChanges: () => void;
@@ -41,15 +42,7 @@ interface ProceduresFormComponentProps {
   patientUuid: string;
 }
 
-interface ConceptSearchResultsProps {
-  isSearching: boolean;
-  onSelect: (result: ConceptReference) => void;
-  searchResults: Array<ConceptReference>;
-  selectedItem: ConceptReference;
-  value: string;
-}
-
-const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
+const ProceduresForm: React.FC<ProceduresFormComponentProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   procedure,
@@ -441,82 +434,4 @@ function RequiredFieldLabel({ label }: { label: string }) {
   );
 }
 
-function ConceptSearchField({
-  label,
-  placeholder,
-  field,
-  onChange,
-}: {
-  label: string;
-  placeholder: string;
-  field: ReturnType<typeof useConceptSearchField>;
-  onChange: (selectedConcept: ConceptReference) => void;
-}) {
-  return (
-    <>
-      <ResponsiveWrapper>
-        <Search
-          labelText={label}
-          placeholder={placeholder}
-          onChange={(e) => field.setSearchTerm(e.target.value)}
-          onClear={field.clear}
-          value={field.selectedConcept ? field.selectedConcept.display : field.searchTerm}
-        />
-      </ResponsiveWrapper>
-
-      <ConceptSearchResults
-        isSearching={field.isSearching}
-        searchResults={field.searchResults}
-        selectedItem={field.selectedConcept}
-        value={field.searchTerm}
-        onSelect={(result) => {
-          field.setSelectedConcept(result);
-          field.setSearchTerm('');
-          onChange(result);
-        }}
-      />
-    </>
-  );
-}
-
-function ConceptSearchResults({
-  isSearching,
-  onSelect,
-  searchResults,
-  selectedItem,
-  value,
-}: ConceptSearchResultsProps) {
-  const { t } = useTranslation();
-
-  if (!value || selectedItem) {
-    return null;
-  }
-
-  if (isSearching) {
-    return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
-  }
-
-  if (searchResults?.length > 0) {
-    return (
-      <ul className={styles.resultsList}>
-        {searchResults.map((result) => (
-          <li className={styles.resultItem} key={result.uuid} onClick={() => onSelect(result)} role="menuitem">
-            {result.display}
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  return (
-    <Layer>
-      <Tile className={styles.emptyResults}>
-        <span>
-          {t('noResultsFor', 'No results for')} <strong>"{value}"</strong>
-        </span>
-      </Tile>
-    </Layer>
-  );
-}
-
-export default ProceduresFormComponent;
+export default ProceduresForm;

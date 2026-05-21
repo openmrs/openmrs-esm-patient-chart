@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import ProceduresFormComponent from './procedures-form.component';
+import ProceduresForm from './procedures.form';
 import { type Procedure } from '../../types';
 
 export type ProceduresFormProps = {
@@ -55,7 +55,7 @@ const schema = z
 
 export type ProceduresFormSchema = z.infer<typeof schema>;
 
-const ProceduresForm: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormProps, object>> = ({
+const ProceduresFormWorkspace: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormProps, object>> = ({
   closeWorkspace,
   groupProps: { patientUuid },
   workspaceProps: { procedure, formContext },
@@ -91,7 +91,7 @@ const ProceduresForm: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormPr
       hasUnsavedChanges={methods.formState.isDirty}
     >
       <FormProvider {...methods}>
-        <ProceduresFormComponent
+        <ProceduresForm
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
           patientUuid={patientUuid}
           procedure={procedure}
@@ -101,4 +101,4 @@ const ProceduresForm: React.FC<PatientWorkspace2DefinitionProps<ProceduresFormPr
   );
 };
 
-export default ProceduresForm;
+export default ProceduresFormWorkspace;

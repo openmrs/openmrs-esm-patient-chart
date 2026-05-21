@@ -1,22 +1,23 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { mockPatient } from 'tools';
 import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
 import DeleteProcedureModal from './delete-procedure.modal';
-import { deleteProcedure } from './procedures.resource';
+import { deleteProcedure } from '../../procedures.resource';
 
-const mockDeleteProcedure = jest.mocked(deleteProcedure);
-const mockShowSnackbar = jest.mocked(showSnackbar);
+const mockDeleteProcedure = vi.mocked(deleteProcedure);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
-jest.mock('./procedures.resource', () => ({
-  ...jest.requireActual('./procedures.resource'),
-  deleteProcedure: jest.fn(),
-  useMutatePatientProcedures: jest.fn().mockReturnValue(jest.fn()),
+vi.mock('../../procedures.resource', async () => ({
+  ...(await vi.importActual('../../procedures.resource')),
+  deleteProcedure: vi.fn(),
+  useMutatePatientProcedures: vi.fn().mockReturnValue(vi.fn()),
 }));
 
 const defaultProps = {
-  closeDeleteModal: jest.fn(),
+  closeDeleteModal: vi.fn(),
   procedureUuid: '123e4567-e89b-12d3-a456-426614174000',
   patientUuid: mockPatient.id,
 };
@@ -62,7 +63,7 @@ describe('<DeleteProcedureModal />', () => {
   });
 
   it('renders an error message if the delete operation fails', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
 
     mockDeleteProcedure.mockRejectedValue({ message: 'Internal server error', status: 500 });

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import styles from './delete-procedure.modal.scss';
-import { deleteProcedure, useMutatePatientProcedures } from './procedures.resource';
+import { deleteProcedure, useMutatePatientProcedures } from '../../procedures.resource';
 
 interface DeleteProcedureModalProps {
   closeDeleteModal: () => void;

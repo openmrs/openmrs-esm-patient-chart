@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -13,9 +14,9 @@ import { mockProceduresResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProceduresOverview from './procedures-overview.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),

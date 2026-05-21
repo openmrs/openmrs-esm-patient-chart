@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -11,28 +12,28 @@ import {
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockProcedureTypes, mockProceduresResponse, searchedProcedure } from '__mocks__';
-import { type ConfigObject, configSchema } from '../config-schema';
-import { saveProcedure, useConceptSearch, useConceptSearchField, useProcedureTypes } from './procedures.resource';
-import ProceduresForm, { type ProceduresFormProps } from './procedures-form.workspace';
-import { type ConceptReference } from '../types';
+import { type ConfigObject, configSchema } from '../../config-schema';
+import { saveProcedure, useConceptSearch, useConceptSearchField, useProcedureTypes } from '../../procedures.resource';
+import ProceduresFormWorkspace, { type ProceduresFormProps } from './procedures-form.workspace';
+import { type ConceptReference } from '../../types';
 
-jest.mock('./procedures.resource', () => ({
-  ...jest.requireActual('./procedures.resource'),
-  saveProcedure: jest.fn(),
-  useConceptSearch: jest.fn(),
-  useConceptSearchField: jest.fn(),
-  useProcedureTypes: jest.fn(),
-  useMutatePatientProcedures: jest.fn(() => jest.fn()),
-  useProcedures: jest.fn(),
+vi.mock('../../procedures.resource', async () => ({
+  ...(await vi.importActual('../../procedures.resource')),
+  saveProcedure: vi.fn(),
+  useConceptSearch: vi.fn(),
+  useConceptSearchField: vi.fn(),
+  useProcedureTypes: vi.fn(),
+  useMutatePatientProcedures: vi.fn(() => vi.fn()),
+  useProcedures: vi.fn(),
 }));
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockSaveProcedure = jest.mocked(saveProcedure);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConceptSearch = jest.mocked(useConceptSearch);
-const mockUseConceptSearchField = jest.mocked(useConceptSearchField);
-const mockUseProcedureTypes = jest.mocked(useProcedureTypes);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockSaveProcedure = vi.mocked(saveProcedure);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConceptSearch = vi.mocked(useConceptSearch);
+const mockUseConceptSearchField = vi.mocked(useConceptSearchField);
+const mockUseProcedureTypes = vi.mocked(useProcedureTypes);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -48,7 +49,7 @@ mockUseConfig.mockReturnValue({
 });
 
 const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object> = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   groupProps: {
     patientUuid: mockPatient.id,
     patient: mockPatient,
@@ -56,7 +57,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: { formContext: 'creating' },
   windowProps: {},
   windowName: '',
@@ -65,7 +66,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<ProceduresFormProps, object
 };
 
 function renderProceduresForm() {
-  render(<ProceduresForm {...defaultProps} />);
+  render(<ProceduresFormWorkspace {...defaultProps} />);
 }
 
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
