@@ -28,7 +28,7 @@ export const configSchema = {
     _default: 'Concept class',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
-  bodySiteConceptSource: {
+  bodySiteConceptUuid: {
     _type: Type.UUID,
     _description:
       'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept classs`, provide the concept class name.',
