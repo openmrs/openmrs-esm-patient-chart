@@ -3,7 +3,7 @@ name: OpenMRS CI
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, 'patch/*']
   pull_request:
     branches: [main]
   release:
