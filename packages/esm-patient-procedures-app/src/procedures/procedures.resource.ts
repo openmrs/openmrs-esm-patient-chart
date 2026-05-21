@@ -31,21 +31,21 @@ function buildConceptSearchUrl(query: string, source: ConceptSource): string {
 
 export function useProcedureTypes() {
   const url = `${restBaseUrl}/proceduretype?v=full`;
-  const { data, error, isLoading } = useSWR<{ data: ProcedureTypeApiResponse }, Error>(url, openmrsFetch);
-  return { procedureTypes: data?.data?.results ?? [], isLoading, error };
+  const { data, isLoading } = useSWR<{ data: ProcedureTypeApiResponse }, Error>(url, openmrsFetch);
+  return { procedureTypes: data?.data?.results ?? [], isLoading };
 }
 
 export function useConceptSearch(query: string, source: ConceptSource) {
   const hasSourceFilter = Boolean(source.uuid) && source.sourceType !== 'any';
   const url = query || hasSourceFilter ? buildConceptSearchUrl(query, source) : null;
-  const { data, error, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
+  const { data, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
 
   const results = data?.data?.results ?? [];
 
   // TODO: RESTWS-1035: Currently the API returns duplicated results, remove the following once the bug is fixed
   const uniqueSearchResults = Array.from(new Map(results.map((concept) => [concept.uuid, concept])).values());
 
-  return { searchResults: uniqueSearchResults, isSearching: isLoading, error };
+  return { searchResults: uniqueSearchResults, isSearching: isLoading };
 }
 
 export async function saveProcedure(payload: RawProcedure) {
