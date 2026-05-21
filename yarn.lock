@@ -5452,6 +5452,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.46.2"
+    vitest: "npm:^4.1.2"
     zod: "npm:^3.23.8"
   peerDependencies:
     "@openmrs/esm-framework": 9.x

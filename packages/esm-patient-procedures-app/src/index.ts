@@ -5,7 +5,7 @@ import { dashboardMeta } from './dashboard.meta';
 import { moduleName } from './constants';
 import ProceduresOverview from './components/overview/procedures-overview.component';
 import ProceduresDetailedSummary from './components/detailed-summary/procedures-detailed-summary.component';
-import ProceduresFormWorkspace from './workspaces/procedures-form/procedures.form';
+import ProceduresFormWorkspace from './workspaces/procedures-form/procedures-form.workspace';
 
 const options = {
   featureName: 'patient-procedures-app',
@@ -23,9 +23,7 @@ export const proceduresOverview = getSyncLifecycle(ProceduresOverview, options);
 
 export const proceduresDetailedSummary = getSyncLifecycle(ProceduresDetailedSummary, options);
 
-export const proceduresDashboardLink =
-  // t('Procedures', 'Procedures')
-  getSyncLifecycle(createDashboardLink({ ...dashboardMeta }), options);
+export const proceduresDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta }), options);
 
 export const proceduresFormWorkspace = getSyncLifecycle(ProceduresFormWorkspace, options);
 
