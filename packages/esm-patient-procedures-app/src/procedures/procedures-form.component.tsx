@@ -132,6 +132,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     uuid: statusConceptUuid,
     sourceType: statusConceptSourceType,
   });
+
   const { searchResults: durationUnitOptions } = useConceptSearch('', {
     uuid: durationUnitConceptUuid,
     sourceType: durationUnitConceptSourceType,

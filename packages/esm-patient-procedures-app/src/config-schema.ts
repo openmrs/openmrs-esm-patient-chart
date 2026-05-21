@@ -1,13 +1,13 @@
 import { Type, validators } from '@openmrs/esm-framework';
 
-export const conceptSourceTypes = ['conceptClass', 'conceptSet', 'answerTo', 'any'] as const;
+export const conceptSourceTypes = ['Concept class', 'Concept set', 'Answer to', 'any'] as const;
 export type ConceptSourceType = (typeof conceptSourceTypes)[number];
 
 const sourceTypeDescription =
   'How the paired UUID filters concept search results: ' +
-  '"conceptClass" filters by concept class (REST `class`); ' +
-  '"conceptSet" returns set members (REST `memberOf`); ' +
-  '"answerTo" returns answers to the given coded question (REST `answerTo`); ' +
+  '"Concept class" filters by concept class (REST `class`); ' +
+  '"Concept set" returns set members (REST `memberOf`); ' +
+  '"Answer to" returns answers to the given coded question (REST `answerTo`); ' +
   '"any" ignores the UUID and searches all concepts.';
 
 export const configSchema = {
@@ -25,33 +25,33 @@ export const configSchema = {
   procedureConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'conceptClass',
+    _default: 'Concept class',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   bodySiteConceptUuid: {
     _type: Type.UUID,
     _description:
-      'UUID used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
-    _default: '',
+      'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept classs`, provide the concept class name.',
+    _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f', // Anatomy concept class
   },
   bodySiteConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'any',
+    _default: 'Concept class',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
-  // TODO: Update the following value once the concept set is available, currently using
-  //  https://app.openconceptlab.org/#/orgs/CIEL/sources/CIEL/concepts/168857/ for demo
+  // TODO: Update the following value once the concept set is available for procedure status, currently using
+  // https://app.openconceptlab.org/#/orgs/CIEL/sources/CIEL/concepts/167157/ (Medication dispense status)
   statusConceptUuid: {
     _type: Type.UUID,
     _description:
       'UUID used to constrain the procedure-status concept search. Its meaning is determined by `statusConceptSourceType`.',
-    _default: '365b8d02-2786-4ac4-a8b6-2bb4f22e4bc2',
+    _default: '167157AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   statusConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'answerTo',
+    _default: 'Concept set',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   durationUnitConceptUuid: {
@@ -63,7 +63,7 @@ export const configSchema = {
   durationUnitConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'answerTo',
+    _default: 'Answer to',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
 };
