@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Workspace2 } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import ProceduresForm from './procedures.form';
+import ProceduresForm from './procedures.form.component';
 import { type Procedure } from '../../types';
 
 export type ProceduresFormProps = {

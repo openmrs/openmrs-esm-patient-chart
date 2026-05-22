@@ -29,7 +29,7 @@ import {
 } from '../../procedures.resource';
 import { type ProceduresFormSchema } from './procedures-form.workspace';
 import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
-import styles from './procedures-form.component.scss';
+import styles from './procedures-form.scss';
 import { type ProcedureType, type ConceptReference, type Procedure } from '../../types';
 import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 
@@ -39,7 +39,7 @@ interface ProceduresFormComponentProps {
   patientUuid: string;
 }
 
-const ProceduresForm: React.FC<ProceduresFormComponentProps> = ({
+const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   closeWorkspaceWithSavedChanges,
   patientUuid,
   procedure,
@@ -455,4 +455,4 @@ const RequiredFieldLabel = ({ label }: { label: string }) => {
   );
 };
 
-export default ProceduresForm;
+export default ProceduresFormComponent;
