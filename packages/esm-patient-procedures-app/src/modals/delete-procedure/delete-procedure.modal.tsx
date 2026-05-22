@@ -2,14 +2,14 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import styles from './delete-procedure.modal.scss';
 import { deleteProcedure, useMutatePatientProcedures } from '../../procedures.resource';
+import styles from './delete-procedure.modal.scss';
 
-interface DeleteProcedureModalProps {
+type DeleteProcedureModalProps = {
   closeDeleteModal: () => void;
   procedureUuid: string;
   patientUuid: string;
-}
+};
 
 const DeleteProcedureModal: React.FC<DeleteProcedureModalProps> = ({
   closeDeleteModal,

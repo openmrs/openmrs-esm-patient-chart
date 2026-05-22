@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
-import { useEffect, useState } from 'react';
 import { type ConceptSourceType } from './config-schema';
 import {
   type ConceptReference,

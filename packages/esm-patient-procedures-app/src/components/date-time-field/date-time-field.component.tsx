@@ -23,13 +23,13 @@ const to24Hour = (hours12: number, meridiem: 'AM' | 'PM'): number => {
   return hours12 === 12 ? 12 : hours12 + 12;
 };
 
-interface DateTimeFieldProps {
+type DateTimeFieldProps = {
   idPrefix: string;
   value: Date | null | undefined;
   onChange: (next: Date | null) => void;
   invalid?: boolean;
   invalidText?: string;
-}
+};
 
 export const DateTimeField = ({ idPrefix, value, onChange, invalid, invalidText }: DateTimeFieldProps) => {
   const { t } = useTranslation();

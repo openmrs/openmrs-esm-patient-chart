@@ -1,10 +1,18 @@
-import { InlineLoading, Layer, Search, Tile } from '@carbon/react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { InlineLoading, Layer, Search, Tile } from '@carbon/react';
 import { ResponsiveWrapper } from '@openmrs/esm-framework';
 import { type ConceptReference } from '../../types';
 import { type useConceptSearchField } from '../../procedures.resource';
 import styles from './concept-search-field.scss';
-import { useTranslation } from 'react-i18next';
+
+type ConceptSearchResultsProps = {
+  isSearching: boolean;
+  onSelect: (result: ConceptReference) => void;
+  searchResults: Array<ConceptReference>;
+  selectedItem: ConceptReference;
+  value: string;
+};
 
 export const ConceptSearchField = ({
   label,
@@ -46,14 +54,6 @@ export const ConceptSearchField = ({
     </>
   );
 };
-
-interface ConceptSearchResultsProps {
-  isSearching: boolean;
-  onSelect: (result: ConceptReference) => void;
-  searchResults: Array<ConceptReference>;
-  selectedItem: ConceptReference;
-  value: string;
-}
 
 const ConceptSearchResults = ({
   isSearching,

@@ -30,11 +30,11 @@ import {
   ErrorState,
   formatPartialDate,
 } from '@openmrs/esm-framework';
-import { useProcedures } from '../../procedures.resource';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './procedures-detailed-summary.scss';
-import { ProceduresActionMenu } from '../action-menu/procedures-action-menu.component';
 import { type ConfigObject } from '../../config-schema';
+import { useProcedures } from '../../procedures.resource';
+import { ProceduresActionMenu } from '../action-menu/procedures-action-menu.component';
+import styles from './procedures-detailed-summary.scss';
 
 type ProceduresDetailedSummaryProps = {
   patient: fhir.Patient;

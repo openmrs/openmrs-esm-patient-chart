@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { Controller, useFormContext } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -16,7 +17,6 @@ import {
   Switch,
   TextArea,
 } from '@carbon/react';
-import { Controller, useFormContext } from 'react-hook-form';
 import { ResponsiveWrapper, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import {
@@ -27,17 +27,17 @@ import {
   useMutatePatientProcedures,
   useProcedureTypes,
 } from '../../procedures.resource';
+import { type ConceptReference, type Procedure, type ProcedureType } from '../../types';
 import { type ProceduresFormSchema } from './procedures-form.workspace';
+import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
 import styles from './procedures-form.scss';
-import { type ProcedureType, type ConceptReference, type Procedure } from '../../types';
-import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 
-interface ProceduresFormComponentProps {
+type ProceduresFormComponentProps = {
   closeWorkspaceWithSavedChanges: () => void;
   procedure?: Procedure;
   patientUuid: string;
-}
+};
 
 const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   closeWorkspaceWithSavedChanges,
