@@ -1,4 +1,11 @@
+import dayjs from 'dayjs';
+
 export const patientUuid = '8673ee4f-e2ab-4077-ba55-4980f408773e';
+
+// Compute future-relative dates at module load so fixtures stay valid as the
+// real-world clock advances.
+const oneYearFromNow = dayjs().add(1, 'year').toISOString();
+const farFutureExpiry = dayjs().add(10, 'years').toISOString();
 
 export const mockDrugSearchResultApiData = [
   {
@@ -181,7 +188,7 @@ export const mockPatientDrugOrdersApiData = [
       display: 'Outpatient',
     },
     dateActivated: '2023-08-14T18:23:05.000+0000',
-    autoExpireDate: '2123-09-13T18:23:04.000+0000',
+    autoExpireDate: farFutureExpiry,
     orderType: {
       uuid: '131168f4-15f5-102d-96e4-000c29c2a5d7',
       display: 'Drug Order',
@@ -590,7 +597,7 @@ export const mockPatientDrugOrdersApiData = [
       type: 'drugorder',
     },
     dateActivated: '2023-08-14T18:24:02.000+0000',
-    scheduledDate: '2113-08-14T18:24:02.000+0000',
+    scheduledDate: oneYearFromNow,
     orderType: {
       uuid: '131168f4-15f5-102d-96e4-000c29c2a5d7',
       display: 'Drug Order',
