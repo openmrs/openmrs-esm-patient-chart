@@ -36,7 +36,7 @@ export const configSchema = {
   bodySiteConceptUuid: {
     _type: Type.UUID,
     _description:
-      'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept classs`, provide the concept class name.',
+      'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept class`, provide the concept class name.',
     _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f', // Anatomy concept class
   },
   bodySiteConceptSourceType: {
