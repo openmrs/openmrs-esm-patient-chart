@@ -60,33 +60,23 @@ describe('FutureMedications', () => {
       {},
     );
   });
-  test.skip('renders a tabular overview of the upcoming medications recorded for a patient', async () => {
+  test('renders a row for each future-scheduled medication order', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockPatientDrugOrdersApiData } });
 
     renderWithSwr(<FutureMedications patient={mockPatient} />);
 
-    await waitForLoadingToFinish();
+    // Carbon's DataTable renders both a primary table and a sticky-header table;
+    // grab the primary one, which carries the data rows.
+    const [table] = await screen.findAllByRole('table');
 
-    const headingElements = screen.getAllByText(/Upcoming Medications/i);
-
-    headingElements.forEach((headingElement) => {
-      expect(headingElement).toBeInTheDocument();
-    });
-    expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
-
-    const table = screen.getByRole('table');
-    expect(screen.getByRole('table')).toBeInTheDocument();
-
-    const expectedColumnHeaders = [/start date/, /details/];
-    expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
-    });
-
-    const expectedTableRows = [];
-
-    expectedTableRows.forEach((row) =>
-      expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
+    const futureOrders = mockPatientDrugOrdersApiData.filter(
+      (order) => order.scheduledDate && new Date(order.scheduledDate) > new Date(),
     );
+
+    // The fixture must include at least one future-scheduled order for this assertion to be meaningful.
+    expect(futureOrders.length).toBeGreaterThan(0);
+    // Header row + one row per future-scheduled order.
+    expect(within(table).getAllByRole('row')).toHaveLength(futureOrders.length + 1);
   });
 
   test('clicking the Record upcoming medications link opens the order basket form', async () => {

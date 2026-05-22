@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
@@ -21,19 +21,8 @@ const customRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
-/**
- * Sorts orders by scheduledDate in descending order.
- * Falls back to dateActivated for backward compatibility.
- *
- * @param orders The orders to sort.
- * @returns The sorted orders.
- */
-function sortOrdersByScheduledDate(orders: Order[]) {
-  return orders?.sort(
-    (order1, order2) =>
-      new Date(order2.scheduledDate || order2.dateActivated).getTime() -
-      new Date(order1.scheduledDate || order1.dateActivated).getTime(),
-  );
+function orderStartTime(order: Order) {
+  return new Date(order.scheduledDate || order.dateActivated).getTime();
 }
 
 export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, now = new Date()) {
@@ -59,6 +48,12 @@ export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, n
     }
   });
 
+  // Soonest first for upcoming so clinicians see what's next at the top.
+  futureOrders.sort((a, b) => orderStartTime(a) - orderStartTime(b));
+  // Most recent first for active and past.
+  activeOrders.sort((a, b) => orderStartTime(b) - orderStartTime(a));
+  pastOrders.sort((a, b) => orderStartTime(b) - orderStartTime(a));
+
   return { futureOrders, activeOrders, pastOrders };
 }
 
@@ -82,9 +77,20 @@ export function useMedicationOrders(patientUuid: string) {
     openmrsFetch,
   );
 
-  const drugOrders = useMemo(() => sortOrdersByScheduledDate(data?.data?.results) ?? null, [data]);
+  const drugOrders = useMemo(() => data?.data?.results ?? null, [data]);
 
-  const { futureOrders, activeOrders, pastOrders } = useMemo(() => bucketMedicationOrders(drugOrders), [drugOrders]);
+  // Re-bucket once a minute so an order whose scheduledDate has just passed
+  // moves from "Upcoming" to "Active" without waiting for SWR revalidation.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const { futureOrders, activeOrders, pastOrders } = useMemo(
+    () => bucketMedicationOrders(drugOrders, now),
+    [drugOrders, now],
+  );
 
   return {
     futureOrders,
@@ -258,7 +264,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    scheduledDate: action === 'RENEW' || action === 'REVISE' ? new Date() : order.scheduledDate || order.dateActivated,
+    scheduledDate:
+      action === 'RENEW' || action === 'REVISE' ? new Date() : new Date(order.scheduledDate || order.dateActivated),
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {

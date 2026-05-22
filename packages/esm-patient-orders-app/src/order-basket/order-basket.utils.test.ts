@@ -5,7 +5,9 @@ import { getEarliestStartDate } from './order-basket.utils';
 const now = new Date('2026-05-06T12:00:00.000Z');
 
 function makeOrderItem(
-  overrides: Partial<OrderBasketItem & { scheduledDate?: Date | string; startDate?: Date | string }> = {},
+  overrides: Partial<
+    Omit<OrderBasketItem, 'scheduledDate'> & { scheduledDate?: Date | string; startDate?: Date | string }
+  > = {},
 ): OrderBasketItem {
   return {
     action: 'NEW',

@@ -30,14 +30,10 @@ export function getStartDateMinimum(
 export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
-  const defaultValues = useMemo(() => {
-    const defaultScheduledDate =
-      typeof initialOrderBasketItem?.scheduledDate === 'string'
-        ? parseDate(initialOrderBasketItem?.scheduledDate)
-        : (initialOrderBasketItem?.scheduledDate as Date) ?? new Date();
-
-    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultScheduledDate);
-  }, [initialOrderBasketItem]);
+  const defaultValues = useMemo(
+    () => drugOrderBasketItemToFormValue(initialOrderBasketItem, initialOrderBasketItem?.scheduledDate ?? new Date()),
+    [initialOrderBasketItem],
+  );
 
   const drugOrderForm: UseFormReturn<MedicationOrderFormData> = useForm<MedicationOrderFormData>({
     mode: 'all',

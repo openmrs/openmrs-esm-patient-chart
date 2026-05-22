@@ -403,12 +403,12 @@ export function DrugOrderForm({
 
   // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { activeOrders } = useMedicationOrders(patient?.id ?? '');
+  const { activeOrders, futureOrders } = useMedicationOrders(patient?.id ?? '');
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
       (initialOrderBasketItem == null || initialOrderBasketItem?.action === 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug?.uuid, initialOrderBasketItem],
+      [...activeOrders, ...futureOrders].some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid, initialOrderBasketItem],
   );
 
   return (

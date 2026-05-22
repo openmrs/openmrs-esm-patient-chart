@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { EmptyState, ErrorState, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, type Order, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { useMedicationOrders } from '../api';
 import { type AddDrugOrderWorkspaceProps } from '../add-drug-order/add-drug-order.workspace';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
@@ -11,6 +11,63 @@ export interface MedicationsSummaryProps {
   patient: fhir.Patient;
 }
 
+interface MedicationsSectionProps {
+  patient: fhir.Patient;
+  orders: Order[];
+  isLoading: boolean;
+  isValidating: boolean;
+  error: Error | undefined;
+  launchAddDrugWorkspace: () => void;
+  headerTitle: string;
+  displayText: string;
+  tableTitle: string;
+  showDiscontinueButton: boolean;
+  showModifyButton: boolean;
+  showRenewButton: boolean;
+  showAddButton?: boolean;
+}
+
+function MedicationsSection({
+  patient,
+  orders,
+  isLoading,
+  isValidating,
+  error,
+  launchAddDrugWorkspace,
+  headerTitle,
+  displayText,
+  tableTitle,
+  showDiscontinueButton,
+  showModifyButton,
+  showRenewButton,
+  showAddButton,
+}: MedicationsSectionProps) {
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
+  }
+
+  if (orders.length) {
+    return (
+      <MedicationsDetailsTable
+        isValidating={isValidating}
+        title={tableTitle}
+        medications={orders}
+        showAddButton={showAddButton}
+        showDiscontinueButton={showDiscontinueButton}
+        showModifyButton={showModifyButton}
+        showRenewButton={showRenewButton}
+        patient={patient}
+      />
+    );
+  }
+
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
+}
+
 export default function MedicationsSummary({ patient }: MedicationsSummaryProps) {
   const { t } = useTranslation();
   const launchAddDrugWorkspace = useLaunchWorkspaceRequiringVisit<AddDrugOrderWorkspaceProps>(
@@ -18,95 +75,58 @@ export default function MedicationsSummary({ patient }: MedicationsSummaryProps)
     'add-drug-order',
   );
 
-  const {
-    futureOrders,
-    activeOrders,
-    pastOrders,
-    error: ordersError,
-    isLoading: isLoadingOrders,
-    isValidating: isValidatingOrders,
-  } = useMedicationOrders(patient?.id);
+  const { futureOrders, activeOrders, pastOrders, error, isLoading, isValidating } = useMedicationOrders(patient?.id);
 
   return (
     <>
       <section className={styles.medicationsSummaryContainer}>
-        {(() => {
-          const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
-          const displayText = t('activeMedicationsDisplayText', 'active medications');
-
-          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-
-          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
-
-          if (activeOrders?.length) {
-            return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingOrders}
-                title={t('activeMedicationsTableTitle', 'Active Medications')}
-                medications={activeOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showRenewButton={true}
-                patient={patient}
-              />
-            );
-          }
-
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
-        })()}
+        <MedicationsSection
+          patient={patient}
+          orders={activeOrders}
+          isLoading={isLoading}
+          isValidating={isValidating}
+          error={error}
+          launchAddDrugWorkspace={launchAddDrugWorkspace}
+          headerTitle={t('activeMedicationsHeaderTitle', 'Active medications')}
+          displayText={t('activeMedicationsDisplayText', 'active medications')}
+          tableTitle={t('activeMedicationsTableTitle', 'Active Medications')}
+          showDiscontinueButton
+          showModifyButton
+          showRenewButton
+        />
       </section>
       <section className={styles.medicationsSummaryContainer}>
-        {(() => {
-          const headerTitle = t('futureMedicationsHeaderTitle', 'Upcoming medications');
-          const displayText = t('futureMedicationsDisplayText', 'upcoming medications');
-
-          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-
-          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
-
-          if (futureOrders?.length) {
-            return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingOrders}
-                title={t('futureMedicationsTableTitle', 'Upcoming Medications')}
-                medications={futureOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showRenewButton={false}
-                patient={patient}
-              />
-            );
-          }
-
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
-        })()}
+        <MedicationsSection
+          patient={patient}
+          orders={futureOrders}
+          isLoading={isLoading}
+          isValidating={isValidating}
+          error={error}
+          launchAddDrugWorkspace={launchAddDrugWorkspace}
+          headerTitle={t('futureMedicationsHeaderTitle', 'Upcoming medications')}
+          displayText={t('futureMedicationsDisplayText', 'upcoming medications')}
+          tableTitle={t('futureMedicationsTableTitle', 'Upcoming Medications')}
+          showDiscontinueButton
+          showModifyButton
+          showRenewButton={false}
+        />
       </section>
       <section>
-        {(() => {
-          const headerTitle = t('pastMedicationsHeaderTitle', 'Past medications');
-          const displayText = t('pastMedicationsDisplayText', 'past medications');
-
-          if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-
-          if (ordersError) return <ErrorState error={ordersError} headerTitle={headerTitle} />;
-
-          if (pastOrders?.length) {
-            return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingOrders}
-                title={t('pastMedicationsTableTitle', 'Past Medications')}
-                medications={pastOrders}
-                showAddButton={false}
-                showDiscontinueButton={false}
-                showModifyButton={false}
-                showRenewButton={true}
-                patient={patient}
-              />
-            );
-          }
-
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAddDrugWorkspace} />;
-        })()}
+        <MedicationsSection
+          patient={patient}
+          orders={pastOrders}
+          isLoading={isLoading}
+          isValidating={isValidating}
+          error={error}
+          launchAddDrugWorkspace={launchAddDrugWorkspace}
+          headerTitle={t('pastMedicationsHeaderTitle', 'Past medications')}
+          displayText={t('pastMedicationsDisplayText', 'past medications')}
+          tableTitle={t('pastMedicationsTableTitle', 'Past Medications')}
+          showAddButton={false}
+          showDiscontinueButton={false}
+          showModifyButton={false}
+          showRenewButton
+        />
       </section>
     </>
   );

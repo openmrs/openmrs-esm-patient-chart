@@ -101,7 +101,8 @@ describe('buildMedicationOrder', () => {
   it('uses the original activation date when building a DISCONTINUE basket item', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 
-    expect(result.scheduledDate).toBe(medicationOrder.dateActivated);
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).toISOString()).toBe(new Date(medicationOrder.dateActivated).toISOString());
   });
 
   it('captures the previous order activation date for REVISE validation', () => {

@@ -68,7 +68,7 @@ export interface OrderBasketItem {
   previousOrder?: string;
   orderType?: string;
   orderNumber?: string;
-  scheduledDate?: string | Date;
+  scheduledDate?: Date;
   encounterUuid?: string;
   visit: Visit;
 }
@@ -97,7 +97,7 @@ export interface OrderPost {
   instructions?: string;
   accessionNumber?: string;
   orderType?: string;
-  scheduledDate?: string | Date;
+  scheduledDate?: string;
 }
 
 export interface DrugOrderPost extends OrderPost {
