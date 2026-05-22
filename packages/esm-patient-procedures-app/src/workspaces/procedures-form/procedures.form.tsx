@@ -29,7 +29,7 @@ import {
 } from '../../procedures.resource';
 import { type ProceduresFormSchema } from './procedures-form.workspace';
 import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
-import styles from './procedures-form.scss';
+import styles from './procedures-form.component.scss';
 import { type ProcedureType, type ConceptReference, type Procedure } from '../../types';
 import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 
