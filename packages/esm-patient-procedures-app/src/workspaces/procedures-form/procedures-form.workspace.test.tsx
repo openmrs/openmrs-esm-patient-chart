@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
   openmrsFetch,
   showSnackbar,
   useConfig,
@@ -13,13 +14,20 @@ import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-comm
 import { mockPatient } from 'tools';
 import { mockProcedureTypes, mockProceduresResponse, searchedProcedure } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
-import { saveProcedure, useConceptSearch, useConceptSearchField, useProcedureTypes } from '../../procedures.resource';
+import {
+  saveProcedure,
+  updateProcedure,
+  useConceptSearch,
+  useConceptSearchField,
+  useProcedureTypes,
+} from '../../procedures.resource';
 import ProceduresFormWorkspace, { type ProceduresFormProps } from './procedures-form.workspace';
-import { type ConceptReference } from '../../types';
+import { type ConceptReference, type Procedure } from '../../types';
 
 vi.mock('../../procedures.resource', async () => ({
   ...(await vi.importActual('../../procedures.resource')),
   saveProcedure: vi.fn(),
+  updateProcedure: vi.fn(),
   useConceptSearch: vi.fn(),
   useConceptSearchField: vi.fn(),
   useProcedureTypes: vi.fn(),
@@ -30,7 +38,9 @@ vi.mock('../../procedures.resource', async () => ({
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSaveProcedure = vi.mocked(saveProcedure);
+const mockUpdateProcedure = vi.mocked(updateProcedure);
 const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
 const mockUseConceptSearch = vi.mocked(useConceptSearch);
 const mockUseConceptSearchField = vi.mocked(useConceptSearchField);
 const mockUseProcedureTypes = vi.mocked(useProcedureTypes);
@@ -93,10 +103,81 @@ const fillRequiredFields = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.paste('2026-04-27');
 };
 
+const mockExistingProcedure: Procedure = {
+  uuid: 'existing-proc-uuid',
+  display: 'Appendectomy',
+  patient: { uuid: mockPatient.id, display: 'Test Patient' },
+  procedureType: { uuid: 'pt-uuid-1', name: 'Surgery' },
+  procedureCoded: { uuid: 'proc-concept-uuid-1', display: 'Appendectomy' },
+  procedureNonCoded: '',
+  bodySite: { uuid: 'proc-concept-uuid-1', display: 'Appendectomy' },
+  startDateTime: '2026-04-27T10:00:00.000+0000',
+  estimatedStartDate: '',
+  endDateTime: '',
+  duration: null,
+  durationUnit: { uuid: '', display: '' },
+  status: { uuid: 'proc-concept-uuid-1', display: 'Appendectomy' },
+  outcomeCoded: { uuid: '', display: '' },
+  outcomeNonCoded: { uuid: '', display: '' },
+  notes: 'Test clinical notes',
+  formNamespaceAndPath: '',
+  voided: false,
+};
+
+const renderEditForm = () => {
+  render(
+    <ProceduresFormWorkspace
+      {...defaultProps}
+      workspaceProps={{ procedure: mockExistingProcedure, formContext: 'editing' }}
+    />,
+  );
+};
+
+const setupEditConceptFieldMock = () => {
+  mockUseConceptSearchField.mockImplementation((_source, initialValue) => {
+    const initialConcept: ConceptReference | null = initialValue
+      ? { uuid: initialValue, display: 'Appendectomy' }
+      : null;
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [selectedConcept, setSelectedConcept] = React.useState<ConceptReference | null>(initialConcept);
+    const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
+    return {
+      searchTerm,
+      setSearchTerm,
+      selectedConcept,
+      setSelectedConcept,
+      searchResults,
+      isSearching,
+      clear: () => {
+        setSearchTerm('');
+        setSelectedConcept(null);
+      },
+    };
+  });
+};
+
 beforeEach(() => {
   mockUseProcedureTypes.mockReturnValue({ procedureTypes: mockProcedureTypes, isLoading: false });
   mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false });
   mockOpenmrsFetch.mockResolvedValue({ data: { results: [] } } as FetchResponse);
+  mockUpdateProcedure.mockReset();
+  // Re-implement with `invalid` prop (real API) so field-level error text is visible in tests.
+  // The default framework mock uses `isInvalid`, which doesn't match what DateTimeField passes.
+  mockOpenmrsDatePicker.mockImplementation(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ({ id, labelText, value, onChange, invalid, invalidText }: any) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input
+          id={id}
+          type="text"
+          value={value ? new Date(value).toISOString().split('T')[0] : ''}
+          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onChange?.(new Date(evt.target.value))}
+        />
+        {invalid && <span role="alert">{invalidText}</span>}
+      </>
+    ),
+  );
   mockUseConceptSearchField.mockImplementation(() => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [selectedConcept, setSelectedConcept] = React.useState<ConceptReference | null>(null);
@@ -514,5 +595,230 @@ describe('ProceduresForm', () => {
         expect.objectContaining({ startDateTime: null, estimatedStartDate: '2023-05' }),
       ),
     );
+  });
+
+  // ── Edit mode ─────────────────────────────────────────────────────────────
+
+  it('pre-populates form fields from an existing procedure in edit mode', () => {
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    setupEditConceptFieldMock();
+    renderEditForm();
+
+    // Concept search fields show the procedure's coded values
+    expect(screen.getAllByDisplayValue('Appendectomy').length).toBeGreaterThan(0);
+    // Notes textarea is pre-populated
+    expect(screen.getByDisplayValue('Test clinical notes')).toBeInTheDocument();
+    // Procedure type ComboBox is pre-selected via initialSelectedItem (driven by defaultValues)
+    const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
+    expect(within(procedureTypeGroup).getByRole('combobox')).toHaveValue('Surgery');
+  });
+
+  it('calls updateProcedure instead of saveProcedure when editing an existing procedure', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
+    setupEditConceptFieldMock();
+
+    renderEditForm();
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockUpdateProcedure).toHaveBeenCalledWith(
+        'existing-proc-uuid',
+        expect.objectContaining({ patient: mockPatient.id, procedureCoded: 'proc-concept-uuid-1' }),
+      ),
+    );
+    expect(mockSaveProcedure).not.toHaveBeenCalled();
+  });
+
+  it('shows a success snackbar after a successful edit', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
+    setupEditConceptFieldMock();
+
+    renderEditForm();
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'success', title: 'Procedure saved' }),
+    );
+  });
+
+  // ── Missing required field validations ────────────────────────────────────
+
+  it('shows "Body site is required" when submitting without a body site', async () => {
+    const user = userEvent.setup();
+    renderProceduresForm();
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(screen.getByText(/body site is required/i)).toBeInTheDocument();
+  });
+
+  it('shows "Procedure type is required" when submitting without a procedure type', async () => {
+    const user = userEvent.setup();
+    renderProceduresForm();
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(screen.getByText(/procedure type is required/i)).toBeInTheDocument();
+  });
+
+  it('shows "Status is required" when submitting without a status', async () => {
+    const user = userEvent.setup();
+    renderProceduresForm();
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    expect(screen.getByText(/status is required/i)).toBeInTheDocument();
+  });
+
+  // ── End date validation ───────────────────────────────────────────────────
+
+  it('blocks save when the end date is before the start date', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+
+    const endGroup = screen.getByRole('group', { name: /end date and time/i });
+    await user.click(within(endGroup).getByLabelText(/^date$/i));
+    await user.paste('2026-04-26');
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    // Zod refine blocks submission; saveProcedure must not be called
+    expect(mockSaveProcedure).not.toHaveBeenCalled();
+    expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+    // Error text is visible via the fixed OpenmrsDatePicker mock (uses `invalid` prop)
+    expect(screen.getByText(/end date must be on or after start date/i)).toBeInTheDocument();
+  });
+
+  it('passes end date validation when end date is equal to the start date', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
+
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+
+    const endGroup = screen.getByRole('group', { name: /end date and time/i });
+    await user.click(within(endGroup).getByLabelText(/^date$/i));
+    await user.paste('2026-04-27');
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() => expect(mockSaveProcedure).toHaveBeenCalled());
+    expect(screen.queryByText(/end date must be on or after start date/i)).not.toBeInTheDocument();
+  });
+
+  // ── Year-only estimated start date ────────────────────────────────────────
+
+  it('submits estimatedStartDate as the year string only when no month is selected', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
+
+    renderProceduresForm();
+
+    await user.type(screen.getByRole('searchbox', { name: /enter procedure/i }), 'App');
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
+    await user.type(screen.getByRole('searchbox', { name: /enter body site/i }), 'Site');
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
+    const statusGroup = screen.getByRole('group', { name: /^status/i });
+    await user.click(within(statusGroup).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /appendectomy/i }));
+    const procedureTypeGroup = screen.getByRole('group', { name: /procedure type/i });
+    await user.click(within(procedureTypeGroup).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /surgery/i }));
+
+    const known = screen.getByRole('group', { name: /is start date known/i });
+    await user.click(within(known).getByRole('tab', { name: /^no$/i }));
+
+    await user.click(screen.getByRole('combobox', { name: /year/i }));
+    await user.click(screen.getByRole('option', { name: '2023' }));
+    // Intentionally leave month unselected
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockSaveProcedure).toHaveBeenCalledWith(expect.objectContaining({ estimatedStartDate: '2023' })),
+    );
+  });
+
+  // ── Save button disabled state ─────────────────────────────────────────────
+
+  it('disables the submit button and shows a loading indicator while saving', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockReturnValue(new Promise(() => {}));
+
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await screen.findByText(/saving\.\.\./i);
+    // 'Save & close' label replaced by loading indicator — button is in loading/disabled state
+    expect(screen.queryByRole('button', { name: /save & close/i })).not.toBeInTheDocument();
+  });
+
+  it('re-enables the submit button after a save failure', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockRejectedValue(new Error('Network Error'));
+
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled());
+  });
+
+  // ── End date/time in payload ──────────────────────────────────────────────
+
+  it('includes end date and time in the save payload when provided', async () => {
+    const user = userEvent.setup();
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
+
+    renderProceduresForm();
+
+    await fillRequiredFields(user);
+
+    const endGroup = screen.getByRole('group', { name: /end date and time/i });
+    await user.click(within(endGroup).getByLabelText(/^date$/i));
+    await user.paste('2026-04-28');
+    await user.type(within(endGroup).getByLabelText(/^time$/i), '03:00');
+    await user.selectOptions(within(endGroup).getByLabelText(/am\/pm/i), 'PM');
+
+    await user.click(screen.getByRole('button', { name: /save & close/i }));
+
+    await waitFor(() =>
+      expect(mockSaveProcedure).toHaveBeenCalledWith(
+        expect.objectContaining({
+          endDateTime: expect.stringMatching(/^2026-04-28T15:00/),
+        }),
+      ),
+    );
+  });
+
+  // ── Cancel does not trigger save ──────────────────────────────────────────
+
+  it('does not call saveProcedure when Cancel is clicked', async () => {
+    const user = userEvent.setup();
+    renderProceduresForm();
+
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(mockSaveProcedure).not.toHaveBeenCalled();
   });
 });
