@@ -34,13 +34,13 @@ import { DateTimeField } from '../../components/date-time-field/date-time-field.
 import styles from './procedures-form.scss';
 
 type ProceduresFormComponentProps = {
-  closeWorkspaceWithSavedChanges: () => void;
+  closeWorkspace: () => void;
   procedure?: Procedure;
   patientUuid: string;
 };
 
 const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
-  closeWorkspaceWithSavedChanges,
+  closeWorkspace,
   patientUuid,
   procedure,
 }) => {
@@ -168,14 +168,14 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
         title: t('procedureSaved', 'Procedure saved'),
         subtitle: t('procedureNowVisible', 'It is now visible on the Procedures page'),
       });
-      closeWorkspaceWithSavedChanges();
+      closeWorkspace();
     } catch (error) {
       setIsSubmittingForm(false);
       setErrorSaving(error);
     }
   }, [
     bodySiteField.selectedConcept,
-    closeWorkspaceWithSavedChanges,
+    closeWorkspace,
     getValues,
     mutate,
     patientUuid,
@@ -427,7 +427,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
           </div>
         ) : null}
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspaceWithSavedChanges()}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
