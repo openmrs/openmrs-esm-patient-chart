@@ -82,7 +82,7 @@ describe('<DeleteProcedureModal />', () => {
       title: 'Error deleting procedure',
       subtitle: 'Internal server error',
     });
-    expect(deleteButton).not.toBeDisabled();
+    expect(deleteButton).toBeEnabled();
 
     consoleSpy.mockRestore();
   });
