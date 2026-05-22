@@ -86,12 +86,8 @@ export const useProcedures = (patientUuid: string, startIndex = 0, limit = 100) 
 };
 
 export const deleteProcedure = async (procedureId: string) => {
-  const controller = new AbortController();
-  const url = `${restBaseUrl}/procedure/${procedureId}`;
-
-  return await openmrsFetch(url, {
+  return await openmrsFetch(`${restBaseUrl}/procedure/${procedureId}`, {
     method: 'DELETE',
-    signal: controller.signal,
   });
 };
 
