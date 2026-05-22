@@ -2,9 +2,9 @@ name: OpenMRS CI
 
 on:
   push:
-    branches: [main, 'patch/*', 'feat/procedure-history']
+    branches: [main, 'patch/*']
   pull_request:
-    branches: [main, 'feat/procedure-history']
+    branches: [main]
   release:
     types:
       - created
