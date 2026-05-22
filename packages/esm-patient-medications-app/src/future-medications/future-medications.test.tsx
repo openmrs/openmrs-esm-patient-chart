@@ -4,8 +4,10 @@ import { launchWorkspace2, openmrsFetch, useSession } from '@openmrs/esm-framewo
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { Order } from '@openmrs/esm-patient-common-lib';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { bucketMedicationOrders } from '../api';
 import FutureMedications from './future-medications.component';
 
 const mockUseSession = vi.mocked(useSession);
@@ -69,9 +71,7 @@ describe('FutureMedications', () => {
     // grab the primary one, which carries the data rows.
     const [table] = await screen.findAllByRole('table');
 
-    const futureOrders = mockPatientDrugOrdersApiData.filter(
-      (order) => order.scheduledDate && new Date(order.scheduledDate) > new Date(),
-    );
+    const { futureOrders } = bucketMedicationOrders(mockPatientDrugOrdersApiData as unknown as Order[]);
 
     // The fixture must include at least one future-scheduled order for this assertion to be meaningful.
     expect(futureOrders.length).toBeGreaterThan(0);

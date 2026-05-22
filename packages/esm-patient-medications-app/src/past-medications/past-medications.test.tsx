@@ -3,8 +3,10 @@ import { vi, describe, it, expect, test, type Mock } from 'vitest';
 import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { screen, within } from '@testing-library/react';
+import type { Order } from '@openmrs/esm-patient-common-lib';
 import { mockPatientDrugOrdersApiData, mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { bucketMedicationOrders } from '../api';
 import PastMedications from './past-medications.component';
 
 const mockUseSession = vi.mocked(useSession);
@@ -63,12 +65,7 @@ describe('PastMedications', () => {
     // grab the primary one, which carries the data rows.
     const [table] = await screen.findAllByRole('table');
 
-    const pastOrders = mockPatientDrugOrdersApiData.filter((order) => {
-      const now = new Date();
-      const dateStopped = order.dateStopped ? new Date(order.dateStopped) : null;
-      const autoExpireDate = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
-      return (autoExpireDate && autoExpireDate <= now) || (dateStopped && dateStopped <= now);
-    });
+    const { pastOrders } = bucketMedicationOrders(mockPatientDrugOrdersApiData as unknown as Order[]);
 
     // The fixture must include at least one past order for this assertion to be meaningful.
     expect(pastOrders.length).toBeGreaterThan(0);
