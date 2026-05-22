@@ -35,7 +35,7 @@
       "order": 8,
       "meta": {
         "slot": "patient-chart-procedures-dashboard-slot",
-        "path": "Procedures"
+        "path": "procedures"
       }
     },
     {

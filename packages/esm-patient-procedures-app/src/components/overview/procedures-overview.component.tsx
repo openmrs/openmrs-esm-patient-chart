@@ -70,7 +70,7 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
         id: p.uuid,
         display: p.display ?? p.procedureNonCoded ?? '',
         startDateTimeRender: p.estimatedStartDate
-          ? `${formatPartialDate(p.estimatedStartDate, { mode: 'wide' })}*`
+          ? `${formatPartialDate(p.estimatedStartDate, { mode: 'wide' })}`
           : formatDate(parseDate(p.startDateTime), { mode: 'wide', time: true }),
       })),
     [procedures],
