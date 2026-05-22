@@ -37,7 +37,7 @@ interface ProceduresOverviewProps {
 }
 
 const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) => {
-  const { procedurePageSize } = useConfig<ConfigObject>();
+  const { overviewPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const launchProceduresForm = useCallback(() => launchWorkspace2('procedures-form-workspace'), []);
   const headerTitle = t('procedures', 'Procedures');
@@ -48,12 +48,12 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
   const isDesktop = isDesktopLayout(layout);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const startIndex = (currentPage - 1) * procedurePageSize;
+  const startIndex = (currentPage - 1) * overviewPageSize;
 
   const { procedures, totalCount, error, isLoading, isValidating } = useProcedures(
     patientUuid,
     startIndex,
-    procedurePageSize,
+    overviewPageSize,
   );
 
   const headers = useMemo(
@@ -137,7 +137,7 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
           currentItems={tableRows?.length ?? 0}
           onPageNumberChange={({ page }) => setCurrentPage(page)}
           pageNumber={currentPage}
-          pageSize={procedurePageSize}
+          pageSize={overviewPageSize}
           totalItems={totalCount}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}

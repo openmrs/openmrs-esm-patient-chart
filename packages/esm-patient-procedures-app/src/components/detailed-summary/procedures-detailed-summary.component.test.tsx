@@ -24,7 +24,7 @@ const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  procedurePageSize: 20,
+  detailedViewPageSize: 20,
 });
 
 describe('ProceduresDetailedSummary', () => {

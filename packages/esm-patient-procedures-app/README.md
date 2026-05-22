@@ -42,7 +42,8 @@ The app is configured through the [OpenMRS config system](https://o3-docs.openmr
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `procedurePageSize` | Number | `5` | Rows per page in the procedures tables. |
+| `overviewPageSize` | Number | `5` | Rows per page in the procedures overview widget. |
+| `detailedViewPageSize` | Number | `10` | Rows per page in the procedures detailed summary view. |
 | `procedureConceptUuid` | UUID | `8d490bf4-…` | Scopes the procedure concept search. |
 | `procedureConceptSourceType` | String | `Concept class` | How `procedureConceptUuid` filters results: `Concept class`, `Concept set`, `Answer to`, or `any`. |
 | `bodySiteConceptUuid` | UUID | `8d491c7a-…` (Anatomy) | Scopes the body-site concept search. |
