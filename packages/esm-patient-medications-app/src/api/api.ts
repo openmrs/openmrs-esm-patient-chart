@@ -79,17 +79,20 @@ export function useMedicationOrders(patientUuid: string) {
 
   const drugOrders = useMemo(() => data?.data?.results ?? null, [data]);
 
-  // Re-bucket once a minute so an order whose scheduledDate has just passed
-  // moves from "Upcoming" to "Active" without waiting for SWR revalidation.
-  const [now, setNow] = useState(() => new Date());
+  // Re-evaluate buckets once a minute so an order whose scheduledDate or
+  // dateStopped has just crossed "now" moves between buckets without waiting
+  // for the next SWR revalidation. `now` is read fresh inside the memo so
+  // bucketing triggered by a data refresh also gets a current timestamp.
+  const [tick, setTick] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60_000);
+    const id = setInterval(() => setTick((t) => t + 1), 60_000);
     return () => clearInterval(id);
   }, []);
 
   const { futureOrders, activeOrders, pastOrders } = useMemo(
-    () => bucketMedicationOrders(drugOrders, now),
-    [drugOrders, now],
+    () => bucketMedicationOrders(drugOrders, new Date()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [drugOrders, tick],
   );
 
   return {
