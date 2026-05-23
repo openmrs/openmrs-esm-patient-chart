@@ -225,6 +225,12 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   }
 };
 
+function getFutureScheduledDate(order: Order, now = new Date()) {
+  const scheduledDate =
+    order.urgency === 'ON_SCHEDULED_DATE' && order.scheduledDate ? new Date(order.scheduledDate) : null;
+  return scheduledDate && scheduledDate > now ? scheduledDate : null;
+}
+
 /**
  * The inverse of prepMedicationOrderPostData - converts an Order into a DrugOrderBasketItem
  * See also the same function defined in esm-patient-orders-app/src/utils/index.ts
@@ -233,6 +239,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
   if (!order.drug) {
     throw new Error('Drug order is missing drug information.');
   }
+
+  const futureScheduledDate = getFutureScheduledDate(order);
 
   return {
     uuid: order.uuid,
@@ -268,7 +276,9 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
     scheduledDate:
-      action === 'RENEW' || action === 'REVISE' ? new Date() : new Date(order.scheduledDate || order.dateActivated),
+      action === 'RENEW' || action === 'REVISE'
+        ? futureScheduledDate ?? new Date()
+        : new Date(order.scheduledDate || order.dateActivated),
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {

@@ -31,6 +31,12 @@ export function compare<T>(x?: T, y?: T) {
   }
 }
 
+function getFutureScheduledDate(order: Order, now = new Date()) {
+  const scheduledDate =
+    order.urgency === 'ON_SCHEDULED_DATE' && order.scheduledDate ? new Date(order.scheduledDate) : null;
+  return scheduledDate && scheduledDate > now ? scheduledDate : null;
+}
+
 /**
  * Builds medication order object from the given order object
  * See also same function in esm-patient-medications-app/src/api/api.ts
@@ -39,6 +45,8 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
   if (!order.drug) {
     throw new Error('Drug order is missing drug information.');
   }
+
+  const futureScheduledDate = getFutureScheduledDate(order);
 
   return {
     display: order.drug.display,
@@ -72,7 +80,9 @@ export function buildMedicationOrder(order: Order, action?: OrderAction): DrugOr
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
     scheduledDate:
-      action === 'RENEW' || action === 'REVISE' ? new Date() : new Date(order.scheduledDate || order.dateActivated),
+      action === 'RENEW' || action === 'REVISE'
+        ? futureScheduledDate ?? new Date()
+        : new Date(order.scheduledDate || order.dateActivated),
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {

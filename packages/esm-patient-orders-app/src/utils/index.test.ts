@@ -98,6 +98,45 @@ describe('buildMedicationOrder', () => {
     expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
   });
 
+  it.each(['RENEW', 'REVISE'] as const)(
+    'preserves the future scheduled date when building a %s basket item for an upcoming order',
+    (action) => {
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ON_SCHEDULED_DATE',
+          scheduledDate: scheduledDate.toISOString(),
+        } as Order,
+        action,
+      );
+
+      expect(result.scheduledDate).toEqual(scheduledDate);
+    },
+  );
+
+  it.each(['RENEW', 'REVISE'] as const)(
+    'defaults %s basket items to now when a future scheduled date is not marked ON_SCHEDULED_DATE',
+    (action) => {
+      const before = Date.now();
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ROUTINE',
+          scheduledDate,
+        } as Order,
+        action,
+      );
+      const after = Date.now();
+
+      expect(result.scheduledDate).toBeInstanceOf(Date);
+      expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+      expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+      expect(result.scheduledDate).not.toEqual(new Date(scheduledDate));
+    },
+  );
+
   it('uses the original activation date when building a DISCONTINUE basket item', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 

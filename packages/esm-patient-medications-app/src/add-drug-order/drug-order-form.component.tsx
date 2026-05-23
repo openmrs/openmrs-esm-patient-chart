@@ -78,6 +78,19 @@ export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?
   return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
 }
 
+function isFutureRevisionOfActiveMedication(
+  action: DrugOrderBasketItem['action'] | undefined,
+  selectedStartDate: Date,
+  initialScheduledDate?: Date,
+  now = new Date(),
+) {
+  if (action !== 'REVISE' || selectedStartDate <= now) {
+    return false;
+  }
+
+  return !(initialScheduledDate && initialScheduledDate > now);
+}
+
 function MedicationInfoHeader({
   drug,
   routeValue,
@@ -164,6 +177,7 @@ export function DrugOrderForm({
     formState: { isDirty, isSubmitting },
     getValues,
     handleSubmit,
+    setError,
     setValue,
     watch,
   } = drugOrderForm;
@@ -285,7 +299,26 @@ export function DrugOrderForm({
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
     // minimum; snap them up before saving.
-    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin);
+    const now = new Date();
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+
+    if (
+      isFutureRevisionOfActiveMedication(
+        initialOrderBasketItem?.action,
+        scheduledDate,
+        initialOrderBasketItem?.scheduledDate,
+        now,
+      )
+    ) {
+      setError('scheduledDate', {
+        type: 'manual',
+        message: t(
+          'activeMedicationRevisionCannotStartInFuture',
+          'Revisions to an active medication must start today or earlier.',
+        ),
+      });
+      return;
+    }
 
     const newBasketItem = {
       ...initialOrderBasketItem,
@@ -434,6 +467,7 @@ export function DrugOrderForm({
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         <Form
           className={styles.orderForm}
+          aria-label={workspaceTitle}
           onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
           id="drugOrderForm"
         >
