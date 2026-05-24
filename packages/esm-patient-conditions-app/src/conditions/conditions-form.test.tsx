@@ -3,6 +3,7 @@ import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
@@ -349,6 +350,58 @@ describe('Duplicate condition detection', () => {
 
     // Save button should still be enabled (non-blocking)
     expect(screen.getByRole('button', { name: /save & close/i })).toBeEnabled();
+  });
+
+  it('does not escape apostrophes in duplicate warning condition names', async () => {
+    const user = userEvent.setup();
+    const translationMock = useTranslation();
+    const tSpy = vi.spyOn(translationMock, 't');
+    const huntingtonCondition = {
+      display: "Huntington's chorea",
+      uuid: '1234567890AAAAAAAAAAAAAAAAAAAAAAAAAA',
+    };
+
+    try {
+      mockUseConditionsSearch.mockReturnValue({
+        searchResults: [huntingtonCondition],
+        error: null,
+        isSearching: false,
+      });
+
+      mockUseConditions.mockReturnValue({
+        conditions: [
+          {
+            clinicalStatus: 'Active',
+            conceptId: huntingtonCondition.uuid,
+            display: huntingtonCondition.display,
+            onsetDateTime: '2020-08-19T00:00:00+00:00',
+            recordedDate: '2020-08-19T18:34:48+00:00',
+            id: 'f4ee2cfe-3880-4ea2-a5a6-82aa8a0f6389',
+          },
+        ],
+        error: null,
+        isLoading: false,
+        isValidating: false,
+        mutate: vi.fn().mockResolvedValue(undefined),
+      });
+
+      renderConditionsForm();
+
+      const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
+      await user.type(conditionSearchInput, "Huntington's");
+      await user.click(screen.getByRole('menuitem', { name: /huntington's chorea/i }));
+
+      expect(
+        screen.getByText(/huntington's chorea is already on this patient's active problem list/i),
+      ).toBeInTheDocument();
+      expect(tSpy).toHaveBeenCalledWith(
+        'duplicateActiveConditionSubtitle',
+        "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
+        { conditionName: huntingtonCondition.display, interpolation: { escapeValue: false } },
+      );
+    } finally {
+      tSpy.mockRestore();
+    }
   });
 
   it('shows a different warning when selecting a condition that exists as inactive', async () => {
