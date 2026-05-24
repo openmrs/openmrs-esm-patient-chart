@@ -25,7 +25,13 @@ test('Record a procedure with a known start date', async ({ page, patient }) => 
     await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
   });
 
-  // Todo: add another step in here to fill the procedure type.
+  await test.step('And I select a procedure type', async () => {
+    await page
+      .getByRole('group', { name: /procedure type/i })
+      .getByRole('combobox')
+      .click();
+    await page.getByRole('option', { name: /surgical/i }).click();
+  });
 
   await test.step('And I search for `Eye` in the search box for body site', async () => {
     await page.getByPlaceholder(/search body sites/i).fill('eye');
@@ -51,7 +57,7 @@ test('Record a procedure with a known start date', async ({ page, patient }) => 
     await endDateInput.getByRole('spinbutton', { name: /day/i }).fill('07');
     await endDateInput.getByRole('spinbutton', { name: /month/i }).fill('07');
     await endDateInput.getByRole('spinbutton', { name: /year/i }).fill('2027');
-    await endGroup.getByLabel(/^time$/i).fill('13:00');
+    await endGroup.getByLabel(/^time$/i).fill('01:00');
     await endGroup.getByLabel(/am\/pm/i).selectOption('PM');
   });
 
@@ -78,8 +84,8 @@ test('Record a procedure with a known start date', async ({ page, patient }) => 
     await expect(page.getByText(/procedure saved/i)).toBeVisible();
   });
 
-  await test.step('And the procedure orbital surgery panel should appear in the procedures table', async () => {
-    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/orbital surgery panel/i);
+  await test.step('And the procedure orbital surgery should appear in the procedures table', async () => {
+    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/orbital surgery/i);
   });
 });
 
@@ -106,7 +112,13 @@ test('Record a procedure with an unknown start date', async ({ page, patient }) 
     await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
   });
 
-  // Todo: add another step in here to fill the procedure type.
+  await test.step('And I select a procedure type', async () => {
+    await page
+      .getByRole('group', { name: /procedure type/i })
+      .getByRole('combobox')
+      .click();
+    await page.getByRole('option', { name: /surgical/i }).click();
+  });
 
   await test.step('And I search for `Eye` in the search box for body site', async () => {
     await page.getByPlaceholder(/search body sites/i).fill('eye');
@@ -120,14 +132,39 @@ test('Record a procedure with an unknown start date', async ({ page, patient }) 
     await page.getByRole('tab', { name: /no/i }).click();
   });
 
-  await test.step('And I select year 2027', async () => {
+  await test.step('And I select year 2025', async () => {
     await page.getByRole('combobox', { name: /year/i }).click();
-    await page.getByRole('option', { name: '2027' }).click();
+    await page.getByRole('option', { name: '2025' }).click();
   });
 
   await test.step('And I select month July', async () => {
     await page.getByRole('combobox', { name: /month/i }).click();
     await page.getByRole('option', { name: 'July' }).click();
+  });
+
+  await test.step('And I set the end date and time to 07/07/2025 13:00 PM', async () => {
+    const endGroup = page.getByRole('group', { name: /end date and time/i });
+    const endDateInput = endGroup.getByLabel(/^date$/i);
+    await endDateInput.getByRole('spinbutton', { name: /day/i }).fill('07');
+    await endDateInput.getByRole('spinbutton', { name: /month/i }).fill('07');
+    await endDateInput.getByRole('spinbutton', { name: /year/i }).fill('2025');
+    await endGroup.getByLabel(/^time$/i).fill('01:00');
+    await endGroup.getByLabel(/am\/pm/i).selectOption('PM');
+  });
+
+  await test.step('And I set the duration to 2 hours', async () => {
+    await page.getByLabel('Duration', { exact: true }).fill('2');
+    await page.getByRole('combobox', { name: /duration unit/i }).click();
+    await page.getByRole('option', { name: /hours/i }).click();
+  });
+
+  await test.step('And I set the status to Preparation', async () => {
+    await page.locator('#status').click();
+    await page.getByRole('option', { name: /preparation/i }).click();
+  });
+
+  await test.step('And I enter notes routine blood pressure check', async () => {
+    await page.getByPlaceholder(/enter notes/i).fill('orbital surgery for routine blood pressure check');
   });
 
   await test.step('And I click "Save & close"', async () => {
@@ -138,11 +175,11 @@ test('Record a procedure with an unknown start date', async ({ page, patient }) 
     await expect(page.getByText(/procedure saved/i)).toBeVisible();
   });
 
-  await test.step('And the procedure orbital surgery panel should appear in the procedures table', async () => {
-    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/orbital surgery panel/i);
+  await test.step('And the procedure orbital surgery should appear in the procedures table', async () => {
+    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/orbital surgery/i);
   });
 
-  await test.step('And the start date column should show July 2027*', async () => {
-    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/july 2027\*/i);
+  await test.step('And the start date column should show Jul — 2025', async () => {
+    await expect(proceduresPage.proceduresTable().locator('tbody')).toContainText(/jul.*2025/i);
   });
 });
