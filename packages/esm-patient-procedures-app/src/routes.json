@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0",
+    "emrapi": ">=3.4.0"
+  },
   "workspaces2": [
     {
       "name": "procedures-form-workspace",
