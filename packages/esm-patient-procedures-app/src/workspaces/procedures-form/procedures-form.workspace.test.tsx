@@ -140,15 +140,18 @@ beforeEach(() => {
   mockUpdateProcedure.mockReset();
   // Re-implement with `invalid` prop (real API) so field-level error text is visible in tests.
   // The default framework mock uses `isInvalid`, which doesn't match what DateTimeField passes.
+  // minDate/maxDate are exposed as data attributes so bound-checking tests can assert on them.
   mockOpenmrsDatePicker.mockImplementation(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ({ id, labelText, value, onChange, invalid, invalidText }: any) => (
+    ({ id, labelText, value, onChange, invalid, invalidText, minDate, maxDate }: any) => (
       <>
         <label htmlFor={id}>{labelText}</label>
         <input
           id={id}
           type="text"
           value={value ? new Date(value).toISOString().split('T')[0] : ''}
+          data-min-date={minDate ? new Date(minDate).toISOString().split('T')[0] : ''}
+          data-max-date={maxDate ? new Date(maxDate).toISOString().split('T')[0] : ''}
           onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onChange?.(new Date(evt.target.value))}
         />
         {invalid && <span role="alert">{invalidText}</span>}
@@ -686,6 +689,40 @@ describe('ProceduresForm', () => {
 
     await waitFor(() => expect(mockSaveProcedure).toHaveBeenCalled());
     expect(screen.queryByText(/end date must be on or after start date/i)).not.toBeInTheDocument();
+  });
+
+  // ── Date picker min/max bounds ────────────────────────────────────────────
+
+  it("constrains the start date picker's maxDate to today", () => {
+    renderProceduresForm();
+
+    const startGroup = screen.getByRole('group', { name: /start date and time/i });
+    const startDateInput = within(startGroup).getByLabelText(/^date$/i);
+    const today = new Date().toISOString().split('T')[0];
+
+    expect(startDateInput).toHaveAttribute('data-max-date', today);
+  });
+
+  it("leaves the end date picker's minDate unset until a start date is picked", () => {
+    renderProceduresForm();
+
+    const endGroup = screen.getByRole('group', { name: /end date and time/i });
+    const endDateInput = within(endGroup).getByLabelText(/^date$/i);
+
+    expect(endDateInput).toHaveAttribute('data-min-date', '');
+  });
+
+  it("sets the end date picker's minDate to the chosen start date (same day allowed)", async () => {
+    const user = userEvent.setup();
+    renderProceduresForm();
+
+    const startGroup = screen.getByRole('group', { name: /start date and time/i });
+    await user.click(within(startGroup).getByLabelText(/^date$/i));
+    await user.paste('2026-04-27');
+
+    const endGroup = screen.getByRole('group', { name: /end date and time/i });
+    const endDateInput = within(endGroup).getByLabelText(/^date$/i);
+    expect(endDateInput).toHaveAttribute('data-min-date', '2026-04-27');
   });
 
   // ── Year-only estimated start date ────────────────────────────────────────

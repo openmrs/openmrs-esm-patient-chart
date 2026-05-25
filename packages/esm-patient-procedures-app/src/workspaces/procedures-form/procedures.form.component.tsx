@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import {
   Button,
   ButtonSet,
@@ -67,6 +67,15 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   } = useFormContext<ProceduresFormSchema>();
 
   const { procedureTypes, isLoading: isLoadingProcedureTypes } = useProcedureTypes();
+
+  const today = useMemo(() => new Date(), []);
+  const watchedStartDateTime = useWatch({ control, name: 'startDateTime' });
+  const endDateMin = useMemo(() => {
+    if (!watchedStartDateTime) return undefined;
+    const startOfDay = new Date(watchedStartDateTime);
+    startOfDay.setHours(0, 0, 0, 0);
+    return startOfDay;
+  }, [watchedStartDateTime]);
 
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
@@ -263,6 +272,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                     onChange={field.onChange}
                     invalid={Boolean(fieldState.error?.message)}
                     invalidText={fieldState.error?.message}
+                    maxDate={today}
                   />
                 )}
               />
@@ -314,6 +324,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   onChange={field.onChange}
                   invalid={Boolean(fieldState.error?.message)}
                   invalidText={fieldState.error?.message}
+                  minDate={endDateMin}
                 />
               )}
             />

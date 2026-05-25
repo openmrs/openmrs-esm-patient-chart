@@ -29,9 +29,19 @@ type DateTimeFieldProps = {
   onChange: (next: Date | null) => void;
   invalid?: boolean;
   invalidText?: string;
+  minDate?: Date | null;
+  maxDate?: Date | null;
 };
 
-export const DateTimeField = ({ idPrefix, value, onChange, invalid, invalidText }: DateTimeFieldProps) => {
+export const DateTimeField = ({
+  idPrefix,
+  value,
+  onChange,
+  invalid,
+  invalidText,
+  minDate,
+  maxDate,
+}: DateTimeFieldProps) => {
   const { t } = useTranslation();
   const dateValue = value ?? null;
   const meridiem = getMeridiem(dateValue);
@@ -80,6 +90,8 @@ export const DateTimeField = ({ idPrefix, value, onChange, invalid, invalidText 
           labelText={t('date', 'Date')}
           invalid={invalid}
           invalidText={invalidText}
+          minDate={minDate ?? undefined}
+          maxDate={maxDate ?? undefined}
         />
       </ResponsiveWrapper>
       <TimePicker
