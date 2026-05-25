@@ -10,20 +10,22 @@ type ConceptSearchResultsProps = {
   isSearching: boolean;
   onSelect: (result: ConceptReference) => void;
   searchResults: Array<ConceptReference>;
-  selectedItem: ConceptReference;
-  value: string;
+  hasSelection: boolean;
+  searchTerm: string;
 };
 
 export const ConceptSearchField = ({
   label,
   placeholder,
   field,
+  selectedConcept,
   onChange,
 }: {
   label: string;
   placeholder: string;
   field: ReturnType<typeof useConceptSearchField>;
-  onChange: (selectedConcept: ConceptReference) => void;
+  selectedConcept: ConceptReference | null;
+  onChange: (selectedConcept: ConceptReference | null) => void;
 }) => {
   return (
     <>
@@ -33,20 +35,24 @@ export const ConceptSearchField = ({
           placeholder={placeholder}
           onChange={(e) => {
             field.setSearchTerm(e.target.value);
-            field.setSelectedConcept(null);
+            if (selectedConcept) {
+              onChange(null);
+            }
           }}
-          onClear={field.clear}
-          value={field.selectedConcept ? field.selectedConcept.display : field.searchTerm}
+          onClear={() => {
+            field.clear();
+            onChange(null);
+          }}
+          value={selectedConcept ? selectedConcept.display : field.searchTerm}
         />
       </ResponsiveWrapper>
 
       <ConceptSearchResults
         isSearching={field.isSearching}
         searchResults={field.searchResults}
-        selectedItem={field.selectedConcept}
-        value={field.searchTerm}
+        hasSelection={Boolean(selectedConcept)}
+        searchTerm={field.searchTerm}
         onSelect={(result) => {
-          field.setSelectedConcept(result);
           field.setSearchTerm('');
           onChange(result);
         }}
@@ -59,12 +65,12 @@ const ConceptSearchResults = ({
   isSearching,
   onSelect,
   searchResults,
-  selectedItem,
-  value,
+  hasSelection,
+  searchTerm,
 }: ConceptSearchResultsProps) => {
   const { t } = useTranslation();
 
-  if (!value || selectedItem) {
+  if (!searchTerm || hasSelection) {
     return null;
   }
 
@@ -101,7 +107,7 @@ const ConceptSearchResults = ({
     <Layer>
       <Tile className={styles.emptyResults}>
         <span>
-          {t('noResultsFor', 'No results for')} <strong>"{value}"</strong>
+          {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
         </span>
       </Tile>
     </Layer>

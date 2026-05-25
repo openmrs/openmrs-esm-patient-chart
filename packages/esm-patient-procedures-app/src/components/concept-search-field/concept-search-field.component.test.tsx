@@ -8,8 +8,6 @@ import type { ConceptReference } from '../../types';
 const createMockField = (overrides = {}) => ({
   searchTerm: '',
   setSearchTerm: vi.fn(),
-  selectedConcept: null as ConceptReference | null,
-  setSelectedConcept: vi.fn(),
   searchResults: [] as Array<ConceptReference>,
   isSearching: false,
   clear: vi.fn(),
@@ -19,6 +17,7 @@ const createMockField = (overrides = {}) => ({
 const defaultProps = {
   label: 'Procedure',
   placeholder: 'Search for a procedure',
+  selectedConcept: null as ConceptReference | null,
   onChange: vi.fn(),
 };
 
@@ -35,7 +34,7 @@ describe('Concept Search Field', () => {
     expect(screen.getByPlaceholderText('Search for a procedure')).toBeInTheDocument();
   });
 
-  it('typing calls setSearchTerm and clears selected concept', async () => {
+  it('typing calls setSearchTerm', async () => {
     const user = userEvent.setup();
     const field = createMockField();
 
@@ -45,10 +44,24 @@ describe('Concept Search Field', () => {
     await user.type(searchInput, 'App');
 
     expect(field.setSearchTerm).toHaveBeenCalled();
-    expect(field.setSelectedConcept).toHaveBeenCalledWith(null);
+    expect(defaultProps.onChange).not.toHaveBeenCalled();
   });
 
-  it('clearing the search input calls field.clear', async () => {
+  it('typing after a concept is selected fires onChange(null)', async () => {
+    const user = userEvent.setup();
+    const field = createMockField();
+    const selectedConcept: ConceptReference = { uuid: '1', display: 'Appendectomy' };
+
+    render(<ConceptSearchField {...defaultProps} field={field} selectedConcept={selectedConcept} />);
+
+    const searchInput = screen.getByRole('searchbox');
+    await user.type(searchInput, 'a');
+
+    expect(field.setSearchTerm).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith(null);
+  });
+
+  it('clearing the search input calls field.clear and fires onChange(null)', async () => {
     const user = userEvent.setup();
     const field = createMockField({ searchTerm: 'App' });
 
@@ -58,13 +71,14 @@ describe('Concept Search Field', () => {
     await user.click(clearButton);
 
     expect(field.clear).toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith(null);
   });
 
   it('displays selected concept display name in the search input', () => {
     const selectedConcept: ConceptReference = { uuid: '1', display: 'Appendectomy' };
-    const field = createMockField({ selectedConcept, searchTerm: 'App' });
+    const field = createMockField({ searchTerm: 'App' });
 
-    render(<ConceptSearchField {...defaultProps} field={field} />);
+    render(<ConceptSearchField {...defaultProps} field={field} selectedConcept={selectedConcept} />);
 
     expect(screen.getByDisplayValue('Appendectomy')).toBeInTheDocument();
   });
@@ -101,7 +115,6 @@ describe('Concept Search Field', () => {
 
     await user.click(screen.getByRole('option', { name: 'Appendectomy' }));
 
-    expect(field.setSelectedConcept).toHaveBeenCalledWith(result);
     expect(field.setSearchTerm).toHaveBeenCalledWith('');
     expect(defaultProps.onChange).toHaveBeenCalledWith(result);
   });
@@ -117,7 +130,6 @@ describe('Concept Search Field', () => {
     option.focus();
     await user.keyboard('{Enter}');
 
-    expect(field.setSelectedConcept).toHaveBeenCalledWith(result);
     expect(field.setSearchTerm).toHaveBeenCalledWith('');
     expect(defaultProps.onChange).toHaveBeenCalledWith(result);
   });
@@ -133,7 +145,6 @@ describe('Concept Search Field', () => {
     option.focus();
     await user.keyboard(' ');
 
-    expect(field.setSelectedConcept).toHaveBeenCalledWith(result);
     expect(field.setSearchTerm).toHaveBeenCalledWith('');
     expect(defaultProps.onChange).toHaveBeenCalledWith(result);
   });
@@ -160,12 +171,11 @@ describe('Concept Search Field', () => {
   it('hides results when a concept is already selected', () => {
     const selectedConcept: ConceptReference = { uuid: '1', display: 'Appendectomy' };
     const field = createMockField({
-      selectedConcept,
       searchTerm: 'App',
       searchResults: [selectedConcept],
     });
 
-    render(<ConceptSearchField {...defaultProps} field={field} />);
+    render(<ConceptSearchField {...defaultProps} field={field} selectedConcept={selectedConcept} />);
 
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(screen.queryByText(/searching/i)).not.toBeInTheDocument();

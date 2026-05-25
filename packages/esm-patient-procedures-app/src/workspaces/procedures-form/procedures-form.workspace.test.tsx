@@ -22,7 +22,7 @@ import {
   useProcedureTypes,
 } from '../../procedures.resource';
 import ProceduresFormWorkspace, { type ProceduresFormProps } from './procedures-form.workspace';
-import type { ConceptReference, Procedure } from '../../types';
+import type { Procedure } from '../../types';
 
 vi.mock('../../procedures.resource', async () => ({
   ...(await vi.importActual('../../procedures.resource')),
@@ -133,29 +133,6 @@ const renderEditForm = () => {
   );
 };
 
-const setupEditConceptFieldMock = () => {
-  mockUseConceptSearchField.mockImplementation((_source, initialValue) => {
-    const initialConcept: ConceptReference | null = initialValue
-      ? { uuid: initialValue, display: 'Appendectomy' }
-      : null;
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [selectedConcept, setSelectedConcept] = React.useState<ConceptReference | null>(initialConcept);
-    const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
-    return {
-      searchTerm,
-      setSearchTerm,
-      selectedConcept,
-      setSelectedConcept,
-      searchResults,
-      isSearching,
-      clear: () => {
-        setSearchTerm('');
-        setSelectedConcept(null);
-      },
-    };
-  });
-};
-
 beforeEach(() => {
   mockUseProcedureTypes.mockReturnValue({ procedureTypes: mockProcedureTypes, isLoading: false });
   mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false });
@@ -180,19 +157,13 @@ beforeEach(() => {
   );
   mockUseConceptSearchField.mockImplementation(() => {
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [selectedConcept, setSelectedConcept] = React.useState<ConceptReference | null>(null);
     const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
     return {
       searchTerm,
       setSearchTerm,
-      selectedConcept,
-      setSelectedConcept,
       searchResults,
       isSearching,
-      clear: () => {
-        setSearchTerm('');
-        setSelectedConcept(null);
-      },
+      clear: () => setSearchTerm(''),
     };
   });
 });
@@ -601,7 +572,6 @@ describe('ProceduresForm', () => {
 
   it('pre-populates form fields from an existing procedure in edit mode', () => {
     mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
-    setupEditConceptFieldMock();
     renderEditForm();
 
     // Concept search fields show the procedure's coded values
@@ -617,7 +587,6 @@ describe('ProceduresForm', () => {
     const user = userEvent.setup();
     mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
     mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
-    setupEditConceptFieldMock();
 
     renderEditForm();
 
@@ -636,7 +605,6 @@ describe('ProceduresForm', () => {
     const user = userEvent.setup();
     mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
     mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
-    setupEditConceptFieldMock();
 
     renderEditForm();
 

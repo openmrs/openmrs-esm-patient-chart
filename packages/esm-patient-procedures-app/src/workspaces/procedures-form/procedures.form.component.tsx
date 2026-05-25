@@ -110,13 +110,14 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
     [t],
   );
 
-  const procedureField = useConceptSearchField(
-    { uuid: procedureConceptUuid, sourceType: procedureConceptSourceType },
-    getValues('procedureCoded'),
+  const procedureField = useConceptSearchField({ uuid: procedureConceptUuid, sourceType: procedureConceptSourceType });
+  const bodySiteField = useConceptSearchField({ uuid: bodySiteConceptUuid, sourceType: bodySiteConceptSourceType });
+
+  const [procedureConcept, setProcedureConcept] = useState<ConceptReference | null>(
+    procedure?.procedureCoded?.uuid ? procedure.procedureCoded : null,
   );
-  const bodySiteField = useConceptSearchField(
-    { uuid: bodySiteConceptUuid, sourceType: bodySiteConceptSourceType },
-    getValues('bodySite'),
+  const [bodySiteConcept, setBodySiteConcept] = useState<ConceptReference | null>(
+    procedure?.bodySite?.uuid ? procedure.bodySite : null,
   );
   const { searchResults: statusOptions } = useConceptSearch('', {
     uuid: statusConceptUuid,
@@ -144,9 +145,9 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
 
     const payload = {
       patient: patientUuid,
-      procedureCoded: procedureField.selectedConcept!.uuid,
+      procedureCoded: getValues('procedureCoded'),
       procedureType: procedureType,
-      bodySite: bodySiteField.selectedConcept!.uuid,
+      bodySite: getValues('bodySite') || null,
       startDateTime: startDateTime ? dayjs(startDateTime).format() : null,
       endDateTime: endDateTime ? dayjs(endDateTime).format() : null,
       status: getValues('status'),
@@ -173,16 +174,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
       setIsSubmittingForm(false);
       setErrorSaving(error);
     }
-  }, [
-    bodySiteField.selectedConcept,
-    closeWorkspace,
-    getValues,
-    mutate,
-    patientUuid,
-    procedureField.selectedConcept,
-    procedure?.uuid,
-    t,
-  ]);
+  }, [closeWorkspace, getValues, mutate, patientUuid, procedure?.uuid, t]);
 
   const onError = () => setIsSubmittingForm(false);
 
@@ -195,7 +187,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               label={t('enterProcedure', 'Enter procedure')}
               placeholder={t('searchProcedures', 'Search procedures')}
               field={procedureField}
-              onChange={(selectedConcept) => setValue('procedureCoded', selectedConcept.uuid)}
+              selectedConcept={procedureConcept}
+              onChange={(concept) => {
+                setProcedureConcept(concept);
+                setValue('procedureCoded', concept?.uuid ?? '');
+              }}
             />
             {errors.procedureCoded && <p className={styles.errorMessage}>{errors.procedureCoded.message}</p>}
           </FormGroup>
@@ -226,7 +222,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
               label={t('enterBodySite', 'Enter body site')}
               placeholder={t('searchBodySites', 'Search body sites')}
               field={bodySiteField}
-              onChange={(selectedConcept) => setValue('bodySite', selectedConcept.uuid)}
+              selectedConcept={bodySiteConcept}
+              onChange={(concept) => {
+                setBodySiteConcept(concept);
+                setValue('bodySite', concept?.uuid ?? '');
+              }}
             />
             {errors.bodySite && <p className={styles.errorMessage}>{errors.bodySite.message}</p>}
           </FormGroup>
