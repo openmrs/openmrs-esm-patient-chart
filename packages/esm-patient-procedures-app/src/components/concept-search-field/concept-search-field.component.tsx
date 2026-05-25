@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading, Layer, Search, Tile } from '@carbon/react';
+import { InlineLoading, InlineNotification, Layer, Search, Tile } from '@carbon/react';
 import { ResponsiveWrapper } from '@openmrs/esm-framework';
 import type { ConceptReference } from '../../types';
 import type { useConceptSearchField } from '../../procedures.resource';
@@ -27,6 +27,8 @@ export const ConceptSearchField = ({
   selectedConcept: ConceptReference | null;
   onChange: (selectedConcept: ConceptReference | null) => void;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <ResponsiveWrapper>
@@ -47,16 +49,25 @@ export const ConceptSearchField = ({
         />
       </ResponsiveWrapper>
 
-      <ConceptSearchResults
-        isSearching={field.isSearching}
-        searchResults={field.searchResults}
-        hasSelection={Boolean(selectedConcept)}
-        searchTerm={field.searchTerm}
-        onSelect={(result) => {
-          field.setSearchTerm('');
-          onChange(result);
-        }}
-      />
+      {field.error ? (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          title={t('errorFetchingConcepts', 'Error fetching concepts')}
+          subtitle={field.error?.message}
+        />
+      ) : (
+        <ConceptSearchResults
+          isSearching={field.isSearching}
+          searchResults={field.searchResults}
+          hasSelection={Boolean(selectedConcept)}
+          searchTerm={field.searchTerm}
+          onSelect={(result) => {
+            field.setSearchTerm('');
+            onChange(result);
+          }}
+        />
+      )}
     </>
   );
 };

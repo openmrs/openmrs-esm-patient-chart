@@ -10,6 +10,7 @@ const createMockField = (overrides = {}) => ({
   setSearchTerm: vi.fn(),
   searchResults: [] as Array<ConceptReference>,
   isSearching: false,
+  error: undefined as Error | undefined,
   clear: vi.fn(),
   ...overrides,
 });
@@ -166,6 +167,17 @@ describe('Concept Search Field', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(screen.queryByText(/no results for/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/searching/i)).not.toBeInTheDocument();
+  });
+
+  it('shows error notification when concept search fails', () => {
+    const error = new Error('Network error');
+    const field = createMockField({ searchTerm: 'App', error });
+
+    render(<ConceptSearchField {...defaultProps} field={field} />);
+
+    expect(screen.getByText(/error fetching concepts/i)).toBeInTheDocument();
+    expect(screen.getByText(/network error/i)).toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('hides results when a concept is already selected', () => {

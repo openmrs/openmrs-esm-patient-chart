@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
 import type { ConceptSourceType } from './config-schema';
-import type { ConceptReference, ProcedureApiResponse, ProcedureTypeApiResponse, RawProcedure, } from './types';
+import type { ConceptReference, ProcedureApiResponse, ProcedureTypeApiResponse, RawProcedure } from './types';
 
 export type ConceptSource = { uuid: string; sourceType: ConceptSourceType };
 
@@ -33,14 +33,14 @@ export const useProcedureTypes = () => {
 export const useConceptSearch = (query: string, source: ConceptSource) => {
   const hasSourceFilter = Boolean(source.uuid) && source.sourceType !== 'any';
   const url = query || hasSourceFilter ? buildConceptSearchUrl(query, source) : null;
-  const { data, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: { results: ConceptReference[] } }, Error>(url, openmrsFetch);
 
   const results = data?.data?.results ?? [];
 
   // TODO: RESTWS-1035: Currently the API returns duplicated results, remove the following once the bug is fixed
   const uniqueSearchResults = Array.from(new Map(results.map((concept) => [concept.uuid, concept])).values());
 
-  return { searchResults: uniqueSearchResults, isSearching: isLoading };
+  return { searchResults: uniqueSearchResults, isSearching: isLoading, error };
 };
 
 export const saveProcedure = async (payload: RawProcedure) => {
@@ -86,16 +86,10 @@ export const deleteProcedure = async (procedureId: string) => {
   });
 };
 
-export const useConceptById = (uuid: string) => {
-  const url = uuid ? `${restBaseUrl}/concept/${uuid}?v=custom:(uuid,display)` : null;
-  const { data } = useSWR<{ data: ConceptReference }, Error>(url, openmrsFetch);
-  return data?.data ?? null;
-};
-
 export const useConceptSearchField = (source: ConceptSource) => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const { searchResults, isSearching } = useConceptSearch(debouncedSearchTerm, source);
+  const { searchResults, isSearching, error } = useConceptSearch(debouncedSearchTerm, source);
   const clear = () => setSearchTerm('');
-  return { searchTerm, setSearchTerm, searchResults, isSearching, clear };
+  return { searchTerm, setSearchTerm, searchResults, isSearching, error, clear };
 };

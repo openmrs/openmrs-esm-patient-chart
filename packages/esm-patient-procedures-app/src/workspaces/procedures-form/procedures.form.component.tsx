@@ -119,12 +119,12 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
   const [bodySiteConcept, setBodySiteConcept] = useState<ConceptReference | null>(
     procedure?.bodySite?.uuid ? procedure.bodySite : null,
   );
-  const { searchResults: statusOptions } = useConceptSearch('', {
+  const { searchResults: statusOptions, error: statusOptionsError } = useConceptSearch('', {
     uuid: statusConceptUuid,
     sourceType: statusConceptSourceType,
   });
 
-  const { searchResults: durationUnitOptions } = useConceptSearch('', {
+  const { searchResults: durationUnitOptions, error: durationUnitOptionsError } = useConceptSearch('', {
     uuid: durationUnitConceptUuid,
     sourceType: durationUnitConceptSourceType,
   });
@@ -367,6 +367,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   </ResponsiveWrapper>
                 )}
               />
+              {durationUnitOptionsError && (
+                <p className={styles.errorMessage}>
+                  {t('durationUnitOptionsLoadFailed', 'Could not load duration unit options. Please try again.')}
+                </p>
+              )}
             </div>
             {errors.duration && <p className={styles.errorMessage}>{errors.duration.message}</p>}
             {errors.durationUnit && <p className={styles.errorMessage}>{errors.durationUnit.message}</p>}
@@ -392,6 +397,11 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 </ResponsiveWrapper>
               )}
             />
+            {statusOptionsError && (
+              <p className={styles.errorMessage}>
+                {t('statusOptionsLoadFailed', 'Could not load status options. Please try again.')}
+              </p>
+            )}
             {errors.status && <p className={styles.errorMessage}>{errors.status.message}</p>}
           </FormGroup>
 

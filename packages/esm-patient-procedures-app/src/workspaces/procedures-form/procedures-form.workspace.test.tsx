@@ -135,7 +135,7 @@ const renderEditForm = () => {
 
 beforeEach(() => {
   mockUseProcedureTypes.mockReturnValue({ procedureTypes: mockProcedureTypes, isLoading: false });
-  mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false });
+  mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false, error: undefined });
   mockOpenmrsFetch.mockResolvedValue({ data: { results: [] } } as FetchResponse);
   mockUpdateProcedure.mockReset();
   // Re-implement with `invalid` prop (real API) so field-level error text is visible in tests.
@@ -157,12 +157,13 @@ beforeEach(() => {
   );
   mockUseConceptSearchField.mockImplementation(() => {
     const [searchTerm, setSearchTerm] = React.useState('');
-    const { searchResults, isSearching } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
+    const { searchResults, isSearching, error } = mockUseConceptSearch(searchTerm, { uuid: '', sourceType: 'any' });
     return {
       searchTerm,
       setSearchTerm,
       searchResults,
       isSearching,
+      error,
       clear: () => setSearchTerm(''),
     };
   });
@@ -213,7 +214,7 @@ describe('ProceduresForm', () => {
   it('renders search results as the user types in the procedure search box', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
 
     renderProceduresForm();
 
@@ -225,7 +226,7 @@ describe('ProceduresForm', () => {
   it('shows a "No results" tile when a search yields no matches', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false, error: undefined });
 
     renderProceduresForm();
 
@@ -237,7 +238,7 @@ describe('ProceduresForm', () => {
   it('shows a loading indicator while searching', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: true });
+    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: true, error: undefined });
 
     renderProceduresForm();
 
@@ -271,7 +272,7 @@ describe('ProceduresForm', () => {
   it('calls saveProcedure with the correct payload on submission', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -299,7 +300,7 @@ describe('ProceduresForm', () => {
   it('includes notes in the payload when provided', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -316,7 +317,7 @@ describe('ProceduresForm', () => {
   it('includes the selected procedure type in the payload', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -332,7 +333,7 @@ describe('ProceduresForm', () => {
   it('closes the workspace after a successful save', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -346,7 +347,7 @@ describe('ProceduresForm', () => {
   it('shows a success snackbar after successfully saving a procedure', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
     mockOpenmrsFetch.mockResolvedValue({ data: mockProceduresResponse } as FetchResponse);
 
@@ -364,7 +365,7 @@ describe('ProceduresForm', () => {
   it('includes duration and duration unit in the payload when provided', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -390,7 +391,7 @@ describe('ProceduresForm', () => {
   it('requires a duration unit when a duration value is entered', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
 
     renderProceduresForm();
 
@@ -441,7 +442,7 @@ describe('ProceduresForm', () => {
   it('submits the combined date and time as an ISO datetime using the AM/PM selection', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -478,7 +479,7 @@ describe('ProceduresForm', () => {
   it('keeps morning hours unchanged when AM is the selected meridiem', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -502,7 +503,7 @@ describe('ProceduresForm', () => {
   it('shows an error notification when saving fails', async () => {
     const user = userEvent.setup();
 
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockRejectedValue(new Error('Internal Server Error'));
     mockOpenmrsFetch.mockResolvedValue({ data: { results: [] } } as FetchResponse);
 
@@ -517,7 +518,7 @@ describe('ProceduresForm', () => {
 
   it('clears exact start date and requires estimated date when toggled to unknown', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     renderProceduresForm();
 
     await fillRequiredFields(user);
@@ -537,7 +538,7 @@ describe('ProceduresForm', () => {
 
   it('saves an estimated start date when "Is start date known?" is "No"', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
     renderProceduresForm();
 
@@ -571,7 +572,7 @@ describe('ProceduresForm', () => {
   // ── Edit mode ─────────────────────────────────────────────────────────────
 
   it('pre-populates form fields from an existing procedure in edit mode', () => {
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     renderEditForm();
 
     // Concept search fields show the procedure's coded values
@@ -585,7 +586,7 @@ describe('ProceduresForm', () => {
 
   it('calls updateProcedure instead of saveProcedure when editing an existing procedure', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
 
     renderEditForm();
@@ -603,7 +604,7 @@ describe('ProceduresForm', () => {
 
   it('shows a success snackbar after a successful edit', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockUpdateProcedure.mockResolvedValue({ status: 200 } as unknown as FetchResponse);
 
     renderEditForm();
@@ -649,7 +650,7 @@ describe('ProceduresForm', () => {
 
   it('blocks save when the end date is before the start date', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
 
     renderProceduresForm();
 
@@ -670,7 +671,7 @@ describe('ProceduresForm', () => {
 
   it('passes end date validation when end date is equal to the start date', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -691,7 +692,7 @@ describe('ProceduresForm', () => {
 
   it('submits estimatedStartDate as the year string only when no month is selected', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -725,7 +726,7 @@ describe('ProceduresForm', () => {
 
   it('disables the submit button and shows a loading indicator while saving', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockReturnValue(new Promise(() => {}));
 
     renderProceduresForm();
@@ -740,7 +741,7 @@ describe('ProceduresForm', () => {
 
   it('re-enables the submit button after a save failure', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockRejectedValue(new Error('Network Error'));
 
     renderProceduresForm();
@@ -755,7 +756,7 @@ describe('ProceduresForm', () => {
 
   it('includes end date and time in the save payload when provided', async () => {
     const user = userEvent.setup();
-    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false });
+    mockUseConceptSearch.mockReturnValue({ searchResults: searchedProcedure, isSearching: false, error: undefined });
     mockSaveProcedure.mockResolvedValue({ status: 201 } as unknown as FetchResponse);
 
     renderProceduresForm();
@@ -788,5 +789,39 @@ describe('ProceduresForm', () => {
     await user.click(screen.getByRole('button', { name: /cancel/i }));
 
     expect(mockSaveProcedure).not.toHaveBeenCalled();
+  });
+
+  // ── Form-level concept fetch errors ──────────────────────────────────────
+
+  it('shows inline error messages when status and duration unit option fetches fail', () => {
+    mockUseConceptSearch.mockReturnValue({
+      searchResults: [],
+      isSearching: false,
+      error: new Error('Concept fetch failed'),
+    });
+
+    renderProceduresForm();
+
+    expect(screen.getByText(/could not load status options/i)).toBeInTheDocument();
+    expect(screen.getByText(/could not load duration unit options/i)).toBeInTheDocument();
+  });
+
+  it('still renders the status ComboBox alongside the error message when status options fail', () => {
+    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false, error: new Error('Network error') });
+
+    renderProceduresForm();
+
+    const statusGroup = screen.getByRole('group', { name: /^status/i });
+    expect(within(statusGroup).getByRole('combobox')).toBeInTheDocument();
+    expect(screen.getByText(/could not load status options/i)).toBeInTheDocument();
+  });
+
+  it('still renders the duration unit ComboBox alongside the error message when duration unit options fail', () => {
+    mockUseConceptSearch.mockReturnValue({ searchResults: [], isSearching: false, error: new Error('Network error') });
+
+    renderProceduresForm();
+
+    expect(screen.getByRole('combobox', { name: /duration unit/i })).toBeInTheDocument();
+    expect(screen.getByText(/could not load duration unit options/i)).toBeInTheDocument();
   });
 });
