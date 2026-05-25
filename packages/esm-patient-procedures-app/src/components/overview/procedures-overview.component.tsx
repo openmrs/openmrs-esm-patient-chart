@@ -39,7 +39,10 @@ type ProceduresOverviewProps = {
 const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) => {
   const { overviewPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
-  const launchProceduresForm = useCallback(() => launchWorkspace2('procedures-form-workspace'), []);
+  const launchProceduresForm = useCallback(
+    () => launchWorkspace2('procedures-form-workspace', { formContext: 'creating' }),
+    [],
+  );
   const headerTitle = t('procedures', 'Procedures');
   const displayText = t('procedures_lower', 'procedures');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/procedures`;

@@ -113,7 +113,7 @@ describe('ProceduresOverview', () => {
     expect(addButton).toBeInTheDocument();
 
     await user.click(addButton);
-    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('procedures-form-workspace');
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('procedures-form-workspace', { formContext: 'creating' });
   });
 
   it('displays a non-coded procedure name when procedureCoded is absent', async () => {
