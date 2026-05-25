@@ -30,14 +30,10 @@ export function getStartDateMinimum(
 export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
-  const defaultValues = useMemo(() => {
-    const defaultStartDate =
-      typeof initialOrderBasketItem?.startDate === 'string'
-        ? parseDate(initialOrderBasketItem?.startDate)
-        : (initialOrderBasketItem?.startDate as Date) ?? new Date();
-
-    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultStartDate);
-  }, [initialOrderBasketItem]);
+  const defaultValues = useMemo(
+    () => drugOrderBasketItemToFormValue(initialOrderBasketItem, initialOrderBasketItem?.scheduledDate ?? new Date()),
+    [initialOrderBasketItem],
+  );
 
   const drugOrderForm: UseFormReturn<MedicationOrderFormData> = useForm<MedicationOrderFormData>({
     mode: 'all',
@@ -48,7 +44,10 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   return drugOrderForm;
 }
 
-export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startDate: Date): MedicationOrderFormData {
+export function drugOrderBasketItemToFormValue(
+  item: DrugOrderBasketItem,
+  scheduledDate: Date,
+): MedicationOrderFormData {
   return {
     drug: item?.drug as Partial<Drug>,
     isFreeTextDosage: item?.isFreeTextDosage ?? false,
@@ -66,7 +65,7 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
     numRefills: item?.numRefills ?? null,
     indication: item?.indication,
     frequency: item?.frequency,
-    startDate,
+    scheduledDate,
   };
 }
 
@@ -141,9 +140,7 @@ function useCreateMedicationOrderFormSchema() {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
         : z.string().nullish(),
-      startDate: z.date().refine((value) => value <= new Date(), {
-        message: t('startDateCannotBeInFuture', 'Start date cannot be in the future'),
-      }),
+      scheduledDate: z.date(),
       frequency: z.object(
         { ...frequencySchema },
         {

@@ -1,9 +1,9 @@
 import { toOmrsIsoString } from '@openmrs/esm-framework';
-import { vi, describe, it, expect } from 'vitest';
-import { prepMedicationOrderPostData, buildMedicationOrder } from './api';
+import { describe, it, expect } from 'vitest';
+import { prepMedicationOrderPostData, buildMedicationOrder, bucketMedicationOrders } from './api';
 import type { DrugOrderBasketItem, Order } from '@openmrs/esm-patient-common-lib';
 
-const startDate = new Date('2026-04-01T10:15:00.000Z');
+const selectedStartDate = new Date('2026-04-01T10:15:00.000Z');
 
 const drugOrderBasketItem: DrugOrderBasketItem = {
   action: 'NEW',
@@ -43,7 +43,7 @@ const drugOrderBasketItem: DrugOrderBasketItem = {
   patientInstructions: 'Take with food',
   asNeeded: false,
   asNeededCondition: null,
-  startDate,
+  scheduledDate: selectedStartDate,
   durationUnit: {
     value: 'Days',
     valueCoded: 'duration-unit-uuid',
@@ -129,7 +129,7 @@ const medicationOrder = {
 } as unknown as Order;
 
 describe('prepMedicationOrderPostData', () => {
-  it.each(['NEW', 'RENEW', 'REVISE'] as const)('includes the selected start date for %s orders', (action) => {
+  it.each(['NEW', 'RENEW', 'REVISE'] as const)('uses dateActivated for past or today %s orders', (action) => {
     const result = prepMedicationOrderPostData(
       {
         ...drugOrderBasketItem,
@@ -141,18 +141,43 @@ describe('prepMedicationOrderPostData', () => {
       'provider-uuid',
     );
 
-    expect(result.dateActivated).toBe(toOmrsIsoString(startDate));
+    expect(result.dateActivated).toBe(toOmrsIsoString(selectedStartDate));
+    expect(result).not.toHaveProperty('scheduledDate');
+    expect(result).not.toHaveProperty('urgency');
   });
 
-  it('does not include dateActivated when a start date is unavailable', () => {
+  it.each(['NEW', 'RENEW', 'REVISE'] as const)(
+    'uses scheduledDate and ON_SCHEDULED_DATE for future %s orders',
+    (action) => {
+      const futureStartDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const result = prepMedicationOrderPostData(
+        {
+          ...drugOrderBasketItem,
+          action,
+          previousOrder: action === 'NEW' ? undefined : 'previous-order-uuid',
+          scheduledDate: futureStartDate,
+        },
+        'patient-uuid',
+        'encounter-uuid',
+        'provider-uuid',
+      );
+
+      expect(result.scheduledDate).toBe(toOmrsIsoString(futureStartDate));
+      expect(result.urgency).toBe('ON_SCHEDULED_DATE');
+      expect(result).not.toHaveProperty('dateActivated');
+    },
+  );
+
+  it('does not include dateActivated when a scheduled date is unavailable', () => {
     const result = prepMedicationOrderPostData(
-      { ...drugOrderBasketItem, startDate: undefined as unknown as Date } as DrugOrderBasketItem,
+      { ...drugOrderBasketItem, scheduledDate: undefined } as DrugOrderBasketItem,
       'patient-uuid',
       'encounter-uuid',
       'provider-uuid',
     );
 
     expect(result).not.toHaveProperty('dateActivated');
+    expect(result).not.toHaveProperty('scheduledDate');
   });
 
   it('does not include dateActivated for DISCONTINUE orders', () => {
@@ -167,27 +192,123 @@ describe('prepMedicationOrderPostData', () => {
   });
 });
 
-describe('buildMedicationOrder', () => {
-  it.each(['RENEW', 'REVISE'] as const)(
-    'defaults %s basket items to now instead of the previous activation date',
-    (action) => {
-      const before = Date.now();
-      const result = buildMedicationOrder(medicationOrder, action);
-      const after = Date.now();
+describe('bucketMedicationOrders', () => {
+  it('classifies medication orders into future, active, and past buckets', () => {
+    const now = new Date('2026-05-15T12:00:00.000Z');
+    const futureOrder = {
+      ...medicationOrder,
+      uuid: 'future-order',
+      scheduledDate: '2026-05-20T00:00:00.000+0000',
+      autoExpireDate: null,
+      dateStopped: null,
+    } as Order;
+    const expiredOrder = {
+      ...medicationOrder,
+      uuid: 'expired-order',
+      scheduledDate: '',
+      autoExpireDate: '2026-05-14T00:00:00.000+0000',
+      dateStopped: null,
+    } as Order;
+    const stoppedOrder = {
+      ...medicationOrder,
+      uuid: 'stopped-order',
+      scheduledDate: '',
+      autoExpireDate: null,
+      dateStopped: '2026-05-14T00:00:00.000+0000',
+    } as Order;
+    const activeOrder = {
+      ...medicationOrder,
+      uuid: 'active-order',
+      scheduledDate: '',
+      autoExpireDate: '2026-05-16T00:00:00.000+0000',
+      dateStopped: null,
+    } as Order;
 
-      expect(result.startDate).toBeInstanceOf(Date);
-      expect((result.startDate as Date).getTime()).toBeGreaterThanOrEqual(before);
-      expect((result.startDate as Date).getTime()).toBeLessThanOrEqual(after);
-      expect(result.startDate).not.toBe(medicationOrder.dateActivated);
+    const result = bucketMedicationOrders([futureOrder, expiredOrder, stoppedOrder, activeOrder], now);
+
+    expect(result.futureOrders).toEqual([futureOrder]);
+    expect(result.pastOrders).toEqual([expiredOrder, stoppedOrder]);
+    expect(result.activeOrders).toEqual([activeOrder]);
+  });
+
+  it('does not classify stopped future-scheduled orders as future', () => {
+    const stoppedFutureOrder = {
+      ...medicationOrder,
+      uuid: 'stopped-future-order',
+      scheduledDate: '2026-05-20T00:00:00.000+0000',
+      autoExpireDate: null,
+      dateStopped: '2026-05-16T00:00:00.000+0000',
+    } as Order;
+
+    const result = bucketMedicationOrders([stoppedFutureOrder], new Date('2026-05-15T12:00:00.000Z'));
+
+    expect(result.futureOrders).toEqual([]);
+    expect(result.activeOrders).toEqual([stoppedFutureOrder]);
+    expect(result.pastOrders).toEqual([]);
+  });
+});
+
+describe('buildMedicationOrder', () => {
+  it('defaults RENEW basket items to now instead of the previous activation date', () => {
+    const before = Date.now();
+    const result = buildMedicationOrder(medicationOrder, 'RENEW');
+    const after = Date.now();
+
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+    expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+    expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
+  });
+
+  it('defaults REVISE basket items to now instead of the previous activation or scheduled date', () => {
+    const before = Date.now();
+    const scheduledDate = '2026-05-01T00:00:00.000+0000';
+    const result = buildMedicationOrder({ ...medicationOrder, scheduledDate } as Order, 'REVISE');
+    const after = Date.now();
+
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+    expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+    expect(result.scheduledDate).not.toBe(scheduledDate);
+    expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
+  });
+
+  it.each(['RENEW', 'REVISE'] as const)(
+    'preserves the future scheduled date when building a %s basket item for an upcoming order',
+    (action) => {
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ON_SCHEDULED_DATE',
+          scheduledDate: scheduledDate.toISOString(),
+        } as Order,
+        action,
+      );
+
+      expect(result.scheduledDate).toEqual(scheduledDate);
     },
   );
 
   it.each(['RENEW', 'REVISE'] as const)(
-    'prevents silent backdating by not pre-filling %s with the original activation date',
+    'defaults %s basket items to now when a future scheduled date is not marked ON_SCHEDULED_DATE',
     (action) => {
-      const result = buildMedicationOrder(medicationOrder, action);
+      const before = Date.now();
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ROUTINE',
+          scheduledDate,
+        } as Order,
+        action,
+      );
+      const after = Date.now();
 
-      expect(result.startDate).not.toEqual(medicationOrder.dateActivated);
+      expect(result.scheduledDate).toBeInstanceOf(Date);
+      expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+      expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+      expect(result.scheduledDate).not.toEqual(new Date(scheduledDate));
     },
   );
 
@@ -204,9 +325,10 @@ describe('buildMedicationOrder', () => {
     },
   );
 
-  it('preserves the original activation date when building a DISCONTINUE basket item', () => {
+  it('uses the original activation date when building a DISCONTINUE basket item', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 
-    expect(result.startDate).toBe(medicationOrder.dateActivated);
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).toISOString()).toBe(new Date(medicationOrder.dateActivated).toISOString());
   });
 });

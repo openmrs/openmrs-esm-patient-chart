@@ -6,7 +6,7 @@
  * matchers on order payloads built with `new Date()` in production code.
  */
 /* eslint-disable testing-library/no-node-access */
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within, renderHook, waitFor } from '@testing-library/react';
@@ -18,19 +18,19 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import { ExtensionSlot, launchWorkspace2, UserHasAccess, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, UserHasAccess, useSession } from '@openmrs/esm-framework';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = vi.fn();
-const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 const mockUseSession = vi.mocked(useSession);
 const mockUseDrugSearch = vi.mocked(useDrugSearch);
 const mockUseDrugTemplate = vi.mocked(useDrugTemplate);
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUserHasAccess = vi.mocked(UserHasAccess);
-const usePatientOrdersMock = vi.fn();
+const mockUseMedicationOrders = vi.fn();
+const mockUseRequireOutpatientQuantity = vi.fn();
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 mockExtensionSlot.mockImplementation(() => null);
@@ -42,12 +42,10 @@ vi.mock('./drug-search/drug-search.resource', async () => ({
   useDrugTemplate: vi.fn(),
 }));
 
-vi.mock('../api/api', async () => ({
-  ...((await vi.importActual('../api/api')) as object),
-  useActivePatientOrders: () => usePatientOrdersMock(),
-  useRequireOutpatientQuantity: vi
-    .fn()
-    .mockReturnValue({ requireOutpatientQuantity: false, error: null, isLoading: false }),
+vi.mock('../api', async () => ({
+  ...((await vi.importActual('../api')) as object),
+  useMedicationOrders: () => mockUseMedicationOrders(),
+  useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
 describe('AddDrugOrderWorkspace drug search', () => {
@@ -68,9 +66,20 @@ describe('AddDrugOrderWorkspace drug search', () => {
       error: null,
     }));
 
-    usePatientOrdersMock.mockReturnValue({
+    // Supply the required response structure for useMedicationOrders
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
       isLoading: false,
-      data: [],
+      isValidating: false,
+    });
+
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: false,
+      error: null,
+      isLoading: false,
     });
   });
 
@@ -82,10 +91,12 @@ describe('AddDrugOrderWorkspace drug search', () => {
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     await screen.findAllByRole('listitem');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
-    // Anotates results with dosing info if an order-template was found.
+
+    // Annotates results with dosing info if an order-template was found.
     const aspirin81 = getByTextWithMarkup(/Aspirin 81mg/i);
     expect(aspirin81).toBeInTheDocument();
     expect(aspirin81.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*81mg.*tablet.*twice daily.*oral/i);
+
     // Only displays drug name for results without a matching order template
     const aspirin325 = getByTextWithMarkup(/Aspirin 325mg/i);
     expect(aspirin325).toBeInTheDocument();
@@ -95,19 +106,48 @@ describe('AddDrugOrderWorkspace drug search', () => {
     expect(asprin162.closest('[role="listitem"]')).toHaveTextContent(/Aspirin.*162.5mg.*tablet/i);
   });
 
-  test('no buttons to click if the medication is already prescribed', async () => {
-    usePatientOrdersMock.mockReturnValue({
+  test('shows a visual cue and disables actions if the medication is already prescribed', async () => {
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [mockPatientDrugOrdersApiData[0]],
+      pastOrders: [],
+      error: null,
       isLoading: false,
-      data: [mockPatientDrugOrdersApiData[0]],
+      isValidating: false,
     });
+
     const user = userEvent.setup();
 
     renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
-    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('[role="listitem"]');
+    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('[role="listitem"]') as HTMLElement;
     expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
+    expect(within(aspirin162Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
+    expect(within(aspirin162Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
+  });
+
+  test('shows a visual cue and disables actions if the medication is already scheduled for later', async () => {
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [mockPatientDrugOrdersApiData[0]],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+
+    const user = userEvent.setup();
+
+    renderAddDrugOrderWorkspace();
+
+    await user.type(screen.getByRole('searchbox'), 'Aspirin');
+    expect(screen.getAllByRole('listitem').length).toEqual(3);
+    const aspirin162Div = getByTextWithMarkup(/Aspirin 162.5mg/i).closest('[role="listitem"]') as HTMLElement;
+    expect(aspirin162Div).toHaveTextContent(/Already prescribed/i);
+    expect(within(aspirin162Div).getByRole('button', { name: /Add to basket/i })).toBeDisabled();
+    expect(within(aspirin162Div).getByRole('button', { name: /Order form/i })).toBeDisabled();
   });
 
   test('can add items directly to the basket', async () => {
@@ -128,7 +168,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null),
         isOrderIncomplete: true,
-        startDate: expect.any(Date),
+        scheduledDate: expect.any(Date),
       }),
     ]);
     expect(mockCloseWorkspace).toHaveBeenCalled();
@@ -140,9 +180,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
     renderAddDrugOrderWorkspace();
 
     await user.type(screen.getByRole('searchbox'), 'Aspirin');
-    const { result: hookResult } = renderHook(() =>
-      useOrderBasket(mockPatient, 'medications', ((x) => x) as unknown as PostDataPrepFunction),
-    );
     const aspirin81Div = getByTextWithMarkup(/Aspirin 81mg/i).closest('[role="listitem"]') as HTMLElement;
     const aspirin81OpenFormButton = within(aspirin81Div).getByText(/Order form/i);
     await user.click(aspirin81OpenFormButton);
@@ -178,7 +215,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
             undefined,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
-          startDate: expect.any(Date),
+          scheduledDate: expect.any(Date),
           indication: 'Hypertension',
         }),
       ]),

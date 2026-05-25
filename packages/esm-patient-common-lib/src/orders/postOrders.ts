@@ -25,20 +25,31 @@ function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: strin
   return orders;
 }
 
+function getOrderStartDate(order: OrderBasketItem) {
+  const orderWithDates = order as { scheduledDate?: Date | string; startDate?: Date | string };
+  if (orderWithDates.scheduledDate) {
+    return { key: 'scheduledDate', value: orderWithDates.scheduledDate } as const;
+  }
+  if (orderWithDates.startDate) {
+    return { key: 'startDate', value: orderWithDates.startDate } as const;
+  }
+  return null;
+}
+
 /**
- * Returns a shallow copy of the basket item with `startDate` floored to `encounterDate`.
- * The backend enforces `dateActivated >= encounterDatetime`, so if a user-selected
- * startDate fell before the encounter date (e.g. because it was earlier than the visit
- * start), it must be raised to match.
+ * Returns a shallow copy of the basket item with its selected start date floored
+ * to `encounterDate`. The backend enforces `dateActivated >= encounterDatetime`,
+ * so if a user-selected start date fell before the encounter date (for example,
+ * because it was earlier than the visit start), it must be raised to match.
  */
 function floorOrderStartDate<T extends OrderBasketItem>(order: T, encounterDate: Date): T {
-  const startDateValue = (order as { startDate?: Date | string }).startDate;
-  if (!startDateValue) {
+  const orderStartDate = getOrderStartDate(order);
+  if (!orderStartDate) {
     return order;
   }
-  const startDate = startDateValue instanceof Date ? startDateValue : new Date(startDateValue);
+  const startDate = orderStartDate.value instanceof Date ? orderStartDate.value : new Date(orderStartDate.value);
   if (startDate < encounterDate) {
-    return { ...order, startDate: encounterDate } as T;
+    return { ...order, [orderStartDate.key]: encounterDate } as T;
   }
   return order;
 }
