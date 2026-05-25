@@ -42,7 +42,7 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
   const launchProceduresForm = useCallback(() => launchWorkspace2('procedures-form-workspace'), []);
   const headerTitle = t('procedures', 'Procedures');
   const displayText = t('procedures_lower', 'procedures');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Procedures`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/procedures`;
   const urlLabel = t('seeAll', 'See all');
   const layout = useLayoutType();
   const isDesktop = isDesktopLayout(layout);
