@@ -7,13 +7,32 @@ import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema'
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
 import { type BiometricsConfigObject } from '../config-schema';
 
-export function calculateBodyMassIndex(weight: number, height: number) {
+/**
+ * Calculates Body Mass Index from weight (kg) and height (cm).
+ *
+ * Formula: BMI = weight(kg) / (height(m))²
+ * Result is rounded to 1 decimal place to match clinical display standards.
+ *
+ * @returns BMI value or null if inputs are zero/negative
+ */
+export function calculateBodyMassIndex(weight: number, height: number): number | null {
   if (weight > 0 && height > 0) {
     return Number((weight / (height / 100) ** 2).toFixed(1));
   }
   return null;
 }
 
+/**
+ * Assesses a vital sign value against its reference range.
+ *
+ * Uses concept metadata reference ranges (from the OpenMRS concept dictionary)
+ * to classify the value as critically_high, high, critically_low, low, or normal.
+ * Falls back to 'normal' when no range is available.
+ *
+ * @param value - The measured value
+ * @param range - Reference ranges for the concept (from concept dictionary)
+ * @returns The clinical interpretation label
+ */
 export function assessValue(value: number | undefined, range?: ObsReferenceRanges): ObservationInterpretation {
   if (range && value != null) {
     if (range.hiCritical != null && value >= range.hiCritical) {

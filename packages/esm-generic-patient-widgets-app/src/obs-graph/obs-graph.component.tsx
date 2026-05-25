@@ -121,7 +121,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
       tooltip: {
         alwaysShowRulerTooltip: true,
         showTotal: false,
-        valueFormatter: (value: any, label: string) =>
+        valueFormatter: (value: string | Date, label: string) =>
           label === t('date', 'Date') ? formatDate(value, { year: true, time: true }) : value.toString(),
         truncation: {
           numCharacter: 40,

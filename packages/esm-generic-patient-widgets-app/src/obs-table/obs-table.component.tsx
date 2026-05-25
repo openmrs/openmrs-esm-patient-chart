@@ -103,7 +103,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
             case 'Numeric': {
               const decimalPlaces: number | undefined = config.data.find(
-                (ele: any) => ele.concept === obs.conceptUuid,
+                (ele) => ele.concept === obs.conceptUuid,
               )?.decimalPlaces;
 
               const value = obs.valueQuantity?.value;
@@ -166,7 +166,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   }, []);
 
   const handleSorting = useCallback(
-    (cellA: any, cellB: any, { key, sortDirection }: { key: string; sortDirection: DataTableSortState }) => {
+    (cellA: { value: string }, cellB: { value: string }, { key, sortDirection }: { key: string; sortDirection: DataTableSortState }) => {
       // Use setTimeout to defer setState until after render completes.
       // This avoids setState during render (which Carbon DataTable's sortRow triggers).
       // The isMountedRef check prevents state updates after unmount.

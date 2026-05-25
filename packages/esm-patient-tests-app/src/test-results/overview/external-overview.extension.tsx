@@ -66,7 +66,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
                       renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => (
                         <ArrowRightIcon size={16} {...props} />
                       )}
-                      iconDescription="See all results"
+                      iconDescription={t('seeAllResultsDescription', 'Navigate to full lab results view')}
                       onClick={handleSeeAll}
                     >
                       {t('seeAllResults', 'See all results')}

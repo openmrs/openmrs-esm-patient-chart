@@ -168,7 +168,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
-              iconDescription="Return to order basket"
+              iconDescription={t('returnToOrderBasket', 'Return to order basket')}
               kind="ghost"
               onClick={() => closeWorkspace()}
               renderIcon={(props: ComponentProps<typeof ArrowLeftIcon>) => <ArrowLeftIcon size={24} {...props} />}

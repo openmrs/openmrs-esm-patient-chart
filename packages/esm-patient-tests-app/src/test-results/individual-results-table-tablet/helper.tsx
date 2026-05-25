@@ -36,7 +36,11 @@ export const getClass = (interpretation: OBSERVATION_INTERPRETATION) => {
   }
 };
 
-export function exist(...args: any[]): boolean {
+/**
+ * Checks that all provided values are non-null and non-undefined.
+ * Used to guard against rendering cells with missing observation data.
+ */
+export function exist(...args: Array<unknown>): boolean {
   for (const y of args) {
     if (y === null || y === undefined) {
       return false;

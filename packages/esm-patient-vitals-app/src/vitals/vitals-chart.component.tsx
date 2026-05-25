@@ -23,6 +23,14 @@ interface VitalsChartData {
   unit: string;
 }
 
+/** Represents a single data point rendered in the Carbon Charts line chart */
+interface ChartDataPoint {
+  group: string;
+  key: string;
+  value: number | undefined;
+  date: string | Date;
+}
+
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
   const labelId = useId();
@@ -33,7 +41,9 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     unit: conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '',
   });
 
-  const vitalSigns: { id: string; label: string; title: string; value: VitalSignKey; unit: string }[] = [
+  // Memoize the vitalSigns array so it's not recreated on every render.
+  // conceptUnits and config are stable references from SWR / config cache.
+  const vitalSigns: { id: string; label: string; title: string; value: VitalSignKey; unit: string }[] = useMemo(() => [
     {
       id: 'bloodPressure',
       label: t('bp', 'BP'),
@@ -69,9 +79,9 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       value: 'pulse',
       unit: conceptUnits.get(config.concepts.pulseUuid) ?? '',
     },
-  ];
+  ], [conceptUnits, config.concepts, t]);
 
-  const chartData = useMemo(() => {
+  const chartData = useMemo((): Array<ChartDataPoint | Array<ChartDataPoint>> => {
     return patientVitals
       .filter((vitals) => vitals[selectedVitalsSign.value])
       .slice(0, 10)
@@ -168,7 +178,11 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   };
 
   return (
-    <div className={styles.vitalsChartContainer}>
+    <div
+      className={styles.vitalsChartContainer}
+      aria-label={t('vitalsChartDescription', 'Interactive chart showing vital sign trends over time. Use the tabs on the left to switch between different vital signs.')}
+      role="region"
+    >
       <div className={styles.vitalSignsArea}>
         <label className={styles.vitalsSignLabel} id={labelId}>
           {t('vitalSignDisplayed', 'Vital sign displayed')}

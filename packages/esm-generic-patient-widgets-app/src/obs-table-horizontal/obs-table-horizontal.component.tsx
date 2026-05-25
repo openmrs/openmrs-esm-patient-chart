@@ -186,7 +186,7 @@ const ObsTableHorizontal: React.FC<ObsTableHorizontalProps> = ({ patientUuid }) 
 
           case 'Numeric': {
             const decimalPlaces: number | undefined = config.data.find(
-              (ele: any) => ele.concept === obs.conceptUuid,
+              (ele) => ele.concept === obs.conceptUuid,
             )?.decimalPlaces;
 
             const rawValue = obs.valueQuantity?.value;
@@ -487,7 +487,7 @@ const Cell: React.FC<{
               id={cellKey}
               size="sm"
               value={editingValue}
-              onChange={(e: any, data: any) => setEditingValue(data.value ?? '')}
+              onChange={(_e: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => setEditingValue(data.value ?? '')}
               onKeyDown={(e) => handleKeyDown(e)}
               autoFocus
               hideSteppers

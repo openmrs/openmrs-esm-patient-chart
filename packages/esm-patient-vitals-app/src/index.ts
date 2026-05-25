@@ -73,3 +73,5 @@ export const vitalsAndBiometricsDeleteConfirmationModal = getAsyncLifecycle(
   () => import('./components/delete-vitals-biometrics-modal/delete-vitals-biometrics.modal'),
   options,
 );
+
+export { default as VitalsSummaryCard } from './vitals/vitals-summary-card.component';

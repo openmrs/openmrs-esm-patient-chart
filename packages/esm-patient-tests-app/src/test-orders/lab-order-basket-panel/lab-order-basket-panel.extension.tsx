@@ -142,7 +142,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
         <div className={styles.buttonContainer}>
           <Button
             className={styles.addButton}
-            iconDescription="Add lab order"
+            iconDescription={t('addLabOrderDescription', 'Order a new laboratory test for this patient')}
             kind="ghost"
             onClick={() => launchLabOrderForm(orderTypeUuid)}
             renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
@@ -154,7 +154,7 @@ function LabOrderBasketPanel({ orderTypeUuid, label, icon, patient, launchLabOrd
             className={styles.chevron}
             disabled={orders.length === 0}
             hasIconOnly
-            iconDescription="View"
+            iconDescription={t('expandCollapseLabOrders', 'Expand or collapse lab orders list')}
             kind="ghost"
             onClick={() => setIsExpanded(!isExpanded)}
             renderIcon={(props: ComponentProps<typeof ChevronUpIcon>) =>

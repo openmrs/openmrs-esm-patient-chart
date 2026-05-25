@@ -251,7 +251,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <Button
           kind="ghost"
           renderIcon={() => <AddIcon className={styles.headerIcon} />}
-          iconDescription="Add"
+          iconDescription={t('addEncounterDescription', 'Add a new clinical encounter entry')}
           onClick={(e) => {
             e.preventDefault();
             launchEncounterForm(formsJson, 'add', '*', requireActiveVisitForEncounterTile, visit);

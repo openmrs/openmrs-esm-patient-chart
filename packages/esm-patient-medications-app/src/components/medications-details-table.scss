@@ -74,3 +74,20 @@
   border: none;
   text-transform: uppercase;
 }
+
+.daysRemaining {
+  @include type.type-style('label-01');
+  color: colors.$green-60;
+  font-weight: 600;
+  margin-top: layout.$spacing-01;
+}
+
+.overdue {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  margin-top: layout.$spacing-01;
+}
+
+.printButton {
+  margin-right: layout.$spacing-02;
+}

@@ -10,12 +10,12 @@ export interface RESTPatientNote {
   encounterProviders: [{ encounterRole: { uuid: string; display: string }; provider: { person: { display: string } } }];
   location: { uuid: string; display: string; name: string };
   auditInfo: {
-    creator: any;
+    creator: { uuid: string; display: string };
     uuid: string;
     display: string;
-    links: any;
+    links: Array<{ rel: string; uri: string }>;
     dateCreated: Date;
-    changedBy?: any;
+    changedBy?: { uuid: string; display: string };
     dateChanged?: Date;
   };
   obs: Array<ObsData>;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@carbon/react';
 import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
@@ -10,12 +10,16 @@ interface PatientChartPaginationProps {
   totalItems: number;
   pageNumber: number;
   pageSize: number;
-  onPageNumberChange?: any;
+  onPageNumberChange?: (data: { page: number; pageSize: number }) => void;
   dashboardLinkUrl?: string;
   dashboardLinkLabel?: string;
 }
 
-export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
+/**
+ * Memoized pagination component to prevent re-renders when parent state changes
+ * don't affect pagination parameters.
+ */
+export const PatientChartPagination: React.FC<PatientChartPaginationProps> = memo(({
   totalItems,
   pageSize,
   onPageNumberChange,
@@ -54,4 +58,6 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
       )}
     </>
   );
-};
+});
+
+PatientChartPagination.displayName = 'PatientChartPagination';

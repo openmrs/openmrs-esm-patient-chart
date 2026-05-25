@@ -12,7 +12,7 @@ interface ActiveMedicationsProps {
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patient }) => {
   const { t } = useTranslation();
   const headerTitle = t('activeMedicationsHeaderTitle', 'Active medications');
-  const displayText = t('activeMedicationsDisplayText', 'active medications');
+  const displayText = t('activeMedicationsDisplayText', 'active medication orders or prescriptions');
 
   const { data: activePatientOrders, error, isLoading, isValidating } = useActivePatientOrders(patient?.id);
 

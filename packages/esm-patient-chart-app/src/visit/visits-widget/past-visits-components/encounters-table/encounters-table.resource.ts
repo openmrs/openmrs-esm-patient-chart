@@ -127,7 +127,7 @@ export function encounterHasJsonSchemaForm(encounter: Encounter): boolean {
     return false;
   }
 
-  return encounter.form.resources.some((resource: any) => resource.name === jsonSchemaResourceName);
+  return encounter.form.resources.some((resource: { name: string }) => resource.name === jsonSchemaResourceName);
 }
 
 export async function downloadPdf(encounterUuids: string[], t: TFunction) {

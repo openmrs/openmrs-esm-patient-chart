@@ -133,7 +133,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   if (!attachments.length) {
     return (
       <EmptyState
-        displayText={t('attachmentsInLowerCase', 'attachments')}
+        displayText={t('attachmentsInLowerCase', 'attachments (lab results, images, consent forms, or other documents)')}
         headerTitle={t('attachmentsInProperFormat', 'Attachments')}
         launchForm={showAddAttachmentModal}
       />
@@ -163,7 +163,8 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
               <Button
                 kind="ghost"
                 renderIcon={AddIcon}
-                iconDescription="Add attachment"
+                iconDescription={t('addAttachmentIconDescription', 'Upload a new file attachment or capture photo')}
+                aria-label={t('addAttachmentButton', 'Add attachment')}
                 onClick={showAddAttachmentModal}
               >
                 {t('add', 'Add')}

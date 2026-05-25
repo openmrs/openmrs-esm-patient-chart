@@ -1,0 +1,63 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.summaryCard {
+  padding: layout.$spacing-05;
+  border-radius: 4px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: layout.$spacing-04;
+}
+
+.title {
+  @include type.type-style('productive-heading-01');
+  color: colors.$gray-100;
+  margin: 0;
+}
+
+.recordedDate {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+}
+
+.vitalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: layout.$spacing-04;
+}
+
+.vitalItem {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.vitalLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.vitalValueRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: layout.$spacing-02;
+}
+
+.vitalValue {
+  @include type.type-style('productive-heading-03');
+  color: colors.$gray-100;
+}
+
+.vitalUnit {
+  @include type.type-style('label-01');
+  color: colors.$gray-60;
+  font-weight: 400;
+}

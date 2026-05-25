@@ -14,7 +14,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { AddIcon, launchWorkspace2, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, NetworkErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-overview.scss';
@@ -26,7 +26,7 @@ interface AllergiesOverviewProps {
 
 const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const { t } = useTranslation();
-  const displayText = t('allergyIntolerances', 'allergy intolerances');
+  const displayText = t('allergyIntolerances', 'allergy intolerances or NKDA (No Known Drug Allergies)');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/allergies`;
@@ -48,6 +48,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     },
   ];
 
+  // Memoize tableRows: the reactions string involves a sort + join which is
+  // moderately expensive when rendering large allergy lists. We depend only on
+  // paginatedAllergies — adding a locale dep would cause unnecessary re-renders
+  // every time the component tree re-renders with the same locale.
   const tableRows = useMemo(() => {
     return paginatedAllergies?.map((allergy) => ({
       ...allergy,
@@ -64,7 +68,12 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   }
 
   if (error) {
-    return <ErrorState error={error} headerTitle={headerTitle} />;
+    return (
+      <NetworkErrorState
+        headerTitle={headerTitle}
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
 
   if (allergies?.length) {
@@ -75,7 +84,8 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
           <Button
             kind="ghost"
             renderIcon={(props) => <AddIcon size={16} {...props} />}
-            iconDescription="Add allergies"
+            iconDescription={t('addAllergiesIconDescription', 'Add a new allergy or intolerance record')}
+            aria-describedby="allergies-add-description"
             onClick={launchAllergiesForm}
           >
             {t('add', 'Add')}
@@ -84,7 +94,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
         <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
-              <Table aria-label="allergies overview" {...getTableProps()}>
+              <Table
+                aria-label={t('allergiesOverviewTable', 'Allergies overview table listing allergy name and reactions')}
+                {...getTableProps()}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

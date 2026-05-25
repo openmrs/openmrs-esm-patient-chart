@@ -148,7 +148,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
                 </span>
               </div>
             </div>
-            <Table className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
+            <Table aria-label={t('individualLabResultsTable', 'Individual lab results table')} className={styles.table} {...getTableProps()} size={isDesktop ? 'md' : 'sm'}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => {

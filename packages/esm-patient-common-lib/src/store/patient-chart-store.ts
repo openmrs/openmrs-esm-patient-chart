@@ -1,5 +1,18 @@
 import { type Actions, createGlobalStore, useStoreWithActions, type Visit } from '@openmrs/esm-framework';
 
+/**
+ * Global store holding the currently active patient and visit context for the patient chart.
+ *
+ * Fields:
+ * - `patientUuid` — UUID of the patient currently open in the chart
+ * - `patient` — Full FHIR Patient resource (populated after the chart loads)
+ * - `visitContext` — The active visit for this patient (null if no visit is active)
+ * - `mutateVisitContext` — SWR mutate function to revalidate the visit context
+ *
+ * Design note: We use a single global store (not per-patient) because only one patient
+ * chart is open at a time. The `usePatientChartStore` hook validates the `patientUuid`
+ * to prevent stale reads when navigating between patients.
+ */
 export interface PatientChartStore {
   patientUuid: string;
   patient: fhir.Patient;

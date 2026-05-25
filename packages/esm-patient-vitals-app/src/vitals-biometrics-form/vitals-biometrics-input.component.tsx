@@ -158,6 +158,9 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
                               title={fieldProperty.name}
                               type="number"
                               value={value ?? ''}
+                              aria-required={fieldProperty.min !== null && fieldProperty.min !== undefined}
+                              aria-invalid={showInvalidInputError || fieldProperty.invalid}
+                              aria-describedby={showInvalidInputError ? `${fieldId}-${fieldProperty.id}-error` : undefined}
                             />
                           );
                         }}
@@ -204,7 +207,12 @@ const VitalsAndBiometricsInput: React.FC<VitalsAndBiometricsInputProps> = ({
       </div>
 
       {showInvalidInputError && (
-        <FormLabel className={styles.invalidInputError}>
+        <FormLabel
+          className={styles.invalidInputError}
+          id={`${fieldId}-${fieldProperties[0]?.id}-error`}
+          aria-live="assertive"
+          role="alert"
+        >
           {t('validationInputError', `Value must be between {{min}} and {{max}}`, {
             min: fieldProperties[0].min,
             max: fieldProperties[0].max,

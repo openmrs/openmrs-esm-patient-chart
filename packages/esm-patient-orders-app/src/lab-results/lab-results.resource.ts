@@ -262,8 +262,8 @@ export function useCompletedLabResultsArray(order: Order) {
 export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
-  obsPayload: any,
-  fulfillerPayload: any,
+  obsPayload: Record<string, unknown>,
+  fulfillerPayload: Record<string, unknown>,
   orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {

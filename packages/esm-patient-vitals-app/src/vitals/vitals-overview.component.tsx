@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useReactToPrint } from 'react-to-print';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Analytics, Table } from '@carbon/react/icons';
-import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, NetworkErrorState, isVitalInNormalRange } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   PrinterIcon,
@@ -14,6 +14,7 @@ import {
   useConfig,
   useLayoutType,
 } from '@openmrs/esm-framework';
+import { Tag } from '@carbon/react';
 import type { ConfigObject } from '../config-schema';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { useLaunchVitalsAndBiometricsForm } from '../utils';
@@ -34,7 +35,7 @@ interface VitalsOverviewProps {
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const displayText = t('vitalSigns', 'vital signs');
+  const displayText = t('vitalSigns', 'vital signs (blood pressure, temperature, pulse, SpO2, and respiratory rate)');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = useState(false);
   const isTablet = useLayoutType() === 'tablet';
@@ -47,6 +48,10 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
   const { conceptUnits } = useConceptUnits();
   const showPrintButton = config.vitals.showPrintButton && !chartView;
 
+  // Memoize patientDetails: this object is passed to the print component and
+  // depends on `patient` (FHIR resource), `t` (stable per locale), and
+  // `excludePatientIdentifierCodeTypes` (stable config value). Without memoization,
+  // this would re-compute on every poll cycle when SWR background-validates.
   const patientDetails = useMemo(() => {
     const getGender = (gender: string): string => {
       switch (gender) {
@@ -186,15 +191,47 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
         }
 
         if (error) {
-          return <ErrorState error={error} headerTitle={headerTitle} />;
+          return (
+            <NetworkErrorState
+              headerTitle={headerTitle}
+              onRetry={() => window.location.reload()}
+            />
+          );
         }
 
         if (vitals?.length) {
+          // Count abnormal vitals in the most recent reading for quick triage
+          const latestVitals = vitals[0];
+          const abnormalCount = [
+            latestVitals.systolic != null && !isVitalInNormalRange('systolic', latestVitals.systolic).isNormal,
+            latestVitals.diastolic != null && !isVitalInNormalRange('diastolic', latestVitals.diastolic).isNormal,
+            latestVitals.pulse != null && !isVitalInNormalRange('pulse', latestVitals.pulse).isNormal,
+            latestVitals.spo2 != null && !isVitalInNormalRange('spo2', latestVitals.spo2).isNormal,
+            latestVitals.temperature != null && !isVitalInNormalRange('temperature', latestVitals.temperature).isNormal,
+            latestVitals.respiratoryRate != null && !isVitalInNormalRange('respiratoryRate', latestVitals.respiratoryRate).isNormal,
+          ].filter(Boolean).length;
+
           return (
             <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
+                {/* Out-of-range vitals summary badge — alerts clinicians at a glance */}
+                {abnormalCount > 0 && (
+                  <Tag
+                    type="red"
+                    size="sm"
+                    title={t('abnormalVitalsTitle', 'Abnormal vital signs in latest reading')}
+                    aria-label={t('abnormalVitalsLabel', '{{count}} abnormal vital signs', { count: abnormalCount })}
+                  >
+                    {t('abnormalCount', '{{count}} abnormal', { count: abnormalCount })}
+                  </Tag>
+                )}
                 <div className={styles.backgroundDataFetchingIndicator}>
-                  <span>{isValidating ? <InlineLoading /> : null}</span>
+                  <span
+                    aria-live="polite"
+                    aria-label={isValidating ? t('updatingVitals', 'Updating vitals data') : undefined}
+                  >
+                    {isValidating ? <InlineLoading /> : null}
+                  </span>
                 </div>
                 <div className={styles.vitalsHeaderActionItems}>
                   <ContentSwitcher
@@ -203,11 +240,12 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     }
                     size={isTablet ? 'md' : 'sm'}
                     selectedIndex={chartView ? 1 : 0}
+                    aria-label={t('vitalsViewSwitcher', 'Switch between table and chart view for vitals')}
                   >
-                    <IconSwitch name="tableView" text="Table view">
+                    <IconSwitch name="tableView" text={t('tableView', 'Table view')}>
                       <Table size={16} />
                     </IconSwitch>
-                    <IconSwitch name="chartView" text="Chart view">
+                    <IconSwitch name="chartView" text={t('chartView', 'Chart view')}>
                       <Analytics size={16} />
                     </IconSwitch>
                   </ContentSwitcher>
@@ -217,7 +255,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                       <Button
                         kind="ghost"
                         renderIcon={PrinterIcon}
-                        iconDescription="Add vitals"
+                        iconDescription={t('printVitalsDescription', 'Print vitals report for this patient')}
                         className={styles.printButton}
                         onClick={handlePrint}
                       >
@@ -227,7 +265,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, patient, p
                     <Button
                       kind="ghost"
                       renderIcon={AddIcon}
-                      iconDescription="Add vitals"
+                      iconDescription={t('addVitalsDescription', 'Record new vital signs for this patient')}
                       onClick={launchVitalsBiometricsForm}
                     >
                       {t('add', 'Add')}

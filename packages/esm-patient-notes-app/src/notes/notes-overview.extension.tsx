@@ -29,7 +29,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
   const urlLabel = t('seeAll', 'See all');
 
   const { visitContext } = usePatientChartStore(patientUuid);
-  const displayText = t('visitNotes', 'Visit notes');
+  const displayText = t('visitNotes', 'visit notes or clinical encounter summaries');
   const headerTitle = t('visitNotes', 'Visit notes');
   const { visitNotes, error, isLoading, isValidating } = useVisitNotes(patientUuid);
   const layout = useLayoutType();
@@ -56,11 +56,16 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={headerTitle}>
-        <span>{isValidating ? <InlineLoading /> : null}</span>
+        <span
+          aria-live="polite"
+          aria-label={isValidating ? t('updatingNotes', 'Updating visit notes') : undefined}
+        >
+          {isValidating ? <InlineLoading /> : null}
+        </span>
         <Button
           kind="ghost"
           renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-          iconDescription={t('addVisitNote', 'Add a visit note')}
+          iconDescription={t('addVisitNoteDescription', 'Create a new clinical visit note for this patient')}
           onClick={launchVisitNoteForm}
         >
           {t('add', 'Add')}

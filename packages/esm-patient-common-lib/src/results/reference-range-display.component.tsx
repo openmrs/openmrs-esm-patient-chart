@@ -12,8 +12,14 @@ interface ReferenceRangeDisplayProps {
 /**
  * Displays a formatted reference range with units.
  * Shows "N/A" when no valid range is available.
+ * Wrapped in React.memo because reference ranges for a given test are stable —
+ * they come from the concept dictionary and rarely change, so we avoid
+ * re-rendering every time a parent component (e.g. the results table) re-renders.
  */
-export const ReferenceRangeDisplay: React.FC<ReferenceRangeDisplayProps> = ({ ranges, units }) => {
+export const ReferenceRangeDisplay: React.FC<ReferenceRangeDisplayProps> = React.memo(function ReferenceRangeDisplay({
+  ranges,
+  units,
+}) {
   const { t } = useTranslation();
   const formatted = formatReferenceRange(ranges, units);
 
@@ -22,4 +28,4 @@ export const ReferenceRangeDisplay: React.FC<ReferenceRangeDisplayProps> = ({ ra
   }
 
   return <span className={styles.referenceRange}>{formatted}</span>;
-};
+});

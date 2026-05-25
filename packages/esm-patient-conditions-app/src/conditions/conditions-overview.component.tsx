@@ -55,7 +55,7 @@ interface ConditionsOverviewProps {
 const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) => {
   const { conditionPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
-  const displayText = t('conditions_lower', 'conditions');
+  const displayText = t('conditions_lower', 'active or historical conditions and diagnoses');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/conditions`;
@@ -145,7 +145,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <span aria-live="polite" aria-label={isValidating ? t('updatingConditions', 'Updating conditions data') : undefined}>
+            {isValidating ? <InlineLoading /> : null}
+          </span>
           <div className={styles.rightMostFlexContainer}>
             <div className={styles.filterContainer}>
               <Dropdown
@@ -168,7 +170,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
             <Button
               kind="ghost"
               renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
-              iconDescription="Add conditions"
+              iconDescription={t('addConditionIconDescription', 'Add a new patient condition or diagnosis')}
               onClick={launchConditionsForm}
             >
               {t('add', 'Add')}
@@ -188,7 +190,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) 
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer className={styles.tableContainer}>
-                <Table {...getTableProps()} className={styles.table}>
+                <Table aria-label={t('conditionsTable', 'Conditions overview table')} {...getTableProps()} className={styles.table}>
                   <TableHead>
                     <TableRow>
                       {(headers as Array<DataTableHeader & ConditionTableHeader>).map((header) => (

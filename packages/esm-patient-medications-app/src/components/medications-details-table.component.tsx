@@ -200,6 +200,30 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
       content: (
         <div className={styles.startDateColumn}>
           <span>{formatDate(new Date(medication.dateActivated))}</span>
+          {/* Show "X days remaining" for active medications with a duration and no stop date */}
+          {medication.duration && !medication.dateStopped && (() => {
+            const durationInDays =
+              medication.durationUnits?.display?.toLowerCase().includes('day') ? medication.duration :
+              medication.durationUnits?.display?.toLowerCase().includes('week') ? medication.duration * 7 :
+              medication.durationUnits?.display?.toLowerCase().includes('month') ? medication.duration * 30 :
+              medication.duration;
+            const endDate = dayjs(medication.dateActivated).add(durationInDays, 'day');
+            const daysRemaining = endDate.diff(dayjs(), 'day');
+            if (daysRemaining > 0) {
+              return (
+                <span className={styles.daysRemaining}>
+                  {t('daysRemaining', '{{count}} days remaining', { count: daysRemaining })}
+                </span>
+              );
+            } else if (daysRemaining < 0) {
+              return (
+                <span className={styles.overdue}>
+                  {t('completedNDaysAgo', 'Completed {{count}} days ago', { count: Math.abs(daysRemaining) })}
+                </span>
+              );
+            }
+            return null;
+          })()}
           {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),
@@ -269,8 +293,19 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={title}>
+        {/* Medication count badge for quick triage awareness */}
+        {medications?.length > 0 && (
+          <Tag
+            size="sm"
+            type="blue"
+            title={t('medicationCount', 'Total medications')}
+            aria-label={t('medicationCountLabel', '{{count}} medications', { count: medications.length })}
+          >
+            {medications.length}
+          </Tag>
+        )}
         {isValidating ? (
-          <span>
+          <span aria-live="polite" aria-label={t('updatingMedications', 'Updating medications data')}>
             <InlineLoading />
           </span>
         ) : null}
@@ -312,7 +347,11 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table aria-label="medications" className={styles.table} {...getTableProps()}>
+              <Table
+                aria-label={t('medicationsTableLabel', 'Medications table listing active prescriptions with start date and dosing details')}
+                className={styles.table}
+                {...getTableProps()}
+              >
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

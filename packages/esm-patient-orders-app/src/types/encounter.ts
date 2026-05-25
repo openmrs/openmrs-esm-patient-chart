@@ -44,7 +44,7 @@ export interface Observation {
     uuid: string;
     display: string;
   };
-  obsGroup: any;
+  obsGroup: Observation | null;
   obsDatetime: string;
   groupMembers?: Array<Observation>;
   value: ObservationValue;

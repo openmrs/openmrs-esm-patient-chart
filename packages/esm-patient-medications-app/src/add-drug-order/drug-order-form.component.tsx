@@ -854,8 +854,8 @@ interface BaseControlledFieldInputProps {
   control: Control<MedicationOrderFormData>;
   name: keyof MedicationOrderFormData;
   type: 'number' | 'toggle' | 'checkbox' | 'textArea' | 'textInput' | 'comboBox';
-  getValues?: (name: keyof MedicationOrderFormData) => any;
-  handleAfterChange?: (newValue: any, prevValue: any) => void;
+  getValues?: (name: keyof MedicationOrderFormData) => MedicationOrderFormData[keyof MedicationOrderFormData];
+  handleAfterChange?: (newValue: MedicationOrderFormData[keyof MedicationOrderFormData], prevValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => void;
 }
 
 type ControlledFieldInputProps = BaseControlledFieldInputProps &
@@ -890,7 +890,7 @@ const ControlledFieldInput = ({
   });
 
   const handleChange = useCallback(
-    (newValue: any) => {
+    (newValue: MedicationOrderFormData[keyof MedicationOrderFormData]) => {
       const prevValue = getValues?.(name);
       onChange(newValue);
       handleAfterChange?.(newValue, prevValue);

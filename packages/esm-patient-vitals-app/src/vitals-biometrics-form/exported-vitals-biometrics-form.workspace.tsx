@@ -43,6 +43,7 @@ import {
   useConceptUnits,
   useEncounterVitalsAndBiometrics,
 } from '../common';
+import { getBMICategory } from '@openmrs/esm-patient-common-lib';
 import { prepareObsForSubmission, shouldShowBmi } from '../common/helpers';
 import { useVitalsConceptMetadata } from '../common/data.resource';
 import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
@@ -609,6 +610,22 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                     label={t('calculatedBmi', 'BMI (calc.)')}
                     unitSymbol={biometricsUnitsSymbols['bmiUnit']}
                   />
+                  {/* Real-time BMI category preview shown while entering height/weight */}
+                  {weight && height && watch('computedBodyMassIndex') && (
+                    <p
+                      className={styles.bmiPreviewText}
+                      aria-live="polite"
+                      aria-label={t('bmiCategoryPreview', 'BMI category preview')}
+                    >
+                      {t('category', 'Category')}: <strong>
+                        {t(
+                          `bmiCategory_${getBMICategory(watch('computedBodyMassIndex'))}`,
+                          getBMICategory(watch('computedBodyMassIndex')).charAt(0).toUpperCase() +
+                            getBMICategory(watch('computedBodyMassIndex')).slice(1),
+                        )}
+                      </strong>
+                    </p>
+                  )}
                 </Column>
               )}
               <Column>

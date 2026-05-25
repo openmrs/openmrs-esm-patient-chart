@@ -1,5 +1,8 @@
 export * from './cards';
 export * from './compare';
+export * from './utils/clinical-utils';
+export * from './utils/normal-ranges';
+export * from './vital-status-badge';
 export * from './dashboards/createDashboardLink';
 export * from './empty-state';
 export * from './error-state';
@@ -14,6 +17,7 @@ export * from './programs/usePatientProgramEnrollment';
 export * from './store/patient-chart-store';
 export * from './time-helper';
 export * from './types';
+export * from './hooks/useDebounce';
 export * from './useAllowedFileExtensions';
 export * from './useSystemVisitSetting';
 export * from './visit';
