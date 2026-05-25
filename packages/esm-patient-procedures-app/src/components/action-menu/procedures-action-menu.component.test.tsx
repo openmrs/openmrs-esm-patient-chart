@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, within } from '@testing-library/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { mockProceduresResponse } from '__mocks__';
-import { type Procedure } from '../../types';
+import type { Procedure } from '../../types';
 import { ProceduresActionMenu } from './procedures-action-menu.component';
 
 const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);

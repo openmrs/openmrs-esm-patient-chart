@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Search, Tile } from '@carbon/react';
 import { ResponsiveWrapper } from '@openmrs/esm-framework';
-import { type ConceptReference } from '../../types';
-import { type useConceptSearchField } from '../../procedures.resource';
+import type { ConceptReference } from '../../types';
+import type { useConceptSearchField } from '../../procedures.resource';
 import styles from './concept-search-field.scss';
 
 type ConceptSearchResultsProps = {

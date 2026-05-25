@@ -10,7 +10,7 @@ import {
   showSnackbar,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import type { PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockProcedureTypes, mockProceduresResponse, searchedProcedure } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -22,7 +22,7 @@ import {
   useProcedureTypes,
 } from '../../procedures.resource';
 import ProceduresFormWorkspace, { type ProceduresFormProps } from './procedures-form.workspace';
-import { type ConceptReference, type Procedure } from '../../types';
+import type { ConceptReference, Procedure } from '../../types';
 
 vi.mock('../../procedures.resource', async () => ({
   ...(await vi.importActual('../../procedures.resource')),

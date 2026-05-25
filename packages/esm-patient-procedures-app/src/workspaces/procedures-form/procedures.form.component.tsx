@@ -18,7 +18,7 @@ import {
   TextArea,
 } from '@carbon/react';
 import { ResponsiveWrapper, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
+import type { ConfigObject } from '../../config-schema';
 import {
   saveProcedure,
   updateProcedure,
@@ -27,8 +27,8 @@ import {
   useMutatePatientProcedures,
   useProcedureTypes,
 } from '../../procedures.resource';
-import { type ConceptReference, type Procedure, type ProcedureType } from '../../types';
-import { type ProceduresFormSchema } from './procedures-form.workspace';
+import type { ConceptReference, Procedure, ProcedureType } from '../../types';
+import type { ProceduresFormSchema } from './procedures-form.workspace';
 import { ConceptSearchField } from '../../components/concept-search-field/concept-search-field.component';
 import { DateTimeField } from '../../components/date-time-field/date-time-field.component';
 import styles from './procedures-form.scss';

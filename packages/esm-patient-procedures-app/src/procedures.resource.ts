@@ -1,13 +1,8 @@
 import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
-import { type ConceptSourceType } from './config-schema';
-import {
-  type ConceptReference,
-  type ProcedureApiResponse,
-  type ProcedureTypeApiResponse,
-  type RawProcedure,
-} from './types';
+import type { ConceptSourceType } from './config-schema';
+import type { ConceptReference, ProcedureApiResponse, ProcedureTypeApiResponse, RawProcedure, } from './types';
 
 export type ConceptSource = { uuid: string; sourceType: ConceptSourceType };
 

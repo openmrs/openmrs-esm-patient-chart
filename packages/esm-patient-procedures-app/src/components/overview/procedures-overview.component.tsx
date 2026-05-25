@@ -28,7 +28,7 @@ import {
   formatPartialDate,
 } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { type ConfigObject } from '../../config-schema';
+import type { ConfigObject } from '../../config-schema';
 import { useProcedures } from '../../procedures.resource';
 import styles from './procedures-overview.scss';
 
