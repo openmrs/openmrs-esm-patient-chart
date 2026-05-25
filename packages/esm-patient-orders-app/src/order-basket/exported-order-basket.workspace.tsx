@@ -34,7 +34,14 @@ const ExportedOrderBasketWorkspace: React.FC<Workspace2DefinitionProps<{}, Expor
         launchChildWorkspace,
         visibleOrderPanels,
       }),
-    [launchChildWorkspace, patient, drugOrderWorkspaceName, labOrderWorkspaceName, generalOrderWorkspaceName, visibleOrderPanels],
+    [
+      launchChildWorkspace,
+      patient,
+      drugOrderWorkspaceName,
+      labOrderWorkspaceName,
+      generalOrderWorkspaceName,
+      visibleOrderPanels,
+    ],
   );
 
   return (

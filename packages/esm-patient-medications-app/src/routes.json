@@ -40,13 +40,22 @@
       "order": 4
     },
     {
+      "name": "future-medications-widget",
+      "component": "futureMedications",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "fullWidth": false
+      },
+      "order": 5
+    },
+    {
       "name": "past-medications-widget",
       "component": "pastMedications",
       "slot": "patient-chart-summary-dashboard-slot",
       "meta": {
         "fullWidth": false
       },
-      "order": 5
+      "order": 6
     },
     {
       "name": "medications-summary-dashboard",

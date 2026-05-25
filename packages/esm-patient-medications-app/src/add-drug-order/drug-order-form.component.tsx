@@ -45,7 +45,7 @@ import {
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useActivePatientOrders, useRequireOutpatientQuantity } from '../api';
+import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
 import {
@@ -67,6 +67,28 @@ export interface DrugOrderFormProps {
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+}
+
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+  const selectedStartDate = isToday ? now : selectedDate;
+  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+}
+
+function isFutureRevisionOfActiveMedication(
+  action: DrugOrderBasketItem['action'] | undefined,
+  selectedStartDate: Date,
+  initialScheduledDate?: Date,
+  now = new Date(),
+) {
+  if (action !== 'REVISE' || selectedStartDate <= now) {
+    return false;
+  }
+
+  return !(initialScheduledDate && initialScheduledDate > now);
 }
 
 function MedicationInfoHeader({
@@ -155,6 +177,7 @@ export function DrugOrderForm({
     formState: { isDirty, isSubmitting },
     getValues,
     handleSubmit,
+    setError,
     setValue,
     watch,
   } = drugOrderForm;
@@ -276,7 +299,26 @@ export function DrugOrderForm({
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
     // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
     // minimum; snap them up before saving.
-    const startDate = startDateMin && data.startDate < startDateMin ? startDateMin : data.startDate;
+    const now = new Date();
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+
+    if (
+      isFutureRevisionOfActiveMedication(
+        initialOrderBasketItem?.action,
+        scheduledDate,
+        initialOrderBasketItem?.scheduledDate,
+        now,
+      )
+    ) {
+      setError('scheduledDate', {
+        type: 'manual',
+        message: t(
+          'activeMedicationRevisionCannotStartInFuture',
+          'Revisions to an active medication must start today or earlier.',
+        ),
+      });
+      return;
+    }
 
     const newBasketItem = {
       ...initialOrderBasketItem,
@@ -297,7 +339,7 @@ export function DrugOrderForm({
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate,
+      scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
@@ -392,14 +434,14 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const { activeOrders, futureOrders } = useMedicationOrders(patient?.id ?? '');
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
-      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem],
+      (initialOrderBasketItem == null || initialOrderBasketItem?.action === 'NEW') &&
+      [...activeOrders, ...futureOrders].some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid, initialOrderBasketItem],
   );
 
   return (
@@ -425,6 +467,7 @@ export function DrugOrderForm({
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         <Form
           className={styles.orderForm}
+          aria-label={workspaceTitle}
           onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
           id="drugOrderForm"
         >
@@ -608,14 +651,13 @@ export function DrugOrderForm({
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
                     <Controller
-                      name="startDate"
+                      name="scheduledDate"
                       control={control}
                       render={({ field, fieldState }) => (
                         <OpenmrsDatePicker
                           {...field}
                           minDate={startDateMin}
-                          maxDate={new Date()}
-                          id="startDatePicker"
+                          id="scheduledDatePicker"
                           labelText={t('startDate', 'Start date')}
                           size={isTablet ? 'md' : 'sm'}
                           invalid={Boolean(fieldState?.error?.message)}
