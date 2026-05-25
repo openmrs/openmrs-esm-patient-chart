@@ -101,8 +101,12 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
       setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
 
       if (!isWorkspaceGroupLaunched.current) {
-        launchWorkspaceGroup2('patient-chart', groupProps);
-        isWorkspaceGroupLaunched.current = true;
+        (async () => {
+          const launchSucceeded = await launchWorkspaceGroup2('patient-chart', groupProps);
+          if (launchSucceeded) {
+            isWorkspaceGroupLaunched.current = true;
+          }
+        })();
       }
     }
   }, [
