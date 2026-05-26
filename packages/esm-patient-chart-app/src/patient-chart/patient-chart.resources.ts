@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
 import {
-  closeWorkspaceGroup2,
   launchWorkspaceGroup2,
   openmrsFetch,
   restBaseUrl,
+  showSnackbar,
   usePatient,
   useVisit,
   type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -49,6 +50,7 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  * @returns
  */
 export function usePatientChartPatientAndVisit(patientUuid: string) {
+  const { t } = useTranslation();
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const {
     patientUuid: storePatientUuid,
@@ -58,7 +60,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     setVisitContext,
   } = usePatientChartStore(patientUuid);
 
-  const isVisitContextValid = visitContext && visitContext.patient.uuid === patientUuid;
+  const isVisitContextValid = visitContext?.patient.uuid === patientUuid;
   const {
     visit: newVisitContext,
     mutate: newMutateVisitContext,
@@ -70,10 +72,11 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     mutate: mutateActiveVisit,
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
-  const isWorkspaceGroupLaunched = useRef(false);
   const launchedVisitContextUuid = useRef<string | null | undefined>(undefined);
+  const isWorkspaceGroupLaunchPending = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
     const initializeWorkspaceGroup = async () => {
       if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
         let groupProps: PatientWorkspaceGroupProps = null;
@@ -105,17 +108,35 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         const visitContextUuid = groupProps.visitContext?.uuid ?? null;
         const visitContextChanged = visitContextUuid !== launchedVisitContextUuid.current;
 
-        if (!isWorkspaceGroupLaunched.current || visitContextChanged) {
-          const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
-          if (launched) {
-            isWorkspaceGroupLaunched.current = true;
-            launchedVisitContextUuid.current = visitContextUuid;
+        if (visitContextChanged && !isWorkspaceGroupLaunchPending.current) {
+          isWorkspaceGroupLaunchPending.current = true;
+          try {
+            const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
+            if (cancelled) {
+              return;
+            }
+
+            if (launched) {
+              launchedVisitContextUuid.current = visitContextUuid;
+            }
+          } finally {
+            isWorkspaceGroupLaunchPending.current = false;
           }
         }
       }
     };
+    initializeWorkspaceGroup().catch((error) => {
+      showSnackbar({
+        title: t('errorLaunchingWorkspaceGroup', 'Error launching workspace group'),
+        subtitle: error.message,
+        kind: 'error',
+        isLowContrast: false,
+      })
+    });
 
-    initializeWorkspaceGroup();
+    return () => {
+      cancelled = true;
+    };
   }, [
     newVisitContext,
     isValidatingVisitContext,
@@ -125,8 +146,8 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     isValidatingActiveVisit,
     storePatientUuid,
     mutateActiveVisit,
-    isWorkspaceGroupLaunched,
     patient,
+    t
   ]);
 
   useEffect(() => {
