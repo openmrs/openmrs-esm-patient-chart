@@ -72,9 +72,18 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     mutate: mutateActiveVisit,
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
+  // undefined = not yet launched; null = launched with no active visit
   const launchedVisitContextUuid = useRef<string | null | undefined>(undefined);
   const latestWorkspaceGroupProps = useRef<PatientWorkspaceGroupProps>(null);
   const isWorkspaceGroupLaunchPending = useRef(false);
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const launchLatestWorkspaceGroup = useCallback(async () => {
     if (isWorkspaceGroupLaunchPending.current) {
@@ -95,6 +104,10 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         }
 
         const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
+
+        if (!isMounted.current) {
+          return;
+        }
 
         if (!launched) {
           needsLaunch = false;
