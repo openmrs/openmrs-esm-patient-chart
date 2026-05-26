@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - feat/procedure-history
   pull_request:
     branches:
       - main
+      - feat/procedure-history
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
