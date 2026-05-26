@@ -6,6 +6,6 @@ export class ProceduresPage {
   readonly proceduresTable = () => this.page.getByRole('table');
 
   async goTo(uuid: string) {
-    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/Procedures`);
+    await this.page.goto(`/openmrs/spa/patient/${uuid}/chart/procedures`);
   }
 }

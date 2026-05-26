@@ -22,7 +22,7 @@ test('Record a procedure with a known start date', async ({ page, patient }) => 
   });
 
   await test.step('And I select the procedure', async () => {
-    await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
+    await page.getByRole('option', { name: 'Orbital surgery' }).click();
   });
 
   await test.step('And I select a procedure type', async () => {
@@ -38,25 +38,25 @@ test('Record a procedure with a known start date', async ({ page, patient }) => 
   });
 
   await test.step('And I select the body site', async () => {
-    await page.getByRole('menuitem', { name: 'Eye', exact: true }).click();
+    await page.getByRole('option', { name: 'Eye', exact: true }).click();
   });
 
-  await test.step('And I set the start date and time to 07/07/2027 11:00 AM', async () => {
+  await test.step('And I set the start date and time to 07/07/2024 11:00 AM', async () => {
     const startGroup = page.getByRole('group', { name: /start date and time/i });
     const startDateInput = startGroup.getByLabel(/^date$/i);
     await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('07');
     await startDateInput.getByRole('spinbutton', { name: /month/i }).fill('07');
-    await startDateInput.getByRole('spinbutton', { name: /year/i }).fill('2027');
+    await startDateInput.getByRole('spinbutton', { name: /year/i }).fill('2024');
     await startGroup.getByLabel(/^time$/i).fill('11:00');
     await startGroup.getByLabel(/am\/pm/i).selectOption('AM');
   });
 
-  await test.step('And I set the end date and time to 07/07/2027 13:00 PM', async () => {
+  await test.step('And I set the end date and time to 07/07/2024 13:00 PM', async () => {
     const endGroup = page.getByRole('group', { name: /end date and time/i });
     const endDateInput = endGroup.getByLabel(/^date$/i);
     await endDateInput.getByRole('spinbutton', { name: /day/i }).fill('07');
     await endDateInput.getByRole('spinbutton', { name: /month/i }).fill('07');
-    await endDateInput.getByRole('spinbutton', { name: /year/i }).fill('2027');
+    await endDateInput.getByRole('spinbutton', { name: /year/i }).fill('2024');
     await endGroup.getByLabel(/^time$/i).fill('01:00');
     await endGroup.getByLabel(/am\/pm/i).selectOption('PM');
   });
@@ -109,7 +109,7 @@ test('Record a procedure with an unknown start date', async ({ page, patient }) 
   });
 
   await test.step('And I select the procedure', async () => {
-    await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
+    await page.getByRole('option', { name: 'Orbital surgery' }).click();
   });
 
   await test.step('And I select a procedure type', async () => {
@@ -125,7 +125,7 @@ test('Record a procedure with an unknown start date', async ({ page, patient }) 
   });
 
   await test.step('And I select the body site', async () => {
-    await page.getByRole('menuitem', { name: 'Eye', exact: true }).click();
+    await page.getByRole('option', { name: 'Eye', exact: true }).click();
   });
 
   await test.step('And I select "No" for "Is start date known?"', async () => {
@@ -192,14 +192,14 @@ test('Edit a procedure', async ({ page, patient }) => {
     await proceduresPage.page.getByText(/record procedures/i).click();
     await expect(proceduresPage.page.getByText('Record procedure', { exact: true })).toBeVisible();
     await page.getByPlaceholder(/search procedures/i).fill('orbital');
-    await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
+    await page.getByRole('option', { name: 'Orbital surgery' }).click();
     await page
       .getByRole('group', { name: /procedure type/i })
       .getByRole('combobox')
       .click();
     await page.getByRole('option', { name: /surgical/i }).click();
     await page.getByPlaceholder(/search body sites/i).fill('eye');
-    await page.getByRole('menuitem', { name: 'Eye', exact: true }).click();
+    await page.getByRole('option', { name: 'Eye', exact: true }).click();
     const startGroup = page.getByRole('group', { name: /start date and time/i });
     const startDateInput = startGroup.getByLabel(/^date$/i);
     await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('01');
@@ -262,14 +262,14 @@ test('Delete a procedure', async ({ page, patient }) => {
     await proceduresPage.page.getByText(/record procedures/i).click();
     await expect(proceduresPage.page.getByText('Record procedure', { exact: true })).toBeVisible();
     await page.getByPlaceholder(/search procedures/i).fill('orbital');
-    await page.getByRole('menuitem', { name: 'Orbital surgery' }).click();
+    await page.getByRole('option', { name: 'Orbital surgery' }).click();
     await page
       .getByRole('group', { name: /procedure type/i })
       .getByRole('combobox')
       .click();
     await page.getByRole('option', { name: /surgical/i }).click();
     await page.getByPlaceholder(/search body sites/i).fill('eye');
-    await page.getByRole('menuitem', { name: 'Eye', exact: true }).click();
+    await page.getByRole('option', { name: 'Eye', exact: true }).click();
     const startGroup = page.getByRole('group', { name: /start date and time/i });
     const startDateInput = startGroup.getByLabel(/^date$/i);
     await startDateInput.getByRole('spinbutton', { name: /day/i }).fill('01');
