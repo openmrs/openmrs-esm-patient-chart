@@ -25,7 +25,7 @@ export const configSchema = {
     _type: Type.UUID,
     _description:
       'UUID used to constrain the procedure concept search. Its meaning is determined by `procedureConceptSourceType`.',
-    _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f',
+    _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f', // Procedure concept class
   },
   procedureConceptSourceType: {
     _type: Type.String,
@@ -36,7 +36,7 @@ export const configSchema = {
   bodySiteConceptUuid: {
     _type: Type.UUID,
     _description:
-      'Value used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`. For `Concept class`, provide the concept class name.',
+      'UUID used to constrain the body-site concept search. Its meaning is determined by `bodySiteConceptSourceType`.',
     _default: '8d491c7a-c2cc-11de-8d13-0010c6dffd0f', // Anatomy concept class
   },
   bodySiteConceptSourceType: {
