@@ -29,6 +29,7 @@ const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Vis
 
 describe('usePatientChartPatientAndVisit', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mockLaunchWorkspaceGroup.mockResolvedValue(true);
     mockUsePatient.mockReturnValue({
       isLoading: false,
@@ -109,5 +110,46 @@ describe('usePatientChartPatientAndVisit', () => {
     // Wait for the effect to fire before asserting the launch count didn't increase
     await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+  });
+
+  it('launches the latest visit context after a previous launch resolves', async () => {
+    let activeVisit = visitA;
+    let resolveFirstLaunch!: (value: boolean) => void;
+    const firstLaunch = new Promise<boolean>((resolve) => {
+      resolveFirstLaunch = resolve;
+    });
+
+    mockLaunchWorkspaceGroup.mockReturnValueOnce(firstLaunch).mockResolvedValue(true);
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisitContext,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitA }),
+    );
+
+    activeVisit = visitB;
+    rerender();
+
+    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+
+    resolveFirstLaunch(true);
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitB }),
+    );
   });
 });
