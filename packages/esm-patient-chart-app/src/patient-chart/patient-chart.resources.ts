@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import {
   launchWorkspaceGroup2,
@@ -10,7 +11,6 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientWorkspaceGroupProps, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 
 const defaultVisitCustomRepresentation =
   'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
@@ -77,6 +77,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
 
   useEffect(() => {
     let cancelled = false;
+
     const initializeWorkspaceGroup = async () => {
       if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
         let groupProps: PatientWorkspaceGroupProps = null;
@@ -125,13 +126,14 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
         }
       }
     };
+
     initializeWorkspaceGroup().catch((error) => {
       showSnackbar({
         title: t('errorLaunchingWorkspaceGroup', 'Error launching workspace group'),
         subtitle: error.message,
         kind: 'error',
         isLowContrast: false,
-      })
+      });
     });
 
     return () => {
@@ -147,7 +149,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     storePatientUuid,
     mutateActiveVisit,
     patient,
-    t
+    t,
   ]);
 
   useEffect(() => {
