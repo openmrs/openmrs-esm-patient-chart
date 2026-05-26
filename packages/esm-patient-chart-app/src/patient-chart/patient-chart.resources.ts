@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import {
-  closeWorkspaceGroup2,
   launchWorkspaceGroup2,
   openmrsFetch,
   restBaseUrl,
+  showSnackbar,
   usePatient,
   useVisit,
   type Visit,
@@ -49,6 +50,7 @@ export function useVisitByUuid(visitUuid: string | null, representation: string 
  * @returns
  */
 export function usePatientChartPatientAndVisit(patientUuid: string) {
+  const { t } = useTranslation();
   const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const {
     patientUuid: storePatientUuid,
@@ -58,7 +60,7 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     setVisitContext,
   } = usePatientChartStore(patientUuid);
 
-  const isVisitContextValid = visitContext && visitContext.patient.uuid === patientUuid;
+  const isVisitContextValid = visitContext?.patient.uuid === patientUuid;
   const {
     visit: newVisitContext,
     mutate: newMutateVisitContext,
@@ -70,41 +72,73 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     mutate: mutateActiveVisit,
   } = useVisit(isVisitContextValid ? null : patientUuid);
 
-  const isWorkspaceGroupLaunched = useRef(false);
+  const launchedVisitContextUuid = useRef<string | null | undefined>(undefined);
+  const isWorkspaceGroupLaunchPending = useRef(false);
 
   useEffect(() => {
-    if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
-      let groupProps: PatientWorkspaceGroupProps = null;
-      if (activeVisit) {
-        groupProps = {
-          patientUuid: patient.id,
-          patient,
-          visitContext: activeVisit,
-          mutateVisitContext: mutateActiveVisit,
-        };
-      } else if (newVisitContext) {
-        groupProps = {
-          patientUuid: patient.id,
-          patient,
-          visitContext: newVisitContext,
-          mutateVisitContext: newMutateVisitContext,
-        };
-      } else {
-        groupProps = {
-          patientUuid: patient.id,
-          patient,
-          visitContext: null,
-          mutateVisitContext: null,
-        };
-      }
+    let cancelled = false;
 
-      setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
+    const initializeWorkspaceGroup = async () => {
+      if (!isValidatingVisitContext && !isValidatingActiveVisit && patient) {
+        let groupProps: PatientWorkspaceGroupProps = null;
+        if (activeVisit) {
+          groupProps = {
+            patientUuid: patient.id,
+            patient,
+            visitContext: activeVisit,
+            mutateVisitContext: mutateActiveVisit,
+          };
+        } else if (newVisitContext) {
+          groupProps = {
+            patientUuid: patient.id,
+            patient,
+            visitContext: newVisitContext,
+            mutateVisitContext: newMutateVisitContext,
+          };
+        } else {
+          groupProps = {
+            patientUuid: patient.id,
+            patient,
+            visitContext: null,
+            mutateVisitContext: null,
+          };
+        }
 
-      if (!isWorkspaceGroupLaunched.current) {
-        launchWorkspaceGroup2('patient-chart', groupProps);
-        isWorkspaceGroupLaunched.current = true;
+        setVisitContext(groupProps.visitContext, groupProps.mutateVisitContext);
+
+        const visitContextUuid = groupProps.visitContext?.uuid ?? null;
+        const visitContextChanged = visitContextUuid !== launchedVisitContextUuid.current;
+
+        if (visitContextChanged && !isWorkspaceGroupLaunchPending.current) {
+          isWorkspaceGroupLaunchPending.current = true;
+          try {
+            const launched = await launchWorkspaceGroup2('patient-chart', groupProps);
+            if (cancelled) {
+              return;
+            }
+
+            if (launched) {
+              launchedVisitContextUuid.current = visitContextUuid;
+            }
+          } finally {
+            isWorkspaceGroupLaunchPending.current = false;
+          }
+        }
       }
-    }
+    };
+
+    initializeWorkspaceGroup().catch((error) => {
+      showSnackbar({
+        title: t('errorLaunchingWorkspaceGroup', 'Error launching workspace group'),
+        subtitle: error.message,
+        kind: 'error',
+        isLowContrast: false,
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     newVisitContext,
     isValidatingVisitContext,
@@ -114,8 +148,8 @@ export function usePatientChartPatientAndVisit(patientUuid: string) {
     isValidatingActiveVisit,
     storePatientUuid,
     mutateActiveVisit,
-    isWorkspaceGroupLaunched,
     patient,
+    t,
   ]);
 
   useEffect(() => {
