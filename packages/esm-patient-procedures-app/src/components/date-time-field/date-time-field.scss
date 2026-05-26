@@ -1,0 +1,8 @@
+@use '@carbon/layout';
+
+.dateTimeFieldGroup {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: layout.$spacing-05;
+  align-items: end;
+}

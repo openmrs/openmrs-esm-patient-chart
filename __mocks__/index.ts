@@ -24,3 +24,4 @@ export * from './visitQueueEntry.mock';
 export * from './visits.mock';
 export * from './vitals-and-biometrics.mock';
 export * from './mockOrders.mock';
+export * from './procedures.mock';
