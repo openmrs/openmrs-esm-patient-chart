@@ -1,5 +1,5 @@
 import type { Order } from '@openmrs/esm-patient-common-lib';
-import { vi, describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { buildMedicationOrder } from './index';
 
 const medicationOrder = {
@@ -74,24 +74,74 @@ const medicationOrder = {
 } as unknown as Order;
 
 describe('buildMedicationOrder', () => {
-  it.each(['RENEW', 'REVISE'] as const)(
-    'defaults %s basket items to now instead of the previous activation date',
-    (action) => {
-      const before = Date.now();
-      const result = buildMedicationOrder(medicationOrder, action);
-      const after = Date.now();
+  it('defaults RENEW basket items to now instead of the previous activation date', () => {
+    const before = Date.now();
+    const result = buildMedicationOrder(medicationOrder, 'RENEW');
+    const after = Date.now();
 
-      expect(result.startDate).toBeInstanceOf(Date);
-      expect((result.startDate as Date).getTime()).toBeGreaterThanOrEqual(before);
-      expect((result.startDate as Date).getTime()).toBeLessThanOrEqual(after);
-      expect(result.startDate).not.toBe(medicationOrder.dateActivated);
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+    expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+    expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
+  });
+
+  it('defaults REVISE basket items to now instead of the previous activation or scheduled date', () => {
+    const before = Date.now();
+    const scheduledDate = '2026-05-01T00:00:00.000+0000';
+    const result = buildMedicationOrder({ ...medicationOrder, scheduledDate } as Order, 'REVISE');
+    const after = Date.now();
+
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+    expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+    expect(result.scheduledDate).not.toBe(scheduledDate);
+    expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
+  });
+
+  it.each(['RENEW', 'REVISE'] as const)(
+    'preserves the future scheduled date when building a %s basket item for an upcoming order',
+    (action) => {
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ON_SCHEDULED_DATE',
+          scheduledDate: scheduledDate.toISOString(),
+        } as Order,
+        action,
+      );
+
+      expect(result.scheduledDate).toEqual(scheduledDate);
     },
   );
 
-  it('preserves the original activation date when building a DISCONTINUE basket item', () => {
+  it.each(['RENEW', 'REVISE'] as const)(
+    'defaults %s basket items to now when a future scheduled date is not marked ON_SCHEDULED_DATE',
+    (action) => {
+      const before = Date.now();
+      const scheduledDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const result = buildMedicationOrder(
+        {
+          ...medicationOrder,
+          urgency: 'ROUTINE',
+          scheduledDate,
+        } as Order,
+        action,
+      );
+      const after = Date.now();
+
+      expect(result.scheduledDate).toBeInstanceOf(Date);
+      expect((result.scheduledDate as Date).getTime()).toBeGreaterThanOrEqual(before);
+      expect((result.scheduledDate as Date).getTime()).toBeLessThanOrEqual(after);
+      expect(result.scheduledDate).not.toEqual(new Date(scheduledDate));
+    },
+  );
+
+  it('uses the original activation date when building a DISCONTINUE basket item', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 
-    expect(result.startDate).toBe(medicationOrder.dateActivated);
+    expect(result.scheduledDate).toBeInstanceOf(Date);
+    expect((result.scheduledDate as Date).toISOString()).toBe(new Date(medicationOrder.dateActivated).toISOString());
   });
 
   it('captures the previous order activation date for REVISE validation', () => {

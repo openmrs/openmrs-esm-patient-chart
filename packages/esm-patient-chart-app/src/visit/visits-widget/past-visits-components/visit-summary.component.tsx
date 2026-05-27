@@ -64,12 +64,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
 
   // Extract diagnoses from lightweight visit (visit-level) or full visit (encounter-level)
   const diagnoses: Array<Diagnosis> = useMemo(() => {
-    // Lightweight API: diagnoses at visit level
     if ('diagnoses' in visit && Array.isArray(visit.diagnoses) && visit.diagnoses.length > 0) {
       return visit.diagnoses.filter((d) => !d.voided).sort((a, b) => a.rank - b.rank);
     }
 
-    // Full API: diagnoses nested in encounters
     if (resolvedVisit?.encounters) {
       return resolvedVisit.encounters
         .flatMap((enc) => enc.diagnoses ?? [])
@@ -82,7 +80,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
 
   // Extract notes from lightweight visit or full visit
   const notes: Array<Note> = useMemo(() => {
-    // Lightweight API: notes at visit level
     if ('notes' in visit && Array.isArray(visit.notes) && visit.notes.length > 0) {
       return visit.notes.map((note) => ({
         note: note.value ?? note.display,
@@ -95,7 +92,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }));
     }
 
-    // Full API: notes from encounter obs
     if (resolvedVisit?.encounters) {
       const extractedNotes: Array<Note> = [];
       resolvedVisit.encounters.forEach((enc) => {
@@ -176,8 +172,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     }
   };
 
-  // Loading state for tabs that need full data
-  const FullDataLoading = () => <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
+  const loadingIndicator = <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 
   return (
     <div className={styles.summaryContainer}>
@@ -243,7 +238,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         <TabPanels>
           <TabPanel>
             {isLoadingFullVisit ? (
-              <FullDataLoading />
+              loadingIndicator
             ) : (
               <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
             )}
@@ -253,33 +248,27 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </TabPanel>
           <TabPanel>
             {isLoadingFullVisit ? (
-              <FullDataLoading />
+              loadingIndicator
             ) : resolvedVisit ? (
               <TestsSummary patientUuid={patientUuid} encounters={resolvedVisit.encounters} />
-            ) : (
-              <FullDataLoading />
-            )}
+            ) : null}
           </TabPanel>
           <TabPanel>
-            {isLoadingFullVisit ? <FullDataLoading /> : <MedicationSummary medications={medications} />}
+            {isLoadingFullVisit ? loadingIndicator : <MedicationSummary medications={medications} />}
           </TabPanel>
           <TabPanel>
             {isLoadingFullVisit ? (
-              <FullDataLoading />
+              loadingIndicator
             ) : resolvedVisit ? (
               <VisitCompletedFormsTable visit={resolvedVisit} patientUuid={patientUuid} />
-            ) : (
-              <FullDataLoading />
-            )}
+            ) : null}
           </TabPanel>
           <TabPanel>
             {isLoadingFullVisit ? (
-              <FullDataLoading />
+              loadingIndicator
             ) : resolvedVisit ? (
               <VisitEncountersTable visit={resolvedVisit} patientUuid={patientUuid} />
-            ) : (
-              <FullDataLoading />
-            )}
+            ) : null}
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
