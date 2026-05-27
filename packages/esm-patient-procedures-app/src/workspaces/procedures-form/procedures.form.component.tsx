@@ -175,8 +175,10 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
       await mutate();
       showSnackbar({
         kind: 'success',
-        title: t('procedureSaved', 'Procedure saved'),
-        subtitle: t('procedureNowVisible', 'It is now visible on the Procedures page'),
+        title: procedure?.uuid ? t('procedureUpdated', 'Procedure updated') : t('procedureSaved', 'Procedure saved'),
+        subtitle: procedure?.uuid
+          ? t('procedureUpdatesNowVisible', 'Changes to the procedure are now visible on the Procedures page')
+          : t('procedureNowVisible', 'It is now visible on the Procedures page'),
       });
       closeWorkspace();
     } catch (error) {
@@ -213,6 +215,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                 <ComboBox
                   id="procedureType"
                   titleText=""
+                  aria-label={t('procedureType', 'Procedure type')}
                   placeholder={t('selectProcedureType', 'Select procedure type')}
                   items={procedureTypes}
                   itemToString={(item: ProcedureType) => item?.name ?? ''}
@@ -397,6 +400,7 @@ const ProceduresFormComponent: React.FC<ProceduresFormComponentProps> = ({
                   <ComboBox
                     id="status"
                     titleText=""
+                    aria-label={t('status', 'Status')}
                     placeholder={t('selectStatus', 'Select status')}
                     items={statusOptions}
                     itemToString={(item: ConceptReference) => item?.display ?? ''}

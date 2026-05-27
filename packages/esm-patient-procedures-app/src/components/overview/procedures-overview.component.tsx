@@ -102,7 +102,6 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
           </Button>
         </CardHeader>
         <DataTable
-          aria-label="procedures overview"
           headers={headers}
           overflowMenuOnHover={isDesktop}
           rows={tableRows ?? []}
@@ -112,7 +111,11 @@ const ProceduresOverview: React.FC<ProceduresOverviewProps> = ({ patientUuid }) 
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer className={styles.tableContainer}>
-                <Table {...getTableProps()} className={styles.table}>
+                <Table
+                  {...getTableProps()}
+                  className={styles.table}
+                  aria-label={t('proceduresOverview', 'Procedures overview')}
+                >
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

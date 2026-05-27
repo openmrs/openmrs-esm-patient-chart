@@ -616,7 +616,7 @@ describe('ProceduresForm', () => {
 
     await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
     expect(mockShowSnackbar).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'success', title: 'Procedure saved' }),
+      expect.objectContaining({ kind: 'success', title: 'Procedure updated' }),
     );
   });
 

@@ -124,7 +124,6 @@ const ProceduresDetailedSummary = ({ patient }: ProceduresDetailedSummaryProps) 
           </Button>
         </CardHeader>
         <DataTable
-          aria-label="procedures detailed summary"
           headers={headers}
           isSortable
           overflowMenuOnHover={isDesktop}
@@ -135,7 +134,11 @@ const ProceduresDetailedSummary = ({ patient }: ProceduresDetailedSummaryProps) 
           {({ rows, headers: carbonHeaders, getRowProps, getExpandedRowProps, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer>
-                <Table {...getTableProps()} className={styles.table}>
+                <Table
+                  {...getTableProps()}
+                  className={styles.table}
+                  aria-label={t('proceduresSummary', 'Procedures summary')}
+                >
                   <TableHead>
                     <TableRow>
                       <TableExpandHeader aria-label="expand row" />
