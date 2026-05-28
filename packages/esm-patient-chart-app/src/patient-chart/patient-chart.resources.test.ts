@@ -26,9 +26,37 @@ const setVisitContext = vi.fn();
 
 const visitA = { uuid: 'visit-a', patient: { uuid: mockFhirPatient.id } } as Visit;
 const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Visit;
+const patientB = { ...mockFhirPatient, id: 'patient-b' };
+
+function mockNoActiveVisitForPatientSwitch() {
+  mockUsePatient.mockImplementation((patientUuid) => ({
+    isLoading: false,
+    patient: patientUuid === patientB.id ? patientB : mockFhirPatient,
+    patientUuid,
+    error: null,
+  }));
+  mockUseVisit.mockImplementation(() => ({
+    activeVisit: null,
+    mutate: mutateVisitContext,
+    isValidating: false,
+    error: null,
+    currentVisit: null,
+    currentVisitIsRetrospective: false,
+    isLoading: false,
+  }));
+  mockUsePatientChartStore.mockImplementation((patientUuid) => ({
+    patientUuid,
+    patient: patientUuid === patientB.id ? patientB : mockFhirPatient,
+    visitContext: null,
+    mutateVisitContext: null,
+    setPatient,
+    setVisitContext,
+  }));
+}
 
 describe('usePatientChartPatientAndVisit', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mockLaunchWorkspaceGroup.mockResolvedValue(true);
     mockUsePatient.mockReturnValue({
       isLoading: false,
@@ -109,5 +137,102 @@ describe('usePatientChartPatientAndVisit', () => {
     // Wait for the effect to fire before asserting the launch count didn't increase
     await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
     expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+  });
+
+  it('relaunches when the patient changes and neither patient has an active visit', async () => {
+    mockNoActiveVisitForPatientSwitch();
+
+    const { rerender } = renderHook(({ patientUuid }) => usePatientChartPatientAndVisit(patientUuid), {
+      initialProps: { patientUuid: mockFhirPatient.id },
+    });
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: null }),
+    );
+
+    rerender({ patientUuid: patientB.id });
+
+    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: patientB.id, visitContext: null }),
+    );
+  });
+
+  it('launches the latest patient after a previous launch resolves', async () => {
+    let patientUuid = mockFhirPatient.id;
+    let resolveFirstLaunch!: (value: boolean) => void;
+    const firstLaunch = new Promise<boolean>((resolve) => {
+      resolveFirstLaunch = resolve;
+    });
+
+    mockLaunchWorkspaceGroup.mockReturnValueOnce(firstLaunch).mockResolvedValue(true);
+    mockNoActiveVisitForPatientSwitch();
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(patientUuid));
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: mockFhirPatient.id, visitContext: null }),
+    );
+
+    patientUuid = patientB.id;
+    rerender();
+
+    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+
+    resolveFirstLaunch(true);
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ patientUuid: patientB.id, visitContext: null }),
+    );
+  });
+
+  it('launches the latest visit context after a previous launch resolves', async () => {
+    let activeVisit = visitA;
+    let resolveFirstLaunch!: (value: boolean) => void;
+    const firstLaunch = new Promise<boolean>((resolve) => {
+      resolveFirstLaunch = resolve;
+    });
+
+    mockLaunchWorkspaceGroup.mockReturnValueOnce(firstLaunch).mockResolvedValue(true);
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisitContext,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitA }),
+    );
+
+    activeVisit = visitB;
+    rerender();
+
+    await waitFor(() => expect(setVisitContext).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(1);
+
+    resolveFirstLaunch(true);
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    expect(mockLaunchWorkspaceGroup).toHaveBeenLastCalledWith(
+      'patient-chart',
+      expect.objectContaining({ visitContext: visitB }),
+    );
   });
 });
