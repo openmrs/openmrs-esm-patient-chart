@@ -135,8 +135,14 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       const test = state.tests[key] as TestResult;
       if (test.obs && Array.isArray(test.obs)) {
         test.obs.forEach((obs) => {
-          // Use a more specific key that includes the test name to avoid over-deduplication
-          const testKey = `${test.flatName}_${obs.obsDatetime}_${obs.value}`;
+          // Dedupe by the observation's concept identity, not flatName. The obstree
+          // backend can return the same concept under several branches of the
+          // orderable-tests tree (e.g. one branch per order), each carrying the
+          // same single obs. Keying on flatName (which differs per branch) left
+          // those as separate rows, so a single result showed up N times. Concept
+          // uuid + datetime + value identifies the actual observation, while still
+          // keeping genuinely different tests apart.
+          const testKey = `${test.conceptUuid ?? test.flatName}_${obs.obsDatetime}_${obs.value}`;
 
           if (!seenTests.has(testKey)) {
             seenTests.add(testKey);
