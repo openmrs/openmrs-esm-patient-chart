@@ -180,6 +180,11 @@ describe('AddDrugOrderWorkspace drug search', () => {
           ),
           startDate: expect.any(Date),
           indication: 'Hypertension',
+          // The drug order form applies these defaults on save (see drug-order-form.resource.ts:
+          // duration ?? 1, numRefills ?? 0, isQuantityManual default false).
+          duration: 1,
+          numRefills: 0,
+          isQuantityManual: false,
         }),
       ]),
     );

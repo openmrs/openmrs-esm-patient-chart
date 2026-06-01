@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-engine-app",
-  "version": "12.1.0",
+  "version": "12.1.0-trigonal",
   "license": "MPL-2.0",
   "description": "Wrapper ESM for the O3 React Form Engine",
   "browser": "dist/openmrs-esm-form-engine-app.js",
@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "@carbon/react": "^1.83.0",
-    "@openmrs/esm-form-engine-lib": "next",
     "lodash-es": "^4.18.1",
     "react-error-boundary": "^4.0.13"
   },
@@ -52,6 +51,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@openmrs/esm-form-engine-lib": "file:./vendor/openmrs-esm-form-engine-lib-4.1.0.tgz",
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "openmrs": "next",
     "vitest": "^4.1.2"

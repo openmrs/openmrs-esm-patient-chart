@@ -50,6 +50,9 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
+# ...except vendored local packages (e.g. our forked esm-form-engine-lib) that
+# must be committed so fresh clones can resolve the file: devDependency.
+!**/vendor/*.tgz
 
 # Yarn Integrity file
 .yarn-integrity

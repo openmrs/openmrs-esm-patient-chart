@@ -5015,12 +5015,11 @@ __metadata:
   resolution: "@openmrs/esm-form-engine-app@workspace:packages/esm-form-engine-app"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
-    "@openmrs/esm-form-engine-lib": "npm:next"
+    "@openmrs/esm-form-engine-lib": "file:./vendor/openmrs-esm-form-engine-lib-4.1.0.tgz"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     react-error-boundary: "npm:^4.0.13"
-    use-resize-observer: "npm:^6.0.0"
     vitest: "npm:^4.1.2"
   peerDependencies:
     "@openmrs/esm-framework": 9.x
@@ -5033,9 +5032,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-form-engine-lib@npm:next":
-  version: 4.1.1-pre.2410
-  resolution: "@openmrs/esm-form-engine-lib@npm:4.1.1-pre.2410"
+"@openmrs/esm-form-engine-lib@file:./vendor/openmrs-esm-form-engine-lib-4.1.0.tgz::locator=%40openmrs%2Fesm-form-engine-app%40workspace%3Apackages%2Fesm-form-engine-app":
+  version: 4.1.0
+  resolution: "@openmrs/esm-form-engine-lib@file:./vendor/openmrs-esm-form-engine-lib-4.1.0.tgz#./vendor/openmrs-esm-form-engine-lib-4.1.0.tgz::hash=43f200&locator=%40openmrs%2Fesm-form-engine-app%40workspace%3Apackages%2Fesm-form-engine-app"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     classnames: "npm:^2.5.1"
@@ -5052,7 +5051,7 @@ __metadata:
     react: 18.x
     react-i18next: 16.x
     swr: 2.x
-  checksum: 10/832a9db108bb8dec6516164a6c2f1ad0c823152c0c6c7ce6ca72f97c0e8d3cb0d49ad1655b9daf0b04dda7855cd039d8efdd8ffc5edaecb0c5cf0970b362cd55
+  checksum: 10/ff97b6370ddd634630554a6d65152f252d77824d8bc593af48e7b9de9e32db0066d94190a9bca3631004723834deee1222a1ae63ccf59dd05a72ea4acdb8d0f1
   languageName: node
   linkType: hard
 
@@ -19846,13 +19845,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resize-observer-polyfill@npm:^1.5.1":
-  version: 1.5.1
-  resolution: "resize-observer-polyfill@npm:1.5.1"
-  checksum: 10/e10ee50cd6cf558001de5c6fb03fee15debd011c2f694564b71f81742eef03fb30d6c2596d1d5bf946d9991cb692fcef529b7bd2e4057041377ecc9636c753ce
-  languageName: node
-  linkType: hard
-
 "resolve-alpn@npm:^1.0.0":
   version: 1.2.1
   resolution: "resolve-alpn@npm:1.2.1"
@@ -22725,18 +22717,6 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10/b271ca7e3d46b7160222e3afa3e531505161c9a4e097febae9664e4b59912f4cbe94861361a4175edac3a03fee99d91e44b6a58c17a634bc5a664b19fc76fbcb
-  languageName: node
-  linkType: hard
-
-"use-resize-observer@npm:^6.0.0":
-  version: 6.1.0
-  resolution: "use-resize-observer@npm:6.1.0"
-  dependencies:
-    resize-observer-polyfill: "npm:^1.5.1"
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10/0490c419ab4ba7bf31202d2d0dc0e296d9709d34218a63565d8337ea58ad7bb61c8aaaf7495305c465b5ce49e8b99e325e3c1f5b923f58e1127af778c82880d6
   languageName: node
   linkType: hard
 
