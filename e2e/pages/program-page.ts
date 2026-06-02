@@ -8,6 +8,6 @@ export class ProgramsPage {
   readonly editProgramButton = () => this.page.getByRole('menuitem', { name: /edit/i });
 
   async goTo(patientUuid: string) {
-    await this.page.goto(`patient/${patientUuid}/chart/Programs`);
+    await this.page.goto(`patient/${patientUuid}/chart/programs`);
   }
 }

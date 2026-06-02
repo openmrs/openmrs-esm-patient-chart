@@ -1,33 +1,44 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
 
 // https://github.com/jsdom/jsdom/issues/1695
 window.HTMLElement.prototype.scrollIntoView = function () {};
 
-window.URL.createObjectURL = jest.fn();
-global.openmrsBase = '/openmrs';
-global.spaBase = '/spa';
-global.getOpenmrsSpaBase = () => '/openmrs/spa/';
-global.Response = Object as any;
-
-// https://github.com/jsdom/jsdom/issues/1695
-window.HTMLElement.prototype.scrollIntoView = function () {};
+window.URL.createObjectURL = vi.fn();
+(globalThis as Record<string, unknown>).openmrsBase = '/openmrs';
+(globalThis as Record<string, unknown>).spaBase = '/spa';
+(globalThis as Record<string, unknown>).getOpenmrsSpaBase = () => '/openmrs/spa/';
+(globalThis as Record<string, unknown>).Response = Object as unknown as typeof Response;
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // Deprecated in MediaQueryList
-    removeListener: jest.fn(), // Deprecated in MediaQueryList
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(), // Deprecated in MediaQueryList
+    removeListener: vi.fn(), // Deprecated in MediaQueryList
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });
 
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+global.ResizeObserver = class ResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+};
+
+class IntersectionObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  trigger: (entries: unknown[]) => void;
+  options: unknown;
+  constructor(callback: (entries: unknown[], observer: IntersectionObserverMock) => void, options?: unknown) {
+    this.trigger = (entries) => callback(entries, this);
+    this.options = options;
+  }
+}
+global.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;

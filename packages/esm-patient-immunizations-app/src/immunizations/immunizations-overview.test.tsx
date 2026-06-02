@@ -1,6 +1,8 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import { useFhirFetchAll } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockImmunizationData } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ImmunizationsOverview from './immunizations-overview.component';
@@ -11,7 +13,7 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseFhirFetchAll = useFhirFetchAll as jest.Mock;
+const mockUseFhirFetchAll = useFhirFetchAll as Mock;
 
 describe('ImmunizationOverview', () => {
   it('renders an empty state view of immunizations data is unavailable', async () => {
@@ -42,7 +44,7 @@ describe('ImmunizationOverview', () => {
       error,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderWithSwr(<ImmunizationsOverview {...testProps} />);
@@ -50,13 +52,7 @@ describe('ImmunizationOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /immunizations/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Immunizations' }), {});
   });
 
   it('renders a tabular overview of recently administered immunizations if available', async () => {

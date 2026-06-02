@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import classNames from 'classnames';
-import { Tag, TagSkeleton, Tooltip } from '@carbon/react';
-import { getCoreTranslation, translateFrom } from '@openmrs/esm-framework';
+import { Button, Tag, TagSkeleton, Tooltip } from '@carbon/react';
+import { AddIcon, getCoreTranslation, launchWorkspace2, translateFrom } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
+import { patientAllergiesFormWorkspace } from '../constants';
 import { severityOrder } from '../utils';
 import styles from './allergies-list.scss';
 
@@ -14,10 +15,14 @@ interface AllergyListProps {
 
 const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   const { allergies, isLoading } = useAllergies(patientUuid);
-
-  const sortedAllergies = allergies?.sort(
-    (a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity],
+  const launchAllergiesForm = useCallback(
+    () => launchWorkspace2(patientAllergiesFormWorkspace, { formContext: 'creating' }),
+    [],
   );
+
+  const sortedAllergies = allergies
+    ? [...allergies].sort((a, b) => severityOrder[a.reactionSeverity] - severityOrder[b.reactionSeverity])
+    : undefined;
 
   if (isLoading) {
     return (
@@ -46,6 +51,14 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
             </Tag>
           </Tooltip>
         ))}
+        <Button
+          hasIconOnly
+          kind="ghost"
+          iconDescription={translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy')}
+          onClick={launchAllergiesForm}
+          renderIcon={(props) => <AddIcon size={16} {...props} />}
+          size="sm"
+        />
       </div>
     );
   }
@@ -53,6 +66,14 @@ const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
   return (
     <div className={classNames(styles.label, styles.container)}>
       {translateFrom(moduleName, 'allergies', 'Allergies')}: {getCoreTranslation('unknown')}
+      <Button
+        hasIconOnly
+        kind="ghost"
+        iconDescription={translateFrom(moduleName, 'recordNewAllergy', 'Record a new allergy')}
+        onClick={launchAllergiesForm}
+        renderIcon={(props) => <AddIcon size={16} {...props} />}
+        size="sm"
+      />
     </div>
   );
 };

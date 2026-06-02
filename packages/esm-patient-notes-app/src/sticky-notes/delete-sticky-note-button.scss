@@ -1,0 +1,13 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.deleteIcon {
+  fill: $danger !important;
+
+  svg {
+    fill: $danger !important;
+  }
+
+  path {
+    fill: $danger !important;
+  }
+}

@@ -1,4 +1,7 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
+
+export const accentColors = ['purple', 'cyan', 'teal', 'magenta', 'orange', 'red', 'green', 'gray'] as const;
+export type AccentColor = (typeof accentColors)[number];
 
 export const configSchema = {
   orderEncounterType: {
@@ -43,6 +46,12 @@ export const configSchema = {
         _description: 'Icon to be shown for the order type. Icons are from the OpenMRS icon library.',
         _default: '',
       },
+      accentColor: {
+        _type: Type.String,
+        _description: `Accent color applied to the order type's tile: icon backdrop, left border, and top border. Must be one of: ${accentColors.join(', ')}.`,
+        _default: 'purple',
+        _validators: [validators.oneOf(accentColors)],
+      },
     },
     _description: 'List of various order types, each associated with the Java class name `org.openmrs.Order`.',
     _default: [],
@@ -71,6 +80,17 @@ export const configSchema = {
       'The name of the ordering location tag. If specified, the order baskets shows the order locations dropdown listing locations with the specified tag. The dropdown is hidden if this config value is not specified, and the order location defaults to the login location of the user.',
     _default: '',
   },
+  enableDrugOrderFavorites: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to enable the drug order favorites (pinned orders) feature',
+  },
+  maxPinnedDrugOrders: {
+    _type: Type.Number,
+    _default: 10,
+    _description: 'Maximum number of pinned drug orders per user',
+    _validators: [validators.inRange(1, 50)],
+  },
 };
 
 export interface OrderTypeDefinition {
@@ -78,6 +98,7 @@ export interface OrderTypeDefinition {
   orderTypeUuid: string;
   orderableConceptSets: Array<string>;
   icon?: string;
+  accentColor?: AccentColor;
 }
 
 export interface ConfigObject {
@@ -89,4 +110,6 @@ export interface ConfigObject {
   enableAddTestsDuringResultEntry: boolean;
   ordererProviderRoles: Array<string>;
   orderLocationTagName: string;
+  enableDrugOrderFavorites: boolean;
+  maxPinnedDrugOrders: number;
 }

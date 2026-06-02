@@ -24,14 +24,15 @@ const createSchema = (formContext: 'creating' | 'editing', t: TFunction) => {
     message: t('clinicalStatusRequired', 'A clinical status is required'),
   });
 
-  const conditionNameValidation = z.string().refine((conditionName) => !isCreating || !!conditionName, {
+  const conditionUuidValidation = z.string().refine((conditionUuid) => !isCreating || !!conditionUuid, {
     message: t('conditionRequired', 'A condition is required'),
   });
 
   return z.object({
     abatementDateTime: z.date().optional().nullable(),
     clinicalStatus: clinicalStatusValidation,
-    conditionName: conditionNameValidation,
+    conditionName: z.string(),
+    conditionUuid: conditionUuidValidation,
     onsetDateTime: z
       .date()
       .nullable()
@@ -64,12 +65,13 @@ const ConditionsForm: React.FC<PatientWorkspace2DefinitionProps<ConditionFormPro
     abatementDateTime:
       isEditing && matchingCondition?.abatementDateTime ? new Date(matchingCondition?.abatementDateTime) : null,
     conditionName: '',
-    clinicalStatus: isEditing ? matchingCondition?.clinicalStatus?.toLowerCase() ?? '' : '',
+    conditionUuid: '',
+    clinicalStatus: isEditing ? matchingCondition?.clinicalStatus?.toLowerCase() ?? '' : 'active',
     onsetDateTime: isEditing && matchingCondition?.onsetDateTime ? new Date(matchingCondition?.onsetDateTime) : null,
   };
 
   const methods = useForm<ConditionsFormSchema>({
-    mode: 'all',
+    mode: 'onSubmit',
     resolver: zodResolver(schema),
     defaultValues,
   });

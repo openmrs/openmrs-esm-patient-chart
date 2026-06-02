@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type ComponentProps, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -15,13 +15,23 @@ import {
   InlineNotification,
   Layer,
   NumberInput,
-  Stack,
   TextArea,
   TextInput,
   Toggle,
 } from '@carbon/react';
 import { Subtract } from '@carbon/react/icons';
 import { capitalize } from 'lodash-es';
+import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
+import type {
+  CommonMedicationValueCoded,
+  DosingUnit,
+  Drug,
+  DrugOrderBasketItem,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
   age,
@@ -30,28 +40,21 @@ import {
   getPatientName,
   OpenmrsDatePicker,
   parseDate,
-  showSnackbar,
   useConfig,
   useLayoutType,
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type Control, Controller, type FieldErrors, useController } from 'react-hook-form';
-import {
-  type Drug,
-  type CommonMedicationValueCoded,
-  type DosingUnit,
-  type DrugOrderBasketItem,
-  type DurationUnit,
-  type MedicationFrequency,
-  type MedicationRoute,
-  type QuantityUnit,
-} from '@openmrs/esm-patient-common-lib';
+import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { useActivePatientOrders } from '../api';
+import {
+  durationToDays,
+  getStartDateMinimum,
+  type MedicationOrderFormData,
+  useDrugOrderForm,
+} from './drug-order-form.resource';
 import styles from './drug-order-form.scss';
-import { type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
 
 export interface DrugOrderFormProps {
   /**
@@ -64,6 +67,28 @@ export interface DrugOrderFormProps {
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+}
+
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+  const selectedStartDate = isToday ? now : selectedDate;
+  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+}
+
+function isFutureRevisionOfActiveMedication(
+  action: DrugOrderBasketItem['action'] | undefined,
+  selectedStartDate: Date,
+  initialScheduledDate?: Date,
+  now = new Date(),
+) {
+  if (action !== 'REVISE' || selectedStartDate <= now) {
+    return false;
+  }
+
+  return !(initialScheduledDate && initialScheduledDate > now);
 }
 
 function MedicationInfoHeader({
@@ -81,24 +106,32 @@ function MedicationInfoHeader({
 
   return (
     <div className={styles.medicationInfo} id="medicationInfo">
-      <strong className={styles.productiveHeading02}>
-        {drug?.display} {drug?.strength && `(${drug?.strength})`}
-      </strong>{' '}
-      <span className={styles.bodyLong01}>
-        {routeValue && <>&mdash; {routeValue}</>}{' '}
-        {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
-      </span>
-      {dosage && unitValue ? (
-        <>
-          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <strong>
-            <span className={styles.productiveHeading02}>
-              {dosage} {unitValue.toLowerCase()}
-            </span>
-          </strong>
-        </>
-      ) : null}{' '}
-      <ExtensionSlot name="medication-info-slot" state={{ order: { drug } as DrugOrderBasketItem }} />
+      <div className={styles.medicationInfoText}>
+        <strong className={styles.productiveHeading02}>
+          {drug?.display} {drug?.strength && `(${drug?.strength})`}
+        </strong>{' '}
+        <span className={styles.bodyLong01}>
+          {routeValue && <>&mdash; {routeValue}</>}{' '}
+          {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}{' '}
+        </span>
+        {dosage && unitValue ? (
+          <>
+            &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+            <strong>
+              <span className={styles.productiveHeading02}>
+                {dosage} {unitValue.toLowerCase()}
+              </span>
+            </strong>
+          </>
+        ) : null}
+      </div>
+      <ExtensionSlot
+        name="medication-info-slot"
+        state={{
+          drug,
+          orderItem: { dosage, unit: { value: unitValue }, route: { value: routeValue } },
+        }}
+      />
     </div>
   );
 }
@@ -113,7 +146,7 @@ function InputWrapper({ children }) {
 }
 
 export function DrugOrderForm({
-  initialOrderBasketItem: initialOrderBasketItem,
+  initialOrderBasketItem,
   patient,
   onSave,
   saveButtonText,
@@ -122,18 +155,29 @@ export function DrugOrderForm({
   workspaceTitle,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
-  const { daysDurationUnit } = useConfig<ConfigObject>();
+  const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
+  const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
-  const [isSaving, setIsSaving] = useState(false);
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
+
+  const startDateMin = useMemo(
+    () =>
+      getStartDateMinimum(
+        initialOrderBasketItem?.action,
+        initialOrderBasketItem?.previousOrderDateActivated,
+        visitContext?.startDatetime,
+      ),
+    [initialOrderBasketItem?.action, initialOrderBasketItem?.previousOrderDateActivated, visitContext?.startDatetime],
+  );
+
   const {
     control,
-    formState: { isDirty },
+    formState: { isDirty, isSubmitting },
     getValues,
-    reset,
     handleSubmit,
+    setError,
     setValue,
     watch,
   } = drugOrderForm;
@@ -165,11 +209,117 @@ export function DrugOrderForm({
 
   const drug = watch('drug') as Drug;
   const routeValue = watch('route')?.value;
-  const unitValue = watch('unit')?.value;
-  const dosage = watch('dosage');
-  const startDate = watch('startDate');
+  const watchedUnit = watch('unit');
+  const watchedUnitValue = watchedUnit?.value;
+  const watchedDosage = watch('dosage');
+  const watchedFrequency = watch('frequency');
+  const watchedDuration = watch('duration');
+  const watchedDurationUnit = watch('durationUnit');
+  const watchedIsFreeText = watch('isFreeTextDosage');
+  const watchedAsNeeded = watch('asNeeded');
+  const watchedQuantityUnits = watch('quantityUnits');
+  const watchedPillsDispensed = watch('pillsDispensed');
+
+  const isExistingOrder = initialOrderBasketItem?.action === 'REVISE' || initialOrderBasketItem?.action === 'RENEW';
+  const [isManualOverride, setIsManualOverride] = useState(
+    initialOrderBasketItem?.isQuantityManual ?? (isExistingOrder && initialOrderBasketItem?.pillsDispensed != null),
+  );
+
+  const calculatedQuantity = useMemo(() => {
+    if (watchedIsFreeText || watchedAsNeeded) {
+      return null;
+    }
+    if (
+      watchedDosage == null ||
+      watchedDosage <= 0 ||
+      watchedFrequency?.frequencyPerDay == null ||
+      watchedFrequency.frequencyPerDay <= 0 ||
+      watchedDuration == null ||
+      watchedDuration <= 0
+    ) {
+      return null;
+    }
+    if (watchedQuantityUnits && watchedQuantityUnits.valueCoded !== watchedUnit?.valueCoded) {
+      return null;
+    }
+    const durationDays = durationToDays(watchedDuration, watchedDurationUnit?.valueCoded, durationUnitsDaysMap);
+    if (durationDays == null) {
+      return null;
+    }
+    const result = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
+    return result > 0 && isFinite(result) ? result : null;
+  }, [
+    watchedIsFreeText,
+    watchedAsNeeded,
+    watchedDosage,
+    watchedFrequency?.frequencyPerDay,
+    watchedDuration,
+    watchedDurationUnit?.valueCoded,
+    watchedUnit?.valueCoded,
+    watchedQuantityUnits,
+    durationUnitsDaysMap,
+  ]);
+
+  useEffect(() => {
+    if (!requireOutpatientQuantity || isManualOverride) {
+      return;
+    }
+
+    if (calculatedQuantity != null) {
+      setValue('pillsDispensed', calculatedQuantity, { shouldValidate: true });
+      if (!watchedQuantityUnits && watchedUnit) {
+        setValue('quantityUnits', watchedUnit, { shouldValidate: true });
+      }
+    } else if (getValues('pillsDispensed') != null) {
+      setValue('pillsDispensed', null);
+    }
+  }, [
+    requireOutpatientQuantity,
+    isManualOverride,
+    calculatedQuantity,
+    watchedFrequency?.frequencyPerDay,
+    watchedUnit,
+    watchedQuantityUnits,
+    getValues,
+    setValue,
+  ]);
+
+  const handleQuantityAfterChange = useCallback(() => {
+    setIsManualOverride(true);
+  }, []);
+
+  const handleRecalculate = useCallback(() => {
+    setValue('pillsDispensed', calculatedQuantity, { shouldValidate: true });
+    if (!watchedQuantityUnits && watchedUnit) {
+      setValue('quantityUnits', watchedUnit, { shouldValidate: true });
+    }
+    setIsManualOverride(false);
+  }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
+    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
+    // minimum; snap them up before saving.
+    const now = new Date();
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+
+    if (
+      isFutureRevisionOfActiveMedication(
+        initialOrderBasketItem?.action,
+        scheduledDate,
+        initialOrderBasketItem?.scheduledDate,
+        now,
+      )
+    ) {
+      setError('scheduledDate', {
+        type: 'manual',
+        message: t(
+          'activeMedicationRevisionCannotStartInFuture',
+          'Revisions to an active medication must start today or earlier.',
+        ),
+      });
+      return;
+    }
+
     const newBasketItem = {
       ...initialOrderBasketItem,
       drug: data.drug,
@@ -184,32 +334,24 @@ export function DrugOrderForm({
       duration: data.duration,
       durationUnit: data.durationUnit,
       pillsDispensed: data.pillsDispensed,
+      isQuantityManual: isManualOverride,
       quantityUnits: data.quantityUnits,
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
       visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
 
-    setIsSaving(true);
     await onSave(newBasketItem);
-    setIsSaving(false);
   };
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
     if (errors) {
       console.error('Error in drug order form', errors);
-      showSnackbar({
-        title: t('drugOrderValidationFailed', 'Validation failed'),
-        subtitle: t('drugOrderValidationFailedDescription', 'Please check the form for errors and try again.'),
-        kind: 'error',
-        timeoutInMs: 5000,
-        isLowContrast: true,
-      });
     }
   };
 
@@ -292,14 +434,14 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const { activeOrders, futureOrders } = useMedicationOrders(patient?.id ?? '');
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
-      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem],
+      (initialOrderBasketItem == null || initialOrderBasketItem?.action === 'NEW') &&
+      [...activeOrders, ...futureOrders].some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid, initialOrderBasketItem],
   );
 
   return (
@@ -307,7 +449,12 @@ export function DrugOrderForm({
       <div className={styles.container}>
         {showStickyMedicationHeader && (
           <div className={styles.stickyMedicationInfo}>
-            <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
+            <MedicationInfoHeader
+              dosage={watchedDosage}
+              drug={drug}
+              routeValue={routeValue}
+              unitValue={watchedUnitValue}
+            />
           </div>
         )}
         <div className={styles.patientHeader}>
@@ -320,6 +467,7 @@ export function DrugOrderForm({
         <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
         <Form
           className={styles.orderForm}
+          aria-label={workspaceTitle}
           onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
           id="drugOrderForm"
         >
@@ -335,7 +483,12 @@ export function DrugOrderForm({
             )}
             <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
             <div ref={medicationInfoHeaderRef}>
-              <MedicationInfoHeader dosage={dosage} drug={drug} routeValue={routeValue} unitValue={unitValue} />
+              <MedicationInfoHeader
+                dosage={watchedDosage}
+                drug={drug}
+                routeValue={routeValue}
+                unitValue={watchedUnitValue}
+              />
             </div>
             <section className={styles.formSection}>
               <Grid className={styles.gridRow}>
@@ -381,7 +534,7 @@ export function DrugOrderForm({
                             id="doseSelection"
                             placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                             label={t('editDoseComboBoxTitle', 'Dose')}
-                            min={0}
+                            min={0.01}
                             hideSteppers={true}
                             step={0.01}
                           />
@@ -494,28 +647,25 @@ export function DrugOrderForm({
             </section>
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
-              <Grid className={styles.gridRow}>
-                {/* TODO: This input does nothing */}
+              <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={16} md={4} sm={4}>
-                  <div className={styles.fullWidthDatePickerContainer}>
-                    <InputWrapper>
-                      <Controller
-                        name="startDate"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <OpenmrsDatePicker
-                            {...field}
-                            maxDate={new Date()}
-                            id="startDatePicker"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                            invalid={Boolean(fieldState?.error?.message)}
-                            invalidText={fieldState?.error?.message}
-                          />
-                        )}
-                      />
-                    </InputWrapper>
-                  </div>
+                  <InputWrapper>
+                    <Controller
+                      name="scheduledDate"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          {...field}
+                          minDate={startDateMin}
+                          id="scheduledDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'md' : 'sm'}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
+                      )}
+                    />
+                  </InputWrapper>
                 </Column>
                 <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
@@ -560,7 +710,7 @@ export function DrugOrderForm({
             </section>
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('dispensingInformation', 'Dispensing instructions')}</h3>
-              <Grid className={styles.gridRow}>
+              <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
                     <ControlledFieldInput
@@ -572,7 +722,23 @@ export function DrugOrderForm({
                       min={0}
                       hideSteppers
                       allowEmpty
+                      getValues={getValues}
+                      handleAfterChange={handleQuantityAfterChange}
                     />
+                    {requireOutpatientQuantity &&
+                      (isManualOverride
+                        ? calculatedQuantity != null && (
+                            <button type="button" className={styles.recalculateLink} onClick={handleRecalculate}>
+                              {t('applyCalculatedQuantity', 'Apply calculated quantity ({{quantity}})', {
+                                quantity: calculatedQuantity,
+                              })}
+                            </button>
+                          )
+                        : watchedPillsDispensed != null && (
+                            <span className={styles.autoCalcHelper}>
+                              {t('quantityAutoCalculated', 'Auto-calculated')}
+                            </span>
+                          ))}
                   </InputWrapper>
                 </Column>
                 <Column lg={8} md={3} sm={4}>
@@ -633,16 +799,27 @@ export function DrugOrderForm({
             </section>
           </div>
 
+          <ExtensionSlot
+            name="drug-order-form-actions-slot"
+            state={{
+              drug,
+              orderItem: {
+                dosage: watchedDosage,
+                unit: watchedUnit,
+                route: watch('route'),
+                frequency: watchedFrequency,
+              },
+            }}
+          />
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+            <Button kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}
             </Button>
             <Button
-              className={styles.button}
               kind="primary"
               type="submit"
               size="xl"
-              disabled={!!errorFetchingOrderConfig || isSaving || drugAlreadyPrescribedForNewOrder}
+              disabled={!!errorFetchingOrderConfig || isSubmitting || drugAlreadyPrescribedForNewOrder}
             >
               {saveButtonText}
             </Button>
@@ -687,7 +864,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   };
 
   return (
-    <div className={styles.customElement}>
+    <div>
       <span className="cds--label" id={`${name}-label`}>
         {labelText}
       </span>
@@ -863,7 +1040,7 @@ const ControlledFieldInput = ({
   return (
     <>
       {component}
-      <FormLabel className={styles.errorLabel}>{error?.message}</FormLabel>
+      {error?.message && <FormLabel className={styles.errorLabel}>{error.message}</FormLabel>}
     </>
   );
 };

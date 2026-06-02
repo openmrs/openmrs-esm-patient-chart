@@ -44,7 +44,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const displayText = t('programEnrollmentsLower', 'program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/programs`;
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = desktopLayout(layout);

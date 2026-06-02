@@ -8,7 +8,7 @@
   "source": true,
   "scripts": {
     "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test": "vitest run --passWithNoTests",
     "typescript": "tsc"
   },
   "browserslist": [
@@ -30,12 +30,16 @@
   },
   "dependencies": {
     "@carbon/react": "^1.83.0",
-    "lodash-es": "^4.17.23",
+    "lodash-es": "^4.18.1",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "9.x",
     "react": "18.x",
     "single-spa": "6.x"
+  },
+  "devDependencies": {
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

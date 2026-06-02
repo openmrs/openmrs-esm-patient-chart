@@ -103,7 +103,9 @@
 }
 
 .spinner {
-  min-height: layout.$spacing-05;
+  &:global(.cds--inline-loading) {
+    min-height: layout.$spacing-05;
+  }
 }
 
 .tablet {

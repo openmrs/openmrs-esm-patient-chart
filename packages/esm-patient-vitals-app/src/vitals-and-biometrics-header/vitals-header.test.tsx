@@ -1,8 +1,10 @@
 import React from 'react';
+import type * as I18next from 'i18next';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig, useVisit } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, NumericObservation, useConfig, useVisit } from '@openmrs/esm-framework';
 import { mockPatient, getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import {
   formattedVitals,
@@ -12,44 +14,47 @@ import {
   mockVitalsConfig,
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitalsButton: true,
   visitContext: mockOngoingVisitWithEncounters,
+  patient: mockPatient,
 };
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
+const mockNumericObservation = vi.mocked(NumericObservation);
+const mockUseVitalsConceptMetadata = vi.mocked(useVitalsConceptMetadata);
 
-const mockLaunchWorkspaceRequiringVisit = jest.fn();
-const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+const mockLaunchWorkspaceRequiringVisit = vi.fn();
+const mockUseLaunchWorkspaceRequiringVisit = vi.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
 });
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
+    useLaunchWorkspaceRequiringVisit: vi.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
-jest.mock('../common/data.resource', () => {
-  const originalModule = jest.requireActual('../common/data.resource');
+vi.mock('../common/data.resource', async () => {
+  const originalModule = (await vi.importActual('../common/data.resource')) as object;
 
   return {
     ...originalModule,
-    useConceptUnits: jest.fn().mockImplementation(() => ({
+    useConceptUnits: vi.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,
       isLoading: false,
     })),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
-    useVitalsAndBiometrics: jest.fn(),
+    useVitalsConceptMetadata: vi.fn(),
+    useVitalsAndBiometrics: vi.fn(),
   };
 });
 
@@ -59,6 +64,12 @@ mockUseConfig.mockReturnValue({
 } as ConfigObject);
 
 describe('VitalsHeader', () => {
+  beforeEach(() => {
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+  });
+
   it('renders an empty state view when there are no vitals data to show', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
@@ -143,7 +154,6 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    // TODO: Fix pluralization so that the string reads "5 days old"
     expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
   });
 
@@ -197,7 +207,10 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByTitle(/abnormal value/i)).toBeInTheDocument();
+    const abnormalCalls = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.interpretation && props.interpretation !== 'normal',
+    );
+    expect(abnormalCalls.length).toBeGreaterThan(0);
   });
 
   it('should launch Form Entry vitals and biometrics form', async () => {
@@ -300,23 +313,46 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
 
-    expect(screen.getAllByTitle(/abnormal value/i)).toHaveLength(1);
-    expect(screen.getByTitle(/abnormal value/i)).toHaveClass('critically-low');
+    const abnormalCalls = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.interpretation && props.interpretation !== 'normal',
+    );
+    expect(abnormalCalls).toHaveLength(1);
+    expect(abnormalCalls[0][0].interpretation).toBe('critically_low');
   });
 
-  it('recalculates interpretation when backend does not provide interpretation', async () => {
-    // All vitals are abnormal, and backend does not provide interpretation for any of them.
-    // It should fallback to recalculating and mark them as abnormal.
+  it('resolves plural translation keys correctly', async () => {
+    const { createInstance } = (await vi.importActual('i18next')) as typeof I18next;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const translations = require('../../translations/en.json');
+    const i18n = createInstance();
+
+    await i18n.init({
+      lng: 'en',
+      resources: { en: { translation: translations } },
+      interpolation: { escapeValue: false },
+    });
+
+    expect(i18n.t('hoursOldVitals', { count: 1 })).toContain('1 hour old');
+    expect(i18n.t('hoursOldVitals', { count: 1 })).not.toContain('hours');
+    expect(i18n.t('hoursOldVitals', { count: 5 })).toContain('5 hours old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).toContain('1 day old');
+    expect(i18n.t('daysOldVitals', { count: 1 })).not.toContain('days');
+    expect(i18n.t('daysOldVitals', { count: 5 })).toContain('5 days old');
+  });
+
+  it('passes conceptUuid for interpretation fallback when backend does not provide interpretation', async () => {
+    // When backend does not provide interpretation, NumericObservation uses conceptUuid
+    // to fetch reference ranges and calculate interpretation internally.
     const vitalsWithoutInterpretation: PatientVitalsAndBiometrics[] = [
       {
         id: '0',
         date: '2021-05-19T04:26:51.000Z',
-        pulse: 240, // should be marked as "critically_high"
-        temperature: 41, // should be marked as "high"
-        respiratoryRate: 5, // should be marked as "low"
+        pulse: 240,
+        temperature: 41,
+        respiratoryRate: 5,
         diastolic: 145,
-        systolic: 240, // blood pressure should be marked as "high"
-        spo2: 70, // should be marked as "low"
+        systolic: 240,
+        spo2: 70,
       },
     ];
 
@@ -334,22 +370,110 @@ describe('VitalsHeader', () => {
     expect(getByTextWithMarkup(/R\. Rate\s*5\s*breaths\/min/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/SpO2\s*70\s*/i)).toBeInTheDocument();
 
-    const abnormalValueElements = screen.getAllByTitle(/abnormal value/i);
-    expect(abnormalValueElements).toHaveLength(5);
+    // Vitals with no backend interpretation should have conceptUuid passed so
+    // NumericObservation can fetch reference ranges and calculate interpretation
+    const callsWithConceptUuid = mockNumericObservation.mock.calls.filter(([props]) => props.conceptUuid);
+    expect(callsWithConceptUuid.length).toBeGreaterThanOrEqual(4);
 
-    const lowElements = abnormalValueElements.filter((element) => {
-      return element.className === 'low';
-    });
-    expect(lowElements).toHaveLength(2);
+    // Vitals without backend interpretation should not have interpretation set
+    const callsWithoutBpAndWithoutInterpretation = mockNumericObservation.mock.calls.filter(
+      ([props]) => props.conceptUuid && !props.interpretation,
+    );
+    expect(callsWithoutBpAndWithoutInterpretation.length).toBeGreaterThanOrEqual(4);
+  });
 
-    const highElements = abnormalValueElements.filter((element) => {
-      return element.className === 'high';
-    });
-    expect(highElements).toHaveLength(2);
+  it('shows the reference ranges toggletip button when conceptRangeMap has entries', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
 
-    const criticallyHighElements = abnormalValueElements.filter((element) => {
-      return element.className === 'critically-high';
-    });
-    expect(criticallyHighElements).toHaveLength(1);
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('button', { name: /view normal ranges/i })).toBeInTheDocument();
+  });
+
+  it('hides the reference ranges toggletip button when conceptRangeMap is empty', async () => {
+    mockUseVitalsConceptMetadata.mockReturnValue({
+      ...mockVitalsConceptMetadata,
+      conceptRangeMap: new Map(),
+    } as ReturnType<typeof useVitalsConceptMetadata>);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('button', { name: /view normal ranges/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const toggletipButton = screen.getByRole('button', { name: /view normal ranges/i });
+    await user.click(toggletipButton);
+
+    expect(screen.getByText(/normal ranges/i)).toBeInTheDocument();
+    // Assert on actual range values from mock data to confirm rows are populated
+    expect(screen.getByText('90–120 / 60–80 mmHg')).toBeInTheDocument(); // BP range
+    expect(screen.getByText('60–100 beats/min')).toBeInTheDocument(); // pulse range
+  });
+
+  it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
+    const minorPatient = {
+      ...mockPatient,
+      // Make patient minor
+      birthDate: '2020-07-22',
+    };
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      biometrics: {
+        ...mockVitalsConfig.biometrics,
+        bmiMinimumAge: 18,
+      },
+    } as ConfigObject);
+
+    const someVitals: PatientVitalsAndBiometrics[] = [
+      {
+        id: '0',
+        date: '2021-05-19T04:26:51.000Z',
+        pulse: 76,
+        temperature: 37,
+        respiratoryRate: 12,
+        diastolic: 89,
+        systolic: 121,
+        bmi: null,
+        muac: 23,
+        bloodPressureRenderInterpretation: 'normal',
+      },
+    ];
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: someVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} patient={minorPatient} />);
+
+    await waitForLoadingToFinish();
+
+    // BMI should be hidden for minors when restriction is enabled
+    expect(screen.queryByText(/BMI/i)).not.toBeInTheDocument();
   });
 });

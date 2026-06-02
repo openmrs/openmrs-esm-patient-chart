@@ -225,6 +225,10 @@ export interface OrderBasketExtensionProps {
   launchDrugOrderForm?(order?: DrugOrderBasketItem): void;
   launchLabOrderForm?(orderTypeUuid: string, order?: TestOrderBasketItem): void;
   launchGeneralOrderForm?(orderTypeUuid: string, order?: OrderBasketItem): void;
+  /**
+   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
+   */
+  visibleOrderPanels?: Array<string>;
 }
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
@@ -238,15 +242,21 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   patientInstructions: string | null;
   asNeeded: boolean;
   asNeededCondition: string | null;
-  startDate: Date | string;
   durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
+  isQuantityManual?: boolean;
   numRefills: number | null;
   indication: string | null;
   isFreeTextDosage: boolean;
   freeTextDosage: string;
   previousOrder?: string;
+  /**
+   * The dateActivated of the order being revised. Set by buildMedicationOrder for
+   * REVISE so the form can enforce dateActivated > previousOrderDateActivated (the
+   * backend computes previous.dateStopped = new.dateActivated - 1s).
+   */
+  previousOrderDateActivated?: string;
   template?: OrderTemplate;
 }
 
@@ -279,7 +289,9 @@ export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
   value: number;
 }
 
-export type MedicationFrequency = CommonMedicationValueCoded;
+export interface MedicationFrequency extends CommonMedicationValueCoded {
+  frequencyPerDay?: number | null;
+}
 
 export type MedicationRoute = CommonMedicationValueCoded;
 
@@ -324,4 +336,8 @@ export interface ExportedOrderBasketWindowProps {
   visitContext: Visit;
   mutateVisitContext: () => void;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
+  /**
+   * An optional array of order type UUIDs to display. If not provided, all panels are shown.
+   */
+  visibleOrderPanels?: Array<string>;
 }

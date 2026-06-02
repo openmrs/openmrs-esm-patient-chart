@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -8,14 +9,15 @@ import {
   openmrsFetch,
   useConfig,
 } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../config-schema';
 import { mockFhirConditionsResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ConditionsOverview from './conditions-overview.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockOpenmrsFetch = jest.mocked(openmrsFetch);
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -53,9 +55,7 @@ describe('ConditionsOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
-    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(screen.getByText(/Sorry, there was a problem displaying this information./i)).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(expect.objectContaining({ error, headerTitle: 'Conditions' }), {});
   });
 
   it("renders an overview of the patient's conditions when present", async () => {

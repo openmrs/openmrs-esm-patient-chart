@@ -16,6 +16,7 @@ import {
 import {
   age,
   ExtensionSlot,
+  type OpenmrsResource,
   showSnackbar,
   useAbortController,
   useConfig,
@@ -42,7 +43,7 @@ import {
   useConceptUnits,
   useEncounterVitalsAndBiometrics,
 } from '../common';
-import { prepareObsForSubmission } from '../common/helpers';
+import { prepareObsForSubmission, shouldShowBmi } from '../common/helpers';
 import { useVitalsConceptMetadata } from '../common/data.resource';
 import { VitalsAndBiometricsFormSchema, type VitalsBiometricsFormData } from './schema';
 import VitalsAndBiometricsInput from './vitals-biometrics-input.component';
@@ -85,6 +86,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const abortController = useAbortController();
   const { invalidateVisitRelatedData } = useOptimisticVisitMutations(patientUuid);
+  const showBmi = useMemo(() => shouldShowBmi(patient, config.biometrics), [patient, config.biometrics]);
 
   const isLoadingInitialValues = useMemo(
     () => (formContext === 'creating' ? false : isLoadingEncounter),
@@ -134,6 +136,11 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
   }, [watch, patient?.birthDate, midUpperArmCircumference]);
 
   useEffect(() => {
+    if (!showBmi) {
+      setValue('computedBodyMassIndex', undefined);
+      return;
+    }
+
     if (height && weight) {
       const computedBodyMassIndex = calculateBodyMassIndex(
         weight,
@@ -142,8 +149,12 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
         conceptUnits.get(config.concepts.heightUuid) as 'm' | 'cm' | 'in',
       );
       setValue('computedBodyMassIndex', computedBodyMassIndex);
+    } else {
+      // Clear the BMI field when either input is missing so a stale value
+      // doesn't leak into the UI or get persisted as an obs on save.
+      setValue('computedBodyMassIndex', undefined);
     }
-  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid]);
+  }, [weight, height, setValue, conceptUnits, config.concepts.weightUuid, config.concepts.heightUuid, showBmi]);
 
   function onError(err) {
     if (err?.oneFieldRequired) {
@@ -172,6 +183,7 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
       setShowErrorMessage(true);
       setShowErrorNotification(false);
 
+      const computedBodyMassIndex = data?.computedBodyMassIndex;
       if (data?.computedBodyMassIndex) {
         delete data.computedBodyMassIndex;
       }
@@ -189,6 +201,26 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
           initialFieldValuesMap,
           config.concepts,
         );
+
+        // BMI is derived from weight and height, so it doesn't go through
+        // prepareObsForSubmission (which keys off dirtyFields for user-entered values).
+        // Persist a fresh BMI obs whenever weight or height was touched, voiding any prior one.
+        const weightOrHeightChanged = Boolean(dirtyFields.weight || dirtyFields.height);
+        const existingBmiObs = initialFieldValuesMap?.get('bodyMassIndex')?.obs;
+        const newBmiObs = {
+          concept: config.concepts.bodyMassIndexUuid,
+          value: computedBodyMassIndex,
+        } as unknown as OpenmrsResource;
+        if (formContext === 'creating' && computedBodyMassIndex != null) {
+          newObs.push(newBmiObs);
+        } else if (formContext === 'editing' && weightOrHeightChanged) {
+          if (existingBmiObs) {
+            toBeVoided.push({ uuid: existingBmiObs.uuid, voided: true } as unknown as OpenmrsResource);
+          }
+          if (computedBodyMassIndex != null) {
+            newObs.push(newBmiObs);
+          }
+        }
 
         createOrUpdateVitalsAndBiometrics(
           patientUuid,
@@ -562,21 +594,23 @@ const ExportedVitalsAndBiometricsForm: React.FC<Workspace2DefinitionProps<Vitals
                   unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
                 />
               </Column>
-              <Column>
-                <VitalsAndBiometricsInput
-                  control={control}
-                  fieldProperties={[
-                    {
-                      name: t('bmi', 'BMI'),
-                      type: 'number',
-                      id: 'computedBodyMassIndex',
-                    },
-                  ]}
-                  readOnly
-                  label={t('calculatedBmi', 'BMI (calc.)')}
-                  unitSymbol={biometricsUnitsSymbols['bmiUnit']}
-                />
-              </Column>
+              {showBmi && (
+                <Column>
+                  <VitalsAndBiometricsInput
+                    control={control}
+                    fieldProperties={[
+                      {
+                        name: t('bmi', 'BMI'),
+                        type: 'number',
+                        id: 'computedBodyMassIndex',
+                      },
+                    ]}
+                    readOnly
+                    label={t('calculatedBmi', 'BMI (calc.)')}
+                    unitSymbol={biometricsUnitsSymbols['bmiUnit']}
+                  />
+                </Column>
+              )}
               <Column>
                 <VitalsAndBiometricsInput
                   control={control}

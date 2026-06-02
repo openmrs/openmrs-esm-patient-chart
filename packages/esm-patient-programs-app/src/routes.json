@@ -24,7 +24,7 @@
       "component": "programsDashboardLink",
       "meta": {
         "slot": "patient-chart-programs-dashboard-slot",
-        "path": "Programs"
+        "path": "programs"
       },
       "order": 10
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -10,15 +11,22 @@ import { usePaginatedVisits } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
+  useAllEncounters,
 } from './past-visits-components/encounters-table/encounters-table.resource';
 
-const mockGetConfig = getConfig as jest.Mock;
-const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
+const mockGetConfig = getConfig as Mock;
+const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+
+const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
+  data: [],
+  isLoading: false,
+  error: undefined,
+} as any);
 
 const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   data: visitOverviewDetailMockData.data.results,
   error: null,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   isValidating: false,
   isLoading: false,
   totalPages: 1,
@@ -28,19 +36,19 @@ const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   paginated: false,
   showNextButton: false,
   showPreviousButton: false,
-  goTo: jest.fn(),
-  goToNext: jest.fn(),
-  goToPrevious: jest.fn(),
+  goTo: vi.fn(),
+  goToNext: vi.fn(),
+  goToPrevious: vi.fn(),
 };
-jest.mock('./visit.resource', () => ({
-  ...jest.requireActual('./visit.resource'),
-  usePaginatedVisits: jest.fn().mockImplementation(() => mockPaginatedVisitsData),
+vi.mock('./visit.resource', async () => ({
+  ...((await vi.importActual('./visit.resource')) as object),
+  usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
 }));
-const mockUsePaginatedVisits = jest.mocked(usePaginatedVisits);
+const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
 
-const mockUsePaginatedEncounters = jest.fn(usePaginatedEncounters).mockReturnValue({
+const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
   error: null,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   isValidating: false,
   isLoading: false,
   data: [],
@@ -56,21 +64,22 @@ const mockUsePaginatedEncounters = jest.fn(usePaginatedEncounters).mockReturnVal
   goToPrevious: undefined,
 });
 
-const mockUseEncounterTypes = jest.fn(useEncounterTypes).mockReturnValue({
+const mockUseEncounterTypes = vi.fn(useEncounterTypes).mockReturnValue({
   data: mockEncounterTypes,
   totalCount: mockEncounterTypes.length,
   hasMore: false,
-  loadMore: jest.fn(),
+  loadMore: vi.fn(),
   error: undefined,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   isValidating: false,
   isLoading: false,
   nextUri: '',
 });
 
-jest.mock('./past-visits-components/encounters-table/encounters-table.resource', () => ({
-  ...jest.requireActual('./past-visits-components/encounters-table/encounters-table.resource'),
+vi.mock('./past-visits-components/encounters-table/encounters-table.resource', async () => ({
+  ...((await vi.importActual('./past-visits-components/encounters-table/encounters-table.resource')) as object),
   usePaginatedEncounters: () => mockUsePaginatedEncounters('patient-uuid', null, 10),
+  useAllEncounters: () => mockUseAllEncounters('patient-uuid', null),
   useEncounterTypes: () => mockUseEncounterTypes(),
 }));
 

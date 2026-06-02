@@ -34,7 +34,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
   const tileContent = (
     <div>
       <div className={styles.orderBasketItemTile}>
-        <div className={styles.clipTextWithEllipsis}>
+        <div>
           <OrderActionLabel orderBasketItem={orderBasketItem} />
           {orderBasketItem.isFreeTextDosage ? (
             <div>
@@ -53,29 +53,30 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
               </span>
             </div>
           )}
-          <span className={styles.label01}>
-            <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-            <span className={styles.dosageLabel}>
-              {orderBasketItem.dosage != null ? orderBasketItem.dosage : '--'} {orderBasketItem.unit?.value ?? ''}
-            </span>{' '}
-            <span className={styles.dosageInfo}>
-              &mdash; {orderBasketItem.route?.value ? <>{orderBasketItem.route.value} &mdash; </> : null}
-              {orderBasketItem.frequency?.value ? <>{orderBasketItem.frequency.value} &mdash; </> : null}
-              {orderBasketItem.numRefills ? (
-                <>
-                  {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills} &mdash;{' '}
-                </>
-              ) : null}
-              {orderBasketItem.pillsDispensed ? (
-                <>
-                  {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
-                  {orderBasketItem.quantityUnits?.value?.toLowerCase()} &mdash;{' '}
-                </>
-              ) : null}
-              {orderBasketItem.patientInstructions && <>&mdash; {orderBasketItem.patientInstructions}</>}
+          {orderBasketItem.dosage != null && (
+            <span className={styles.label01}>
+              <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+              <span className={styles.dosageLabel}>
+                {orderBasketItem.dosage} {orderBasketItem.unit?.value ?? ''}
+              </span>{' '}
+              <span className={styles.dosageInfo}>
+                {orderBasketItem.route?.value && <>&mdash; {orderBasketItem.route.value} </>}
+                {orderBasketItem.frequency?.value && <>&mdash; {orderBasketItem.frequency.value} </>}
+                {orderBasketItem.numRefills ? (
+                  <>
+                    &mdash; {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
+                  </>
+                ) : null}
+                {orderBasketItem.pillsDispensed ? (
+                  <>
+                    &mdash; {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
+                    {orderBasketItem.quantityUnits?.value?.toLowerCase()}{' '}
+                  </>
+                ) : null}
+                {orderBasketItem.patientInstructions && <>&mdash; {orderBasketItem.patientInstructions}</>}
+              </span>
             </span>
-          </span>
-          <br />
+          )}
           <span className={styles.label01}>
             {orderBasketItem.indication && (
               <>

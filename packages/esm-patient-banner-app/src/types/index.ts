@@ -58,3 +58,19 @@ interface Cohort {
   startDate: string;
   endDate: string;
 }
+
+export interface PersonAttributeResponse {
+  display: string;
+  uuid: string;
+  value:
+    | string
+    | {
+        uuid: string;
+        display: string;
+      };
+  attributeType: {
+    display: string;
+    uuid: string;
+    format: 'org.openmrs.Concept' | string;
+  };
+}

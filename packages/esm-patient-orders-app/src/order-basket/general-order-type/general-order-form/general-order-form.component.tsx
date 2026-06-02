@@ -1,18 +1,6 @@
-import React, { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import {
-  Button,
-  ButtonSet,
-  Column,
-  Form,
-  Grid,
-  InlineNotification,
-  Layer,
-  Select,
-  SelectItem,
-  TextArea,
-  TextInput,
-} from '@carbon/react';
+import { Button, ButtonSet, Column, Form, Grid, Layer, Select, SelectItem, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +16,6 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import {
   useLayoutType,
-  useSession,
   useConfig,
   ExtensionSlot,
   OpenmrsDatePicker,
@@ -44,6 +31,7 @@ export interface OrderFormProps {
   orderToEditOrdererUuid?: string;
   orderTypeUuid: string;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  onCancel: () => void;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
   patient: fhir.Patient;
 }
@@ -57,13 +45,12 @@ export function OrderForm({
   orderToEditOrdererUuid,
   orderTypeUuid,
   closeWorkspace,
+  onCancel,
   setHasUnsavedChanges,
 }: OrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSession();
   const { orders, setOrders, clearOrders } = useOrderBasket<OrderBasketItem>(patient, orderTypeUuid, prepOrderPostData);
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const { orderType } = useOrderType(orderTypeUuid);
   const config = useConfig<ConfigObject>();
   const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
@@ -96,7 +83,7 @@ export function OrderForm({
   const {
     control,
     handleSubmit,
-    formState: { errors, defaultValues, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     setValue,
     watch,
   } = useForm<OrderBasketItem>({
@@ -108,10 +95,6 @@ export function OrderForm({
   });
 
   const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
-
-  const filterItemsByName = useCallback((menu) => {
-    return menu?.item?.value?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  }, []);
 
   const saveOrderToBasket = useCallback(
     (data: OrderBasketItem) => {
@@ -140,14 +123,16 @@ export function OrderForm({
     [orders, setOrders, initialOrder, closeWorkspace],
   );
 
-  const submitDrugOrderToServer = useCallback(
+  const submitOrderToServer = useCallback(
     (data: OrderBasketItem) => {
       const finalizedOrder: OrderBasketItem = {
         ...initialOrder,
         ...data,
       };
 
-      postOrder(prepOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid))
+      return postOrder(
+        prepOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
+      )
         .then(() => {
           clearOrders();
           mutateOrders();
@@ -170,23 +155,8 @@ export function OrderForm({
     [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
-  const cancelOrder = useCallback(() => {
-    closeWorkspace().then((didClose: boolean) => {
-      if (didClose) {
-        setOrders(orders.filter((order) => order.concept.uuid !== defaultValues.concept.conceptUuid));
-      }
-    });
-  }, [closeWorkspace, orders, setOrders, defaultValues]);
-
-  const closeModifyOrderWorkspace = useCallback(() => {
-    clearOrders();
-    closeWorkspace();
-  }, [clearOrders, closeWorkspace]);
-
   const onError = (errors: FieldErrors<OrderBasketItem>) => {
-    if (errors) {
-      setShowErrorNotification(true);
-    }
+    console.error('Error in order form', errors);
   };
 
   const handleUpdateUrgency = (fieldOnChange: ControllerRenderProps['onChange']) => {
@@ -209,8 +179,8 @@ export function OrderForm({
     <>
       <Form
         className={styles.orderForm}
-        onSubmit={handleSubmit(initialOrder?.action == 'REVISE' ? submitDrugOrderToServer : saveOrderToBasket, onError)}
-        id="drugOrderForm"
+        onSubmit={handleSubmit(initialOrder?.action === 'REVISE' ? submitOrderToServer : saveOrderToBasket, onError)}
+        id="generalOrderForm"
       >
         <div className={styles.form}>
           <ExtensionSlot name="top-of-lab-order-form-slot" state={{ order: initialOrder }} />
@@ -320,33 +290,16 @@ export function OrderForm({
             </Column>
           </Grid>
         </div>
-        <div>
-          {showErrorNotification && (
-            <Column className={styles.errorContainer}>
-              <InlineNotification
-                lowContrast
-                onClose={() => setShowErrorNotification(false)}
-                subtitle={t('pleaseRequiredFields', 'Please fill all required fields') + '.'}
-                title={t('error', 'Error')}
-              />
-            </Column>
-          )}
-          <ButtonSet
-            className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
-          >
-            <Button
-              className={styles.button}
-              kind="secondary"
-              onClick={initialOrder?.action == 'REVISE' ? closeModifyOrderWorkspace : cancelOrder}
-              size="xl"
-            >
-              {t('discard', 'Discard')}
-            </Button>
-            <Button className={styles.button} kind="primary" size="xl" type="submit">
-              {t('saveOrder', 'Save order')}
-            </Button>
-          </ButtonSet>
-        </div>
+        <ButtonSet
+          className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}
+        >
+          <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} kind="primary" size="xl" type="submit" disabled={isSubmitting}>
+            {t('saveOrder', 'Save order')}
+          </Button>
+        </ButtonSet>
       </Form>
     </>
   );

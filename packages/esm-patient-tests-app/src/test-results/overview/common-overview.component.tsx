@@ -25,7 +25,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({ patientUuid, overviewDa
   ];
 
   const handleSeeAvailableResults = useCallback(() => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/Results` });
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/results` });
   }, [patientUuid]);
 
   if (!overviewData.length)

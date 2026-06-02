@@ -1,7 +1,9 @@
 import React from 'react';
+import { vi, describe, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { mockPatient } from 'tools';
 import { mockGroupedResults, mockResults } from '__mocks__';
@@ -9,8 +11,8 @@ import { type FilterContextProps } from '../filter/filter-types';
 import FilterContext from '../filter/filter-context';
 import TreeView from '../tree-view/tree-view.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseGetManyObstreeData = jest.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseGetManyObstreeData = vi.fn();
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
@@ -28,15 +30,15 @@ mockUseConfig.mockReturnValue({
   labTestsWithOrderReasons: [],
 });
 
-jest.mock('../grouped-timeline', () => ({
-  ...jest.requireActual('../grouped-timeline'),
+vi.mock('../grouped-timeline', async () => ({
+  ...((await vi.importActual('../grouped-timeline')) as object),
   useGetManyObstreeData: () => mockUseGetManyObstreeData(),
 }));
 
 const testProps = {
   patientUuid: mockPatient.id,
   patient: mockPatient,
-  basePath: '/spa/patient/some-uuid/chart/Results',
+  basePath: '/spa/patient/some-uuid/chart/results',
   testUuid: 'test-uuid',
   expanded: false,
   type: 'default',
@@ -60,19 +62,19 @@ const mockFilterContext: FilterContextProps = {
   lowestParents: mockGroupedResults['lowestParents'],
   totalResultsCount: 0,
   isLoading: false,
-  initialize: jest.fn(),
-  toggleVal: jest.fn(),
-  updateParent: jest.fn(),
-  resetTree: jest.fn(),
+  initialize: vi.fn(),
+  toggleVal: vi.fn(),
+  updateParent: vi.fn(),
+  resetTree: vi.fn(),
   roots: mockResults,
   tests: {},
   filteredResultsCount: 0,
 };
 
-global.IntersectionObserver = jest.fn(function (callback, options) {
-  this.observe = jest.fn();
-  this.unobserve = jest.fn();
-  this.disconnect = jest.fn();
+global.IntersectionObserver = vi.fn(function (callback, options) {
+  this.observe = vi.fn();
+  this.unobserve = vi.fn();
+  this.disconnect = vi.fn();
   this.trigger = (entries) => callback(entries, this);
   this.options = options;
 }) as any;
@@ -106,13 +108,10 @@ describe('ResultsViewer', () => {
       error: new Error('An error occurred'),
     });
     render(<TreeView {...testProps} />);
-    const testResultsText = screen.getByRole('heading', { name: /data load error/i });
-    expect(testResultsText).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: new Error('An error occurred'), headerTitle: 'Data Load Error' }),
+      {},
+    );
   });
 
   it('should render the Tree wrapper component component', async () => {

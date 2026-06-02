@@ -1,7 +1,9 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockResults } from '__mocks__';
 import { type ConfigObject, configSchema } from '../../config-schema';
@@ -10,13 +12,13 @@ import { FilterProvider, type Roots } from '../filter/filter-context';
 import { type ObsTreeNode } from '../grouped-timeline/useObstreeData';
 import TreeView from './tree-view.component';
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseGetManyObstreeData = jest.mocked(useGetManyObstreeData);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseGetManyObstreeData = vi.mocked(useGetManyObstreeData);
 
-jest.mock('../grouped-timeline', () => ({
-  ...jest.requireActual('../grouped-timeline'),
-  useGetManyObstreeData: jest.fn(),
+vi.mock('../grouped-timeline', async () => ({
+  ...((await vi.importActual('../grouped-timeline')) as object),
+  useGetManyObstreeData: vi.fn(),
 }));
 
 const mockProps = {
@@ -85,12 +87,10 @@ describe('TreeView', () => {
 
     render(<TreeView {...mockProps} />);
 
-    expect(screen.getByRole('heading', { name: /data load error/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /sorry, there was a problem displaying this information. you can try to reload this page, or contact the site administrator and quote the error code above./i,
-      ),
-    ).toBeInTheDocument();
+    expect(ErrorState).toHaveBeenCalledWith(
+      expect.objectContaining({ error: mockError, headerTitle: 'Data Load Error' }),
+      {},
+    );
   });
 
   it('renders the tree view when test data is successfully fetched', async () => {

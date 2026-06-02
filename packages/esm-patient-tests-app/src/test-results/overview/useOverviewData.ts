@@ -58,10 +58,10 @@ export function parseSingleEntry(entry: ObsRecord, type: string, panelName: stri
 
 function useOverviewData(patientUuid: string) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-  const [overviewData, setDisplayData] = useState<Array<OverviewPanelEntry>>([]);
+  const [overviewData, setOverviewData] = useState<Array<OverviewPanelEntry>>([]);
 
   useEffect(() => {
-    setDisplayData(
+    setOverviewData(
       Object.entries(sortedObs)
         .map(([panelName, { entries, type, uuid }]): OverviewPanelEntry => {
           const newestEntry = entries[0];

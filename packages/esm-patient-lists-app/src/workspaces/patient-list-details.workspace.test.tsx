@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, it, expect, type Mock } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import PatientListDetailsWorkspace, { type PatientListDetailsWorkspaceProps } from './patient-list-details.workspace';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as Mock;
 
 const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspaceProps, object> = {
   groupProps: {
@@ -13,7 +14,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
     visitContext: null,
     mutateVisitContext: null,
   },
-  closeWorkspace: jest.fn(),
+  closeWorkspace: vi.fn(),
   workspaceProps: {
     list: {
       attributes: [],
@@ -27,7 +28,7 @@ const defaultProps: PatientWorkspace2DefinitionProps<PatientListDetailsWorkspace
     },
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   windowProps: {},
   windowName: '',
   isRootWorkspace: false,

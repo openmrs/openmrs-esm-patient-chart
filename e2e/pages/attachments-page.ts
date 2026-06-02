@@ -4,6 +4,6 @@ export class AttachmentsPage {
   constructor(readonly page: Page) {}
 
   async goTo(uuid: string) {
-    await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/Attachments');
+    await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/attachments');
   }
 }

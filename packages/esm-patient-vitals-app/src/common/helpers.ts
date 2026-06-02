@@ -1,8 +1,11 @@
+import dayjs from 'dayjs';
 import { type OpenmrsResource } from '@openmrs/esm-framework';
+
 import { type ConceptMetadata } from '../common';
 import type { FHIRInterpretation, ObsReferenceRanges, ObservationInterpretation } from './types';
 import { type VitalsBiometricsFormData } from '../vitals-biometrics-form/schema';
 import { type VitalsAndBiometricsFieldValuesMap } from './data.resource';
+import { type BiometricsConfigObject } from '../config-schema';
 
 export function calculateBodyMassIndex(weight: number, height: number) {
   if (weight > 0 && height > 0) {
@@ -177,3 +180,38 @@ export function prepareObsForSubmission(
     },
   );
 }
+
+/**
+ * Uses the patient's birthDate to calculate their age in years.
+ * Returns null if birthDate is missing or invalid.
+ */
+export const getPatientAge = (patient: fhir.Patient): number | null => {
+  if (!patient.birthDate) {
+    return null;
+  }
+
+  const birthDate = dayjs(patient.birthDate);
+  return birthDate.isValid() ? dayjs().diff(birthDate, 'years') : null;
+};
+
+/**
+ * Determines whether BMI should be shown for the given patient,
+ * based on the biometrics configuration and patient's age.
+ */
+export const shouldShowBmi = (patient: fhir.Patient, biometricsConfig: BiometricsConfigObject): boolean => {
+  const minAge = biometricsConfig.bmiMinimumAge ?? 0;
+
+  // If the minimum age is 0 or less, we always show BMI (No restriction)
+  if (minAge <= 0) {
+    return true;
+  }
+
+  const patientAge = getPatientAge(patient);
+
+  // Fallback: If birthDate is missing/invalid, show BMI to be safe
+  if (patientAge === null) {
+    return true;
+  }
+
+  return patientAge >= minAge;
+};

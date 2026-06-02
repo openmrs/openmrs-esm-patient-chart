@@ -4,17 +4,17 @@ import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { Tile, Button, SkeletonText, ButtonSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  type Workspace2DefinitionProps,
   ArrowRightIcon,
   ShoppingCartArrowDownIcon,
-  useLayoutType,
   type Visit,
+  type Workspace2DefinitionProps,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import {
-  useOrderBasket,
   type OrderBasketItem,
-  useOrderableConceptSets,
   type OrderableConcept,
+  useOrderBasket,
+  useOrderableConceptSets,
 } from '@openmrs/esm-patient-common-lib';
 import { createEmptyOrder, prepOrderPostData } from '../resources';
 import styles from './search-results.scss';
@@ -23,7 +23,6 @@ interface OrderableConceptSearchResultsProps {
   searchTerm: string;
   openOrderForm: (order: OrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
-  cancelOrder: () => void;
   orderableConceptSets: Array<string>;
   orderTypeUuid: string;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
@@ -35,7 +34,6 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
   searchTerm,
   openOrderForm,
   focusAndClearSearchInput,
-  cancelOrder,
   orderableConceptSets,
   orderTypeUuid,
   closeWorkspace,
@@ -98,14 +96,6 @@ const OrderableConceptSearchResults: React.FC<OrderableConceptSearchResultsProps
             ))}
           </div>
         </div>
-        {isTablet && (
-          <div className={styles.separatorContainer}>
-            <p className={styles.separator}>{t('or', 'or')}</p>
-            <Button iconDescription="Return to order basket" kind="ghost" onClick={cancelOrder}>
-              {t('returnToOrderBasket', 'Return to order basket')}
-            </Button>
-          </div>
-        )}
       </>
     );
   }
