@@ -225,6 +225,17 @@ export function DrugOrderForm({
     initialOrderBasketItem?.isQuantityManual ?? (isExistingOrder && initialOrderBasketItem?.pillsDispensed != null),
   );
 
+  const watchedFrequencyPerDay = useMemo(() => {
+    if (watchedFrequency?.frequencyPerDay != null) {
+      return watchedFrequency.frequencyPerDay;
+    }
+
+    return (
+      orderConfigObject?.orderFrequencies?.find(({ valueCoded }) => valueCoded === watchedFrequency?.valueCoded)
+        ?.frequencyPerDay ?? null
+    );
+  }, [orderConfigObject?.orderFrequencies, watchedFrequency?.frequencyPerDay, watchedFrequency?.valueCoded]);
+
   const calculatedQuantity = useMemo(() => {
     if (watchedIsFreeText || watchedAsNeeded) {
       return null;
@@ -232,8 +243,8 @@ export function DrugOrderForm({
     if (
       watchedDosage == null ||
       watchedDosage <= 0 ||
-      watchedFrequency?.frequencyPerDay == null ||
-      watchedFrequency.frequencyPerDay <= 0 ||
+      watchedFrequencyPerDay == null ||
+      watchedFrequencyPerDay <= 0 ||
       watchedDuration == null ||
       watchedDuration <= 0
     ) {
@@ -246,13 +257,13 @@ export function DrugOrderForm({
     if (durationDays == null) {
       return null;
     }
-    const result = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
+    const result = Math.ceil(watchedDosage * watchedFrequencyPerDay * durationDays);
     return result > 0 && isFinite(result) ? result : null;
   }, [
     watchedIsFreeText,
     watchedAsNeeded,
     watchedDosage,
-    watchedFrequency?.frequencyPerDay,
+    watchedFrequencyPerDay,
     watchedDuration,
     watchedDurationUnit?.valueCoded,
     watchedUnit?.valueCoded,
@@ -277,7 +288,7 @@ export function DrugOrderForm({
     requireOutpatientQuantity,
     isManualOverride,
     calculatedQuantity,
-    watchedFrequency?.frequencyPerDay,
+    watchedFrequencyPerDay,
     watchedUnit,
     watchedQuantityUnits,
     getValues,
@@ -727,7 +738,8 @@ export function DrugOrderForm({
                     />
                     {requireOutpatientQuantity &&
                       (isManualOverride
-                        ? calculatedQuantity != null && (
+                        ? calculatedQuantity != null &&
+                          calculatedQuantity !== watchedPillsDispensed && (
                             <button type="button" className={styles.recalculateLink} onClick={handleRecalculate}>
                               {t('applyCalculatedQuantity', 'Apply calculated quantity ({{quantity}})', {
                                 quantity: calculatedQuantity,
