@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { InlineLoading, InlineNotification, Layer, Search, Tile } from '@carbon/react';
 import { ResponsiveWrapper } from '@openmrs/esm-framework';
 import type { ConceptReference } from '../../types';
@@ -20,34 +21,50 @@ export const ConceptSearchField = ({
   field,
   selectedConcept,
   onChange,
+  invalid,
+  invalidText,
 }: {
   label: string;
   placeholder: string;
   field: ReturnType<typeof useConceptSearchField>;
   selectedConcept: ConceptReference | null;
   onChange: (selectedConcept: ConceptReference | null) => void;
+  invalid?: boolean;
+  invalidText?: string;
 }) => {
   const { t } = useTranslation();
+  const invalidTextId = useId();
+  const showInvalidText = Boolean(invalid && invalidText);
 
   return (
     <>
       <ResponsiveWrapper>
-        <Search
-          labelText={label}
-          placeholder={placeholder}
-          onChange={(e) => {
-            field.setSearchTerm(e.target.value);
-            if (selectedConcept) {
+        <div className={classNames({ [styles.invalid]: invalid })}>
+          <Search
+            aria-describedby={showInvalidText ? invalidTextId : undefined}
+            aria-invalid={invalid || undefined}
+            labelText={label}
+            placeholder={placeholder}
+            onChange={(e) => {
+              field.setSearchTerm(e.target.value);
+              if (selectedConcept) {
+                onChange(null);
+              }
+            }}
+            onClear={() => {
+              field.clear();
               onChange(null);
-            }
-          }}
-          onClear={() => {
-            field.clear();
-            onChange(null);
-          }}
-          value={selectedConcept ? selectedConcept.display : field.searchTerm}
-        />
+            }}
+            value={selectedConcept ? selectedConcept.display : field.searchTerm}
+          />
+        </div>
       </ResponsiveWrapper>
+
+      {showInvalidText && (
+        <p className={styles.invalidText} id={invalidTextId}>
+          {invalidText}
+        </p>
+      )}
 
       {field.error ? (
         <InlineNotification
