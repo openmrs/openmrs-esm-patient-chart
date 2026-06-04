@@ -11,11 +11,6 @@ const sourceTypeDescription =
   '"any" ignores the UUID and searches all concepts.';
 
 export const configSchema = {
-  overviewPageSize: {
-    _type: Type.Number,
-    _description: 'Number of rows per page in the procedures overview widget',
-    _default: 5,
-  },
   detailedViewPageSize: {
     _type: Type.Number,
     _description: 'Number of rows per page in the procedures detailed summary view',
@@ -74,7 +69,6 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
-  overviewPageSize: number;
   detailedViewPageSize: number;
   procedureConceptUuid: string;
   procedureConceptSourceType: ConceptSourceType;
