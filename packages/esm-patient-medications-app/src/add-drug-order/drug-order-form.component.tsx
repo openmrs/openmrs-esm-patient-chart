@@ -67,6 +67,7 @@ export interface DrugOrderFormProps {
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+  launchAllergyForm?: () => void;
 }
 
 export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
@@ -153,6 +154,7 @@ export function DrugOrderForm({
   onCancel,
   visitContext,
   workspaceTitle,
+  launchAllergyForm,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
@@ -475,7 +477,7 @@ export function DrugOrderForm({
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
         </div>
-        <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+        <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
         <Form
           className={styles.orderForm}
           aria-label={workspaceTitle}

@@ -11,13 +11,22 @@ const moduleName = '@openmrs/esm-patient-allergies-app';
 
 interface AllergyListProps {
   patientUuid: string;
+  /**
+   * Optional launcher provided by hosts outside the patient chart (e.g. the ward order basket),
+   * which launches the allergy form in the host's own workspace group. Without it, the form is
+   * launched into the patient chart's workspace group, which only exists inside the chart.
+   */
+  launchAllergyForm?: () => void;
 }
 
-const AllergyList: React.FC<AllergyListProps> = ({ patientUuid }) => {
+const AllergyList: React.FC<AllergyListProps> = ({ patientUuid, launchAllergyForm }) => {
   const { allergies, isLoading } = useAllergies(patientUuid);
   const launchAllergiesForm = useCallback(
-    () => launchWorkspace2(patientAllergiesFormWorkspace, { formContext: 'creating' }),
-    [],
+    () =>
+      launchAllergyForm
+        ? launchAllergyForm()
+        : launchWorkspace2(patientAllergiesFormWorkspace, { formContext: 'creating' }),
+    [launchAllergyForm],
   );
 
   const sortedAllergies = allergies

@@ -47,6 +47,13 @@ export interface AddDrugOrderProps {
   patientUuid: string;
   visitContext: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+
+  /**
+   * Optional launcher for the allergy form, provided when this workspace runs outside the patient
+   * chart. Forwarded to the allergy "+" affordance so it opens the form in the host's workspace
+   * group rather than the chart's.
+   */
+  launchAllergyForm?: () => void;
 }
 
 /**
@@ -62,6 +69,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
   patientUuid,
   visitContext,
   closeWorkspace,
+  launchAllergyForm,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -194,6 +202,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
                     openOrderForm={openOrderForm}
                     searchTerm={searchTerm}
                     onSearchTermChange={setSearchTerm}
+                    launchAllergyForm={launchAllergyForm}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -219,6 +228,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
               openOrderForm={openOrderForm}
               searchTerm={searchTerm}
               onSearchTermChange={setSearchTerm}
+              launchAllergyForm={launchAllergyForm}
             />
           </div>
         )}
@@ -234,6 +244,7 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
         visitContext={visitContext}
         saveButtonText={t('saveOrder', 'Save order')}
         workspaceTitle={workspaceTitle}
+        launchAllergyForm={launchAllergyForm}
       />
     );
   }
