@@ -22,6 +22,7 @@ export interface DrugSearchProps {
   visit: Visit;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
+  launchAllergyForm?: () => void;
 }
 
 export default function DrugSearch({
@@ -31,6 +32,7 @@ export default function DrugSearch({
   visit,
   searchTerm,
   onSearchTermChange,
+  launchAllergyForm,
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -52,7 +54,7 @@ export default function DrugSearch({
 
   return (
     <div className={styles.searchPopupContainer}>
-      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
       <ResponsiveWrapper>
         <Search
           autoFocus

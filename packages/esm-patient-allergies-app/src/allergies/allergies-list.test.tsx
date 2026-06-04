@@ -149,7 +149,7 @@ describe('AllergyList', () => {
     expect(allergyTags.map((tag) => tag.textContent)).toEqual(['Aspirin', 'ACE inhibitors', 'Fish']);
   });
 
-  it('launches the allergy form workspace in create mode from the quick-add action', async () => {
+  it('launches the chart allergy form workspace in create mode from the quick-add action', async () => {
     const user = userEvent.setup();
     mockUseAllergies.mockReturnValue({
       allergies: allergyFixtures,
@@ -163,5 +163,23 @@ describe('AllergyList', () => {
     await user.click(screen.getByRole('button', { name: /recordnewallergy/i }));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(patientAllergiesFormWorkspace, { formContext: 'creating' });
+  });
+
+  it('defers to the host-provided launcher when one is given (e.g. outside the patient chart)', async () => {
+    const user = userEvent.setup();
+    const launchAllergyForm = vi.fn();
+    mockUseAllergies.mockReturnValue({
+      allergies: allergyFixtures,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    render(<AllergyList patientUuid="patient-uuid" launchAllergyForm={launchAllergyForm} />);
+
+    await user.click(screen.getByRole('button', { name: /recordnewallergy/i }));
+
+    expect(launchAllergyForm).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace2).not.toHaveBeenCalled();
   });
 });
