@@ -155,6 +155,46 @@ describe('GroupedTimeline', () => {
     expect(screen.queryByText('Serum chemistry panel')).not.toBeInTheDocument();
   });
 
+  it('renders only panels that contain filtered rows', () => {
+    renderGroupedTimeline({
+      ...mockFilterContext,
+      someChecked: true,
+      activeTests: ['Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin'],
+      timelineData: {
+        ...mockFilterContext.timelineData,
+        data: {
+          ...mockFilterContext.timelineData.data,
+          rowData: [
+            ...mockFilterContext.timelineData.data.rowData,
+            {
+              ...mockFilterContext.timelineData.data.rowData[0],
+              flatName: 'Bloodwork-Hematology-Complete blood count-Hemoglobin',
+              display: 'Hemoglobin',
+            },
+          ],
+        },
+      },
+      tableData: [
+        ...mockFilterContext.tableData,
+        {
+          key: 'Complete blood count',
+          flatName: 'Bloodwork-Hematology-Complete blood count',
+          entries: [
+            {
+              key: 'Hemoglobin',
+              flatName: 'Bloodwork-Hematology-Complete blood count-Hemoglobin',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(screen.getByText('Serum chemistry panel')).toBeInTheDocument();
+    expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
+    expect(screen.queryByText('Complete blood count')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hemoglobin')).not.toBeInTheDocument();
+  });
+
   it('correctly applies interpretation styling to results', () => {
     const contextWithInterpretations = {
       ...mockFilterContext,
