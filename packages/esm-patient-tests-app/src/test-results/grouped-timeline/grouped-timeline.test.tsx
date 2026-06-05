@@ -183,9 +183,9 @@ describe('GroupedTimeline', () => {
             {
               key: 'Hemoglobin',
               flatName: 'Bloodwork-Hematology-Complete blood count-Hemoglobin',
-            },
+            } as any,
           ],
-        },
+        } as any,
       ],
     });
 
