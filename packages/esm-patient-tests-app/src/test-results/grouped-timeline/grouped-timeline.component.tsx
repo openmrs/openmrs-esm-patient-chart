@@ -33,9 +33,12 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
       return [];
     }
 
+    // Panels are derived from the filtered rows so the grouped timeline stays in sync
+    // with the active filter selection instead of rendering from the full table dataset.
     const visibleRowNames = new Set(visibleRows.map((row) => row.flatName));
     const panels = tableData.filter((panel) => panel.entries.some((entry) => visibleRowNames.has(entry.flatName)));
 
+    // Some datasets can surface duplicate panel entries with the same flatName.
     return panels.filter(
       (panel, index, allPanels) => index === allPanels.findIndex((p) => p.flatName === panel.flatName),
     );
