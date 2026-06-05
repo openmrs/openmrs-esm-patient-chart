@@ -1,7 +1,7 @@
 import React, { type ComponentProps, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, SkeletonText, Tile } from '@carbon/react';
+import { Button, ButtonSkeleton, SkeletonText, Tile, Tag } from '@carbon/react';
 import { ShoppingCartArrowUp } from '@carbon/react/icons';
 import { type DrugOrderBasketItem, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import {
@@ -15,7 +15,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { prepMedicationOrderPostData, useActivePatientOrders } from '../../api/api';
+import { prepMedicationOrderPostData, useMedicationOrders } from '../../api';
 import { ordersEqual } from './helpers';
 import {
   type DrugSearchResult,
@@ -142,17 +142,16 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
     'medications',
     prepMedicationOrderPostData,
   );
-  const patientUuid = patient.id;
-  const { data: activeOrders, isLoading: isLoadingActiveOrders } = useActivePatientOrders(patientUuid);
   const drugAlreadyInBasket = useMemo(
     () => orders?.some((order) => ordersEqual(order, getTemplateOrderBasketItem(drug, visit))),
     [orders, drug, visit],
   );
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
+  const { activeOrders, futureOrders, isLoading: isLoadingOrders } = useMedicationOrders(patient.id);
   const drugAlreadyPrescribed = useMemo(
-    () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug?.uuid],
+    () => activeOrders.concat(futureOrders).some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid],
   );
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
@@ -200,6 +199,11 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                 {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
                 {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
               </p>
+              {drugAlreadyPrescribed && (
+                <Tag type="green" size="sm">
+                  {t('drugAlreadyPrescribed', 'Already prescribed')}
+                </Tag>
+              )}
               <ExtensionSlot name="drug-search-result-actions-slot" state={{ drug, orderItem }} />
             </div>
             <UserHasAccess privilege="Manage OrderTemplates">
@@ -221,44 +225,38 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
               )}
             </UserHasAccess>
           </div>
-          {!isLoadingActiveOrders ? (
-            drugAlreadyPrescribed ? (
-              <div className={styles.drugAlreadyPrescribed}>{t('drugAlreadyPrescribed', 'Already prescribed')}</div>
-            ) : (
-              <div className={styles.searchResultActions}>
-                {drugAlreadyInBasket ? (
-                  <Button
-                    kind="danger--ghost"
-                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
-                      <ShoppingCartArrowUp size={16} {...props} />
-                    )}
-                    onClick={() => removeFromBasket(orderItem)}
-                  >
-                    {t('removeFromBasket', 'Remove from basket')}
-                  </Button>
-                ) : (
-                  <Button
-                    kind="ghost"
-                    renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
-                      <ShoppingCartArrowDownIcon size={16} {...props} />
-                    )}
-                    onClick={() => addToBasket(orderItem)}
-                    disabled={drugAlreadyPrescribed}
-                  >
-                    {t('directlyAddToBasket', 'Add to basket')}
-                  </Button>
+          <div className={styles.searchResultActions}>
+            {drugAlreadyInBasket ? (
+              <Button
+                kind="danger--ghost"
+                renderIcon={(props: ComponentProps<typeof ShoppingCartArrowUp>) => (
+                  <ShoppingCartArrowUp size={16} {...props} />
                 )}
-                <Button
-                  kind="ghost"
-                  renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-                  onClick={() => openOrderForm(orderItem)}
-                  disabled={drugAlreadyPrescribed}
-                >
-                  {t('goToDrugOrderForm', 'Order form')}
-                </Button>
-              </div>
-            )
-          ) : null}
+                onClick={() => removeFromBasket(orderItem)}
+              >
+                {t('removeFromBasket', 'Remove from basket')}
+              </Button>
+            ) : (
+              <Button
+                kind="ghost"
+                renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
+                  <ShoppingCartArrowDownIcon size={16} {...props} />
+                )}
+                onClick={() => addToBasket(orderItem)}
+                disabled={isLoadingOrders || drugAlreadyPrescribed}
+              >
+                {t('directlyAddToBasket', 'Add to basket')}
+              </Button>
+            )}
+            <Button
+              kind="ghost"
+              renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
+              onClick={() => openOrderForm(orderItem)}
+              disabled={isLoadingOrders || drugAlreadyPrescribed}
+            >
+              {t('goToDrugOrderForm', 'Order form')}
+            </Button>
+          </div>
         </Tile>
       ))}
     </>

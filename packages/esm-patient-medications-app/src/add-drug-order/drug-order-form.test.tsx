@@ -1,18 +1,31 @@
 import React from 'react';
-import { vi, describe, it, expect, type Mock } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig, useSession } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { useRequireOutpatientQuantity } from '../api/api';
 import { getTemplateOrderBasketItem } from './drug-search/drug-search.resource';
-import DrugOrderForm from './drug-order-form.component';
+import DrugOrderForm, { getOrderStartDateForSubmission } from './drug-order-form.component';
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
+const mockUseMedicationOrders = vi.fn().mockReturnValue({
+  futureOrders: [],
+  activeOrders: [],
+  pastOrders: [],
+  error: null,
+  isLoading: false,
+  isValidating: false,
+});
+const mockUseRequireOutpatientQuantity = vi.fn().mockReturnValue({
+  requireOutpatientQuantity: true,
+  error: null,
+  isLoading: false,
+});
 
 mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
@@ -40,21 +53,19 @@ vi.mock('../api/order-config', () => ({
   }),
 }));
 
-vi.mock('../api/api', async () => ({
-  ...((await vi.importActual('../api/api')) as object),
-  useActivePatientOrders: vi.fn().mockReturnValue({ isLoading: false, data: [] }),
-  useRequireOutpatientQuantity: vi
-    .fn()
-    .mockReturnValue({ requireOutpatientQuantity: true, error: null, isLoading: false }),
+vi.mock('../api', async () => ({
+  ...((await vi.importActual('../api')) as object),
+  useMedicationOrders: () => mockUseMedicationOrders(),
+  useRequireOutpatientQuantity: () => mockUseRequireOutpatientQuantity(),
 }));
 
-function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
+function renderDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem, onSave = vi.fn()) {
   return render(
     <DrugOrderForm
       initialOrderBasketItem={initialOrderBasketItem}
       patient={mockPatient}
       visitContext={null}
-      onSave={vi.fn()}
+      onSave={onSave}
       saveButtonText="Save order"
       onCancel={vi.fn()}
       workspaceTitle="Add drug order"
@@ -72,7 +83,88 @@ function createNewOrderBasketItem(overrides?: Partial<DrugOrderBasketItem>): Dru
   } as DrugOrderBasketItem;
 }
 
+const completeMedicationOrderFields: Partial<DrugOrderBasketItem> = {
+  dosage: 1,
+  unit: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+  route: { valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Oral' },
+  frequency: { valueCoded: 'once-daily-uuid', value: 'Once daily', frequencyPerDay: 1 },
+  duration: 7,
+  durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+  indication: 'Pain',
+  pillsDispensed: 7,
+  quantityUnits: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+  numRefills: 0,
+};
+
+function getDateFromToday(days: number) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toDatePickerInputValue(value: unknown) {
+  if (value instanceof Date) {
+    return toDateInputValue(value);
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    return toDateInputValue(new Date(value));
+  }
+  return '';
+}
+
 describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
+  beforeEach(() => {
+    mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange, invalid, invalidText }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input
+          id={id}
+          type="text"
+          value={toDatePickerInputValue(value)}
+          aria-invalid={invalid ? 'true' : undefined}
+          onChange={(evt) => onChange?.(new Date(`${evt.target.value}T00:00:00`))}
+        />
+        {invalid ? <span>{invalidText}</span> : null}
+      </>
+    ));
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it('snaps same-day date-only start dates to the current wall-clock time before saving', () => {
+    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
+    const now = new Date('2026-05-21T12:34:56.000Z');
+
+    expect(getOrderStartDateForSubmission(selectedDate, undefined, now)).toBe(now);
+  });
+
+  it('keeps applying the minimum start date after snapping same-day start dates', () => {
+    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
+    const now = new Date('2026-05-21T12:34:56.000Z');
+    const startDateMin = new Date('2026-05-21T13:00:00.000Z');
+
+    expect(getOrderStartDateForSubmission(selectedDate, startDateMin, now)).toBe(startDateMin);
+  });
+
   it('auto-calculates quantity when dose, frequency, and duration are filled', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
@@ -467,13 +559,50 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
 
     renderDrugOrderForm(item);
 
-    // Quantity is preserved from the existing order — the effect returns early for
-    // REVISE orders with null frequencyPerDay
+    // Quantity is preserved from the existing order until the clinician applies the
+    // calculated quantity.
     await waitFor(() => {
       expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(30);
     });
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
   });
+
+  it.each(['REVISE', 'RENEW'] as const)(
+    'uses order config frequencyPerDay to show recalculate link for %s orders',
+    async (action) => {
+      const user = userEvent.setup();
+      const item = createNewOrderBasketItem({
+        action,
+        pillsDispensed: 5,
+        frequency: {
+          valueCoded: 'once-daily-uuid',
+          value: 'Once daily',
+          frequencyPerDay: null,
+        },
+        dosage: 1,
+        unit: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+        duration: 5,
+        durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+        quantityUnits: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+      });
+
+      renderDrugOrderForm(item);
+
+      await waitFor(() => {
+        expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(5);
+      });
+      expect(screen.queryByText(/apply calculated quantity/i)).not.toBeInTheDocument();
+
+      const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
+      await user.clear(durationInput);
+      await user.type(durationInput, '7');
+
+      await waitFor(() => {
+        expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(5);
+      });
+      expect(screen.getByText(/apply calculated quantity \(7\)/i)).toBeInTheDocument();
+    },
+  );
 
   it('shows recalculate link for REVISE orders after re-selecting frequency with frequencyPerDay', async () => {
     const user = userEvent.setup();
@@ -521,7 +650,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
 
   it('does not auto-calculate when requireOutpatientQuantity is false', async () => {
     const user = userEvent.setup();
-    (useRequireOutpatientQuantity as Mock).mockReturnValue({
+    mockUseRequireOutpatientQuantity.mockReturnValue({
       requireOutpatientQuantity: false,
       error: null,
       isLoading: false,
@@ -552,7 +681,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
 
     // Restore default mock
-    (useRequireOutpatientQuantity as Mock).mockReturnValue({
+    mockUseRequireOutpatientQuantity.mockReturnValue({
       requireOutpatientQuantity: true,
       error: null,
       isLoading: false,
@@ -584,5 +713,51 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
       const quantityUnitCombobox = screen.getByRole('combobox', { name: /quantity unit/i });
       expect(quantityUnitCombobox).toHaveValue('Tablet');
     });
+  });
+
+  it('does not save a future start date when revising an active medication', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const futureStartDate = getDateFromToday(2);
+    renderDrugOrderForm(
+      createNewOrderBasketItem({
+        ...completeMedicationOrderFields,
+        action: 'REVISE',
+        scheduledDate: getDateFromToday(-1),
+      }),
+      onSave,
+    );
+
+    fireEvent.change(screen.getByLabelText(/start date/i), { target: { value: toDateInputValue(futureStartDate) } });
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    expect(
+      await screen.findByText('Revisions to an active medication must start today or earlier.'),
+    ).toBeInTheDocument();
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('saves a future start date when revising an already-upcoming medication', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const upcomingScheduledDate = getDateFromToday(1);
+    const futureStartDate = getDateFromToday(2);
+    renderDrugOrderForm(
+      createNewOrderBasketItem({
+        ...completeMedicationOrderFields,
+        action: 'REVISE',
+        scheduledDate: upcomingScheduledDate,
+      }),
+      onSave,
+    );
+
+    fireEvent.change(screen.getByLabelText(/start date/i), { target: { value: toDateInputValue(futureStartDate) } });
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    const savedOrder = onSave.mock.calls[0][0] as DrugOrderBasketItem;
+    expect(savedOrder.action).toBe('REVISE');
+    expect(savedOrder.scheduledDate).toBeInstanceOf(Date);
+    expect((savedOrder.scheduledDate as Date).getFullYear()).toBe(futureStartDate.getFullYear());
+    expect((savedOrder.scheduledDate as Date).getMonth()).toBe(futureStartDate.getMonth());
+    expect((savedOrder.scheduledDate as Date).getDate()).toBe(futureStartDate.getDate());
   });
 });

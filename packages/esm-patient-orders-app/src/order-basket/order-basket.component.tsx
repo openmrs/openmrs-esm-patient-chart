@@ -114,7 +114,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     if (!orderEncounterUuid) {
       try {
         // Backend rejects orders whose dateActivated is before the encounter's encounterDatetime,
-        // so set encounterDatetime to the earliest startDate among basket items.
+        // so set encounterDatetime to the earliest selected start date among basket items.
         // postOrdersOnNewEncounter clamps this to the visit window before posting.
         const encounterDate = getEarliestStartDate(orders);
 
