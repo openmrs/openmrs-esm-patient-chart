@@ -140,6 +140,21 @@ describe('GroupedTimeline', () => {
     expect(screen.queryByText('Total protein')).not.toBeInTheDocument();
   });
 
+  it('renders an empty state when selected filters remove all grouped timeline rows', () => {
+    renderGroupedTimeline({
+      ...mockFilterContext,
+      someChecked: true,
+      activeTests: ['non-existent-test'],
+      checkboxes: {
+        'non-existent-test': true,
+      },
+    });
+
+    expect(screen.getByRole('heading', { name: /data timeline/i })).toBeInTheDocument();
+    expect(screen.getByText(/there are no data to display for this patient/i)).toBeInTheDocument();
+    expect(screen.queryByText('Serum chemistry panel')).not.toBeInTheDocument();
+  });
+
   it('correctly applies interpretation styling to results', () => {
     const contextWithInterpretations = {
       ...mockFilterContext,
