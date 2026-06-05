@@ -125,20 +125,19 @@ describe('GroupedTimeline', () => {
     renderGroupedTimeline({
       ...mockFilterContext,
       someChecked: true,
-      checkboxes: { Chemistry: false, Bloodwork: true },
+      activeTests: ['Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin'],
+      checkboxes: {
+        'Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin': true,
+        'Bloodwork-Chemistry-Serum chemistry panel-Serum glutamic-pyruvic transaminase': false,
+      },
     });
 
-    // TODO: Add assertions for showing checked items; would require updated mock data
-    // TODO: The filtering logic for someChecked doesn't appear to be implemented yet
-
-    // For now, just verify the component renders when someChecked is true
     expect(screen.getByText('Serum chemistry panel')).toBeInTheDocument();
-
-    // Assert that Chemistry items are not shown (commenting out until filtering is implemented)
-    // expect(screen.queryByText('Serum glutamic-pyruvic transaminase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Serum glutamic-oxaloacetic transaminase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Alkaline phosphatase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Total bilirubin')).not.toBeInTheDocument();
+    expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
+    expect(screen.queryByText('Serum glutamic-pyruvic transaminase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Serum glutamic-oxaloacetic transaminase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Alkaline phosphatase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Total protein')).not.toBeInTheDocument();
   });
 
   it('correctly applies interpretation styling to results', () => {
