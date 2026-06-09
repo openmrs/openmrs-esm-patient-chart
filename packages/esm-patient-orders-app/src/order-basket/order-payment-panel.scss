@@ -1,0 +1,42 @@
+@use '@carbon/layout';
+
+.panel {
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background: var(--cds-layer, #f4f4f4);
+  margin: layout.$spacing-05;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  font-weight: 600;
+  margin-bottom: layout.$spacing-03;
+}
+
+.orderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: layout.$spacing-03 0;
+  border-bottom: 1px solid var(--cds-border-subtle, #e0e0e0);
+}
+
+.price {
+  font-weight: 600;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-04 0;
+  border-top: 1px solid var(--cds-border-subtle, #e0e0e0);
+  font-weight: 600;
+  margin-top: layout.$spacing-03;
+}
+
+.actions {
+  display: flex;
+  gap: layout.$spacing-04;
+  margin-top: layout.$spacing-04;
+}

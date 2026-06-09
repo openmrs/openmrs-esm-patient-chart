@@ -142,5 +142,14 @@
   "unpinOrder": "Unpin order",
   "updated": "Updated",
   "usingADifferentTerm": "using a different term",
-  "view": "View"
+  "view": "View",
+  "orderPayment": "Order payment",
+  "totalPayable": "Total payable",
+  "sendForPayment": "Send for payment",
+  "noPriceSet": "No price set",
+  "loadingPrices": "Loading prices…",
+  "sending": "Sending…",
+  "paymentRequestSent": "Payment request sent to cashier",
+  "orderProceedsAfterPayment": "The order can be completed once the patient pays.",
+  "paymentRequestFailed": "Could not send payment request"
 }
