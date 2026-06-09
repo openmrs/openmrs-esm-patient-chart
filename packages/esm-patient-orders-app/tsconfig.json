@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "../../tools/setup-tests.ts"],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src/**/*", "../../tools/setup-tests.ts"]
 }
