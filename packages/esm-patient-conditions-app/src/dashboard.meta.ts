@@ -4,5 +4,5 @@ export const dashboardMeta: DashboardLinkConfig & { slot: string } = {
   slot: 'patient-chart-conditions-dashboard-slot',
   path: 'conditions',
   title: 'Conditions',
-  icon: 'omrs-icon-list-checked',
+  icon: 'omrs-icon-table-of-contents',
 };
