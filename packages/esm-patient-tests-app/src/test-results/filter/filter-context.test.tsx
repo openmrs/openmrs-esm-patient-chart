@@ -336,6 +336,156 @@ describe('FilterContext', () => {
     });
   });
 
+  describe('Table data de-duplication by conceptUuid', () => {
+    const sharedConceptUuid = '729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const sharedObs = [{ obsDatetime: '2024-11-04T05:48:00.000Z', value: '56.0', interpretation: 'LOW' as const }];
+
+    const PlateletEntryConsumer = () => {
+      const { tableData } = useContext(FilterContext);
+      const plateletEntries = (tableData ?? [])
+        .flatMap((group) => group.entries)
+        .filter((entry) => entry.conceptUuid === sharedConceptUuid);
+
+      return (
+        <div>
+          <div data-testid="table-groups">{tableData?.length ?? 0}</div>
+          <div data-testid="platelet-entry-count">{plateletEntries.length}</div>
+        </div>
+      );
+    };
+
+    it('collapses the same observation appearing twice within one rendered panel', async () => {
+      // Two leaves resolve to the same panel group key ("Complete blood count") but
+      // carry distinct flatNames, mirroring obstree returning one branch per order.
+      // They share a conceptUuid and identical obs, so they must collapse to one row.
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Platelets',
+                  flatName: 'Hematology-Complete blood count-Platelets',
+                  conceptUuid: sharedConceptUuid,
+                  hasData: true,
+                  obs: sharedObs,
+                  subSets: [],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          display: 'Chemistry',
+          flatName: 'Chemistry',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Chemistry-Complete blood count',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Platelets',
+                  flatName: 'Chemistry-Complete blood count-Platelets',
+                  conceptUuid: sharedConceptUuid,
+                  hasData: true,
+                  obs: sharedObs,
+                  subSets: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <PlateletEntryConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('1');
+      });
+    });
+
+    it('keeps the same observation that legitimately renders under two different panels', async () => {
+      // Same conceptUuid and obs, but the leaves resolve to different panel group
+      // keys ("Complete blood count" vs "Hematology"), mirroring a concept mounted
+      // beneath two roots. Both rows must survive.
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Platelets',
+                  flatName: 'Hematology-Complete blood count-Platelets',
+                  conceptUuid: sharedConceptUuid,
+                  hasData: true,
+                  obs: sharedObs,
+                  subSets: [],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          display: 'Bloodwork',
+          flatName: 'Bloodwork',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Hematology',
+              flatName: 'Bloodwork-Hematology',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Complete blood count',
+                  flatName: 'Bloodwork-Hematology-Complete blood count',
+                  hasData: true,
+                  subSets: [
+                    {
+                      display: 'Platelets',
+                      flatName: 'Bloodwork-Hematology-Complete blood count-Platelets',
+                      conceptUuid: sharedConceptUuid,
+                      hasData: true,
+                      obs: sharedObs,
+                      subSets: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <PlateletEntryConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('2');
+      });
+    });
+  });
+
   describe('Actions', () => {
     it('should toggle individual test via toggleVal', async () => {
       const user = userEvent.setup();
