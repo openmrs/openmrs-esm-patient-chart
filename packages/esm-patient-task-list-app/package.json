@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-task-list-app",
-  "version": "12.2.0",
+  "version": "12.2.1",
   "license": "MPL-2.0",
   "description": "Task list microfrontend for the OpenMRS SPA patient chart",
   "browser": "dist/openmrs-esm-patient-task-list-app.js",
