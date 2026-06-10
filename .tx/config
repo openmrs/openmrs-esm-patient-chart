@@ -162,3 +162,12 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-vitals-app
+
+[o:openmrs:p:openmrs3:r:esm-patient-procedures-app]
+file_filter            = packages/esm-patient-procedures-app/translations/<lang>.json
+source_file            = packages/esm-patient-procedures-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-patient-procedures-app

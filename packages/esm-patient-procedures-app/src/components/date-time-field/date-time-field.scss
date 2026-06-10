@@ -4,5 +4,6 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: layout.$spacing-05;
-  align-items: end;
+  // Top-align so error text below one column doesn't drag the other column down
+  align-items: start;
 }

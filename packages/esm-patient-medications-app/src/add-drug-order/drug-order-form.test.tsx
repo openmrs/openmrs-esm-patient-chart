@@ -559,13 +559,50 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
 
     renderDrugOrderForm(item);
 
-    // Quantity is preserved from the existing order — the effect returns early for
-    // REVISE orders with null frequencyPerDay
+    // Quantity is preserved from the existing order until the clinician applies the
+    // calculated quantity.
     await waitFor(() => {
       expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(30);
     });
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
   });
+
+  it.each(['REVISE', 'RENEW'] as const)(
+    'uses order config frequencyPerDay to show recalculate link for %s orders',
+    async (action) => {
+      const user = userEvent.setup();
+      const item = createNewOrderBasketItem({
+        action,
+        pillsDispensed: 5,
+        frequency: {
+          valueCoded: 'once-daily-uuid',
+          value: 'Once daily',
+          frequencyPerDay: null,
+        },
+        dosage: 1,
+        unit: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+        duration: 5,
+        durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+        quantityUnits: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
+      });
+
+      renderDrugOrderForm(item);
+
+      await waitFor(() => {
+        expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(5);
+      });
+      expect(screen.queryByText(/apply calculated quantity/i)).not.toBeInTheDocument();
+
+      const durationInput = screen.getByRole('spinbutton', { name: /duration/i });
+      await user.clear(durationInput);
+      await user.type(durationInput, '7');
+
+      await waitFor(() => {
+        expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(5);
+      });
+      expect(screen.getByText(/apply calculated quantity \(7\)/i)).toBeInTheDocument();
+    },
+  );
 
   it('shows recalculate link for REVISE orders after re-selecting frequency with frequencyPerDay', async () => {
     const user = userEvent.setup();
