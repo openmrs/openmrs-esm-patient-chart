@@ -3,5 +3,6 @@
   "compilerOptions": {
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src/**/*", "../../tools/setup-tests.ts"]
+  "include": ["src/**/*", "../../tools/setup-tests.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

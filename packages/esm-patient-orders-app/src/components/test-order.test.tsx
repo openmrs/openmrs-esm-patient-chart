@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithSwr } from 'tools';
 import { mockOrders, mockOrderPriceData } from '__mocks__';
@@ -12,26 +13,26 @@ import {
 import { useReferenceRanges, type Order } from '@openmrs/esm-patient-common-lib';
 import TestOrder from './test-order.component';
 
-const mockUseOrderPrice = jest.mocked(useOrderPrice);
-const mockUseLabEncounter = jest.mocked(useLabEncounter);
-const mockUseOrderConceptByUuid = jest.mocked(useOrderConceptByUuid);
-const mockUseOrderConceptsByUuids = jest.mocked(useOrderConceptsByUuids);
-const mockUseReferenceRanges = jest.mocked(useReferenceRanges);
+const mockUseOrderPrice = vi.mocked(useOrderPrice);
+const mockUseLabEncounter = vi.mocked(useLabEncounter);
+const mockUseOrderConceptByUuid = vi.mocked(useOrderConceptByUuid);
+const mockUseOrderConceptsByUuids = vi.mocked(useOrderConceptsByUuids);
+const mockUseReferenceRanges = vi.mocked(useReferenceRanges);
 
-jest.mock('../hooks/useOrderPrice', () => ({
-  useOrderPrice: jest.fn(),
+vi.mock('../hooks/useOrderPrice', () => ({
+  useOrderPrice: vi.fn(),
 }));
 
-jest.mock('../lab-results/lab-results.resource', () => ({
-  useLabEncounter: jest.fn(),
-  useOrderConceptByUuid: jest.fn(),
-  useOrderConceptsByUuids: jest.fn(),
+vi.mock('../lab-results/lab-results.resource', () => ({
+  useLabEncounter: vi.fn(),
+  useOrderConceptByUuid: vi.fn(),
+  useOrderConceptsByUuids: vi.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useReferenceRanges: jest.fn(),
-  ReferenceRangeDisplay: jest.fn(() => null),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...(await vi.importActual('@openmrs/esm-patient-common-lib')),
+  useReferenceRanges: vi.fn(),
+  ReferenceRangeDisplay: vi.fn(() => null),
 }));
 
 const mockTestOrder = mockOrders[1] as unknown as Order;
@@ -64,14 +65,14 @@ const mockConcept: LabOrderConcept = {
 
 describe('TestOrder', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     mockUseOrderConceptByUuid.mockReturnValue({
       concept: mockConcept,
       isLoading: false,
       error: undefined,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockUseLabEncounter.mockReturnValue({
@@ -79,7 +80,7 @@ describe('TestOrder', () => {
       isLoading: false,
       error: undefined,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockUseOrderConceptsByUuids.mockReturnValue({
@@ -87,14 +88,14 @@ describe('TestOrder', () => {
       isLoading: false,
       error: undefined,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     mockUseReferenceRanges.mockReturnValue({
       ranges: new Map(),
       isLoading: false,
       error: undefined,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
   });
 
