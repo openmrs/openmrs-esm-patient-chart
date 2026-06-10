@@ -125,20 +125,74 @@ describe('GroupedTimeline', () => {
     renderGroupedTimeline({
       ...mockFilterContext,
       someChecked: true,
-      checkboxes: { Chemistry: false, Bloodwork: true },
+      activeTests: ['Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin'],
+      checkboxes: {
+        'Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin': true,
+        'Bloodwork-Chemistry-Serum chemistry panel-Serum glutamic-pyruvic transaminase': false,
+      },
     });
 
-    // TODO: Add assertions for showing checked items; would require updated mock data
-    // TODO: The filtering logic for someChecked doesn't appear to be implemented yet
-
-    // For now, just verify the component renders when someChecked is true
     expect(screen.getByText('Serum chemistry panel')).toBeInTheDocument();
+    expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
+    expect(screen.queryByText('Serum glutamic-pyruvic transaminase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Serum glutamic-oxaloacetic transaminase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Alkaline phosphatase')).not.toBeInTheDocument();
+    expect(screen.queryByText('Total protein')).not.toBeInTheDocument();
+  });
 
-    // Assert that Chemistry items are not shown (commenting out until filtering is implemented)
-    // expect(screen.queryByText('Serum glutamic-pyruvic transaminase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Serum glutamic-oxaloacetic transaminase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Alkaline phosphatase')).not.toBeInTheDocument();
-    // expect(screen.queryByText('Total bilirubin')).not.toBeInTheDocument();
+  it('renders an empty state when selected filters remove all grouped timeline rows', () => {
+    renderGroupedTimeline({
+      ...mockFilterContext,
+      someChecked: true,
+      activeTests: ['non-existent-test'],
+      checkboxes: {
+        'non-existent-test': true,
+      },
+    });
+
+    expect(screen.getByRole('heading', { name: /data timeline/i })).toBeInTheDocument();
+    expect(screen.getByText(/there are no data to display for this patient/i)).toBeInTheDocument();
+    expect(screen.queryByText('Serum chemistry panel')).not.toBeInTheDocument();
+  });
+
+  it('renders only panels that contain filtered rows', () => {
+    renderGroupedTimeline({
+      ...mockFilterContext,
+      someChecked: true,
+      activeTests: ['Bloodwork-Chemistry-Serum chemistry panel-Total bilirubin'],
+      timelineData: {
+        ...mockFilterContext.timelineData,
+        data: {
+          ...mockFilterContext.timelineData.data,
+          rowData: [
+            ...mockFilterContext.timelineData.data.rowData,
+            {
+              ...mockFilterContext.timelineData.data.rowData[0],
+              flatName: 'Bloodwork-Hematology-Complete blood count-Hemoglobin',
+              display: 'Hemoglobin',
+            },
+          ],
+        },
+      },
+      tableData: [
+        ...mockFilterContext.tableData,
+        {
+          key: 'Complete blood count',
+          flatName: 'Bloodwork-Hematology-Complete blood count',
+          entries: [
+            {
+              key: 'Hemoglobin',
+              flatName: 'Bloodwork-Hematology-Complete blood count-Hemoglobin',
+            } as any,
+          ],
+        } as any,
+      ],
+    });
+
+    expect(screen.getByText('Serum chemistry panel')).toBeInTheDocument();
+    expect(screen.getByText('Total bilirubin')).toBeInTheDocument();
+    expect(screen.queryByText('Complete blood count')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hemoglobin')).not.toBeInTheDocument();
   });
 
   it('correctly applies interpretation styling to results', () => {
