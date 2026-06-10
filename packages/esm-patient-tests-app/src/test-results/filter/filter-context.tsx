@@ -35,6 +35,16 @@ function parseTime(sortedTimes: Array<string>) {
   return { yearColumns, dayColumns, timeColumns, sortedTimes };
 }
 
+// Derive the key of the panel a test is rendered under from its flatName.
+// flatNames look like "Hematology-Complete blood count-Platelets", where the
+// panel name sits at index 1; deeper roots like "Bloodwork-Hematology-..."
+// therefore resolve to a different key. Used both to group rows and to scope
+// de-duplication, so the two stay aligned.
+function deriveGroupKey(flatName: string): string {
+  const flatNameParts = flatName.split('-');
+  return flatNameParts.length >= 2 ? flatNameParts[1] : flatNameParts[0];
+}
+
 const initialState: ReducerState = {
   checkboxes: {},
   parents: {},
@@ -135,8 +145,16 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
       const test = state.tests[key] as TestResult;
       if (test.obs && Array.isArray(test.obs)) {
         test.obs.forEach((obs) => {
-          // Use a more specific key that includes the test name to avoid over-deduplication
-          const testKey = `${test.flatName}_${obs.obsDatetime}_${obs.value}`;
+          // Dedupe by the observation's concept identity within its rendered panel.
+          // The obstree backend can return the same concept under several branches
+          // of the orderable-tests tree (e.g. one branch per order), each carrying
+          // the same single obs. Keying on flatName (which differs per branch) left
+          // those as separate rows, so a single result showed up N times. Scoping
+          // to the panel group key keeps the same concept that legitimately appears
+          // under different panels (e.g. mounted beneath two roots) as separate
+          // rows, while collapsing true duplicates within one panel.
+          const groupKey = deriveGroupKey(test.flatName);
+          const testKey = `${groupKey}_${test.conceptUuid ?? test.flatName}_${obs.obsDatetime}_${obs.value}`;
 
           if (!seenTests.has(testKey)) {
             seenTests.add(testKey);
@@ -154,20 +172,7 @@ const FilterProvider = ({ roots, isLoading, children }: FilterProviderProps) => 
     const groupedObs: Record<string, GroupedObservation> = {};
 
     flattenedObs.forEach((curr: MappedObservation) => {
-      const flatNameParts = curr.flatName.split('-');
-
-      // Extract the actual panel name from the flatName
-      // Panel names are at index 1 (second part) like "Lipid panel", "Basic metabolic panel"
-      // This is based on the actual flatName structure we observed
-      let groupKey: string;
-      if (flatNameParts.length >= 2) {
-        // For names like "Hematology-Lipid panel-Total cholesterol" or "Chemistry-Basic metabolic panel-Serum sodium"
-        // Take the second part (index 1) which is the actual panel name
-        groupKey = flatNameParts[1];
-      } else {
-        // Fallback to first part if only one part exists
-        groupKey = flatNameParts[0];
-      }
+      const groupKey = deriveGroupKey(curr.flatName);
 
       const dateKey = new Date(curr.obsDatetime).toISOString().split('T')[0];
 
