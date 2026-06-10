@@ -262,6 +262,91 @@ describe('FilterContext', () => {
       });
     });
 
+    it('should collapse duplicate branches in timeline data and keep alias filters working', async () => {
+      const user = userEvent.setup();
+      const sharedConceptUuid = '729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+      const primaryFlatName = 'Hematology-Complete blood count-Platelets';
+      const selectedFlatName = 'Chemistry-Complete blood count-Platelets';
+      const sharedObs = [{ obsDatetime: '2024-11-04T05:48:00.000Z', value: '56.0', interpretation: 'LOW' as const }];
+
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Platelets',
+                  flatName: primaryFlatName,
+                  conceptUuid: sharedConceptUuid,
+                  hasData: true,
+                  obs: sharedObs,
+                  subSets: [],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          display: 'Chemistry',
+          flatName: 'Chemistry',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Chemistry-Complete blood count',
+              hasData: true,
+              subSets: [
+                {
+                  display: 'Platelets',
+                  flatName: selectedFlatName,
+                  conceptUuid: sharedConceptUuid,
+                  hasData: true,
+                  obs: sharedObs,
+                  subSets: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const TimelineAliasConsumer = () => {
+        const { toggleVal, timelineData } = useContext(FilterContext);
+        const rows = timelineData?.data?.rowData ?? [];
+
+        return (
+          <div>
+            <div data-testid="timeline-rows">{rows.length}</div>
+            <div data-testid="timeline-flat-names">{rows.flatMap((row) => row.flatNames ?? []).join(',')}</div>
+            <button onClick={() => toggleVal(selectedFlatName)}>Toggle Chemistry Platelets</button>
+          </div>
+        );
+      };
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <TimelineAliasConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('timeline-rows')).toHaveTextContent('1');
+      });
+      expect(screen.getByTestId('timeline-flat-names')).toHaveTextContent(selectedFlatName);
+
+      await user.click(screen.getByRole('button', { name: /toggle chemistry platelets/i }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('timeline-rows')).toHaveTextContent('1');
+      });
+    });
+
     it('should sort timeline observations by date descending', async () => {
       const TimelineDetailsComponent = () => {
         const { timelineData } = useContext(FilterContext);
@@ -483,6 +568,161 @@ describe('FilterContext', () => {
       await waitFor(() => {
         expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('2');
       });
+    });
+  });
+
+  describe('Normalized branch counts and true duplicate results', () => {
+    const sharedConceptUuid = '729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const obsAt = (value: string) => ({
+      obsDatetime: '2024-11-04T05:48:00.000Z',
+      value,
+      interpretation: 'LOW' as const,
+    });
+
+    const CountsConsumer = () => {
+      const { tableData, totalResultsCount } = useContext(FilterContext);
+      const plateletEntries = (tableData ?? [])
+        .flatMap((group) => group.entries)
+        .filter((entry) => entry.conceptUuid === sharedConceptUuid);
+
+      return (
+        <div>
+          <div data-testid="platelet-entry-count">{plateletEntries.length}</div>
+          <div data-testid="total-results-count">{totalResultsCount}</div>
+        </div>
+      );
+    };
+
+    const plateletLeaf = (flatName: string, obs: Array<ReturnType<typeof obsAt>>) => ({
+      display: 'Platelets',
+      flatName,
+      conceptUuid: sharedConceptUuid,
+      hasData: true,
+      obs,
+      subSets: [],
+    });
+
+    it('keeps the header count aligned with rendered rows when duplicate branches differ in flatName', async () => {
+      // Two branches with different flatNames resolve to the same rendered
+      // panel ("Complete blood count") and carry copies of the same obs list.
+      // They collapse to one row, and the count must follow the rows.
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [plateletLeaf('Hematology-Complete blood count-Platelets', [obsAt('56.0')])],
+            },
+          ],
+        },
+        {
+          display: 'Chemistry',
+          flatName: 'Chemistry',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Chemistry-Complete blood count',
+              hasData: true,
+              subSets: [plateletLeaf('Chemistry-Complete blood count-Platelets', [obsAt('56.0')])],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <CountsConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('1');
+      });
+      expect(screen.getByTestId('total-results-count')).toHaveTextContent('1');
+    });
+
+    it('keeps the header count aligned with rendered rows when duplicate branches share a flatName', async () => {
+      // Two roots produce the identical leaf flatName, mirroring the default
+      // Hematology + Bloodwork config after augmentation drops the Bloodwork
+      // prefix. One result must render as one row and count as one result,
+      // regardless of which layer collapses the duplicate.
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [plateletLeaf('Hematology-Complete blood count-Platelets', [obsAt('56.0')])],
+            },
+          ],
+        },
+        {
+          display: 'Bloodwork',
+          flatName: 'Bloodwork',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [plateletLeaf('Hematology-Complete blood count-Platelets', [obsAt('56.0')])],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <CountsConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('1');
+      });
+      expect(screen.getByTestId('total-results-count')).toHaveTextContent('1');
+    });
+
+    it('keeps two genuinely distinct results with equal value and datetime as two rows', async () => {
+      // Equal obs within a single branch's list are distinct real results
+      // (e.g. one result per order, entered against the same encounter), not
+      // copies. Both must render and both must count.
+      const roots: Array<TreeNode> = [
+        {
+          display: 'Hematology',
+          flatName: 'Hematology',
+          hasData: true,
+          subSets: [
+            {
+              display: 'Complete blood count',
+              flatName: 'Hematology-Complete blood count',
+              hasData: true,
+              subSets: [plateletLeaf('Hematology-Complete blood count-Platelets', [obsAt('56.0'), obsAt('56.0')])],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <FilterProvider roots={roots} isLoading={false}>
+          <CountsConsumer />
+        </FilterProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('platelet-entry-count')).toHaveTextContent('2');
+      });
+      expect(screen.getByTestId('total-results-count')).toHaveTextContent('2');
     });
   });
 

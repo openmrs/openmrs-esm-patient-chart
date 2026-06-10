@@ -587,4 +587,55 @@ describe('filterReducer', () => {
       expect(newState).toEqual(currentState);
     });
   });
+
+  describe('Merging same-flatName duplicates across trees', () => {
+    const obs = (value: string) =>
+      ({ obsDatetime: '2024-11-04T05:48:00.000Z', value, interpretation: 'LOW' }) as TreeNode['obs'][number];
+
+    const treeWithPlatelets = (rootFlatName: string, plateletObs: TreeNode['obs']): TreeNode => ({
+      flatName: rootFlatName,
+      display: rootFlatName,
+      hasData: true,
+      subSets: [
+        {
+          // Both roots resolve to the same leaf flatName, mirroring the
+          // augmentation that drops the Bloodwork prefix for overlapping roots.
+          flatName: 'Hematology: Platelets',
+          display: 'Platelets',
+          obs: plateletObs,
+          hasData: true,
+        },
+      ],
+    });
+
+    it('collapses copies of the same obs list instead of concatenating them', () => {
+      const trees = [treeWithPlatelets('Hematology', [obs('56')]), treeWithPlatelets('Bloodwork', [obs('56')])];
+
+      const newState = reducer(initialState, { type: ReducerActionType.INITIALIZE, trees });
+
+      expect(newState.tests['Hematology: Platelets'].obs).toHaveLength(1);
+    });
+
+    it('keeps genuinely repeated equal obs that appear within a single list', () => {
+      const trees = [
+        treeWithPlatelets('Hematology', [obs('56'), obs('56')]),
+        treeWithPlatelets('Bloodwork', [obs('56')]),
+      ];
+
+      const newState = reducer(initialState, { type: ReducerActionType.INITIALIZE, trees });
+
+      expect(newState.tests['Hematology: Platelets'].obs).toHaveLength(2);
+    });
+
+    it('does not mutate the source trees and stays idempotent across re-initialization', () => {
+      const trees = [treeWithPlatelets('Hematology', [obs('56')]), treeWithPlatelets('Bloodwork', [obs('56')])];
+
+      const firstState = reducer(initialState, { type: ReducerActionType.INITIALIZE, trees });
+      const secondState = reducer(firstState, { type: ReducerActionType.INITIALIZE, trees });
+
+      expect(trees[0].subSets[0].obs).toHaveLength(1);
+      expect(trees[1].subSets[0].obs).toHaveLength(1);
+      expect(secondState.tests['Hematology: Platelets'].obs).toHaveLength(1);
+    });
+  });
 });

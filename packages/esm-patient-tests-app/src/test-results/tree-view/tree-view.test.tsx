@@ -108,6 +108,63 @@ describe('TreeView', () => {
     expect(screen.getAllByText('Hematocrit').length).toBeGreaterThan(0);
   });
 
+  describe('Checkbox filtering of collapsed duplicate branches', () => {
+    const sharedConceptUuid = '729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
+    const plateletBranch = (rootName: string) => ({
+      display: rootName,
+      flatName: rootName,
+      hasData: true,
+      subSets: [
+        {
+          display: 'Complete blood count',
+          flatName: `${rootName}-Complete blood count`,
+          hasData: true,
+          subSets: [
+            {
+              display: 'Platelets',
+              flatName: `${rootName}-Complete blood count-Platelets`,
+              conceptUuid: sharedConceptUuid,
+              hasData: true,
+              obs: [{ obsDatetime: '2024-11-04T05:48:00.000Z', value: '56.0', interpretation: 'LOW' as const }],
+              subSets: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    it('keeps the collapsed row visible when filtering by its second contributing flatName', async () => {
+      const user = userEvent.setup();
+      // The same concept under two roots resolves to one rendered row in the
+      // "Complete blood count" panel, but both leaves stay checkable in the
+      // filter tree. Checking either one must keep the collapsed row visible.
+      const roots = [plateletBranch('Hematology'), plateletBranch('Chemistry')];
+
+      mockUseGetManyObstreeData.mockReturnValue({
+        roots: roots as unknown as Array<ObsTreeNode>,
+        isLoading: false,
+        error: null,
+      });
+
+      render(
+        <FilterProvider roots={roots as Roots} isLoading={false}>
+          <TreeView {...mockProps} />
+        </FilterProvider>,
+      );
+
+      expect(screen.getAllByRole('table').length).toBeGreaterThan(0);
+
+      const plateletsCheckboxes = screen.getAllByRole('checkbox', { name: /platelets/i });
+      expect(plateletsCheckboxes).toHaveLength(2);
+
+      await user.click(plateletsCheckboxes[1]);
+
+      expect(plateletsCheckboxes[1]).toBeChecked();
+      expect(screen.getAllByRole('table').length).toBeGreaterThan(0);
+    });
+  });
+
   describe('Reset button - Tablet overlay', () => {
     beforeEach(() => {
       mockUseLayoutType.mockReturnValue('tablet');
