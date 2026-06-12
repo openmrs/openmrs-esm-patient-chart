@@ -7,7 +7,13 @@ import {
   invalidateVisitAndEncounterData,
   EmptyState,
 } from '@openmrs/esm-patient-common-lib';
-import { ExtensionSlot, showSnackbar, Workspace2, useConnectivity } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  showSnackbar,
+  Workspace2,
+  useConnectivity,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { useSWRConfig } from 'swr';
 import { markPatientDeceased, useFormByName } from '../data.resource';
 
@@ -18,6 +24,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
   const { t } = useTranslation();
   const { mutate: globalMutate } = useSWRConfig();
   const isOnline = useConnectivity();
+  const { deathDateConceptUuid, causeOfDeathConceptUuid } = useConfig();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { form, isLoading: isLoadingForm, error: formError } = useFormByName('Death Note');
@@ -38,12 +45,12 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
         mode: 'enter',
       },
       handlePostResponse: (encounter) => {
-        // Extract Pronounced death date and time (Concept: 086be09f-2360-4907-ad02-caa69c0ddb71)
-        const deathDateObs = encounter.obs.find((obs) => obs.concept.uuid === '086be09f-2360-4907-ad02-caa69c0ddb71');
+        // Extract Pronounced death date and time
+        const deathDateObs = encounter.obs.find((obs) => obs.concept.uuid === deathDateConceptUuid);
         const deathDate = deathDateObs ? new Date(deathDateObs.value) : new Date();
 
-        // Extract Primary cause of death (textarea) (Concept: f5f376d8-3351-487b-b283-63561e03859d)
-        const causeObs = encounter.obs.find((obs) => obs.concept.uuid === 'f5f376d8-3351-487b-b283-63561e03859d');
+        // Extract Primary cause of death (textarea)
+        const causeObs = encounter.obs.find((obs) => obs.concept.uuid === causeOfDeathConceptUuid);
         const nonCodedCause = typeof causeObs?.value === 'string' ? causeObs.value : null;
 
         // Mark the patient as deceased in the person record
@@ -69,7 +76,18 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
       promptBeforeClosing: (func) => setHasUnsavedChanges(func()),
       setHasUnsavedChanges,
     }),
-    [closeWorkspace, form?.uuid, globalMutate, isOnline, patient, patientUuid, t, visitContext],
+    [
+      closeWorkspace,
+      form?.uuid,
+      globalMutate,
+      isOnline,
+      patient,
+      patientUuid,
+      t,
+      visitContext,
+      deathDateConceptUuid,
+      causeOfDeathConceptUuid,
+    ],
   );
 
   return (
@@ -83,10 +101,7 @@ const MarkPatientDeceasedForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>
         </div>
       ) : (
         <EmptyState
-          displayText={t(
-            'deathNoteFormNotFound',
-            'The "Death Note" form could not be found. Please ensure it is configured in the system.',
-          )}
+          displayText={t('deathNoteFormNotFound', 'The "Death Note" form could not be found. Please ensure it is configured in the system.')}
           headerTitle={t('formNotFound', 'Form Not Found')}
         />
       )}

@@ -204,6 +204,16 @@ export const esmPatientChartSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+  deathDateConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept UUID for the pronounced death date and time',
+    _default: 'ebe93dec-73a0-4703-abec-e05164896fe3',
+  },
+  causeOfDeathConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept UUID for the primary cause of death',
+    _default: '0249a235-db19-46c7-abda-7bbd61563821',
+  },
 };
 
 export interface ChartConfig {
@@ -249,4 +259,6 @@ export interface ChartConfig {
   }>;
   otherConceptUuid: string;
   drugOrderTypeUUID: string;
+  deathDateConceptUuid: string;
+  causeOfDeathConceptUuid: string;
 }
