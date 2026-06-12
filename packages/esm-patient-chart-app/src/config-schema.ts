@@ -20,7 +20,7 @@ export const esmPatientChartSchema = {
     _type: Type.Number,
     _default: 0,
     _description:
-      'The number of minutes an encounter is editable after it is created. -1 means the encounter is deletable forever & 0 means never',
+      'The number of minutes an encounter is editable after it is created. -1 means the encounter is deletable forever & 0 means never.',
   },
   encounterEditableDurationOverridePrivileges: {
     _type: Type.Array,
@@ -35,7 +35,7 @@ export const esmPatientChartSchema = {
     _type: Type.Number,
     _default: 0,
     _description:
-      'The number of minutes an encounter is editable after it is created. -1 means the encounter is deletable forever & 0 means never.',
+      'The number of minutes an encounter is deletable after it is created. -1 means the encounter is deletable forever & 0 means never.',
   },
   encounterDeleteableDurationOverridePrivileges: {
     _type: Type.Array,
@@ -44,7 +44,7 @@ export const esmPatientChartSchema = {
     },
     _default: ['Delete Encounters'],
     _description:
-      'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
+      'The privileges that allow users to delete encounters even after the deleteable duration (set by `encounterDeleteableDuration`) has expired. Any privilege in the list is sufficient to delete the encounter.',
   },
   freeTextFieldConceptUuid: {
     _type: Type.ConceptUuid,
