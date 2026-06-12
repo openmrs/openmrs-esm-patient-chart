@@ -20,14 +20,29 @@ export const esmPatientChartSchema = {
     _type: Type.Number,
     _default: 0,
     _description:
-      'The number of minutes an encounter is editable after it is created. 0 means the encounter is editable forever.',
+      'The number of minutes an encounter is editable after it is created. -1 means the encounter is deletable forever & 0 means never',
   },
   encounterEditableDurationOverridePrivileges: {
     _type: Type.Array,
     _elements: {
       _type: Type.String,
     },
-    _default: [],
+    _default: ['Edit Encounters'],
+    _description:
+      'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
+  },
+  encounterDeletableDuration: {
+    _type: Type.Number,
+    _default: 0,
+    _description:
+      'The number of minutes an encounter is editable after it is created. -1 means the encounter is deletable forever & 0 means never.',
+  },
+  encounterDeleteableDurationOverridePrivileges: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['Delete Encounters'],
     _description:
       'The privileges that allow users to edit encounters even after the editable duration (set by `encounterEditableDuration`) has expired. Any privilege in the list is sufficient to edit the encounter.',
   },
@@ -197,6 +212,8 @@ export interface ChartConfig {
   disableEmptyTabs: boolean;
   encounterEditableDuration: number;
   encounterEditableDurationOverridePrivileges: Array<string>;
+  encounterDeleteableDuration: number;
+  encounterDeleteableDurationOverridePrivileges: Array<string>;
   freeTextFieldConceptUuid: string;
   logo: {
     alt: string;

@@ -86,7 +86,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges, encounterDeleteableDuration, encounterDeleteableDurationOverridePrivileges } = useConfig<ChartConfig>();
   const [isPrinting, setIsPrinting] = useState(false);
 
   const paginatedMappedEncounters = useMemo(
@@ -262,16 +262,29 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const encounterAgeInMinutes =
                       (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
 
-                    const canDeleteEncounter =
+                    const hasEditEncounterAccess =
                       userHasAccess(encounter.editPrivilege, session?.user) &&
-                      (encounterEditableDuration === 0 ||
+                      (encounterEditableDuration === -1 ||
                         (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
                         encounterEditableDurationOverridePrivileges.some((privilege) =>
                           userHasAccess(privilege, session?.user),
                         ));
 
+                    const canDeleteEncounter =
+                        userHasAccess(encounter.editPrivilege, session?.user) &&
+                        (
+                          encounterDeleteableDuration === -1 ||
+                          (
+                            encounterDeleteableDuration > 0 &&
+                            encounterAgeInMinutes <= encounterDeleteableDuration
+                          ) ||
+                          encounterDeleteableDurationOverridePrivileges.some((privilege) =>
+                            userHasAccess(privilege, session?.user)
+                          )
+                        );
+
                     const canEditEncounter =
-                      canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
+                      hasEditEncounterAccess && (encounter.form?.uuid || isVisitNoteEncounter(encounter));
 
                     const canPrintEncounter = canPrintEncounters && supportsEmbeddedFormView(encounter);
 
