@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs, InlineLoading } from '@carbon/react';
 import {
   type Diagnosis,
   DiagnosisTags,
@@ -13,9 +13,12 @@ import {
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
+
 import type { ChartConfig } from '../../../config-schema';
 import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import type { Note, Order, OrderItem } from '../visit.resource';
+import type { Note, Order, OrderItem, LightweightVisit } from '../visit.resource';
+import { useFullVisit } from '../visit.resource';
+
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -26,53 +29,76 @@ import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
-  visit: Visit;
+  visit: Visit | LightweightVisit;
   patientUuid: string;
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
+
+/**
+ * Tabs that require full visit data (encounters, obs, orders).
+ * When user navigates to these tabs, we fetch the full visit on-demand.
+ */
+const TABS_REQUIRING_FULL_DATA = new Set([
+  'timeline-tab',
+  'tests-tab',
+  'medications-tab',
+  'completed-forms-tab',
+  'encounters-tab',
+]);
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
-  const [diagnoses, notes, medications]: [Array<Diagnosis>, Array<Note>, Array<OrderItem>] = useMemo(() => {
-    // Medication Tab
-    const medications: Array<OrderItem> = [];
-    // Diagnoses in a Visit
-    const diagnoses: Array<Diagnosis> = [];
-    // Notes Tab
-    const notes: Array<Note> = [];
+  // Track whether user has requested full data (by clicking a tab that needs it)
+  const [fullDataRequested, setFullDataRequested] = useState(false);
 
-    visit?.encounters?.forEach((enc) => {
-      if (enc.hasOwnProperty('orders')) {
-        medications.push(
-          ...enc.orders.map((order: Order) => ({
-            order,
-            provider: {
-              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-            },
-          })),
-        );
-      }
+  // On-demand fetch: only fires when fullDataRequested is true
+  const { visit: fullVisit, isLoading: isLoadingFullVisit } = useFullVisit(fullDataRequested ? visit.uuid : null);
 
-      // Check if there is a diagnosis associated with this encounter
-      if (enc.hasOwnProperty('diagnoses')) {
-        if (enc.diagnoses.length > 0) {
-          const validDiagnoses = enc.diagnoses.filter((diagnosis) => !diagnosis.voided);
-          diagnoses.push(...validDiagnoses);
-        }
-      }
+  // Determine which visit object to use for heavy processing
+  const resolvedVisit: Visit | null =
+    fullVisit ?? ('encounters' in visit && visit.encounters ? (visit as Visit) : null);
 
-      // Check for Visit Diagnoses and Notes
-      if (enc.hasOwnProperty('obs')) {
-        enc.obs.forEach((obs) => {
+  // Extract diagnoses from lightweight visit (visit-level) or full visit (encounter-level)
+  const diagnoses: Array<Diagnosis> = useMemo(() => {
+    if ('diagnoses' in visit && Array.isArray(visit.diagnoses) && visit.diagnoses.length > 0) {
+      return visit.diagnoses.filter((d) => !d.voided).sort((a, b) => a.rank - b.rank);
+    }
+
+    if (resolvedVisit?.encounters) {
+      return resolvedVisit.encounters
+        .flatMap((enc) => enc.diagnoses ?? [])
+        .filter((d) => !d.voided)
+        .sort((a, b) => a.rank - b.rank);
+    }
+
+    return [];
+  }, [visit, resolvedVisit]);
+
+  // Extract notes from lightweight visit or full visit
+  const notes: Array<Note> = useMemo(() => {
+    if ('notes' in visit && Array.isArray(visit.notes) && visit.notes.length > 0) {
+      return visit.notes.map((note) => ({
+        note: note.value ?? note.display,
+        provider: {
+          name: note.provider?.display ?? '',
+          role: '',
+        },
+        time: note.obsDatetime ? formatTime(parseDate(note.obsDatetime)) : '',
+        concept: { uuid: '', display: '' },
+      }));
+    }
+
+    if (resolvedVisit?.encounters) {
+      const extractedNotes: Array<Note> = [];
+      resolvedVisit.encounters.forEach((enc) => {
+        enc.obs?.forEach((obs) => {
           if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
-            // Putting all notes in a single array.
-            notes.push({
-              note: obs.value as string, // TODO: add better typing check
+            extractedNotes.push({
+              note: obs.value as string,
               provider: {
                 name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
                 role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
@@ -82,19 +108,40 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             });
           }
         });
+      });
+      return extractedNotes;
+    }
+
+    return [];
+  }, [visit, resolvedVisit, config.notesConceptUuids]);
+
+  // Medications - only available from full visit
+  const medications: Array<OrderItem> = useMemo(() => {
+    if (!resolvedVisit?.encounters) return [];
+
+    const meds: Array<OrderItem> = [];
+    resolvedVisit.encounters.forEach((enc) => {
+      if (enc.orders) {
+        meds.push(
+          ...enc.orders.map((order: Order) => ({
+            order,
+            provider: {
+              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+            },
+          })),
+        );
       }
     });
 
-    // Sort the diagnoses by rank, so that primary diagnoses come first
-    diagnoses.sort((a, b) => a.rank - b.rank);
+    meds.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
+    return meds;
+  }, [resolvedVisit]);
 
-    // Sort medications by dateActivated DESC (newest first) to align with backend ordering
-    medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
-
-    return [diagnoses, notes, medications];
-  }, [config.notesConceptUuids, visit?.encounters]);
-
-  const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
+  const encounterIds = useMemo(
+    () => resolvedVisit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [],
+    [resolvedVisit?.encounters],
+  );
 
   const testsFilter = useMemo<ExternalOverviewProps['filter']>(
     () =>
@@ -104,9 +151,28 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   );
 
   const hasCompletedForms = useMemo(
-    () => visit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
-    [visit?.encounters],
+    () => resolvedVisit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
+    [resolvedVisit?.encounters],
   );
+
+  // Handle tab change - trigger full data fetch when needed
+  const handleTabChange = (evt: { selectedIndex: number }) => {
+    const tabIds = [
+      'timeline-tab',
+      'notes-tab',
+      'tests-tab',
+      'medications-tab',
+      'completed-forms-tab',
+      'encounters-tab',
+    ];
+    const selectedTabId = tabIds[evt.selectedIndex];
+
+    if (TABS_REQUIRING_FULL_DATA.has(selectedTabId) && !fullDataRequested) {
+      setFullDataRequested(true);
+    }
+  };
+
+  const loadingIndicator = <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 
   return (
     <div className={styles.summaryContainer}>
@@ -120,7 +186,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </p>
         )}
       </div>
-      <Tabs>
+      <Tabs onChange={handleTabChange}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab className={classNames(styles.tab, styles.bodyLong01)} id="timeline-tab">
             {t('timeline', 'Timeline')}
@@ -132,23 +198,31 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" disabled={encounterIds.length === 0 && config.disableEmptyTabs}>
+          <Tab
+            className={styles.tab}
+            id="tests-tab"
+            disabled={encounterIds.length === 0 && !fullDataRequested && config.disableEmptyTabs}
+          >
             {t('tests', 'Tests')}
           </Tab>
           <Tab
             className={styles.tab}
             id="medications-tab"
-            disabled={medications.length <= 0 && config.disableEmptyTabs}
+            disabled={medications.length <= 0 && !fullDataRequested && config.disableEmptyTabs}
           >
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="completed-forms-tab" disabled={!hasCompletedForms && config.disableEmptyTabs}>
+          <Tab
+            className={styles.tab}
+            id="completed-forms-tab"
+            disabled={!hasCompletedForms && !fullDataRequested && config.disableEmptyTabs}
+          >
             {t('completedForms', 'Completed forms')}
           </Tab>
           <Tab
             className={styles.tab}
             id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            disabled={!resolvedVisit?.encounters?.length && !fullDataRequested && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
@@ -163,26 +237,42 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            {isLoadingFullVisit ? (
+              loadingIndicator
+            ) : (
+              <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            )}
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
           </TabPanel>
           <TabPanel>
-            <TestsSummary patientUuid={patientUuid} encounters={visit?.encounters} />
+            {isLoadingFullVisit ? (
+              loadingIndicator
+            ) : resolvedVisit ? (
+              <TestsSummary patientUuid={patientUuid} encounters={resolvedVisit.encounters} />
+            ) : null}
           </TabPanel>
           <TabPanel>
-            <MedicationSummary medications={medications} />
+            {isLoadingFullVisit ? loadingIndicator : <MedicationSummary medications={medications} />}
           </TabPanel>
           <TabPanel>
-            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
+            {isLoadingFullVisit ? (
+              loadingIndicator
+            ) : resolvedVisit ? (
+              <VisitCompletedFormsTable visit={resolvedVisit} patientUuid={patientUuid} />
+            ) : null}
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+            {isLoadingFullVisit ? (
+              loadingIndicator
+            ) : resolvedVisit ? (
+              <VisitEncountersTable visit={resolvedVisit} patientUuid={patientUuid} />
+            ) : null}
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>
-              <Extension state={{ patientUuid, visit }} />
+              <Extension state={{ patientUuid, visit: resolvedVisit ?? visit }} />
             </TabPanel>
           </ExtensionSlot>
         </TabPanels>
