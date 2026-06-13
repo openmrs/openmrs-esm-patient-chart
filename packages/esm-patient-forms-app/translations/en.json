@@ -6,7 +6,9 @@
   "homeOverviewCardView": "View",
   "lastCompleted": "Last completed",
   "never": "Never",
+  "nextPage": "Next page",
   "noFormsToDisplay": "There are no forms to display.",
+  "noOfForms": "No. of forms",
   "off": "Off",
   "offlineForms": "Offline forms",
   "offlineForms__lower": "offline forms",
@@ -18,5 +20,6 @@
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
   "on": "On",
+  "previousPage": "Previous page",
   "searchThisList": "Search this list"
 }
