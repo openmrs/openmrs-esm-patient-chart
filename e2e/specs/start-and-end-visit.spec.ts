@@ -79,7 +79,20 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     await waitForVisitLocationValue(chartPage.page);
   });
 
-  await test.step('And I select the visit type: `OPD Visit`', async () => {
+  await test.step('And when I click on the `Start Visit` button without selecting a visit type', async () => {
+    await chartPage.page
+      .locator('form')
+      .getByRole('button', { name: /start visit/i })
+      .click();
+  });
+
+  await test.step('Then I should see a `Missing visit type` validation error and no visit should start', async () => {
+    await expect(chartPage.page.getByText(/missing visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByText(/please select a visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeHidden();
+  });
+
+  await test.step('When I select the visit type: `OPD Visit`', async () => {
     const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
     await expect(opdVisitLabel).toBeVisible();
     await opdVisitLabel.click();
