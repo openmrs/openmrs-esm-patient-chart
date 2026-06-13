@@ -59,6 +59,14 @@ export const esmPatientChartSchema = {
     },
     _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
   },
+  visitNoteEncounterTypes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['Visit Note'],
+    _description: 'Encounter type names that should be treated as visit notes for encounter edit flows.',
+  },
   obsConceptUuidsToHide: {
     _type: Type.Array,
     _elements: {
@@ -204,6 +212,7 @@ export interface ChartConfig {
     src: string;
   };
   notesConceptUuids: string[];
+  visitNoteEncounterTypes: Array<string>;
   offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
