@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Button, SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, showModal } from '@openmrs/esm-framework';
-import { type StickyNoteObs } from './sticky-note.resource';
+import { decodeHtmlEntities, type StickyNoteObs } from './sticky-note.resource';
 import DeleteStickyNote from './delete-sticky-note-button.component';
 import EditStickyNote from './edit-sticky-note-button.component';
 import styles from './sticky-note-panel.scss';
@@ -18,6 +18,7 @@ interface StickyNotePanelProps {
 
 const StickyNotePanel: React.FC<StickyNotePanelProps> = ({ error, isLoading, mutate, note, onClose, patientUuid }) => {
   const { t } = useTranslation();
+  const decodedValue = useMemo(() => (note ? decodeHtmlEntities(note.value) : ''), [note]);
 
   const handleEdit = useCallback(() => {
     if (!note) {
@@ -67,7 +68,7 @@ const StickyNotePanel: React.FC<StickyNotePanelProps> = ({ error, isLoading, mut
   return (
     <div className={styles.stickyNoteContainer}>
       <div className={styles.noteContent}>
-        <p>{note.value}</p>
+        <p>{decodedValue}</p>
       </div>
       <div className={styles.noteFooter}>
         <div className={styles.noteMetadata}>

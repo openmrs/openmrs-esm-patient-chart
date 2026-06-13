@@ -9,7 +9,8 @@ import { type ConfigObject } from '../config-schema';
 import { createStickyNote, updateStickyNote } from './sticky-note.resource';
 import StickyNoteModal from './sticky-note.modal';
 
-vi.mock('./sticky-note.resource', () => ({
+vi.mock(import('./sticky-note.resource'), async (importOriginal) => ({
+  ...(await importOriginal()),
   createStickyNote: vi.fn(),
   updateStickyNote: vi.fn(),
 }));
