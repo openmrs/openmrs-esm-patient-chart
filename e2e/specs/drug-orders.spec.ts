@@ -235,7 +235,7 @@ test.describe('Drug Order Tests', () => {
     await test.step('And I should see the updated order in the list in Active Medications table', async () => {
       const activeMedicationsTable = page.getByRole('table', { name: /medications/i }).first();
       const headerRow = activeMedicationsTable.locator('thead > tr');
-      const dataRow = activeMedicationsTable.locator('tbody > tr');
+      const dataRow = activeMedicationsTable.locator('tbody > tr').filter({ hasText: /aspirin 81mg/i });
 
       await expect(headerRow).toContainText(/start date/i);
       await expect(headerRow).toContainText(/details/i);
