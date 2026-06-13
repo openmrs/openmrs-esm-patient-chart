@@ -1,24 +1,44 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { SingleSpaProps, singleSpaPropsSubject } from '../../single-spa-props';
+import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { SingleSpaProps, dequeueInstanceSubject } from '../../single-spa-props';
 
 /**
  * A utility service simplifying common interactions with the MFs single SPA props.
+ *
+ * Each Angular app instance created by a parcel mount gets its own service
+ * instance (Angular creates a new injector per `bootstrapModule` call). The
+ * service subscribes to the per-instance `ReplaySubject` that was enqueued in
+ * `bootstrap.ts` just before this module was bootstrapped, so it only ever
+ * sees the props that belong to *this* instance. Multiple concurrent form
+ * instances therefore never overwrite each other's props.
  */
 @Injectable()
 export class SingleSpaPropsService implements OnDestroy {
   /**
-   * The most recent {@link SingleSpaProps} value pushed to the MF module.
+   * The most recent {@link SingleSpaProps} value pushed to this instance.
    */
   public lastProps?: SingleSpaProps = undefined;
+
+  private readonly subject: ReplaySubject<SingleSpaProps> | null;
   private readonly lastPropsSubscription?: Subscription;
 
   constructor() {
-    this.lastPropsSubscription = singleSpaPropsSubject.subscribe((props) => (this.lastProps = props));
+    this.subject = dequeueInstanceSubject();
+    if (this.subject) {
+      this.lastPropsSubscription = this.subject.subscribe((props) => (this.lastProps = props));
+    }
   }
 
   public ngOnDestroy() {
     this.lastPropsSubscription?.unsubscribe();
+  }
+
+  /**
+   * Observable of props updates for this instance. Components can subscribe
+   * reactively instead of polling `lastProps`.
+   */
+  public get props$(): Observable<SingleSpaProps> {
+    return this.subject?.asObservable() ?? new Observable<SingleSpaProps>();
   }
 
   /**
