@@ -14,6 +14,7 @@ import {
   useLocations,
   useVisit,
   useVisitTypes,
+  Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
 import { mockLocations, mockPastVisitWithEncounters, mockVisitTypes, mockVisitWithAttributes } from '__mocks__';
@@ -87,6 +88,7 @@ const mockUseDefaultVisitLocation = vi.fn().mockReturnValue(defaultVisitLocation
 
 const mockSaveVisit = vi.mocked(saveVisit);
 const mockUpdateVisit = vi.mocked(updateVisit);
+const mockWorkspace2 = vi.mocked(Workspace2);
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
 const mockUseVisitAttributeType = vi.mocked(useVisitAttributeType);
 const mockUseVisit = vi.mocked(useVisit);
@@ -467,6 +469,34 @@ describe('Visit form', () => {
       kind: 'success',
       title: 'Visit started',
     });
+  });
+
+  it('reports no unsaved changes after a successful save, even while callbacks are still pending', async () => {
+    const user = userEvent.setup();
+
+    let resolveCallback: () => void;
+    const pendingCallback = new Promise<void>((resolve) => {
+      resolveCallback = resolve;
+    });
+    mockOnVisitCreatedOrUpdatedCallback.mockReturnValueOnce(pendingCallback);
+
+    renderVisitForm();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    await waitFor(() => expect(mockSaveVisit).toHaveBeenCalledTimes(1));
+
+    await waitFor(() => {
+      const lastCall = mockWorkspace2.mock.lastCall?.[0];
+      expect(lastCall?.hasUnsavedChanges).toBe(false);
+    });
+
+    resolveCallback();
   });
 
   it('starts a new visit with attributes upon successful submission of the form', async () => {
