@@ -87,7 +87,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
       const orthancUrl = attachment.description ?? '';
       if (orthancUrl.includes(':8889')) {
         const studyIdMatch = orthancUrl.match(/[?&]study=([^&#+]+)/) || orthancUrl.match(/#\/studies\/([^?&]+)/);
-        const studyId = studyIdMatch ? studyIdMatch[1] : null;
+        const orthancIdMatch = orthancUrl.match(/[?&]orthancId=([^&]+)/);
+        const studyId = studyIdMatch
+          ? orthancIdMatch
+            ? `${studyIdMatch[1]}&orthancId=${orthancIdMatch[1]}`
+            : studyIdMatch[1]
+          : null;
         if (!studyId) {
           showSnackbar({
             title: t('dicomError', 'DICOM Viewer Error'),
