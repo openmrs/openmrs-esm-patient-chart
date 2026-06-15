@@ -143,6 +143,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   const { earliestAllowedStartDate, isLoading: isLoadingBirthdateCheck } =
     useEarliestAllowedVisitStartDate(patientUuid);
 
+  const [isVisitSaved, setIsVisitSaved] = useState(false);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   } | null>(null);
@@ -359,6 +360,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
             // now that visit is created / updated, we run post-submit actions
             // to update visit attributes or any other OnVisitCreatedOrUpdated actions
             const visit = response.data;
+            setIsVisitSaved(true);
 
             // Use targeted SWR invalidation instead of global mutateVisit
             // This will invalidate visit history and encounter tables for this patient
@@ -401,6 +403,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
           payload.startDatetime,
         ).then(
           async (visit) => {
+            setIsVisitSaved(true);
             // Also invalidate visit history and encounter tables
             invalidateVisitAndEncounterData(globalMutate, patientUuid);
             invalidateCurrentVisit(globalMutate, patientUuid);
@@ -445,7 +448,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   return (
     <Workspace2
       title={visitToEdit ? t('editVisit', 'Edit visit') : t('startVisitWorkspaceTitle', 'Start a visit')}
-      hasUnsavedChanges={isDirty}
+      hasUnsavedChanges={isDirty && !isVisitSaved}
     >
       <FormProvider {...methods}>
         <Form className={styles.form} onSubmit={handleSubmit(onSubmit)} data-openmrs-role="Start Visit Form">
