@@ -10,9 +10,12 @@ import { createStickyNote, updateStickyNote } from './sticky-note.resource';
 import StickyNoteModal from './sticky-note.modal';
 
 vi.mock('./sticky-note.resource', () => ({
-  decodeHtmlEntities: (text: string) => text,
   createStickyNote: vi.fn(),
   updateStickyNote: vi.fn(),
+}));
+
+vi.mock('./utils', () => ({
+  decodeHtmlEntities: (text: string) => text,
 }));
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);

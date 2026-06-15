@@ -23,15 +23,6 @@ interface StickyNoteResponse {
   results: Array<StickyNoteObs>;
 }
 
-/**
- * Decodes HTML entities (e.g. &lt; &gt; &amp;) that the REST API may return
- * in obs values back into their original characters.
- */
-export function decodeHtmlEntities(text: string): string {
-  const parser = new DOMParser();
-  return parser.parseFromString(text, 'text/html').documentElement.textContent ?? text;
-}
-
 // Exclude obs attached to an encounter or created by a form engine. The sticky-note UI only
 // writes standalone obs, so this guards against another feature (e.g. the visit note) writing
 // to the same concept UUID.
