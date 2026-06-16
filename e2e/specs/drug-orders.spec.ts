@@ -366,4 +366,94 @@ test.describe('Drug Order Tests', () => {
       ).toBeVisible();
     });
   });
+
+  test('Block saving a drug order with missing required fields', async ({ page, patient }) => {
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('And I click the Add button on the medications details table to launch the order basket', async () => {
+      const launchOrderBasketButton = page
+        .getByRole('button', { name: /record active medications/i })
+        .or(page.getByRole('button', { name: 'Add', exact: true }))
+        .first();
+      await expect(launchOrderBasketButton).toBeVisible();
+      await launchOrderBasketButton.click();
+    });
+
+    await test.step('And I open the add-drug-order workspace in the order basket', async () => {
+      const addDrugOrderSearchbox = page.getByRole('searchbox', { name: /search for a drug or orderset/i });
+      const addToOrderBasketButton = page
+        .locator("[id='order-basket']")
+        .getByRole('button', { name: 'Add', exact: true })
+        .first();
+
+      // Some environments open the workspace directly after launching the order basket,
+      // while others require an additional "Add +" click.
+      await addToOrderBasketButton.click({ timeout: 5_000 }).catch(() => {});
+      await expect(addDrugOrderSearchbox).toBeVisible();
+    });
+
+    await test.step('And I search for "Aspirin" and add "Aspirin 325mg" to the basket', async () => {
+      await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
+      await page
+        .getByRole('listitem')
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i })
+        .getByRole('button', { name: /add to basket/i })
+        .click();
+    });
+
+    await test.step('And I click on the incomplete drug order to open the order form', async () => {
+      const orderBasketLauncher = page.getByRole('button', { name: /^order basket$/i });
+      const incompleteAspirinBasketItem = orderBasket
+        .getByRole('listitem')
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
+
+      await expect(incompleteAspirinBasketItem)
+        .toBeVisible({ timeout: 5_000 })
+        .catch(async () => {
+          await orderBasketLauncher.click();
+          await expect(incompleteAspirinBasketItem).toBeVisible();
+        });
+      await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
+      await expect(page.getByText(/order form/i)).toBeVisible();
+    });
+
+    await test.step('When I click on the "Save Order" button without filling in the required fields', async () => {
+      await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('Then the save should be blocked with a validation error', async () => {
+      // Per-message assertions live in drug-order-form.test.tsx; here we only
+      // assert the journey outcome: save is blocked and an error is shown.
+      await expect(page.getByText(/dosage is required/i)).toBeVisible();
+    });
+
+    await test.step('And the order should remain in the Incomplete state in the order basket', async () => {
+      await expect(orderBasket.getByRole('status', { name: /incomplete/i })).toBeVisible();
+    });
+
+    await test.step('When I fill in the required fields', async () => {
+      await page.getByLabel(/^dose$/i, { exact: true }).fill('1');
+      await page.getByRole('combobox', { name: /route/i }).click();
+      await page.getByRole('option', { name: /oral/i }).click();
+      await page.getByRole('combobox', { name: /frequency/i }).click();
+      await page.getByRole('option', { name: /once daily/i }).click();
+      await page.getByLabel(/^quantity to dispense$/i).fill('3');
+      await page.getByLabel(/^prescription refills$/i).fill('1');
+      await page.getByRole('textbox', { name: 'Indication' }).fill('Headache');
+    });
+
+    await test.step('And when I click on the "Save Order" button', async () => {
+      await page.getByRole('button', { name: /save order/i }).click();
+    });
+
+    await test.step('Then the order status should be changed to "New"', async () => {
+      await expect(orderBasket.getByText(/incomplete/i)).toBeHidden();
+      await expect(orderBasket.getByText(/new/i)).toBeVisible();
+    });
+  });
 });
