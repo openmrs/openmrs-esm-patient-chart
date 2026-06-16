@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ProgramsPage } from '../pages';
 
-test('Add and edit a program enrollment', async ({ page, patient }) => {
+test('Add, edit, and delete a program enrollment', async ({ page, patient }) => {
   const programsPage = new ProgramsPage(page);
   const headerRow = programsPage.programsTable().locator('thead > tr');
   const dataRow = programsPage.programsTable().locator('tbody > tr');
@@ -116,5 +116,26 @@ test('Add and edit a program enrollment', async ({ page, patient }) => {
     await expect(dataRow).toContainText(/completed on 04-Jul-2023/i);
     await expect(dataRow).not.toContainText(/outpatient clinic/i);
     await expect(dataRow).toContainText(/community outreach/i);
+  });
+
+  await test.step('When I click the `Delete` button of the program', async () => {
+    await programsPage.overflowButton().click();
+    await page.getByRole('menuitem', { name: /delete/i }).click();
+  });
+
+  await test.step('Then I should see a confirmation modal', async () => {
+    await expect(page.getByText(/are you sure you want to delete this program enrollment\?/i)).toBeVisible();
+  });
+
+  await test.step('When I confirm the deletion', async () => {
+    await page.getByRole('button', { name: /confirm/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/program enrollment deleted/i)).toBeVisible();
+  });
+
+  await test.step('And the program should no longer appear in the list', async () => {
+    await expect(page.getByRole('cell', { name: /hiv care and treatment/i })).toBeHidden();
   });
 });
