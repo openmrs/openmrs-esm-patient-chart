@@ -35,10 +35,12 @@ export class PatientPreviousEncounterService {
             } else {
               resolve(Object.create({}));
             }
+          } else {
+            resolve(Object.create({}));
           }
         },
         (error) => {
-          console.error('Previous encounter', error);
+          reject(error);
         },
       );
     });
