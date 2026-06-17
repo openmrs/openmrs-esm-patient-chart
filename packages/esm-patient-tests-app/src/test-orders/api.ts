@@ -10,6 +10,7 @@ import {
   type TestOrderPost,
 } from '@openmrs/esm-patient-common-lib';
 import {
+  evaluateAsBooleanAsync,
   type FetchResponse,
   openmrsFetch,
   restBaseUrl,
@@ -17,7 +18,7 @@ import {
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
+import { type ConfigObject, type OrderReasonReference } from '../config-schema';
 
 /**
  * SWR-based data fetcher for patient orders.
@@ -64,17 +65,45 @@ export function usePatientLabOrders(patientUuid: string, status: 'ACTIVE' | 'any
 
 const conceptRepresentation = 'custom:(uuid,display)';
 
-export function useOrderReasons(conceptUuids: Array<string>) {
+async function getVisibleConceptUuids(conceptUuids: Array<OrderReasonReference>, patient: fhir.Patient) {
+  const visibleConceptUuids = await Promise.allSettled(
+    conceptUuids.map(async (concept) => {
+      if (typeof concept === 'string') {
+        return concept;
+      }
+
+      if (concept.hideWhenExpression) {
+        const evaluatedExpression = await evaluateAsBooleanAsync(concept.hideWhenExpression, {
+          patient: patient,
+          openmrsFetch,
+        });
+        return evaluatedExpression ? null : concept.conceptUuid;
+      }
+
+      return concept.conceptUuid;
+    }),
+  );
+
+  return visibleConceptUuids
+    .filter(
+      (result): result is PromiseFulfilledResult<string> => result.status === 'fulfilled' && result.value !== null,
+    )
+    .map((result) => result.value);
+}
+
+export function useOrderReasons(conceptUuids: Array<OrderReasonReference>, patient: fhir.Patient) {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptReferenceResponse>, Error>(
     conceptUuids && conceptUuids.length > 0
-      ? [`${restBaseUrl}/conceptreferences?v=${conceptRepresentation}`, conceptUuids]
+      ? [`${restBaseUrl}/conceptreferences?v=${conceptRepresentation}`, conceptUuids, patient.id]
       : null,
-    ([url, refs]) =>
-      openmrsFetch<ConceptReferenceResponse>(url, {
+    async ([url]) => {
+      const refs = await getVisibleConceptUuids(conceptUuids, patient);
+      return openmrsFetch<ConceptReferenceResponse>(url, {
         headers: { 'Content-Type': 'application/json' },
         body: { references: refs },
         method: 'POST',
-      }),
+      });
+    },
   );
 
   const orderReasons = Object.values(data?.data ?? {}).map((value) => ({

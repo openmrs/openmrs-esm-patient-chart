@@ -137,7 +137,7 @@ export function LabOrderForm({
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
 
-  const { orderReasons } = useOrderReasons(orderReasonUuids);
+  const { orderReasons } = useOrderReasons(orderReasonUuids, patient);
 
   const filterItemsByName = useCallback((menu) => {
     const inputValue = menu?.inputValue?.toLowerCase();
