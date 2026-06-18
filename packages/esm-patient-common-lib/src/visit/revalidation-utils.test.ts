@@ -4,6 +4,7 @@ import {
   invalidatePatientEncounters,
   invalidateVisitAndEncounterData,
   invalidateCurrentVisit,
+  invalidatePatientConditions,
 } from './revalidation-utils';
 
 const mockMutate = vi.fn();
@@ -75,26 +76,57 @@ describe('revalidation-utils', () => {
     });
   });
 
+  describe('invalidatePatientConditions', () => {
+    it('should invalidate condition keys for the specified patient', () => {
+      const patientUuid = 'test-patient-123';
+
+      invalidatePatientConditions(mockMutate, patientUuid);
+
+      expect(mockMutate).toHaveBeenCalledTimes(1);
+      expect(mockMutate).toHaveBeenCalledWith(expect.any(Function));
+
+      // Test the cache key matcher function
+      const matcherFn = mockMutate.mock.calls[0][0];
+
+      // Should match FHIR condition endpoints with patient parameter
+      expect(matcherFn('/ws/fhir2/R4/Condition?patient=test-patient-123&_count=100')).toBe(true);
+
+      // Should not match other patient's conditions
+      expect(matcherFn('/ws/fhir2/R4/Condition?patient=other-patient&_count=100')).toBe(false);
+
+      // Should not match non-condition endpoints
+      expect(matcherFn('/ws/rest/v1/visit?patient=test-patient-123')).toBe(false);
+
+      // Should not match non-string keys
+      expect(matcherFn({ url: '/ws/fhir2/R4/Condition?patient=test-patient-123' })).toBe(false);
+    });
+  });
+
   describe('invalidateVisitAndEncounterData', () => {
-    it('should call both visit history and encounter invalidation functions', () => {
+    it('should call visit history, encounter, and conditions invalidation functions', () => {
       const patientUuid = 'test-patient-123';
 
       invalidateVisitAndEncounterData(mockMutate, patientUuid);
 
-      // Should be called twice - once for visits, once for encounters
-      expect(mockMutate).toHaveBeenCalledTimes(2);
+      // Should be called three times - once for visits, once for encounters, once for conditions
+      expect(mockMutate).toHaveBeenCalledTimes(3);
       expect(mockMutate).toHaveBeenNthCalledWith(1, expect.any(Function));
       expect(mockMutate).toHaveBeenNthCalledWith(2, expect.any(Function));
+      expect(mockMutate).toHaveBeenNthCalledWith(3, expect.any(Function));
 
-      // Test that both matcher functions work correctly
+      // Test that all matcher functions work correctly
       const visitMatcherFn = mockMutate.mock.calls[0][0];
       const encounterMatcherFn = mockMutate.mock.calls[1][0];
+      const conditionMatcherFn = mockMutate.mock.calls[2][0];
 
       // Visit matcher should work
       expect(visitMatcherFn('/ws/rest/v1/visit?patient=test-patient-123&v=custom&limit=10')).toBe(true);
 
       // Encounter matcher should work
       expect(encounterMatcherFn('/ws/rest/v1/encounter?patient=test-patient-123&v=custom')).toBe(true);
+
+      // Conditions matcher should work
+      expect(conditionMatcherFn('/ws/fhir2/R4/Condition?patient=test-patient-123&_count=100')).toBe(true);
     });
   });
 

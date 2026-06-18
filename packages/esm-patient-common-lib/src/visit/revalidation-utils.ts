@@ -1,5 +1,5 @@
 import type { KeyedMutator } from 'swr';
-import { restBaseUrl } from '@openmrs/esm-framework';
+import { fhirBaseUrl, restBaseUrl } from '@openmrs/esm-framework';
 
 /**
  * Invalidates visit history table data without triggering global visit revalidation cascade.
@@ -117,6 +117,23 @@ export function invalidateCurrentVisit(mutate: KeyedMutator<unknown>, patientUui
 export function invalidateVisitAndEncounterData(mutate: KeyedMutator<unknown>, patientUuid: string): void {
   invalidateVisitHistory(mutate, patientUuid);
   invalidatePatientEncounters(mutate, patientUuid);
+  invalidatePatientConditions(mutate, patientUuid);
+}
+
+/**
+ * Invalidates conditions cache for a specific patient.
+ *
+ * @param mutate - SWR mutate function from useSWRConfig()
+ * @param patientUuid - Patient UUID to target conditions for
+ */
+export function invalidatePatientConditions(mutate: KeyedMutator<unknown>, patientUuid: string): void {
+  mutate((key) => {
+    return (
+      typeof key === 'string' &&
+      key.includes(`${fhirBaseUrl}/Condition`) &&
+      key.includes(`patient=${patientUuid}`)
+    );
+  });
 }
 
 /**
