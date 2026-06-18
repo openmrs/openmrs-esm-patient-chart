@@ -38,6 +38,7 @@ import {
   useFeatureFlag,
   useLayoutType,
   useSession,
+  useVisit,
   Workspace2,
   type Encounter,
   type UploadedFile,
@@ -126,6 +127,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
+  const { activeVisit } = useVisit(patientUuid);
 
   const visitNoteFormSchema = useMemo(
     () => createSchema(t, isRetrospectiveDataEntryEnabled),
@@ -394,6 +396,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               },
             ]
           : [],
+        visit: activeVisit?.uuid ?? null,
       };
 
       const abortController = new AbortController();
@@ -483,6 +486,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         });
     },
     [
+      activeVisit?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
       combinedDiagnoses,

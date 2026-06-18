@@ -14,7 +14,6 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import type { ChartConfig } from '../../../config-schema';
-import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import type { Note, Order, OrderItem } from '../visit.resource';
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
@@ -95,13 +94,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
   }, [config.notesConceptUuids, visit?.encounters]);
 
   const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
-
-  const testsFilter = useMemo<ExternalOverviewProps['filter']>(
-    () =>
-      ([entry]) =>
-        encounterIds.includes(entry.encounter?.reference),
-    [encounterIds],
-  );
 
   const hasCompletedForms = useMemo(
     () => visit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
