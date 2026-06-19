@@ -396,7 +396,9 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
               },
             ]
           : [],
-        visit: activeVisit?.uuid ?? null,
+        // Only attach the visit when creating a note. On edit, omitting `visit` leaves the encounter's
+        // existing visit untouched rather than reassigning it to (or detaching it from) the active visit.
+        ...(!isEditing && activeVisit?.uuid && { visit: activeVisit.uuid }),
       };
 
       const abortController = new AbortController();
