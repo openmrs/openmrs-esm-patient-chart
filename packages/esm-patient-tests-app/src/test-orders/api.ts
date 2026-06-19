@@ -73,11 +73,19 @@ async function getVisibleConceptUuids(conceptUuids: Array<OrderReasonReference>,
       }
 
       if (concept.hideWhenExpression) {
-        const evaluatedExpression = await evaluateAsBooleanAsync(concept.hideWhenExpression, {
-          patient: patient,
-          openmrsFetch,
-        });
-        return evaluatedExpression ? null : concept.conceptUuid;
+        try {
+          const evaluatedExpression = await evaluateAsBooleanAsync(concept.hideWhenExpression, {
+            patient: patient,
+            openmrsFetch,
+          });
+          return evaluatedExpression ? null : concept.conceptUuid;
+        } catch (err) {
+          console.error(
+            `Failed to evaluate hideWhenExpression "${concept.hideWhenExpression}" for concept ${concept.conceptUuid}; showing reason anyway.`,
+            err,
+          );
+          return concept.conceptUuid;
+        }
       }
 
       return concept.conceptUuid;

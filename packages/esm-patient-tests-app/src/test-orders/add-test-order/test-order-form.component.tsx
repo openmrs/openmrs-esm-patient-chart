@@ -84,6 +84,12 @@ export function LabOrderForm({
     [config.labTestsWithOrderReasons, initialOrder?.testType?.conceptUuid],
   );
 
+  const orderReasonUuids =
+    (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})
+      .orderReasons || [];
+
+  const { orderReasons } = useOrderReasons(orderReasonUuids, patient);
+
   const labOrderFormSchema = useMemo(
     () =>
       z
@@ -100,20 +106,21 @@ export function LabOrderForm({
               invalid_type_error: t('testTypeRequired', 'Test type is required'),
             },
           ),
-          orderReason: orderReasonRequired
-            ? z
-                .string({
-                  required_error: t('orderReasonRequired', 'Order reason is required'),
-                })
-                .refine((value) => !!value, t('orderReasonRequired', 'Order reason is required'))
-            : z.string().optional(),
+          orderReason:
+            orderReasonRequired && orderReasons.length > 0
+              ? z
+                  .string({
+                    required_error: t('orderReasonRequired', 'Order reason is required'),
+                  })
+                  .refine((value) => !!value, t('orderReasonRequired', 'Order reason is required'))
+              : z.string().optional(),
           scheduledDate: z.date({}).nullish(),
         })
         .refine((data) => data.urgency !== 'ON_SCHEDULED_DATE' || Boolean(data.scheduledDate), {
           message: t('scheduledDateRequired', 'Scheduled date is required'),
           path: ['scheduledDate'],
         }),
-    [orderReasonRequired, t],
+    [orderReasonRequired, orderReasons.length, t],
   );
 
   const {
@@ -132,12 +139,6 @@ export function LabOrderForm({
   });
 
   const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
-
-  const orderReasonUuids =
-    (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
-      .orderReasons || [];
-
-  const { orderReasons } = useOrderReasons(orderReasonUuids, patient);
 
   const filterItemsByName = useCallback((menu) => {
     const inputValue = menu?.inputValue?.toLowerCase();

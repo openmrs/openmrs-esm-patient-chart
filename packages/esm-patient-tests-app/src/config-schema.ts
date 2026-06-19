@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
   resultsViewerConcepts: {
@@ -107,7 +107,13 @@ export const configSchema = {
       orderReasons: {
         _type: Type.Array,
         _elements: {
-          _type: Type.ConceptUuid,
+          _validators: [
+            validator(
+              (v) =>
+                typeof v === 'string' || (typeof v === 'object' && v !== null && typeof v.conceptUuid === 'string'),
+              'must be a concept UUID string or an object with a `conceptUuid` string',
+            ),
+          ],
         },
         _description:
           'Coded Lab test order reason options. Each entry may be a plain concept UUID string, or an object with `conceptUuid` (string) and an optional `hideWhenExpression`.',

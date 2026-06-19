@@ -178,6 +178,42 @@ describe('LabOrderForm', () => {
     await screen.findByText(/order reason is required/i);
   });
 
+  it('allows saving when required:true but every reason is hidden by expression', async () => {
+    const user = userEvent.setup();
+    const mockSetOrders = vi.fn();
+    mockUseOrderBasket.mockReturnValue({ orders: [], setOrders: mockSetOrders, clearOrders: vi.fn() });
+    const actual = await vi.importActual<typeof Api>('../api');
+    mockUseOrderReasons.mockImplementation(actual.useOrderReasons);
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      showReferenceNumberField: true,
+      labTestsWithOrderReasons: [
+        {
+          labTestUuid: testType.conceptUuid,
+          required: true,
+          orderReasons: [{ conceptUuid: 'reason-uuid-1', hideWhenExpression: 'true' }],
+        },
+      ],
+    });
+
+    // conceptreferences is never reached because the visible list is empty
+    mockOpenmrsFetch.mockResolvedValue({ data: {} } as any);
+
+    renderLabOrderForm();
+
+    // No combobox — all reasons are hidden
+    await waitFor(() => {
+      expect(screen.queryByRole('combobox', { name: /order reason/i })).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /save order/i }));
+
+    // Form submits; no "Order reason is required" blocking error
+    await waitFor(() => expect(mockSetOrders).toHaveBeenCalled());
+    expect(screen.queryByText(/order reason is required/i)).not.toBeInTheDocument();
+  });
+
   it('hides the order reason field when only one reason exists but is hidden by expression', async () => {
     const actual = await vi.importActual<typeof Api>('../api');
     mockUseOrderReasons.mockImplementation(actual.useOrderReasons);
