@@ -38,7 +38,6 @@ import {
   useFeatureFlag,
   useLayoutType,
   useSession,
-  useVisit,
   Workspace2,
   type Encounter,
   type UploadedFile,
