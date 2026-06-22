@@ -62,6 +62,15 @@ export const configSchema = {
       _type: Type.String,
     },
   },
+  minimumCharacterLengthForDrugSearch: {
+    _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
+    _description:
+      'The minimum number of characters that must be entered in the drug search input before the search is performed.',
+    _default: 2,
+  },
 };
 
 export interface ConfigObject {
@@ -76,4 +85,5 @@ export interface ConfigObject {
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
   drugCategoryConceptSets: Array<string>;
+  minimumCharacterLengthForDrugSearch: number;
 }

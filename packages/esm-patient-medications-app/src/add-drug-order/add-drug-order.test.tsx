@@ -18,12 +18,20 @@ import {
   mockSessionDataResponse,
 } from '__mocks__';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search/drug-search.resource';
-import { ExtensionSlot, UserHasAccess, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  UserHasAccess,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { type PostDataPrepFunction, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import AddDrugOrderWorkspace from './add-drug-order.workspace';
 
 const mockCloseWorkspace = vi.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseSession = vi.mocked(useSession);
 const mockUseDrugSearch = vi.mocked(useDrugSearch);
 const mockUseDrugTemplate = vi.mocked(useDrugTemplate);
@@ -32,6 +40,7 @@ const mockUserHasAccess = vi.mocked(UserHasAccess);
 const mockUseMedicationOrders = vi.fn();
 const mockUseRequireOutpatientQuantity = vi.fn();
 
+mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema) as ConfigObject);
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 mockExtensionSlot.mockImplementation(() => null);
 mockUserHasAccess.mockImplementation(({ children }) => <>{children}</>);
@@ -164,9 +173,10 @@ describe('AddDrugOrderWorkspace drug search', () => {
     const aspirin325AddButton = within(aspirin325Div).getByText(/Add to basket/i);
     await user.click(aspirin325AddButton);
 
+    const { daysDurationUnit } = getDefaultsFromConfigSchema(configSchema) as ConfigObject;
     expect(hookResult.current.orders).toEqual([
       expect.objectContaining({
-        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null),
+        ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null, daysDurationUnit),
         isOrderIncomplete: true,
         scheduledDate: expect.any(Date),
       }),
@@ -212,7 +222,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
           ...getTemplateOrderBasketItem(
             mockDrugSearchResultApiData[0],
             null,
-            undefined,
+            (getDefaultsFromConfigSchema(configSchema) as ConfigObject).daysDurationUnit,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
           scheduledDate: expect.any(Date),
