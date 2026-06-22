@@ -47,6 +47,7 @@ import {
   invalidateVisitAndEncounterData,
   type PatientWorkspace2DefinitionProps,
   useAllowedFileExtensions,
+  usePatientChartStore,
 } from '@openmrs/esm-patient-common-lib';
 import type { ConfigObject } from '../config-schema';
 import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
@@ -127,7 +128,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
-  const { activeVisit } = useVisit(patientUuid);
+  const { visitContext } = usePatientChartStore(patientUuid);
 
   const visitNoteFormSchema = useMemo(
     () => createSchema(t, isRetrospectiveDataEntryEnabled),
@@ -398,7 +399,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
           : [],
         // Only attach the visit when creating a note. On edit, omitting `visit` leaves the encounter's
         // existing visit untouched rather than reassigning it to (or detaching it from) the active visit.
-        ...(!isEditing && activeVisit?.uuid && { visit: activeVisit.uuid }),
+        ...(!isEditing && visitContext?.uuid && { visit: visitContext.uuid }),
       };
 
       const abortController = new AbortController();
@@ -488,7 +489,7 @@ const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormPr
         });
     },
     [
-      activeVisit?.uuid,
+      visitContext?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
       combinedDiagnoses,
