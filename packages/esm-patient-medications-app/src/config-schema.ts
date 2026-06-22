@@ -64,9 +64,12 @@ export const configSchema = {
   },
   minimumCharacterLengthForDrugSearch: {
     _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
     _description:
       'The minimum number of characters that must be entered in the drug search input before the search is performed.',
-    _default: 3,
+    _default: 2,
   },
 };
 
