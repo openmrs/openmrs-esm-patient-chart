@@ -83,62 +83,17 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   );
 
   const openAttachment = useCallback(
-    async (attachment: Attachment) => {
-      const orthancUrl = attachment.description ?? '';
-      if (orthancUrl.includes(':8889')) {
-        const normalizedUrl = orthancUrl.replace(/&amp;/g, '&');
-        const studyIdMatch = normalizedUrl.match(/[?&]study=([^&#+]+)/) || normalizedUrl.match(/#\/studies\/([^?&]+)/);
-        const orthancIdMatch = normalizedUrl.match(/[?&]orthancId=([^&]+)/);
-        const studyId = studyIdMatch
-          ? orthancIdMatch
-            ? `${studyIdMatch[1]}&orthancId=${orthancIdMatch[1]}`
-            : studyIdMatch[1]
-          : null;
-        if (!studyId) {
-          showSnackbar({
-            title: t('dicomError', 'DICOM Viewer Error'),
-            subtitle: t('dicomStudyIdError', 'Could not extract study ID from DICOM attachment.'),
-            kind: 'error',
-          });
-          return;
-        }
-        try {
-          const response = await fetch(`/openmrs/ws/rest/v1/orthanc/token?studyId=${encodeURIComponent(studyId)}`, {
-            credentials: 'include',
-            headers: { Accept: 'application/json' },
-          });
-
-          if (response.status === 401) {
-            // Session expired — redirect to login and come back to this page after
-            const returnUrl = encodeURIComponent(window.location.href);
-            window.location.href = `/openmrs/login.htm?redirect=${returnUrl}`;
-            return;
-          }
-
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const data = await response.json();
-          window.open(data.url, '_blank', 'noopener,noreferrer');
-        } catch (err) {
-          showSnackbar({
-            title: t('dicomError', 'DICOM Viewer Error'),
-            subtitle: t('dicomTokenError', `Could not open DICOM viewer: ${(err as Error).message}`),
-            kind: 'error',
-          });
-        }
-        return;
-      }
-
+    (attachment: Attachment) => {
       if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
         setAttachmentToPreview(attachment);
-        return;
+      } else {
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', attachment.src);
+        anchor.setAttribute('download', attachment.filename);
+        anchor.click();
       }
-
-      const anchor = document.createElement('a');
-      anchor.setAttribute('href', attachment.src);
-      anchor.setAttribute('download', attachment.filename);
-      anchor.click();
     },
-    [setAttachmentToPreview, t],
+    [setAttachmentToPreview],
   );
 
   const showAddAttachmentModal = useCallback(() => {
