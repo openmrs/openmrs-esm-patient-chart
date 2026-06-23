@@ -49,7 +49,7 @@ export const configSchema = {
   statusConceptSourceType: {
     _type: Type.String,
     _description: sourceTypeDescription,
-    _default: 'Concept set',
+    _default: 'Answer to',
     _validators: [validators.oneOf(conceptSourceTypes)],
   },
   durationUnitConceptUuid: {
