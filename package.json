@@ -1,7 +1,7 @@
 {
   "name": "@openmrs/esm-patient-chart",
   "private": true,
-  "version": "12.2.1",
+  "version": "12.3.1",
   "workspaces": [
     "packages/*"
   ],
