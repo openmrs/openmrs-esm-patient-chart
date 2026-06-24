@@ -4,7 +4,6 @@
 
 .formContainer {
   padding: 0 layout.$spacing-05;
-  height: 100%;
 }
 
 .formSection {
@@ -20,6 +19,8 @@
 }
 
 .bottomButtons {
+  margin-top: auto;
+
   :global(.cds--btn) {
     width: 50%;
     max-width: unset;
