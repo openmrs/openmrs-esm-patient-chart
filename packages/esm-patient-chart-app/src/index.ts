@@ -16,6 +16,7 @@ import startVisitActionButtonComponent from './actions-buttons/start-visit.compo
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.extension';
+import visitCompletedFormsTableComponent from './visit/visits-widget/past-visits-components/encounters-table/visit-completed-forms-table.component';
 
 // This allows @openmrs/esm-framework to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -95,6 +96,11 @@ export const encountersSummaryDashboardLink =
 
 export const currentVisitSummary = getSyncLifecycle(currentVisitSummaryComponent, {
   featureName: 'current-visit-summary',
+  moduleName,
+});
+
+export const visitSummaryCompletedFormsTable = getSyncLifecycle(visitCompletedFormsTableComponent, {
+  featureName: 'visit-summary-completed-forms-table',
   moduleName,
 });
 

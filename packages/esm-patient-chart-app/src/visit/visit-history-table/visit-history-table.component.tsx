@@ -15,13 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, useConfig, useLayoutType, VisitSummary } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../../config-schema';
 import { usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
-import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitTypeCell from './visit-type-cell.component';
 import styles from './visit-history-table.scss';
 
@@ -40,6 +40,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
 
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
   const { t } = useTranslation();
+  const { notesConceptUuids, drugOrderTypeUUID, disableEmptyTabs } = useConfig<ChartConfig>();
   const desktopLayout = isDesktop(useLayoutType());
 
   // TODO: make this configurable
@@ -110,7 +111,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} patientUuid={patientUuid} />
+                            <VisitSummary
+                              visit={visit}
+                              patientUuid={patientUuid}
+                              notesConceptUuids={notesConceptUuids}
+                              drugOrderTypeUUID={drugOrderTypeUUID}
+                              disableEmptyTabs={disableEmptyTabs}
+                            />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

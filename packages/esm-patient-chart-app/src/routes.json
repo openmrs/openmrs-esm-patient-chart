@@ -143,6 +143,17 @@
       }
     },
     {
+      "name": "visit-summary-completed-forms-table",
+      "component": "visitSummaryCompletedFormsTable",
+      "slot": "visit-summary-completed-forms-slot",
+      "order": 0,
+      "online": true,
+      "offline": true,
+      "meta": {
+        "title": "Completed forms"
+      }
+    },
+    {
       "name": "edit-visit-action-button",
       "slot": "visit-detail-overview-actions",
       "component": "editVisitDetailsActionButton",

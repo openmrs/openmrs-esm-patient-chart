@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
+import { launchWorkspace2, useConfig, VisitSummary } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
-import VisitSummary from './past-visits-components/visit-summary.component';
+import { type ChartConfig } from '../../config-schema';
 import styles from './current-visit-summary.scss';
 
 interface CurrentVisitSummaryProps {
@@ -15,6 +15,7 @@ interface CurrentVisitSummaryProps {
  */
 const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { notesConceptUuids, drugOrderTypeUUID, disableEmptyTabs } = useConfig<ChartConfig>();
   const { patientUuid: storePatientUuid, visitContext } = usePatientChartStore(patientUuid);
 
   if (patientUuid !== storePatientUuid) {
@@ -39,7 +40,13 @@ const CurrentVisitSummary: React.FC<CurrentVisitSummaryProps> = ({ patientUuid }
         <span />
       </CardHeader>
       <div className={styles.visitSummaryCard}>
-        <VisitSummary visit={visitContext} patientUuid={patientUuid} />
+        <VisitSummary
+          visit={visitContext}
+          patientUuid={patientUuid}
+          notesConceptUuids={notesConceptUuids}
+          drugOrderTypeUUID={drugOrderTypeUUID}
+          disableEmptyTabs={disableEmptyTabs}
+        />
       </div>
     </div>
   );
