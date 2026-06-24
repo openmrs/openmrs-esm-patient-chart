@@ -160,6 +160,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
   }, [isEditMode, existingTask, reset, systemTasks]);
 
   const selectedDueDateType = watch('dueDateType');
+  const selectedAssigneeRole = watch('assigneeRole');
 
   const providerOptions = useMemo(
     () =>
@@ -169,7 +170,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
       })),
     [providers],
   );
-  const providerRoleOptions = useProviderRoles();
+  const { providerRoleOptions, isLoading: isLoadingProviderRoles } = useProviderRoles();
 
   const handleSystemTaskSelected = useCallback(
     (task: SystemTask) => {
@@ -403,32 +404,33 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
               />
             </InputWrapper>
 
-            {allowAssigningProviderRole && (
-              <InputWrapper>
-                <Controller
-                  name="assigneeRole"
-                  control={control}
-                  render={({ field }) => (
-                    <ComboBox
-                      id="assigneeRole"
-                      titleText={t('assignProviderRoleLabel', 'Assign to provider role')}
-                      placeholder={t('assignProviderRolePlaceholder', 'Search provider roles')}
-                      items={providerRoleOptions}
-                      itemToString={(item) => item?.label ?? ''}
-                      selectedItem={field.value ?? null}
-                      onChange={({ selectedItem }) => {
-                        field.onChange(selectedItem ?? undefined);
-                        if (selectedItem) {
-                          setValue('assignee', undefined, { shouldDirty: true, shouldValidate: true });
-                        }
-                      }}
-                      invalid={Boolean(errors.assigneeRole)}
-                      invalidText={errors.assigneeRole?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            )}
+            {allowAssigningProviderRole &&
+              (isLoadingProviderRoles || providerRoleOptions.length > 0 || Boolean(selectedAssigneeRole)) && (
+                <InputWrapper>
+                  <Controller
+                    name="assigneeRole"
+                    control={control}
+                    render={({ field }) => (
+                      <ComboBox
+                        id="assigneeRole"
+                        titleText={t('assignProviderRoleLabel', 'Assign to provider role')}
+                        placeholder={t('assignProviderRolePlaceholder', 'Search provider roles')}
+                        items={providerRoleOptions}
+                        itemToString={(item) => item?.label ?? ''}
+                        selectedItem={field.value ?? null}
+                        onChange={({ selectedItem }) => {
+                          field.onChange(selectedItem ?? undefined);
+                          if (selectedItem) {
+                            setValue('assignee', undefined, { shouldDirty: true, shouldValidate: true });
+                          }
+                        }}
+                        invalid={Boolean(errors.assigneeRole)}
+                        invalidText={errors.assigneeRole?.message}
+                      />
+                    )}
+                  />
+                </InputWrapper>
+              )}
 
             <InputWrapper>
               <Controller
@@ -486,7 +488,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
           {isEditMode ? getCoreTranslation('cancel') : t('discard', 'Discard')}
         </Button>
         <Button kind="primary" size="xl" onClick={handleSubmit(handleFormSubmission)}>
-          {isEditMode ? t('saveTask', 'Save task') : t('addTaskButton', 'Add Task')}
+          {isEditMode ? t('saveTask', 'Save task') : t('addTask', 'Add task')}
         </Button>
       </ButtonSet>
     </>
