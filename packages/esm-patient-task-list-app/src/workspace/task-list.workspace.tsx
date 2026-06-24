@@ -44,8 +44,22 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
   const backText =
     view === 'edit' ? t('backToTaskDetails', 'Back to task details') : t('backToTaskList', 'Back to task list');
 
+  const title = (() => {
+    switch (view) {
+      case 'form':
+        return t('addTask', 'Add task');
+      case 'edit':
+        return t('editTask', 'Edit task');
+      case 'details':
+        return t('taskDetails', 'Task details');
+      case 'list':
+      default:
+        return t('taskListWorkspaceTitle', 'Task list');
+    }
+  })();
+
   return (
-    <Workspace2 title={t('taskListWorkspaceTitle', 'Task List')}>
+    <Workspace2 title={title}>
       <div className={styles.workspaceContainer}>
         {['form', 'details', 'edit'].includes(view) && (
           <div className={styles.backButton}>
@@ -54,6 +68,7 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
               renderIcon={(props) => <ArrowLeft size={16} {...props} />}
               iconDescription={backText}
               onClick={handleBackClick}
+              size="sm"
             >
               <span>{backText}</span>
             </Button>
@@ -68,10 +83,10 @@ const TaskListWorkspace: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              iconDescription={t('addTask', 'Add Task')}
+              iconDescription={t('addTask', 'Add task')}
               onClick={() => setView('form')}
             >
-              {t('addTask', 'Add Task')}
+              {t('addTask', 'Add task')}
             </Button>
           </div>
         )}

@@ -488,7 +488,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
           {isEditMode ? getCoreTranslation('cancel') : t('discard', 'Discard')}
         </Button>
         <Button kind="primary" size="xl" onClick={handleSubmit(handleFormSubmission)}>
-          {isEditMode ? t('saveTask', 'Save task') : t('addTaskButton', 'Add Task')}
+          {isEditMode ? t('saveTask', 'Save task') : t('addTask', 'Add task')}
         </Button>
       </ButtonSet>
     </>
