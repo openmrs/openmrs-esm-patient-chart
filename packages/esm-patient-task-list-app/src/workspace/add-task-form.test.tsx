@@ -79,7 +79,7 @@ describe('AddTaskForm', () => {
       error: null,
     });
 
-    mockUseProviderRoles.mockReturnValue([]);
+    mockUseProviderRoles.mockReturnValue({ providerRoleOptions: [], isLoading: false });
 
     mockSaveTask.mockResolvedValue({} as any);
     mockUpdateTask.mockResolvedValue({} as any);
@@ -611,6 +611,35 @@ describe('AddTaskForm', () => {
           }),
         );
       });
+    });
+  });
+
+  describe('Provider role field visibility', () => {
+    it('hides the "Assign to provider role" field when no provider roles exist', () => {
+      mockUseProviderRoles.mockReturnValue({ providerRoleOptions: [], isLoading: false });
+
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
+
+      expect(screen.queryByRole('combobox', { name: /assign to provider role/i })).not.toBeInTheDocument();
+    });
+
+    it('shows the "Assign to provider role" field when provider roles exist', () => {
+      mockUseProviderRoles.mockReturnValue({
+        providerRoleOptions: [{ id: 'role-uuid-123', label: 'Nurse' }],
+        isLoading: false,
+      });
+
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
+
+      expect(screen.getByRole('combobox', { name: /assign to provider role/i })).toBeInTheDocument();
+    });
+
+    it('shows the "Assign to provider role" field while provider roles are loading', () => {
+      mockUseProviderRoles.mockReturnValue({ providerRoleOptions: [], isLoading: true });
+
+      render(<AddTaskForm patientUuid={patientUuid} activeVisit={mockActiveVisit} onClose={mockOnClose} />);
+
+      expect(screen.getByRole('combobox', { name: /assign to provider role/i })).toBeInTheDocument();
     });
   });
 });
