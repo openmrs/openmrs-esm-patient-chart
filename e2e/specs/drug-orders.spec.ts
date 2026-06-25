@@ -521,7 +521,7 @@ test.describe('Drug Order Tests', () => {
       await expect(page.getByText(/dose unit is required/i)).toBeVisible();
     });
 
-    await test.step('Then the Dose input stays top-aligned with the Dose unit field', async () => {
+    await test.step('Then the Dose and Dose unit fields stay top-aligned and equal height', async () => {
       // Regression test: the error label below the Dose unit field used to stretch the row
       // and push the centered Dose input down out of alignment. Both inputs should share the
       // same top edge regardless of the error label.
@@ -531,6 +531,11 @@ test.describe('Drug Order Tests', () => {
       expect(doseBox).not.toBeNull();
       expect(doseUnitBox).not.toBeNull();
       expect(Math.abs(doseBox.y - doseUnitBox.y)).toBeLessThanOrEqual(4);
+
+      // The size="sm" Dose unit ComboBox must match the size="sm" Dose field height; Carbon
+      // otherwise renders the list-box at its md height (~40px), leaving the pair mismatched.
+      // Assert parity rather than an absolute px value so this survives Carbon version changes.
+      expect(Math.abs(doseBox.height - doseUnitBox.height)).toBeLessThanOrEqual(2);
     });
   });
 });
