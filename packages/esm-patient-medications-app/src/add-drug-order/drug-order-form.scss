@@ -121,8 +121,13 @@
 }
 
 .numberInput {
+  :global(.cds--number__input-wrapper) {
+    width: 100%;
+  }
+
   :global(.cds--number__input-wrapper) input {
     min-width: unset !important;
+    width: 100%;
     padding-right: layout.$spacing-05;
   }
 }
@@ -161,6 +166,10 @@
 .linkedInput {
   display: flex;
   align-items: center;
+  // Keep the number input top-aligned with its paired unit field. Without this the column
+  // stretches to match a taller sibling (e.g. when the unit field renders a validation error)
+  // and the centered input gets pushed down out of alignment.
+  align-self: flex-start;
 
   :global(.cds--layer-one),
   :global(.cds--layer-two),
