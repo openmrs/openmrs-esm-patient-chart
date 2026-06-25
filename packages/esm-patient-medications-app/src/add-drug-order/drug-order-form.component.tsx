@@ -683,16 +683,18 @@ export function DrugOrderForm({
                 <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     {!isTablet ? (
-                      <ControlledFieldInput
-                        control={control}
-                        name="duration"
-                        type="number"
-                        id="durationInput"
-                        label={t('duration', 'Duration')}
-                        min={0}
-                        step={1}
-                        allowEmpty
-                      />
+                      <div className={styles.numberInput}>
+                        <ControlledFieldInput
+                          control={control}
+                          name="duration"
+                          type="number"
+                          id="durationInput"
+                          label={t('duration', 'Duration')}
+                          min={0}
+                          step={1}
+                          allowEmpty
+                        />
+                      </div>
                     ) : (
                       <CustomNumberInput
                         control={control}
@@ -726,18 +728,20 @@ export function DrugOrderForm({
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
-                    <ControlledFieldInput
-                      control={control}
-                      name="pillsDispensed"
-                      type="number"
-                      id="quantityDispensed"
-                      label={t('quantityToDispense', 'Quantity to dispense')}
-                      min={0}
-                      hideSteppers
-                      allowEmpty
-                      getValues={getValues}
-                      handleAfterChange={handleQuantityAfterChange}
-                    />
+                    <div className={styles.numberInput}>
+                      <ControlledFieldInput
+                        control={control}
+                        name="pillsDispensed"
+                        type="number"
+                        id="quantityDispensed"
+                        label={t('quantityToDispense', 'Quantity to dispense')}
+                        min={0}
+                        hideSteppers
+                        allowEmpty
+                        getValues={getValues}
+                        handleAfterChange={handleQuantityAfterChange}
+                      />
+                    </div>
                     {requireOutpatientQuantity &&
                       (isManualOverride
                         ? calculatedQuantity != null &&
@@ -773,16 +777,18 @@ export function DrugOrderForm({
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
                     {!isTablet ? (
-                      <ControlledFieldInput
-                        control={control}
-                        name="numRefills"
-                        type="number"
-                        id="prescriptionRefills"
-                        min={0}
-                        label={t('prescriptionRefills', 'Prescription refills')}
-                        max={99}
-                        allowEmpty
-                      />
+                      <div className={styles.numberInput}>
+                        <ControlledFieldInput
+                          control={control}
+                          name="numRefills"
+                          type="number"
+                          id="prescriptionRefills"
+                          min={0}
+                          label={t('prescriptionRefills', 'Prescription refills')}
+                          max={99}
+                          allowEmpty
+                        />
+                      </div>
                     ) : (
                       <CustomNumberInput
                         control={control}
