@@ -45,8 +45,8 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
       patientUuid,
       launchWorkspace2,
       launchStartVisitPrompt,
-      launchAppointmentForm: () => {
-        launchWorkspace2('patient-chart-appointments-form-workspace', {}, {}, { patientUuid, patient });
+      launchAppointmentForm: (_patientUuid: string, appointment?: object) => {
+        launchWorkspace2('patient-chart-appointments-form-workspace', { appointment }, {}, { patientUuid, patient });
       },
     }),
     [patient, patientUuid, view],
