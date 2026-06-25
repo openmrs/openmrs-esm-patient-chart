@@ -34,6 +34,15 @@
     border: 0;
   }
 
+  // Carbon's `cds--list-box--sm` doesn't set --cds-layout-size-height, so size="sm"
+  // ComboBoxes render at md height (40px) and sit taller than their paired size="sm"
+  // NumberInputs (e.g. Dose vs Dose unit). Pin the token so Carbon's clamp resolves to the
+  // sm height and the paired fields match. Mirrors the styleguide's cds--search--lg fix;
+  // remove once @carbon/styles ships the sm list-box height.
+  :global(.cds--list-box--sm) {
+    --cds-layout-size-height: #{layout.$spacing-07};
+  }
+
   :global(.cds--number__control-btn) {
     border: 0;
   }
