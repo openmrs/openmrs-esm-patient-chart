@@ -20,6 +20,23 @@ export interface CustomWorkerFixtures {
 }
 
 export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
+  // Overrides the built-in `page` fixture to capture uncaught client-side exceptions.
+  page: async ({ page }, use) => {
+    const pageErrors: Array<Error> = [];
+    page.on('pageerror', (error) => {
+      pageErrors.push(error);
+    });
+
+    await use(page);
+
+    if (pageErrors.length > 0) {
+      throw new Error(
+        `The page emitted ${pageErrors.length} uncaught error(s) during this test:\n\n` +
+          pageErrors.map((error) => error.stack ?? error.message).join('\n\n'),
+      );
+    }
+  },
+
   api: [api, { scope: 'worker' }],
 
   patient: [

@@ -456,4 +456,81 @@ test.describe('Drug Order Tests', () => {
       await expect(orderBasket.getByText(/new/i)).toBeVisible();
     });
   });
+
+  test('Keeps the Dose field aligned with the Dose unit field when the Dose unit shows an error', async ({
+    page,
+    patient,
+  }) => {
+    const orderBasket = page.locator('[data-extension-slot-name="order-basket-slot"]');
+    const medicationsPage = new MedicationsPage(page);
+
+    await test.step('When I visit the medications page', async () => {
+      await medicationsPage.goTo(patient.uuid);
+    });
+
+    await test.step('And I click the Add button on the medications details table to launch the order basket', async () => {
+      const launchOrderBasketButton = page
+        .getByRole('button', { name: /record active medications/i })
+        .or(page.getByRole('button', { name: 'Add', exact: true }))
+        .first();
+      await expect(launchOrderBasketButton).toBeVisible();
+      await launchOrderBasketButton.click();
+    });
+
+    await test.step('And I open the add-drug-order workspace in the order basket', async () => {
+      const addDrugOrderSearchbox = page.getByRole('searchbox', { name: /search for a drug or orderset/i });
+      const addToOrderBasketButton = page
+        .locator("[id='order-basket']")
+        .getByRole('button', { name: 'Add', exact: true })
+        .first();
+
+      // Some environments open the workspace directly after launching the order basket,
+      // while others require an additional "Add +" click.
+      await addToOrderBasketButton.click({ timeout: 5_000 }).catch(() => {});
+      await expect(addDrugOrderSearchbox).toBeVisible();
+    });
+
+    await test.step('And I search for "Aspirin" and add "Aspirin 325mg" to the basket', async () => {
+      await page.getByRole('searchbox', { name: /search for a drug or orderset/i }).fill('aspirin');
+      await page
+        .getByRole('listitem')
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i })
+        .getByRole('button', { name: /add to basket/i })
+        .click();
+    });
+
+    await test.step('And I click on the incomplete drug order to open the order form', async () => {
+      const orderBasketLauncher = page.getByRole('button', { name: /^order basket$/i });
+      const incompleteAspirinBasketItem = orderBasket
+        .getByRole('listitem')
+        .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
+
+      await expect(incompleteAspirinBasketItem)
+        .toBeVisible({ timeout: 5_000 })
+        .catch(async () => {
+          await orderBasketLauncher.click();
+          await expect(incompleteAspirinBasketItem).toBeVisible();
+        });
+      await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
+      await expect(page.getByText(/order form/i)).toBeVisible();
+    });
+
+    await test.step('When I clear the Dose unit so it renders a validation error', async () => {
+      await page.getByRole('combobox', { name: /dose unit/i }).clear();
+      await page.getByRole('button', { name: /save order/i }).click();
+      await expect(page.getByText(/dose unit is required/i)).toBeVisible();
+    });
+
+    await test.step('Then the Dose input stays top-aligned with the Dose unit field', async () => {
+      // Regression test: the error label below the Dose unit field used to stretch the row
+      // and push the centered Dose input down out of alignment. Both inputs should share the
+      // same top edge regardless of the error label.
+      const doseBox = await page.getByLabel(/^dose$/i, { exact: true }).boundingBox();
+      const doseUnitBox = await page.getByRole('combobox', { name: /dose unit/i }).boundingBox();
+
+      expect(doseBox).not.toBeNull();
+      expect(doseUnitBox).not.toBeNull();
+      expect(Math.abs(doseBox.y - doseUnitBox.y)).toBeLessThanOrEqual(4);
+    });
+  });
 });
