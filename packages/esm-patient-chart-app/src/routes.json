@@ -175,6 +175,24 @@
       "name": "retrospective-date-time-picker",
       "slot": "restrospective-date-time-picker-slot",
       "component": "retrospectiveDateTimePicker"
+    },
+    {
+      "name": "encounter-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "component": "encounterOverviewComponent"
+    },
+    {
+      "name": "visit-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "component": "visitOverviewComponent"
+    },
+    {
+      "name": "diagnosis-overview-widget",
+      "slot": "patient-chart-summary-dashboard-slot",
+      "order": 2,
+      "component": "diagnosisOverview",
+      "online": true,
+      "offline": true
     }
   ],
   "featureFlags": [

@@ -16,6 +16,10 @@ import startVisitActionButtonComponent from './actions-buttons/start-visit.compo
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.extension';
+import EncounterOverview from './visit/visits-widget/past-visits-components/encounters-table/all-encounters-overview.component';
+import VisitHistoryOverview from './visit/visit-history-table/visit-overview.component';
+import DiagnosisOverview from './diagnosis/diagnosis-overview.component';
+
 
 // This allows @openmrs/esm-framework to be accessed by modules that are not
 // using webpack. This is used for ngx-formentry.
@@ -112,6 +116,22 @@ export const visitAttributeTags = getSyncLifecycle(visitAttributeTagsComponent, 
   featureName: 'visit-attribute-tags',
   moduleName,
 });
+
+export const encounterOverviewComponent = getSyncLifecycle(EncounterOverview, {
+  featureName: 'encounter-overview-widget',
+  moduleName,
+});
+
+export const visitOverviewComponent = getSyncLifecycle(VisitHistoryOverview, {
+  featureName: 'visit-overview-widget',
+  moduleName,
+});
+
+export const diagnosisOverview = getSyncLifecycle(DiagnosisOverview, {
+  featureName: 'diagnosis-overview-widget',
+  moduleName,
+});
+
 
 export const startVisitWorkspace = getAsyncLifecycle(() => import('./visit/visit-form/visit-form.workspace'), {
   featureName: 'start-visit-form',
