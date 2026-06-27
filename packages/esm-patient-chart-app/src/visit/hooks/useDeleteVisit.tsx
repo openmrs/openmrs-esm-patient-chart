@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
-import { type Visit, showSnackbar } from '@openmrs/esm-framework';
+import { type Visit, openmrsFetch, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import {
   invalidateCurrentVisit,
   invalidateVisitAndEncounterData,
@@ -17,6 +17,20 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
   const patientUuid = activeVisit?.patient?.uuid || '';
   const { visitContext, setVisitContext } = usePatientChartStore(patientUuid);
 
+  const voidQueueEntryForVisit = async (visitUuid: string) => {
+    try {
+      const { data } = await openmrsFetch(`${restBaseUrl}/visit-queue-entry?visit=${visitUuid}`);
+      const queueEntryUuid = data?.results?.[0]?.queueEntry?.uuid;
+      if (queueEntryUuid) {
+        await openmrsFetch(`${restBaseUrl}/queue-entry/${queueEntryUuid}`, {
+          method: 'DELETE',
+        });
+      }
+    } catch (e) {
+      console.warn('Failed to void queue entry for visit', e);
+    }
+  };
+
   const restoreDeletedVisit = () => {
     restoreVisit(activeVisit?.uuid)
       .then(({ data: updatedVisit }) => {
@@ -25,7 +39,6 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
           setVisitContext(updatedVisit, mutateSavedOrUpdatedVisit);
         }
 
-        // Use targeted SWR invalidation instead of global mutateVisit
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         window.dispatchEvent(new CustomEvent('queue-entry-updated'));
@@ -40,7 +53,6 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         onVisitRestore?.();
       })
       .catch(() => {
-        // On error, revalidate to get correct state
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         showSnackbar({
@@ -57,12 +69,14 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
     setIsDeletingVisit(true);
 
     deleteVisit(activeVisit?.uuid)
-      .then(() => {
+      .then(async () => {
         if (activeVisit.uuid == visitContext?.uuid) {
           setVisitContext(null, null);
         }
 
-        // Use targeted SWR invalidation instead of global mutateVisit
+        // Void the associated queue entry so patient is removed from the queue
+        await voidQueueEntryForVisit(activeVisit.uuid);
+
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
         window.dispatchEvent(new CustomEvent('queue-entry-updated'));
@@ -81,7 +95,6 @@ export function useDeleteVisit(activeVisit: Visit, onVisitDelete = () => {}, onV
         onVisitDelete?.();
       })
       .catch(() => {
-        // On error, revalidate to get correct state
         invalidateCurrentVisit(globalMutate, patientUuid);
         invalidateVisitAndEncounterData(globalMutate, patientUuid);
 
