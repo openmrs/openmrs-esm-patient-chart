@@ -22,7 +22,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const {
     data: { observations, concepts },
-  } = useObs(patientUuid);
+  } = useObs(patientUuid, { oldestFirst: config.graphOldestFirst });
 
   const obsByConceptUuid = useMemo(() => {
     return Object.fromEntries(
@@ -79,13 +79,9 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           value: obs.valueQuantity.value,
         }));
 
-      if (config.graphOldestFirst) {
-        chartRecords.reverse();
-      }
-
       return chartRecords;
     },
-    [obsByConceptUuid, configByConceptUuid, config.graphOldestFirst, t],
+    [obsByConceptUuid, configByConceptUuid, t],
   );
 
   const chartColors = useMemo(
