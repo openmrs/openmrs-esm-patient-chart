@@ -82,7 +82,8 @@
     "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "shell-quote": ">=1.8.4"
   },
   "packageManager": "yarn@4.10.3"
 }
