@@ -68,6 +68,7 @@ export interface EncounterType {
 
 export interface ListResponse<T> {
   results: Array<T>;
+  totalCount: number;
 }
 
 export interface CompletedFormInfo {
