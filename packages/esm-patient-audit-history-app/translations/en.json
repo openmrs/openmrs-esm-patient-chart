@@ -1,0 +1,22 @@
+{
+  "alsoChanged": "Also changed in this revision",
+  "auditHistory": "Audit history",
+  "Audit History": "Audit History",
+  "auditRecords": "audit records",
+  "changedBy": "Changed by",
+  "changeDetails": "Change details",
+  "created": "Created",
+  "dateTime": "Date & time",
+  "deleted": "Deleted",
+  "event": "Event",
+  "expandRow": "Expand row",
+  "field": "Field",
+  "moduleNotInstalled": "The auditlogweb module is not installed on this server.",
+  "newValue": "New value",
+  "noFieldChangesRecorded": "No field-level changes recorded for this revision.",
+  "noPermission": "You do not have permission to view this patient's audit history.",
+  "previousValue": "Previous value",
+  "unknownUser": "Unknown",
+  "updated": "Updated",
+  "updating": "Updating…"
+}

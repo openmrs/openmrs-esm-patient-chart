@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": ">=2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "patient-audit-history-dashboard-link",
+      "component": "auditHistoryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 18,
+      "meta": {
+        "slot": "patient-chart-audit-history-dashboard-slot",
+        "path": "audit-history"
+      }
+    },
+    {
+      "name": "patient-audit-history-details-widget",
+      "component": "auditHistoryDashboard",
+      "slot": "patient-chart-audit-history-dashboard-slot",
+      "meta": {
+        "fullWidth": true
+      }
+    }
+  ]
+}

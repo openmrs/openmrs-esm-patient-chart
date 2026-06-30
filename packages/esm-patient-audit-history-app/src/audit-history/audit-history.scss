@@ -1,0 +1,55 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+
+.messageTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: layout.$spacing-12;
+  padding: layout.$spacing-05;
+  border: 1px solid $ui-03;
+}
+
+.expandedRow > td {
+  padding: 0 layout.$spacing-07;
+}
+
+.expandedRow > td > div {
+  max-height: max-content;
+}
+
+.relatedEntities {
+  padding: 0 layout.$spacing-06 layout.$spacing-05;
+}
+
+.relatedTitle {
+  @include type.type-style('label-01');
+  color: $text-02;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 layout.$spacing-03;
+}
+
+.relatedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+  align-items: center;
+}
+
+.relatedItem {
+  display: inline-flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.relatedName {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
