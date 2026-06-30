@@ -1,7 +1,34 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+const fs = require('fs');
+
+const LINUX_CHROME_PATHS = [
+  '/snap/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/chromium',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/google-chrome',
+];
+
+function findChromeBin() {
+  if (process.env.CHROME_BIN) {
+    return process.env.CHROME_BIN;
+  }
+  for (const p of LINUX_CHROME_PATHS) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+  return undefined;
+}
+
 module.exports = function (config) {
+  const chromeBin = findChromeBin();
+  if (chromeBin) {
+    process.env.CHROME_BIN = chromeBin;
+  }
+
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
