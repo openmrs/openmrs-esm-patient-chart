@@ -17,6 +17,15 @@ export const configSchema = {
     _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _description: 'The concept UUID for storing sticky notes as observations',
   },
+  visitNoteEncounterTypes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['Visit Note'],
+    _description:
+      'Encounter type names that should be treated as visit notes in visit note workflows (for example edit flow).',
+  },
   visitNoteConfig: notesConfigSchema,
 };
 
@@ -24,5 +33,6 @@ export interface ConfigObject {
   diagnosisConceptClass: string;
   isPrimaryDiagnosisRequired: boolean;
   stickyNoteConceptUuid: string;
+  visitNoteEncounterTypes: Array<string>;
   visitNoteConfig: VisitNoteConfigObject;
 }
