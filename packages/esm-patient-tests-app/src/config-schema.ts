@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const configSchema = {
   resultsViewerConcepts: {
@@ -35,7 +35,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
     _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
   },
   orders: {
@@ -106,10 +107,16 @@ export const configSchema = {
       orderReasons: {
         _type: Type.Array,
         _elements: {
-          _type: Type.ConceptUuid,
-          _description: 'Array of coded concepts that represent reasons for ordering a lab test',
+          _validators: [
+            validator(
+              (v) =>
+                typeof v === 'string' || (typeof v === 'object' && v !== null && typeof v.conceptUuid === 'string'),
+              'must be a concept UUID string or an object with a `conceptUuid` string',
+            ),
+          ],
         },
-        _description: 'Coded Lab test order reason options',
+        _description:
+          'Coded Lab test order reason options. Each entry may be a plain concept UUID string, or an object with `conceptUuid` (string) and an optional `hideWhenExpression`.',
         _default: [],
       },
     },
@@ -128,9 +135,16 @@ export interface LabTestReason {
   label?: string;
 }
 
+export interface OrderReasonReferenceConfig {
+  conceptUuid: string;
+  hideWhenExpression?: string;
+}
+
+export type OrderReasonReference = string | OrderReasonReferenceConfig;
+
 export interface OrderReason {
   labTestUuid: string;
-  orderReasons: Array<string>;
+  orderReasons: Array<OrderReasonReference>;
   required: boolean;
 }
 
