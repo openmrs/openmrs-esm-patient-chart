@@ -83,7 +83,6 @@
   },
   "resolutions": {
     "sass": "^1.54.3",
-    "shell-quote": ">=1.8.4",
     "@remix-run/router": "^1.23.3",
     "react-router-dom": "^6.30.4",
     "cross-spawn": "^7.0.6",
