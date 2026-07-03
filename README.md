@@ -210,3 +210,13 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 ## Deployment
 
 See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.
+
+## Dependency Overrides
+
+Some dependencies are temporarily pinned in `package.json` under the `resolutions` field to work around issues in upstream packages.
+
+### `dompurify`
+
+`dompurify` is pinned to `3.4.11` because `@carbon/charts@1.27.0` and `jspdf@4.2.1` have not yet updated their own dependency. This override should be removed once both upstream packages ship with `dompurify >=3.4.11` natively.
+
+Tracking issue: O3-5785.
