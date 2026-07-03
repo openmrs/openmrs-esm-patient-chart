@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
+import type { ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -12,6 +13,7 @@ import {
   TableRow,
   Tile,
   Tag,
+  Button,
   type DataTableHeader,
   type DataTableSortState,
 } from '@carbon/react';
@@ -21,7 +23,9 @@ import {
   parseDate,
   useLayoutType,
   usePagination,
+  launchWorkspace2
 } from '@openmrs/esm-framework';
+import { AddIcon } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useAllEncounters } from '../visit/visits-widget/past-visits-components/encounters-table/encounters-table.resource';
 import styles from './diagnosis-overview.scss';
@@ -89,6 +93,13 @@ const DiagnosisOverview: React.FC<DiagnosisOverviewProps> = ({ patientUuid }) =>
   const layout = useLayoutType();
   const isDesktop = isDesktopLayout(layout);
   const isTablet = !isDesktop;
+  const launchDiagnosesForm = useCallback(
+    () =>
+      launchWorkspace2('visit-notes-form-workspace', {
+        formContext: 'creating',
+      }),
+    [],
+  );
 
   const { data: allEncounters, isLoading, error } = useAllEncounters(patientUuid);
 
@@ -146,8 +157,8 @@ const DiagnosisOverview: React.FC<DiagnosisOverviewProps> = ({ patientUuid }) =>
                 diag.rank === 1
                   ? t('primary', 'Primary')
                   : diag.rank === 2
-                  ? t('secondary', 'Secondary')
-                  : String(diag.rank || '--'),
+                    ? t('secondary', 'Secondary')
+                    : String(diag.rank || '--'),
               certainty: diag.certainty
                 ? diag.certainty.charAt(0).toUpperCase() + diag.certainty.slice(1).toLowerCase()
                 : '--',
@@ -183,13 +194,20 @@ const DiagnosisOverview: React.FC<DiagnosisOverviewProps> = ({ patientUuid }) =>
   }
 
   if (tableRows.length === 0) {
-    return <EmptyState displayText={t('diagnoses_lower', 'diagnoses')} headerTitle={headerTitle} />;
+    return <EmptyState displayText={t('diagnoses_lower', 'diagnoses')} headerTitle={headerTitle} launchForm={launchDiagnosesForm} />;
   }
 
   return (
     <div className={styles.widgetCard}>
       <CardHeader title={headerTitle}>
-        <span />
+        <Button
+          kind="ghost"
+          renderIcon={(props: ComponentProps<typeof AddIcon>) => <AddIcon size={16} {...props} />}
+          iconDescription="Add Diagnoses"
+          onClick={launchDiagnosesForm}
+        >
+          {t('add', 'Add')}
+        </Button>
       </CardHeader>
       <DataTable
         aria-label="diagnoses overview"
