@@ -150,3 +150,18 @@
 .text02 {
   color: $text-02;
 }
+
+.searchResultTileContent {
+  padding: layout.$spacing-03 layout.$spacing-05;
+  overflow-wrap: break-word;  //wrap long words
+  word-break: break-word;     //break long words if needed
+}
+
+.heading {
+  @include type.type-style('heading-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+  overflow-wrap: break-word;  // wrap long words
+  word-break: break-word;     // break long words if needed
+}
+

@@ -125,7 +125,7 @@ const useUnifiedSearch = (
     conceptSets.length > 0
       ? conceptSets.map(
           (c) =>
-            `${restBaseUrl}/concept/${c.uuid}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,conceptClass:(display),names:(display),setMembers:(display,uuid,conceptClass:(display),names:(display))))`,
+            `${restBaseUrl}/concept/${c.uuid}?v=custom:(display,names:(display),uuid,setMembers:(display,uuid,conceptClass:(display)))`,
         )
       : null,
     openmrsFetchMultipleConcepts,
@@ -159,15 +159,6 @@ const useUnifiedSearch = (
             type: 'concept',
             conceptClass: m.conceptClass || { display: category },
           });
-          if (m.setMembers) {
-            m.setMembers.forEach((child) => {
-              concepts.push({
-                ...child,
-                type: 'concept',
-                conceptClass: child.conceptClass || { display: category },
-              });
-            });
-          }
         });
       });
     }
@@ -375,7 +366,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
               renderIcon={(props: any) => <ArrowRightIcon size={16} {...props} />}
               onClick={openForm}
             >
-              {t('goToDrugOrderForm', 'Order form')}
+              {t('goToForm', 'Form')}
             </Button>
           )}
         </div>
