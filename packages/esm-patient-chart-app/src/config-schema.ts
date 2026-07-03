@@ -50,6 +50,10 @@ export const esmPatientChartSchema = {
     _type: Type.ConceptUuid,
     _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  consultationEncounterTypeUUid: {
+    _type: Type.ConceptUuid,
+    _default: 'dd528487-82a5-4082-9c72-ed246bd49591',
+  },
   logo: {
     alt: {
       _type: Type.String,
@@ -225,6 +229,7 @@ export interface ChartConfig {
   encounterDeleteableDuration: number;
   encounterDeleteableDurationOverridePrivileges: Array<string>;
   freeTextFieldConceptUuid: string;
+  consultationEncounterTypeUUid: string;
   logo: {
     alt: string;
     name: string;

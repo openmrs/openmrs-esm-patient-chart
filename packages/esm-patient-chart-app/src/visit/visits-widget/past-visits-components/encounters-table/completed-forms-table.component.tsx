@@ -6,10 +6,11 @@ import EncountersTable from './encounters-table.component';
 interface CompletedFormsTableProps {
   patientUuid: string;
   isTabActive?: boolean;
+  filter?: EncounterType | null
 }
 
-const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid, isTabActive = false }) => {
-  const [encounterTypeToFilter, setEncounterTypeToFilterState] = useState<EncounterType>(null);
+const CompletedFormsTable: React.FC<CompletedFormsTableProps> = ({ patientUuid, isTabActive = false, filter=null }) => {
+  const [encounterTypeToFilter, setEncounterTypeToFilterState] = useState<EncounterType | null>(filter);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
