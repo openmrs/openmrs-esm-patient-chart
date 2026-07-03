@@ -7037,13 +7037,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.9.0":
-  version: 1.9.0
-  resolution: "@remix-run/router@npm:1.9.0"
-  checksum: 10/a3d7bee87ba30e32961550e102cc3253e0056b8de9edb46aed4aad0dad740bc613e2a27f0e991df17e60b9678aeb58fcda0ee396d384d6e5f62960a82b573928
-  languageName: node
-  linkType: hard
-
 "@rolldown/binding-android-arm64@npm:1.0.0":
   version: 1.0.0
   resolution: "@rolldown/binding-android-arm64@npm:1.0.0"
@@ -20138,20 +20131,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^6.3.0":
-  version: 6.16.0
-  resolution: "react-router-dom@npm:6.16.0"
-  dependencies:
-    "@remix-run/router": "npm:1.9.0"
-    react-router: "npm:6.16.0"
-  peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 10/31dc3bcfd28ae08bb802347d0d637d8ac7e2db530b92e4c0763a19cee2e40a90d1621519ef304bd2add2bb8e6ef13e94970b2e901cc73159692e04a57fff9080
-  languageName: node
-  linkType: hard
-
-"react-router-dom@npm:^6.30.4":
+"react-router-dom@npm:^6.3.0, react-router-dom@npm:^6.30.4":
   version: 6.30.4
   resolution: "react-router-dom@npm:6.30.4"
   dependencies:
@@ -20161,17 +20141,6 @@ __metadata:
     react: ">=16.8"
     react-dom: ">=16.8"
   checksum: 10/e220abac766bb9bcc56a99b78d30d99745cae3618f84baa92bd6ec481eccb6afb12c724d49dc68e6f870b70ff449f751f20f4aa33f1896d3f7d3bda8e47a6ce1
-  languageName: node
-  linkType: hard
-
-"react-router@npm:6.16.0":
-  version: 6.16.0
-  resolution: "react-router@npm:6.16.0"
-  dependencies:
-    "@remix-run/router": "npm:1.9.0"
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 10/b509cf2a72884e31bf500c823b95bbfdf006c829ca1e97c31366aea1c0e5e43a896b020af5cfba18d23e2d18f5f707a890e4fc13493a2fb8efbdb7330390fb81
   languageName: node
   linkType: hard
 
