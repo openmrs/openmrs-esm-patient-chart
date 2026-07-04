@@ -19,12 +19,12 @@
     "test": {
       "inputs": [
         "src/**",
-        "__mocks__/**",
-        "mock.ts",
-        "mock-jest.ts",
-        "mock-jest.tsx",
         "vitest.config.ts",
-        "setup-tests.ts"
+        "$TURBO_ROOT$/tools/vitest.shared.ts",
+        "$TURBO_ROOT$/tools/setup-tests.ts",
+        "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/index.ts",
+        "$TURBO_ROOT$/__mocks__/**"
       ]
     },
     "test:watch": {
@@ -34,12 +34,12 @@
     "coverage": {
       "inputs": [
         "src/**",
-        "__mocks__/**",
-        "mock.ts",
-        "mock-jest.ts",
-        "mock-jest.tsx",
         "vitest.config.ts",
-        "setup-tests.ts"
+        "$TURBO_ROOT$/tools/vitest.shared.ts",
+        "$TURBO_ROOT$/tools/setup-tests.ts",
+        "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/index.ts",
+        "$TURBO_ROOT$/__mocks__/**"
       ],
       "outputs": ["coverage/**"]
     },

@@ -45,10 +45,15 @@ import {
   Workspace2,
   type Visit,
 } from '@openmrs/esm-framework';
-import { useActivePatientOrders, useRequireOutpatientQuantity } from '../api';
+import { useMedicationOrders, useRequireOutpatientQuantity } from '../api';
 import { useOrderConfig } from '../api/order-config';
 import { type ConfigObject } from '../config-schema';
-import { durationToDays, type MedicationOrderFormData, useDrugOrderForm } from './drug-order-form.resource';
+import {
+  durationToDays,
+  getStartDateMinimum,
+  type MedicationOrderFormData,
+  useDrugOrderForm,
+} from './drug-order-form.resource';
 import styles from './drug-order-form.scss';
 
 export interface DrugOrderFormProps {
@@ -62,6 +67,29 @@ export interface DrugOrderFormProps {
   saveButtonText: string;
   onCancel: () => void;
   workspaceTitle: string;
+  launchAllergyForm?: () => void;
+}
+
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+  const selectedStartDate = isToday ? now : selectedDate;
+  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+}
+
+function isFutureRevisionOfActiveMedication(
+  action: DrugOrderBasketItem['action'] | undefined,
+  selectedStartDate: Date,
+  initialScheduledDate?: Date,
+  now = new Date(),
+) {
+  if (action !== 'REVISE' || selectedStartDate <= now) {
+    return false;
+  }
+
+  return !(initialScheduledDate && initialScheduledDate > now);
 }
 
 function MedicationInfoHeader({
@@ -126,6 +154,7 @@ export function DrugOrderForm({
   onCancel,
   visitContext,
   workspaceTitle,
+  launchAllergyForm,
 }: DrugOrderFormProps) {
   const { t } = useTranslation();
   const { daysDurationUnit, durationUnitsDaysMap } = useConfig<ConfigObject>();
@@ -134,11 +163,23 @@ export function DrugOrderForm({
   const { requireOutpatientQuantity } = useRequireOutpatientQuantity();
 
   const drugOrderForm = useDrugOrderForm(initialOrderBasketItem);
+
+  const startDateMin = useMemo(
+    () =>
+      getStartDateMinimum(
+        initialOrderBasketItem?.action,
+        initialOrderBasketItem?.previousOrderDateActivated,
+        visitContext?.startDatetime,
+      ),
+    [initialOrderBasketItem?.action, initialOrderBasketItem?.previousOrderDateActivated, visitContext?.startDatetime],
+  );
+
   const {
     control,
     formState: { isDirty, isSubmitting },
     getValues,
     handleSubmit,
+    setError,
     setValue,
     watch,
   } = drugOrderForm;
@@ -186,6 +227,17 @@ export function DrugOrderForm({
     initialOrderBasketItem?.isQuantityManual ?? (isExistingOrder && initialOrderBasketItem?.pillsDispensed != null),
   );
 
+  const watchedFrequencyPerDay = useMemo(() => {
+    if (watchedFrequency?.frequencyPerDay != null) {
+      return watchedFrequency.frequencyPerDay;
+    }
+
+    return (
+      orderConfigObject?.orderFrequencies?.find(({ valueCoded }) => valueCoded === watchedFrequency?.valueCoded)
+        ?.frequencyPerDay ?? null
+    );
+  }, [orderConfigObject?.orderFrequencies, watchedFrequency?.frequencyPerDay, watchedFrequency?.valueCoded]);
+
   const calculatedQuantity = useMemo(() => {
     if (watchedIsFreeText || watchedAsNeeded) {
       return null;
@@ -193,8 +245,8 @@ export function DrugOrderForm({
     if (
       watchedDosage == null ||
       watchedDosage <= 0 ||
-      watchedFrequency?.frequencyPerDay == null ||
-      watchedFrequency.frequencyPerDay <= 0 ||
+      watchedFrequencyPerDay == null ||
+      watchedFrequencyPerDay <= 0 ||
       watchedDuration == null ||
       watchedDuration <= 0
     ) {
@@ -207,13 +259,13 @@ export function DrugOrderForm({
     if (durationDays == null) {
       return null;
     }
-    const result = Math.ceil(watchedDosage * watchedFrequency.frequencyPerDay * durationDays);
+    const result = Math.ceil(watchedDosage * watchedFrequencyPerDay * durationDays);
     return result > 0 && isFinite(result) ? result : null;
   }, [
     watchedIsFreeText,
     watchedAsNeeded,
     watchedDosage,
-    watchedFrequency?.frequencyPerDay,
+    watchedFrequencyPerDay,
     watchedDuration,
     watchedDurationUnit?.valueCoded,
     watchedUnit?.valueCoded,
@@ -238,7 +290,7 @@ export function DrugOrderForm({
     requireOutpatientQuantity,
     isManualOverride,
     calculatedQuantity,
-    watchedFrequency?.frequencyPerDay,
+    watchedFrequencyPerDay,
     watchedUnit,
     watchedQuantityUnits,
     getValues,
@@ -258,6 +310,29 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
+    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
+    // minimum; snap them up before saving.
+    const now = new Date();
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+
+    if (
+      isFutureRevisionOfActiveMedication(
+        initialOrderBasketItem?.action,
+        scheduledDate,
+        initialOrderBasketItem?.scheduledDate,
+        now,
+      )
+    ) {
+      setError('scheduledDate', {
+        type: 'manual',
+        message: t(
+          'activeMedicationRevisionCannotStartInFuture',
+          'Revisions to an active medication must start today or earlier.',
+        ),
+      });
+      return;
+    }
+
     const newBasketItem = {
       ...initialOrderBasketItem,
       drug: data.drug,
@@ -277,7 +352,7 @@ export function DrugOrderForm({
       numRefills: data.numRefills,
       indication: data.indication,
       frequency: data.frequency,
-      startDate: data.startDate,
+      scheduledDate,
       action: initialOrderBasketItem?.action ?? 'NEW',
       commonMedicationName: data.drug.display,
       display: data.drug.display,
@@ -372,14 +447,14 @@ export function DrugOrderForm({
     fieldState: { error: drugFieldError },
   } = useController<MedicationOrderFormData>({ name: 'drug', control });
 
-  // TODO: use the backend instead of this to determine whether the drug formulation can be ordered
+  // TODO: use the backend to determine whether the drug formulation can be ordered
   // See: https://openmrs.atlassian.net/browse/RESTWS-1003
-  const { data: activeOrders } = useActivePatientOrders(patient.id);
+  const { activeOrders, futureOrders } = useMedicationOrders(patient?.id ?? '');
   const drugAlreadyPrescribedForNewOrder = useMemo(
     () =>
-      (initialOrderBasketItem == null || initialOrderBasketItem?.action == 'NEW') &&
-      activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
-    [activeOrders, drug, initialOrderBasketItem],
+      (initialOrderBasketItem == null || initialOrderBasketItem?.action === 'NEW') &&
+      [...activeOrders, ...futureOrders].some((order) => order?.drug?.uuid === drug?.uuid),
+    [activeOrders, futureOrders, drug?.uuid, initialOrderBasketItem],
   );
 
   return (
@@ -402,9 +477,10 @@ export function DrugOrderForm({
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </span>
         </div>
-        <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+        <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
         <Form
           className={styles.orderForm}
+          aria-label={workspaceTitle}
           onSubmit={handleSubmit(handleFormSubmission, handleFormSubmissionError)}
           id="drugOrderForm"
         >
@@ -585,41 +661,40 @@ export function DrugOrderForm({
             <section className={styles.formSection}>
               <h3 className={styles.sectionHeader}>{t('prescriptionDuration', 'Prescription duration')}</h3>
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
-                {/* TODO: This input does nothing */}
                 <Column lg={16} md={4} sm={4}>
-                  <div className={styles.fullWidthDatePickerContainer}>
-                    <InputWrapper>
-                      <Controller
-                        name="startDate"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <OpenmrsDatePicker
-                            {...field}
-                            maxDate={new Date()}
-                            id="startDatePicker"
-                            labelText={t('startDate', 'Start date')}
-                            size={isTablet ? 'lg' : 'sm'}
-                            invalid={Boolean(fieldState?.error?.message)}
-                            invalidText={fieldState?.error?.message}
-                          />
-                        )}
-                      />
-                    </InputWrapper>
-                  </div>
+                  <InputWrapper>
+                    <Controller
+                      name="scheduledDate"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <OpenmrsDatePicker
+                          {...field}
+                          minDate={startDateMin}
+                          id="scheduledDatePicker"
+                          labelText={t('startDate', 'Start date')}
+                          size={isTablet ? 'md' : 'sm'}
+                          invalid={Boolean(fieldState?.error?.message)}
+                          invalidText={fieldState?.error?.message}
+                        />
+                      )}
+                    />
+                  </InputWrapper>
                 </Column>
                 <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     {!isTablet ? (
-                      <ControlledFieldInput
-                        control={control}
-                        name="duration"
-                        type="number"
-                        id="durationInput"
-                        label={t('duration', 'Duration')}
-                        min={0}
-                        step={1}
-                        allowEmpty
-                      />
+                      <div className={styles.numberInput}>
+                        <ControlledFieldInput
+                          control={control}
+                          name="duration"
+                          type="number"
+                          id="durationInput"
+                          label={t('duration', 'Duration')}
+                          min={0}
+                          step={1}
+                          allowEmpty
+                        />
+                      </div>
                     ) : (
                       <CustomNumberInput
                         control={control}
@@ -653,21 +728,24 @@ export function DrugOrderForm({
               <Grid className={classNames(styles.gridRow, styles.topAlignedGridRow)}>
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
-                    <ControlledFieldInput
-                      control={control}
-                      name="pillsDispensed"
-                      type="number"
-                      id="quantityDispensed"
-                      label={t('quantityToDispense', 'Quantity to dispense')}
-                      min={0}
-                      hideSteppers
-                      allowEmpty
-                      getValues={getValues}
-                      handleAfterChange={handleQuantityAfterChange}
-                    />
+                    <div className={styles.numberInput}>
+                      <ControlledFieldInput
+                        control={control}
+                        name="pillsDispensed"
+                        type="number"
+                        id="quantityDispensed"
+                        label={t('quantityToDispense', 'Quantity to dispense')}
+                        min={0}
+                        hideSteppers
+                        allowEmpty
+                        getValues={getValues}
+                        handleAfterChange={handleQuantityAfterChange}
+                      />
+                    </div>
                     {requireOutpatientQuantity &&
                       (isManualOverride
-                        ? calculatedQuantity != null && (
+                        ? calculatedQuantity != null &&
+                          calculatedQuantity !== watchedPillsDispensed && (
                             <button type="button" className={styles.recalculateLink} onClick={handleRecalculate}>
                               {t('applyCalculatedQuantity', 'Apply calculated quantity ({{quantity}})', {
                                 quantity: calculatedQuantity,
@@ -699,16 +777,18 @@ export function DrugOrderForm({
                 <Column lg={8} md={3} sm={4}>
                   <InputWrapper>
                     {!isTablet ? (
-                      <ControlledFieldInput
-                        control={control}
-                        name="numRefills"
-                        type="number"
-                        id="prescriptionRefills"
-                        min={0}
-                        label={t('prescriptionRefills', 'Prescription refills')}
-                        max={99}
-                        allowEmpty
-                      />
+                      <div className={styles.numberInput}>
+                        <ControlledFieldInput
+                          control={control}
+                          name="numRefills"
+                          type="number"
+                          id="prescriptionRefills"
+                          min={0}
+                          label={t('prescriptionRefills', 'Prescription refills')}
+                          max={99}
+                          allowEmpty
+                        />
+                      </div>
                     ) : (
                       <CustomNumberInput
                         control={control}
@@ -752,11 +832,10 @@ export function DrugOrderForm({
             }}
           />
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
+            <Button kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}
             </Button>
             <Button
-              className={styles.button}
               kind="primary"
               type="submit"
               size="xl"
@@ -805,7 +884,7 @@ const CustomNumberInput = ({ setValue, control, name, labelText, isTablet, ...in
   };
 
   return (
-    <div className={styles.customElement}>
+    <div>
       <span className="cds--label" id={`${name}-label`}>
         {labelText}
       </span>

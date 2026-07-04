@@ -31,6 +31,7 @@ import {
 import { type ConfigObject } from '../config-schema';
 import { type Provider, useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import GeneralOrderPanel from './general-order-type/general-order-panel.component';
+import { getEarliestStartDate } from './order-basket.utils';
 import styles from './order-basket.scss';
 
 interface OrderBasketProps {
@@ -62,7 +63,10 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     sessionLocation,
     user: { person },
   } = useSession();
-  const currentProvider: Provider = useMemo(() => ({ ..._currentProvider, person }), [_currentProvider, person]);
+  const currentProvider: Provider | null = useMemo(
+    () => (_currentProvider ? { ..._currentProvider, person } : null),
+    [_currentProvider, person],
+  );
   const { orders, clearOrders } = useOrderBasket(patient);
   const [ordersWithErrors, setOrdersWithErrors] = useState<OrderBasketItem[]>([]);
   const {
@@ -91,7 +95,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
   const [orderer, setOrderer] = useState<Provider>(allowSelectingOrderer ? null : currentProvider);
 
   useEffect(() => {
-    if (allowSelectingOrderer && providers?.length > 0) {
+    if (allowSelectingOrderer && providers?.length > 0 && currentProvider) {
       // default orderer to current user if they have the right provider roles
       if (providers.some((p) => p.uuid === currentProvider.uuid)) {
         setOrderer(currentProvider);
@@ -109,6 +113,11 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     // If orderEncounterUuid is present, then just post the orders to that encounter.
     if (!orderEncounterUuid) {
       try {
+        // Backend rejects orders whose dateActivated is before the encounter's encounterDatetime,
+        // so set encounterDatetime to the earliest selected start date among basket items.
+        // postOrdersOnNewEncounter clamps this to the visit window before posting.
+        const encounterDate = getEarliestStartDate(orders);
+
         const postedEncounter = await postOrdersOnNewEncounter(
           patientUuid,
           orderEncounterType,
@@ -116,6 +125,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
           orderLocationUuid,
           orderer.uuid,
           abortController,
+          encounterDate,
         );
         await closeWorkspace({ discardUnsavedChanges: true });
         mutateEncounterUuid();
@@ -288,13 +298,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                   orderBasketExtensionProps.visibleOrderPanels.includes(orderType.orderTypeUuid),
               )
               .map((orderType) => (
-                <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                  <GeneralOrderPanel
-                    {...orderType}
-                    launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
-                    patient={patient}
-                  />
-                </div>
+                <GeneralOrderPanel
+                  key={orderType.orderTypeUuid}
+                  {...orderType}
+                  launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
+                  patient={patient}
+                />
               ))}
         </div>
         <div>

@@ -196,10 +196,10 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
       ),
     },
     startDate: {
-      sortKey: dayjs(medication.dateActivated).toDate(),
+      sortKey: dayjs(medication.scheduledDate || medication.dateActivated).toDate(),
       content: (
         <div className={styles.startDateColumn}>
-          <span>{formatDate(new Date(medication.dateActivated))}</span>
+          <span>{formatDate(new Date(medication.scheduledDate || medication.dateActivated))}</span>
           {!isPrinting && <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />}
         </div>
       ),

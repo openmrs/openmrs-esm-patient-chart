@@ -242,7 +242,6 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   patientInstructions: string | null;
   asNeeded: boolean;
   asNeededCondition: string | null;
-  startDate: Date | string;
   durationUnit: DurationUnit | null;
   duration: number | null;
   pillsDispensed: number | null;
@@ -252,6 +251,12 @@ export interface DrugOrderBasketItem extends OrderBasketItem {
   isFreeTextDosage: boolean;
   freeTextDosage: string;
   previousOrder?: string;
+  /**
+   * The dateActivated of the order being revised. Set by buildMedicationOrder for
+   * REVISE so the form can enforce dateActivated > previousOrderDateActivated (the
+   * backend computes previous.dateStopped = new.dateActivated - 1s).
+   */
+  previousOrderDateActivated?: string;
   template?: OrderTemplate;
 }
 
@@ -326,6 +331,12 @@ export interface ExportedOrderBasketWindowProps {
   drugOrderWorkspaceName: string;
   labOrderWorkspaceName: string;
   generalOrderWorkspaceName: string;
+  /**
+   * Name of a workspace, registered by the host into the order basket window, that renders the
+   * allergy form. Supplied when the order basket runs outside the patient chart so the allergy
+   * "+" affordance can launch the form in the host's workspace group instead of the chart's.
+   */
+  allergyFormWorkspaceName?: string;
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit | null;

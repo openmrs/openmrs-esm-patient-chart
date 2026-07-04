@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import dayjs from 'dayjs';
 import { test } from '../core';
 import { ChartPage } from '../pages';
 import { ensureNoActiveVisits } from '../commands/visit-operations';
@@ -79,7 +80,20 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     await waitForVisitLocationValue(chartPage.page);
   });
 
-  await test.step('And I select the visit type: `OPD Visit`', async () => {
+  await test.step('And when I click on the `Start Visit` button without selecting a visit type', async () => {
+    await chartPage.page
+      .locator('form')
+      .getByRole('button', { name: /start visit/i })
+      .click();
+  });
+
+  await test.step('Then I should see a `Missing visit type` validation error and no visit should start', async () => {
+    await expect(chartPage.page.getByText(/missing visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByText(/please select a visit type/i)).toBeVisible();
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeHidden();
+  });
+
+  await test.step('When I select the visit type: `OPD Visit`', async () => {
     const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
     await expect(opdVisitLabel).toBeVisible();
     await opdVisitLabel.click();
@@ -111,7 +125,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   });
 
   await test.step('When I click on the `End Visit` button to confirm', async () => {
-    await chartPage.page.getByRole('button', { name: 'danger End Visit' }).click();
+    await chartPage.page.getByRole('button', { name: /end visit/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {
@@ -135,7 +149,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail with no visit', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see a modal to prompt for starting a visit', async () => {
@@ -155,7 +169,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail again with no visit', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
@@ -213,7 +227,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click on the "Delete visit" button', async () => {
-    await page.getByRole('button', { name: 'danger Delete visit' }).click();
+    await page.getByRole('button', { name: /delete visit/i }).click();
   });
 
   await test.step('Then I should see a confirmation toast and active visit tag removed', async () => {
@@ -230,7 +244,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
@@ -252,13 +266,78 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('When I click the `Visit note` button on the siderail', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see a modal to prompt for starting a visit', async () => {
     await expect(chartPage.page.getByText(/no active visit/i)).toBeVisible();
     await expect(chartPage.page.getByRole('button', { name: /cancel/i })).toBeVisible();
     await expect(chartPage.page.getByRole('button', { name: /start new visit/i })).toBeVisible();
+  });
+});
+
+test('Start a visit in the past', async ({ page, patient, api }) => {
+  await test.step('Ensure no active visits for the patient', async () => {
+    await ensureNoActiveVisits(api, patient.uuid);
+  });
+
+  const chartPage = new ChartPage(page);
+  const startDate = dayjs().subtract(2, 'day');
+  const endDate = dayjs().subtract(1, 'day');
+
+  await test.step('When I visit the chart summary page', async () => {
+    await chartPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click on the `Add visit` button in the actions overflow menu', async () => {
+    await chartPage.page.getByRole('button', { name: /actions/i }).click();
+    await chartPage.page.getByRole('menuitem', { name: /add visit/i }).click();
+  });
+
+  await test.step('When I select visit status: In the past', async () => {
+    const pastTab = chartPage.page.getByRole('tab', { name: /in the past/i });
+    await pastTab.click();
+    await expect(pastTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  await test.step('And the visit location should be resolved', async () => {
+    await waitForVisitLocationValue(chartPage.page);
+  });
+
+  await test.step('And I set the start date two days ago', async () => {
+    const startDateInput = chartPage.page.getByTestId('visitStartDateInput');
+    await startDateInput.getByRole('spinbutton', { name: /month/i }).fill(startDate.format('MM'));
+    await startDateInput.getByRole('spinbutton', { name: /day/i }).fill(startDate.format('DD'));
+    await startDateInput.getByRole('spinbutton', { name: /year/i }).fill(startDate.format('YYYY'));
+  });
+
+  await test.step('And I set the end date one day ago', async () => {
+    const endDateInput = chartPage.page.getByTestId('visitStopDateInput');
+    await endDateInput.getByRole('spinbutton', { name: /month/i }).fill(endDate.format('MM'));
+    await endDateInput.getByRole('spinbutton', { name: /day/i }).fill(endDate.format('DD'));
+    await endDateInput.getByRole('spinbutton', { name: /year/i }).fill(endDate.format('YYYY'));
+  });
+
+  await test.step('And I select the visit type: `OPD Visit`', async () => {
+    const opdVisitLabel = chartPage.page.locator('label').filter({ hasText: /^OPD Visit$/i });
+    await expect(opdVisitLabel).toBeVisible();
+    await opdVisitLabel.click();
+    await expect(chartPage.page.getByRole('radio', { name: /^OPD Visit$/i })).toBeChecked();
+  });
+
+  await test.step('And I click on the `Start Visit` button', async () => {
+    await chartPage.page
+      .locator('form')
+      .getByRole('button', { name: /start visit/i })
+      .click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(chartPage.page.getByText(/opd visit started successfully/i)).toBeVisible();
+  });
+
+  await test.step('And the patient should not have an active visit tag', async () => {
+    await expect(chartPage.page.getByLabel(/active visit/i)).toBeHidden();
   });
 });
 

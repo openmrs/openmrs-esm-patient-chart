@@ -47,6 +47,7 @@ export function usePinToggle(drug: Drug | undefined) {
         successTitle: t('orderPinned', 'Order pinned'),
         successSubtitle: t('orderPinnedSubtitle', '{{drugName}} added to your pinned orders', {
           drugName: newFavorite.displayName,
+          interpolation: { escapeValue: false },
         }),
         errorTitle: t('errorPinningOrder', 'Error pinning order'),
       });

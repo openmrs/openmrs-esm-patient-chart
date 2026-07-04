@@ -22,6 +22,7 @@ export interface DrugSearchProps {
   visit: Visit;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
+  launchAllergyForm?: () => void;
 }
 
 export default function DrugSearch({
@@ -31,11 +32,15 @@ export default function DrugSearch({
   visit,
   searchTerm,
   onSearchTermChange,
+  launchAllergyForm,
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { debounceDelayInMs, daysDurationUnit } = useConfig<ConfigObject>();
-  const debouncedSearchTerm = useDebounce(searchTerm, debounceDelayInMs ?? 300);
+  const { debounceDelayInMs, daysDurationUnit, minimumCharacterLengthForDrugSearch } = useConfig<ConfigObject>();
+  const debouncedSearchTerm = useDebounce(
+    searchTerm?.length >= minimumCharacterLengthForDrugSearch ? searchTerm : '',
+    debounceDelayInMs ?? 300,
+  );
   const searchInputRef = useRef(null);
 
   const handleSearchTermChange = useCallback(
@@ -52,7 +57,7 @@ export default function DrugSearch({
 
   return (
     <div className={styles.searchPopupContainer}>
-      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id }} />
+      <ExtensionSlot name="allergy-list-pills-slot" state={{ patientUuid: patient?.id, launchAllergyForm }} />
       <ResponsiveWrapper>
         <Search
           autoFocus
@@ -79,8 +84,11 @@ export default function DrugSearch({
       />
       {isTablet && (
         <div className={styles.separatorContainer}>
-          <p className={styles.separator}>{t('or', 'or')}</p>
-          <Button iconDescription="Return to order basket" kind="ghost" onClick={() => closeWorkspace()}>
+          <Button
+            iconDescription={t('returnToOrderBasket', 'Return to order basket')}
+            kind="ghost"
+            onClick={() => closeWorkspace()}
+          >
             {t('returnToOrderBasket', 'Return to order basket')}
           </Button>
         </div>

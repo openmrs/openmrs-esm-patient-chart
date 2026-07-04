@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import OrderPriceDetailsComponent from './order-price-details.component';
 import { useOrderPrice } from '../hooks/useOrderPrice';
@@ -6,18 +7,18 @@ import { renderWithSwr } from 'tools';
 import { mockOrderPriceData } from '__mocks__';
 import { getLocale } from '@openmrs/esm-framework';
 
-const mockGetLocale = jest.mocked(getLocale);
-const mockUseOrderPrice = jest.mocked(useOrderPrice);
+const mockGetLocale = vi.mocked(getLocale);
+const mockUseOrderPrice = vi.mocked(useOrderPrice);
 
-jest.mock('../hooks/useOrderPrice', () => ({
-  useOrderPrice: jest.fn(),
+vi.mock('../hooks/useOrderPrice', () => ({
+  useOrderPrice: vi.fn(),
 }));
 
 describe('OrderPriceDetailsComponent', () => {
   const mockOrderItemUuid = 'test-uuid';
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockGetLocale.mockReturnValue('en-US');
   });
 
@@ -75,7 +76,7 @@ describe('OrderPriceDetailsComponent', () => {
   });
 
   it('handles invalid currency codes gracefully', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     mockUseOrderPrice.mockReturnValue({
       data: {
