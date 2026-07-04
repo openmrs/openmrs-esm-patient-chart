@@ -51,10 +51,11 @@ export const GroupedTimeline: React.FC<{ patientUuid: string }> = ({ patientUuid
   if (activeTests && timelineData && loaded && tableData) {
     return (
       <div className={styles.timelineDataContainer}>
-        {visiblePanels.map((panel, index) => {
-          // Filter rowData to only include tests that belong to this panel
-          const panelTestNames = panel.entries.map((entry) => entry.flatName);
-          const subRows = visibleRows.filter((row: { flatName: string }) => panelTestNames.includes(row.flatName));
+        {tableData.map((panel, index) => {
+          const panelTestNames = new Set(
+            panel.entries.flatMap((entry) => [...(entry.flatNames ?? []), entry.flatName]),
+          );
+          const subRows = rowData?.filter((row: { flatName: string }) => panelTestNames.has(row.flatName));
 
           return (
             subRows?.length > 0 && (

@@ -761,3 +761,43 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect((savedOrder.scheduledDate as Date).getDate()).toBe(futureStartDate.getDate());
   });
 });
+
+describe('DrugOrderForm - required field validation', () => {
+  beforeEach(() => {
+    mockOpenmrsDatePicker.mockImplementation(({ id, labelText }) => (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input id={id} type="text" />
+      </>
+    ));
+    mockUseMedicationOrders.mockReturnValue({
+      futureOrders: [],
+      activeOrders: [],
+      pastOrders: [],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+    });
+    mockUseRequireOutpatientQuantity.mockReturnValue({
+      requireOutpatientQuantity: true,
+      error: null,
+      isLoading: false,
+    });
+  });
+
+  it('shows an error for each required field and does not save when submitting an empty order', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    renderDrugOrderForm(createNewOrderBasketItem(), onSave);
+
+    await user.click(screen.getByRole('button', { name: /save order/i }));
+
+    expect(await screen.findByText('Dosage is required')).toBeInTheDocument();
+    expect(screen.getByText('Route is required')).toBeInTheDocument();
+    expect(screen.getByText('Frequency is required')).toBeInTheDocument();
+    expect(screen.getByText('Indication is required')).toBeInTheDocument();
+    expect(screen.getByText('Quantity to dispense is required')).toBeInTheDocument();
+    expect(screen.getByText('Number of refills is required')).toBeInTheDocument();
+    expect(onSave).not.toHaveBeenCalled();
+  });
+});

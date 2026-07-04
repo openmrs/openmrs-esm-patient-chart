@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader, TextArea } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { createStickyNote, type StickyNoteObs, updateStickyNote } from './sticky-note.resource';
+import { decodeHtmlEntities } from './utils';
 import styles from './sticky-note.modal.scss';
 
 const MAX_NOTE_LENGTH = 300;
@@ -18,12 +19,16 @@ interface StickyNoteModalProps {
 const StickyNoteModal: React.FC<StickyNoteModalProps> = ({ close, existingNote, mutate, patientUuid }) => {
   const { t } = useTranslation();
   const { stickyNoteConceptUuid } = useConfig<ConfigObject>();
-  const [value, setValue] = useState(existingNote?.value ?? '');
+  const decodedExistingValue = useMemo(
+    () => (existingNote?.value ? decodeHtmlEntities(existingNote.value) : ''),
+    [existingNote],
+  );
+  const [value, setValue] = useState(decodedExistingValue);
   const [isSaving, setIsSaving] = useState(false);
 
   const isEditMode = Boolean(existingNote);
   const trimmed = value.trim();
-  const isUnchanged = isEditMode && trimmed === existingNote?.value?.trim();
+  const isUnchanged = isEditMode && trimmed === decodedExistingValue.trim();
 
   const handleSave = useCallback(async () => {
     if (!trimmed || isUnchanged) {
