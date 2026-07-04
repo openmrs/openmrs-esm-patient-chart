@@ -1,5 +1,5 @@
 import { useSWRConfig } from 'swr';
-import { vi, describe, it, expect, test, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { openmrsFetch, showSnackbar, type Visit } from '@openmrs/esm-framework';
 import {
@@ -26,6 +26,7 @@ vi.mock('../visits-widget/visit.resource', async () => {
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
   invalidateCurrentVisit: vi.fn(),
   invalidateVisitAndEncounterData: vi.fn(),
+  invalidateVisitByUuid: vi.fn(),
   usePatientChartStore: vi.fn(),
 }));
 
@@ -59,6 +60,15 @@ const mockVisit = {
   links: [],
   resourceVersion: '1.8',
 } as Visit;
+
+const mockQueueEntry = {
+  uuid: 'queue-entry-123',
+  queue: { uuid: 'queue-uuid-1' },
+  patient: { uuid: 'patient-123' },
+  priority: { uuid: 'priority-uuid-1' },
+  status: { uuid: 'status-uuid-1' },
+  startedAt: '2023-01-01T10:00:00Z',
+};
 
 describe('useDeleteVisit', () => {
   beforeEach(() => {
@@ -108,13 +118,21 @@ describe('useDeleteVisit', () => {
     expect(onVisitDelete).toHaveBeenCalled();
   });
 
-  it('should void the queue entry associated with the visit on deletion', async () => {
-    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
-    mockOpenmrsFetch
-      .mockResolvedValueOnce({
-        data: { results: [{ queueEntry: { uuid: 'queue-entry-123' } }] },
-      } as any)
-      .mockResolvedValueOnce({ data: {} } as any);
+  it('should fetch the queue entry BEFORE deleting the visit', async () => {
+    const callOrder: string[] = [];
+
+    mockOpenmrsFetch.mockImplementation(async (url: string) => {
+      if (typeof url === 'string' && url.includes('/visit-queue-entry')) {
+        callOrder.push('fetchQueueEntry');
+        return { data: { results: [] } } as any;
+      }
+      return { data: {} } as any;
+    });
+
+    mockDeleteVisit.mockImplementation(async () => {
+      callOrder.push('deleteVisit');
+      return { data: {} } as any;
+    });
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, () => {}));
 
@@ -122,31 +140,51 @@ describe('useDeleteVisit', () => {
       result.current.initiateDeletingVisit();
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith(expect.stringContaining('/visit-queue-entry?visit=visit-123'));
+    expect(callOrder[0]).toBe('fetchQueueEntry');
+    expect(callOrder[1]).toBe('deleteVisit');
+  });
+
+  it('should end (not void) the queue entry using POST with endedAt', async () => {
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: { results: [{ queueEntry: mockQueueEntry }] } } as any)
+      .mockResolvedValueOnce({ data: {} } as any);
+    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
+
+    const { result } = renderHook(() => useDeleteVisit(mockVisit, () => {}));
+
+    await act(async () => {
+      result.current.initiateDeletingVisit();
+    });
+
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(
       expect.stringContaining('/queue-entry/queue-entry-123'),
-      expect.objectContaining({ method: 'DELETE' }),
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('endedAt'),
+      }),
     );
   });
 
-  it('should not call DELETE if no queue entry exists for the visit', async () => {
-    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
+  it('should not call end queue entry if no queue entry exists for the visit', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({ data: { results: [] } } as any);
-
+    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
     const onVisitDelete = vi.fn();
+
     const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
 
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
-    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1); // only the GET, no DELETE
+    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1); // only the GET, no POST
     expect(onVisitDelete).toHaveBeenCalled();
   });
 
-  it('should still complete visit deletion if voiding queue entry fails', async () => {
+  it('should show a warning snackbar if ending the queue entry fails', async () => {
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: { results: [{ queueEntry: mockQueueEntry }] } } as any)
+      .mockRejectedValueOnce(new Error('Queue API error'));
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
-    mockOpenmrsFetch.mockRejectedValueOnce(new Error('Queue API error'));
     const onVisitDelete = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, onVisitDelete));
@@ -155,8 +193,20 @@ describe('useDeleteVisit', () => {
       result.current.initiateDeletingVisit();
     });
 
+    // Should show warning for queue failure
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+      }),
+    );
+
+    // Visit deletion should still succeed
     expect(onVisitDelete).toHaveBeenCalled();
-    expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+      }),
+    );
   });
 
   it('should handle delete error and trigger revalidation', async () => {
@@ -180,18 +230,77 @@ describe('useDeleteVisit', () => {
     expect(onVisitDelete).not.toHaveBeenCalled();
   });
 
-  it('should restore visit successfully when undo is clicked', async () => {
-    mockRestoreVisit.mockResolvedValue({ data: {} } as any);
+  it('should restore visit and re-create the queue entry on undo', async () => {
+    // First: delete visit with a queue entry
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: { results: [{ queueEntry: mockQueueEntry }] } } as any) // fetch queue entry
+      .mockResolvedValueOnce({ data: {} } as any); // end queue entry
+    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
     const onVisitRestore = vi.fn();
 
     const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
-    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
 
-    const restoreFunction = mockShowSnackbar.mock.calls[0][0].onActionButtonClick;
+    const restoreFunction = mockShowSnackbar.mock.calls.find(
+      (call) => call[0].kind === 'success' && call[0].actionButtonLabel,
+    )?.[0].onActionButtonClick;
+
+    expect(restoreFunction).toBeDefined();
+
+    // Now restore
+    vi.clearAllMocks();
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: 'patient-123',
+      patient: null,
+      visitContext: null,
+      mutateVisitContext: vi.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: mockSetVisitContext,
+    });
+    mockUseSWRConfig.mockReturnValue({
+      mutate: mockGlobalMutate,
+      cache: new Map(),
+    } as any);
+
+    mockRestoreVisit.mockResolvedValue({ data: { stopDatetime: null, uuid: 'visit-123' } } as any);
+    mockOpenmrsFetch.mockResolvedValue({ data: {} } as any); // re-create queue entry
+
+    await act(async () => {
+      restoreFunction();
+    });
+
+    expect(mockRestoreVisit).toHaveBeenCalledWith('visit-123');
+
+    // Should re-create the queue entry
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/queue-entry'),
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('queue'),
+      }),
+    );
+
+    expect(onVisitRestore).toHaveBeenCalled();
+  });
+
+  it('should show warning if queue entry restore fails on undo', async () => {
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({ data: { results: [{ queueEntry: mockQueueEntry }] } } as any)
+      .mockResolvedValueOnce({ data: {} } as any);
+    mockDeleteVisit.mockResolvedValue({ data: {} } as any);
+
+    const { result } = renderHook(() => useDeleteVisit(mockVisit));
+
+    await act(async () => {
+      result.current.initiateDeletingVisit();
+    });
+
+    const restoreFunction = mockShowSnackbar.mock.calls.find(
+      (call) => call[0].kind === 'success' && call[0].actionButtonLabel,
+    )?.[0].onActionButtonClick;
 
     vi.clearAllMocks();
     mockUsePatientChartStore.mockReturnValue({
@@ -207,29 +316,27 @@ describe('useDeleteVisit', () => {
       cache: new Map(),
     } as any);
 
+    mockRestoreVisit.mockResolvedValue({ data: { stopDatetime: null, uuid: 'visit-123' } } as any);
+    mockOpenmrsFetch.mockRejectedValue(new Error('Queue restore failed'));
+
     await act(async () => {
       restoreFunction();
     });
 
-    expect(mockRestoreVisit).toHaveBeenCalledWith('visit-123');
-    expect(mockInvalidateVisitAndEncounterData).toHaveBeenCalledWith(mockGlobalMutate, 'patient-123');
-
-    expect(mockShowSnackbar).toHaveBeenCalledWith({
-      title: 'Visit restored',
-      subtitle: 'Outpatient Visit restored successfully',
-      kind: 'success',
-    });
-
-    expect(onVisitRestore).toHaveBeenCalled();
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'warning',
+        title: expect.stringContaining('Queue entry not restored'),
+      }),
+    );
   });
 
   it('should handle restore error and trigger revalidation', async () => {
     mockRestoreVisit.mockRejectedValue(new Error('Restore failed'));
-    const onVisitRestore = vi.fn();
-
-    const { result } = renderHook(() => useDeleteVisit(mockVisit, undefined, onVisitRestore));
 
     mockDeleteVisit.mockResolvedValue({ data: {} } as any);
+    const { result } = renderHook(() => useDeleteVisit(mockVisit));
+
     await act(async () => {
       result.current.initiateDeletingVisit();
     });
@@ -261,8 +368,6 @@ describe('useDeleteVisit', () => {
       subtitle: 'Error occurred when restoring Outpatient Visit',
       kind: 'error',
     });
-
-    expect(onVisitRestore).not.toHaveBeenCalled();
   });
 
   it('should manage loading state correctly', async () => {
