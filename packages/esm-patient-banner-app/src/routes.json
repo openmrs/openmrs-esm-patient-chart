@@ -18,6 +18,13 @@
       "offline": true
     },
     {
+      "name": "past-visit-tag",
+      "slot": "patient-banner-tags-slot",
+      "component": "pastVisitTag",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "deceased-patient-tag",
       "slot": "patient-banner-tags-slot",
       "component": "deceasedPatientTag",
