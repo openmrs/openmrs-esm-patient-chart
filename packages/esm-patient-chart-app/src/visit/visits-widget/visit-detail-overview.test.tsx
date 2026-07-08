@@ -150,6 +150,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
@@ -183,6 +184,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
     expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();

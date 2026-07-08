@@ -20,6 +20,7 @@ import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import VisitCompletedFormsTable from './encounters-table/visit-completed-forms-table.component';
+import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
 import styles from './visit-summary.scss';
 
@@ -136,6 +137,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <Tab className={styles.tab} id="completed-forms-tab" disabled={!hasCompletedForms && config.disableEmptyTabs}>
             {t('completedForms', 'Completed forms')}
           </Tab>
+          <Tab
+            className={styles.tab}
+            id="encounters-tab"
+            disabled={(visit?.encounters?.length ?? 0) <= 0 && config.disableEmptyTabs}
+          >
+            {t('encounters_title', 'Encounters')}
+          </Tab>
           {extensions?.map((extension, index) => (
             <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
               {t(extension.meta.title, {
@@ -160,6 +168,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </TabPanel>
           <TabPanel>
             <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
+          </TabPanel>
+          <TabPanel>
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

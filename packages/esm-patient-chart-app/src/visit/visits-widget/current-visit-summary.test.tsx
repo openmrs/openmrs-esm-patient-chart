@@ -77,7 +77,7 @@ describe('CurrentVisitSummary', () => {
 
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
     expect(screen.getByText('Diagnoses')).toBeInTheDocument();
-    const buttonNames = ['Notes', 'Tests', 'Medications'];
+    const buttonNames = ['Notes', 'Tests', 'Medications', 'Encounters'];
     buttonNames.forEach((buttonName) => {
       expect(screen.getByRole('tab', { name: buttonName })).toBeInTheDocument();
     });
