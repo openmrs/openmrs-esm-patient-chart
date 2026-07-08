@@ -84,6 +84,7 @@
   "filterByEncounterType": "Filter by encounter type",
   "form": "Form name",
   "fromDateToDate": "{{fromDate}} - {{toDate}}",
+  "fullDayVisit": "Full day visit",
   "futureEndTime": "End time cannot be in the future",
   "futureStartTime": "Start time cannot be in the future",
   "generating": "Generating...",
