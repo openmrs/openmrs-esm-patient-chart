@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -163,6 +164,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     handleSubmit,
     control,
     getValues,
+    setValue,
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = methods;
@@ -179,6 +181,16 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       keepTouched: true,
     });
   }, [defaultValues, reset]);
+
+  // When creating a new visit (not editing an existing one), the user can switch the visit status
+  // to "past" via the content switcher. defaultValues only defaults isFullDayVisit to true when
+  // visitToEdit is itself already a past visit, so this keeps the checkbox checked-by-default
+  // for that case too, without affecting the edit flow (which is excluded via !visitToEdit).
+  useEffect(() => {
+    if (!visitToEdit && visitStatus === 'past') {
+      setValue('isFullDayVisit', true);
+    }
+  }, [visitStatus, visitToEdit, setValue]);
 
   const getErrorDescription = useCallback(
     (error: unknown) => {
@@ -283,13 +295,19 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
         visitStopDate,
         visitStopTime,
         visitStopTimeFormat,
+        isFullDayVisit,
       } = data;
 
       const { handleCreateExtraVisitInfo, attributes: extraAttributes } = extraVisitInfo ?? {};
       const hasStartTime = ['ongoing', 'past'].includes(visitStatus);
       const hasStopTime = 'past' === visitStatus;
-      const startDatetime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
-      const stopDatetime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
+      const isFullDay = isFullDayVisit && visitStatus === 'past';
+      const startDatetime = isFullDay
+        ? dayjs(visitStartDate).startOf('day').toDate()
+        : convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+      const stopDatetime = isFullDay
+        ? dayjs(visitStartDate).endOf('day').toDate()
+        : convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
       // For new visits, include attributes in the payload for atomic creation (avoids orphaned visits).
       // For edits, attributes are managed separately (backend rejects inline updates with maxOccurs).

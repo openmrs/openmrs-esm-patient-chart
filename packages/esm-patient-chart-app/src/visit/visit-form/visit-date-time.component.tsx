@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { type Control, Controller, type FieldPath, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { Checkbox, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { convertToDate, type VisitFormData } from './visit-form.resource';
@@ -46,6 +46,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
     visitStopDate,
     visitStopTime,
     visitStopTimeFormat,
+    isFullDayVisit,
   ] = useWatch({
     control,
     name: [
@@ -56,10 +57,12 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
       'visitStopDate',
       'visitStopTime',
       'visitStopTimeFormat',
+      'isFullDayVisit',
     ],
   });
 
   const hasStopTime = 'past' === visitStatus;
+  const isFullDay = hasStopTime && Boolean(isFullDayVisit);
   const selectedVisitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
   const selectedVisitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
@@ -74,14 +77,31 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
           ? t('visitStartDate', 'Visit start date')
           : t('visitStartAndEndDate', 'Visit start and end date')}
       </div>
+      {hasStopTime && (
+        <Controller
+          name="isFullDayVisit"
+          control={control}
+          render={({ field: { onChange, value, ref } }) => (
+            <Checkbox
+              className={styles.sectionField}
+              id="isFullDayVisit"
+              labelText={t('fullDayVisit', 'Full day visit')}
+              checked={Boolean(value)}
+              onChange={(_, { checked }) => onChange(checked)}
+              ref={ref}
+            />
+          )}
+        />
+      )}
       <VisitDateTimeField
-        dateField={{ name: 'visitStartDate', label: t('startDate', 'Start date') }}
+        dateField={{ name: 'visitStartDate', label: isFullDay ? t('date', 'Date') : t('startDate', 'Start date') }}
         timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
         timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
         minDate={earliestStartDate}
         maxDate={minOf(Date.now(), firstEncounterDateTime, selectedVisitStopDateTime?.getTime())}
+        hideTime={isFullDay}
       />
-      {hasStopTime && (
+      {hasStopTime && !isFullDay && (
         <VisitDateTimeField
           dateField={{ name: 'visitStopDate', label: t('endDate', 'End date') }}
           timeField={{ name: 'visitStopTime', label: t('endTime', 'End time') }}
@@ -101,6 +121,7 @@ interface VisitDateTimeFieldProps {
   minDate?: dayjs.ConfigType;
   maxDate?: dayjs.ConfigType;
   disabled?: boolean;
+  hideTime?: boolean;
 }
 
 interface Field {
@@ -120,6 +141,7 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
   minDate,
   maxDate,
   disabled,
+  hideTime,
 }) => {
   const {
     control,
@@ -154,51 +176,53 @@ const VisitDateTimeField: React.FC<VisitDateTimeFieldProps> = ({
           </ResponsiveWrapper>
         )}
       />
-      <ResponsiveWrapper>
-        <Controller
-          name={timeField.name}
-          control={control}
-          render={({ field: { onBlur, onChange, value } }) => (
-            <div className={styles.timePickerContainer}>
-              <TimePicker
-                className={styles.timePicker}
-                disabled={disabled}
-                id={timeField.name}
-                invalid={Boolean(errors[timeField.name])}
-                invalidText={errors[timeField.name]?.message}
-                labelText={timeField.label}
-                onBlur={onBlur}
-                onChange={(event) => onChange(event.target.value)}
-                pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
-                value={value as string}
-              >
-                <Controller
-                  name={timeFormatField.name}
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <TimePickerSelect
-                      aria-label={timeFormatField.label}
-                      className={classNames({
-                        [styles.timePickerSelectError]: errors[timeFormatField.name],
-                      })}
-                      disabled={disabled}
-                      id={`${timeFormatField.name}Input`}
-                      onChange={(event) => onChange(event.target.value as amPm)}
-                      value={value as amPm}
-                    >
-                      <SelectItem value="AM" text={t('AM', 'AM')} />
-                      <SelectItem value="PM" text={t('PM', 'PM')} />
-                    </TimePickerSelect>
-                  )}
-                />
-              </TimePicker>
-              {errors[timeFormatField.name] && (
-                <div className={styles.timerPickerError}>{errors[timeFormatField.name]?.message}</div>
-              )}
-            </div>
-          )}
-        />
-      </ResponsiveWrapper>
+      {!hideTime && (
+        <ResponsiveWrapper>
+          <Controller
+            name={timeField.name}
+            control={control}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <div className={styles.timePickerContainer}>
+                <TimePicker
+                  className={styles.timePicker}
+                  disabled={disabled}
+                  id={timeField.name}
+                  invalid={Boolean(errors[timeField.name])}
+                  invalidText={errors[timeField.name]?.message}
+                  labelText={timeField.label}
+                  onBlur={onBlur}
+                  onChange={(event) => onChange(event.target.value)}
+                  pattern="^(0[1-9]|1[0-2]):([0-5][0-9])$"
+                  value={value as string}
+                >
+                  <Controller
+                    name={timeFormatField.name}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <TimePickerSelect
+                        aria-label={timeFormatField.label}
+                        className={classNames({
+                          [styles.timePickerSelectError]: errors[timeFormatField.name],
+                        })}
+                        disabled={disabled}
+                        id={`${timeFormatField.name}Input`}
+                        onChange={(event) => onChange(event.target.value as amPm)}
+                        value={value as amPm}
+                      >
+                        <SelectItem value="AM" text={t('AM', 'AM')} />
+                        <SelectItem value="PM" text={t('PM', 'PM')} />
+                      </TimePickerSelect>
+                    )}
+                  />
+                </TimePicker>
+                {errors[timeFormatField.name] && (
+                  <div className={styles.timerPickerError}>{errors[timeFormatField.name]?.message}</div>
+                )}
+              </div>
+            )}
+          />
+        </ResponsiveWrapper>
+      )}
     </div>
   );
 };
