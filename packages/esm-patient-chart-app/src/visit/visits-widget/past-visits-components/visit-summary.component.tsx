@@ -15,9 +15,15 @@ import {
 } from '@openmrs/esm-framework';
 
 import type { ChartConfig } from '../../../config-schema';
+<<<<<<< HEAD
 import type { Note, Order, OrderItem, LightweightVisit } from '../visit.resource';
 import { useFullVisit } from '../visit.resource';
 import { dedupeDiagnoses } from '../../dedupe-diagnoses';
+=======
+import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import type { Note, Order, OrderItem, LightweightVisit } from '../visit.resource';
+import { useFullVisit } from '../visit.resource';
+>>>>>>> 0b417cfc (chore: remove accidentally created files)
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
