@@ -22,6 +22,7 @@ const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 describe('VisitSummary', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mockExtensionSlot.mockImplementation((ext) => ext.name);
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
@@ -162,5 +163,64 @@ describe('VisitSummary', () => {
       const loadingElements = screen.getAllByText(/Loading visit details/i);
       expect(loadingElements.length).toBeGreaterThan(0);
     });
+  });
+
+  it('should trigger full data fetch when clicking a tab that requires it', async () => {
+    const user = userEvent.setup();
+    const mockVisitData = visitOverviewDetailMockDataNotEmpty.data.results[0];
+
+    mockUseFullVisit.mockReturnValue({
+      visit: null,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    const { rerender } = render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+
+    const testsTab = screen.getByRole('tab', { name: /Tests/i });
+    await user.click(testsTab);
+
+    mockUseFullVisit.mockReturnValue({
+      visit: mockVisitData,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    rerender(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+
+    await user.click(testsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+    });
+  });
+
+  it('should not trigger full data fetch when clicking the Notes tab', async () => {
+    const user = userEvent.setup();
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+
+    const notesTab = screen.getByRole('tab', { name: /Notes/i });
+    await user.click(notesTab);
+
+    expect(mockUseFullVisit).toHaveBeenCalledWith(null);
+  });
+
+  it('should not show infinite loading spinner for tabs before full data is requested', () => {
+    mockUseFullVisit.mockReturnValue({
+      visit: null,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+
+    expect(screen.queryByText(/Loading visit details/i)).not.toBeInTheDocument();
   });
 });

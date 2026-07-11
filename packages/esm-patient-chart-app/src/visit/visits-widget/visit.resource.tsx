@@ -13,7 +13,6 @@ const customRepresentation =
 
 /**
  * Lightweight visit hook that fetches only basic visit details, diagnoses, and notes.
- * Used for the initial UI load to improve performance.
  * Uses the custom emrapi endpoint introduced in EA-207.
  */
 export function useLightweightVisits(patientUuid: string, pageSize: number = 10) {
@@ -29,12 +28,9 @@ export function useLightweightVisits(patientUuid: string, pageSize: number = 10)
 /**
  * Wrapper hook that tries the lightweight endpoint first, falling back to
  * the standard paginated visits endpoint if the lightweight one is unavailable.
- * This ensures the UI works even when the emrapi module is not installed.
  */
 export function useVisitsWithFallback(patientUuid: string, pageSize: number = 10) {
   const lightweight = useLightweightVisits(patientUuid, pageSize);
-
-  // Fall back to the standard paginated visits if the lightweight endpoint errors
   const shouldFallback = !!lightweight.error;
   const fallback = usePaginatedVisits(patientUuid, pageSize, {}, shouldFallback);
 
@@ -67,7 +63,7 @@ export function useVisitsWithFallback(patientUuid: string, pageSize: number = 10
 
 /**
  * On-demand hook to fetch full visit details (encounters, obs, orders, etc.)
- * Only fetches when visitUuid is provided (i.e., when user clicks Tests/Medications/Encounters tabs).
+ * Only fetches when visitUuid is provided.
  */
 export function useFullVisit(visitUuid: string | null) {
   const url = visitUuid ? `${restBaseUrl}/visit/${visitUuid}?v=${customRepresentation}` : null;
@@ -147,10 +143,16 @@ export interface LightweightVisit {
     name: string;
     display: string;
   };
-  location: OpenmrsResource;
-  patient: OpenmrsResource;
-  diagnoses: Diagnosis[];
-  notes: LightweightNote[];
+  location?: OpenmrsResource;
+  patient?: OpenmrsResource;
+  attributes?: Array<{ attributeType: OpenmrsResource; display: string; uuid: string; value: string }>;
+  diagnoses?: Diagnosis[];
+  notes?: LightweightNote[];
+  encounters?: Array<{
+    uuid: string;
+    encounterDatetime: string;
+    encounterType: { uuid: string; display: string };
+  }>;
 }
 
 export interface LightweightNote {
@@ -161,7 +163,9 @@ export interface LightweightNote {
   provider?: {
     uuid: string;
     display: string;
+    role?: string;
   };
+  concept?: OpenmrsResource;
 }
 
 export interface Order {
