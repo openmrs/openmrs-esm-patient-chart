@@ -74,7 +74,7 @@
     "swr": "2.2.5",
     "turbo": "^2.9.14",
     "typescript": "^5.0.0",
-    "vitest": "^4.1.2",
+    "vitest": "^4.1.10",
     "webpack-dev-server": "^5.2.4"
   },
   "lint-staged": {
@@ -83,7 +83,8 @@
   },
   "resolutions": {
     "sass": "^1.54.3",
-    "dompurify": "^3.4.11"
+    "dompurify": "^3.4.11",
+    "vite": "^8.0.16"
   },
   "packageManager": "yarn@4.10.3"
 }

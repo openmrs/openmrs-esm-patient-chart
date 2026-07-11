@@ -58,6 +58,6 @@
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "@types/uuid": "^9.0.4",
     "openmrs": "next",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.10"
   }
 }
