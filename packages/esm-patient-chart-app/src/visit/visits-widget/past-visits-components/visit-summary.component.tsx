@@ -15,18 +15,9 @@ import {
 } from '@openmrs/esm-framework';
 
 import type { ChartConfig } from '../../../config-schema';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import type { Note, Order, OrderItem, LightweightVisit } from '../visit.resource';
 import { useFullVisit } from '../visit.resource';
 import { dedupeDiagnoses } from '../../dedupe-diagnoses';
-=======
-import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-=======
->>>>>>> a2207c94 (chore: remove unused import and update i18n files)
-import type { Note, Order, OrderItem, LightweightVisit } from '../visit.resource';
-import { useFullVisit } from '../visit.resource';
->>>>>>> 0b417cfc (chore: remove accidentally created files)
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -75,11 +66,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     }
 
     if (resolvedVisit?.encounters) {
-      return dedupeDiagnoses(
-        resolvedVisit.encounters
-          .flatMap((enc) => enc.diagnoses ?? [])
-          .filter((d) => !d.voided),
-      );
+      return dedupeDiagnoses(resolvedVisit.encounters.flatMap((enc) => enc.diagnoses ?? []).filter((d) => !d.voided));
     }
 
     return [];
@@ -153,10 +140,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     [resolvedVisit?.encounters],
   );
 
-<<<<<<< HEAD
   /** Maps selected tab index to tab ID, accounting for dynamic extension tabs. */
-=======
->>>>>>> a2207c94 (chore: remove unused import and update i18n files)
   const handleTabChange = (evt: { selectedIndex: number }) => {
     const builtInTabIds = [
       'timeline-tab',
@@ -175,7 +159,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     }
   };
 
-<<<<<<< HEAD
   /** Renders tab panel content only after full data is requested and loaded. */
   const renderFullDataPanel = (content: React.ReactNode) => {
     if (isLoadingFullVisit) {
@@ -186,9 +169,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
     }
     return content;
   };
-=======
-  const FullDataLoading = () => <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
->>>>>>> a2207c94 (chore: remove unused import and update i18n files)
 
   return (
     <div className={styles.summaryContainer}>
