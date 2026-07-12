@@ -140,7 +140,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           <Tab
             className={styles.tab}
             id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            disabled={(visit?.encounters?.length ?? 0) <= 0 && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
