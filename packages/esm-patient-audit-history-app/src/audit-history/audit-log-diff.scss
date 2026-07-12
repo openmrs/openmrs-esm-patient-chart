@@ -21,6 +21,10 @@
   align-items: baseline;
 }
 
+.row {
+  display: contents;
+}
+
 .headerCell {
   @include type.type-style('label-01');
   color: $text-02;
@@ -52,4 +56,22 @@
   color: $text-02;
   padding: layout.$spacing-05 layout.$spacing-06;
   margin: 0;
+}
+
+.snapshotDetails {
+  margin-top: layout.$spacing-03;
+
+  summary {
+    @include type.type-style('label-01');
+    color: $text-02;
+    cursor: pointer;
+  }
+}
+
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+  column-gap: layout.$spacing-06;
+  align-items: baseline;
+  margin-top: layout.$spacing-03;
 }

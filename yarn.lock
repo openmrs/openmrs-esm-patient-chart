@@ -5427,7 +5427,7 @@ __metadata:
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
-    "@openmrs/esm-framework": 9.x
+    "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
     react: 18.x

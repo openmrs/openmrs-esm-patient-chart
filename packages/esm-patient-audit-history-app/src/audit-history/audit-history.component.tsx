@@ -27,10 +27,11 @@ import {
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
-import { DEFAULT_PAGE_SIZE } from '../constants';
+import { DEFAULT_PAGE_SIZE, getVisibleChanges, isFullSnapshot } from '../constants';
 import { usePatientAuditHistory } from './audit-history.resource';
 import AuditLogDiff from './audit-log-diff.component';
 import AuditLogEventTag from './audit-log-event-tag.component';
+import { formatRevisionDatetime } from './audit-log-format';
 import styles from './audit-history.scss';
 
 interface AuditHistoryProps {
@@ -48,11 +49,12 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
 
   const resolvedPatientUuid = patientUuid ?? patient?.id ?? '';
   const pageSize = auditHistoryPageSize ?? DEFAULT_PAGE_SIZE;
+  const hasAccess = !viewPrivilege || !session || userHasAccess(viewPrivilege, session.user);
 
   const [page, setPage] = useState(1);
 
   const { logs, totalLogs, isLoading, isValidating, error, mutate } = usePatientAuditHistory(
-    resolvedPatientUuid,
+    hasAccess ? resolvedPatientUuid : '',
     page - 1,
     pageSize,
   );
@@ -62,6 +64,7 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
       { key: 'changedOn', header: t('dateTime', 'Date & time') },
       { key: 'eventType', header: t('event', 'Event') },
       { key: 'changedBy', header: t('changedBy', 'Changed by') },
+      { key: 'changesCount', header: t('changes', 'Changes') },
     ],
     [t],
   );
@@ -73,11 +76,14 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
       const occurrence = occurrences.get(baseKey) ?? 0;
       occurrences.set(baseKey, occurrence + 1);
       const id = occurrence === 0 ? baseKey : `${baseKey}-${occurrence}`;
+      const visibleChanges = getVisibleChanges(log.changes ?? []);
+      const changeCount = visibleChanges.length + (log.relatedEntities?.length ?? 0);
       return {
         id,
         changedOn: log.changedOn,
         eventType: log.eventType,
         changedBy: log.changedBy || t('unknownUser', 'Unknown'),
+        changesCount: isFullSnapshot(visibleChanges) ? t('newRecord', 'New record') : String(changeCount),
         _original: log,
       };
     });
@@ -87,7 +93,7 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
     };
   }, [logs, t]);
 
-  if (viewPrivilege && session && !userHasAccess(viewPrivilege, session.user)) {
+  if (!hasAccess) {
     return (
       <Layer>
         <Tile className={styles.messageTile}>
@@ -106,7 +112,12 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
       return (
         <Layer>
           <Tile className={styles.messageTile}>
-            <p>{t('moduleNotInstalled', 'The auditlogweb module is not installed on this server.')}</p>
+            <p>
+              {t(
+                'moduleNotInstalled',
+                'The auditlogweb module is not installed or does not support patient audit history.',
+              )}
+            </p>
           </Tile>
         </Layer>
       );
@@ -147,7 +158,9 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'eventType' ? (
-                              <AuditLogEventTag eventType={cell.value} />
+                              <AuditLogEventTag eventType={cell.value} changes={original?.changes ?? []} />
+                            ) : cell.info.header === 'changedOn' ? (
+                              formatRevisionDatetime(cell.value)
                             ) : (
                               cell.value
                             )}
@@ -156,10 +169,10 @@ const AuditHistory: React.FC<AuditHistoryProps> = ({ patientUuid, patient }) => 
                       </TableExpandRow>
                       {row.isExpanded && (
                         <TableExpandedRow colSpan={headers.length + 1} className={styles.expandedRow}>
-                          <AuditLogDiff changes={original?.changes ?? []} />
+                          <AuditLogDiff changes={original?.changes ?? []} eventType={original?.eventType} />
                           {relatedEntities.length > 0 && (
                             <div className={styles.relatedEntities}>
-                              <p className={styles.relatedTitle}>{t('alsoChanged', 'Also changed in this revision')}</p>
+                              <p className={styles.relatedTitle}>{t('alsoChanged', 'Changed in the same save')}</p>
                               <div className={styles.relatedList}>
                                 {relatedEntities.map((related, idx) => (
                                   <span

@@ -5,6 +5,8 @@ export interface AuditFieldDiff {
   oldValue: string;
   currentValue: string;
   changed: boolean;
+  oldDisplay?: string | null;
+  currentDisplay?: string | null;
 }
 
 export interface RelatedEntity {
