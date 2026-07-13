@@ -266,7 +266,7 @@ test('Record and edit test results', async ({ page, patient }) => {
     for (const { resultsPageReference, value } of completeBloodCountData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
+        const valueCell = row.locator('td:nth-child(3)');
         await expect(valueCell).toContainText(value);
       });
     }
@@ -274,7 +274,7 @@ test('Record and edit test results', async ({ page, patient }) => {
     for (const { resultsPageReference, value } of chemistryResultsData) {
       await test.step(resultsPageReference, async () => {
         const row = page.locator(`tr:has-text("${resultsPageReference}"):has(td:has-text("${value}"))`).first();
-        const valueCell = row.locator('td:nth-child(2)');
+        const valueCell = row.locator('td:nth-child(3)');
         await expect(valueCell).toContainText(value);
       });
     }
@@ -300,7 +300,7 @@ test('Record and edit test results', async ({ page, patient }) => {
   });
 
   await test.step('Then I should NOT see the newly added test results included in the list', async () => {
-    await expect(page.getByText(/No encounters to display/i)).toBeVisible();
+    await expect(page.getByRole('tabpanel').getByText(/No encounters to display/i)).toBeVisible();
   });
 
   await test.step('When I clear the filter', async () => {

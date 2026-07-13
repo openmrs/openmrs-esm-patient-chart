@@ -18,7 +18,7 @@
       "order": 0,
       "meta": {
         "slot": "patient-chart-summary-dashboard-slot",
-        "path": "Patient Summary"
+        "path": "patient-summary"
       },
       "online": true,
       "offline": true
@@ -92,7 +92,7 @@
       "component": "encountersSummaryDashboardLink",
       "meta": {
         "slot": "patient-chart-encounters-dashboard-slot",
-        "path": "Visits",
+        "path": "visits",
         "layoutMode": "anchored"
       },
       "order": 5,
@@ -141,6 +141,12 @@
       "meta": {
         "fullWidth": true
       }
+    },
+    {
+      "name": "visit-summary",
+      "component": "visitSummary",
+      "online": true,
+      "offline": true
     },
     {
       "name": "edit-visit-action-button",

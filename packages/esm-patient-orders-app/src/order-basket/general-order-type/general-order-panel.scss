@@ -1,7 +1,42 @@
+@use 'sass:list';
 @use '@carbon/colors';
 @use '@carbon/layout';
-@use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
+
+$accents: (
+  'purple': (
+    colors.$purple-70,
+    colors.$purple-20,
+  ),
+  'cyan': (
+    colors.$cyan-70,
+    colors.$cyan-20,
+  ),
+  'teal': (
+    colors.$teal-70,
+    colors.$teal-20,
+  ),
+  'magenta': (
+    colors.$magenta-70,
+    colors.$magenta-20,
+  ),
+  'orange': (
+    colors.$orange-70,
+    colors.$orange-20,
+  ),
+  'red': (
+    colors.$red-70,
+    colors.$red-20,
+  ),
+  'green': (
+    colors.$green-70,
+    colors.$green-20,
+  ),
+  'gray': (
+    colors.$gray-70,
+    colors.$gray-20,
+  ),
+);
 
 .desktopTile {
   border-left: layout.$spacing-02 solid colors.$purple-70;
@@ -9,11 +44,24 @@
   border-top: 1px solid colors.$purple-20;
   border-right: none;
   padding: 0;
+  margin-top: layout.$spacing-07;
 }
 
 .tabletTile {
   @extend .desktopTile;
-  border-top: 1px solid #3778c1;
+  margin-top: layout.$spacing-05;
+}
+
+@each $name, $shades in $accents {
+  .desktopTile[data-accent-color='#{$name}'] {
+    border-left-color: list.nth($shades, 1);
+    border-top-color: list.nth($shades, 2);
+
+    .iconBackdrop {
+      background-color: list.nth($shades, 2);
+      color: list.nth($shades, 1);
+    }
+  }
 }
 
 .collapsedTile {
@@ -25,32 +73,20 @@
   }
 }
 
-.tabletTile .collapsedTile {
+.tabletTile.collapsedTile {
   border-bottom: 1px solid $grey-2;
 }
 
 .container {
-  background-color: $ui-02;
+  background-color: colors.$gray-10;
   display: flex;
   justify-content: space-between;
   align-items: center;
   text-align: left;
 }
 
-.desktopTile .container {
-  h4 {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-  }
-}
-
 .tabletTile .container {
-  padding: layout.$spacing-03;
-
-  h4 {
-    @include type.type-style('heading-03');
-    color: $ui-05;
-  }
+  background-color: colors.$white-0;
 }
 
 .heading {
@@ -63,7 +99,29 @@
   margin: layout.$spacing-03;
 }
 
+.iconBackdrop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: layout.$spacing-06;
+  height: layout.$spacing-06;
+  background-color: colors.$purple-20;
+  color: colors.$purple-70;
+  flex-shrink: 0;
+}
+
+.tabletTile .iconBackdrop {
+  width: layout.$spacing-08;
+  height: layout.$spacing-08;
+}
+
 .buttonContainer {
   display: flex;
   align-items: center;
+}
+
+.chevron {
+  svg {
+    fill: black;
+  }
 }

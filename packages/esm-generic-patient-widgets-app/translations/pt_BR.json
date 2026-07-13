@@ -1,10 +1,10 @@
 {
-  "addEncounter": "Add encounter",
-  "date": "Date",
+  "addEncounter": "Adicionar atendimento",
+  "date": "Data",
   "dateAndTime": "Data e hora",
-  "editabilityNote": "Tap an observation to edit",
+  "editabilityNote": "Toque em uma observação para editar",
   "encounterType": "Tipo de encontro",
-  "errorSavingObservation": "Error saving observation",
-  "noValue": "No value",
-  "observationSaved": "Observation saved successfully"
+  "errorSavingObservation": "Erro ao salvar observação",
+  "noValue": "Sem valor",
+  "observationSaved": "Observação salva com sucesso"
 }

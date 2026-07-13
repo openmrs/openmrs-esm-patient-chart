@@ -4,21 +4,36 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { parseDate, useConfig } from '@openmrs/esm-framework';
-import { type Drug, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type Drug, type DrugOrderBasketItem, type OrderAction } from '@openmrs/esm-patient-common-lib';
 import { useRequireOutpatientQuantity } from '../api';
 import { type ConfigObject } from '../config-schema';
+
+/**
+ * Returns the earliest selectable Start date for the drug order form. For REVISE,
+ * the new order's dateActivated must be strictly after the previous order's
+ * dateActivated (the backend computes previous.dateStopped = new.dateActivated - 1s),
+ * so the floor is previous + 1s. For NEW/RENEW/DISCONTINUE the floor is the visit
+ * start so the encounter the form ultimately writes to can hold the chosen
+ * dateActivated.
+ */
+export function getStartDateMinimum(
+  action: OrderAction | undefined,
+  previousOrderDateActivated: string | undefined,
+  visitStartDatetime: string | undefined,
+): Date | undefined {
+  if (action === 'REVISE' && previousOrderDateActivated) {
+    return new Date(new Date(previousOrderDateActivated).getTime() + 1000);
+  }
+  return visitStartDatetime ? parseDate(visitStartDatetime) : undefined;
+}
 
 export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   const medicationOrderFormSchema = useCreateMedicationOrderFormSchema();
 
-  const defaultValues = useMemo(() => {
-    const defaultStartDate =
-      typeof initialOrderBasketItem?.startDate === 'string'
-        ? parseDate(initialOrderBasketItem?.startDate)
-        : (initialOrderBasketItem?.startDate as Date) ?? new Date();
-
-    return drugOrderBasketItemToFormValue(initialOrderBasketItem, defaultStartDate);
-  }, [initialOrderBasketItem]);
+  const defaultValues = useMemo(
+    () => drugOrderBasketItemToFormValue(initialOrderBasketItem, initialOrderBasketItem?.scheduledDate ?? new Date()),
+    [initialOrderBasketItem],
+  );
 
   const drugOrderForm: UseFormReturn<MedicationOrderFormData> = useForm<MedicationOrderFormData>({
     mode: 'all',
@@ -29,7 +44,10 @@ export function useDrugOrderForm(initialOrderBasketItem: DrugOrderBasketItem) {
   return drugOrderForm;
 }
 
-export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startDate: Date): MedicationOrderFormData {
+export function drugOrderBasketItemToFormValue(
+  item: DrugOrderBasketItem,
+  scheduledDate: Date,
+): MedicationOrderFormData {
   return {
     drug: item?.drug as Partial<Drug>,
     isFreeTextDosage: item?.isFreeTextDosage ?? false,
@@ -47,7 +65,7 @@ export function drugOrderBasketItemToFormValue(item: DrugOrderBasketItem, startD
     numRefills: item?.numRefills ?? null,
     indication: item?.indication,
     frequency: item?.frequency,
-    startDate,
+    scheduledDate,
   };
 }
 
@@ -122,7 +140,7 @@ function useCreateMedicationOrderFormSchema() {
             message: t('indicationErrorMessage', 'Indication is required'),
           })
         : z.string().nullish(),
-      startDate: z.date(),
+      scheduledDate: z.date(),
       frequency: z.object(
         { ...frequencySchema },
         {

@@ -73,3 +73,15 @@ export const exportedAddGeneralOrderWorkspace = getAsyncLifecycle(
   () => import('./order-basket/general-order-type/add-general-order/exported-add-general-order.workspace'),
   options,
 );
+
+export const drugPinButton = getAsyncLifecycle(() => import('./order-favorites/drug-actions-menu.component'), options);
+
+export const drugOrderPinAction = getAsyncLifecycle(
+  () => import('./order-favorites/drug-order-pin-action.component'),
+  options,
+);
+
+export const drugFavoritesListExtension = getAsyncLifecycle(
+  () => import('./order-favorites/drug-favorites-list.component'),
+  options,
+);

@@ -10,18 +10,48 @@ import {
 import { type OrderBasketStore, orderBasketStore } from './store';
 import type { ExtractedOrderErrorObject, Order, OrderBasketItem, OrderErrorObject, OrderPost } from './types';
 
-function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string) {
+function getOrdersPayloadFromOrderBasket(patientUuid: string, ordererUuid: string, encounterDate?: Date) {
   const { items, postDataPrepFunctions }: OrderBasketStore = orderBasketStore.getState();
   const patientItems = items[patientUuid];
 
   const orders: Array<OrderPost> = [];
   Object.entries(patientItems).forEach(([grouping, groupOrders]) => {
     groupOrders.forEach((order) => {
-      orders.push(postDataPrepFunctions[grouping](order, patientUuid, null, ordererUuid));
+      const preppedOrder = encounterDate ? floorOrderStartDate(order, encounterDate) : order;
+      orders.push(postDataPrepFunctions[grouping](preppedOrder, patientUuid, null, ordererUuid));
     });
   });
 
   return orders;
+}
+
+function getOrderStartDate(order: OrderBasketItem) {
+  const orderWithDates = order as { scheduledDate?: Date | string; startDate?: Date | string };
+  if (orderWithDates.scheduledDate) {
+    return { key: 'scheduledDate', value: orderWithDates.scheduledDate } as const;
+  }
+  if (orderWithDates.startDate) {
+    return { key: 'startDate', value: orderWithDates.startDate } as const;
+  }
+  return null;
+}
+
+/**
+ * Returns a shallow copy of the basket item with its selected start date floored
+ * to `encounterDate`. The backend enforces `dateActivated >= encounterDatetime`,
+ * so if a user-selected start date fell before the encounter date (for example,
+ * because it was earlier than the visit start), it must be raised to match.
+ */
+function floorOrderStartDate<T extends OrderBasketItem>(order: T, encounterDate: Date): T {
+  const orderStartDate = getOrderStartDate(order);
+  if (!orderStartDate) {
+    return order;
+  }
+  const startDate = orderStartDate.value instanceof Date ? orderStartDate.value : new Date(orderStartDate.value);
+  if (startDate < encounterDate) {
+    return { ...order, [orderStartDate.key]: encounterDate } as T;
+  }
+  return order;
 }
 
 export async function postOrdersOnNewEncounter(
@@ -33,8 +63,9 @@ export async function postOrdersOnNewEncounter(
   abortController?: AbortController,
 
   /**
-   * If not specified, the encounterDate will either be set to
-   * `now` if currentVisit is active, or the start of the visit
+   * Desired encounter datetime. Clamped to the visit window before posting.
+   * When omitted: if the visit is stopped, falls back to `visit.startDatetime`;
+   * otherwise the field is dropped from the POST so the server defaults to now.
    */
   encounterDate?: Date,
 ) {
@@ -46,7 +77,22 @@ export async function postOrdersOnNewEncounter(
     }
   }
 
-  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
+  // Clamp the encounter datetime to the visit window so the backend's
+  // Encounter.datetimeShouldBeInVisitDatesRange constraint holds at both ends.
+  if (encounterDate && currentVisit?.startDatetime) {
+    const visitStart = parseDate(currentVisit.startDatetime);
+    if (encounterDate < visitStart) {
+      encounterDate = visitStart;
+    }
+  }
+  if (encounterDate && currentVisit?.stopDatetime) {
+    const visitStop = parseDate(currentVisit.stopDatetime);
+    if (encounterDate > visitStop) {
+      encounterDate = visitStop;
+    }
+  }
+
+  const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid, encounterDate ?? undefined);
 
   const encounterPostData: EncounterPost = {
     patient: patientUuid,
@@ -62,6 +108,7 @@ export async function postOrdersOnNewEncounter(
 
   return postEncounter(encounterPostData, abortController);
 }
+
 interface ObsPayload {
   concept: Concept | string;
   value?: string | OpenmrsResource;

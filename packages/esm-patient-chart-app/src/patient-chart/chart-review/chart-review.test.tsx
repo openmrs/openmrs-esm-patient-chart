@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
 import {
@@ -10,16 +11,16 @@ import {
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
-const mockUseExtensionStore = jest.mocked(useExtensionStore);
-const mockUseExtensionSlotMeta = jest.mocked(useExtensionSlotMeta);
+const mockUseExtensionStore = vi.mocked(useExtensionStore);
+const mockUseExtensionSlotMeta = vi.mocked(useExtensionSlotMeta);
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  Redirect: jest.fn(),
-  useMatch: jest.fn().mockReturnValue({
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
+  Redirect: vi.fn(),
+  useMatch: vi.fn().mockReturnValue({
     params: {
       url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
-      view: 'Patient Summary',
+      view: 'patient-summary',
     },
   }),
 }));
@@ -42,7 +43,7 @@ describe('ChartReview', () => {
               name: 'charts-summary-dashboard',
               meta: {
                 slot: 'patient-chart-summary-dashboard-slot',
-                path: 'Patient Summary',
+                path: 'patient-summary',
                 title: 'Patient Summary',
               },
             },
@@ -67,7 +68,7 @@ describe('ChartReview', () => {
 
     render(
       <BrowserRouter>
-        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="Patient Summary" />
+        <ChartReview patient={mockPatient} patientUuid={mockPatient.id} view="patient-summary" />
       </BrowserRouter>,
     );
 

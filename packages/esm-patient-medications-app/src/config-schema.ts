@@ -18,6 +18,12 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
+  orderTypeUuid: {
+    _type: Type.UUID,
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match drugOrderTypeUUID if that value is overridden.",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
   showPrintButton: {
     _type: Type.Boolean,
     _default: false,
@@ -47,6 +53,24 @@ export const configSchema = {
       '1734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 365, // Years
     },
   },
+  drugCategoryConceptSets: {
+    _type: Type.Array,
+    _description:
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+    _default: [],
+    _elements: {
+      _type: Type.String,
+    },
+  },
+  minimumCharacterLengthForDrugSearch: {
+    _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
+    _description:
+      'The minimum number of characters that must be entered in the drug search input before the search is performed.',
+    _default: 2,
+  },
 };
 
 export interface ConfigObject {
@@ -55,8 +79,11 @@ export interface ConfigObject {
     display: string;
   };
   drugOrderTypeUUID: string;
+  orderTypeUuid: string;
   showPrintButton: boolean;
   debounceDelayInMs: number;
   requireIndication: boolean;
   durationUnitsDaysMap: Record<string, number>;
+  drugCategoryConceptSets: Array<string>;
+  minimumCharacterLengthForDrugSearch: number;
 }

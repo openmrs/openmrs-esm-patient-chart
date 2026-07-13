@@ -1,4 +1,5 @@
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect } from 'vitest';
 import { type TreeNode } from '../filter/filter-types';
 import { computeTrendlineData } from './trendline-resource';
 

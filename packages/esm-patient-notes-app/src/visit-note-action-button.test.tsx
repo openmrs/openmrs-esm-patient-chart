@@ -1,17 +1,18 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import { type LayoutType, useLayoutType } from '@openmrs/esm-framework';
 import VisitNoteActionButton from './visit-note-action-button.extension';
 import { mockPatient } from 'tools';
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useStartVisitIfNeeded: jest.fn(() => () => Promise.resolve(true)),
+    useStartVisitIfNeeded: vi.fn(() => () => Promise.resolve(true)),
   };
 });
 

@@ -1,7 +1,13 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import {
+  getDefaultsFromConfigSchema,
+  showSnackbar,
+  useConfig,
+  type Workspace2DefinitionProps,
+} from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 import { mockAllergens, mockAllergicReactions, mockAllergy } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -13,21 +19,22 @@ import {
   updatePatientAllergy,
 } from './allergy-form.resource';
 import { type AllergiesConfigObject, configSchema } from '../../config-schema';
-import AllergyForm, { type AllergyFormWorkspaceProps } from './allergy-form.workspace';
+import AllergyFormWorkspace, { type AllergyFormWorkspaceProps } from './allergy-form.workspace';
+import ExportedAllergyFormWorkspace, { type ExportedAllergyFormWindowProps } from './exported-allergy-form.workspace';
 
-const mockSaveAllergy = jest.mocked(saveAllergy);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUpdatePatientAllergy = jest.mocked(updatePatientAllergy);
-const mockUseAllergens = jest.mocked(useAllergens);
-const mockUseAllergicReactions = jest.mocked(useAllergicReactions);
-const mockUseConfig = jest.mocked(useConfig<AllergiesConfigObject>);
+const mockSaveAllergy = vi.mocked(saveAllergy);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUpdatePatientAllergy = vi.mocked(updatePatientAllergy);
+const mockUseAllergens = vi.mocked(useAllergens);
+const mockUseAllergicReactions = vi.mocked(useAllergicReactions);
+const mockUseConfig = vi.mocked(useConfig<AllergiesConfigObject>);
 
-jest.mock('./allergy-form.resource', () => ({
-  ...jest.requireActual('./allergy-form.resource'),
-  saveAllergy: jest.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
-  updatePatientAllergy: jest.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
-  useAllergens: jest.fn(),
-  useAllergicReactions: jest.fn(),
+vi.mock('./allergy-form.resource', async () => ({
+  ...((await vi.importActual('./allergy-form.resource')) as object),
+  saveAllergy: vi.fn().mockResolvedValue({ data: {}, status: 201, statusText: 'Created' }),
+  updatePatientAllergy: vi.fn().mockResolvedValue({ data: {}, status: 200, statusText: 'Updated' }),
+  useAllergens: vi.fn(),
+  useAllergicReactions: vi.fn(),
 }));
 
 const mockConcepts = {
@@ -157,6 +164,22 @@ describe('AllergyForm', () => {
         kind: 'error',
       });
     });
+
+    // Regression test for the order basket "Add allergy" crash in the ward app. Outside the patient
+    // chart there is no patient-chart workspace group, so the host launches `exportedAllergyFormWorkspace`
+    // instead, which sources the patient from window props. This exercises that out-of-chart path.
+    it('renders and saves via the exported workspace, sourcing the patient from window props', async () => {
+      renderExportedAllergyForm();
+
+      await user.click(screen.getByRole('combobox', { name: /allergen/i }));
+      await user.click(screen.getByText(aceInhibitorsAllergen.display));
+      await user.click(screen.getByRole('checkbox', { name: reactionToAceInhibitors }));
+      await user.click(screen.getByRole('radio', { name: /moderate/i }));
+      await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+      expect(mockSaveAllergy).toHaveBeenCalledTimes(1);
+      expect(mockSaveAllergy).toHaveBeenCalledWith(expect.anything(), mockPatient.id, expect.anything());
+    });
   });
 
   describe('Editing an existing allergy', () => {
@@ -210,8 +233,8 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
       visitContext: null,
       mutateVisitContext: null,
     },
-    closeWorkspace: jest.fn(),
-    launchChildWorkspace: jest.fn(),
+    closeWorkspace: vi.fn(),
+    launchChildWorkspace: vi.fn(),
     windowProps: {},
     workspaceName: '',
     windowName: '',
@@ -227,7 +250,29 @@ function renderAllergyForm(workspaceProps: Partial<AllergyFormWorkspaceProps> = 
     },
   };
 
-  render(<AllergyForm {...props} />);
+  render(<AllergyFormWorkspace {...props} />);
+}
+
+function renderExportedAllergyForm() {
+  const props: Workspace2DefinitionProps<AllergyFormWorkspaceProps, ExportedAllergyFormWindowProps> = {
+    workspaceProps: {
+      allergy: null,
+      formContext: 'creating',
+    },
+    windowProps: {
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+    },
+    groupProps: {},
+    closeWorkspace: vi.fn(),
+    launchChildWorkspace: vi.fn(),
+    workspaceName: '',
+    windowName: '',
+    isRootWorkspace: false,
+    showActionMenu: true,
+  };
+
+  render(<ExportedAllergyFormWorkspace {...props} />);
 }
 
 function buildExpectedPayload(allergen, reaction, severity, comment) {

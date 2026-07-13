@@ -34,6 +34,15 @@
     border: 0;
   }
 
+  // Carbon's `cds--list-box--sm` doesn't set --cds-layout-size-height, so size="sm"
+  // ComboBoxes render at md height (40px) and sit taller than their paired size="sm"
+  // NumberInputs (e.g. Dose vs Dose unit). Pin the token so Carbon's clamp resolves to the
+  // sm height and the paired fields match. Mirrors the styleguide's cds--search--lg fix;
+  // remove once @carbon/styles ships the sm list-box height.
+  :global(.cds--list-box--sm) {
+    --cds-layout-size-height: #{layout.$spacing-07};
+  }
+
   :global(.cds--number__control-btn) {
     border: 0;
   }
@@ -54,6 +63,13 @@
   padding: layout.$spacing-05;
   margin-left: calc(layout.$spacing-05 * -1);
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.medicationInfoText {
+  flex: 1;
 }
 
 .inlineNotification {
@@ -113,51 +129,15 @@
   }
 }
 
-.fullWidthDatePickerContainer {
-  :global .cds--date-picker {
-    width: 100%;
-
-    :global .cds--date-picker-container {
-      width: 100%;
-
-      :global .cds--date-picker-input__wrapper {
-        width: 100%;
-
-        :global .cds--date-picker__input {
-          width: 100%;
-        }
-      }
-    }
-  }
-}
-
 .numberInput {
+  :global(.cds--number__input-wrapper) {
+    width: 100%;
+  }
+
   :global(.cds--number__input-wrapper) input {
     min-width: unset !important;
+    width: 100%;
     padding-right: layout.$spacing-05;
-  }
-}
-
-.backButton {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  margin: layout.$spacing-03 0;
-
-  button {
-    display: flex;
-    padding-left: 0 !important;
-
-    svg {
-      order: 1;
-      margin-right: layout.$spacing-03;
-      margin-left: 0 !important;
-      fill: currentColor !important;
-    }
-
-    span {
-      order: 2;
-    }
   }
 }
 
@@ -195,6 +175,10 @@
 .linkedInput {
   display: flex;
   align-items: center;
+  // Keep the number input top-aligned with its paired unit field. Without this the column
+  // stretches to match a taller sibling (e.g. when the unit field renders a validation error)
+  // and the centered input gets pushed down out of alignment.
+  align-self: flex-start;
 
   :global(.cds--layer-one),
   :global(.cds--layer-two),

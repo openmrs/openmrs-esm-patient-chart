@@ -5054,7 +5054,12 @@ export const mockFhirVitalsResponse = {
 };
 
 export const mockBiometricsConfig = {
-  concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+  concepts: {
+    heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    midUpperArmCircumferenceUuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    bodyMassIndexUuid: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
   biometrics: {
     bmiUnit: 'kg / m²',
     bmiMinimumAge: 0,
@@ -5073,6 +5078,7 @@ export const mockVitalsConfig = {
     generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     midUpperArmCircumferenceUuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    bodyMassIndexUuid: '1342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     oxygenSaturationUuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     respiratoryRateUuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -5105,6 +5111,7 @@ export const formattedVitals = [
     bmi: null,
     muac: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Pt reports severe L chest pain',
   },
   {
     id: '1',
@@ -5119,6 +5126,7 @@ export const formattedVitals = [
     spo2: 90,
     bmi: 23,
     bloodPressureRenderInterpretation: 'normal',
+    note: 'Follow up in 2 weeks. Patient also mentioned having some trouble sleeping lately and asked for some advice on sleep hygiene. Advised to avoid caffeine in the afternoon.',
   },
   {
     id: '2',
