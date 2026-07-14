@@ -9,6 +9,7 @@
   "deceased": "Falecido",
   "district": "Estado",
   "from_lower": "de",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Código postal CEP",
   "started": "Iniciado",
   "state": "Estado",
