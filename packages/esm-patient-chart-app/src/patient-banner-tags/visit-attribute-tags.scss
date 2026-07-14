@@ -6,3 +6,21 @@
   gap: layout.$spacing-02;
   margin: 0 layout.$spacing-02;
 }
+
+.tagsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.allergiesLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.allergies {
+  margin: layout.$spacing-02;
+}

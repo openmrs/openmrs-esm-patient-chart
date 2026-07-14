@@ -16,6 +16,8 @@ import startVisitActionButtonComponent from './actions-buttons/start-visit.compo
 import startVisitActionButtonOnPatientSearch from './visit/start-visit-button.component';
 import stopVisitActionButtonComponent from './actions-buttons/stop-visit.component';
 import visitAttributeTagsComponent from './patient-banner-tags/visit-attribute-tags.extension';
+import allergiesTagsComponent from './patient-banner-tags/allergies-tags.extension';
+import conditionsTagsComponent from './patient-banner-tags/conditions-tags.extension';
 import EncounterOverview from './visit/visits-widget/past-visits-components/encounters-table/all-encounters-overview.component';
 import VisitHistoryOverview from './visit/visit-history-table/visit-overview.component';
 import DiagnosisOverview from './diagnosis/diagnosis-overview.component';
@@ -114,6 +116,16 @@ export const patientDetailsTile = getSyncLifecycle(patientDetailsTileComponent, 
 
 export const visitAttributeTags = getSyncLifecycle(visitAttributeTagsComponent, {
   featureName: 'visit-attribute-tags',
+  moduleName,
+});
+
+export const allergiesTags = getSyncLifecycle(allergiesTagsComponent, {
+  featureName: 'allergies-tags',
+  moduleName,
+});
+
+export const conditionsTags = getSyncLifecycle(conditionsTagsComponent, {
+  featureName: 'conditions-tags',
   moduleName,
 });
 

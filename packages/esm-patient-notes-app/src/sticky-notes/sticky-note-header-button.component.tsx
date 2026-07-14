@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { DocumentIcon, showModal, useConfig, useOnClickOutside } from '@openmrs/esm-framework';
+import { DocumentIcon, showModal, useConfig, useOnClickOutside, ExtensionSlot } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useStickyNote } from './sticky-note.resource';
 import StickyNotePanel from './sticky-note-panel.component';
@@ -60,6 +60,12 @@ const StickyNoteHeaderButton: React.FC<StickyNoteHeaderButtonProps> = ({ patient
 
   return (
     <div className={styles.content} ref={containerRef}>
+      <ExtensionSlot
+        name="patient-sticky-notes-left-slot"
+        state={{
+          patientUuid
+        }}
+      />
       <Button
         kind="ghost"
         size="sm"

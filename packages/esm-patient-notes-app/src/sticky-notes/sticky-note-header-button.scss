@@ -15,8 +15,9 @@
 .content {
   display: flex;
   align-items: center;
-  width: fit-content;
-  margin-inline-start: auto;
+  width: 100%;
+  justify-content: space-between;
+  margin-inline-start: 0.5rem;
   position: relative;
 }
 

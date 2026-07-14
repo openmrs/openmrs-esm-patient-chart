@@ -134,6 +134,20 @@
       "offline": true
     },
     {
+      "name": "allergies-tags",
+      "slot": "patient-sticky-notes-left-slot",
+      "component": "allergiesTags",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "conditions-tags",
+      "slot": "patient-payment-status-left-slot",
+      "component": "conditionsTags",
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "current-visit-summary",
       "component": "currentVisitSummary",
       "online": true,
