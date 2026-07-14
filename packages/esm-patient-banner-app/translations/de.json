@@ -9,6 +9,7 @@
   "deceased": "Verstorben",
   "district": "Landkreis",
   "from_lower": "aus",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Postleitzahl",
   "started": "Gestartet",
   "state": "Bundesland",

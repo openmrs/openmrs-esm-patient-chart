@@ -9,6 +9,7 @@
   "deceased": "Deceased",
   "district": "מחוז",
   "from_lower": "from",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "מיקוד",
   "started": "Started",
   "state": "מדינה",

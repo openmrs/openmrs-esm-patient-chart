@@ -9,6 +9,7 @@
   "deceased": "Умер",
   "district": "Район",
   "from_lower": "с",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "Почтовый индекс",
   "started": "Начато",
   "state": "Область",
