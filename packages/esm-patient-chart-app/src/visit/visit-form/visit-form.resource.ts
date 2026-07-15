@@ -243,6 +243,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
     const isVisitToEditFullDay =
       Boolean(visitToEdit?.startDatetime) &&
       Boolean(visitToEdit?.stopDatetime) &&
+      dayjs(visitToEdit.startDatetime).isSame(dayjs(visitToEdit.stopDatetime), 'day') &&
       dayjs(visitToEdit.startDatetime).isSame(dayjs(visitToEdit.startDatetime).startOf('day'), 'minute') &&
       dayjs(visitToEdit.stopDatetime).isSame(dayjs(visitToEdit.stopDatetime).endOf('day'), 'minute');
 
