@@ -98,7 +98,7 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
         timeField={{ name: 'visitStartTime', label: t('startTime', 'Start time') }}
         timeFormatField={{ name: 'visitStartTimeFormat', label: t('startTimeFormat', 'Start time format') }}
         minDate={earliestStartDate}
-        maxDate={minOf(Date.now(), firstEncounterDateTime, selectedVisitStopDateTime?.getTime())}
+        maxDate={minOf(Date.now(), firstEncounterDateTime, isFullDay ? undefined : selectedVisitStopDateTime?.getTime())}
         hideTime={isFullDay}
       />
       {hasStopTime && !isFullDay && (
