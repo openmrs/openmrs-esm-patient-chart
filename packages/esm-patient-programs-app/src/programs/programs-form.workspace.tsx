@@ -55,7 +55,11 @@ const createProgramsFormSchema = (t: TFunction) =>
       selectedProgramStatus: z.string(),
     })
     .superRefine((data, ctx) => {
-      if (data.completionDate && data.enrollmentDate && data.completionDate < data.enrollmentDate) {
+      if (
+        data.completionDate &&
+        data.enrollmentDate &&
+        dayjs(data.completionDate).isBefore(data.enrollmentDate, 'day')
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: t(
@@ -135,7 +139,11 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         patient: patientUuid,
         program: selectedProgram,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
-        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
+        dateCompleted: completionDate
+          ? dayjs(completionDate).isSame(enrollmentDate, 'day')
+            ? dayjs(enrollmentDate).format()
+            : dayjs(completionDate).format()
+          : null,
         location: enrollmentLocation,
         states:
           !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid

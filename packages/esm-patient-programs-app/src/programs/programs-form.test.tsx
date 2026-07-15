@@ -6,6 +6,7 @@
  * matchers on payloads built with `new Date()` in production code.
  */
 import React from 'react';
+import dayjs from 'dayjs';
 import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -189,8 +190,42 @@ describe('ProgramsForm', () => {
 
     await user.click(saveButton);
 
+    expect(screen.getByText(/completion date cannot be before the enrollment date/i)).toBeInTheDocument();
     expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
     expect(mockUpdateProgramEnrollment).not.toHaveBeenCalled();
+  });
+
+  it('submits the form when the completion date is on the same day as the enrollment date', async () => {
+    const user = userEvent.setup();
+
+    // In create mode the enrollment date defaults to `new Date()`, which carries a
+    // time-of-day, while the date picker emits midnight. This guards that same-day
+    // completion is allowed and saved rather than rejected as "before enrollment".
+    const today = dayjs().format('YYYY-MM-DD');
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.click(completionDateInput);
+    await user.paste(today);
+    await user.tab();
+
+    await user.click(saveButton);
+
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledTimes(1);
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dateCompleted: expect.stringMatching(new RegExp(`^${today}`)),
+        program: oncologyScreeningProgramUuid,
+        patient: mockPatient.id,
+      }),
+      new AbortController(),
+    );
   });
 
   it('renders the programs status field if the config property is set to true', async () => {
