@@ -349,7 +349,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
           }
         }
 
-        if (visitStatus === 'past' && !isFullDayVisit) {
+        if (visitStatus === 'past') {
           if (visitStopDateTime === null) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
