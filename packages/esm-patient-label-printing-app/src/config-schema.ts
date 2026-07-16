@@ -6,8 +6,14 @@ export const configSchema = {
     _description: "Whether to display the 'Print identifier sticker' button in the patient banner",
     _default: false,
   },
+  showPrintVisitSummaryButton: {
+    _type: Type.Boolean,
+    _description: "Whether to display the 'Print visit summary' button in the visit history row actions",
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
   showPrintIdentifierStickerButton: boolean;
+  showPrintVisitSummaryButton: boolean;
 }
