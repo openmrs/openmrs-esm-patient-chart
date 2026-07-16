@@ -309,8 +309,17 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
           isFullDayVisit,
         } = data;
 
-        const visitStartDateTime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
-        const visitStopDateTime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
+        const isFullDay = visitStatus === 'past' && isFullDayVisit;
+        const visitStartDateTime = isFullDay
+          ? visitStartDate
+            ? dayjs(visitStartDate).startOf('day').toDate()
+            : null
+          : convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+        const visitStopDateTime = isFullDay
+          ? visitStartDate
+            ? dayjs(visitStartDate).endOf('day').toDate()
+            : null
+          : convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
         if (visitStatus === 'ongoing' || visitStatus === 'past') {
           if (visitStartDateTime === null) {
@@ -329,7 +338,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('futureStartTime', 'Start time cannot be in the future'),
-              path: ['visitStartTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStartTime'],
             });
           } else if (visitStartDateTime.getTime() > firstEncounterDateTime) {
             ctx.addIssue({
@@ -344,7 +353,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
                   },
                 },
               ),
-              path: ['visitStartTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStartTime'],
             });
           }
         }
