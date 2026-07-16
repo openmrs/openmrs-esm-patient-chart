@@ -103,6 +103,19 @@ describe('PrintVisitSummaryModal', () => {
     expect(screen.queryByText(visitNotFoundText)).not.toBeInTheDocument();
   });
 
+  it('shows the generation-failed error, not the network error, when the response body cannot be read', async () => {
+    mockOpenmrsFetch.mockResolvedValue({
+      blob: () => Promise.reject(new TypeError('Failed to read response body')),
+    } as unknown as FetchResponse);
+
+    renderModal();
+
+    expect(await screen.findByText(generationFailedText)).toBeInTheDocument();
+    expect(screen.getByText(/pdf generation failed/i)).toBeInTheDocument();
+    expect(screen.queryByText(networkErrorText)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/visit summary preview/i)).not.toBeInTheDocument();
+  });
+
   it('shows the network error when the request rejects without a response', async () => {
     mockOpenmrsFetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
