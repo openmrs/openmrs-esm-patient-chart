@@ -23,6 +23,7 @@ import TestsSummary from './tests-summary.component';
 import VisitCompletedFormsTable from './encounters-table/visit-completed-forms-table.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
+import VisitAssignedDoctorsTable from './encounters-table/visit-assigned-doctors.component';
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
@@ -151,6 +152,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
+          </Tab>        
+          <Tab className={styles.tab} id="assigned-doctor-tab">
+            {t('assignedDoctor', 'Assigned Doctors')}
           </Tab>
           {extensions?.map((extension, index) => (
             <Tab key={index} className={styles.tab} id={`${extension.meta.title || index}-tab`}>
@@ -179,6 +183,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           </TabPanel>
           <TabPanel>
             <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+          </TabPanel>
+          <TabPanel>
+            <VisitAssignedDoctorsTable visit={visit} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

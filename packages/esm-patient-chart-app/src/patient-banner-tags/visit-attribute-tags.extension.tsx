@@ -17,6 +17,8 @@ const getAttributeValue = (attributeType, value) => {
     case 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype':
     case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
       return value;
+    case 'org.openmrs.customdatatype.datatype.ProviderDatatype':
+      return value?.person.display;
     case 'org.openmrs.customdatatype.datatype.DateDatatype':
       return formatDate(new Date(value), {
         mode: 'wide',

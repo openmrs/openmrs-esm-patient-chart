@@ -13,7 +13,8 @@ interface VisitAttributeType {
     | 'org.openmrs.customdatatype.datatype.BooleanDatatype'
     | 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype'
     | 'org.openmrs.customdatatype.datatype.FreeTextDatatype'
-    | 'org.openmrs.customdatatype.datatype.DateDatatype';
+    | 'org.openmrs.customdatatype.datatype.DateDatatype'
+    | 'org.openmrs.customdatatype.datatype.ProviderDatatype';
   datatypeConfig: string;
   preferredHandlerClassname: any;
   retired: boolean;

@@ -15,6 +15,7 @@ import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import { type VisitFormData } from './visit-form.resource';
+import { useProviders } from '../../data.resource';
 import styles from './visit-attribute-type.scss';
 
 interface VisitAttributes {
@@ -117,6 +118,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   const baseId = useId();
   const displayText = data?.display?.trim() || data?.name?.trim() || '--';
   const labelText = !required ? `${displayText} (${t('optional', 'optional')})` : displayText;
+  const { value: providers, isProvidersLoading, isProvidersValidating, error: errorFetchingProviders } = useProviders();
 
   const {
     formState: { errors },
@@ -215,6 +217,34 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             invalidText={fieldState?.error?.message}
           />
         );
+      case 'org.openmrs.customdatatype.datatype.ProviderDatatype': {
+        if (isProvidersLoading) {
+          return <SelectSkeleton />;
+        }
+
+        if (errorFetchingProviders) {
+          return null;
+        }
+
+        const filteredProviders = providers
+          .filter((p) => !p.retired)
+          .sort((a, b) => a.display.localeCompare(b.display));
+
+        return (
+          <Select
+            id={`select-provider-${baseId}`}
+            {...fieldProps}
+            labelText={labelText}
+            invalid={!!fieldState?.error?.message}
+            invalidText={fieldState?.error?.message}
+          >
+            <SelectItem text={t('selectProvider', 'Select Provider')} value="" />
+            {filteredProviders.map((provider) => (
+              <SelectItem key={provider.uuid} value={provider.uuid} text={provider.person.display} />
+            ))}
+          </Select>
+        );
+      }
       default:
         return (
           <TextInput
@@ -238,6 +268,9 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     fieldState?.error?.message,
     t,
     answers,
+    errorFetchingProviders,
+    isProvidersLoading,
+    providers,
   ]);
 
   if (isLoading) {

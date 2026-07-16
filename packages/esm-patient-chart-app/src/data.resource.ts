@@ -24,6 +24,47 @@ interface CauseOfDeathPayload {
   deathDate?: Date;
 }
 
+interface ProviderAttribute {
+  attributeType: {
+    display: string;
+  };
+  value: string;
+  voided: boolean;
+}
+
+interface Person {
+  uuid: string;
+  display: string;
+  gender: string;
+  age: number | null;
+  birthdate: string | null;
+  birthdateEstimated: boolean;
+  dead: boolean;
+  deathDate: string | null;
+  causeOfDeath: string | null;
+  preferredName: {
+    uuid: string;
+    display: string;
+  };
+  preferredAddress: unknown;
+  attributes: ProviderAttribute[];
+  voided: boolean;
+  birthtime: string | null;
+  deathdateEstimated: boolean;
+}
+
+interface Provider {
+  uuid: string;
+  display: string;
+  person: Person;
+  retired: boolean;
+  attributes: ProviderAttribute[];
+}
+
+interface ProviderFetchResponse {
+  results: Provider[];
+}
+
 export function useCausesOfDeath() {
   const { isCauseOfDeathLoading, isCauseOfDeathValidating, value: causeOfDeathConcept } = useCauseOfDeathConcept();
   const { isConceptLoading, isConceptAnswerValidating, conceptAnswers } = useConceptAnswers(causeOfDeathConcept);
@@ -128,4 +169,31 @@ export function useFormByName(formName: string) {
     error,
     isValidating,
   };
+}
+
+export function useProviders() {
+  const { data, error, isLoading, isValidating } = useSWR<any[]>(
+    `${restBaseUrl}/provider?v=custom:(uuid,display,person:(display),attributes:(attributeType:(display),value))`,
+    (url: string) =>
+      openmrsFetch(url).then((res) =>
+        res.data.results.filter((provider: any) =>
+          provider.attributes?.some(
+            (attr: any) =>
+              attr.attributeType?.display === 'practitioner_type' &&
+              attr.value?.toLowerCase() === 'doctor'
+          )
+        )
+      )
+  );
+
+  const result = useMemo(() => {
+    return {
+      value: data ?? [],
+      isProvidersLoading: isLoading,
+      isProvidersValidating: isValidating,
+      error,
+    };
+  }, [data, isLoading, isValidating, error]);
+
+  return result;
 }

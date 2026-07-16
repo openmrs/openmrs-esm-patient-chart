@@ -149,6 +149,11 @@ export const esmPatientChartSchema = {
         required: false,
         displayInThePatientBanner: true,
       },
+      {
+        uuid: 'e965fdc6-42c1-4167-9dfe-0b3865a6d2e6',
+        required: false,
+        displayInThePatientBanner: true,
+      }
     ],
   },
   visitDiagnosisConceptUuid: {
