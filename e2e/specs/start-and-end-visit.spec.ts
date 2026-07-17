@@ -63,9 +63,14 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     // The "In the past" status defaults this checkbox to checked, which hides the manual
     // start/end time fields in favor of a single date field. Uncheck it to exercise the
     // manual time picker fields the next step asserts on.
-    const fullDayVisitCheckbox = chartPage.page.getByRole('checkbox', { name: /full day visit/i });
-    await expect(fullDayVisitCheckbox).toBeChecked();
-    await fullDayVisitCheckbox.uncheck();
+    // Carbon's checkbox label visually overlaps the native input, so Playwright's `.uncheck()`
+    // can't click the input directly - click the label instead, matching the pattern already
+    // used for Carbon radio buttons elsewhere in this file (see the `opdVisitLabel` steps below).
+    const fullDayVisitLabel = chartPage.page.locator('label').filter({ hasText: /full day visit/i });
+    await expect(fullDayVisitLabel).toBeVisible();
+    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    await fullDayVisitLabel.click();
+    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
   });
 
   await test.step('Then I should see Start date and time picker AND End date and time picker', async () => {
@@ -318,9 +323,14 @@ test('Start a visit in the past', async ({ page, patient, api }) => {
     // The "In the past" status defaults this checkbox to checked, which hides the separate
     // start/end date fields (visitStartDateInput / visitStopDateInput) in favor of a single
     // date field. Uncheck it so the two-date-field flow below still applies.
-    const fullDayVisitCheckbox = chartPage.page.getByRole('checkbox', { name: /full day visit/i });
-    await expect(fullDayVisitCheckbox).toBeChecked();
-    await fullDayVisitCheckbox.uncheck();
+    // Carbon's checkbox label visually overlaps the native input, so Playwright's `.uncheck()`
+    // can't click the input directly - click the label instead, matching the pattern already
+    // used for Carbon radio buttons elsewhere in this file (see the `opdVisitLabel` steps below).
+    const fullDayVisitLabel = chartPage.page.locator('label').filter({ hasText: /full day visit/i });
+    await expect(fullDayVisitLabel).toBeVisible();
+    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    await fullDayVisitLabel.click();
+    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
   });
 
   await test.step('And I set the start date two days ago', async () => {
