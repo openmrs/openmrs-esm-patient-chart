@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { type Control, Controller, type FieldPath, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { SelectItem, TimePicker, TimePickerSelect, Toggle } from '@carbon/react';
 import { type amPm } from '@openmrs/esm-patient-common-lib';
 import { OpenmrsDatePicker, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { convertToDate, type VisitFormData } from './visit-form.resource';
@@ -206,14 +206,15 @@ const VisitDateTimeSection: React.FC<VisitDateTimeSectionProps> = ({
         <Controller
           name="isFullDayVisit"
           control={control}
-          render={({ field: { onChange, value, ref } }) => (
-            <Checkbox
+          render={({ field: { onChange, value } }) => (
+            <Toggle
               className={styles.sectionField}
               id="isFullDayVisit"
               labelText={t('fullDayVisit', 'Full day visit')}
-              checked={Boolean(value)}
-              onChange={(_, { checked }) => onChange(checked)}
-              ref={ref}
+              labelA={t('off', 'Off')}
+              labelB={t('on', 'On')}
+              toggled={Boolean(value)}
+              onToggle={(checked) => onChange(checked)}
             />
           )}
         />

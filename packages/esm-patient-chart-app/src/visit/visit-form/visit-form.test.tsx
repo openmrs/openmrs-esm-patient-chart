@@ -399,6 +399,41 @@ describe('Visit form', () => {
     await waitFor(() => expect(screen.getByRole('radio', { name: /^Outpatient Visit$/i })).toBeChecked());
   });
 
+  it('keeps the full day visit toggle checked (set programmatically, not by a user click) when default values update', async () => {
+    const user = userEvent.setup();
+    mockUseDefaultVisitLocation.mockReturnValue({
+      display: 'Outpatient Clinic',
+      uuid: 'location-a',
+    });
+
+    const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        visitContext: null,
+      },
+    };
+    const { rerender } = render(<VisitForm {...props} />);
+
+    // Switching to "In the past" sets isFullDayVisit programmatically (via the workspace's own
+    // effect), not via a user click on the toggle itself. Let this fully settle first.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // Only now does the default visit location resolve to a different value, in a later, separate
+    // render cycle - well after the status switch has already settled. This changes defaultValues'
+    // identity and triggers the workspace's reset() effect independently of the status effect,
+    // which previously clobbered isFullDayVisit back to false because it was set via setValue()
+    // without shouldDirty: true, so keepDirtyValues didn't protect it.
+    mockUseDefaultVisitLocation.mockReturnValue({
+      display: 'Inpatient Ward',
+      uuid: 'location-b',
+    });
+    rerender(<VisitForm {...props} />);
+
+    await waitFor(() => expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked());
+  });
+
   it('displays an error message when the visit start time is in the future', async () => {
     const user = userEvent.setup();
 
@@ -992,7 +1027,7 @@ describe('Visit form', () => {
   it('defaults the full day visit checkbox to checked and hides the end date/time and start time fields when editing a past visit whose stored times genuinely span a full day', () => {
     renderVisitForm(mockFullDayPastVisit);
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     expect(fullDayVisitCheckbox).toBeChecked();
 
     expect(screen.getByText(/visit date/i)).toBeInTheDocument();
@@ -1009,13 +1044,13 @@ describe('Visit form', () => {
   it('defaults the full day visit checkbox to checked even when the stored stop time has truncated milliseconds after a REST API round-trip', () => {
     renderVisitForm(mockFullDayPastVisitWithTruncatedStopTime);
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
   });
 
   it('does not default the full day visit checkbox to checked for a visit that spans multiple calendar days, even though both boundary times individually look like full-day boundaries', () => {
     renderVisitForm(mockFullDayPastVisitSpanningMultipleDays);
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     expect(fullDayVisitCheckbox).not.toBeChecked();
 
     expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
@@ -1029,7 +1064,7 @@ describe('Visit form', () => {
   it('defaults the full day visit checkbox to unchecked and shows both date/time field groups when editing a past visit with specific manual times', () => {
     renderVisitForm(mockPastVisitWithEncounters);
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     expect(fullDayVisitCheckbox).not.toBeChecked();
 
     expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
@@ -1046,7 +1081,7 @@ describe('Visit form', () => {
 
     await user.click(screen.getByRole('tab', { name: /in the past/i }));
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     expect(fullDayVisitCheckbox).toBeChecked();
 
     expect(screen.getByLabelText(/^date$/i)).toBeInTheDocument();
@@ -1063,21 +1098,21 @@ describe('Visit form', () => {
     renderVisitForm();
 
     await user.click(screen.getByRole('tab', { name: /in the past/i }));
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     expect(fullDayVisitCheckbox).toBeChecked();
 
     // Manually uncheck it, then leave "In the past" (the isFullDayVisit field is reset to its
     // non-past default of false here, even though the checkbox itself isn't rendered for
     // "ongoing") and come back.
     await user.click(fullDayVisitCheckbox);
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
 
     await user.click(screen.getByRole('tab', { name: /ongoing/i }));
     await user.click(screen.getByRole('tab', { name: /in the past/i }));
 
     // Re-entering "In the past" re-applies config.defaultToFullDayVisit rather than reflecting
     // whatever the checkbox happened to be left at during the earlier "past" session.
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
   });
 
   it('does not default the full day visit checkbox to checked when config.defaultToFullDayVisit is false', async () => {
@@ -1103,14 +1138,14 @@ describe('Visit form', () => {
 
     await user.click(screen.getByRole('tab', { name: /in the past/i }));
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
   });
 
   it('reveals the end date/time and start time fields again when the full day visit checkbox is unchecked', async () => {
     const user = userEvent.setup();
     renderVisitForm(mockFullDayPastVisit);
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     await user.click(fullDayVisitCheckbox);
 
     expect(fullDayVisitCheckbox).not.toBeChecked();
@@ -1125,7 +1160,7 @@ describe('Visit form', () => {
   it('excludes today from the selectable date range for the visit date field when the full day visit checkbox is checked', () => {
     renderVisitForm(mockFullDayPastVisit);
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
 
     const dateFieldCalls = mockOpenmrsDatePicker.mock.calls.filter((call) => call[0]?.id === 'visitStartDateInput');
     const { maxDate } = dateFieldCalls[dateFieldCalls.length - 1][0];
@@ -1157,12 +1192,12 @@ describe('Visit form', () => {
     renderVisitForm(mockPastVisitWithEncounters);
 
     // mockPastVisitWithEncounters defaults to manual (unchecked) mode with the start date field visible.
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
 
     const startDateInput = screen.getByLabelText(/start date/i);
     fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
 
-    await user.click(screen.getByRole('checkbox', { name: /full day visit/i }));
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
 
     const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
     await waitFor(() => {
@@ -1174,12 +1209,12 @@ describe('Visit form', () => {
     const user = userEvent.setup();
     renderVisitForm(mockPastVisitWithEncounters);
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
 
     const startDateInput = screen.getByLabelText(/start date/i);
     fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     await user.click(fullDayVisitCheckbox);
 
     const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
@@ -1199,12 +1234,12 @@ describe('Visit form', () => {
     const user = userEvent.setup();
     renderVisitForm(mockPastVisitWithEncounters);
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
 
     const startDateInput = screen.getByLabelText(/start date/i);
     fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
 
-    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
     await user.click(fullDayVisitCheckbox);
 
     const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
@@ -1245,7 +1280,7 @@ describe('Visit form', () => {
 
     renderVisitForm(mockFullDayPastVisit);
 
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
 
     await user.click(screen.getByLabelText(/Outpatient visit/i));
 
@@ -1285,7 +1320,7 @@ describe('Visit form', () => {
 
     // mockPastVisitWithEncounters has specific (non-full-day) start/stop times, so the
     // checkbox already defaults to unchecked here — no need to click it.
-    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
 
     await user.click(screen.getByLabelText(/Outpatient visit/i));
 
@@ -1338,7 +1373,7 @@ describe('Visit form', () => {
 
     // Now check the full day visit checkbox, which hides the time fields while the stale invalid
     // value remains in form state.
-    await user.click(screen.getByRole('checkbox', { name: /full day visit/i }));
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
 
     await user.click(screen.getByRole('button', { name: /Update visit/i }));
 

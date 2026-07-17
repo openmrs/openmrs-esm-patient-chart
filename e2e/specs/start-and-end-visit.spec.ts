@@ -59,18 +59,19 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
     await chartPage.page.getByRole('tab', { name: /in the past/i }).click();
   });
 
-  await test.step('And I uncheck the `Full day visit` checkbox', async () => {
-    // The "In the past" status defaults this checkbox to checked, which hides the manual
+  await test.step('And I uncheck the `Full day visit` toggle', async () => {
+    // The "In the past" status defaults this toggle to checked, which hides the manual
     // start/end time fields in favor of a single date field. Uncheck it to exercise the
     // manual time picker fields the next step asserts on.
-    // Carbon's checkbox label visually overlaps the native input, so Playwright's `.uncheck()`
-    // can't click the input directly - click the label instead, matching the pattern already
-    // used for Carbon radio buttons elsewhere in this file (see the `opdVisitLabel` steps below).
+    // Carbon's Toggle renders role="switch" on a visually-hidden <button>, with the visible
+    // switch UI living in an associated <label for="...">, the same overlap issue Checkbox and
+    // radio have - click the label instead, matching the pattern already used for Carbon radio
+    // buttons elsewhere in this file (see the `opdVisitLabel` steps below).
     const fullDayVisitLabel = chartPage.page.locator('label').filter({ hasText: /full day visit/i });
     await expect(fullDayVisitLabel).toBeVisible();
-    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    await expect(chartPage.page.getByRole('switch', { name: /full day visit/i })).toBeChecked();
     await fullDayVisitLabel.click();
-    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    await expect(chartPage.page.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
   });
 
   await test.step('Then I should see Start date and time picker AND End date and time picker', async () => {
@@ -319,18 +320,19 @@ test('Start a visit in the past', async ({ page, patient, api }) => {
     await waitForVisitLocationValue(chartPage.page);
   });
 
-  await test.step('And I uncheck the `Full day visit` checkbox', async () => {
-    // The "In the past" status defaults this checkbox to checked, which hides the separate
+  await test.step('And I uncheck the `Full day visit` toggle', async () => {
+    // The "In the past" status defaults this toggle to checked, which hides the separate
     // start/end date fields (visitStartDateInput / visitStopDateInput) in favor of a single
     // date field. Uncheck it so the two-date-field flow below still applies.
-    // Carbon's checkbox label visually overlaps the native input, so Playwright's `.uncheck()`
-    // can't click the input directly - click the label instead, matching the pattern already
-    // used for Carbon radio buttons elsewhere in this file (see the `opdVisitLabel` steps below).
+    // Carbon's Toggle renders role="switch" on a visually-hidden <button>, with the visible
+    // switch UI living in an associated <label for="...">, the same overlap issue Checkbox and
+    // radio have - click the label instead, matching the pattern already used for Carbon radio
+    // buttons elsewhere in this file (see the `opdVisitLabel` steps below).
     const fullDayVisitLabel = chartPage.page.locator('label').filter({ hasText: /full day visit/i });
     await expect(fullDayVisitLabel).toBeVisible();
-    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+    await expect(chartPage.page.getByRole('switch', { name: /full day visit/i })).toBeChecked();
     await fullDayVisitLabel.click();
-    await expect(chartPage.page.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+    await expect(chartPage.page.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
   });
 
   await test.step('And I set the start date two days ago', async () => {

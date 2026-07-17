@@ -188,11 +188,18 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
   // that case too (without affecting the edit flow, which is excluded via !visitToEdit), and
   // resets the checkbox back to its non-past default (false) when the user switches away from
   // "past" again, so a stale checked/unchecked state doesn't leak into a later switch back.
+  // shouldDirty: true is required here - defaultValues.isFullDayVisit is always false for a new
+  // visit (it's derived from visitToEdit, not the live watched visitStatus), so without marking
+  // this field dirty, a later defaultValues-driven reset() (e.g. once the default visit location
+  // finishes resolving asynchronously) would silently clobber this value back to false via
+  // keepDirtyValues, even though the field was never actually touched by the user.
   useEffect(() => {
     if (visitToEdit) {
       return;
     }
-    setValue('isFullDayVisit', visitStatus === 'past' ? config.defaultToFullDayVisit : false);
+    setValue('isFullDayVisit', visitStatus === 'past' ? config.defaultToFullDayVisit : false, {
+      shouldDirty: true,
+    });
   }, [visitStatus, visitToEdit, setValue, config.defaultToFullDayVisit]);
 
   const getErrorDescription = useCallback(
