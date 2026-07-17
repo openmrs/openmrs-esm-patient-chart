@@ -5986,8 +5986,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 20.0.1-pre.525
-  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.525"
+  version: 20.0.1-pre.564
+  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.564"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -5999,7 +5999,7 @@ __metadata:
     "@angular/core": ^20.0.0
     "@angular/forms": ^20.0.0
     "@carbon/styles": 1.x
-    "@ng-select/ng-select": ^15.1.3
+    "@ng-select/ng-select": ^20.4.0
     "@ngx-translate/core": ^16.0.4
     "@openmrs/ngx-file-uploader": ^20.0.0
     lodash: ^4.17.21
@@ -6008,7 +6008,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/62f3c3b5e1df7be3ba5d4e9b445f1e02a54da049dd1f0d6e9f195e6c0f6d3c3c3afde816980697a6a881b20d6c3e6f99945bfb686b0726628b80850139f2f5df
+  checksum: 10/28908af6f170032259bd6369b683c61d2bb20038d5d5a23bd16b3420fd81cd99b89ed2bfd7cf102b3cc8a673efed03e385117618998e7972ff1d0110677e86d0
   languageName: node
   linkType: hard
 
