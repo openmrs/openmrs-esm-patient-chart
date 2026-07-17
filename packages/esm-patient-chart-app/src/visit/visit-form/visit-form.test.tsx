@@ -1058,6 +1058,54 @@ describe('Visit form', () => {
     expect(screen.queryByRole('combobox', { name: /end time format/i })).not.toBeInTheDocument();
   });
 
+  it('re-defaults the full day visit checkbox to checked from config after the user unchecks it, switches away from "In the past", and switches back', async () => {
+    const user = userEvent.setup();
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    const fullDayVisitCheckbox = screen.getByRole('checkbox', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).toBeChecked();
+
+    // Manually uncheck it, then leave "In the past" (the isFullDayVisit field is reset to its
+    // non-past default of false here, even though the checkbox itself isn't rendered for
+    // "ongoing") and come back.
+    await user.click(fullDayVisitCheckbox);
+    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('tab', { name: /ongoing/i }));
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+
+    // Re-entering "In the past" re-applies config.defaultToFullDayVisit rather than reflecting
+    // whatever the checkbox happened to be left at during the earlier "past" session.
+    expect(screen.getByRole('checkbox', { name: /full day visit/i })).toBeChecked();
+  });
+
+  it('does not default the full day visit checkbox to checked when config.defaultToFullDayVisit is false', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      defaultToFullDayVisit: false,
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+
+    expect(screen.getByRole('checkbox', { name: /full day visit/i })).not.toBeChecked();
+  });
+
   it('reveals the end date/time and start time fields again when the full day visit checkbox is unchecked', async () => {
     const user = userEvent.setup();
     renderVisitForm(mockFullDayPastVisit);

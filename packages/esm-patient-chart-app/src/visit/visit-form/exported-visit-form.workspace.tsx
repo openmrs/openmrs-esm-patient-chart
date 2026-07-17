@@ -184,13 +184,16 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
 
   // When creating a new visit (not editing an existing one), the user can switch the visit status
   // to "past" via the content switcher. defaultValues only defaults isFullDayVisit to true when
-  // visitToEdit is itself already a past visit, so this keeps the checkbox checked-by-default
-  // for that case too, without affecting the edit flow (which is excluded via !visitToEdit).
+  // visitToEdit is itself already a past visit, so this applies config.defaultToFullDayVisit for
+  // that case too (without affecting the edit flow, which is excluded via !visitToEdit), and
+  // resets the checkbox back to its non-past default (false) when the user switches away from
+  // "past" again, so a stale checked/unchecked state doesn't leak into a later switch back.
   useEffect(() => {
-    if (!visitToEdit && visitStatus === 'past') {
-      setValue('isFullDayVisit', true);
+    if (visitToEdit) {
+      return;
     }
-  }, [visitStatus, visitToEdit, setValue]);
+    setValue('isFullDayVisit', visitStatus === 'past' ? config.defaultToFullDayVisit : false);
+  }, [visitStatus, visitToEdit, setValue, config.defaultToFullDayVisit]);
 
   const getErrorDescription = useCallback(
     (error: unknown) => {
