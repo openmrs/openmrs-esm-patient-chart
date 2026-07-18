@@ -16,7 +16,7 @@ const mockObjectUrl = 'blob:mock-visit-summary-pdf';
 const notAuthorizedText = /you do not have permission to generate visit summaries/i;
 const visitNotFoundText = /this visit could not be found on the server/i;
 const generationFailedText = /the server could not generate the visit summary/i;
-const networkErrorText = /check your internet connection and try again/i;
+const networkErrorText = /check your network connection and try again/i;
 
 const renderModal = () => render(<PrintVisitSummaryModal visitUuid={visitUuid} closeModal={mockCloseModal} />);
 
@@ -69,6 +69,23 @@ describe('PrintVisitSummaryModal', () => {
     unmount();
 
     expect(window.URL.revokeObjectURL).toHaveBeenCalledWith(mockObjectUrl);
+  });
+
+  it('does not retain the revoked object URL when the visit changes', async () => {
+    mockOpenmrsFetch
+      .mockResolvedValueOnce({
+        blob: () => Promise.resolve(mockPdfBlob),
+      } as unknown as FetchResponse)
+      .mockImplementationOnce(() => new Promise(() => {}));
+
+    const { rerender } = renderModal();
+    await screen.findByTitle(/visit summary preview/i);
+
+    rerender(<PrintVisitSummaryModal visitUuid="another-visit-uuid" closeModal={mockCloseModal} />);
+
+    expect(window.URL.revokeObjectURL).toHaveBeenCalledWith(mockObjectUrl);
+    expect(screen.queryByTitle(/visit summary preview/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/generating visit summary/i)).toBeInTheDocument();
   });
 
   it('shows the not-authorized error for a 403 response', async () => {

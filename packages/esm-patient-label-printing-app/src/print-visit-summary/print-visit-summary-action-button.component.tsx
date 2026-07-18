@@ -9,7 +9,9 @@ interface PrintVisitSummaryActionButtonProps {
   patient: fhir.Patient;
 
   /**
-   * If true, renders as IconButton instead
+   * Provided via the `visit-detail-overview-actions` extension slot state. The visit
+   * history table passes `compact: true` to render an icon-only button; hosts that
+   * omit it get a full button with a text label.
    */
   compact?: boolean;
 }

@@ -43,6 +43,10 @@ const PrintVisitSummaryModal: React.FC<PrintVisitSummaryModalProps> = ({ visitUu
       if (createdObjectUrl) {
         window.URL.revokeObjectURL(createdObjectUrl);
       }
+      // Reset state so a re-run for a new visit doesn't render the revoked URL
+      // or a stale error. On unmount these are no-ops.
+      setObjectUrl(null);
+      setErrorType(null);
     };
   }, [visitUuid]);
 
@@ -72,7 +76,7 @@ const PrintVisitSummaryModal: React.FC<PrintVisitSummaryModalProps> = ({ visitUu
       title: t('visitSummaryNetworkErrorTitle', 'Network error'),
       subtitle: t(
         'visitSummaryNetworkError',
-        'The visit summary could not be retrieved. Check your internet connection and try again.',
+        'The visit summary could not be retrieved. Check your network connection and try again.',
       ),
     },
   };
