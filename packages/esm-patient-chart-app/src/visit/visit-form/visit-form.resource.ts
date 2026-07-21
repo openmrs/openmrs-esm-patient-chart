@@ -369,7 +369,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('futureEndTime', 'End time cannot be in the future'),
-              path: ['visitStopTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopTime'],
             });
           } else if (visitStopDateTime < visitStartDateTime) {
             ctx.addIssue({
@@ -390,7 +390,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
                   },
                 },
               ),
-              path: ['visitStopTime'],
+              path: [isFullDay ? 'visitStartDate' : 'visitStopTime'],
             });
           }
         }

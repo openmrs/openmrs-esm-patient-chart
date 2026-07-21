@@ -1303,6 +1303,44 @@ describe('Visit form', () => {
     );
   });
 
+  it('attaches the "end time must be after most recent encounter" error to the visible Date field, not the hidden visitStopTime field, when editing a multi-day visit switched to full-day mode', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockFullDayPastVisitSpanningMultipleDays);
+
+    // mockFullDayPastVisitSpanningMultipleDays spans multiple calendar days, so it doesn't default to full-day.
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // mockFullDayPastVisitSpanningMultipleDays's encounters (inherited from mockPastVisitWithEncounters) fall on
+    // 2022-01-01. Moving the full-day date to the day before means the computed end-of-day time
+    // no longer covers the visit's most recent encounter.
+    const dayBeforeEncounters = dayjs(mockPastVisitWithEncounters.startDatetime)
+      .subtract(1, 'day')
+      .format('YYYY-MM-DD');
+    const dateInput = screen.getByLabelText(/^date$/i);
+    fireEvent.change(dateInput, { target: { value: dayBeforeEncounters } });
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+    // The save must be blocked...
+    await waitFor(() => expect(mockUpdateVisit).not.toHaveBeenCalled());
+
+    // ...and the error must be attached to the visible "Date" field (visitStartDate), not
+    // silently stuck on the hidden visitStopTime field, where it would never be shown to the
+    // user and the save would appear to fail for no visible reason.
+    const dateFieldCalls = mockOpenmrsDatePicker.mock.calls.filter((call) => call[0]?.id === 'visitStartDateInput');
+    const { invalid, invalidText } = dateFieldCalls[dateFieldCalls.length - 1][0];
+    expect(invalid).toBe(true);
+    expect(invalidText).toMatch(/end time must be on or after/i);
+  });
+
   it('preserves the existing manual start/end time behavior when the full day visit checkbox is unchecked', async () => {
     const user = userEvent.setup();
 
@@ -1570,9 +1608,12 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       visitStopTime: undefined,
     });
 
+    // path must point to the visible "Date" field (visitStartDate), not the hidden
+    // visitStopTime field - otherwise the error blocks saving with no visible message anywhere.
     expect(error?.issues).toContainEqual(
       expect.objectContaining({
         message: 'End time cannot be in the future',
+        path: ['visitStartDate'],
       }),
     );
   });
@@ -1597,9 +1638,12 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       visitStopTime: undefined,
     });
 
+    // path must point to the visible "Date" field (visitStartDate), not the hidden
+    // visitStopTime field - otherwise the error blocks saving with no visible message anywhere.
     expect(error?.issues).toContainEqual(
       expect.objectContaining({
         message: expect.stringContaining('End time must be on or after'),
+        path: ['visitStartDate'],
       }),
     );
   });
