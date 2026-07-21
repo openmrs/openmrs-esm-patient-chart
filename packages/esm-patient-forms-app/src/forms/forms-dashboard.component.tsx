@@ -7,6 +7,7 @@ import type { FormEntryConfigSchema } from '../config-schema';
 import { useFormEvaluationContext } from '../hooks/use-form-evaluation-context';
 import { useForms } from '../hooks/use-forms';
 import { filterFormsByContext, partitionFormsByGroup } from './form-context-filter';
+import FormFavoritesList from './form-favorites-list.component';
 import FormsList from './forms-list.component';
 import styles from './forms-dashboard.scss';
 
@@ -87,6 +88,7 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
 
   return (
     <div className={styles.container}>
+      <FormFavoritesList onFormSelect={handleFormOpen} />
       {showLegacySections ? (
         structuredSections?.map((section) => {
           return (

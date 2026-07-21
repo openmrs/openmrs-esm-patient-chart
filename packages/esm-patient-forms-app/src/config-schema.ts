@@ -133,6 +133,16 @@ export const configSchema = {
     },
     _default: [],
   },
+  enableFormFavorites: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether form pinning (favorites) should be enabled for users.',
+  },
+  maxPinnedForms: {
+    _type: Type.Number,
+    _default: 10,
+    _description: 'Maximum number of forms a user can pin as favorites.',
+  },
   contextualFormFiltering: {
     _type: Type.Boolean,
     _default: true,
@@ -179,6 +189,8 @@ export interface FormEntryConfigSchema {
   customFormsUrl: string;
   orderBy: 'name' | 'most-recent';
   showHtmlFormEntryForms: boolean;
+  enableFormFavorites: boolean;
+  maxPinnedForms: number;
   contextualFormFiltering: boolean;
   medicoLegalPersonAttributeTypeUuid: string;
   formVisibilityRuleEntries: Array<FormVisibilityRuleEntry>;

@@ -15,7 +15,10 @@ import {
   TableToolbarSearch,
   Tag,
 } from '@carbon/react';
+import { useConfig } from '@openmrs/esm-framework';
+import type { FormEntryConfigSchema } from '../config-schema';
 import { type Form } from '../types';
+import FormPinButton from './form-pin-button.component';
 import styles from './forms-table.scss';
 
 /*
@@ -44,8 +47,15 @@ interface FormsTableProps {
 
 const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFormOpen }: FormsTableProps) => {
   const { t } = useTranslation();
+  const { enableFormFavorites } = useConfig<FormEntryConfigSchema>();
+
+  const allHeaders = [
+    ...tableHeaders,
+    ...(enableFormFavorites ? [{ header: '', key: 'pin' }] : []),
+  ];
+
   return (
-    <DataTable rows={tableRows} headers={tableHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+    <DataTable rows={tableRows} headers={allHeaders} size={isTablet ? 'lg' : 'sm'} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
         <>
           <TableContainer className={styles.tableContainer}>
@@ -67,7 +77,13 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader
+                        key={header.key}
+                        {...getHeaderProps({ header })}
+                        className={header.key === 'pin' ? styles.pinHeader : undefined}
+                      >
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -76,30 +92,35 @@ const FormsTable = ({ tableHeaders, tableRows, isTablet, handleSearch, handleFor
                     <TableRow {...getRowProps({ row })}>
                       <TableCell key={row.cells[0].id}>
                         <div className={styles.formNameCell}>
-                          <Link
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              handleFormOpen(tableRows[i].form, '');
-                            }}
-                            role="presentation"
-                            className={styles.formName}
-                          >
-                            {tableRows[i]?.formName}
-                          </Link>
-                          {(tableRows[i]?.contextTags?.length ?? 0) > 0 && (
-                            <div className={styles.contextTags} aria-label={t('formContextTags', 'Form context')}>
-                              {(tableRows[i]?.contextTags ?? []).map((tag, idx) => (
-                                <Tag key={`${tag}-${idx}`} type="blue" size="sm">
-                                  {tag}
-                                </Tag>
-                              ))}
-                            </div>
-                          )}
+                          <div className={styles.formNameRow}>
+                            <Link
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleFormOpen(tableRows[i].form, '')}
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {tableRows[i]?.formName}
+                            </Link>
+                            {(tableRows[i]?.contextTags?.length ?? 0) > 0 && (
+                              <div className={styles.contextTags} aria-label={t('formContextTags', 'Form context')}>
+                                {(tableRows[i]?.contextTags ?? []).map((tag, idx) => (
+                                  <Tag key={`${tag}-${idx}`} type="blue" size="sm">
+                                    {tag}
+                                  </Tag>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className={styles.editCell}>
                         <span>{row.cells[1].value ?? t('never', 'Never')}</span>
                       </TableCell>
+                      {enableFormFavorites && (
+                        <TableCell className={styles.pinCell}>
+                          <FormPinButton form={tableRows[i].form} isTablet={isTablet} />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

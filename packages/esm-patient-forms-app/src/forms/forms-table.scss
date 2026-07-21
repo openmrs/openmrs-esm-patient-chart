@@ -134,9 +134,43 @@
 
 .formNameCell {
   display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.formNameRow {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: layout.$spacing-03;
+}
+
+.pinHeader {
+  width: 3rem;
+  min-width: 3rem;
+}
+
+.pinCell {
+  width: 3rem;
+  padding-inline: layout.$spacing-02 !important;
+}
+
+.pinButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pinIcon {
+  color: $text-02;
+}
+
+.pinIconActive {
+  color: $interactive-01;
+}
+
+.pinLoading {
+  width: 1.5rem;
 }
 
 .contextTags {
