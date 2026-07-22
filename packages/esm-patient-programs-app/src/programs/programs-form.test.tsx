@@ -228,6 +228,47 @@ describe('ProgramsForm', () => {
     );
   });
 
+  it('preserves a stored completion time that falls later than the enrollment time on the same day', async () => {
+    const user = userEvent.setup();
+
+    // The backend only rejects completion strictly before enrollment, so a stored same-day
+    // completion time later than the enrollment time is valid and must survive a resave
+    // that only touches an unrelated field.
+    const sameDayEnrollment = {
+      ...mockEnrolledProgramsResponse[0],
+      dateEnrolled: '2020-01-16T09:00:00.000+0000',
+      dateCompleted: '2020-01-16T17:00:00.000+0000',
+    };
+
+    mockUseEnrollments.mockReturnValue({
+      data: [sameDayEnrollment],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      activeEnrollments: [],
+      mutateEnrollments: vi.fn(),
+    });
+
+    mockUpdateProgramEnrollment.mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+    } as unknown as FetchResponse);
+
+    renderProgramsForm(sameDayEnrollment.uuid);
+
+    await user.click(screen.getByRole('radio', { name: 'location_2' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockUpdateProgramEnrollment).toHaveBeenCalledTimes(1);
+    expect(mockUpdateProgramEnrollment).toHaveBeenCalledWith(
+      sameDayEnrollment.uuid,
+      expect.objectContaining({
+        dateCompleted: dayjs('2020-01-16T17:00:00.000+0000').format(),
+      }),
+      new AbortController(),
+    );
+  });
+
   it('renders the programs status field if the config property is set to true', async () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),

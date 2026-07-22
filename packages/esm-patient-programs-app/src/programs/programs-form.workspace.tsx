@@ -139,8 +139,11 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         patient: patientUuid,
         program: selectedProgram,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
+        // The date picker emits midnight timestamps, which the backend would reject as "before" a
+        // same-day enrollment. Align those to the enrollment timestamp, but preserve stored
+        // completion times that already fall later on the same day.
         dateCompleted: completionDate
-          ? dayjs(completionDate).isSame(enrollmentDate, 'day')
+          ? dayjs(completionDate).isSame(enrollmentDate, 'day') && dayjs(completionDate).isBefore(enrollmentDate)
             ? dayjs(enrollmentDate).format()
             : dayjs(completionDate).format()
           : null,
