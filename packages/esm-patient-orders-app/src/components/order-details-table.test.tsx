@@ -604,8 +604,8 @@ describe('OrderDetailsTable', () => {
     await screen.findByRole('table');
     await user.click(screen.getByRole('button', { name: /options/i }));
 
-    expect(screen.getByText(/modify order/i).closest('button')).toBeDisabled();
-    expect(screen.getByText(/cancel order/i).closest('button')).toBeDisabled();
+    expect(screen.getByRole('button', { name: /modify order/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /cancel order/i })).toBeDisabled();
   });
 });
 
