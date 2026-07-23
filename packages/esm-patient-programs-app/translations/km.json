@@ -8,6 +8,7 @@
   "chooseProgram": "ជ្រើសរើសកម្មវិធីមួយ",
   "chooseStatus": "Choose a program status",
   "completedOn": "បានបញ្ចប់នៅលើ",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "សូមកំណត់រចនាសម្ព័ន្ធកម្មវិធីដើម្បីបន្ត",
   "dateCompleted": "កាលបរិច្ឆេទដែលបានបំពេញ",
   "dateEnrolled": "កាលបរិច្ឆេទចុះឈ្មោះ",

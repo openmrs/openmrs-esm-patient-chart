@@ -8,6 +8,7 @@
   "chooseProgram": "Alege un program",
   "chooseStatus": "Alege statusul programului",
   "completedOn": "Finalizat la",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "Configureaza programele pentru a continua.",
   "dateCompleted": "Data finalizarii",
   "dateEnrolled": "Data inscrierii",

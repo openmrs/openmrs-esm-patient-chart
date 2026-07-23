@@ -8,6 +8,7 @@
   "chooseProgram": "Pilih program",
   "chooseStatus": "Pilih status program",
   "completedOn": "Selesai Pada",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "Harap konfigurasikan program untuk melanjutkan.",
   "dateCompleted": "Tanggal selesai",
   "dateEnrolled": "Tanggal pendaftaran",
