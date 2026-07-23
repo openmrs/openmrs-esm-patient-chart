@@ -596,7 +596,7 @@ describe('OrderDetailsTable', () => {
       error: undefined,
       isLoading: false,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     renderOrderDetailsTable();
