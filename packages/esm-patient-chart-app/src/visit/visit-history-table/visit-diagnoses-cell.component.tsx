@@ -1,5 +1,6 @@
 import { DiagnosisTags, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
+import { dedupeDiagnoses } from '../dedupe-diagnoses';
 
 interface Props {
   visit: Visit;
@@ -7,10 +8,9 @@ interface Props {
 }
 
 const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {
-  const diagnoses = visit.encounters
-    .flatMap((encounter) => encounter.diagnoses)
-    .filter((diagnosis) => !diagnosis.voided)
-    .sort((a, b) => a.rank - b.rank);
+  const diagnoses = dedupeDiagnoses(
+    visit.encounters.flatMap((encounter) => encounter.diagnoses).filter((diagnosis) => !diagnosis.voided),
+  );
 
   return <DiagnosisTags diagnoses={diagnoses} />;
 };
