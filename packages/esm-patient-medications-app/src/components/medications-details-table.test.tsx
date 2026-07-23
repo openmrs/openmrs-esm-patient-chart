@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
@@ -6,30 +7,33 @@ import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-p
 import { mockFhirPatient, mockOrders } from '__mocks__';
 import MedicationsDetailsTable from './medications-details-table.component';
 
-const mockUseOrderBasket = jest.mocked(useOrderBasket);
-const mockUseConfig = jest.mocked(useConfig);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePagination = jest.mocked(usePagination);
-const mockUseLaunchWorkspaceRequiringVisit = jest.mocked(useLaunchWorkspaceRequiringVisit);
+const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockUseConfig = vi.mocked(useConfig);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePagination = vi.mocked(usePagination);
+const mockUseLaunchWorkspaceRequiringVisit = vi.mocked(useLaunchWorkspaceRequiringVisit);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
-  useLayoutType: jest.fn(),
-  usePagination: jest.fn(),
-}));
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
+vi.mock('@openmrs/esm-framework', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-framework')) as object;
   return {
     ...originalModule,
-    useLaunchWorkspaceRequiringVisit: jest.fn(),
-    useOrderBasket: jest.fn(),
+    useConfig: vi.fn(),
+    useLayoutType: vi.fn(),
+    usePagination: vi.fn(),
   };
 });
 
-jest.mock('../print/print.component', () => ({
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
+
+  return {
+    ...originalModule,
+    useLaunchWorkspaceRequiringVisit: vi.fn(),
+    useOrderBasket: vi.fn(),
+  };
+});
+
+vi.mock('../print/print.component', () => ({
   __esModule: true,
   default: function MockPrintComponent() {
     return 'PrintComponent';
@@ -40,20 +44,23 @@ describe('MedicationsDetailsTable', () => {
   beforeEach(() => {
     mockUseOrderBasket.mockReturnValue({
       orders: [],
-      setOrders: jest.fn(),
-      clearOrders: jest.fn(),
+      setOrders: vi.fn(),
+      clearOrders: vi.fn(),
     });
     mockUseConfig.mockReturnValue({
       excludePatientIdentifierCodeTypes: { uuids: [] },
       showPrintButton: false,
     } as any);
-    mockUseLayoutType.mockReturnValue('desktop');
-    mockUsePagination.mockImplementation((items) => ({
-      currentPage: 1,
-      goTo: jest.fn(),
-      results: items,
-    }));
-    mockUseLaunchWorkspaceRequiringVisit.mockReturnValue(jest.fn());
+    mockUseLayoutType.mockReturnValue('desktop' as any);
+    mockUsePagination.mockImplementation(
+      (items) =>
+        ({
+          currentPage: 1,
+          goTo: vi.fn(),
+          results: items,
+        }) as any,
+    );
+    mockUseLaunchWorkspaceRequiringVisit.mockReturnValue(vi.fn());
   });
 
   it('disables modify, renew, and discontinue actions when a medication has no visit context', async () => {
