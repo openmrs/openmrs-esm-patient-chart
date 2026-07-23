@@ -10,6 +10,20 @@
       "component": "printIdentifierStickerActionButton",
       "online": true,
       "offline": true
+    },
+    {
+      "name": "print-visit-summary-button",
+      "slot": "visit-detail-overview-actions",
+      "component": "printVisitSummaryActionButton",
+      "online": true,
+      "offline": true,
+      "order": 2
+    }
+  ],
+  "modals": [
+    {
+      "name": "print-visit-summary-modal",
+      "component": "printVisitSummaryModal"
     }
   ]
 }

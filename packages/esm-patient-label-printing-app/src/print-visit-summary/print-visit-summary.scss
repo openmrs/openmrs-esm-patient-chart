@@ -1,0 +1,14 @@
+@use '@carbon/layout';
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  min-height: layout.$spacing-13;
+}
+
+.previewFrame {
+  width: 100%;
+  min-height: 70vh;
+  flex: 1;
+  border: none;
+}
