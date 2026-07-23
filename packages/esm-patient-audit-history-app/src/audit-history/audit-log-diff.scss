@@ -1,0 +1,77 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.diffWrapper {
+  padding: layout.$spacing-05 layout.$spacing-06;
+}
+
+.diffTitle {
+  @include type.type-style('label-01');
+  color: $text-02;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 layout.$spacing-03;
+}
+
+.diffGrid {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr) minmax(0, 2fr);
+  column-gap: layout.$spacing-06;
+  align-items: baseline;
+}
+
+.row {
+  display: contents;
+}
+
+.headerCell {
+  @include type.type-style('label-01');
+  color: $text-02;
+  font-weight: 600;
+  padding: layout.$spacing-03 0;
+  border-bottom: 1px solid $ui-03;
+}
+
+.fieldCell,
+.valueCell {
+  @include type.type-style('body-compact-01');
+  padding: layout.$spacing-03 0;
+  border-bottom: 1px solid $ui-03;
+  overflow-wrap: anywhere;
+}
+
+.oldValue {
+  color: $danger;
+  text-decoration: line-through;
+}
+
+.newValue {
+  color: $support-02;
+  font-weight: 600;
+}
+
+.noChanges {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  padding: layout.$spacing-05 layout.$spacing-06;
+  margin: 0;
+}
+
+.snapshotDetails {
+  margin-top: layout.$spacing-03;
+
+  summary {
+    @include type.type-style('label-01');
+    color: $text-02;
+    cursor: pointer;
+  }
+}
+
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+  column-gap: layout.$spacing-06;
+  align-items: baseline;
+  margin-top: layout.$spacing-03;
+}
