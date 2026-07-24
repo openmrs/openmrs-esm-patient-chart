@@ -1,26 +1,26 @@
-import { DiagnosisTags, type Visit } from '@openmrs/esm-framework';
+import { type Diagnosis, DiagnosisTags, type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { dedupeDiagnoses } from '../dedupe-diagnoses';
-import type { LightweightVisit } from '../visits-widget/visit.resource';
 
 interface Props {
-  visit: Visit | LightweightVisit;
+  visit: Visit;
+  emrapiDiagnoses?: Array<Diagnosis>;
   patient: fhir.Patient;
 }
 
-const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {
-  const diagnoses = getDiagnosesFromVisit(visit);
+const VisitDiagnosisCell: React.FC<Props> = ({ visit, emrapiDiagnoses }) => {
+  const diagnoses = getDiagnosesFromVisit(visit, emrapiDiagnoses);
   return <DiagnosisTags diagnoses={diagnoses} />;
 };
 
-function getDiagnosesFromVisit(visit: Visit | LightweightVisit) {
-  if ('diagnoses' in visit && Array.isArray(visit.diagnoses) && visit.diagnoses.length > 0) {
-    return dedupeDiagnoses(visit.diagnoses.filter((d) => !d.voided));
+function getDiagnosesFromVisit(visit: Visit, emrapiDiagnoses?: Array<Diagnosis>) {
+  if (emrapiDiagnoses && emrapiDiagnoses.length > 0) {
+    return dedupeDiagnoses(emrapiDiagnoses.filter((diagnosis) => !diagnosis.voided));
   }
 
-  if ('encounters' in visit && Array.isArray(visit.encounters)) {
+  if (visit.encounters) {
     return dedupeDiagnoses(
-      visit.encounters.flatMap((encounter) => encounter.diagnoses ?? []).filter((d) => !d.voided),
+      visit.encounters.flatMap((encounter) => encounter.diagnoses ?? []).filter((diagnosis) => !diagnosis.voided),
     );
   }
 

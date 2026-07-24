@@ -7,7 +7,7 @@ import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { usePaginatedVisits, useFullVisit } from './visit.resource';
+import { usePaginatedVisits, useLightweightVisits, useVisitEncounters } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
@@ -40,11 +40,17 @@ const mockPaginatedVisitsData = {
   goToNext: vi.fn(),
   goToPrevious: vi.fn(),
 };
+
 vi.mock('./visit.resource', async () => ({
   ...((await vi.importActual('./visit.resource')) as object),
   usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
-  useFullVisit: vi.fn().mockReturnValue({
-    visit: null,
+  useLightweightVisits: vi.fn().mockReturnValue({
+    visits: [],
+    error: undefined,
+    isLoading: false,
+  }),
+  useVisitEncounters: vi.fn().mockReturnValue({
+    encounters: null,
     isLoading: false,
     error: undefined,
     isValidating: false,
@@ -52,7 +58,8 @@ vi.mock('./visit.resource', async () => ({
   }),
 }));
 const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
-const mockUseFullVisit = vi.mocked(useFullVisit);
+const mockUseLightweightVisits = vi.mocked(useLightweightVisits);
+const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 
 const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
   error: null,
@@ -93,8 +100,8 @@ vi.mock('./past-visits-components/encounters-table/encounters-table.resource', a
 
 describe('VisitDetailOverview', () => {
   beforeEach(() => {
-    mockUseFullVisit.mockReturnValue({
-      visit: visitOverviewDetailMockData.data.results[0],
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: visitOverviewDetailMockData.data.results[0].encounters,
       isLoading: false,
       error: undefined,
       isValidating: false,
@@ -113,6 +120,7 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
+    // visits table view
     expect(screen.getByRole('heading', { name: /past visits/i })).toBeInTheDocument();
     expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
@@ -154,6 +162,7 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
+    // visits table view
     const allEncountersTab = screen.getByRole('tab', { name: /All encounters/i });
     const visitsTab = screen.getByRole('tab', { name: /visit/i });
 
@@ -191,6 +200,7 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
+    // visits table view
     const visitsTab = screen.getByRole('tab', { name: /visits/i });
 
     expect(visitsTab).toBeInTheDocument();

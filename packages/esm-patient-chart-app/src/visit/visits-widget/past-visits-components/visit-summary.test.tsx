@@ -1,23 +1,23 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { ExtensionSlot, getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
 import { mockPatient } from 'tools';
 import { visitOverviewDetailMockData, visitOverviewDetailMockDataNotEmpty } from '__mocks__';
 import VisitSummary from './visit-summary.component';
-import { useFullVisit } from '../visit.resource';
+import { useVisitEncounters } from '../visit.resource';
 
 vi.mock('../visit.resource', async () => ({
   ...((await vi.importActual('../visit.resource')) as object),
-  useFullVisit: vi.fn(),
+  useVisitEncounters: vi.fn(),
 }));
 
 const mockExtensionSlot = ExtensionSlot as Mock;
 const mockGetConfig = vi.mocked(getConfig);
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
-const mockUseFullVisit = vi.mocked(useFullVisit);
+const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
 
 describe('VisitSummary', () => {
@@ -29,8 +29,8 @@ describe('VisitSummary', () => {
       notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
       visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     });
-    mockUseFullVisit.mockReturnValue({
-      visit: null,
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: null,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -42,8 +42,8 @@ describe('VisitSummary', () => {
     const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
-    mockUseFullVisit.mockReturnValue({
-      visit: mockVisit,
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: mockVisit.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -58,6 +58,7 @@ describe('VisitSummary', () => {
     expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
 
+    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -66,23 +67,19 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
   it('renders diagnoses tags when there are diagnoses', () => {
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
-    mockUseFullVisit.mockReturnValue({
-      visit: mockVisit,
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: mockVisit.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -104,8 +101,8 @@ describe('VisitSummary', () => {
 
     const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
-    mockUseFullVisit.mockReturnValue({
-      visit: mockVisit,
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: mockVisit.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
@@ -121,6 +118,7 @@ describe('VisitSummary', () => {
     expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
 
+    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -131,23 +129,17 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    await waitFor(() => {
-      expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
-    });
+    expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
-  it('should show loading state when full visit data is being fetched', async () => {
-    const user = userEvent.setup();
-
-    mockUseFullVisit.mockReturnValue({
-      visit: null,
+  it('should show loading state when encounter data is being fetched', () => {
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: null,
       error: undefined,
       isLoading: true,
       isValidating: true,
@@ -156,63 +148,13 @@ describe('VisitSummary', () => {
 
     render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
-    const medicationTab = screen.getByRole('tab', { name: /Medication/i });
-    await user.click(medicationTab);
-
-    await waitFor(() => {
-      const loadingElements = screen.getAllByText(/Loading visit details/i);
-      expect(loadingElements.length).toBeGreaterThan(0);
-    });
+    const loadingElements = screen.getAllByText(/Loading visit details/i);
+    expect(loadingElements.length).toBeGreaterThan(0);
   });
 
-  it('should trigger full data fetch when clicking a tab that requires it', async () => {
-    const user = userEvent.setup();
-    const mockVisitData = visitOverviewDetailMockDataNotEmpty.data.results[0];
-
-    mockUseFullVisit.mockReturnValue({
-      visit: null,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    });
-
-    const { rerender } = render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
-
-    const testsTab = screen.getByRole('tab', { name: /Tests/i });
-    await user.click(testsTab);
-
-    mockUseFullVisit.mockReturnValue({
-      visit: mockVisitData,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    });
-
-    rerender(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
-
-    await user.click(testsTab);
-
-    await waitFor(() => {
-      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
-    });
-  });
-
-  it('should not trigger full data fetch when clicking the Notes tab', async () => {
-    const user = userEvent.setup();
-
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
-
-    const notesTab = screen.getByRole('tab', { name: /Notes/i });
-    await user.click(notesTab);
-
-    expect(mockUseFullVisit).toHaveBeenCalledWith(null);
-  });
-
-  it('should not show infinite loading spinner for tabs before full data is requested', () => {
-    mockUseFullVisit.mockReturnValue({
-      visit: null,
+  it('should not show loading spinner when encounters are loaded', () => {
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: mockVisit.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
