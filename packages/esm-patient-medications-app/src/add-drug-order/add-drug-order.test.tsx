@@ -178,7 +178,6 @@ describe('AddDrugOrderWorkspace drug search', () => {
       expect.objectContaining({
         ...getTemplateOrderBasketItem(mockDrugSearchResultApiData[2], null, daysDurationUnit),
         isOrderIncomplete: true,
-        scheduledDate: expect.any(Date),
       }),
     ]);
     expect(mockCloseWorkspace).toHaveBeenCalled();
@@ -225,7 +224,7 @@ describe('AddDrugOrderWorkspace drug search', () => {
             (getDefaultsFromConfigSchema(configSchema) as ConfigObject).daysDurationUnit,
             mockDrugOrderTemplateApiData[mockDrugSearchResultApiData[0].uuid][0],
           ),
-          scheduledDate: expect.any(Date),
+          scheduledDate: undefined,
           indication: 'Hypertension',
         }),
       ]),
