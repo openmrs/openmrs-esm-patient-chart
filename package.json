@@ -83,7 +83,7 @@
   },
   "resolutions": {
     "sass": "^1.54.3",
-    "dompurify": "^3.4.11"
+    "dompurify": "^3.4.12"
   },
   "packageManager": "yarn@4.10.3"
 }
