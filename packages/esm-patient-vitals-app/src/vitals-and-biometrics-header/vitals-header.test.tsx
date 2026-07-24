@@ -1,5 +1,7 @@
 import React from 'react';
+import i18n from 'i18next';
 import type * as I18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
@@ -13,6 +15,7 @@ import {
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
+import enTranslations from '../../translations/en.json';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import VitalsHeader from './vitals-header.extension';
@@ -56,6 +59,26 @@ vi.mock('../common/data.resource', async () => {
     useVitalsConceptMetadata: vi.fn(),
     useVitalsAndBiometrics: vi.fn(),
   };
+});
+
+// Use the real react-i18next (not the shared passthrough mock, which does not implement
+// pluralization) so the overdue tag renders the actual plural forms from en.json. The alias
+// only matches the bare "react-i18next" specifier, so resolving the absolute path bypasses it.
+vi.mock('react-i18next', async () => {
+  const { createRequire } = await import('node:module');
+  return vi.importActual(createRequire(import.meta.url).resolve('react-i18next'));
+});
+
+// The @openmrs/esm-framework mock stubs `window.i18next`, but @openmrs/esm-translations registers
+// an "initialized" hook that calls `window.i18next.loadNamespaces`. Point the global at the real
+// instance (as the app shell does) so init does not crash.
+window.i18next = i18n;
+
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  initImmediate: false,
+  interpolation: { escapeValue: false },
+  resources: { en: { translation: enTranslations } },
 });
 
 mockUseConfig.mockReturnValue({
@@ -154,7 +177,7 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/These vitals are 5 days old/i)).toBeInTheDocument();
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
