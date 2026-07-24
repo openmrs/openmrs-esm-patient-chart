@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { usePaginatedVisits } from '../visits-widget/visit.resource';
+import { useLightweightVisits, usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitActionsCell from './visit-actions-cell.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitDiagnosisCell from './visit-diagnoses-cell.component';
@@ -32,7 +32,10 @@ interface VisitHistoryTableProps {
 
 /**
  * This shows a list of visit histories in the visit tab in patient chart.
- * Full visit data is fetched on-demand when a row is expanded (handled by VisitSummary).
+ * Uses usePaginatedVisits as the primary data source for table rendering.
+ * The lightweight EMRAPI endpoint is used as an optional enhancement
+ * for diagnoses when available. Full encounter data is fetched on-demand
+ * when a row is expanded (handled by VisitSummary).
  */
 const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
@@ -40,6 +43,13 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { data: visits, currentPage, error, isLoading, totalCount, goTo } = usePaginatedVisits(patientUuid, pageSize);
+
+  // Optional: fetch lightweight diagnoses from EMRAPI endpoint if available
+  const { visits: emrapiVisits } = useLightweightVisits(patientUuid, pageSize);
+
+  // Build a map of visitUuid -> diagnoses from EMRAPI response
+  const emrapiDiagnosesMap = new Map(emrapiVisits?.map((item) => [item.visit.uuid, item.diagnoses]) ?? []);
+
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -56,7 +66,14 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const rowData = visits?.map((visit) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} patient={patient} />;
+      row[key] = (
+        <CellComponent
+          key={key}
+          visit={visit}
+          {...(key === 'diagnoses' ? { emrapiDiagnoses: emrapiDiagnosesMap.get(visit.uuid) } : {})}
+          patient={patient}
+        />
+      );
     }
     return row;
   });
@@ -111,8 +128,11 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            {/* VisitSummary will fetch full visit data on-demand */}
-                            <VisitSummary visit={visit} patientUuid={patientUuid} />
+                            <VisitSummary
+                              visit={visit}
+                              emrapiDiagnoses={emrapiDiagnosesMap.get(visit.uuid)}
+                              patientUuid={patientUuid}
+                            />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

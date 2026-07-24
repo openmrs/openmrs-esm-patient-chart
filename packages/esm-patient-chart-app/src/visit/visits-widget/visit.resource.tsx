@@ -1,6 +1,7 @@
 import {
   openmrsFetch,
   restBaseUrl,
+  type Diagnosis,
   type OpenmrsResource,
   type Visit,
   useOpenmrsInfinite,
@@ -11,67 +12,45 @@ import useSWR from 'swr';
 const customRepresentation =
   'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
 
+const encounterCustomRepresentation =
+  'custom:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display))))';
+
+/** Response shape from the EMRAPI /patient/{uuid}/visit endpoint */
+export interface EmrapiVisitResponse {
+  visit: Visit;
+  diagnoses: Array<Diagnosis>;
+}
+
 /**
- * Lightweight visit hook that fetches only basic visit details, diagnoses, and notes.
+ * Lightweight visit hook that fetches only basic visit details and diagnoses.
  * Uses the custom emrapi endpoint introduced in EA-207.
  */
 export function useLightweightVisits(patientUuid: string, pageSize: number = 10) {
   const url = patientUuid
-    ? new URL(`${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit`, window.location.toString())
+    ? new URL(
+        `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
+        window.location.toString(),
+      )
     : null;
 
-  const { data, mutate, ...rest } = useOpenmrsPagination<LightweightVisit>(url, pageSize);
+  const { data, mutate, ...rest } = useOpenmrsPagination<EmrapiVisitResponse>(url, pageSize);
 
   return { visits: data, mutate, ...rest };
 }
 
 /**
- * Wrapper hook that tries the lightweight endpoint first, falling back to
- * the standard paginated visits endpoint if the lightweight one is unavailable.
+ * On-demand hook to fetch encounters for a specific visit.
+ * Only fetches when visitUuid is provided (i.e., when a visit row is expanded).
  */
-export function useVisitsWithFallback(patientUuid: string, pageSize: number = 10) {
-  const lightweight = useLightweightVisits(patientUuid, pageSize);
-  const shouldFallback = !!lightweight.error;
-  const fallback = usePaginatedVisits(patientUuid, pageSize, {}, shouldFallback);
+export function useVisitEncounters(patientUuid: string, visitUuid: string | null) {
+  const url = visitUuid
+    ? `${restBaseUrl}/encounter?patient=${patientUuid}&visit=${visitUuid}&v=${encounterCustomRepresentation}`
+    : null;
 
-  if (shouldFallback) {
-    return {
-      visits: fallback.data,
-      error: fallback.error,
-      isLoading: fallback.isLoading,
-      isValidating: fallback.isValidating,
-      mutate: fallback.mutate,
-      totalCount: fallback.totalCount,
-      currentPage: fallback.currentPage,
-      totalPages: fallback.totalPages,
-      goTo: fallback.goTo,
-      currentPageSize: fallback.currentPageSize,
-      paginated: fallback.paginated,
-      showNextButton: fallback.showNextButton,
-      showPreviousButton: fallback.showPreviousButton,
-      goToNext: fallback.goToNext,
-      goToPrevious: fallback.goToPrevious,
-      isLightweight: false,
-    };
-  }
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
 
   return {
-    ...lightweight,
-    isLightweight: true,
-  };
-}
-
-/**
- * On-demand hook to fetch full visit details (encounters, obs, orders, etc.)
- * Only fetches when visitUuid is provided.
- */
-export function useFullVisit(visitUuid: string | null) {
-  const url = visitUuid ? `${restBaseUrl}/visit/${visitUuid}?v=${customRepresentation}` : null;
-
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Visit }>(url, openmrsFetch);
-
-  return {
-    visit: data?.data ?? null,
+    encounters: data?.data?.results ?? null,
     error,
     isLoading,
     isValidating,
@@ -134,40 +113,6 @@ export function restoreVisit(visitUuid: string) {
 
 // ============ Types ============
 
-export interface LightweightVisit {
-  uuid: string;
-  startDatetime: string;
-  stopDatetime: string | null;
-  visitType: {
-    uuid: string;
-    name: string;
-    display: string;
-  };
-  location?: OpenmrsResource;
-  patient?: OpenmrsResource;
-  attributes?: Array<{ attributeType: OpenmrsResource; display: string; uuid: string; value: string }>;
-  diagnoses?: Diagnosis[];
-  notes?: LightweightNote[];
-  encounters?: Array<{
-    uuid: string;
-    encounterDatetime: string;
-    encounterType: { uuid: string; display: string };
-  }>;
-}
-
-export interface LightweightNote {
-  uuid: string;
-  display: string;
-  value: string;
-  obsDatetime: string;
-  provider?: {
-    uuid: string;
-    display: string;
-    role?: string;
-  };
-  concept?: OpenmrsResource;
-}
-
 export interface Order {
   uuid: string;
   action?: string | null;
@@ -229,22 +174,5 @@ export interface OrderItem {
   provider: {
     name: string;
     role: string;
-  };
-}
-
-export interface Diagnosis {
-  certainty: string;
-  display: string;
-  encounter: OpenmrsResource;
-  links: Array<any>;
-  patient: OpenmrsResource;
-  rank: number;
-  resourceVersion: string;
-  uuid: string;
-  voided: boolean;
-  diagnosis: {
-    coded: {
-      display: string;
-    };
   };
 }
