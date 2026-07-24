@@ -11,6 +11,6 @@ export function useValidOfflineFormEncounters() {
   const config = useConfig<FormEntryConfigSchema>();
   return {
     ...formEncountersSwr,
-    data: formEncountersSwr.data?.filter((form) => isValidOfflineFormEncounter(form, config.htmlFormEntryForms)),
+    data: formEncountersSwr.data?.forms.filter((form) => isValidOfflineFormEncounter(form, config.htmlFormEntryForms)),
   };
 }
