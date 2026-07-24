@@ -70,22 +70,31 @@ export interface DrugOrderFormProps {
   launchAllergyForm?: () => void;
 }
 
-export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date, now = new Date()) {
+/**
+ * Resolves the start date to persist on the basket item. Returns `undefined` for a same-day
+ * selection so the posting layer can supply the datetime (server-stamped, or the retrospective
+ * encounter's datetime). An explicit future/past day is preserved, raised to `startDateMin` when
+ * it falls below the earliest allowed start.
+ */
+export function getOrderStartDateForSubmission(selectedDate: Date, startDateMin?: Date): Date | undefined {
+  const now = new Date();
   const isToday =
     selectedDate.getFullYear() === now.getFullYear() &&
     selectedDate.getMonth() === now.getMonth() &&
     selectedDate.getDate() === now.getDate();
-  const selectedStartDate = isToday ? now : selectedDate;
-  return startDateMin && selectedStartDate < startDateMin ? startDateMin : selectedStartDate;
+  if (isToday) {
+    return undefined;
+  }
+  return startDateMin && selectedDate < startDateMin ? startDateMin : selectedDate;
 }
 
 function isFutureRevisionOfActiveMedication(
   action: DrugOrderBasketItem['action'] | undefined,
-  selectedStartDate: Date,
+  selectedStartDate: Date | undefined,
   initialScheduledDate?: Date,
   now = new Date(),
 ) {
-  if (action !== 'REVISE' || selectedStartDate <= now) {
+  if (action !== 'REVISE' || !selectedStartDate || selectedStartDate <= now) {
     return false;
   }
 
@@ -310,10 +319,10 @@ export function DrugOrderForm({
   }, [calculatedQuantity, setValue, watchedQuantityUnits, watchedUnit]);
 
   const handleFormSubmission = async (data: MedicationOrderFormData) => {
-    // OpenmrsDatePicker is date-only, so same-day selections can be earlier than the datetime
-    // minimum; snap them up before saving.
+    // A same-day selection resolves to no scheduledDate (the posting layer supplies the datetime);
+    // an explicit future/past day is kept.
     const now = new Date();
-    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin, now);
+    const scheduledDate = getOrderStartDateForSubmission(data.scheduledDate, startDateMin);
 
     if (
       isFutureRevisionOfActiveMedication(
