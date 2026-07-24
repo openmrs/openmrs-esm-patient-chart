@@ -8,6 +8,7 @@
   "chooseProgram": "Выберите программу",
   "chooseStatus": "Выберите статус",
   "completedOn": "Завершено",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "Пожалуйста, настройте программы чтобы продолжить.",
   "dateCompleted": "Дата завершения",
   "dateEnrolled": "Дата зачисления",

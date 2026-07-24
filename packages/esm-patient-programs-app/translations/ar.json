@@ -8,6 +8,7 @@
   "chooseProgram": "اختر برنامجًا",
   "chooseStatus": "Choose a program status",
   "completedOn": "أكتمل في",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "يرجى تكوين البرامج للمتابعة.",
   "dateCompleted": "تاريخ الاكتمال",
   "dateEnrolled": "تاريخ التسجيل",

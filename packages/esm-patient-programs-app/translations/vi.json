@@ -8,6 +8,7 @@
   "chooseProgram": "Chọn một chương trình",
   "chooseStatus": "Chọn trạng thái chương trình",
   "completedOn": "Hoàn thành vào",
+  "completionDateCannotBeBeforeEnrollmentDate": "Completion date cannot be before the enrollment date",
   "configurePrograms": "Vui lòng cấu hình chương trình để tiếp tục.",
   "dateCompleted": "Ngày hoàn thành",
   "dateEnrolled": "Ngày ghi danh",
