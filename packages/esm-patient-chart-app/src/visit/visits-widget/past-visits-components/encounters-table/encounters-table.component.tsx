@@ -195,10 +195,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
           getTableProps,
           getSelectionProps,
           selectedRows,
-        }: {
-          headers: Array<{ header: React.ReactNode; key: string }>;
-          rows: Array<{ id: string; isExpanded: boolean; cells: Array<{ id: string; value: React.ReactNode }> }>;
-          [key: string]: any;
         }) => {
           const selectedRowsCount = selectedRows.length;
           return (
