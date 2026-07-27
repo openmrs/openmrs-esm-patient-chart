@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { type Visit, formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-tag.scss';
 
 interface VisitTagProps {
@@ -11,8 +12,12 @@ interface VisitTagProps {
 
 function VisitTag({ patientUuid, patient }: VisitTagProps) {
   const { activeVisit, isLoading } = useVisit(patientUuid);
+  const { visitContext } = usePatientChartStore(patientUuid);
   const isNotDeceased = !patient?.deceasedDateTime;
-  return !isLoading && activeVisit && isNotDeceased ? <ActiveVisitTag activeVisit={activeVisit} /> : null;
+  const isPastVisitContext = Boolean(visitContext && visitContext.stopDatetime);
+  return !isLoading && activeVisit && isNotDeceased && !isPastVisitContext ? (
+    <ActiveVisitTag activeVisit={activeVisit} />
+  ) : null;
 }
 
 interface ActiveVisitTagProps {

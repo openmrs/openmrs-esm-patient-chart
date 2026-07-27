@@ -1,7 +1,15 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { isFunction } from 'lodash-es';
 import moment from 'moment';
-import { DataSources, EncounterAdapter, Form, FormFactory, PatientIdentifierAdapter } from '@openmrs/ngx-formentry';
+import {
+  DataSources,
+  EncounterAdapter,
+  EndpointDataSource,
+  Form,
+  FormFactory,
+  PatientIdentifierAdapter,
+} from '@openmrs/ngx-formentry';
 import { Session } from '@openmrs/esm-framework';
 import { ConfigResourceService } from '../services/config-resource.service';
 import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
@@ -67,6 +75,7 @@ export class FormCreationService {
     private readonly configResourceService: ConfigResourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private readonly patientIdentifierAdapter: PatientIdentifierAdapter,
+    private readonly httpClient: HttpClient,
   ) {}
 
   /**
@@ -111,6 +120,10 @@ export class FormCreationService {
     for (const dataSourceKey of Object.keys(this.dataSources.dataSources)) {
       this.dataSources.clearDataSource(dataSourceKey);
     }
+
+    // Restore the engine's built-in endpoint data source, which the clearing above removed.
+    // Register it before the configurable data sources so one with the same name can override it.
+    this.dataSources.registerDataSource('endpoint', new EndpointDataSource(this.httpClient));
 
     // Fixed data sources which are always required.
     // We re-register them during each form creation flow because props like the logged-in user or patient

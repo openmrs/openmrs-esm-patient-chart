@@ -17,24 +17,23 @@ interface PatientBannerProps {
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
-  const patientBannerRef = useRef(null);
-  const [isTabletViewport, setIsTabletViewport] = useState(false);
+  const patientBannerRef = useRef<HTMLElement>(null);
+  const [bannerWidth, setBannerWidth] = useState<number | null>(null);
   const [showContactDetails, setShowContactDetails] = useState(false);
 
   useEffect(() => {
-    const currentRef = patientBannerRef.current;
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setIsTabletViewport(entry.contentRect.width < 1023);
+        setBannerWidth(entry.contentRect.width);
       }
     });
-    resizeObserver.observe(patientBannerRef.current);
-    return () => {
-      if (currentRef) {
-        resizeObserver.unobserve(currentRef);
-      }
-    };
-  }, [patientBannerRef, setIsTabletViewport]);
+    if (patientBannerRef.current) {
+      resizeObserver.observe(patientBannerRef.current);
+    }
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const isTabletViewport = bannerWidth !== null && bannerWidth < 1023;
 
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -44,7 +43,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
   const maxDesktopWorkspaceWidthInPx = 520;
-  const showDetailsButtonBelowHeader = patientBannerRef.current?.scrollWidth <= maxDesktopWorkspaceWidthInPx;
+  const showDetailsButtonBelowHeader = bannerWidth !== null && bannerWidth <= maxDesktopWorkspaceWidthInPx;
 
   return (
     <header
@@ -61,7 +60,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
         </div>
         <PatientBannerPatientInfo patient={patient} renderedFrom="patient-chart" />
-        <div className={styles.buttonCol}>
+        <div className={styles.buttonCol} data-testid="patient-banner-button-col">
           <div className={styles.buttonRow}>
             {!hideActionsOverflow ? (
               <PatientBannerActionsMenu

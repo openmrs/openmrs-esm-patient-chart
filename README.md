@@ -11,19 +11,25 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 - [Conditions](packages/esm-patient-conditions-app/README.md)
 - [Flags](packages/esm-patient-flags-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
+- [Generic patient widgets](packages/esm-generic-patient-widgets-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
+- [Label printing](packages/esm-patient-label-printing-app/README.md)
 - [Lists](packages/esm-patient-lists-app/README.md)
 - [Medications](packages/esm-patient-medications-app/README.md)
 - [Notes](packages/esm-patient-notes-app/README.md)
 - [Orders](packages/esm-patient-orders-app/README.md)
 - [Patient banner](packages/esm-patient-banner-app/README.md)
+- [Procedures](packages/esm-patient-procedures-app/README.md)
 - [Programs](packages/esm-patient-programs-app/README.md)
+- [Task list](packages/esm-patient-task-list-app/README.md)
 - [Tests](packages/esm-patient-tests-app/README.md)
 - [Vitals and Biometrics](packages/esm-patient-vitals-app/README.md)
 
-In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
+In addition to these widgets, several other microfrontends exist that encapsulate cross-cutting concerns. These are:
 
 - [Common lib](packages/esm-patient-common-lib/README.md)
+- [Form engine](packages/esm-form-engine-app/README.md)
+- [Form entry](packages/esm-form-entry-app/README.md)
 - [Patient chart](packages/esm-patient-chart-app/README.md)
 
 ## Setup
@@ -210,3 +216,13 @@ Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpa
 ## Deployment
 
 See [Creating a Distribution](https://openmrs.atlassian.net/wiki/x/xoIBCQ) for information about adding microfrontends to a distribution.
+
+## Dependency Overrides
+
+Some dependencies are temporarily pinned in `package.json` under the `resolutions` field to work around issues in upstream packages.
+
+### `dompurify`
+
+`dompurify` is pinned to `3.4.11` because `@carbon/charts@1.27.0` and `jspdf@4.2.1` have not yet updated their own dependency. This override should be removed once both upstream packages ship with `dompurify >=3.4.11` natively.
+
+Tracking issue: [O3-5785](https://openmrs.atlassian.net/browse/O3-5785).
