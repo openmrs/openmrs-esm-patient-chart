@@ -464,7 +464,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/animations@npm:^20.3.21":
+"@angular/animations@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/animations@npm:20.3.26"
   dependencies:
@@ -597,7 +597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/common@npm:^20.3.21":
+"@angular/common@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/common@npm:20.3.26"
   dependencies:
@@ -609,7 +609,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/compiler-cli@npm:^20.3.21":
+"@angular/compiler-cli@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/compiler-cli@npm:20.3.26"
   dependencies:
@@ -634,7 +634,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/compiler@npm:^20.3.21":
+"@angular/compiler@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/compiler@npm:20.3.26"
   dependencies:
@@ -643,7 +643,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/core@npm:^20.3.21":
+"@angular/core@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/core@npm:20.3.26"
   dependencies:
@@ -661,7 +661,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/forms@npm:^20.3.21":
+"@angular/forms@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/forms@npm:20.3.26"
   dependencies:
@@ -675,14 +675,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/language-service@npm:^20.3.21":
+"@angular/language-service@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/language-service@npm:20.3.26"
   checksum: 10/f41ebbc0f0de012417e2c0b87cf257bdf205d4ebd13fef12b06a31dd01e466c3577633483bbba948568b516943fe8ad55f1c997eb4f8d50668075e5d87eb5006
   languageName: node
   linkType: hard
 
-"@angular/localize@npm:^20.3.21":
+"@angular/localize@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/localize@npm:20.3.26"
   dependencies:
@@ -717,7 +717,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/platform-browser-dynamic@npm:^20.3.21":
+"@angular/platform-browser-dynamic@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/platform-browser-dynamic@npm:20.3.26"
   dependencies:
@@ -731,7 +731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/platform-browser@npm:^20.3.21":
+"@angular/platform-browser@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/platform-browser@npm:20.3.26"
   dependencies:
@@ -747,7 +747,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/router@npm:^20.3.21":
+"@angular/router@npm:^20.3.26":
   version: 20.3.26
   resolution: "@angular/router@npm:20.3.26"
   dependencies:
@@ -5011,20 +5011,20 @@ __metadata:
     "@angular-eslint/schematics": "npm:^20.7.0"
     "@angular-eslint/template-parser": "npm:^20.7.0"
     "@angular-extensions/elements": "npm:^20.0.2"
-    "@angular/animations": "npm:^20.3.21"
+    "@angular/animations": "npm:^20.3.26"
     "@angular/cdk": "npm:^20.2.14"
     "@angular/cli": "npm:^20.3.26"
-    "@angular/common": "npm:^20.3.21"
-    "@angular/compiler": "npm:^20.3.21"
-    "@angular/compiler-cli": "npm:^20.3.21"
-    "@angular/core": "npm:^20.3.21"
-    "@angular/forms": "npm:^20.3.21"
-    "@angular/language-service": "npm:^20.3.21"
-    "@angular/localize": "npm:^20.3.21"
+    "@angular/common": "npm:^20.3.26"
+    "@angular/compiler": "npm:^20.3.26"
+    "@angular/compiler-cli": "npm:^20.3.26"
+    "@angular/core": "npm:^20.3.26"
+    "@angular/forms": "npm:^20.3.26"
+    "@angular/language-service": "npm:^20.3.26"
+    "@angular/localize": "npm:^20.3.26"
     "@angular/material": "npm:^20.2.14"
-    "@angular/platform-browser": "npm:^20.3.21"
-    "@angular/platform-browser-dynamic": "npm:^20.3.21"
-    "@angular/router": "npm:^20.3.21"
+    "@angular/platform-browser": "npm:^20.3.26"
+    "@angular/platform-browser-dynamic": "npm:^20.3.26"
+    "@angular/router": "npm:^20.3.26"
     "@carbon/icons": "npm:^11.73.0"
     "@carbon/styles": "npm:^1.98.0"
     "@ng-select/ng-select": "npm:^15.1.3"
