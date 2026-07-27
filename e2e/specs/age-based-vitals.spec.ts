@@ -222,13 +222,6 @@ test.describe('Vitals validation for different age groups', () => {
         });
         expect(afterContent).toBe('" ↑"');
       });
-
-      // Respiratory rate styling assertions are not possible yet because the vitals
-      // table relies on backend-provided FHIR observation interpretation, which is not
-      // set for respiratory rate. The vitals header cards DO show correct age-based
-      // styling because they use NumericObservation with client-side reference range
-      // lookup. Once #3180 (NumericObservation migration) lands, the table cells will
-      // also calculate interpretation client-side and these assertions can be added.
     });
   });
 });
