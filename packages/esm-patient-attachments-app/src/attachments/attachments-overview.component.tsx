@@ -89,11 +89,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
         const normalizedUrl = orthancUrl.replace(/&amp;/g, '&');
         const studyIdMatch = normalizedUrl.match(/[?&]study=([^&#+]+)/) || normalizedUrl.match(/#\/studies\/([^?&]+)/);
         const orthancIdMatch = normalizedUrl.match(/[?&]orthancId=([^&]+)/);
-        const studyId = studyIdMatch
-          ? orthancIdMatch
-            ? `${studyIdMatch[1]}&orthancId=${orthancIdMatch[1]}`
-            : studyIdMatch[1]
-          : null;
+        const studyId = orthancIdMatch ? orthancIdMatch[1] : studyIdMatch ? studyIdMatch[1] : null;
         if (!studyId) {
           showSnackbar({
             title: t('dicomError', 'DICOM Viewer Error'),
