@@ -17,7 +17,6 @@ import {
 import type { ChartConfig } from '../../../config-schema';
 import type { Note, Order, OrderItem } from '../visit.resource';
 import { useVisitEncounters } from '../visit.resource';
-import { dedupeDiagnoses } from '../../dedupe-diagnoses';
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -41,25 +40,12 @@ const VisitDetailLoading: React.FC = () => {
   return <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 };
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = [], patientUuid }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
-  // Fetch encounters on mount (when the visit row is expanded)
   const { encounters, isLoading: isLoadingEncounters } = useVisitEncounters(patientUuid, visit.uuid);
-
-  const diagnoses: Array<Diagnosis> = useMemo(() => {
-    if (emrapiDiagnoses && emrapiDiagnoses.length > 0) {
-      return dedupeDiagnoses(emrapiDiagnoses.filter((diagnosis) => !diagnosis.voided));
-    }
-
-    if (encounters) {
-      return dedupeDiagnoses(encounters.flatMap((enc) => enc.diagnoses ?? []).filter((diagnosis) => !diagnosis.voided));
-    }
-
-    return [];
-  }, [emrapiDiagnoses, encounters]);
 
   const notes: Array<Note> = useMemo(() => {
     if (!encounters) return [];
@@ -113,8 +99,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses, pat
     <div className={styles.summaryContainer}>
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
-        {diagnoses.length > 0 ? (
-          <DiagnosisTags diagnoses={diagnoses} />
+        {emrapiDiagnoses.length > 0 ? (
+          <DiagnosisTags diagnoses={emrapiDiagnoses} />
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}

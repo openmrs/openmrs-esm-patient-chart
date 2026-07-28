@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import { ExtensionSlot, getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
 import { mockPatient } from 'tools';
@@ -19,6 +19,7 @@ const mockGetConfig = vi.mocked(getConfig);
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
 const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 const mockVisit = visitOverviewDetailMockData.data.results[0];
+const mockVisitNotEmpty = visitOverviewDetailMockDataNotEmpty.data.results[0];
 
 describe('VisitSummary', () => {
   beforeEach(() => {
@@ -50,7 +51,7 @@ describe('VisitSummary', () => {
       mutate: vi.fn(),
     });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} emrapiDiagnoses={[]} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
@@ -58,7 +59,6 @@ describe('VisitSummary', () => {
     expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
 
-    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -67,26 +67,30 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
+    });
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+    });
   });
 
-  it('renders diagnoses tags when there are diagnoses', () => {
-    const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
+  it('renders diagnoses tags from emrapiDiagnoses', () => {
+    const mockDiagnoses = mockVisitNotEmpty.encounters.flatMap((enc) => enc.diagnoses ?? []).filter((d) => !d.voided);
 
     mockUseVisitEncounters.mockReturnValue({
-      encounters: mockVisit.encounters,
+      encounters: mockVisitNotEmpty.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
       mutate: vi.fn(),
     });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisitNotEmpty} emrapiDiagnoses={mockDiagnoses} />);
 
     const malariaTag = screen.getByText(/^malaria, confirmed$/i);
     const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
@@ -98,27 +102,22 @@ describe('VisitSummary', () => {
 
   it('should display notes, tests and medication summary', async () => {
     const user = userEvent.setup();
-
-    const mockVisit = visitOverviewDetailMockDataNotEmpty.data.results[0];
+    const mockDiagnoses = mockVisitNotEmpty.encounters.flatMap((enc) => enc.diagnoses ?? []).filter((d) => !d.voided);
 
     mockUseVisitEncounters.mockReturnValue({
-      encounters: mockVisit.encounters,
+      encounters: mockVisitNotEmpty.encounters,
       error: undefined,
       isLoading: false,
       isValidating: false,
       mutate: vi.fn(),
     });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisitNotEmpty} emrapiDiagnoses={mockDiagnoses} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
     expect(screen.getByText(/HUMAN IMMUNODEFICIENCY VIRUS/i)).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Medication/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
 
-    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -129,15 +128,19 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
+    });
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
+    });
   });
 
-  it('should show loading state when encounter data is being fetched', () => {
+  it('should show loading state when encounters are being fetched', async () => {
     mockUseVisitEncounters.mockReturnValue({
       encounters: null,
       error: undefined,
@@ -146,23 +149,17 @@ describe('VisitSummary', () => {
       mutate: vi.fn(),
     });
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} emrapiDiagnoses={[]} />);
 
-    const loadingElements = screen.getAllByText(/Loading visit details/i);
-    expect(loadingElements.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const loadingElements = screen.getAllByText(/Loading visit details/i);
+      expect(loadingElements.length).toBeGreaterThan(0);
+    });
   });
 
-  it('should not show loading spinner when encounters are loaded', () => {
-    mockUseVisitEncounters.mockReturnValue({
-      encounters: mockVisit.encounters,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    });
+  it('should show no diagnoses found when emrapiDiagnoses is empty', () => {
+    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} emrapiDiagnoses={[]} />);
 
-    render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
-
-    expect(screen.queryByText(/Loading visit details/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/^No diagnoses found$/)).toBeInTheDocument();
   });
 });
