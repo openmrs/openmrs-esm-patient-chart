@@ -7,7 +7,7 @@ import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { usePaginatedVisits, useLightweightVisits, useVisitEncounters } from './visit.resource';
+import { useEmrApiVisits, useVisitEncounters } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
@@ -23,8 +23,11 @@ const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
   error: undefined,
 } as any);
 
-const mockPaginatedVisitsData = {
-  data: visitOverviewDetailMockData.data.results,
+const mockEmrApiVisitsData = {
+  visits: visitOverviewDetailMockData.data.results.map((visit) => ({
+    visit,
+    diagnoses: [],
+  })),
   error: null,
   mutate: vi.fn(),
   isValidating: false,
@@ -43,12 +46,7 @@ const mockPaginatedVisitsData = {
 
 vi.mock('./visit.resource', async () => ({
   ...((await vi.importActual('./visit.resource')) as object),
-  usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
-  useLightweightVisits: vi.fn().mockReturnValue({
-    visits: [],
-    error: undefined,
-    isLoading: false,
-  }),
+  useEmrApiVisits: vi.fn().mockImplementation(() => mockEmrApiVisitsData),
   useVisitEncounters: vi.fn().mockReturnValue({
     encounters: null,
     isLoading: false,
@@ -57,8 +55,7 @@ vi.mock('./visit.resource', async () => ({
     mutate: vi.fn(),
   }),
 }));
-const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
-const mockUseLightweightVisits = vi.mocked(useLightweightVisits);
+const mockUseEmrApiVisits = vi.mocked(useEmrApiVisits);
 const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 
 const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
@@ -110,9 +107,9 @@ describe('VisitDetailOverview', () => {
   });
 
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockUsePaginatedVisits.mockReturnValueOnce({
-      ...mockPaginatedVisitsData,
-      data: [],
+    mockUseEmrApiVisits.mockReturnValueOnce({
+      ...mockEmrApiVisitsData,
+      visits: [],
     });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
@@ -120,7 +117,6 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    // visits table view
     expect(screen.getByRole('heading', { name: /past visits/i })).toBeInTheDocument();
     expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
@@ -134,9 +130,9 @@ describe('VisitDetailOverview', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockUsePaginatedVisits.mockReturnValue({
-      ...mockPaginatedVisitsData,
-      data: null,
+    mockUseEmrApiVisits.mockReturnValue({
+      ...mockEmrApiVisitsData,
+      visits: null,
       error,
     });
 
@@ -156,13 +152,12 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
-    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
+    mockUseEmrApiVisits.mockReturnValue(mockEmrApiVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    // visits table view
     const allEncountersTab = screen.getByRole('tab', { name: /All encounters/i });
     const visitsTab = screen.getByRole('tab', { name: /visit/i });
 
@@ -193,13 +188,12 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
-    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
+    mockUseEmrApiVisits.mockReturnValue(mockEmrApiVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
     await waitForLoadingToFinish();
 
-    // visits table view
     const visitsTab = screen.getByRole('tab', { name: /visits/i });
 
     expect(visitsTab).toBeInTheDocument();

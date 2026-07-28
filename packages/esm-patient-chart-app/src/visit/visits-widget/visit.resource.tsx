@@ -7,7 +7,9 @@ import {
   useOpenmrsInfinite,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import useSWR from 'swr';
+import { dedupeDiagnoses } from '../dedupe-diagnoses';
 
 const customRepresentation =
   'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
@@ -16,16 +18,16 @@ const encounterCustomRepresentation =
   'custom:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display))))';
 
 /** Response shape from the EMRAPI /patient/{uuid}/visit endpoint */
-export interface EmrapiVisitResponse {
+export interface EmrApiVisitResponse {
   visit: Visit;
   diagnoses: Array<Diagnosis>;
 }
 
 /**
- * Lightweight visit hook that fetches only basic visit details and diagnoses.
- * Uses the custom emrapi endpoint introduced in EA-207.
+ * Fetches visits and diagnoses from the EMRAPI endpoint.
+ * Diagnoses are deduped within the hook so consumers don't need to handle it.
  */
-export function useLightweightVisits(patientUuid: string, pageSize: number = 10) {
+export function useEmrApiVisits(patientUuid: string, pageSize: number = 10) {
   const url = patientUuid
     ? new URL(
         `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
@@ -33,9 +35,18 @@ export function useLightweightVisits(patientUuid: string, pageSize: number = 10)
       )
     : null;
 
-  const { data, mutate, ...rest } = useOpenmrsPagination<EmrapiVisitResponse>(url, pageSize);
+  const { data, mutate, ...rest } = useOpenmrsPagination<EmrApiVisitResponse>(url, pageSize);
 
-  return { visits: data, mutate, ...rest };
+  const visits = useMemo(
+    () =>
+      data?.map((item) => ({
+        visit: item.visit,
+        diagnoses: dedupeDiagnoses(item.diagnoses?.filter((d) => !d.voided) ?? []),
+      })) ?? null,
+    [data],
+  );
+
+  return { visits, mutate, ...rest };
 }
 
 /**
@@ -80,7 +91,6 @@ export function usePaginatedVisits(
   patientUuid: string,
   pageSize: number,
   params: Record<string, number | string> = {},
-  enabled: boolean = true,
 ) {
   const url = new URL(
     `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -90,7 +100,7 @@ export function usePaginatedVisits(
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const ret = useOpenmrsPagination<Visit>(patientUuid && enabled ? url : null, pageSize);
+  const ret = useOpenmrsPagination<Visit>(patientUuid ? url : null, pageSize);
 
   return ret;
 }
