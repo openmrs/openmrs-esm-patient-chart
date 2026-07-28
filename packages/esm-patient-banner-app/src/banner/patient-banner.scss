@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
@@ -8,9 +9,91 @@
   background-color: $ui-01;
 }
 
-.activePatientContainer,
-.deceasedPatientContainer {
+.activePatientContainer {
   background-color: $ui-01;
+}
+
+// Differentiate the header for deceased patients with a somber, dark grey band, lightening the
+// text and icons that sit directly on it. Carbon components that carry their own light surfaces
+// (identifier/status tags, the actions overflow-menu popover, and toggletip/popover content) are
+// excluded from the recolour so their dark-on-light text is never flipped to light-on-light. The
+// exclusions use attribute selectors so CSS Modules leaves the global Carbon class names alone.
+.deceasedPatientContainer {
+  background-color: colors.$gray-70;
+  // Carbon's ghost-button focus ring defaults to blue ($focus, #0f62fe), which is only 1.56:1
+  // against this band, below the 3:1 WCAG 1.4.11 needs for non-text contrast. Recolor it light so
+  // keyboard focus is visible on the Show more/less toggle.
+  --cds-button-focus-color: #{colors.$white};
+
+  // The Actions trigger needs its own rule: Carbon draws `.cds--overflow-menu__trigger:focus` with
+  // an `outline`, which paints over the inset box-shadow the property above recolours. Scoped to
+  // the trigger so the menu popover's items keep their blue ring on their own light surface.
+  [class*='cds--overflow-menu__trigger']:focus {
+    outline-color: colors.$white;
+  }
+
+  // Lighten the plain name/gender/demographics/contact-details text so it reads on the band. The
+  // exclusions cover both the ROOT and descendants of Carbon components that carry their own light
+  // surfaces — identifier/status tags, the actions overflow-menu popover, and toggletip/popover
+  // content — so their dark-on-light text is never flipped to light-on-light. (li/div are included
+  // because the contact-details panel renders its values in them; without this they'd inherit the
+  // wrapper's $text-02, which is the same grey as the band.)
+  :is(span, p, a, li, div, h1, h2, h3, h4, h5, h6):not(
+      [class*='cds--tag'],
+      [class*='cds--tag'] *,
+      [class*='cds--overflow-menu-options'],
+      [class*='cds--overflow-menu-options'] *,
+      [class*='cds--popover-content'],
+      [class*='cds--popover-content'] *
+    ) {
+    color: colors.$gray-10;
+  }
+
+  // The `cds--loading` exclusion keeps Carbon's InlineLoading spinner (shown while the
+  // contact-details sections fetch) hollow — Carbon's own `fill: transparent` is single-class and
+  // would otherwise be outranked, drawing the spinner as a solid disc.
+  svg:not(
+      [class*='cds--tag'] *,
+      [class*='cds--overflow-menu-options'] *,
+      [class*='cds--popover-content'] *,
+      [class*='cds--loading']
+    ) {
+    fill: colors.$gray-10;
+  }
+
+  // The "Show more / Show less" toggle is a Carbon ghost button whose label + chevron are link
+  // blue — readable on the white banner, but far too low-contrast on the dark band. Force both
+  // light. The icon needs !important to beat the base .toggleContactDetailsButton rule below.
+  .toggleContactDetailsButton {
+    color: colors.$gray-10;
+
+    > svg {
+      fill: colors.$gray-10 !important;
+    }
+  }
+
+  // The Actions overflow trigger (the three-dots icon) has a blue fill set as an inline style in
+  // the styleguide, so it needs !important to override on the dark band. Scoped to the trigger so
+  // the menu popover's own icons are left alone.
+  [class*='cds--overflow-menu__trigger'] svg {
+    fill: colors.$gray-10 !important;
+  }
+
+  // Carbon ghost buttons (the Actions trigger and the Show more/less toggle) use a *light* hover
+  // background, which hides our light label text on the dark band. Darken the hover instead so
+  // the label stays readable. Exclude the menu popover, whose items sit on their own light surface.
+  [class*='cds--btn--ghost']:hover:not([class*='cds--overflow-menu-options'] *) {
+    background-color: colors.$gray-80;
+  }
+
+  // The deceased tag keeps its own $gray-80 chip (deceased-patient-tag.scss), which reads well on
+  // the light banners this extension also renders in (patient search, appointments, the queue
+  // workspace). That chip nearly vanishes on this dark band (1.48:1), so lift it to a light pill
+  // here only — scoped to the deceased container so the other surfaces are untouched.
+  [data-extension-id='deceased-patient-tag'] [class*='cds--tag'] {
+    background-color: colors.$gray-20;
+    color: colors.$gray-100;
+  }
 }
 
 .buttonCol {
