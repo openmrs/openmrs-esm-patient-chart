@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile } from '@carbon/react';
+import { Search, Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity, type Visit } from '@openmrs/esm-framework';
 import { EmptyDataIllustration, type Form } from '@openmrs/esm-patient-common-lib';
+import { debounce } from 'lodash-es';
 import type { FormEntryConfigSchema } from '../config-schema';
 import { useFormEvaluationContext } from '../hooks/use-form-evaluation-context';
 import { useForms } from '../hooks/use-forms';
@@ -27,6 +28,9 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
   const config = useConfig<FormEntryConfigSchema>();
   const isOnline = useConnectivity();
   const evaluationContext = useFormEvaluationContext(patient, visitContext);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearch = useMemo(() => debounce((value: string) => setSearchTerm(value), 300), []);
 
   const { data: forms, error } = useForms(
     patient.id,
@@ -88,19 +92,27 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
 
   return (
     <div className={styles.container}>
-      <FormFavoritesList onFormSelect={handleFormOpen} />
+      <div className={styles.searchBar}>
+        <Search
+          size="sm"
+          labelText={t('searchForms', 'Search forms')}
+          placeholder={t('searchThisList', 'Search this list')}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+          onClear={() => setSearchTerm('')}
+        />
+      </div>
+      <FormFavoritesList onFormSelect={handleFormOpen} isSearching={Boolean(searchTerm)} />
       {showLegacySections ? (
-        structuredSections?.map((section) => {
-          return (
-            <FormsList
-              key={`form-section-${section.name}`}
-              sectionName={section.name}
-              forms={section.availableForms}
-              error={error}
-              handleFormOpen={handleFormOpen}
-            />
-          );
-        })
+        structuredSections?.map((section) => (
+          <FormsList
+            key={`form-section-${section.name}`}
+            sectionName={section.name}
+            forms={section.availableForms}
+            error={error}
+            searchTerm={searchTerm}
+            handleFormOpen={handleFormOpen}
+          />
+        ))
       ) : (
         <>
           {recommended.length > 0 && (
@@ -109,6 +121,7 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
               sectionName="recommendedForLocation"
               forms={recommended}
               error={error}
+              searchTerm={searchTerm}
               handleFormOpen={handleFormOpen}
             />
           )}
@@ -118,6 +131,7 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
               sectionName="generalForms"
               forms={general}
               error={error}
+              searchTerm={searchTerm}
               handleFormOpen={handleFormOpen}
             />
           )}

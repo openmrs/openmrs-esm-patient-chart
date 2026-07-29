@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { debounce } from 'lodash-es';
 import fuzzy from 'fuzzy';
 import { DataTableSkeleton } from '@carbon/react';
 import { formatDatetime, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
@@ -14,6 +13,7 @@ export type FormsListProps = {
   forms?: Array<CompletedFormInfo>;
   error?: any;
   sectionName?: string;
+  searchTerm?: string;
   handleFormOpen: (form: Form, encounterUuid: string) => void;
 };
 
@@ -24,13 +24,10 @@ export type FormsListProps = {
  * t('generalForms', 'General forms')
  */
 
-const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handleFormOpen }) => {
+const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, searchTerm = '', handleFormOpen }) => {
   const { t } = useTranslation();
   const config = useConfig<FormEntryConfigSchema>();
-  const [searchTerm, setSearchTerm] = useState('');
   const isTablet = useLayoutType() === 'tablet';
-
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const filteredForms = useMemo(() => {
     if (!searchTerm) {
@@ -97,7 +94,6 @@ const FormsList: React.FC<FormsListProps> = ({ forms, error, sectionName, handle
         tableHeaders={tableHeaders}
         tableRows={tableRows}
         isTablet={isTablet}
-        handleSearch={handleSearch}
         handleFormOpen={handleFormOpen}
       />
     </ResponsiveWrapper>

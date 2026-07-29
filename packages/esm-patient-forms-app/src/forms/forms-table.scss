@@ -16,58 +16,6 @@
   justify-content: space-between;
 }
 
-.toolbarWrapper {
-  position: relative;
-  display: flex;
-  height: layout.$spacing-09;
-  justify-content: flex-end;
-}
-
-.tableToolbar {
-  width: 20%;
-  min-width: 12.5rem;
-}
-
-.search {
-  input {
-    padding: 0 layout.$spacing-10 !important;
-  }
-
-  :global(.cds--search-close:focus) {
-    outline: none;
-    outline-offset: 0;
-  }
-
-  :global(.cds--search-close:focus:before) {
-    background-color: none;
-  }
-}
-
-.table tr:last-of-type {
-  td {
-    border-bottom: none;
-  }
-}
-
-.heading {
-  margin-bottom: layout.$spacing-06;
-}
-
-.toolbar {
-  position: relative;
-  display: flex;
-  width: 100%;
-  min-height: layout.$spacing-09;
-  margin-bottom: layout.$spacing-03;
-}
-
-.emptyContainer {
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: layout.$spacing-05;
-}
-
 .tableContainer {
   padding: 0;
 

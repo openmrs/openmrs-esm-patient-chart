@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, InlineNotification, SkeletonText } from '@carbon/react';
 import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
@@ -11,6 +11,7 @@ import styles from './form-favorites-list.scss';
 
 interface FormFavoritesListProps {
   onFormSelect: (form: Form, encounterUuid: string) => void;
+  isSearching?: boolean;
 }
 
 interface FavoriteListItemProps {
@@ -44,12 +45,16 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(({ favorite
   );
 });
 
-const FormFavoritesList: React.FC<FormFavoritesListProps> = ({ onFormSelect }) => {
+const FormFavoritesList: React.FC<FormFavoritesListProps> = ({ onFormSelect, isSearching = false }) => {
   const { t } = useTranslation();
   const { enableFormFavorites } = useConfig<FormEntryConfigSchema>();
   const isTablet = useLayoutType() === 'tablet';
   const { favorites, error, isLoading, deleteMultipleFavorites } = useFormFavoritesActions();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    setIsCollapsed(isSearching);
+  }, [isSearching]);
 
   const toggleCollapsed = () => setIsCollapsed((prev) => !prev);
 

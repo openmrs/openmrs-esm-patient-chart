@@ -26,3 +26,35 @@
     margin: layout.$spacing-05;
   }
 }
+
+.searchBar {
+  input {
+      padding: 0 layout.$spacing-08 !important;
+    }
+  
+    :global(.cds--search-close:focus) {
+      outline: none;
+      outline-offset: 0;
+    }
+
+    :global(.cds--search-input) {
+      height: layout.$spacing-09;
+    }
+  
+    :global(.cds--search-close:focus:before) {
+      background-color: none;
+    }
+}
+
+
+.toolbarWrapper {
+  position: relative;
+  display: flex;
+  height: layout.$spacing-09;
+  justify-content: flex-end;
+}
+
+.tableToolbar {
+  width: 20%;
+  min-width: 12.5rem;
+}
