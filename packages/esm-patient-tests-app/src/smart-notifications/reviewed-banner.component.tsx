@@ -1,0 +1,43 @@
+import React from 'react';
+import { InlineNotification } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
+import { useLatestReviewForPatient } from './review-store';
+import { useRelativeTimeLabel } from './relative-time.component';
+import styles from './reviewed-banner.scss';
+
+interface ReviewedBannerProps {
+  patientUuid: string;
+}
+
+/**
+ * Confirms, on the Results dashboard, that a notification was signed off — the other half of the
+ * round trip that starts with "Mark as reviewed" or "View in chart" in the notification inbox.
+ */
+const ReviewedBanner: React.FC<ReviewedBannerProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
+  const { smartNotifications } = useConfig<ConfigObject>();
+  const review = useLatestReviewForPatient(patientUuid);
+  const relativeTime = useRelativeTimeLabel(review?.reviewedAt);
+
+  if (!smartNotifications?.enabled || !review) {
+    return null;
+  }
+
+  return (
+    <InlineNotification
+      className={styles.banner}
+      hideCloseButton
+      kind="success"
+      lowContrast
+      subtitle={t('reviewedByAtTime', 'Reviewed by {{provider}} · {{time}}', {
+        provider: review.providerDisplay,
+        time: relativeTime,
+      })}
+      title={t('resultReviewed', 'Result reviewed')}
+    />
+  );
+};
+
+export default ReviewedBanner;

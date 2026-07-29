@@ -35,7 +35,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
     _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
   },
   orders: {
@@ -89,6 +90,30 @@ export const configSchema = {
     _description: 'List of various order types, each associated with the Java class name `org.openmrs.TestOrder`.',
     _default: [],
   },
+  smartNotifications: {
+    enabled: {
+      _type: Type.Boolean,
+      _default: true,
+      _description:
+        'Master switch for smart lab-result notifications. Turning this off hides both the header notification bell and the "Notify me when resulted" control on the test order form.',
+    },
+    notifyOnAbnormalNonCritical: {
+      _type: Type.Boolean,
+      _default: false,
+      _description:
+        'Also raise a notification for abnormal-but-not-critical values. Critical values always notify and cannot be turned off.',
+    },
+    locationScoped: {
+      _type: Type.Boolean,
+      _default: true,
+      _description: 'Only surface a notification at the location where the order was placed.',
+    },
+    pollingIntervalMs: {
+      _type: Type.Number,
+      _default: 30000,
+      _description: 'How often, in milliseconds, to poll for newly resulted orders.',
+    },
+  },
   labTestsWithOrderReasons: {
     _type: Type.Array,
     _elements: {
@@ -134,9 +159,17 @@ export interface OrderReason {
   required: boolean;
 }
 
+export interface SmartNotificationsConfig {
+  enabled: boolean;
+  notifyOnAbnormalNonCritical: boolean;
+  locationScoped: boolean;
+  pollingIntervalMs: number;
+}
+
 export interface ConfigObject {
   orderTypeUuid: string;
   labTestsWithOrderReasons: Array<OrderReason>;
+  smartNotifications: SmartNotificationsConfig;
   orders: {
     labOrderTypeUuid: string;
     labOrderableConcepts: Array<string>;

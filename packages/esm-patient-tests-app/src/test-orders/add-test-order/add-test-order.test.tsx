@@ -16,7 +16,9 @@ import { type PostDataPrepFunction, useOrderBasket, useOrderType } from '@openmr
 import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
-import { createEmptyLabOrder } from './test-order';
+import { createEmptyLabOrder, type SmartTestOrderBasketItem } from './test-order';
+import { _resetOptInStore, isOptedIn } from '../../smart-notifications/opt-in-store';
+import { prepTestOrderPostData } from '../api';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as Mock;
@@ -336,5 +338,127 @@ describe('AddLabOrder', () => {
     });
     renderAddLabOrderWorkspace();
     expect(screen.getByText(/Error/i)).toBeInTheDocument();
+  });
+});
+
+describe('AddLabOrder — notify me when resulted', () => {
+  const defaultConfig: ConfigObject = {
+    ...getDefaultsFromConfigSchema(configSchema),
+    orders: {
+      labOrderTypeUuid: 'test-lab-order-type-uuid',
+      labOrderableConcepts: [],
+    },
+    additionalTestOrderTypes: [],
+  };
+
+  beforeEach(() => {
+    _resetOrderBasketStore();
+    _resetOptInStore();
+    localStorage.clear();
+    mockUseTestTypes.mockReturnValue({ testTypes: mockTestTypes, isLoading: false, error: null });
+    mockUseConfig.mockReturnValue(defaultConfig);
+  });
+
+  async function openOrderForm(user: ReturnType<typeof userEvent.setup>) {
+    renderAddLabOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+    await user.click(screen.getByRole('button', { name: /order form/i }));
+  }
+
+  test('renders the opt-in toggle, off by default, with its explanatory callout', async () => {
+    const user = userEvent.setup();
+
+    await openOrderForm(user);
+
+    const toggle = screen.getByRole('switch', { name: /notify me when resulted/i });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).not.toBeChecked();
+    expect(screen.getByText(/sends you a notification the moment this order is resulted/i)).toBeInTheDocument();
+  });
+
+  test('explains what will happen based on the selected priority', async () => {
+    const user = userEvent.setup();
+
+    await openOrderForm(user);
+
+    expect(screen.getByText(/filed silently to the chart unless the entered value is critical/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Priority' }), 'STAT');
+
+    expect(screen.getByText(/a notification fires the moment results are entered/i)).toBeInTheDocument();
+  });
+
+  test('turning the toggle on records the choice on the order', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
+
+    await openOrderForm(user);
+    await user.click(screen.getByRole('switch', { name: /notify me when resulted/i }));
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([expect.objectContaining({ notifyWhenResulted: true })]);
+    });
+  });
+
+  test('leaves the flag off when the toggle is not touched', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
+
+    await openOrderForm(user);
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([expect.objectContaining({ notifyWhenResulted: false })]);
+    });
+  });
+
+  test('hides the toggle entirely when smart notifications are disabled', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      smartNotifications: { ...defaultConfig.smartNotifications, enabled: false },
+    });
+
+    await openOrderForm(user);
+
+    expect(screen.queryByRole('switch', { name: /notify me when resulted/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/filed silently to the chart/i)).not.toBeInTheDocument();
+  });
+
+  test('persists the opt-in against patient and concept when the order is submitted', () => {
+    const order: SmartTestOrderBasketItem = {
+      action: 'NEW',
+      display: 'CD4 COUNT',
+      notifyWhenResulted: true,
+      testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
+      urgency: 'ROUTINE',
+      visit: null,
+    };
+
+    prepTestOrderPostData(order, mockPatient.id, 'encounter-uuid', 'orderer-uuid');
+
+    expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(true);
+    expect(isOptedIn('another-patient', 'test-lab-uuid-2')).toBe(false);
+  });
+
+  test('does not persist an opt-in when the toggle was left off', () => {
+    const order: SmartTestOrderBasketItem = {
+      action: 'NEW',
+      display: 'CD4 COUNT',
+      notifyWhenResulted: false,
+      testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
+      urgency: 'ROUTINE',
+      visit: null,
+    };
+
+    prepTestOrderPostData(order, mockPatient.id, 'encounter-uuid', 'orderer-uuid');
+
+    expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(false);
   });
 });

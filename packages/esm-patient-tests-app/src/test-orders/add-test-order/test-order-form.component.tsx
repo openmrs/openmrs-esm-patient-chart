@@ -7,11 +7,13 @@ import {
   ComboBox,
   Form,
   Grid,
+  InlineNotification,
   Layer,
   Select,
   SelectItem,
   TextArea,
   TextInput,
+  Toggle,
 } from '@carbon/react';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,13 +38,13 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
-import { ordersEqual } from './test-order';
+import { ordersEqual, type SmartTestOrderBasketItem } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import styles from './test-order-form.scss';
 
 export interface LabOrderFormProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
-  initialOrder: TestOrderBasketItem;
+  initialOrder: SmartTestOrderBasketItem;
   onCancel: () => void;
 
   /**
@@ -93,6 +95,7 @@ export function LabOrderForm({
             message: t('priorityRequired', 'Priority is required'),
           }),
           accessionNumber: z.string().nullish(),
+          notifyWhenResulted: z.boolean().optional(),
           testType: z.object(
             { label: z.string(), conceptUuid: z.string() },
             {
@@ -122,16 +125,31 @@ export function LabOrderForm({
     formState: { errors, defaultValues, isDirty, isSubmitting },
     setValue,
     watch,
-  } = useForm<TestOrderBasketItem>({
+  } = useForm<SmartTestOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
       accessionNumber: null,
+      notifyWhenResulted: false,
       ...initialOrder,
     },
   });
 
-  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
+  const urgency = watch('urgency');
+  const isScheduledDateRequired = urgency === 'ON_SCHEDULED_DATE';
+  const showNotifyToggle = config.smartNotifications?.enabled;
+
+  // Explains what will actually happen to this order once it is resulted, so the clinician can see
+  // why a routine test needs the opt-in and a STAT one doesn't.
+  const notifyHelperText = useMemo(() => {
+    if (urgency === 'STAT') {
+      return t(
+        'notifyHelperStat',
+        'Stat — the clinician is actively waiting. A notification fires the moment results are entered.',
+      );
+    }
+    return t('notifyHelperRoutine', 'Routine — filed silently to the chart unless the entered value is critical.');
+  }, [t, urgency]);
 
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
@@ -148,14 +166,32 @@ export function LabOrderForm({
     return itemDisplay?.includes(inputValue);
   }, []);
 
+  const handleNotifyToggle = useCallback(
+    (fieldOnChange: ControllerRenderProps['onChange']) => (checked: boolean) => {
+      fieldOnChange(checked);
+      if (checked) {
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          title: t('notifyWhenResulted', 'Notify when resulted'),
+          subtitle: t(
+            'notifyWhenResultedExplainer',
+            "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
+          ),
+        });
+      }
+    },
+    [t],
+  );
+
   const saveLabOrderToBasket = useCallback(
-    (data: TestOrderBasketItem) => {
-      const finalizedOrder: TestOrderBasketItem = {
+    (data: SmartTestOrderBasketItem) => {
+      const finalizedOrder: SmartTestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
 
-      const newOrders = [...orders];
+      const newOrders = [...orders] as Array<SmartTestOrderBasketItem>;
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
 
       if (existingOrder) {
@@ -176,8 +212,8 @@ export function LabOrderForm({
   );
 
   const submitLabOrderToServer = useCallback(
-    (data: TestOrderBasketItem) => {
-      const finalizedOrder: TestOrderBasketItem = {
+    (data: SmartTestOrderBasketItem) => {
+      const finalizedOrder: SmartTestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
@@ -215,7 +251,7 @@ export function LabOrderForm({
     [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
-  const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
+  const onError = (errors: FieldErrors<SmartTestOrderBasketItem>) => {
     console.error('Error in lab order form', errors);
   };
 
@@ -308,6 +344,41 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {showNotifyToggle && (
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="notifyWhenResulted"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Toggle
+                      className={styles.notifyToggle}
+                      id="notifyWhenResultedToggle"
+                      labelA={t('off', 'Off')}
+                      labelB={t('on', 'On')}
+                      labelText={t('notifyMeWhenResulted', 'Notify me when resulted')}
+                      onToggle={handleNotifyToggle(onChange)}
+                      size="sm"
+                      toggled={Boolean(value)}
+                    />
+                  )}
+                />
+                <InlineNotification
+                  className={styles.notifyCallout}
+                  hideCloseButton
+                  kind="info"
+                  lowContrast
+                  subtitle={t(
+                    'notifyWhenResultedExplainer',
+                    "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
+                  )}
+                  title=""
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+        )}
         {isScheduledDateRequired && (
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
@@ -381,6 +452,7 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {showNotifyToggle && <p className={styles.notifyHelperText}>{notifyHelperText}</p>}
       </div>
       <ButtonSet className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}>
         <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">

@@ -1,0 +1,371 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// The feature's own stylesheets, emitted as plain global CSS. Component `.scss` imports are stubbed
+// with identity-obj-proxy in the harness (see vite.config.ts), so `styles.foo` evaluates to the
+// string "foo" and matches the class names emitted here. Class names across these files are
+// deliberately unique so there is nothing for the flattening to collide.
+@use '../../packages/esm-patient-tests-app/src/smart-notifications/notification-bell.scss';
+@use '../../packages/esm-patient-tests-app/src/smart-notifications/notification-panel.scss';
+@use '../../packages/esm-patient-tests-app/src/smart-notifications/notification-detail.scss';
+@use '../../packages/esm-patient-tests-app/src/smart-notifications/notification-tag.scss';
+@use '../../packages/esm-patient-tests-app/src/smart-notifications/reviewed-banner.scss';
+@use '../../packages/esm-patient-tests-app/src/test-orders/add-test-order/test-order-form.scss';
+
+// Carbon's compiled stylesheet, so the harness renders Carbon components exactly as the app does.
+@import '@carbon/styles/css/styles.css';
+
+// `:global(...)` is a CSS-modules construct that plain Sass emits verbatim, so the handful of rules
+// that use it are restated here as ordinary global selectors.
+.modalHeader .cds--modal-header__heading {
+  margin-bottom: 0;
+}
+
+.modalFooter .cds--btn {
+  max-width: none;
+  width: 50%;
+}
+
+.banner .cds--inline-notification__text-wrapper {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+}
+
+.notifyCallout .cds--inline-notification__title {
+  display: none;
+}
+
+.orderForm .cds--css-grid {
+  max-width: unset;
+}
+
+.orderForm .cds--css-grid-column {
+  margin: 0 !important;
+}
+
+// --- harness chrome ---------------------------------------------------------------------------
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  @include type.type-style('body-compact-01');
+  background-color: $openmrs-background-grey;
+  color: $ui-05;
+  margin: 0;
+}
+
+.harnessRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.harnessTopNav {
+  align-items: center;
+  // Wins over `.cds--header`'s own dark background and border.
+  background-color: #005d5d !important;
+  border: none !important;
+  color: #ffffff;
+  display: flex;
+  gap: layout.$spacing-05;
+  height: layout.$spacing-09;
+  padding: 0 layout.$spacing-05;
+  position: static !important;
+}
+
+.harnessBrand {
+  @include type.type-style('heading-compact-01');
+}
+
+.harnessDivider {
+  background-color: rgba(255, 255, 255, 0.25);
+  height: layout.$spacing-05;
+  width: 1px;
+}
+
+.harnessLocation {
+  @include type.type-style('body-compact-01');
+}
+
+.harnessTopNavActions {
+  align-items: center;
+  display: flex;
+  gap: layout.$spacing-02;
+  margin-left: auto;
+}
+
+// In a real distro the top nav carries Carbon's inverse (g100) theme, which is what turns header
+// action glyphs white. The harness only borrows the class names, so it supplies that colour itself.
+.harnessTopNav .cds--header__action {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+
+  // Carbon fills button glyphs from `$icon-secondary` rather than inheriting `color`. A real distro
+  // gets a light value for that token from the header's g100 theme; the harness forces it.
+  svg {
+    fill: #ffffff !important;
+  }
+}
+
+.harnessTopNavIcon {
+  background-color: rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  display: block;
+  height: layout.$spacing-05;
+  width: layout.$spacing-05;
+}
+
+.harnessColumns {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.harnessLeftNav {
+  background-color: $ui-02;
+  border-right: 1px solid $ui-03;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: layout.$spacing-05 0;
+  width: 16rem;
+}
+
+.harnessNavItem,
+.harnessNavItemActive {
+  @include type.type-style('body-compact-01');
+  padding: layout.$spacing-04 layout.$spacing-06;
+}
+
+.harnessNavItemActive {
+  background-color: $ui-01;
+  border-left: 3px solid #007d79;
+  font-weight: 600;
+  padding-left: calc(#{layout.$spacing-06} - 3px);
+}
+
+.harnessMain {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.harnessBanner {
+  align-items: center;
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
+  display: flex;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-06;
+}
+
+.harnessBannerAvatar {
+  @include type.type-style('heading-03');
+  align-items: center;
+  background-color: #007d79;
+  border-radius: layout.$spacing-02;
+  color: #ffffff;
+  display: flex;
+  height: layout.$spacing-09;
+  justify-content: center;
+  width: layout.$spacing-09;
+}
+
+.harnessBannerName {
+  @include type.type-style('heading-04');
+}
+
+.harnessBannerMeta {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.harnessBannerTag {
+  @include type.type-style('label-01');
+  background-color: #d0e2ff;
+  border-radius: layout.$spacing-05;
+  color: #0043ce;
+  padding: layout.$spacing-01 layout.$spacing-03;
+}
+
+.harnessVitals {
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
+  padding: layout.$spacing-05 layout.$spacing-06;
+}
+
+.harnessVitalsTitle {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-04;
+}
+
+.harnessVitalsRow {
+  display: flex;
+}
+
+.harnessVital {
+  border: 1px solid $ui-03;
+  flex: 1 1 0;
+  margin-right: -1px;
+  padding: layout.$spacing-04 layout.$spacing-05;
+}
+
+.harnessVital--warn {
+  background-color: $warning-background;
+}
+
+.harnessVital--danger {
+  background-color: #fff1f1;
+}
+
+.harnessVitalLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.harnessVitalValue {
+  @include type.type-style('heading-04');
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: layout.$spacing-02;
+}
+
+.harnessVitalUnits {
+  @include type.type-style('label-01');
+  color: $text-02;
+  font-family: inherit;
+}
+
+.harnessContent {
+  padding: layout.$spacing-06;
+}
+
+.harnessTile {
+  background-color: $ui-02;
+  border: 1px solid $ui-03;
+}
+
+.harnessTileHeader {
+  align-items: center;
+  border-bottom: 1px solid $ui-03;
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-04 layout.$spacing-05;
+
+  h3 {
+    @include type.type-style('heading-compact-02');
+  }
+}
+
+.harnessLink {
+  color: $interactive-01;
+}
+
+.harnessMuted {
+  color: $text-02;
+}
+
+.harnessEmpty {
+  color: $text-02;
+  padding: layout.$spacing-09;
+  text-align: center;
+}
+
+.harnessTable {
+  border-collapse: collapse;
+  width: 100%;
+
+  th,
+  td {
+    border-bottom: 1px solid $ui-03;
+    padding: layout.$spacing-04 layout.$spacing-05;
+    text-align: left;
+  }
+
+  th {
+    @include type.type-style('label-01');
+    background-color: $ui-01;
+  }
+}
+
+.harnessWorkspace {
+  background-color: $ui-02;
+  border-left: 1px solid $ui-03;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  top: layout.$spacing-09;
+  width: 30rem;
+  z-index: 8000;
+}
+
+.harnessWorkspaceHeader {
+  border-bottom: 1px solid $ui-03;
+  padding: layout.$spacing-05;
+
+  h2 {
+    @include type.type-style('heading-compact-02');
+  }
+}
+
+.harnessModalOverlay {
+  align-items: center;
+  background-color: rgba(22, 22, 22, 0.5);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 9500;
+}
+
+.harnessModal {
+  background-color: $ui-02;
+  max-width: 48rem;
+  width: 100%;
+}
+
+.harnessSnackbar {
+  background-color: $ui-02;
+  border-left: 3px solid $support-02;
+  bottom: layout.$spacing-06;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: layout.$spacing-04;
+  left: layout.$spacing-07;
+  max-width: 22rem;
+  padding: layout.$spacing-05;
+  position: fixed;
+  z-index: 9600;
+}
+
+.harnessSnackbarCheck {
+  color: $support-02;
+  font-weight: 700;
+}
+
+.harnessSnackbarTitle {
+  @include type.type-style('heading-compact-01');
+}
+
+.harnessSnackbarSubtitle {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-02;
+}
+
+// Drive-only affordances: present for the spec, never in a screenshot.
+.harnessControls {
+  left: -9999px;
+  position: absolute;
+  top: -9999px;
+}

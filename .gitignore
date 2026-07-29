@@ -97,6 +97,7 @@ moduleName/
 /playwright-report/
 /playwright/.cache/
 e2e/storageState.json
+e2e/harness/test-results/
 
 # misc
 .angular
