@@ -21,6 +21,7 @@ export interface DrugSearchResult {
     display: string;
     uuid: string;
   };
+  narcotic?: boolean;
 }
 
 export interface ConceptTreeNode {
@@ -53,7 +54,7 @@ interface DrugListFetchResult {
 
 const maxConceptsPerRequest = 20;
 const drugPageSize = 50;
-const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))';
+const drugSearchRepresentation = 'custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid),narcotic)';
 
 /**
  * Search for a list of drugs based on the given query string or concepts (uuid/name/mapping)
@@ -152,9 +153,9 @@ export function useConceptSets(conceptSetUuids: string[] = []) {
   return useMemo(() => {
     const conceptSets: ConceptSet[] = data?.data
       ? Object.values(data.data).map((concept) => ({
-          uuid: concept.uuid,
-          display: concept.display,
-        }))
+        uuid: concept.uuid,
+        display: concept.display,
+      }))
       : [];
 
     return {
@@ -260,82 +261,82 @@ export function getTemplateOrderBasketItem(
 ): DrugOrderBasketItem {
   return template
     ? {
-        action: 'NEW',
-        display: drug.display,
-        drug,
-        unit:
-          (getDefault(template.template, 'unit') ?? drug?.dosageForm)
-            ? {
-                value: drug?.dosageForm?.display,
-                valueCoded: drug?.dosageForm?.uuid,
-              }
-            : null,
-        dosage: getDefault(template.template, 'dose')?.value,
-        frequency: getDefault(template.template, 'frequency'),
-        route: getDefault(template.template, 'route'),
-        commonMedicationName: drug.display,
-        isFreeTextDosage: false,
-        patientInstructions: '',
-        asNeeded: template.template.dosingInstructions.asNeeded || false,
-        asNeededCondition: template.template.dosingInstructions.asNeededCondition,
-        startDate: new Date(),
-        duration: null,
-        durationUnit: configDefaultDurationConcept
+      action: 'NEW',
+      display: drug.display,
+      drug,
+      unit:
+        (getDefault(template.template, 'unit') ?? drug?.dosageForm)
           ? {
-              value: configDefaultDurationConcept?.display,
-              valueCoded: configDefaultDurationConcept?.uuid,
-            }
+            value: drug?.dosageForm?.display,
+            valueCoded: drug?.dosageForm?.uuid,
+          }
           : null,
-        pillsDispensed: null,
-        numRefills: null,
-        freeTextDosage: '',
-        indication: '',
-        template: template.template,
-        quantityUnits:
-          (getDefault(template.template, 'quantityUnits') ?? drug?.dosageForm)
-            ? {
-                value: drug?.dosageForm?.display,
-                valueCoded: drug?.dosageForm?.uuid,
-              }
-            : null,
-        visit,
-      }
+      dosage: getDefault(template.template, 'dose')?.value,
+      frequency: getDefault(template.template, 'frequency'),
+      route: getDefault(template.template, 'route'),
+      commonMedicationName: drug.display,
+      isFreeTextDosage: false,
+      patientInstructions: '',
+      asNeeded: template.template.dosingInstructions.asNeeded || false,
+      asNeededCondition: template.template.dosingInstructions.asNeededCondition,
+      startDate: new Date(),
+      duration: null,
+      durationUnit: configDefaultDurationConcept
+        ? {
+          value: configDefaultDurationConcept?.display,
+          valueCoded: configDefaultDurationConcept?.uuid,
+        }
+        : null,
+      pillsDispensed: null,
+      numRefills: null,
+      freeTextDosage: '',
+      indication: '',
+      template: template.template,
+      quantityUnits:
+        (getDefault(template.template, 'quantityUnits') ?? drug?.dosageForm)
+          ? {
+            value: drug?.dosageForm?.display,
+            valueCoded: drug?.dosageForm?.uuid,
+          }
+          : null,
+      visit,
+    }
     : {
-        action: 'NEW',
-        display: drug.display,
-        drug,
-        unit: drug?.dosageForm
-          ? {
-              value: drug?.dosageForm?.display,
-              valueCoded: drug?.dosageForm?.uuid,
-            }
-          : null,
-        dosage: null,
-        frequency: null,
-        route: null,
-        commonMedicationName: drug.display,
-        isFreeTextDosage: false,
-        patientInstructions: '',
-        asNeeded: false,
-        asNeededCondition: null,
-        startDate: new Date(),
-        duration: null,
-        durationUnit: configDefaultDurationConcept
-          ? {
-              value: configDefaultDurationConcept?.display,
-              valueCoded: configDefaultDurationConcept?.uuid,
-            }
-          : null,
-        pillsDispensed: null,
-        numRefills: null,
-        freeTextDosage: '',
-        indication: '',
-        quantityUnits: drug?.dosageForm
-          ? {
-              value: drug?.dosageForm?.display,
-              valueCoded: drug?.dosageForm?.uuid,
-            }
-          : null,
-        visit,
-      };
+      action: 'NEW',
+      display: drug.display,
+      drug,
+      unit: drug?.dosageForm
+        ? {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        }
+        : null,
+      dosage: null,
+      frequency: null,
+      route: null,
+      commonMedicationName: drug.display,
+      isFreeTextDosage: false,
+      patientInstructions: '',
+      asNeeded: false,
+      asNeededCondition: null,
+      startDate: new Date(),
+      duration: null,
+      durationUnit: configDefaultDurationConcept
+        ? {
+          value: configDefaultDurationConcept?.display,
+          valueCoded: configDefaultDurationConcept?.uuid,
+        }
+        : null,
+      pillsDispensed: null,
+      numRefills: null,
+      freeTextDosage: '',
+      indication: '',
+      quantityUnits: drug?.dosageForm
+        ? {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        }
+        : null,
+      visit,
+    };
 }

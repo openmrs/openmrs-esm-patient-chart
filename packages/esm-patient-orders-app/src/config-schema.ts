@@ -146,7 +146,7 @@ export const configSchema = {
   enableDrugOrderFavorites: {
     _type: Type.Boolean,
     _description: 'Whether to enable pinning drugs as order favorites.',
-    _default: false,
+    _default: true,
   },
   maxPinnedDrugOrders: {
     _type: Type.Number,

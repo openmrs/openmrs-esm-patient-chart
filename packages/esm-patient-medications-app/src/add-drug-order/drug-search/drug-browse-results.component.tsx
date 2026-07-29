@@ -2,8 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { InlineNotification, SkeletonText, Tile } from '@carbon/react';
-import { useLayoutType, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { useLayoutType, type Visit, type Workspace2DefinitionProps, useSession, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import useSWR from 'swr';
 import { DrugBrowseEmptyState } from './drug-browse-empty-state.component';
 import { type DrugSearchResult } from './drug-search.resource';
 import { DrugSearchResultItem } from './order-basket-search-results.component';
@@ -32,6 +33,23 @@ export default function DrugBrowseResults({
 }: DrugBrowseResultsProps) {
   const { t } = useTranslation();
   const hasErrors = errors.length > 0;
+
+  const { currentProvider } = useSession();
+  const { data: doctors } = useSWR<any[]>(
+    `${restBaseUrl}/provider?v=custom:(uuid,display,person:(display),attributes:(attributeType:(display),value))`,
+    (url: string) =>
+      openmrsFetch(url).then((res) =>
+        res.data.results.filter((provider: any) =>
+          provider.attributes?.some(
+            (attr: any) =>
+              attr.attributeType?.display === 'practitioner_type' &&
+              attr.value?.toLowerCase() === 'doctor',
+          ),
+        ),
+      ),
+  );
+
+  const isDoctor = doctors?.some((provider) => provider.uuid === currentProvider?.uuid);
 
   if (isLoading) {
     return <DrugBrowseSkeleton />;
@@ -75,6 +93,7 @@ export default function DrugBrowseResults({
             visit={visit}
             closeWorkspace={closeWorkspace}
             openOrderForm={openOrderForm}
+            isDoctor={isDoctor}
           />
         ))}
       </div>

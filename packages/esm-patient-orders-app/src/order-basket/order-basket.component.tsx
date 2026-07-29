@@ -36,7 +36,9 @@ import {
   ResponsiveWrapper,
   ArrowRightIcon,
   ShoppingCartArrowDownIcon,
+  showSnackbar,
 } from '@openmrs/esm-framework';
+import { useIsDoctorProvider } from '../hooks/useIsDoctorProvider';
 import {
   invalidateVisitAndEncounterData,
   type Order,
@@ -137,7 +139,7 @@ const useUnifiedSearch = (
     isLoading: isSearchingDrugs,
   } = useSWR<any>(
     searchTerm
-      ? `${restBaseUrl}/drug?q=${searchTerm}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
+      ? `${restBaseUrl}/drug?q=${searchTerm}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid),narcotic)`
       : null,
     openmrsFetch,
   );
@@ -192,6 +194,7 @@ interface SearchResultItemProps {
   orderBasketExtensionProps: OrderBasketExtensionProps;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
   onOrderAdded: () => void;
+  isDoctor?: boolean;
 }
 
 const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
@@ -204,6 +207,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
     orderBasketExtensionProps,
     closeWorkspace,
     onOrderAdded,
+    isDoctor,
   }) => {
     const { t } = useTranslation();
     const config = useConfig() as ConfigObject;
@@ -233,6 +237,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
     }, [item, visit, session.currentProvider?.uuid, details, isOrderSet]);
 
     const addToBasket = useCallback(() => {
+      if (isDrugItem && item.narcotic && !isDoctor) {
+        showSnackbar({
+          title: t('narcoticAccessDenied', "This is a narcotic drug and you don't have access to prescribe this"),
+          kind: 'error',
+        });
+        return;
+      }
       if (isOrderSet) {
         const members = item.members || [];
         members.forEach((member: any) => {
@@ -257,6 +268,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
       isOrderSet,
       item.members,
       item.uuid,
+      item.narcotic,
+      isDrugItem,
+      isDoctor,
       visit,
       session.currentProvider?.uuid,
       config,
@@ -264,6 +278,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
       setAnyOrders,
       addedOrderSets,
       setAddedOrderSets,
+      t,
     ]);
 
     const removeFromBasket = useCallback(() => {
@@ -276,6 +291,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
 
     const openForm = useCallback(() => {
       if (isOrderSet) return;
+      if (isDrugItem && item.narcotic && !isDoctor) {
+        showSnackbar({
+          title: t('narcoticAccessDenied', "This is a narcotic drug and you don't have access to prescribe this"),
+          kind: 'error',
+        });
+        return;
+      }
       const { labOrderTypeUuid, radiologyOrderTypeUuid, procedureOrderTypeUuid, medicalSupplyOrderTypeUuid } = config;
 
       if (isDrugItem) {
@@ -319,6 +341,8 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(
       basketKey,
       orderBasketExtensionProps,
       config,
+      isDoctor,
+      t,
     ]);
 
     return (
@@ -555,6 +579,8 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
     config.medicalSupplyConceptSetUuid,
   );
 
+  const { isDoctor } = useIsDoctorProvider();
+
   return (
     <Workspace2 title={t('orderBasketWorkspaceTitle', 'Order Basket')} hasUnsavedChanges={!!orders.length}>
       <div id="order-basket" className={styles.container}>
@@ -664,6 +690,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                       orderBasketExtensionProps={orderBasketExtensionProps}
                       closeWorkspace={closeWorkspace}
                       onOrderAdded={() => {}}
+                      isDoctor={isDoctor}
                     />
                   ))
                 )}

@@ -13,7 +13,12 @@ import {
   UserHasAccess,
   type Visit,
   type Workspace2DefinitionProps,
+  useSession,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
 } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { type ConfigObject } from '../../config-schema';
 import { prepMedicationOrderPostData, useActivePatientOrders } from '../../api/api';
 import { ordersEqual } from './helpers';
@@ -40,6 +45,7 @@ interface DrugSearchResultItemProps {
   openOrderForm: (searchResult: DrugOrderBasketItem) => void;
   visit: Visit;
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
+  isDoctor?: boolean;
 }
 
 export default function OrderBasketSearchResults({
@@ -53,6 +59,23 @@ export default function OrderBasketSearchResults({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
+
+  const { currentProvider } = useSession();
+  const { data: doctors } = useSWR<any[]>(
+    `${restBaseUrl}/provider?v=custom:(uuid,display,person:(display),attributes:(attributeType:(display),value))`,
+    (url: string) =>
+      openmrsFetch(url).then((res) =>
+        res.data.results.filter((provider: any) =>
+          provider.attributes?.some(
+            (attr: any) =>
+              attr.attributeType?.display === 'practitioner_type' &&
+              attr.value?.toLowerCase() === 'doctor',
+          ),
+        ),
+      ),
+  );
+
+  const isDoctor = doctors?.some((provider) => provider.uuid === currentProvider?.uuid);
 
   if (!searchTerm) {
     return <div className={styles.container}></div>;
@@ -122,6 +145,7 @@ export default function OrderBasketSearchResults({
             openOrderForm={openOrderForm}
             visit={visit}
             closeWorkspace={closeWorkspace}
+            isDoctor={isDoctor}
           />
         ))}
       </div>
@@ -135,6 +159,7 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
   openOrderForm,
   visit,
   closeWorkspace,
+  isDoctor,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
   const { orders, setOrders } = useOrderBasket<DrugOrderBasketItem>(
@@ -154,6 +179,32 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
     () => activeOrders?.some((order) => order?.drug?.uuid === drug?.uuid),
     [activeOrders, drug?.uuid],
   );
+
+  const { currentProvider } = useSession();
+  const { data: doctors } = useSWR<any[]>(
+    isDoctor === undefined
+      ? `${restBaseUrl}/provider?v=custom:(uuid,display,person:(display),attributes:(attributeType:(display),value))`
+      : null,
+    (url: string) =>
+      openmrsFetch(url).then((res) =>
+        res.data.results.filter((provider: any) =>
+          provider.attributes?.some(
+            (attr: any) =>
+              attr.attributeType?.display === 'practitioner_type' &&
+              attr.value?.toLowerCase() === 'doctor',
+          ),
+        ),
+      ),
+  );
+
+  const resolvedIsDoctor = useMemo(() => {
+    if (isDoctor !== undefined) {
+      return isDoctor;
+    }
+    return doctors?.some((provider) => provider.uuid === currentProvider?.uuid);
+  }, [isDoctor, doctors, currentProvider]);
+
+  const isNarcoticDisabled = drug.narcotic && !resolvedIsDoctor;
 
   const { templates, error: fetchingDrugOrderTemplatesError } = useDrugTemplate(drug?.uuid);
   const { t } = useTranslation();
@@ -242,7 +293,19 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                     renderIcon={(props: ComponentProps<typeof ShoppingCartArrowDownIcon>) => (
                       <ShoppingCartArrowDownIcon size={16} {...props} />
                     )}
-                    onClick={() => addToBasket(orderItem)}
+                    onClick={() => {
+                      if (isNarcoticDisabled) {
+                        showSnackbar({
+                          title: t(
+                            'narcoticAccessDenied',
+                            "This is a narcotic drug and you don't have access to prescribe this",
+                          ),
+                          kind: 'error',
+                        });
+                      } else {
+                        addToBasket(orderItem);
+                      }
+                    }}
                     disabled={drugAlreadyPrescribed}
                   >
                     {t('directlyAddToBasket', 'Add to basket')}
@@ -251,7 +314,19 @@ export const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({
                 <Button
                   kind="ghost"
                   renderIcon={(props: ComponentProps<typeof ArrowRightIcon>) => <ArrowRightIcon size={16} {...props} />}
-                  onClick={() => openOrderForm(orderItem)}
+                  onClick={() => {
+                    if (isNarcoticDisabled) {
+                      showSnackbar({
+                        title: t(
+                          'narcoticAccessDenied',
+                          "This is a narcotic drug and you don't have access to prescribe this",
+                        ),
+                        kind: 'error',
+                      });
+                    } else {
+                      openOrderForm(orderItem);
+                    }
+                  }}
                   disabled={drugAlreadyPrescribed}
                 >
                   {t('goToDrugOrderForm', 'Order form')}
