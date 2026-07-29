@@ -76,7 +76,6 @@ window.i18next = i18n;
 
 i18n.use(initReactI18next).init({
   lng: 'en',
-  initImmediate: false,
   interpolation: { escapeValue: false },
   resources: { en: { translation: enTranslations } },
 });
