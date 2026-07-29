@@ -120,6 +120,19 @@ export function openmrsFetch(url: string) {
   return Promise.resolve({ data: { results: [] } });
 }
 
+/** The real PatientPhoto fetches an attachment and falls back to a generated avatar; the harness
+ * has no backend, so it renders the fallback shape directly. */
+export const PatientPhoto: React.FC<{ patientName: string; patientUuid: string }> = ({ patientName }) => (
+  <span className="harnessAvatar">
+    {patientName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('')}
+  </span>
+);
+
 export const ExtensionSlot: React.FC<{ name: string }> = () => null;
 
 export const OpenmrsDatePicker: React.FC<{ labelText: string; id: string }> = ({ labelText, id }) => (

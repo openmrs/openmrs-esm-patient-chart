@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Button, SkeletonText } from '@carbon/react';
-import { ChevronRightIcon, CloseIcon, getPatientName, showModal } from '@openmrs/esm-framework';
+import { Button, HeaderPanel, SkeletonText } from '@carbon/react';
+import { ChevronRightIcon, CloseIcon, getPatientName, PatientPhoto, showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { type SmartNotification } from './notification-model';
+import { interpretationLabel, type SmartNotification } from './notification-model';
 import { smartNotificationDetailModalName } from './constants';
-import { getInitials } from './patient-display';
 import PriorityTag from './notification-tag.component';
 import RelativeTime from './relative-time.component';
 import styles from './notification-panel.scss';
@@ -20,21 +19,21 @@ interface NotificationPanelProps {
 const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading, notifications, onClose, patient }) => {
+  /* Key used by interpretationLabel in notification-model.ts, which the i18next parser does not scan.
+   * t('noInterpretation', 'No interpretation')
+   */
   const { t } = useTranslation();
-  const panelRef = useRef<HTMLElement>(null);
-  const initials = getInitials(patient);
+  const panelRef = useRef<HTMLDivElement>(null);
   const patientName = patient ? getPatientName(patient) : '';
 
-  // Move focus into the panel on open, and keep Tab inside it while it is open, so the inbox
-  // behaves like the dialog it is announced as.
+  // Move focus into the panel on open and keep Tab inside it, so the inbox behaves like the dialog
+  // it is announced as. Carbon's HeaderPanel handles the geometry but not the focus contract.
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) {
       return;
     }
 
-    // Focus the panel itself rather than its first control, so a screen reader announces the
-    // dialog and its heading before anything else, and no tooltip pops open on arrival.
     panel.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -71,15 +70,19 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
     [patient],
   );
 
+  // HeaderPanel spreads unknown props onto its <div>, but its prop types don't declare them, so the
+  // dialog semantics go in through a spread rather than as literal attributes.
+  const dialogProps = { role: 'dialog', tabIndex: -1 };
+
   return (
-    <aside
+    <HeaderPanel
       aria-label={t('notifications', 'Notifications')}
       className={styles.panel}
+      expanded
       ref={panelRef}
-      role="dialog"
-      tabIndex={-1}
+      {...dialogProps}
     >
-      <header className={styles.header}>
+      <div className={styles.header}>
         <div>
           <h2 className={styles.title}>{t('notifications', 'Notifications')}</h2>
           <p className={styles.subtitle}>
@@ -95,7 +98,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
           renderIcon={CloseIcon}
           size="sm"
         />
-      </header>
+      </div>
 
       <div className={styles.body}>
         {isLoading ? (
@@ -121,8 +124,8 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
               {notifications.map((notification) => (
                 <li key={notification.id}>
                   <button className={styles.row} onClick={() => handleOpenDetail(notification)} type="button">
-                    <span aria-hidden="true" className={styles.avatar}>
-                      {initials}
+                    <span className={styles.avatar}>
+                      <PatientPhoto patientName={patientName} patientUuid={notification.patientUuid} />
                     </span>
                     <span className={styles.rowBody}>
                       <span className={styles.rowMeta}>
@@ -142,10 +145,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
                       <span className={styles.rowRange}>
                         {notification.rejectionReason ??
                           t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
-                            interpretation: notification.interpretation
-                              ? notification.interpretation.charAt(0) +
-                                notification.interpretation.slice(1).toLowerCase().replace(/_/g, ' ')
-                              : t('noInterpretation', 'No interpretation'),
+                            interpretation: interpretationLabel(notification.interpretation, t),
                             range: notification.referenceRangeText,
                           })}
                       </span>
@@ -159,7 +159,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
         )}
       </div>
 
-      <footer className={styles.footer}>
+      <div className={styles.footer}>
         <p>
           <strong>{t('smartFiltering', 'Smart filtering:')}</strong>{' '}
           {t(
@@ -167,8 +167,8 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
             'only STAT orders and critical values interrupt you. Routine, normal & expected-abnormal results are filed silently.',
           )}
         </p>
-      </footer>
-    </aside>
+      </div>
+    </HeaderPanel>
   );
 };
 

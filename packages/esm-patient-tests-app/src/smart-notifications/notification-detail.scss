@@ -33,16 +33,15 @@
 }
 
 .modalAvatar {
-  @include type.type-style('heading-compact-01');
-  align-items: center;
-  background-color: $interactive-01;
-  border-radius: layout.$spacing-02;
-  color: $ui-02;
   display: flex;
   flex-shrink: 0;
-  height: layout.$spacing-09;
-  justify-content: center;
-  width: layout.$spacing-09;
+
+  // PatientPhoto defaults to 56px; the dialog wants it a touch smaller.
+  :global(img),
+  :global(svg) {
+    block-size: layout.$spacing-09;
+    inline-size: layout.$spacing-09;
+  }
 }
 
 .patientName {

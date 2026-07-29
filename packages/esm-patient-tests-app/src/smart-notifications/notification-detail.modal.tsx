@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { age, getPatientName, navigate, useSession } from '@openmrs/esm-framework';
+import { age, getPatientName, navigate, PatientPhoto, useSession } from '@openmrs/esm-framework';
 import { dashboardMeta } from '../test-results/dashboard.meta';
-import { type SmartNotification } from './notification-model';
-import { getInitials, getPreferredIdentifier } from './patient-display';
+import { interpretationLabel, type SmartNotification } from './notification-model';
+import { getPreferredIdentifier } from './patient-display';
 import { markNotificationReviewed } from './review-store';
-import { useRelativeTimeLabel } from './relative-time.component';
+import { formatRelativeTime } from './relative-time';
 import PriorityTag from './notification-tag.component';
 import styles from './notification-detail.scss';
 
@@ -19,7 +19,7 @@ interface NotificationDetailModalProps {
 const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ closeModal, notification, patient }) => {
   const { t } = useTranslation();
   const session = useSession();
-  const relativeTime = useRelativeTimeLabel(notification.resultDate);
+  const relativeTime = formatRelativeTime(notification.resultDate, t);
   const identifier = getPreferredIdentifier(patient);
   const patientName = patient ? getPatientName(patient) : '';
 
@@ -35,10 +35,6 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
     closeModal();
   }, [closeModal, notification.patientUuid]);
 
-  const interpretationLabel = notification.interpretation
-    ? notification.interpretation.charAt(0) + notification.interpretation.slice(1).toLowerCase().replace(/_/g, ' ')
-    : t('noInterpretation', 'No interpretation');
-
   return (
     <>
       <ModalHeader className={styles.modalHeader} closeModal={closeModal}>
@@ -51,8 +47,8 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
       </ModalHeader>
       <ModalBody className={styles.modalBody}>
         <div className={styles.patientRow}>
-          <span aria-hidden="true" className={styles.modalAvatar}>
-            {getInitials(patient)}
+          <span className={styles.modalAvatar}>
+            <PatientPhoto patientName={patientName} patientUuid={notification.patientUuid} />
           </span>
           <div>
             <p className={styles.patientName}>{patientName}</p>
@@ -83,7 +79,7 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
             <dd className={styles.detailSubValue}>
               {notification.rejectionReason ??
                 t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
-                  interpretation: interpretationLabel,
+                  interpretation: interpretationLabel(notification.interpretation, t),
                   range: notification.referenceRangeText,
                 })}
             </dd>

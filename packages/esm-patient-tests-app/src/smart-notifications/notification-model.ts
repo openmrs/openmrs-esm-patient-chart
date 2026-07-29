@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import {
   assessValue,
   formatReferenceRange,
@@ -84,6 +85,15 @@ export function resolveInterpretation(obs: ResultedObservation): OBSERVATION_INT
 
 export function isCritical(interpretation: OBSERVATION_INTERPRETATION | undefined): boolean {
   return Boolean(interpretation) && criticalInterpretations.includes(interpretation);
+}
+
+/** Human-readable interpretation, e.g. `CRITICALLY_LOW` -> "Critically low". */
+export function interpretationLabel(interpretation: OBSERVATION_INTERPRETATION | undefined, t: TFunction): string {
+  if (!interpretation) {
+    return t('noInterpretation', 'No interpretation');
+  }
+  const words = interpretation.toLowerCase().replace(/_/g, ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
 /**

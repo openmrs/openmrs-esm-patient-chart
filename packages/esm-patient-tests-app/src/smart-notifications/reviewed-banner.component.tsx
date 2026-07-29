@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useLatestReviewForPatient } from './review-store';
-import { useRelativeTimeLabel } from './relative-time.component';
+import { formatRelativeTime } from './relative-time';
 import styles from './reviewed-banner.scss';
 
 interface ReviewedBannerProps {
@@ -19,7 +19,7 @@ const ReviewedBanner: React.FC<ReviewedBannerProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { smartNotifications } = useConfig<ConfigObject>();
   const review = useLatestReviewForPatient(patientUuid);
-  const relativeTime = useRelativeTimeLabel(review?.reviewedAt);
+  const relativeTime = formatRelativeTime(review?.reviewedAt, t);
 
   if (!smartNotifications?.enabled || !review) {
     return null;

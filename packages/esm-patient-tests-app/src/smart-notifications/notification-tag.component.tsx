@@ -18,7 +18,7 @@ interface PriorityTagProps {
   tag: NotificationTag;
 }
 
-export function usePriorityTagLabel(tag: NotificationTag): string {
+function usePriorityTagLabel(tag: NotificationTag): string {
   const { t } = useTranslation();
 
   switch (tag) {

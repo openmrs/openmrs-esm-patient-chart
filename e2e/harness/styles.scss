@@ -18,6 +18,43 @@
 
 // `:global(...)` is a CSS-modules construct that plain Sass emits verbatim, so the handful of rules
 // that use it are restated here as ordinary global selectors.
+.panel {
+  display: flex;
+  flex-direction: column;
+  inset-block: layout.$spacing-09 0;
+  inset-inline-end: 0;
+  inline-size: 25rem;
+  overflow: hidden;
+  position: fixed;
+  z-index: 8000;
+  box-shadow:
+    0 2px 10px 1px rgba(0, 0, 0, 0.12),
+    0 2px 6px 1px rgba(171, 198, 213, 0.12);
+}
+
+// PatientPhoto's fallback avatar, sized per surface.
+.harnessAvatar {
+  align-items: center;
+  background-color: $interactive-01;
+  border-radius: layout.$spacing-02;
+  color: $ui-02;
+  display: flex;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.avatar .harnessAvatar {
+  @include type.type-style('label-01');
+  block-size: layout.$spacing-07;
+  inline-size: layout.$spacing-07;
+}
+
+.modalAvatar .harnessAvatar {
+  @include type.type-style('heading-compact-01');
+  block-size: layout.$spacing-09;
+  inline-size: layout.$spacing-09;
+}
+
 .modalHeader .cds--modal-header__heading {
   margin-bottom: 0;
 }
