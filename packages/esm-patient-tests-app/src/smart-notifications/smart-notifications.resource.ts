@@ -28,6 +28,7 @@ import {
   toNotification,
 } from './notification-model';
 import { useOptIns } from './opt-in-store';
+import { useReadNotifications } from './read-store';
 import { optInKey } from './constants';
 import { useReviewedNotifications } from './review-store';
 
@@ -74,11 +75,19 @@ export function toResultedObservation(
 }
 
 /**
- * Pairs each order with its result.
+ * Pairs each order with the result it produced.
  *
- * FHIR lab observations carry no `basedOn` pointing back at the order, so the join is heuristic:
- * same concept **and** same encounter. Where the encounter is missing on either side we fall back
- * to concept alone and take the most recent observation.
+ * FHIR lab observations carry no `basedOn` pointing back at the order, so the join is heuristic.
+ * Two rules keep it honest, because a wrong pairing means a notification for an order that was
+ * never resulted:
+ *
+ * 1. A result must plausibly belong to the order — either recorded in the same encounter, or
+ *    timestamped at/after the order was placed. Without this, a fresh order inherits an old result
+ *    for the same concept and notifies straight away, before the lab has done anything.
+ * 2. A result is claimed by at most one order, newest order first, so re-ordering the same test
+ *    doesn't make one result light up every past order for that concept.
+ *
+ * Orders with no result yet are returned unpaired, which is what makes a pending order silent.
  */
 export function joinObservationsToOrders(
   orders: Array<Order>,
@@ -94,15 +103,35 @@ export function joinObservationsToOrders(
     byConcept.set(obs.conceptUuid, bucket);
   }
 
-  return orders.map((order) => {
-    const candidates = byConcept.get(order.concept?.uuid) ?? [];
+  const claimed = new Set<string>();
+
+  // Newest order first, so the most recent order gets first claim on the most recent result.
+  const newestFirst = [...orders].sort((a, b) => (b.dateActivated ?? '').localeCompare(a.dateActivated ?? ''));
+
+  const matches = new Map<string, ResultedObservation | undefined>();
+
+  for (const order of newestFirst) {
+    const candidates = (byConcept.get(order.concept?.uuid) ?? []).filter((obs) => !claimed.has(obs.uuid));
+
     const sameEncounter = candidates.filter(
       (obs) => obs.encounterUuid && order.encounter?.uuid && obs.encounterUuid === order.encounter.uuid,
     );
-    const pool = sameEncounter.length ? sameEncounter : candidates;
-    const obs = [...pool].sort((a, b) => (b.effectiveDateTime ?? '').localeCompare(a.effectiveDateTime ?? ''))[0];
-    return { order, obs };
-  });
+
+    // A result cannot predate the order that asked for it.
+    const afterOrder = candidates.filter(
+      (obs) => obs.effectiveDateTime && order.dateActivated && obs.effectiveDateTime >= order.dateActivated,
+    );
+
+    const pool = sameEncounter.length ? sameEncounter : afterOrder;
+    const obs = [...pool].sort((a, b) => (a.effectiveDateTime ?? '').localeCompare(b.effectiveDateTime ?? ''))[0];
+
+    if (obs) {
+      claimed.add(obs.uuid);
+    }
+    matches.set(order.uuid, obs);
+  }
+
+  return orders.map((order) => ({ order, obs: matches.get(order.uuid) }));
 }
 
 /**
@@ -117,6 +146,7 @@ export function useSmartNotifications(patientUuid: string) {
   const { labOrderTypeUuid } = config.orders;
   const session = useSession();
   const reviewed = useReviewedNotifications();
+  const read = useReadNotifications();
   const optIns = useOptIns();
 
   const shouldFetch = Boolean(enabled && patientUuid);
@@ -206,9 +236,17 @@ export function useSmartNotifications(patientUuid: string) {
     shouldFetch,
   ]);
 
+  // The badge counts what the clinician has not opened yet. Reading a notification silences the
+  // badge but leaves it in the inbox, so glancing at something never makes it disappear.
+  const unreadCount = useMemo(
+    () => notifications.filter((notification) => !read[notification.id]).length,
+    [notifications, read],
+  );
+
   return {
     notifications,
-    unreadCount: notifications.length,
+    read,
+    unreadCount,
     isLoading: shouldFetch && (isLoadingOrders || isLoadingObservations),
     error: ordersError ?? observationsError,
     mutate: () => {

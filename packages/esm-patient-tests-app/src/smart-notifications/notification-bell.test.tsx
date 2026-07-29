@@ -48,10 +48,11 @@ const useRealOnClickOutside = <T extends HTMLElement>(handler: (event: MouseEven
   return ref;
 };
 
-function mockNotifications(notifications: Array<unknown> = []) {
+function mockNotifications(notifications: Array<unknown> = [], read: Record<string, string> = {}) {
   mockUseSmartNotifications.mockReturnValue({
     notifications: notifications as never,
-    unreadCount: notifications.length,
+    read,
+    unreadCount: (notifications as Array<{ id: string }>).filter((notification) => !read[notification.id]).length,
     isLoading: false,
     error: undefined,
     mutate: vi.fn(),
@@ -82,8 +83,28 @@ describe('NotificationBell', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
+  it('counts only unread notifications, not everything in the inbox', () => {
+    // Reading a notification silences the badge but leaves the row in the list.
+    mockNotifications([mockSmartNotification, mockCriticalSmartNotification], {
+      [mockSmartNotification.id]: '2026-06-29T09:31:00.000Z',
+    });
+
+    render(<NotificationBell />);
+
+    expect(screen.getByText('1')).toBeInTheDocument();
+  });
+
+  it('shows no badge once every notification has been read', () => {
+    mockNotifications([mockSmartNotification], { [mockSmartNotification.id]: '2026-06-29T09:31:00.000Z' });
+
+    render(<NotificationBell />);
+
+    expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
+    expect(screen.queryByText('1')).not.toBeInTheDocument();
+  });
+
   it('caps the badge at 9+ so it cannot overflow the header', () => {
-    mockNotifications(new Array(12).fill(mockSmartNotification));
+    mockNotifications(new Array(12).fill(0).map((_, index) => ({ ...mockSmartNotification, id: `n-${index}` })));
 
     render(<NotificationBell />);
 

@@ -1,32 +1,14 @@
 import { createGlobalStore, useStore } from '@openmrs/esm-framework';
 import { optInKey, optInStorageKey } from './constants';
+import { readRecordFromStorage, writeRecordToStorage } from './local-storage';
 
 export interface OptInState {
   optIns: Record<string, boolean>;
 }
 
-function readFromStorage(): Record<string, boolean> {
-  try {
-    const raw = localStorage.getItem(optInStorageKey);
-    if (!raw) {
-      return {};
-    }
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-const optInStore = createGlobalStore<OptInState>('smart-notifications-opt-in', { optIns: readFromStorage() });
-
-function persist(optIns: Record<string, boolean>) {
-  try {
-    localStorage.setItem(optInStorageKey, JSON.stringify(optIns));
-  } catch (error) {
-    console.error('Could not persist smart notification opt-in state', error);
-  }
-}
+const optInStore = createGlobalStore<OptInState>('smart-notifications-opt-in', {
+  optIns: readRecordFromStorage<boolean>(optInStorageKey),
+});
 
 /**
  * Records (or clears) the clinician's "Notify me when resulted" choice.
@@ -49,7 +31,7 @@ export function setOptIn(patientUuid: string, conceptUuid: string, optedIn: bool
     }
     const next = { ...optIns, [key]: true };
     optInStore.setState({ optIns: next });
-    persist(next);
+    writeRecordToStorage(optInStorageKey, next);
     return;
   }
 
@@ -59,7 +41,7 @@ export function setOptIn(patientUuid: string, conceptUuid: string, optedIn: bool
   const next = { ...optIns };
   delete next[key];
   optInStore.setState({ optIns: next });
-  persist(next);
+  writeRecordToStorage(optInStorageKey, next);
 }
 
 export function isOptedIn(patientUuid: string, conceptUuid: string): boolean {

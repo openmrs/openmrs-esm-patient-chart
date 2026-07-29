@@ -83,6 +83,25 @@ test.describe('notification bell', () => {
     await page.screenshot({ path: `${screenshotDir}/03-inbox-empty-state.png` });
   });
 
+  test('a routine order without an opt-in never reaches the bell', async ({ page }) => {
+    // `quiet` is a single routine, in-range, non-opted-in order — the alert-fatigue control.
+    await gotoScene(page, { scenario: 'quiet' });
+
+    await expect(bellOf(page).locator('.bellBadge')).toBeHidden();
+    await bellOf(page).click();
+    await expect(panelOf(page).getByText('Serum glucose')).toBeHidden();
+  });
+
+  test('a pending STAT order does not adopt an old result for the same test', async ({ page }) => {
+    // Regression guard: a fresh STAT order plus a months-old result for the same concept used to
+    // notify immediately, which made the bell fire for orders the lab had not touched.
+    await gotoScene(page, { scenario: 'pending' });
+
+    await expect(bellOf(page).locator('.bellBadge')).toBeHidden();
+    await bellOf(page).click();
+    await expect(panelOf(page).getByText('Nothing needs your attention')).toBeVisible();
+  });
+
   test('closes on Escape', async ({ page }) => {
     await gotoScene(page, { scenario: 'single' });
     await bellOf(page).click();
@@ -130,6 +149,38 @@ test.describe('notification detail dialog', () => {
     await page.screenshot({ path: `${screenshotDir}/04-detail-dialog.png` });
   });
 
+  test('opening a message decrements the badge but keeps it in the inbox', async ({ page }) => {
+    await gotoScene(page, { scenario: 'triage' });
+
+    await expect(bellOf(page).locator('.bellBadge')).toHaveText('3');
+    await bellOf(page).click();
+
+    await page.getByRole('button', { name: /Haemoglobin/ }).click();
+    await expect(page.getByRole('dialog', { name: 'Notification detail' })).toBeVisible();
+
+    // Reading it drops the count...
+    await expect(bellOf(page).locator('.bellBadge')).toHaveText('2');
+
+    await page.getByRole('dialog', { name: 'Notification detail' }).getByRole('button', { name: 'Close' }).click();
+
+    // ...but the row is still there to act on, now marked as read.
+    const row = panelOf(page).getByRole('button', { name: /Haemoglobin/ });
+    await expect(row).toBeVisible();
+    await expect(row).not.toHaveClass(/rowUnread/);
+    await expect(panelOf(page).getByRole('button', { name: /Serum Creatinine/ })).toHaveClass(/rowUnread/);
+  });
+
+  test('a read notification stays read after a reload', async ({ page }) => {
+    await gotoScene(page, { scenario: 'triage' });
+    await bellOf(page).click();
+    await page.getByRole('button', { name: /Haemoglobin/ }).click();
+    await expect(bellOf(page).locator('.bellBadge')).toHaveText('2');
+
+    await page.reload();
+
+    await expect(bellOf(page).locator('.bellBadge')).toHaveText('2');
+  });
+
   test('"View in chart" navigates to Results and leaves the notification in the inbox', async ({ page }) => {
     await gotoScene(page, { scenario: 'single' });
 
@@ -146,8 +197,10 @@ test.describe('notification detail dialog', () => {
     await page.getByRole('button', { name: 'View in chart' }).click();
 
     expect(navigations).toEqual(['${openmrsSpaBase}/patient/betty-bliss-uuid/chart/results']);
-    // A look, not a sign-off.
-    await expect(bellOf(page).locator('.bellBadge')).toHaveText('1');
+    // A look, not a sign-off: opening it marked it read, so the badge is quiet, but the row is
+    // still in the inbox waiting to be reviewed.
+    await expect(bellOf(page).locator('.bellBadge')).toBeHidden();
+    await expect(panelOf(page).getByRole('button', { name: /Serum Creatinine/ })).toBeVisible();
   });
 
   test('"Mark as reviewed" records the reviewer and drops the count', async ({ page }) => {

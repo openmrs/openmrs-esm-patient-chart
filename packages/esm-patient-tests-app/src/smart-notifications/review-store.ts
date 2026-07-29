@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { createGlobalStore, useStore } from '@openmrs/esm-framework';
 import { reviewedStorageKey } from './constants';
+import { readRecordFromStorage, writeRecordToStorage } from './local-storage';
 
 export interface ReviewRecord {
   /** Denormalised so the "Result reviewed" banner can name the reviewer without a provider lookup. */
@@ -12,30 +13,6 @@ export interface ReviewRecord {
 export interface ReviewState {
   userUuid: string | null;
   reviewed: Record<string, ReviewRecord>;
-}
-
-function readFromStorage(userUuid: string): Record<string, ReviewRecord> {
-  try {
-    const raw = localStorage.getItem(reviewedStorageKey(userUuid));
-    if (!raw) {
-      return {};
-    }
-    const parsed = JSON.parse(raw);
-    // Anything other than a plain object (a stale format, a hand-edited value) is discarded rather
-    // than allowed to crash the bell.
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeToStorage(userUuid: string, reviewed: Record<string, ReviewRecord>) {
-  try {
-    localStorage.setItem(reviewedStorageKey(userUuid), JSON.stringify(reviewed));
-  } catch (error) {
-    // A full or unavailable localStorage must not break triage; the review just won't persist.
-    console.error('Could not persist smart notification review state', error);
-  }
 }
 
 const reviewStore = createGlobalStore<ReviewState>('smart-notifications-review', {
@@ -52,7 +29,10 @@ export function setReviewUser(userUuid: string) {
   if (state.userUuid === userUuid) {
     return;
   }
-  reviewStore.setState({ userUuid, reviewed: userUuid ? readFromStorage(userUuid) : {} });
+  reviewStore.setState({
+    userUuid,
+    reviewed: userUuid ? readRecordFromStorage<ReviewRecord>(reviewedStorageKey(userUuid)) : {},
+  });
 }
 
 export function markNotificationReviewed(id: string, patientUuid: string, providerDisplay: string) {
@@ -63,7 +43,7 @@ export function markNotificationReviewed(id: string, patientUuid: string, provid
   };
   reviewStore.setState({ reviewed: next });
   if (userUuid) {
-    writeToStorage(userUuid, next);
+    writeRecordToStorage(reviewedStorageKey(userUuid), next);
   }
 }
 

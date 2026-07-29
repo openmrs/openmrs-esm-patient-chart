@@ -136,6 +136,29 @@ const glucoseObs = observation({
   referenceRange: [normalRange(4, 7), criticalRange(2, 20)],
 });
 
+/**
+ * A brand-new STAT order with no result of its own, alongside a months-old result for the same
+ * concept from a previous encounter. The stale result must not be adopted by the new order — that
+ * was the defect that made every lab order notify regardless of priority or opt-in.
+ */
+const pendingStatOrder = order({
+  uuid: 'order-uuid-pending-stat',
+  concept: { uuid: 'concept-urea', display: 'Blood urea nitrogen' },
+  display: 'Blood urea nitrogen',
+  orderNumber: 'ORD-1005',
+  urgency: 'STAT',
+});
+
+const staleUreaObs = observation({
+  id: 'obs-uuid-urea-last-month',
+  code: { coding: [{ code: 'concept-urea', display: 'Blood urea nitrogen' }], text: 'Blood urea nitrogen' },
+  encounter: { reference: 'Encounter/encounter-uuid-last-month', type: 'Encounter' },
+  effectiveDateTime: '2026-05-01T09:30:00.000Z',
+  issued: '2026-05-01T09:30:00.000Z',
+  valueQuantity: { value: 5, unit: 'mmol/L', system: 'http://unitsofmeasure.org', code: 'mmol/L' },
+  referenceRange: [normalRange(2.5, 7.1), criticalRange(1, 30)],
+});
+
 export const scenarios = {
   /** One opted-in routine result, plus a silent routine result that must not surface. */
   single: {
@@ -154,6 +177,12 @@ export const scenarios = {
     optIns: [],
     orders: [glucoseOrder],
     observations: [glucoseObs],
+  },
+  /** A pending STAT order plus a stale result for the same concept: nothing should notify. */
+  pending: {
+    optIns: [],
+    orders: [pendingStatOrder, glucoseOrder],
+    observations: [staleUreaObs, glucoseObs],
   },
 } as const;
 

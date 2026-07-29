@@ -7,6 +7,7 @@ import { mockCriticalSmartNotification, mockSmartNotification } from '__mocks__'
 import { mockPatient } from 'tools';
 import translations from '../../translations/en.json';
 import { smartNotificationDetailModalName } from './constants';
+import { _resetReadStore, getReadNotifications, setReadUser } from './read-store';
 import NotificationPanel from './notification-panel.component';
 
 const mockShowModal = showModal as Mock;
@@ -19,6 +20,7 @@ function renderPanel(props: Partial<React.ComponentProps<typeof NotificationPane
       notifications={[mockSmartNotification]}
       onClose={vi.fn()}
       patient={mockPatient}
+      read={{}}
       {...props}
     />,
   );
@@ -26,6 +28,8 @@ function renderPanel(props: Partial<React.ComponentProps<typeof NotificationPane
 
 describe('NotificationPanel', () => {
   beforeEach(() => {
+    localStorage.clear();
+    _resetReadStore();
     vi.useFakeTimers({ toFake: ['Date'] });
     // Pin "now" a minute after the fixture result so the relative timestamp is stable.
     vi.setSystemTime(new Date('2026-06-29T09:30:30.000Z'));
@@ -112,6 +116,35 @@ describe('NotificationPanel', () => {
       smartNotificationDetailModalName,
       expect.objectContaining({ notification: mockCriticalSmartNotification, patient: mockPatient }),
     );
+  });
+
+  it('marks a notification read when its detail is opened', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    setReadUser('user-uuid-1');
+    renderPanel();
+
+    expect(getReadNotifications()).toEqual({});
+
+    await user.click(screen.getByRole('button', { name: /serum creatinine/i }));
+
+    expect(getReadNotifications()).toHaveProperty(mockSmartNotification.id);
+  });
+
+  it('marks unread rows so they can be told apart from ones already opened', () => {
+    renderPanel({
+      notifications: [mockSmartNotification, mockCriticalSmartNotification],
+      read: { [mockSmartNotification.id]: '2026-06-29T09:30:00.000Z' },
+    });
+
+    expect(screen.getByRole('button', { name: /serum creatinine/i })).not.toHaveClass('rowUnread');
+    expect(screen.getByRole('button', { name: /haemoglobin/i })).toHaveClass('rowUnread');
+  });
+
+  it('keeps a read notification in the list rather than dropping it', () => {
+    renderPanel({ read: { [mockSmartNotification.id]: '2026-06-29T09:30:00.000Z' } });
+
+    expect(screen.getByRole('button', { name: /serum creatinine/i })).toBeInTheDocument();
+    expect(screen.queryByText('Nothing needs your attention')).not.toBeInTheDocument();
   });
 
   it('closes when the close button is used', async () => {

@@ -10,6 +10,15 @@ export function reviewedStorageKey(userUuid: string): string {
   return `openmrs:smart-notifications:reviewed:${userUuid}`;
 }
 
+/**
+ * Read state is separate from review state, and per-user for the same reason. Opening a
+ * notification marks it read — it stops counting against the bell but stays in the inbox until it
+ * is actually reviewed.
+ */
+export function readStorageKey(userUuid: string): string {
+  return `openmrs:smart-notifications:read:${userUuid}`;
+}
+
 /** Opt-in is keyed by patient + concept; there is no order uuid at the time the checkbox is set. */
 export const optInStorageKey = 'openmrs:smart-notifications:opt-in';
 

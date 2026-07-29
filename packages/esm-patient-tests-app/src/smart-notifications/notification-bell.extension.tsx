@@ -4,6 +4,7 @@ import { Notification, NotificationNew } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useOnClickOutside, useSession } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import { setReadUser } from './read-store';
 import { setReviewUser } from './review-store';
 import { useSmartNotifications } from './smart-notifications.resource';
 import { useChartPatient } from './use-chart-patient';
@@ -19,7 +20,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ patient, patientUui
   const { t } = useTranslation();
   const [showPanel, setShowPanel] = useState(false);
   const session = useSession();
-  const { error, isLoading, notifications, unreadCount } = useSmartNotifications(patientUuid);
+  const { error, isLoading, notifications, read, unreadCount } = useSmartNotifications(patientUuid);
 
   const userUuid = session?.user?.uuid;
 
@@ -27,6 +28,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ patient, patientUui
   useEffect(() => {
     if (userUuid) {
       setReviewUser(userUuid);
+      setReadUser(userUuid);
     }
   }, [userUuid]);
 
@@ -81,6 +83,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ patient, patientUui
           notifications={notifications}
           onClose={handleClose}
           patient={patient}
+          read={read}
         />
       )}
     </div>

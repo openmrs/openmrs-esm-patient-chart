@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { Button, HeaderPanel, SkeletonText } from '@carbon/react';
 import { ChevronRightIcon, CloseIcon, getPatientName, PatientPhoto, showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { interpretationLabel, type SmartNotification } from './notification-model';
 import { smartNotificationDetailModalName } from './constants';
+import { markNotificationRead } from './read-store';
 import PriorityTag from './notification-tag.component';
 import RelativeTime from './relative-time.component';
 import styles from './notification-panel.scss';
@@ -14,11 +16,20 @@ interface NotificationPanelProps {
   notifications: Array<SmartNotification>;
   onClose: () => void;
   patient: fhir.Patient;
+  /** Notification id -> the time it was opened. Read rows stay listed but stop drawing attention. */
+  read: Record<string, string>;
 }
 
 const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading, notifications, onClose, patient }) => {
+const NotificationPanel: React.FC<NotificationPanelProps> = ({
+  error,
+  isLoading,
+  notifications,
+  onClose,
+  patient,
+  read,
+}) => {
   /* Key used by interpretationLabel in notification-model.ts, which the i18next parser does not scan.
    * t('noInterpretation', 'No interpretation')
    */
@@ -61,6 +72,8 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
 
   const handleOpenDetail = useCallback(
     (notification: SmartNotification) => {
+      // Opening the detail is what "reading" means, so the badge drops as soon as the dialog opens.
+      markNotificationRead(notification.id);
       const dispose = showModal(smartNotificationDetailModalName, {
         closeModal: () => dispose(),
         notification,
@@ -123,7 +136,11 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ error, isLoading,
             <ul className={styles.list}>
               {notifications.map((notification) => (
                 <li key={notification.id}>
-                  <button className={styles.row} onClick={() => handleOpenDetail(notification)} type="button">
+                  <button
+                    className={classNames(styles.row, { [styles.rowUnread]: !read[notification.id] })}
+                    onClick={() => handleOpenDetail(notification)}
+                    type="button"
+                  >
                     <span className={styles.avatar}>
                       <PatientPhoto patientName={patientName} patientUuid={notification.patientUuid} />
                     </span>
