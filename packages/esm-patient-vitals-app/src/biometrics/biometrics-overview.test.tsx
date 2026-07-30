@@ -137,6 +137,18 @@ describe('Biometrics Overview', () => {
 
     // Initial state should be descending
     expect(getRowDates()).toEqual(expectedDescendingOrder);
+
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    // The first click sorts in ascending order, putting the oldest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
+
+    // The second click sorts in descending order, putting the newest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {

@@ -54,11 +54,19 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
     _cellB: any,
     { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
   ) => {
-    if (sortDirection === 'NONE') {
-      setSortParams({ key: '', sortDirection });
-    } else {
-      setSortParams({ key, sortDirection });
-    }
+    // Carbon re-runs this comparator while deriving its own state, so keep the
+    // previous object when nothing changed. Returning a new one every time would
+    // re-render, produce a fresh `sortedData` reference, and re-enter this
+    // callback through Carbon's rows effect, looping indefinitely.
+    setSortParams((prevSortParams) => {
+      const nextKey = sortDirection === 'NONE' ? '' : key;
+
+      if (prevSortParams.key === nextKey && prevSortParams.sortDirection === sortDirection) {
+        return prevSortParams;
+      }
+
+      return { key: nextKey, sortDirection };
+    });
     return 0;
   };
 
@@ -73,9 +81,11 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
       return tableRows;
     }
 
+    // `sortFunc` compares in ascending order, so it maps directly onto the ASC
+    // sort direction and needs inverting for DESC.
     const sortedRows = tableRows.slice().sort((rowA, rowB) => {
       const sortingNum = header.sortFunc(rowA, rowB);
-      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
+      return sortParams.sortDirection === 'DESC' ? -sortingNum : sortingNum;
     });
 
     return sortedRows;
