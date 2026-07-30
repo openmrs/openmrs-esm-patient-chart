@@ -111,6 +111,44 @@ describe('VitalsOverview', () => {
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
+  it('sorts the vitals table in the direction indicated by the column header', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
+
+    const getRowDates = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1) // Exclude the header row
+        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+        .filter(Boolean);
+
+    const expectedDescendingOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021', '08 — Apr — 2021'];
+    const expectedAscendingOrder = [...expectedDescendingOrder].reverse();
+
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+
+    const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    // The first click sorts in ascending order, putting the oldest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
+
+    // The second click sorts in descending order, putting the newest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+  });
+
   it('expands a vitals row to show an associated note', async () => {
     const user = userEvent.setup();
 
