@@ -8,6 +8,7 @@ import {
   age,
   closeWorkspace,
   getDefaultsFromConfigSchema,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useSession,
@@ -20,6 +21,7 @@ import { createEmptyLabOrder } from './test-order';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
 const mockCloseWorkspace = closeWorkspace as Mock;
+const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockUseSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -81,14 +83,16 @@ function renderAddLabOrderWorkspace() {
   );
 }
 
-mockUseConfig.mockReturnValue({
+const defaultConfig: ConfigObject = {
   ...getDefaultsFromConfigSchema(configSchema),
   orders: {
     labOrderTypeUuid: 'test-lab-order-type-uuid',
     labOrderableConcepts: [],
   },
   additionalTestOrderTypes: [],
-});
+};
+
+mockUseConfig.mockReturnValue(defaultConfig);
 
 mockUseSession.mockReturnValue(mockSessionDataResponse.data);
 
@@ -110,6 +114,8 @@ mockUseOrderType.mockReturnValue({
 describe('AddLabOrder', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
+    mockUseConfig.mockReturnValue(defaultConfig);
+    mockShowSnackbar.mockClear();
   });
 
   test('happy path fill and submit form', async () => {
@@ -160,6 +166,84 @@ describe('AddLabOrder', () => {
     });
 
     expect(mockCloseWorkspace).toHaveBeenCalled();
+  });
+
+  test('opting in to notifications records the preference on the order and confirms it', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
+    renderAddLabOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+    await user.click(screen.getByRole('button', { name: /order form/i }));
+
+    const notifyToggle = screen.getByRole('switch', { name: /notify me when resulted/i });
+    expect(notifyToggle).not.toBeChecked();
+    expect(
+      screen.getByText(/turning this on sends you a notification the moment this order is resulted/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Planned for a future release.')).toBeInTheDocument();
+
+    await user.click(notifyToggle);
+
+    expect(notifyToggle).toBeChecked();
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'success', title: 'Notify when resulted' }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([expect.objectContaining({ notifyWhenResulted: true })]);
+    });
+  });
+
+  test('leaving the notification opt-in untouched records the order as not opted in', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
+    renderAddLabOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+    await user.click(screen.getByRole('button', { name: /order form/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([expect.objectContaining({ notifyWhenResulted: false })]);
+    });
+    expect(mockShowSnackbar).not.toHaveBeenCalled();
+  });
+
+  test('summarizes how the selected priority is notified', async () => {
+    const user = userEvent.setup();
+    renderAddLabOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+    await user.click(screen.getByRole('button', { name: /order form/i }));
+
+    expect(screen.getByText(/routine — filed silently to the chart/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Priority' }), 'STAT');
+
+    expect(screen.getByText(/stat — the clinician is actively waiting/i)).toBeInTheDocument();
+    expect(screen.queryByText(/routine — filed silently to the chart/i)).not.toBeInTheDocument();
+  });
+
+  test('hides the notification opt-in when it is disabled by configuration', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({ ...defaultConfig, showNotifyWhenResultedToggle: false });
+
+    renderAddLabOrderWorkspace();
+    await user.type(screen.getByRole('searchbox'), 'cd4');
+    await screen.findByText('CD4 COUNT');
+    await user.click(screen.getByRole('button', { name: /order form/i }));
+
+    expect(screen.getByRole('combobox', { name: 'Priority' })).toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: /notify me when resulted/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/routine — filed silently to the chart/i)).not.toBeInTheDocument();
   });
 
   test('from lab search, click add directly to order basket', async () => {

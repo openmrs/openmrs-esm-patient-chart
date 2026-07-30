@@ -35,7 +35,8 @@ export const configSchema = {
   },
   orderTypeUuid: {
     _type: Type.UUID,
-    _description: "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
+    _description:
+      "UUID identifying this extension's order type for order basket panel filtering. Must match orders.labOrderTypeUuid if that value is overridden.",
     _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
   },
   orders: {
@@ -58,6 +59,12 @@ export const configSchema = {
     _default: true,
     _description:
       'Whether to display the Reference number field in the Test Order form. This field maps to the accesion_number property in the Order data model',
+  },
+  showNotifyWhenResultedToggle: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'Whether to display the "Notify me when resulted" opt-in toggle in the Test Order form, along with the summary of how the selected priority is notified. The opt-in is recorded in the order basket only; delivering the notification depends on backend support that is not available yet.',
   },
   additionalTestOrderTypes: {
     _type: Type.Array,
@@ -142,6 +149,7 @@ export interface ConfigObject {
     labOrderableConcepts: Array<string>;
   };
   showReferenceNumberField: boolean;
+  showNotifyWhenResultedToggle: boolean;
   additionalTestOrderTypes: Array<{
     label?: string;
     orderTypeUuid: string;

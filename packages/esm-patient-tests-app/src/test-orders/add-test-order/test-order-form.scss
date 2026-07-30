@@ -57,6 +57,22 @@
   color: $text-02;
 }
 
+.notifyWhenResultedHint {
+  margin-top: layout.$spacing-03;
+  margin-bottom: 0;
+  max-width: unset;
+  width: 100%;
+}
+
+.futureReleaseNote {
+  color: $text-02;
+}
+
+.priorityNotificationSummary {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {

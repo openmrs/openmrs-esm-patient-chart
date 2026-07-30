@@ -7,11 +7,13 @@ import {
   ComboBox,
   Form,
   Grid,
+  InlineNotification,
   Layer,
   Select,
   SelectItem,
   TextArea,
   TextInput,
+  Toggle,
 } from '@carbon/react';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -93,6 +95,7 @@ export function LabOrderForm({
             message: t('priorityRequired', 'Priority is required'),
           }),
           accessionNumber: z.string().nullish(),
+          notifyWhenResulted: z.boolean().nullish(),
           testType: z.object(
             { label: z.string(), conceptUuid: z.string() },
             {
@@ -131,7 +134,38 @@ export function LabOrderForm({
     },
   });
 
-  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
+  const urgency = watch('urgency');
+  const isScheduledDateRequired = urgency === 'ON_SCHEDULED_DATE';
+
+  const notifyWhenResultedHint = t(
+    'notifyWhenResultedHint',
+    "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
+  );
+  const futureReleaseNote = t('plannedForFutureRelease', 'Planned for a future release.');
+
+  // Summarizes how the currently selected priority is notified, so the clinician can tell whether
+  // opting in adds anything on top of what the priority already does.
+  const priorityNotificationSummary = useMemo(() => {
+    switch (urgency) {
+      case 'ROUTINE':
+        return t(
+          'routinePriorityNotificationSummary',
+          'Routine — filed silently to the chart unless the entered value is critical.',
+        );
+      case 'STAT':
+        return t(
+          'statPriorityNotificationSummary',
+          'Stat — the clinician is actively waiting. A push notification fires the moment results are entered.',
+        );
+      case 'ON_SCHEDULED_DATE':
+        return t(
+          'scheduledPriorityNotificationSummary',
+          'On scheduled date — the order activates on the scheduled date, then follows routine handling.',
+        );
+      default:
+        return null;
+    }
+  }, [t, urgency]);
 
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
@@ -232,6 +266,23 @@ export function LabOrderForm({
     [setValue],
   );
 
+  const handleToggleNotifyWhenResulted = useCallback(
+    (fieldOnChange: ControllerRenderProps['onChange']) => {
+      return (checked: boolean) => {
+        fieldOnChange(checked);
+        if (checked) {
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'success',
+            title: t('notifyWhenResulted', 'Notify when resulted'),
+            subtitle: `${notifyWhenResultedHint} ${futureReleaseNote}`,
+          });
+        }
+      };
+    },
+    [futureReleaseNote, notifyWhenResultedHint, t],
+  );
+
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -308,6 +359,33 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {config.showNotifyWhenResultedToggle ? (
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="notifyWhenResulted"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Toggle
+                      aria-label={t('notifyMeWhenResulted', 'Notify me when resulted')}
+                      id="notifyWhenResultedToggle"
+                      labelA={t('off', 'Off')}
+                      labelB={t('on', 'On')}
+                      labelText={t('notifyMeWhenResulted', 'Notify me when resulted')}
+                      onToggle={handleToggleNotifyWhenResulted(onChange)}
+                      size={isTablet ? 'md' : 'sm'}
+                      toggled={Boolean(value)}
+                    />
+                  )}
+                />
+                <InlineNotification className={styles.notifyWhenResultedHint} hideCloseButton kind="info" lowContrast>
+                  {notifyWhenResultedHint} <span className={styles.futureReleaseNote}>{futureReleaseNote}</span>
+                </InlineNotification>
+              </InputWrapper>
+            </Column>
+          </Grid>
+        ) : null}
         {isScheduledDateRequired && (
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
@@ -381,6 +459,9 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {config.showNotifyWhenResultedToggle && priorityNotificationSummary ? (
+          <p className={styles.priorityNotificationSummary}>{priorityNotificationSummary}</p>
+        ) : null}
       </div>
       <ButtonSet className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}>
         <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">

@@ -319,6 +319,12 @@ export interface TestOrderBasketItem extends OrderBasketItem {
   };
   orderReason?: string;
   specimenSource?: string;
+  /**
+   * Whether the orderer has opted in to being notified as soon as this order is resulted, even when
+   * the result is not flagged as critical. The opt-in is currently held in the order basket only;
+   * the Order data model has no field for it, so it is not posted to the backend.
+   */
+  notifyWhenResulted?: boolean;
 }
 
 export interface OrderBasketWindowProps {
