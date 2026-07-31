@@ -21,6 +21,20 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     }
   }
 
+  function getObservationValueDisplay(obs: Obs): string {
+    const value = obs.value as { display?: string; name?: string } | string | number | null | undefined;
+
+    if (typeof value === 'object' && value?.display) {
+      return value.display;
+    }
+
+    if (typeof value === 'object' && value?.name) {
+      return value.name;
+    }
+
+    return getAnswerFromDisplay(obs.display);
+  }
+
   const filteredObservations = !!obsConceptUuidsToHide.length
     ? observations?.filter((obs) => {
         return !obsConceptUuidsToHide.includes(obs?.concept?.uuid);
@@ -46,7 +60,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
               {obs.groupMembers.map((member) => (
                 <React.Fragment key={index}>
                   <span className={styles.childConcept}>{member.concept.display}</span>
-                  <span>{getAnswerFromDisplay(member.display)}</span>
+                  <span>{getObservationValueDisplay(member)}</span>
                 </React.Fragment>
               ))}
             </React.Fragment>
@@ -55,7 +69,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
           return (
             <React.Fragment key={index}>
               <span>{obs.concept.display}</span>
-              <span>{getAnswerFromDisplay(obs.display)}</span>
+              <span>{getObservationValueDisplay(obs)}</span>
             </React.Fragment>
           );
         }
