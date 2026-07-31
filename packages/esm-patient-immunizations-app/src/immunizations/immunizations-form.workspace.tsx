@@ -49,9 +49,17 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine is required')),
       vaccinationDate: z
         .date()
-        .min(new Date(patient.birthDate), {
-          message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
-        })
+        .refine(
+          (date) => {
+            // Normalize both dates to start of day in local timezone
+            const inputDate = dayjs(date).startOf('day');
+            const birthDate = dayjs(patient.birthDate).startOf('day');
+            return inputDate.isSame(birthDate) || inputDate.isAfter(birthDate);
+          },
+          {
+            message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
+          },
+        )
         .refine(
           (date) => {
             // Normalize both dates to start of day in local timezone
