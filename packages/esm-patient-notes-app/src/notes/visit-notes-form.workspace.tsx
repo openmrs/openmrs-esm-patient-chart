@@ -1,9 +1,9 @@
 import React from 'react';
 import { type Encounter } from '@openmrs/esm-framework';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
-import ExportedVisitNotesForm from './exported-visit-notes-form.workspace';
+import VisitNotesForm from './visit-notes-form.component';
 
-export interface VisitNotesFormProps {
+export interface VisitNotesFormWorkspaceProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
 }
@@ -14,19 +14,21 @@ export interface VisitNotesFormProps {
  * This workspace must only be used within the patient chart.
  * @see exported-visit-notes-form.workspace.tsx
  */
-const VisitNotesForm: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}>> = ({
+const VisitNotesFormWorkspace: React.FC<PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProps, {}>> = ({
+  closeWorkspace,
   workspaceProps: { encounter, formContext = 'creating' },
   groupProps: { patientUuid, patient, visitContext },
-  ...rest
 }) => {
   return (
-    <ExportedVisitNotesForm
-      workspaceProps={{ encounter, formContext, patientUuid, patient, visitContext }}
-      windowProps={null}
-      groupProps={null}
-      {...rest}
+    <VisitNotesForm
+      encounter={encounter}
+      formContext={formContext}
+      patientUuid={patientUuid}
+      patient={patient}
+      visitContext={visitContext}
+      closeWorkspace={closeWorkspace}
     />
   );
 };
 
-export default VisitNotesForm;
+export default VisitNotesFormWorkspace;
