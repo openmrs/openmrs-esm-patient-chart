@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { createGlobalStore, useStore } from '@openmrs/esm-framework';
-import { reviewedStorageKey } from './constants';
+import { reviewedBannerWindowMs, reviewedStorageKey } from './constants';
 import { readRecordFromStorage, writeRecordToStorage } from './local-storage';
 
 export interface ReviewRecord {
@@ -8,6 +8,8 @@ export interface ReviewRecord {
   providerDisplay: string;
   reviewedAt: string;
   patientUuid: string;
+  /** Denormalised for the same reason, so the banner can say *which* result was signed off. */
+  testLabel?: string;
 }
 
 export interface ReviewState {
@@ -35,11 +37,11 @@ export function setReviewUser(userUuid: string) {
   });
 }
 
-export function markNotificationReviewed(id: string, patientUuid: string, providerDisplay: string) {
+export function markNotificationReviewed(id: string, patientUuid: string, providerDisplay: string, testLabel?: string) {
   const { userUuid, reviewed } = reviewStore.getState();
   const next = {
     ...reviewed,
-    [id]: { providerDisplay, patientUuid, reviewedAt: new Date().toISOString() },
+    [id]: { providerDisplay, patientUuid, testLabel, reviewedAt: new Date().toISOString() },
   };
   reviewStore.setState({ reviewed: next });
   if (userUuid) {
@@ -63,6 +65,12 @@ export function useReviewedNotifications(): Record<string, ReviewRecord> {
 /**
  * The most recent review for a patient, which is what the Results dashboard banner shows after
  * "View in chart" brings the clinician over from the inbox.
+ *
+ * Bounded to {@link reviewedBannerWindowMs}: the banner is a receipt for one notification, so a
+ * review older than that stops being reported. A record whose timestamp will not parse is dropped
+ * rather than kept — the opposite of {@link isWithinNotificationWindow}, because here the risk runs
+ * the other way. Hiding a notification could cost a clinician a critical result; a stale green
+ * "reviewed" strip is itself the hazard.
  */
 export function useLatestReviewForPatient(patientUuid: string): ReviewRecord | undefined {
   const reviewed = useReviewedNotifications();
@@ -71,8 +79,10 @@ export function useLatestReviewForPatient(patientUuid: string): ReviewRecord | u
     if (!patientUuid) {
       return undefined;
     }
+    const cutoff = Date.now() - reviewedBannerWindowMs;
     return Object.values(reviewed)
       .filter((record) => record.patientUuid === patientUuid)
+      .filter((record) => Date.parse(record.reviewedAt) >= cutoff)
       .sort((a, b) => b.reviewedAt.localeCompare(a.reviewedAt))[0];
   }, [patientUuid, reviewed]);
 }

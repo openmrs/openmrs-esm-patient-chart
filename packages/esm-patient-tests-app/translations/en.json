@@ -154,6 +154,7 @@
   "testResults": "test results",
   "testResults_title": "Test Results",
   "testResultsData": "test results data",
+  "testReviewed": "{{testLabel}} reviewed",
   "tests": "Tests",
   "testType": "Test type",
   "testTypeRequired": "Test type is required",

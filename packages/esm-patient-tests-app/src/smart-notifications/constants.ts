@@ -36,3 +36,13 @@ export function optInKey(patientUuid: string, conceptUuid: string): string {
 }
 
 export const smartNotificationDetailModalName = 'smart-notification-detail-modal';
+
+/**
+ * How long the Results dashboard goes on confirming a review.
+ *
+ * The banner is a receipt for the one notification that was just signed off, not a statement about
+ * the patient's current results. Unbounded it still reads "reviewed" weeks later — including when
+ * newer unreviewed criticals have arrived since, which is exactly when a green strip is most
+ * misleading.
+ */
+export const reviewedBannerWindowMs = 24 * 60 * 60 * 1000;

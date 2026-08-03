@@ -79,6 +79,7 @@ describe('NotificationDetailModal', () => {
       expect.objectContaining({
         patientUuid: mockSmartNotification.patientUuid,
         providerDisplay: mockSessionDataResponse.data.user.person.display,
+        testLabel: mockSmartNotification.testLabel,
       }),
     );
     expect(closeModal).toHaveBeenCalled();

@@ -35,7 +35,14 @@ const ReviewedBanner: React.FC<ReviewedBannerProps> = ({ patientUuid }) => {
         provider: review.providerDisplay,
         time: relativeTime,
       })}
-      title={t('resultReviewed', 'Result reviewed')}
+      // Names the test so the banner reads as a receipt for one notification rather than a verdict
+      // on the whole dashboard. Records written before the label was stored fall back to the
+      // generic wording.
+      title={
+        review.testLabel
+          ? t('testReviewed', '{{testLabel}} reviewed', { testLabel: review.testLabel })
+          : t('resultReviewed', 'Result reviewed')
+      }
     />
   );
 };

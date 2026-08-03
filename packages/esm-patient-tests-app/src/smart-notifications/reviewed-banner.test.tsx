@@ -24,14 +24,34 @@ describe('ReviewedBanner', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('confirms the review, naming the reviewer and how long ago it was', () => {
+  it('confirms the review, naming the test, the reviewer and how long ago it was', () => {
+    setReviewUser('user-uuid-1');
+    markNotificationReviewed('notification-1', mockPatient.id, 'Dr. Sarah Smith', 'Serum creatinine');
+
+    render(<ReviewedBanner patientUuid={mockPatient.id} />);
+
+    expect(screen.getByText('Serum creatinine reviewed')).toBeInTheDocument();
+    expect(screen.getByText('Reviewed by Dr. Sarah Smith · Just now')).toBeInTheDocument();
+  });
+
+  it('falls back to the generic wording for a review recorded before labels were stored', () => {
     setReviewUser('user-uuid-1');
     markNotificationReviewed('notification-1', mockPatient.id, 'Dr. Sarah Smith');
 
     render(<ReviewedBanner patientUuid={mockPatient.id} />);
 
     expect(screen.getByText('Result reviewed')).toBeInTheDocument();
-    expect(screen.getByText('Reviewed by Dr. Sarah Smith · Just now')).toBeInTheDocument();
+  });
+
+  it('stops confirming a review that has fallen out of the banner window', () => {
+    setReviewUser('user-uuid-1');
+    markNotificationReviewed('notification-1', mockPatient.id, 'Dr. Sarah Smith', 'Serum creatinine');
+    // A fortnight later the dashboard should not still open on a green "reviewed" strip.
+    vi.setSystemTime(new Date('2026-07-13T09:30:00.000Z'));
+
+    const { container } = render(<ReviewedBanner patientUuid={mockPatient.id} />);
+
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('does not show another patient’s review', () => {

@@ -107,5 +107,55 @@ describe('review store', () => {
 
       expect(result.current).toBeUndefined();
     });
+
+    it('keeps reporting a review from inside the banner window', () => {
+      vi.useFakeTimers();
+      setReviewUser(userUuid);
+      vi.setSystemTime(new Date('2026-06-29T09:00:00.000Z'));
+      markNotificationReviewed('recent', patientUuid, 'Dr. Sarah Smith');
+      vi.setSystemTime(new Date('2026-06-29T20:00:00.000Z'));
+
+      const { result } = renderHook(() => useLatestReviewForPatient(patientUuid));
+
+      expect(result.current.providerDisplay).toBe('Dr. Sarah Smith');
+      vi.useRealTimers();
+    });
+
+    it('stops reporting a review once it falls out of the banner window', () => {
+      vi.useFakeTimers();
+      setReviewUser(userUuid);
+      vi.setSystemTime(new Date('2026-06-29T09:00:00.000Z'));
+      markNotificationReviewed('stale', patientUuid, 'Dr. Sarah Smith');
+      // Two weeks on, with newer unreviewed results likely to have arrived since.
+      vi.setSystemTime(new Date('2026-07-13T09:00:00.000Z'));
+
+      const { result } = renderHook(() => useLatestReviewForPatient(patientUuid));
+
+      expect(result.current).toBeUndefined();
+      vi.useRealTimers();
+    });
+
+    it('drops a review whose timestamp will not parse rather than showing it forever', () => {
+      setReviewUser(userUuid);
+      localStorage.setItem(
+        reviewedStorageKey(userUuid),
+        JSON.stringify({ broken: { providerDisplay: 'Dr. Amoit', patientUuid, reviewedAt: 'not-a-date' } }),
+      );
+      _resetReviewStore();
+      setReviewUser(userUuid);
+
+      const { result } = renderHook(() => useLatestReviewForPatient(patientUuid));
+
+      expect(result.current).toBeUndefined();
+    });
+
+    it('carries the test label so the banner can say which result was signed off', () => {
+      setReviewUser(userUuid);
+      markNotificationReviewed('notification-1', patientUuid, 'Dr. Sarah Smith', 'Serum creatinine');
+
+      const { result } = renderHook(() => useLatestReviewForPatient(patientUuid));
+
+      expect(result.current.testLabel).toBe('Serum creatinine');
+    });
   });
 });

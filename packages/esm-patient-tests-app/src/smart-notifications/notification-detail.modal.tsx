@@ -25,9 +25,9 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
 
   const handleMarkAsReviewed = useCallback(() => {
     const providerDisplay = session?.user?.person?.display ?? session?.user?.display ?? '';
-    markNotificationReviewed(notification.id, notification.patientUuid, providerDisplay);
+    markNotificationReviewed(notification.id, notification.patientUuid, providerDisplay, notification.testLabel);
     closeModal();
-  }, [closeModal, notification.id, notification.patientUuid, session]);
+  }, [closeModal, notification.id, notification.patientUuid, notification.testLabel, session]);
 
   // Deliberately does not clear the notification: the clinician is looking, not signing off.
   const handleViewInChart = useCallback(() => {
