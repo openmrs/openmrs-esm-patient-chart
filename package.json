@@ -16,9 +16,7 @@
     "test": "turbo run test --color",
     "coverage": "turbo run coverage --color",
     "postinstall": "husky install",
-    "test-e2e": "playwright test",
-    "harness": "node ./node_modules/vite/bin/vite.js --config e2e/harness/vite.config.ts",
-    "test-e2e:screenshots": "playwright test --config playwright.harness.config.ts"
+    "test-e2e": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
