@@ -35,10 +35,11 @@ import {
   showSnackbar,
   useConfig,
   useLayoutType,
+  useSession,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
-import { setOptIn } from '../../smart-notifications/opt-in-store';
+import { setOptIn, setOptInUser } from '../../smart-notifications/opt-in-store';
 import { ordersEqual, type SmartTestOrderBasketItem } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import styles from './test-order-form.scss';
@@ -80,6 +81,16 @@ export function LabOrderForm({
   const config = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
   const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
+  const session = useSession();
+  const userUuid = session?.user?.uuid;
+
+  // "Notify me when resulted" is recorded against the clinician who ticks it, so point the opt-in
+  // store at whoever is signed in before this form writes to it.
+  useEffect(() => {
+    if (userUuid) {
+      setOptInUser(userUuid);
+    }
+  }, [userUuid]);
   const orderReasonRequired = useMemo(
     () =>
       (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})

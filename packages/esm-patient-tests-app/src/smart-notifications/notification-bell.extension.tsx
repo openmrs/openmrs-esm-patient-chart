@@ -4,6 +4,7 @@ import { Notification, NotificationNew } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useOnClickOutside, useSession } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import { setOptInUser } from './opt-in-store';
 import { setReadUser } from './read-store';
 import { setReviewUser } from './review-store';
 import { useSmartNotifications } from './smart-notifications.resource';
@@ -24,11 +25,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ patient, patientUui
 
   const userUuid = session?.user?.uuid;
 
-  // Review state is per-user; point the store at whoever is signed in before reading it.
+  // Review, read and opt-in state are all per-user; point the stores at whoever is signed in before
+  // reading them.
   useEffect(() => {
     if (userUuid) {
       setReviewUser(userUuid);
       setReadUser(userUuid);
+      setOptInUser(userUuid);
     }
   }, [userUuid]);
 

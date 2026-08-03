@@ -19,8 +19,17 @@ export function readStorageKey(userUuid: string): string {
   return `openmrs:smart-notifications:read:${userUuid}`;
 }
 
-/** Opt-in is keyed by patient + concept; there is no order uuid at the time the checkbox is set. */
-export const optInStorageKey = 'openmrs:smart-notifications:opt-in';
+/**
+ * Opt-in is keyed by patient + concept; there is no order uuid at the time the checkbox is set.
+ *
+ * Per-user for the same reason as review and read state. "Notify me when resulted" is a promise to
+ * the clinician who ticked it, and a browser-global store would quietly turn that into "notify
+ * whoever signs in at this workstation next" — the next clinician would inherit the routine
+ * notification and be able to clear it by re-ordering the same test with the toggle off.
+ */
+export function optInStorageKey(userUuid: string): string {
+  return `openmrs:smart-notifications:opt-in:${userUuid}`;
+}
 
 export function optInKey(patientUuid: string, conceptUuid: string): string {
   return `${patientUuid}:${conceptUuid}`;

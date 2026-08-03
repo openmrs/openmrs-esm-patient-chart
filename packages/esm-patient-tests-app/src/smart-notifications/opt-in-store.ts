@@ -3,15 +3,34 @@ import { optInKey, optInStorageKey } from './constants';
 import { readRecordFromStorage, writeRecordToStorage } from './local-storage';
 
 export interface OptInState {
+  userUuid: string | null;
   optIns: Record<string, boolean>;
 }
 
 const optInStore = createGlobalStore<OptInState>('smart-notifications-opt-in', {
-  optIns: readRecordFromStorage<boolean>(optInStorageKey),
+  userUuid: null,
+  optIns: {},
 });
 
 /**
- * Records (or clears) the clinician's "Notify me when resulted" choice.
+ * Points the store at a user and loads that user's opt-ins. Called by the bell as soon as the
+ * session is known, alongside `setReviewUser` and `setReadUser`, and by the order form before it
+ * can record a choice.
+ */
+export function setOptInUser(userUuid: string) {
+  const state = optInStore.getState();
+  if (state.userUuid === userUuid) {
+    return;
+  }
+  optInStore.setState({
+    userUuid,
+    optIns: userUuid ? readRecordFromStorage<boolean>(optInStorageKey(userUuid)) : {},
+  });
+}
+
+/**
+ * Records (or clears) the clinician's "Notify me when resulted" choice, against whoever the store is
+ * currently pointed at.
  *
  * The opt-in is concept-level, not order-level: OpenMRS core has no order attribute to carry it and
  * the order basket's grouped submit can't smuggle a custom flag into the POST. Ordering the same
@@ -23,15 +42,13 @@ export function setOptIn(patientUuid: string, conceptUuid: string, optedIn: bool
   }
 
   const key = optInKey(patientUuid, conceptUuid);
-  const { optIns } = optInStore.getState();
+  const { userUuid, optIns } = optInStore.getState();
 
   if (optedIn) {
     if (optIns[key]) {
       return;
     }
-    const next = { ...optIns, [key]: true };
-    optInStore.setState({ optIns: next });
-    writeRecordToStorage(optInStorageKey, next);
+    persist({ ...optIns, [key]: true }, userUuid);
     return;
   }
 
@@ -40,8 +57,14 @@ export function setOptIn(patientUuid: string, conceptUuid: string, optedIn: bool
   }
   const next = { ...optIns };
   delete next[key];
-  optInStore.setState({ optIns: next });
-  writeRecordToStorage(optInStorageKey, next);
+  persist(next, userUuid);
+}
+
+function persist(optIns: Record<string, boolean>, userUuid: string | null) {
+  optInStore.setState({ optIns });
+  if (userUuid) {
+    writeRecordToStorage(optInStorageKey(userUuid), optIns);
+  }
 }
 
 export function isOptedIn(patientUuid: string, conceptUuid: string): boolean {
@@ -50,7 +73,7 @@ export function isOptedIn(patientUuid: string, conceptUuid: string): boolean {
 
 /** Test seam: drops in-memory opt-in state. */
 export function _resetOptInStore() {
-  optInStore.setState({ optIns: {} });
+  optInStore.setState({ userUuid: null, optIns: {} });
 }
 
 export function useOptIns(): Record<string, boolean> {
