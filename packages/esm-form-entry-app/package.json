@@ -39,7 +39,7 @@
     "@angular-extensions/elements": "^20.0.2",
     "@angular/animations": "^20.3.26",
     "@angular/cdk": "^20.2.14",
-    "@angular/common": "^20.3.26",
+    "@angular/common": "^20.3.27",
     "@angular/compiler": "^20.3.26",
     "@angular/compiler-cli": "^20.3.26",
     "@angular/core": "^20.3.26",
