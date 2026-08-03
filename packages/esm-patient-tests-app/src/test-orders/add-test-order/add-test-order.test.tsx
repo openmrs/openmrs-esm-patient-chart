@@ -17,7 +17,7 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient } from 'tools';
 import { createEmptyLabOrder, type SmartTestOrderBasketItem } from './test-order';
-import { _resetOptInStore, isOptedIn } from '../../smart-notifications/opt-in-store';
+import { _resetOptInStore, isOptedIn, setOptIn } from '../../smart-notifications/opt-in-store';
 import { prepTestOrderPostData } from '../api';
 import AddTestOrderWorkspace from './add-test-order.workspace';
 
@@ -431,27 +431,48 @@ describe('AddLabOrder — notify me when resulted', () => {
     expect(screen.queryByText(/filed silently to the chart/i)).not.toBeInTheDocument();
   });
 
-  test('persists the opt-in against patient and concept when the order is submitted', () => {
+  test('persists the opt-in against patient and concept when the order is saved to the basket', async () => {
+    const user = userEvent.setup();
+
+    await openOrderForm(user);
+    await user.click(screen.getByRole('switch', { name: /notify me when resulted/i }));
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(true);
+    });
+    expect(isOptedIn('another-patient', 'test-lab-uuid-2')).toBe(false);
+  });
+
+  test('does not persist an opt-in when the toggle was left off', async () => {
+    const user = userEvent.setup();
+
+    await openOrderForm(user);
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(mockCloseWorkspace).toHaveBeenCalled();
+    });
+    expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(false);
+  });
+
+  test('saving with the toggle off clears an opt-in left by an earlier order', async () => {
+    const user = userEvent.setup();
+    setOptIn(mockPatient.id, 'test-lab-uuid-2', true);
+
+    await openOrderForm(user);
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(false);
+    });
+  });
+
+  test('leaves the prep function free of opt-in side effects', () => {
     const order: SmartTestOrderBasketItem = {
       action: 'NEW',
       display: 'CD4 COUNT',
       notifyWhenResulted: true,
-      testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
-      urgency: 'ROUTINE',
-      visit: null,
-    };
-
-    prepTestOrderPostData(order, mockPatient.id, 'encounter-uuid', 'orderer-uuid');
-
-    expect(isOptedIn(mockPatient.id, 'test-lab-uuid-2')).toBe(true);
-    expect(isOptedIn('another-patient', 'test-lab-uuid-2')).toBe(false);
-  });
-
-  test('does not persist an opt-in when the toggle was left off', () => {
-    const order: SmartTestOrderBasketItem = {
-      action: 'NEW',
-      display: 'CD4 COUNT',
-      notifyWhenResulted: false,
       testType: { label: 'CD4 COUNT', conceptUuid: 'test-lab-uuid-2' },
       urgency: 'ROUTINE',
       visit: null,

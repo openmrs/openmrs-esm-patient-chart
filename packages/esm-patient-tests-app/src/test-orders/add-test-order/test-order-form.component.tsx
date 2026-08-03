@@ -38,6 +38,7 @@ import {
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
+import { setOptIn } from '../../smart-notifications/opt-in-store';
 import { ordersEqual, type SmartTestOrderBasketItem } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import styles from './test-order-form.scss';
@@ -204,11 +205,17 @@ export function LabOrderForm({
         newOrders.push(finalizedOrder);
       }
 
+      // Recorded here rather than in prepTestOrderPostData: the prep function is a pure mapper that
+      // the basket may resolve to a different implementation for this grouping, and it runs while
+      // building the payload — before the POST resolves — so it would also record opt-ins for orders
+      // that failed to save. Always passes the boolean so un-ticking clears a prior opt-in.
+      setOptIn(patient.id, finalizedOrder.testType?.conceptUuid, Boolean(finalizedOrder.notifyWhenResulted));
+
       setOrders(newOrders);
 
       closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, closeWorkspace, initialOrder],
+    [orders, setOrders, closeWorkspace, initialOrder, patient.id],
   );
 
   const submitLabOrderToServer = useCallback(
@@ -221,6 +228,10 @@ export function LabOrderForm({
         prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
       )
         .then(() => {
+          // This path posts directly rather than going through the basket, so the opt-in is recorded
+          // once the order is known to have saved.
+          setOptIn(patient.id, finalizedOrder.testType?.conceptUuid, Boolean(finalizedOrder.notifyWhenResulted));
+
           clearOrders();
           mutateOrders();
 

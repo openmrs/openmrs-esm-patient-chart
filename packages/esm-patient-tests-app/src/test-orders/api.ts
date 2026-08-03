@@ -18,7 +18,6 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import { setOptIn } from '../smart-notifications/opt-in-store';
 import { type SmartTestOrderBasketItem } from './add-test-order/test-order';
 
 /**
@@ -102,11 +101,6 @@ export const prepTestOrderPostData: PostDataPrepFunction = (
   orderingProviderUuid,
 ): TestOrderPost => {
   if (order.action === 'NEW' || order.action === 'RENEW') {
-    // The "Notify me when resulted" opt-in can't ride along in the POST — core has no order-level
-    // notify field — so it is recorded client-side here, at the one point that sees the final
-    // submitted order. Keyed by patient + concept; see opt-in-store for the consequences.
-    setOptIn(patientUuid, order.testType?.conceptUuid, Boolean(order.notifyWhenResulted));
-
     return {
       action: 'NEW',
       type: 'testorder',
