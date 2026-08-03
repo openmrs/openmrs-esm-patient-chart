@@ -49,7 +49,7 @@ const ImmunizationsForm: React.FC<PatientWorkspace2DefinitionProps<{}, {}>> = ({
       vaccineUuid: z.string().min(1, t('vaccineRequired', 'Vaccine is required')),
       vaccinationDate: z
         .date()
-        .min(new Date(patient.birthDate), {
+        .refine((date) => !patient.birthDate || !dayjs(date).isBefore(patient.birthDate, 'day'), {
           message: t('vaccinationDateCannotBeBeforeBirthDate', 'Vaccination date cannot precede birth date'),
         })
         .refine(

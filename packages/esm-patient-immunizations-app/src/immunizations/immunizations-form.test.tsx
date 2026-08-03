@@ -6,10 +6,10 @@
  * matchers on form payloads that production code builds with `new Date()`.
  */
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, beforeAll, afterAll, type Mock } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -593,6 +593,88 @@ describe('Immunizations Form', () => {
       'existing-uuid',
       expect.any(AbortController),
     );
+  });
+
+  describe('Vaccination date boundaries', () => {
+    const originalTimezone = process.env.TZ;
+
+    beforeAll(() => {
+      // The birth-date boundary bug only reproduces in timezones ahead of UTC
+      process.env.TZ = 'Africa/Nairobi';
+    });
+
+    afterAll(() => {
+      process.env.TZ = originalTimezone;
+    });
+
+    it("should accept a vaccination date that matches the patient's birth date", async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
+
+      mockSavePatientImmunization.mockResolvedValue({
+        status: 201,
+        ok: true,
+        data: { id: 'new-immunization-id' },
+      });
+
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '1972-04-04' } }); // matches mockPatient.birthDate
+      fireEvent.blur(vaccinationDateField);
+
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
+
+      expect(screen.queryByText(/Vaccination date cannot precede birth date/i)).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Save/i }));
+
+      expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
+    });
+
+    it("should reject a vaccination date one day before the patient's birth date", async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
+
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '1972-04-03' } }); // one day before birth date
+      fireEvent.blur(vaccinationDateField);
+
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
+
+      expect(screen.getByText(/Vaccination date cannot precede birth date/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Save/i }));
+
+      expect(mockSavePatientImmunization).not.toHaveBeenCalled();
+    });
+
+    it('should reject a vaccination date in the future', async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
+
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '2099-01-01' } });
+      fireEvent.blur(vaccinationDateField);
+
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
+
+      expect(screen.getByText(/Vaccination date cannot be in the future/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Save/i }));
+
+      expect(mockSavePatientImmunization).not.toHaveBeenCalled();
+    });
   });
 });
 
