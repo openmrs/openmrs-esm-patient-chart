@@ -111,5 +111,16 @@ test('Mark a patient as deceased', async ({ page, patient }) => {
     expect(valueContrast).toBeGreaterThanOrEqual(4.5);
     expect(minTagContrast).toBeGreaterThanOrEqual(4.5);
     expect(minTagVsBand).toBeGreaterThanOrEqual(3);
+
+    // Carbon draws the Actions trigger's focus ring as an outline and the toggle's as an inset
+    // box-shadow, so each needs its own read. The default blue (#0f62fe) is 1.56:1 against this
+    // band, below the 3:1 WCAG 1.4.11 wants for non-text contrast.
+    const actionsTrigger = banner.getByRole('button', { name: /actions/i });
+    await actionsTrigger.focus();
+    await expect(actionsTrigger).toHaveCSS('outline-color', 'rgb(255, 255, 255)');
+
+    const showLessToggle = banner.getByRole('button', { name: /show less/i });
+    await showLessToggle.focus();
+    await expect(showLessToggle).toHaveCSS('box-shadow', /^rgb\(255, 255, 255\)/);
   });
 });
