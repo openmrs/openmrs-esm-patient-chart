@@ -113,6 +113,12 @@ export const configSchema = {
       _default: 30000,
       _description: 'How often, in milliseconds, to poll for newly resulted orders.',
     },
+    notificationWindowDays: {
+      _type: Type.Number,
+      _default: 7,
+      _description:
+        'How many days back a result or sample rejection can be and still raise a notification. Bounds the bell to recent activity: without it, opening a long-standing patient chart surfaces every rejected or STAT order still in the newest page of their lab history. Measured against the result date, so a slow-turnaround test still notifies when it comes back. Set to 0 to disable the bound and notify on everything fetched.',
+    },
   },
   labTestsWithOrderReasons: {
     _type: Type.Array,
@@ -164,6 +170,7 @@ export interface SmartNotificationsConfig {
   notifyOnAbnormalNonCritical: boolean;
   locationScoped: boolean;
   pollingIntervalMs: number;
+  notificationWindowDays: number;
 }
 
 export interface ConfigObject {

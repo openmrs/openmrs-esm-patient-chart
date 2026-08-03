@@ -135,6 +135,32 @@ export function joinObservationsToOrders(
 }
 
 /**
+ * Start of the notification window as an epoch timestamp, or `undefined` when the bound is off.
+ *
+ * `notificationWindowDays: 0` disables the horizon, restoring the unbounded behaviour for distros
+ * that would rather see everything the order search returns.
+ */
+export function notificationWindowStart(notificationWindowDays: number, now = Date.now()): number | undefined {
+  return notificationWindowDays > 0 ? now - notificationWindowDays * 24 * 60 * 60 * 1000 : undefined;
+}
+
+/**
+ * Whether a notification is recent enough to still be worth raising.
+ *
+ * Measured against `resultDate` — the result's own timestamp, falling back to the order date for a
+ * rejection, which never gets a result. Deliberately not the date the order was *placed*: a
+ * slow-turnaround test ordered outside the window but resulted just now is exactly the thing the
+ * bell exists for. A notification carrying no usable date is kept rather than silently dropped.
+ */
+export function isWithinNotificationWindow(resultDate: string | undefined, windowStart: number | undefined): boolean {
+  if (windowStart === undefined || !resultDate) {
+    return true;
+  }
+  const resultTime = Date.parse(resultDate);
+  return Number.isNaN(resultTime) || resultTime >= windowStart;
+}
+
+/**
  * Derives the notifications that need a clinician's attention for the open chart.
  *
  * Everything is computed client-side from the order REST resource and FHIR observations; there is
@@ -142,7 +168,8 @@ export function joinObservationsToOrders(
  */
 export function useSmartNotifications(patientUuid: string) {
   const config = useConfig<ConfigObject>();
-  const { enabled, locationScoped, notifyOnAbnormalNonCritical, pollingIntervalMs } = config.smartNotifications;
+  const { enabled, locationScoped, notifyOnAbnormalNonCritical, notificationWindowDays, pollingIntervalMs } =
+    config.smartNotifications;
   const { labOrderTypeUuid } = config.orders;
   const session = useSession();
   const reviewed = useReviewedNotifications();
@@ -203,6 +230,12 @@ export function useSmartNotifications(patientUuid: string) {
 
     const sessionLocationUuid = session?.sessionLocation?.uuid;
 
+    // The order search is not date-bounded — it returns the newest page of the patient's lab orders,
+    // which for a long-standing patient can reach back years. Without a horizon every old rejected
+    // sample and every long-settled STAT result reappears in the bell, and because review state is
+    // per user per browser, each clinician gets that backlog again on each new workstation.
+    const windowStart = notificationWindowStart(notificationWindowDays);
+
     const derived = joinObservationsToOrders(orders, observations)
       .map(({ order, obs }) =>
         toNotification(order, obs, {
@@ -213,6 +246,9 @@ export function useSmartNotifications(patientUuid: string) {
       .filter((notification): notification is SmartNotification => notification !== null)
       // Reviewed notifications leave the list and stay gone across reloads.
       .filter((notification) => !reviewed[notification.id])
+      // Bounds the bell to recent activity; see isWithinNotificationWindow for why it keys off the
+      // result date rather than the order date.
+      .filter((notification) => isWithinNotificationWindow(notification.resultDate, windowStart))
       // Only surface a notification at the location where the order was placed. Orders with no
       // recorded location are always shown rather than silently hidden.
       .filter(
@@ -226,6 +262,7 @@ export function useSmartNotifications(patientUuid: string) {
     return sortNotifications(derived);
   }, [
     locationScoped,
+    notificationWindowDays,
     notifyOnAbnormalNonCritical,
     observations,
     optIns,

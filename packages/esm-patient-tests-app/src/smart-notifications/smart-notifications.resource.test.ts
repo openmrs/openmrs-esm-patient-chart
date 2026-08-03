@@ -10,7 +10,12 @@ import {
   mockStatOrder,
 } from '__mocks__';
 import { toNotification } from './notification-model';
-import { joinObservationsToOrders, toResultedObservation } from './smart-notifications.resource';
+import {
+  isWithinNotificationWindow,
+  joinObservationsToOrders,
+  notificationWindowStart,
+  toResultedObservation,
+} from './smart-notifications.resource';
 
 describe('toResultedObservation', () => {
   it('maps a FHIR Observation onto the shape the notification rule consumes', () => {
@@ -191,4 +196,89 @@ describe('what actually reaches the bell', () => {
       expect.objectContaining({ tag: 'SAMPLE_REJECTED' }),
     ]);
   });
+});
+
+describe('the notification window', () => {
+  const now = Date.parse('2026-06-30T09:00:00.000+0000');
+  const daysAgo = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000).toISOString();
+
+  it('keeps a result from inside the window', () => {
+    const windowStart = notificationWindowStart(7, now);
+
+    expect(isWithinNotificationWindow(daysAgo(2), windowStart)).toBe(true);
+  });
+
+  it('drops a result from before the window', () => {
+    const windowStart = notificationWindowStart(7, now);
+
+    // The backlog case: a long-settled order still sitting in the newest page of lab history.
+    expect(isWithinNotificationWindow(daysAgo(400), windowStart)).toBe(false);
+    expect(isWithinNotificationWindow(daysAgo(8), windowStart)).toBe(false);
+  });
+
+  it('keeps everything when the bound is disabled with 0', () => {
+    const windowStart = notificationWindowStart(0, now);
+
+    expect(windowStart).toBeUndefined();
+    expect(isWithinNotificationWindow(daysAgo(400), windowStart)).toBe(true);
+  });
+
+  it('keeps a notification that carries no usable date rather than hiding it', () => {
+    const windowStart = notificationWindowStart(7, now);
+
+    expect(isWithinNotificationWindow(undefined, windowStart)).toBe(true);
+    expect(isWithinNotificationWindow('not-a-date', windowStart)).toBe(true);
+  });
+
+  it('judges a slow-turnaround test on when it resulted, not when it was ordered', () => {
+    const windowStart = notificationWindowStart(7, now);
+    // Ordered three weeks ago, resulted this morning: exactly what the bell is for.
+    const order = labOrderPlacedAt(daysAgo(21));
+    const notification = toNotification(order, resultObservedAt(daysAgo(0)), {
+      notifyOnAbnormalNonCritical: false,
+      optedIn: false,
+    });
+
+    expect(notification?.tag).toBe('STAT');
+    expect(isWithinNotificationWindow(notification?.resultDate, windowStart)).toBe(true);
+  });
+
+  it('drops an old rejection, which has no result date of its own', () => {
+    const windowStart = notificationWindowStart(7, now);
+    const order = { ...labOrderPlacedAt(daysAgo(90)), fulfillerStatus: 'DECLINED' } as never as Order;
+    const notification = toNotification(order, undefined, {
+      notifyOnAbnormalNonCritical: false,
+      optedIn: false,
+    });
+
+    expect(notification?.tag).toBe('SAMPLE_REJECTED');
+    expect(isWithinNotificationWindow(notification?.resultDate, windowStart)).toBe(false);
+  });
+
+  function labOrderPlacedAt(dateActivated: string) {
+    return {
+      uuid: 'order-glucose',
+      concept: { uuid: 'concept-glucose', display: 'Serum glucose' },
+      encounter: { uuid: 'encounter-today', location: { uuid: 'loc-1', display: 'Outpatient' } },
+      orderNumber: 'ORD-9001',
+      orderer: { display: 'Dr. Sarah Smith' },
+      patient: { uuid: 'patient-1' },
+      dateActivated,
+      display: 'Serum glucose',
+      urgency: 'STAT',
+      fulfillerStatus: 'COMPLETED',
+    } as never as Order;
+  }
+
+  function resultObservedAt(effectiveDateTime: string) {
+    return {
+      uuid: 'obs-glucose',
+      conceptUuid: 'concept-glucose',
+      display: 'Serum glucose',
+      value: '5',
+      units: 'mmol/L',
+      ranges: { lowNormal: 4, hiNormal: 7, lowCritical: 2, hiCritical: 25, units: 'mmol/L' },
+      effectiveDateTime,
+    };
+  }
 });
