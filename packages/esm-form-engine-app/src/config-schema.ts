@@ -11,7 +11,7 @@ export const configSchema = {
     _type: Type.Object,
     _description: 'PHQ-9 concept UUIDs for score calculation',
     _default: {
-      notAtAll: '160215AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Not at all
+      notAtAll: '160215AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Not at anytime
       severalDays: '167000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Several days
       moreThanHalf: '167001AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // More than half
       nearlyEveryDay: '167002AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Nearly every day
