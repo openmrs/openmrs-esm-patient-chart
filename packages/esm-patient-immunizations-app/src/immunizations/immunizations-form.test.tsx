@@ -6,10 +6,10 @@
  * matchers on form payloads that production code builds with `new Date()`.
  */
 import React from 'react';
-import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
+import { vi, describe, it, expect, test, beforeEach, beforeAll, afterAll, type Mock } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import {
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -27,7 +27,6 @@ import { savePatientImmunization } from './immunizations.resource';
 import { FHIR_NEXT_DOSE_DATE_EXTENSION_URL } from './immunization-mapper';
 import { useImmunizations } from '../hooks/useImmunizations';
 import ImmunizationsForm from './immunizations-form.workspace';
-import { fireEvent } from '@testing-library/react';
 
 const mockCloseWorkspace = vi.fn();
 const mockSavePatientImmunization = savePatientImmunization as Mock;
@@ -596,73 +595,86 @@ describe('Immunizations Form', () => {
     );
   });
 
-  it("should accept a vaccination date that matches the patient's birth date", async () => {
-    const user = userEvent.setup();
-    render(<ImmunizationsForm {...testProps} />);
+  describe('Vaccination date boundaries', () => {
+    const originalTimezone = process.env.TZ;
 
-    mockSavePatientImmunization.mockResolvedValue({
-      status: 201,
-      ok: true,
-      data: { id: 'new-immunization-id' },
+    beforeAll(() => {
+      // The birth-date boundary bug only reproduces in timezones ahead of UTC
+      process.env.TZ = 'Africa/Nairobi';
     });
 
-    const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
-    fireEvent.change(vaccinationDateField, { target: { value: '04/04/1972' } }); // matches mockPatient.birthDate
-    fireEvent.blur(vaccinationDateField);
+    afterAll(() => {
+      process.env.TZ = originalTimezone;
+    });
 
-    const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
-    await selectOption(vaccineField, 'Hepatitis B vaccination');
-    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
-    await user.clear(doseField);
-    await user.type(doseField, '1');
+    it("should accept a vaccination date that matches the patient's birth date", async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
 
-    expect(screen.queryByText(/Vaccination date cannot precede birth date/i)).not.toBeInTheDocument();
+      mockSavePatientImmunization.mockResolvedValue({
+        status: 201,
+        ok: true,
+        data: { id: 'new-immunization-id' },
+      });
 
-    await user.click(screen.getByRole('button', { name: /Save/i }));
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '1972-04-04' } }); // matches mockPatient.birthDate
+      fireEvent.blur(vaccinationDateField);
 
-    expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
-  });
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
 
-  it("should reject a vaccination date one day before the patient's birth date", async () => {
-    const user = userEvent.setup();
-    render(<ImmunizationsForm {...testProps} />);
+      expect(screen.queryByText(/Vaccination date cannot precede birth date/i)).not.toBeInTheDocument();
 
-    const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
-    fireEvent.change(vaccinationDateField, { target: { value: '03/04/1972' } }); // one day before birth date
-    fireEvent.blur(vaccinationDateField);
+      await user.click(screen.getByRole('button', { name: /Save/i }));
 
-    const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
-    await selectOption(vaccineField, 'Hepatitis B vaccination');
-    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
-    await user.clear(doseField);
-    await user.type(doseField, '1');
+      expect(mockSavePatientImmunization).toHaveBeenCalledTimes(1);
+    });
 
-    expect(screen.getByText(/Vaccination date cannot precede birth date/i)).toBeInTheDocument();
+    it("should reject a vaccination date one day before the patient's birth date", async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
 
-    await user.click(screen.getByRole('button', { name: /Save/i }));
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '1972-04-03' } }); // one day before birth date
+      fireEvent.blur(vaccinationDateField);
 
-    expect(mockSavePatientImmunization).not.toHaveBeenCalled();
-  });
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
 
-  it('should reject a vaccination date in the future', async () => {
-    const user = userEvent.setup();
-    render(<ImmunizationsForm {...testProps} />);
+      expect(screen.getByText(/Vaccination date cannot precede birth date/i)).toBeInTheDocument();
 
-    const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
-    fireEvent.change(vaccinationDateField, { target: { value: '01/01/2099' } });
-    fireEvent.blur(vaccinationDateField);
+      await user.click(screen.getByRole('button', { name: /Save/i }));
 
-    const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
-    await selectOption(vaccineField, 'Hepatitis B vaccination');
-    const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
-    await user.clear(doseField);
-    await user.type(doseField, '1');
+      expect(mockSavePatientImmunization).not.toHaveBeenCalled();
+    });
 
-    expect(screen.getByText(/Vaccination date cannot be in the future/i)).toBeInTheDocument();
+    it('should reject a vaccination date in the future', async () => {
+      const user = userEvent.setup();
+      render(<ImmunizationsForm {...testProps} />);
 
-    await user.click(screen.getByRole('button', { name: /Save/i }));
+      const vaccinationDateField = screen.getByRole('textbox', { name: /vaccination date/i });
+      fireEvent.change(vaccinationDateField, { target: { value: '2099-01-01' } });
+      fireEvent.blur(vaccinationDateField);
 
-    expect(mockSavePatientImmunization).not.toHaveBeenCalled();
+      const vaccineField = screen.getByRole('combobox', { name: /Immunization/i });
+      await selectOption(vaccineField, 'Hepatitis B vaccination');
+      const doseField = screen.getByRole('spinbutton', { name: /Dose number within series/i });
+      await user.clear(doseField);
+      await user.type(doseField, '1');
+
+      expect(screen.getByText(/Vaccination date cannot be in the future/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Save/i }));
+
+      expect(mockSavePatientImmunization).not.toHaveBeenCalled();
+    });
   });
 });
 
