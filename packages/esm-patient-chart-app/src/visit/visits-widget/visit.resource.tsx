@@ -27,13 +27,14 @@ export interface EmrApiVisitResponse {
  * Fetches visits and diagnoses from the EMRAPI endpoint.
  * Diagnoses are deduped within the hook so consumers don't need to handle it.
  */
-export function useEmrApiVisits(patientUuid: string, pageSize: number = 10) {
-  const url = patientUuid
-    ? new URL(
-        `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
-        window.location.toString(),
-      )
-    : null;
+export function useEmrApiVisits(patientUuid: string, pageSize: number = 10, enabled: boolean = true) {
+  const url =
+    patientUuid && enabled
+      ? new URL(
+          `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
+          window.location.toString(),
+        )
+      : null;
 
   const { data, mutate, ...rest } = useOpenmrsPagination<EmrApiVisitResponse>(url, pageSize);
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getConfig, getDefaultsFromConfigSchema, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
@@ -16,6 +16,7 @@ import {
 
 const mockGetConfig = getConfig as Mock;
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
   data: [],
@@ -117,6 +118,8 @@ vi.mock('./past-visits-components/encounters-table/encounters-table.resource', a
 
 describe('VisitDetailOverview', () => {
   beforeEach(() => {
+    mockUseFeatureFlag.mockReturnValue(false);
+    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
     mockUseVisitEncounters.mockReturnValue({
       encounters: visitOverviewDetailMockData.data.results[0].encounters,
       isLoading: false,
@@ -127,9 +130,9 @@ describe('VisitDetailOverview', () => {
   });
 
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockUseEmrApiVisits.mockReturnValueOnce({
-      ...mockEmrApiVisitsData,
-      visits: [],
+    mockUsePaginatedVisits.mockReturnValue({
+      ...mockPaginatedVisitsData,
+      data: [],
     });
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
@@ -150,11 +153,6 @@ describe('VisitDetailOverview', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockUseEmrApiVisits.mockReturnValue({
-      ...mockEmrApiVisitsData,
-      visits: null,
-      error,
-    });
     mockUsePaginatedVisits.mockReturnValue({
       ...mockPaginatedVisitsData,
       data: null,
@@ -177,7 +175,6 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
-    mockUseEmrApiVisits.mockReturnValue(mockEmrApiVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
@@ -213,7 +210,6 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
-    mockUseEmrApiVisits.mockReturnValue(mockEmrApiVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
