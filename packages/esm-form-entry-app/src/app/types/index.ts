@@ -261,6 +261,20 @@ export interface Concept {
   answers: Array<Concept>;
   setMembers: Array<Concept>;
   display: string;
+  mappings?: Array<ConceptMapping>;
+}
+
+export interface ConceptMapping {
+  conceptMapType?: {
+    uuid?: string;
+    display?: string;
+  };
+  conceptReferenceTerm?: {
+    code?: string;
+    conceptSource?: {
+      uuid?: string;
+    };
+  };
 }
 
 export interface Visit {

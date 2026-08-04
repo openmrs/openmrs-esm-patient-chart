@@ -46,13 +46,30 @@ export interface ProgramsFormProps {
 }
 
 const createProgramsFormSchema = (t: TFunction) =>
-  z.object({
-    selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
-    enrollmentDate: z.date(),
-    completionDate: z.date().optional().nullable(),
-    enrollmentLocation: z.string(),
-    selectedProgramStatus: z.string(),
-  });
+  z
+    .object({
+      selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
+      enrollmentDate: z.date(),
+      completionDate: z.date().optional().nullable(),
+      enrollmentLocation: z.string(),
+      selectedProgramStatus: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      if (
+        data.completionDate &&
+        data.enrollmentDate &&
+        dayjs(data.completionDate).isBefore(data.enrollmentDate, 'day')
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t(
+            'completionDateCannotBeBeforeEnrollmentDate',
+            'Completion date cannot be before the enrollment date',
+          ),
+          path: ['completionDate'],
+        });
+      }
+    });
 
 export type ProgramsFormData = z.infer<ReturnType<typeof createProgramsFormSchema>>;
 
@@ -122,7 +139,14 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         patient: patientUuid,
         program: selectedProgram,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
-        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
+        // The date picker emits midnight timestamps, which the backend would reject as "before" a
+        // same-day enrollment. Align those to the enrollment timestamp, but preserve stored
+        // completion times that already fall later on the same day.
+        dateCompleted: completionDate
+          ? dayjs(completionDate).isSame(enrollmentDate, 'day') && dayjs(completionDate).isBefore(enrollmentDate)
+            ? dayjs(enrollmentDate).format()
+            : dayjs(completionDate).format()
+          : null,
         location: enrollmentLocation,
         states:
           !!selectedProgramStatus && selectedProgramStatus != currentState?.state.uuid
@@ -205,7 +229,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
           data-testid="enrollmentDate"
           maxDate={(() => {
             const completionDate = watch('completionDate');
-            return completionDate ? dayjs(completionDate).subtract(1, 'day').toDate() : new Date();
+            return completionDate ? dayjs(completionDate).toDate() : new Date();
           })()}
           labelText={t('dateEnrolled', 'Date enrolled')}
           invalid={Boolean(fieldState?.error?.message)}
@@ -224,9 +248,8 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
           {...field}
           id="completionDate"
           data-testid="completionDate"
-          minDate={dayjs(watch('enrollmentDate')).add(1, 'day').toDate()}
+          minDate={dayjs(watch('enrollmentDate')).toDate()}
           maxDate={new Date()}
-          isDisabled={dayjs(watch('enrollmentDate')).isSame(dayjs(), 'day')}
           labelText={t('dateCompleted', 'Date completed')}
           invalid={Boolean(fieldState?.error?.message)}
           invalidText={fieldState?.error?.message}
