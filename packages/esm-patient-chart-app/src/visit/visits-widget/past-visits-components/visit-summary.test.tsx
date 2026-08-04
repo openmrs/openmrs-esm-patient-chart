@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { ExtensionSlot, getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
 import { mockPatient } from 'tools';
@@ -59,6 +59,7 @@ describe('VisitSummary', () => {
     expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
 
+    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -67,16 +68,12 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/^There are no medications to display for this patient$/)).toBeInTheDocument();
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
   it('renders diagnoses tags from emrapiDiagnoses', () => {
@@ -118,6 +115,7 @@ describe('VisitSummary', () => {
     expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
     expect(screen.getByText(/HUMAN IMMUNODEFICIENCY VIRUS/i)).toBeInTheDocument();
 
+    //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     await user.click(notesTab);
 
@@ -128,19 +126,15 @@ describe('VisitSummary', () => {
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
     await user.click(medicationTab);
 
-    await waitFor(() => {
-      expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
-    });
+    expect(screen.getByRole('tabpanel', { name: /Medication/i })).toBeInTheDocument();
 
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
     await user.click(testsTab);
 
-    await waitFor(() => {
-      expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
-  it('should show loading state when encounters are being fetched', async () => {
+  it('should show loading state when encounters are being fetched', () => {
     mockUseVisitEncounters.mockReturnValue({
       encounters: null,
       error: undefined,
@@ -151,10 +145,8 @@ describe('VisitSummary', () => {
 
     render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} emrapiDiagnoses={[]} />);
 
-    await waitFor(() => {
-      const loadingElements = screen.getAllByText(/Loading visit details/i);
-      expect(loadingElements.length).toBeGreaterThan(0);
-    });
+    const loadingElements = screen.getAllByText(/Loading visit details/i);
+    expect(loadingElements.length).toBeGreaterThan(0);
   });
 
   it('should show no diagnoses found when emrapiDiagnoses is empty', () => {

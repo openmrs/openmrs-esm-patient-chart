@@ -17,12 +17,12 @@ import {
 } from '@carbon/react';
 import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useEmrApiVisits, usePaginatedVisits } from '../visits-widget/visit.resource';
-import VisitActionsCell from './visit-actions-cell.component';
-import VisitDateCell from './visit-date-cell.component';
-import VisitDiagnosisCell from './visit-diagnoses-cell.component';
+import { useEmrApiVisits } from '../visits-widget/visit.resource';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
+import VisitDateCell from './visit-date-cell.component';
 import VisitTypeCell from './visit-type-cell.component';
+import VisitDiagnosisCell from './visit-diagnoses-cell.component';
+import VisitActionsCell from './visit-actions-cell.component';
 import styles from './visit-history-table.scss';
 
 interface VisitHistoryTableProps {
@@ -31,26 +31,26 @@ interface VisitHistoryTableProps {
 }
 
 /**
- * Shows a list of visit histories in the visit tab in patient chart.
- * Uses the EMRAPI endpoint as the primary data source, with a fallback
- * to the standard visits endpoint if EMRAPI is unavailable.
+ * This shows a list of visit histories in the visit tab in patient chart.
+ * Uses the EMRAPI endpoint to fetch lightweight visit data + diagnoses.
+ * Full encounter data is fetched on-demand when a row is expanded (handled by VisitSummary).
  */
 const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
   const defaultPageSize = 10;
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const pageSizes = [10, 20, 30, 40, 50];
-
-  const emrApi = useEmrApiVisits(patientUuid, pageSize);
-  const shouldFallback = !!emrApi.error;
-  const fallback = usePaginatedVisits(patientUuid, pageSize, {}, shouldFallback);
-
-  const visits = shouldFallback ? fallback.data?.map((visit) => ({ visit, diagnoses: [] })) ?? [] : emrApi.visits ?? [];
-
-  const { currentPage, isLoading, totalCount, goTo } = shouldFallback ? fallback : emrApi;
-  const error = shouldFallback ? fallback.error : emrApi.error;
-
   const { t } = useTranslation();
-  const desktopLayout = isDesktop(useLayoutType());
+  const layout = useLayoutType();
+  const desktopLayout = isDesktop(layout);
+
+  const {
+    visits: emrapiVisits,
+    currentPage,
+    error,
+    isLoading,
+    totalCount,
+    goTo,
+  } = useEmrApiVisits(patientUuid, pageSize);
 
   const columns = [
     { key: 'visitDate', header: t('date', 'Date'), CellComponent: VisitDateCell },
@@ -59,25 +59,23 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
     { key: 'actions', header: '', CellComponent: VisitActionsCell },
   ];
 
-  const layout = useLayoutType();
-
-  const rowData = visits.map(({ visit, diagnoses }) => {
+  const rowData = emrapiVisits?.map(({ visit, diagnoses }) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} diagnoses={diagnoses} patient={patient} />;
+      row[key] = <CellComponent key={key} visit={visit} patient={patient} diagnoses={diagnoses} />;
     }
     return row;
   });
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" compact={isDesktop(layout)} zebra />;
+    return <DataTableSkeleton role="progressbar" compact={desktopLayout} zebra />;
   }
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('pastVisits', 'Past visits')} />;
   }
 
-  if (visits.length === 0) {
+  if (!emrapiVisits || emrapiVisits.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
         <EmptyState headerTitle={t('pastVisits', 'Past visits')} displayText={t('visits', 'visits')} />
@@ -110,17 +108,17 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => {
-                    const { visit, diagnoses } = visits[i];
+                    const { visit, diagnoses } = emrapiVisits[i];
                     return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => {
-                            return <TableCell key={cell.id}>{cell?.value}</TableCell>;
-                          })}
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell?.value}</TableCell>
+                          ))}
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow {...getExpandedRowProps({ row })} colSpan={headers.length + 2}>
-                            <VisitSummary visit={visit} emrapiDiagnoses={diagnoses} patientUuid={patientUuid} />
+                            <VisitSummary visit={visit} patientUuid={patientUuid} emrapiDiagnoses={diagnoses} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

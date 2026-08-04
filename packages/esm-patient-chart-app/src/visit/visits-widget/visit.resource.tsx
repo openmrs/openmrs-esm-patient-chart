@@ -41,7 +41,7 @@ export function useEmrApiVisits(patientUuid: string, pageSize: number = 10) {
     () =>
       data?.map((item) => ({
         visit: item.visit,
-        diagnoses: dedupeDiagnoses(item.diagnoses?.filter((d) => !d.voided) ?? []),
+        diagnoses: dedupeDiagnoses(item.diagnoses?.filter((diagnosis) => !diagnosis.voided) ?? []),
       })) ?? null,
     [data],
   );
@@ -91,7 +91,6 @@ export function usePaginatedVisits(
   patientUuid: string,
   pageSize: number,
   params: Record<string, number | string> = {},
-  enabled: boolean = true,
 ) {
   const url = new URL(
     `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -101,7 +100,7 @@ export function usePaginatedVisits(
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const ret = useOpenmrsPagination<Visit>(patientUuid && enabled ? url : null, pageSize);
+  const ret = useOpenmrsPagination<Visit>(patientUuid ? url : null, pageSize);
 
   return ret;
 }
