@@ -91,6 +91,7 @@ export function usePaginatedVisits(
   patientUuid: string,
   pageSize: number,
   params: Record<string, number | string> = {},
+  enabled: boolean = true,
 ) {
   const url = new URL(
     `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -100,7 +101,7 @@ export function usePaginatedVisits(
     url.searchParams.set(key, '' + params[key]);
   }
 
-  const ret = useOpenmrsPagination<Visit>(patientUuid ? url : null, pageSize);
+  const ret = useOpenmrsPagination<Visit>(patientUuid && enabled ? url : null, pageSize);
 
   return ret;
 }
