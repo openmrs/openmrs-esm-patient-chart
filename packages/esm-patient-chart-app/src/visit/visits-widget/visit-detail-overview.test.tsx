@@ -7,7 +7,7 @@ import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { useEmrApiVisits, useVisitEncounters } from './visit.resource';
+import { useEmrApiVisits, usePaginatedVisits, useVisitEncounters } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
@@ -44,9 +44,28 @@ const mockEmrApiVisitsData = {
   goToPrevious: vi.fn(),
 };
 
+const mockPaginatedVisitsData = {
+  data: visitOverviewDetailMockData.data.results,
+  error: null,
+  mutate: vi.fn(),
+  isValidating: false,
+  isLoading: false,
+  totalPages: 1,
+  totalCount: 1,
+  currentPage: 1,
+  currentPageSize: { current: 10 },
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: vi.fn(),
+  goToNext: vi.fn(),
+  goToPrevious: vi.fn(),
+};
+
 vi.mock('./visit.resource', async () => ({
   ...((await vi.importActual('./visit.resource')) as object),
   useEmrApiVisits: vi.fn().mockImplementation(() => mockEmrApiVisitsData),
+  usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
   useVisitEncounters: vi.fn().mockReturnValue({
     encounters: null,
     isLoading: false,
@@ -56,6 +75,7 @@ vi.mock('./visit.resource', async () => ({
   }),
 }));
 const mockUseEmrApiVisits = vi.mocked(useEmrApiVisits);
+const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
 const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 
 const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
@@ -133,6 +153,11 @@ describe('VisitDetailOverview', () => {
     mockUseEmrApiVisits.mockReturnValue({
       ...mockEmrApiVisitsData,
       visits: null,
+      error,
+    });
+    mockUsePaginatedVisits.mockReturnValue({
+      ...mockPaginatedVisitsData,
+      data: null,
       error,
     });
 
