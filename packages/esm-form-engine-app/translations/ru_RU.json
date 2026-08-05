@@ -36,7 +36,7 @@
   "errorMarkingPatientDeceased": "Ошибка при отметке пациента как умершего",
   "errorRenderingField": "Ошибка при отображении поля",
   "errorSavingAttachments": "Ошибка при сохранении вложений",
-  "errorSavingEncounter": "Ошибка при сохранении приема",
+  "errorSavingEncounter": "Ошибка при сохранении события",
   "errorSavingEnrollment": "Ошибка при сохранении записи о зачислении в программу",
   "errorSavingPatientIdentifiers": "Ошибка при сохранении идентификаторов пациента",
   "errorSavingPatientPrograms": "Ошибка при сохранении программ пациента",
