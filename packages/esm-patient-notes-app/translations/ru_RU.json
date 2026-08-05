@@ -1,7 +1,7 @@
 {
   "add": "Добавить",
   "addImage": "Добавить изображение",
-  "addVisitNote": "Добавить запись о посещении",
+  "addVisitNote": "Примечание к визиту",
   "clinicalNoteLabel": "Напишите текст вашей записи",
   "clinicalNotePlaceholder": "Введите любой текст здесь",
   "confirmDeleteStickyNote": "Подтвердите удаление",
@@ -28,7 +28,7 @@
   "imageUploadHelperText": "Загрузите изображение или используйте камеру этого устройства для съёмки",
   "noMatchingDiagnoses": "Подходящих диагнозов не найдено",
   "note": "Заметка",
-  "noVisitNoteToDisplay": "Нет заметок",
+  "noVisitNoteToDisplay": "Нет примечаний",
   "primaryDiagnosis": "Основной диагноз",
   "primaryDiagnosisInputPlaceholder": "Выберите основной диагноз",
   "primaryDiagnosisRequired": "Выберите хотя бы один основной диагноз",
@@ -45,11 +45,11 @@
   "stickyNoteDeleted": "Заметка удалена",
   "stickyNoteDeletedSuccessfully": "Заметка успешно удалена",
   "stickyNoteUpdated": "Заметка обновлена",
-  "visitDate": "Дата посещения",
-  "visitNote": "Запись о посещении",
-  "visitNoteNowVisible": "Теперь она отображается на странице приемов",
-  "visitNotes": "Записи о посещениях",
-  "visitNoteSaved": "Запись о посещении сохранена",
-  "visitNoteSaveError": "Ошибка при сохранении записи",
-  "visitNoteWorkspaceTitle": "Запись о посещении"
+  "visitDate": "Дата визита",
+  "visitNote": "Примечание",
+  "visitNoteNowVisible": "Отображается в разделе событий",
+  "visitNotes": "Примечания",
+  "visitNoteSaved": "Примечание сохранено",
+  "visitNoteSaveError": "Ошибка при сохранении примечания",
+  "visitNoteWorkspaceTitle": "Примечание к визиту"
 }
