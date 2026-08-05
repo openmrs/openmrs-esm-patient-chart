@@ -104,6 +104,51 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
     () => new Map(results?.map((medication) => [medication.uuid, medication]) ?? []),
     [results],
   );
+  const encounterMedicationsByUuid = useMemo(() => {
+    const groups = new Map<string, Array<Order>>();
+
+    medications?.forEach((medication) => {
+      const encounterUuid = medication.encounter?.uuid;
+      if (!encounterUuid) {
+        return;
+      }
+
+      const existingGroup = groups.get(encounterUuid);
+      if (existingGroup) {
+        existingGroup.push(medication);
+      } else {
+        groups.set(encounterUuid, [medication]);
+      }
+    });
+
+    return groups;
+  }, [medications]);
+
+  const getEncounterGroupLabel = useCallback(
+    (medication: Order) => {
+      const encounterDateTime = medication.encounter?.encounterDatetime;
+      return encounterDateTime
+        ? formatDate(new Date(encounterDateTime), { time: true })
+        : t('unknownEncounterDate', 'Unknown date');
+    },
+    [t],
+  );
+
+  const handleRenewAllClick = useCallback(
+    (encounterUuid: string, encounterMedications: Array<Order>) => {
+      const renewableOrders = encounterMedications.filter(
+        (medication) => !orders.some((existingOrder) => existingOrder.uuid === medication.uuid),
+      );
+
+      if (!renewableOrders.length) {
+        return;
+      }
+
+      setOrders([...orders, ...renewableOrders.map((medication) => buildMedicationOrder(medication, 'RENEW'))]);
+      launchOrderBasket({}, { encounterUuid });
+    },
+    [launchOrderBasket, orders, setOrders],
+  );
 
   const tableRows = results?.map((medication) => ({
     id: medication.uuid,
@@ -328,18 +373,59 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => {
+                  {rows.reduce<Array<React.ReactNode>>((renderedRows, row, index) => {
                     const medication = medicationsByUuid.get(row.id);
+                    if (!medication) {
+                      return renderedRows;
+                    }
 
-                    return (
-                      <TableRow className={styles.row} {...getRowProps({ row })}>
+                    const previousMedication = index > 0 ? medicationsByUuid.get(rows[index - 1].id) : null;
+                    const encounterUuid = medication.encounter?.uuid;
+                    const previousEncounterUuid = previousMedication?.encounter?.uuid;
+                    const encounterGroupKey = encounterUuid ?? `missing-${row.id}`;
+
+                    if (encounterGroupKey !== (previousEncounterUuid ?? `missing-${rows[index - 1]?.id}`)) {
+                      const encounterMedications = encounterUuid
+                        ? encounterMedicationsByUuid.get(encounterUuid) ?? [medication]
+                        : [medication];
+                      const allOrdersAlreadyInBasket = encounterMedications.every((groupMedication) =>
+                        orders.some((existingOrder) => existingOrder.uuid === groupMedication.uuid),
+                      );
+
+                      renderedRows.push(
+                        <TableRow key={`encounter-${encounterGroupKey}`} className={styles.encounterRow}>
+                          <TableCell
+                            className={styles.encounterHeaderCell}
+                            colSpan={headers.length + (isPrinting ? 0 : 1)}
+                          >
+                            <div className={styles.encounterHeaderContent}>
+                              <span>{getEncounterGroupLabel(medication)}</span>
+                              {!isPrinting && showRenewButton && encounterUuid && (
+                                <Button
+                                  kind="ghost"
+                                  size="sm"
+                                  className={styles.renewAllButton}
+                                  disabled={allOrdersAlreadyInBasket}
+                                  onClick={() => handleRenewAllClick(encounterUuid, encounterMedications)}
+                                >
+                                  {t('renewAll', 'Renew all')}
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>,
+                      );
+                    }
+
+                    renderedRows.push(
+                      <TableRow className={styles.row} key={row.id} {...getRowProps({ row })}>
                         {row.cells.map((cell) => (
                           <TableCell className={styles.tableCell} key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
                         ))}
 
-                        {!isPrinting && medication && (
+                        {!isPrinting && (
                           <TableCell className="cds--table-column-menu">
                             <OrderBasketItemActions
                               patient={patient}
@@ -352,9 +438,11 @@ const MedicationsDetailsTable: React.FC<MedicationsDetailsTableProps> = ({
                             />
                           </TableCell>
                         )}
-                      </TableRow>
+                      </TableRow>,
                     );
-                  })}
+
+                    return renderedRows;
+                  }, [])}
                 </TableBody>
               </Table>
             </TableContainer>

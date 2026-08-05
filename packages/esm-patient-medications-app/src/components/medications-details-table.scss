@@ -17,6 +17,35 @@
   }
 }
 
+.encounterRow {
+  td {
+    border-bottom: 1px solid colors.$gray-20 !important;
+    border-top: 1px solid colors.$gray-20 !important;
+  }
+}
+
+.encounterHeaderCell {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  background-color: colors.$gray-10;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04rem;
+  padding: layout.$spacing-03 layout.$spacing-05;
+}
+
+.encounterHeaderContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
+}
+
+.renewAllButton {
+  min-height: auto;
+  padding-inline: 0;
+}
+
 .medicationRecord {
   display: flex;
   flex-direction: column;
