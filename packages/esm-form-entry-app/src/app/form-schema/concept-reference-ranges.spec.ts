@@ -58,6 +58,35 @@ describe('getNumericQuestionConcepts', () => {
   it('returns an empty list for a schema without pages', () => {
     expect(getNumericQuestionConcepts({} as FormSchema)).toEqual([]);
   });
+
+  it('resolves concept references and deduplicates the resolved concepts', () => {
+    const schema = buildSchema(
+      [
+        { id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'CIEL:5089' } as any },
+        { id: 'weightAgain', type: 'obs', questionOptions: { rendering: 'number', concept: 'weight-uuid' } as any },
+      ],
+      { 'CIEL:5089': { uuid: 'weight-uuid', display: 'Weight (kg)' } },
+    );
+
+    expect(getNumericQuestionConcepts(schema)).toEqual(['weight-uuid']);
+  });
+
+  it('leaves out references which the schema tells us do not resolve', () => {
+    const schema = buildSchema(
+      [
+        { id: 'stale', type: 'obs', questionOptions: { rendering: 'number', concept: 'CIEL:00000' } as any },
+        { id: 'alsoStale', type: 'obs', questionOptions: { rendering: 'number', concept: 'CIEL:11111' } as any },
+        { id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'CIEL:5089' } as any },
+      ],
+      {
+        'CIEL:00000': { uuid: null, display: null },
+        'CIEL:11111': {},
+        'CIEL:5089': { uuid: 'weight-uuid', display: 'Weight (kg)' },
+      },
+    );
+
+    expect(getNumericQuestionConcepts(schema)).toEqual(['weight-uuid']);
+  });
 });
 
 describe('applyConceptReferenceRanges', () => {
@@ -141,6 +170,18 @@ describe('applyConceptReferenceRanges', () => {
     const schema = buildSchema([{ id: 'temperature', type: 'obs', questionOptions }]);
 
     applyConceptReferenceRanges(schema, buildReferenceRange('temperature-uuid', { hiAbsolute: 43 }));
+
+    expect(questionOptions.min).toBeUndefined();
+    expect(questionOptions.max).toBeUndefined();
+  });
+
+  it('leaves questions whose concept reference does not resolve untouched', () => {
+    const questionOptions = { rendering: 'number', concept: 'CIEL:00000' } as any;
+    const schema = buildSchema([{ id: 'stale', type: 'obs', questionOptions }], {
+      'CIEL:00000': { uuid: null, display: null },
+    });
+
+    applyConceptReferenceRanges(schema, buildReferenceRange('CIEL:00000', { lowAbsolute: 0, hiAbsolute: 230 }));
 
     expect(questionOptions.min).toBeUndefined();
     expect(questionOptions.max).toBeUndefined();

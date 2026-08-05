@@ -9,9 +9,17 @@ const numericRenderingTypes = ['number', 'decimal'];
 /**
  * Collects the concept of every numeric question in the given schema. These are the concepts for
  * which reference ranges can be applied.
+ *
+ * The concepts are resolved and deduplicated so that the request stays as small as it can be:
+ * questions whose concept reference is known not to resolve are left out entirely, and two
+ * questions sharing a concept only account for one entry.
  */
 export function getNumericQuestionConcepts(formSchema: FormSchema): Array<string> {
-  return Array.from(new Set(getNumericQuestions(formSchema).map((question) => question.questionOptions.concept)));
+  const concepts = getNumericQuestions(formSchema)
+    .map((question) => resolveConceptUuid(formSchema, question.questionOptions.concept))
+    .filter((concept) => Boolean(concept));
+
+  return Array.from(new Set(concepts));
 }
 
 /**
@@ -33,7 +41,8 @@ export function applyConceptReferenceRanges(
   }
 
   for (const question of getNumericQuestions(formSchema)) {
-    const referenceRange = referenceRanges.get(resolveConceptUuid(formSchema, question.questionOptions.concept));
+    const concept = resolveConceptUuid(formSchema, question.questionOptions.concept);
+    const referenceRange = concept ? referenceRanges.get(concept) : undefined;
 
     if (!referenceRange) {
       continue;
@@ -78,9 +87,18 @@ function getNumericQuestions(formSchema: FormSchema): Array<Questions> {
 /**
  * Questions can refer to their concept either by UUID or by a concept reference such as `CIEL:5089`,
  * while the reference ranges are always keyed by UUID.
+ *
+ * Returns nothing for a reference the schema itself already tells us does not resolve, which is how
+ * a stale question ends up being left out of the request instead of taking a whole batch down.
  */
-function resolveConceptUuid(formSchema: FormSchema, concept: string): string {
-  return formSchema.conceptReferences?.[concept]?.uuid ?? concept;
+function resolveConceptUuid(formSchema: FormSchema, concept: string): string | undefined {
+  const conceptReferences = formSchema.conceptReferences;
+
+  if (conceptReferences && concept in conceptReferences) {
+    return conceptReferences[concept]?.uuid ?? undefined;
+  }
+
+  return concept;
 }
 
 function toNumber(value: string | number | null | undefined): number | undefined {
