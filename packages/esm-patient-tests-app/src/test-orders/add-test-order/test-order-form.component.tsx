@@ -178,24 +178,6 @@ export function LabOrderForm({
     return itemDisplay?.includes(inputValue);
   }, []);
 
-  const handleNotifyToggle = useCallback(
-    (fieldOnChange: ControllerRenderProps['onChange']) => (checked: boolean) => {
-      fieldOnChange(checked);
-      if (checked) {
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'success',
-          title: t('notifyWhenResulted', 'Notify when resulted'),
-          subtitle: t(
-            'notifyWhenResultedExplainer',
-            "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
-          ),
-        });
-      }
-    },
-    [t],
-  );
-
   const saveLabOrderToBasket = useCallback(
     (data: SmartTestOrderBasketItem) => {
       const finalizedOrder: SmartTestOrderBasketItem = {
@@ -380,7 +362,7 @@ export function LabOrderForm({
                       labelA={t('off', 'Off')}
                       labelB={t('on', 'On')}
                       labelText={t('notifyMeWhenResulted', 'Notify me when resulted')}
-                      onToggle={handleNotifyToggle(onChange)}
+                      onToggle={onChange}
                       size="sm"
                       toggled={Boolean(value)}
                     />
