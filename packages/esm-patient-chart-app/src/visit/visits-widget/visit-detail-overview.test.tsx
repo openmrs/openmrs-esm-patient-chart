@@ -1,13 +1,13 @@
 import React from 'react';
-import { vi, describe, it, expect, type Mock } from 'vitest';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getConfig, getDefaultsFromConfigSchema, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { usePaginatedVisits } from './visit.resource';
+import { useEmrApiVisits, usePaginatedVisits, useVisitEncounters } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
@@ -16,6 +16,7 @@ import {
 
 const mockGetConfig = getConfig as Mock;
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
   data: [],
@@ -23,7 +24,28 @@ const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
   error: undefined,
 } as any);
 
-const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
+const mockEmrApiVisitsData = {
+  visits: visitOverviewDetailMockData.data.results.map((visit) => ({
+    visit,
+    diagnoses: [],
+  })),
+  error: null,
+  mutate: vi.fn(),
+  isValidating: false,
+  isLoading: false,
+  totalPages: 1,
+  totalCount: 1,
+  currentPage: 1,
+  currentPageSize: { current: 10 },
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: vi.fn(),
+  goToNext: vi.fn(),
+  goToPrevious: vi.fn(),
+};
+
+const mockPaginatedVisitsData = {
   data: visitOverviewDetailMockData.data.results,
   error: null,
   mutate: vi.fn(),
@@ -40,11 +62,22 @@ const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   goToNext: vi.fn(),
   goToPrevious: vi.fn(),
 };
+
 vi.mock('./visit.resource', async () => ({
   ...((await vi.importActual('./visit.resource')) as object),
+  useEmrApiVisits: vi.fn().mockImplementation(() => mockEmrApiVisitsData),
   usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
+  useVisitEncounters: vi.fn().mockReturnValue({
+    encounters: null,
+    isLoading: false,
+    error: undefined,
+    isValidating: false,
+    mutate: vi.fn(),
+  }),
 }));
+const mockUseEmrApiVisits = vi.mocked(useEmrApiVisits);
 const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
+const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 
 const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
   error: null,
@@ -84,8 +117,20 @@ vi.mock('./past-visits-components/encounters-table/encounters-table.resource', a
 }));
 
 describe('VisitDetailOverview', () => {
+  beforeEach(() => {
+    mockUseFeatureFlag.mockReturnValue(false);
+    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: visitOverviewDetailMockData.data.results[0].encounters,
+      isLoading: false,
+      error: undefined,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+  });
+
   it('renders an empty state view if encounters data is unavailable', async () => {
-    mockUsePaginatedVisits.mockReturnValueOnce({
+    mockUsePaginatedVisits.mockReturnValue({
       ...mockPaginatedVisitsData,
       data: [],
     });
@@ -95,7 +140,6 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    // visits table view
     expect(screen.getByRole('heading', { name: /past visits/i })).toBeInTheDocument();
     expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
@@ -119,7 +163,6 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    // visits table view
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getAllByText(/visits/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Error State/i)).toBeInTheDocument();
@@ -132,7 +175,6 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: true,
     });
-    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
@@ -168,7 +210,6 @@ describe('VisitDetailOverview', () => {
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
       showAllEncountersTab: false,
     });
-    mockUsePaginatedVisits.mockReturnValue(mockPaginatedVisitsData);
 
     renderWithSwr(<VisitDetailOverview patientUuid={mockPatient.id} patient={mockPatient} />);
 
