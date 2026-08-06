@@ -27,7 +27,7 @@ import {
   sortNotifications,
   toNotification,
 } from './notification-model';
-import { useOptIns } from './opt-in-store';
+import { optInCoversOrder, useOptIns } from './opt-in-store';
 import { useReadNotifications } from './read-store';
 import { optInKey } from './constants';
 import { useReviewedNotifications } from './review-store';
@@ -240,7 +240,9 @@ export function useSmartNotifications(patientUuid: string) {
       .map(({ order, obs }) =>
         toNotification(order, obs, {
           notifyOnAbnormalNonCritical,
-          optedIn: Boolean(optIns[optInKey(patientUuid, order.concept?.uuid)]),
+          // Bounded by when the opt-in was recorded, so ticking the toggle once cannot light up
+          // orders of the same test placed earlier with it switched off.
+          optedIn: optInCoversOrder(optIns[optInKey(patientUuid, order.concept?.uuid)], order.dateActivated),
         }),
       )
       .filter((notification): notification is SmartNotification => notification !== null)

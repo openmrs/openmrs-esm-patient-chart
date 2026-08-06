@@ -17,8 +17,9 @@ describe('opt-in store', () => {
     setOptIn(patientUuid, conceptUuid, true);
 
     expect(isOptedIn(patientUuid, conceptUuid)).toBe(true);
+    // Stored as the moment it was recorded, so it cannot be applied to earlier orders.
     expect(JSON.parse(localStorage.getItem(optInStorageKey(userUuid)))).toEqual({
-      [`${patientUuid}:${conceptUuid}`]: true,
+      [`${patientUuid}:${conceptUuid}`]: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
     });
   });
 

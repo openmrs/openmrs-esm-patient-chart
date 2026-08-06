@@ -65,6 +65,74 @@ export interface ClassificationOptions {
   optedIn: boolean;
 }
 
+const isSet = (value: number | undefined): value is number => value !== null && value !== undefined;
+
+/**
+ * Drops critical and absolute bounds that contradict the concept's normal range.
+ *
+ * `assessValue` accepts `0` as a real bound — its `exist` guard only rejects `null` and `undefined`
+ * — so a concept whose `hiCritical` is stored as `0` rather than left unset marks *every* positive
+ * result CRITICALLY_HIGH. CRITICAL notifies regardless of opt-in, so a single badly configured
+ * concept floods the bell with a notification for every resulted order.
+ *
+ * A critical-high threshold below the normal range cannot be right, so it is ignored rather than
+ * allowed to manufacture a critical. Coherent ranges pass through untouched, which is what keeps
+ * this safe: it can only ever remove a false critical, never suppress a real one. Where the concept
+ * carries no normal range at all there is nothing to judge coherence against, so the bounds stand.
+ */
+/**
+ * Whether the concept has a normal band we can judge the critical bounds against.
+ *
+ * A band collapsed to a point — most often `0`/`0` from dictionary fields that were never filled in
+ * — tells us nothing about where "critical" begins, so it counts as no band at all.
+ */
+function hasUsableNormalRange(ranges: ReferenceRanges): boolean {
+  const { hiNormal, lowNormal } = ranges;
+  if (!isSet(hiNormal) && !isSet(lowNormal)) {
+    return false;
+  }
+  return !(isSet(hiNormal) && isSet(lowNormal) && hiNormal <= lowNormal);
+}
+
+export function withCoherentCriticalBounds(ranges: ReferenceRanges | undefined): ReferenceRanges | undefined {
+  if (!ranges) {
+    return ranges;
+  }
+
+  // With nothing to anchor against we cannot tell a real threshold from an unset field left at 0,
+  // so every critical and absolute bound is dropped. This is the safe direction: a false CRITICAL
+  // ignores the opt-in and cannot be configured off, so it would put a notification on the bell for
+  // every single resulted order. A concept in this state can still raise CRITICAL the normal way —
+  // from an interpretation the lab itself supplied, which `resolveInterpretation` prefers anyway.
+  if (!hasUsableNormalRange(ranges)) {
+    return { units: ranges.units };
+  }
+
+  const upperReference = ranges.hiNormal ?? ranges.lowNormal;
+  const lowerReference = ranges.lowNormal ?? ranges.hiNormal;
+  const coherent = { ...ranges };
+
+  if (isSet(upperReference)) {
+    if (isSet(coherent.hiCritical) && coherent.hiCritical < upperReference) {
+      coherent.hiCritical = undefined;
+    }
+    if (isSet(coherent.hiAbsolute) && coherent.hiAbsolute < upperReference) {
+      coherent.hiAbsolute = undefined;
+    }
+  }
+
+  if (isSet(lowerReference)) {
+    if (isSet(coherent.lowCritical) && coherent.lowCritical > lowerReference) {
+      coherent.lowCritical = undefined;
+    }
+    if (isSet(coherent.lowAbsolute) && coherent.lowAbsolute > lowerReference) {
+      coherent.lowAbsolute = undefined;
+    }
+  }
+
+  return coherent;
+}
+
 /**
  * Resolves the interpretation for an observation, preferring one the lab supplied over one we
  * derive from reference ranges.
@@ -80,7 +148,7 @@ export function resolveInterpretation(obs: ResultedObservation): OBSERVATION_INT
   if (Number.isNaN(numericValue)) {
     return undefined;
   }
-  return assessValue(numericValue, obs.ranges);
+  return assessValue(numericValue, withCoherentCriticalBounds(obs.ranges));
 }
 
 export function isCritical(interpretation: OBSERVATION_INTERPRETATION | undefined): boolean {
