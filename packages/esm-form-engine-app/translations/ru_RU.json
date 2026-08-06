@@ -55,7 +55,7 @@
   "notification": "Уведомление",
   "nullMandatoryField": "Пожалуйста, заполните обязательные поля",
   "or": "или",
-  "ordersSaved": "Заказы успешно сохранены",
+  "ordersSaved": "Назначения сохранены",
   "patientCannotBeMarkedAsDeceasedBecauseNoPayloadSupplied": "Пациент не может быть отмечен как умерший, так как не переданы данные",
   "patientIdentifiersSaved": "Идентификаторы пациента успешно сохранены",
   "patientIsAlreadyMarkedAsDeceased": "Пациент уже отмечен как умерший",
