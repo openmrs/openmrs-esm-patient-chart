@@ -31,7 +31,7 @@
   "errorDeleting": "Ошибка при удалении записей",
   "female": "Женский",
   "goToSummary": "Перейти к сводке",
-  "heartRate": "Частота сердечных сокращений",
+  "heartRate": "ЧСС",
   "height": "Рост",
   "hoursOldVitals_one": "<0>Этим показателям <1>{{count}} час</1></0>",
   "hoursOldVitals_other": "<0>Этим показателям <1>{{count}} часов</1></0>",
