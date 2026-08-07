@@ -156,6 +156,10 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                           ? t('testAndValue', '{{test}} — {{value}}', {
                               test: notification.testLabel,
                               value: [notification.value, notification.units].filter(Boolean).join(' '),
+                              // Units and concept names contain characters i18next escapes by
+                              // default, which React then renders literally as "U&#x2F;L". React
+                              // escapes on render anyway, so this only avoids double-escaping.
+                              interpolation: { escapeValue: false },
                             })
                           : notification.testLabel}
                       </span>
@@ -164,6 +168,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                           t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
                             interpretation: interpretationLabel(notification.interpretation, t),
                             range: notification.referenceRangeText,
+                            interpolation: { escapeValue: false },
                           })}
                       </span>
                     </span>

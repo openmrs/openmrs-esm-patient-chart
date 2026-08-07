@@ -65,6 +65,31 @@ describe('NotificationPanel', () => {
     expect(screen.getByText('Just now')).toBeInTheDocument();
   });
 
+  // The react-i18next test double substitutes placeholders with a plain string replace, so it cannot
+  // reproduce the real escaping — units reached the UI as "U&#x2F;L" while these tests stayed green.
+  // Asserting on the call is therefore the only guard available at this level.
+  it('opts out of i18next escaping for the rows carrying units', async () => {
+    const i18next = await import('react-i18next');
+    const tSpy = vi.spyOn(i18next.useTranslation(), 't');
+
+    try {
+      renderPanel();
+
+      expect(tSpy).toHaveBeenCalledWith(
+        'testAndValue',
+        '{{test}} — {{value}}',
+        expect.objectContaining({ interpolation: { escapeValue: false } }),
+      );
+      expect(tSpy).toHaveBeenCalledWith(
+        'interpretationAndRange',
+        '{{interpretation}} · Ref {{range}}',
+        expect.objectContaining({ interpolation: { escapeValue: false } }),
+      );
+    } finally {
+      tSpy.mockRestore();
+    }
+  });
+
   it('shows the rejection reason instead of a range for a rejected sample', () => {
     renderPanel({
       notifications: [

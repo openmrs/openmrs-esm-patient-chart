@@ -81,6 +81,9 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
                 t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
                   interpretation: interpretationLabel(notification.interpretation, t),
                   range: notification.referenceRangeText,
+                  // The range carries units such as "U/L"; without this i18next escapes the solidus
+                  // and the UI shows "U&#x2F;L". React still escapes the result on render.
+                  interpolation: { escapeValue: false },
                 })}
             </dd>
           </div>
