@@ -15,6 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import type { ChartConfig } from '../../../config-schema';
 import type { Note, Order, OrderItem } from '../visit.resource';
+import { dedupeDiagnoses } from '../../dedupe-diagnoses';
 import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -84,13 +85,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
     });
 
-    // Sort the diagnoses by rank, so that primary diagnoses come first
-    diagnoses.sort((a, b) => a.rank - b.rank);
-
     // Sort medications by dateActivated DESC (newest first) to align with backend ordering
     medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
 
-    return [diagnoses, notes, medications];
+    return [dedupeDiagnoses(diagnoses), notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
   const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
