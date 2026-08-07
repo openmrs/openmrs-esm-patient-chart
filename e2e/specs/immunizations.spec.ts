@@ -232,7 +232,10 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('And when I confirm the deletion', async () => {
-    await page.getByRole('button', { name: 'danger Delete' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /(danger\s*)?delete/i })
+      .click();
   });
 
   await test.step('Then I should see a success notification', async () => {
