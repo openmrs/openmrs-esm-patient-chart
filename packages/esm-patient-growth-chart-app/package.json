@@ -1,0 +1,39 @@
+{
+  "name": "@openmrs/esm-patient-growth-chart-app",
+  "version": "12.3.4",
+  "license": "MPL-2.0",
+  "description": "Patient growth chart microfrontend for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-patient-growth-chart-app.js",
+  "main": "src/index.ts",
+  "source": true,
+  "scripts": {
+    "start": "openmrs develop",
+    "serve": "rspack serve --mode=development",
+    "debug": "npm run serve",
+    "build": "rspack --mode=production",
+    "lint": "cross-env eslint src --ext tsx,ts --fix --max-warnings=0",
+    "typescript": "tsc"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "keywords": [
+    "openmrs"
+  ],
+  "dependencies": {
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0"
+  },
+  "peerDependencies": {
+    "@openmrs/esm-framework": "10.x",
+    "react": "18.x",
+    "react-i18next": "16.x",
+    "react-router-dom": "6.x",
+    "rxjs": "6.x",
+    "swr": "2.x"
+  },
+  "devDependencies": {
+    "openmrs": "next",
+    "vitest": "^4.1.2"
+  }
+}
