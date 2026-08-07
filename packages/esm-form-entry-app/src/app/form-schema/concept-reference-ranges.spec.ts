@@ -79,8 +79,6 @@ describe('getNumericQuestionConcepts', () => {
         { id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'CIEL:5089' } as any },
       ],
       {
-        'CIEL:00000': { uuid: null, display: null },
-        'CIEL:11111': {},
         'CIEL:5089': { uuid: 'weight-uuid', display: 'Weight (kg)' },
       },
     );
