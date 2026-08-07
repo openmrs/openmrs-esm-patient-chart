@@ -60,7 +60,7 @@
     "i18next": "^25.0.0",
     "i18next-parser": "^9.3.0",
     "identity-obj-proxy": "^3.0.0",
-    "jsdom": "^28.0.0",
+    "jsdom": "^29.1.1",
     "lint-staged": "^14.0.1",
     "lodash": "^4.18.1",
     "openmrs": "next",
