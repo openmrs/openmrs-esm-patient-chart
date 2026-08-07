@@ -82,7 +82,7 @@ const PrintVisitSummaryModal: React.FC<PrintVisitSummaryModalProps> = ({ visitUu
   };
 
   return (
-    <div>
+    <>
       <ModalHeader closeModal={closeModal} title={t('visitSummary', 'Visit summary')} />
       <ModalBody className={styles.modalBody}>
         {errorType ? (
@@ -117,7 +117,7 @@ const PrintVisitSummaryModal: React.FC<PrintVisitSummaryModalProps> = ({ visitUu
           </Button>
         )}
       </ModalFooter>
-    </div>
+    </>
   );
 };
 
