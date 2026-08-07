@@ -99,10 +99,6 @@ function resolveConceptUuid(formSchema: FormSchema, concept: string): string | u
   }
 
   return concept;
-    return conceptReferences[concept]?.uuid ?? undefined;
-  }
-
-  return concept;
 }
 
 function toNumber(value: string | number | null | undefined): number | undefined {
