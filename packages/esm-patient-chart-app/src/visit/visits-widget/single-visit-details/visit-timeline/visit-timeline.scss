@@ -9,7 +9,7 @@
 }
 
 .timelineHeader {
-  padding: 0 layout.$spacing-10;
+  padding-inline: calc(layout.$spacing-08 + layout.$spacing-06 + layout.$spacing-03) layout.$spacing-10;
   @include type.type-style('helper-text-01');
   display: flex;
   gap: layout.$spacing-03;
@@ -25,36 +25,57 @@
   position: relative;
 }
 
+.timelineEntryWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .timelineEntry {
   display: flex;
   gap: layout.$spacing-03;
   align-items: center;
 }
 
-.encounterType {
-  font-weight: 700;
+// Sits on top of the timeline line, acting as the marker for its entry
+.expandButton {
+  background-color: colors.$white;
+  min-height: layout.$spacing-06;
+  padding: 0;
+  width: layout.$spacing-06;
+  z-index: 10;
 }
 
-.timelineDot {
-  height: 8px;
-  width: 8px;
-  background-color: colors.$blue-30;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: layout.$spacing-03;
-  z-index: 10;
+.layer {
+  display: flex;
+  margin-inline-start: auto;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.expandedPanel {
+  background-color: colors.$gray-10;
+  border-inline-start: 2px solid colors.$blue-30;
+  margin-block-start: layout.$spacing-03;
+  margin-inline-start: layout.$spacing-07;
+  padding: layout.$spacing-04 layout.$spacing-05;
+}
+
+.recordedVia {
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.encounterType {
+  font-weight: 700;
 }
 
 .timelineLine {
   position: absolute;
   border-left: 1px solid colors.$blue-20;
   height: 100%;
-  left: 3.4px;
-  top: 4px;
+  left: layout.$spacing-04;
   z-index: 9;
-}
-
-.skeleton {
-  width: 5% !important; // using hardcoded px values could be a bad idea.
-  margin-bottom: 0 !important;
 }

@@ -29,9 +29,6 @@ import {
 import {
   EditIcon,
   isDesktop,
-  launchWorkspace2,
-  showModal,
-  showSnackbar,
   TrashCanIcon,
   useConfig,
   useLayoutType,
@@ -42,11 +39,11 @@ import {
   useFeatureFlag,
   PrinterIcon,
 } from '@openmrs/esm-framework';
-import { invalidateVisitAndEncounterData, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
+import { confirmAndDeleteEncounter, isVisitNoteEncounter, launchEditEncounterWorkspace } from './encounter-actions';
 import {
-  deleteEncounter,
   downloadPdf,
   mapEncounter,
   useEncounterTypes,
@@ -57,7 +54,7 @@ import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
 
 /**
- * This components is used by the AllEncountersTable and VisitEncountersTable to display
+ * This components is used by the AllEncountersTable and the completed forms tables to display
  * a table of encounters, with the actual data, pagination and filtering logic passed in
  * as props.
  */
@@ -128,40 +125,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
-      const dispose = showModal('delete-encounter-modal', {
-        close: () => dispose(),
-        encounterTypeName: encounterTypeName || '',
-        onConfirmation: () => {
-          const abortController = new AbortController();
-          deleteEncounter(encounterUuid, abortController)
-            .then(() => {
-              // Update current visit data for critical components
-              mutateVisitContext?.();
-
-              // Also invalidate visit history and encounter tables since the encounter was deleted
-              invalidateVisitAndEncounterData(mutate, patientUuid);
-
-              showSnackbar({
-                isLowContrast: true,
-                title: t('encounterDeleted', 'Encounter deleted'),
-                subtitle: t('encounterSuccessfullyDeleted', 'The encounter has been deleted successfully'),
-                kind: 'success',
-              });
-            })
-            .catch(() => {
-              showSnackbar({
-                isLowContrast: false,
-                title: t('error', 'Error'),
-                subtitle: t(
-                  'encounterWithError',
-                  'The encounter could not be deleted successfully. If the error persists, please contact your system administrator.',
-                ),
-                kind: 'error',
-              });
-            });
-          dispose();
-        },
-      });
+      confirmAndDeleteEncounter({ encounterUuid, encounterTypeName, patientUuid, t, mutate, mutateVisitContext });
     },
     [mutate, mutateVisitContext, patientUuid, t],
   );
@@ -252,9 +216,6 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
 
                     if (!encounter) return null;
 
-                    const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                      encounter.encounterType === 'Visit Note' && !encounter.form;
-
                     const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
@@ -295,20 +256,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace2('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchWorkspace2('patient-form-entry-workspace', {
-                                            form: encounter.form,
-                                            encounterUuid: encounter.id,
-                                          });
-                                        }
-                                      }}
+                                      onClick={() => launchEditEncounterWorkspace(encounter, patientUuid)}
                                     />
                                   )}
                                   {canPrintEncounter && (
@@ -365,20 +313,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 {canEditEncounter && (
                                   <Button
                                     kind="ghost"
-                                    onClick={() => {
-                                      if (isVisitNoteEncounter(encounter)) {
-                                        launchWorkspace2('visit-notes-form-workspace', {
-                                          encounter,
-                                          formContext: 'editing',
-                                          patientUuid,
-                                        });
-                                      } else {
-                                        launchWorkspace2('patient-form-entry-workspace', {
-                                          form: encounter.form,
-                                          encounterUuid: encounter.id,
-                                        });
-                                      }
-                                    }}
+                                    onClick={() => launchEditEncounterWorkspace(encounter, patientUuid)}
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}
