@@ -149,6 +149,78 @@ describe('VitalsOverview', () => {
     expect(getRowDates()).toEqual(expectedDescendingOrder);
   });
 
+  it('sorts across the whole dataset even when the visible page holds a single row', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedVitals,
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    // With one row per page Carbon's comparator is never invoked, because
+    // `Array.prototype.sort` performs no comparisons on a single-element array.
+    renderWithSwr(<VitalsOverview {...testProps} pageSize={1} />);
+
+    await waitForLoadingToFinish();
+
+    const getVisibleDate = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1) // Exclude the header row
+        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+        .filter(Boolean);
+
+    expect(getVisibleDate()).toEqual(['19 — May — 2021']);
+
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    await user.click(screen.getByRole('button', { name: /date and time/i }));
+
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getVisibleDate()).toEqual(['08 — Apr — 2021']);
+  });
+
+  it('restores the unsorted order once the header cycles back to none', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-05-19T04:26:51.000Z', pulse: 90 },
+        { id: '1', date: '2021-05-10T06:41:46.000Z', pulse: 60 },
+        { id: '2', date: '2021-05-07T09:04:51.000Z', pulse: 75 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const getRowDates = () =>
+      screen
+        .getAllByRole('row')
+        .slice(1) // Exclude the header row
+        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+        .filter(Boolean);
+
+    const unsortedOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021'];
+    expect(getRowDates()).toEqual(unsortedOrder);
+
+    const sortRowsButton = screen.getByRole('button', { name: /pulse/i });
+    const pulseColumnHeader = () => screen.getByRole('columnheader', { name: /pulse/i });
+
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(['10 — May — 2021', '07 — May — 2021', '19 — May — 2021']);
+
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(['19 — May — 2021', '07 — May — 2021', '10 — May — 2021']);
+
+    // The third click clears the sort, so the rows return to their original order
+    await user.click(sortRowsButton);
+    expect(pulseColumnHeader()).toHaveAttribute('aria-sort', 'none');
+    expect(getRowDates()).toEqual(unsortedOrder);
+  });
+
   it('expands a vitals row to show an associated note', async () => {
     const user = userEvent.setup();
 

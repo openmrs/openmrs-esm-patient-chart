@@ -31,6 +31,8 @@ interface PaginatedVitalsProps {
   patient: fhir.Patient;
 }
 
+const noopSortRow = () => 0;
+
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   isPrinting,
   pageSize,
@@ -49,25 +51,15 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
     sortDirection: 'NONE',
   });
 
-  const handleSorting = (
-    _cellA: any,
-    _cellB: any,
-    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
+  // Carbon only ever sorts the rows it was handed, which is a single page. We sort
+  // the full dataset ourselves instead, so the comparator stays inert and the sort
+  // state is read from the header's click handler, which Carbon calls exactly once
+  // per click with the state it is transitioning to.
+  const handleSortHeaderClick = (
+    _event: unknown,
+    { sortHeaderKey, sortDirection }: { sortHeaderKey: string; sortDirection: DataTableSortState },
   ) => {
-    // Carbon re-runs this comparator while deriving its own state, so keep the
-    // previous object when nothing changed. Returning a new one every time would
-    // re-render, produce a fresh `sortedData` reference, and re-enter this
-    // callback through Carbon's rows effect, looping indefinitely.
-    setSortParams((prevSortParams) => {
-      const nextKey = sortDirection === 'NONE' ? '' : key;
-
-      if (prevSortParams.key === nextKey && prevSortParams.sortDirection === sortDirection) {
-        return prevSortParams;
-      }
-
-      return { key: nextKey, sortDirection };
-    });
-    return 0;
+    setSortParams({ key: sortDirection === 'NONE' ? '' : sortHeaderKey, sortDirection });
   };
 
   const sortedData: Array<VitalsTableRow> = useMemo(() => {
@@ -109,7 +101,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
         overflowMenuOnHover={!isTablet}
         rows={displayedRows}
         size={isTablet ? 'lg' : 'sm'}
-        sortRow={handleSorting}
+        sortRow={noopSortRow}
         useZebraStyles
       >
         {({ rows, headers, getTableProps, getHeaderProps, getExpandHeaderProps, getRowProps, getExpandedRowProps }) => (
@@ -119,7 +111,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
                 <TableRow>
                   {hasAnyNotes && <TableExpandHeader {...getExpandHeaderProps()} />}
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                    <TableHeader {...getHeaderProps({ header, onClick: handleSortHeaderClick })} key={header.key}>
                       {header.header}
                     </TableHeader>
                   ))}
