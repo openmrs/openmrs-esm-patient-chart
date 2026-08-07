@@ -94,7 +94,11 @@ function getNumericQuestions(formSchema: FormSchema): Array<Questions> {
 function resolveConceptUuid(formSchema: FormSchema, concept: string): string | undefined {
   const conceptReferences = formSchema.conceptReferences;
 
-  if (conceptReferences && concept in conceptReferences) {
+  if (conceptReferences) {
+    return conceptReferences[concept]?.uuid ?? undefined;
+  }
+
+  return concept;
     return conceptReferences[concept]?.uuid ?? undefined;
   }
 
