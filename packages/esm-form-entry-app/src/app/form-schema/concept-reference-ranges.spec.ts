@@ -75,13 +75,30 @@ describe('getNumericQuestionConcepts', () => {
     const schema = buildSchema(
       [
         { id: 'stale', type: 'obs', questionOptions: { rendering: 'number', concept: 'CIEL:00000' } as any },
-        { id: 'alsoStale', type: 'obs', questionOptions: { rendering: 'number', concept: 'CIEL:11111' } as any },
+        { id: 'alsoStale', type: 'obs', questionOptions: { rendering: 'number', concept: 'stale-uuid' } as any },
         { id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'CIEL:5089' } as any },
       ],
       {
         'CIEL:5089': { uuid: 'weight-uuid', display: 'Weight (kg)' },
       },
     );
+
+    expect(getNumericQuestionConcepts(schema)).toEqual(['weight-uuid']);
+  });
+
+  it('keeps a question whose concept is a UUID the schema resolved', () => {
+    const schema = buildSchema(
+      [{ id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'weight-uuid' } as any }],
+      { 'weight-uuid': { uuid: 'weight-uuid', display: 'Weight (kg)' } },
+    );
+
+    expect(getNumericQuestionConcepts(schema)).toEqual(['weight-uuid']);
+  });
+
+  it('falls back to the concept of the question when the schema carries no concept references', () => {
+    const schema = buildSchema([
+      { id: 'weight', type: 'obs', questionOptions: { rendering: 'decimal', concept: 'weight-uuid' } as any },
+    ]);
 
     expect(getNumericQuestionConcepts(schema)).toEqual(['weight-uuid']);
   });
@@ -176,7 +193,7 @@ describe('applyConceptReferenceRanges', () => {
   it('leaves questions whose concept reference does not resolve untouched', () => {
     const questionOptions = { rendering: 'number', concept: 'CIEL:00000' } as any;
     const schema = buildSchema([{ id: 'stale', type: 'obs', questionOptions }], {
-      'CIEL:00000': { uuid: null, display: null },
+      'CIEL:5089': { uuid: 'weight-uuid', display: 'Weight (kg)' },
     });
 
     applyConceptReferenceRanges(schema, buildReferenceRange('CIEL:00000', { lowAbsolute: 0, hiAbsolute: 230 }));
