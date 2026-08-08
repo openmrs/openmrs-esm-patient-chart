@@ -7,6 +7,7 @@ import React from 'react';
 import {
   ExtensionSlot,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   showModal,
   useConfig,
   useFeatureFlag,
@@ -42,6 +43,7 @@ const mockUserHasAccess = vi.mocked(userHasAccess).mockReturnValue(true);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 const mockUseEncounterTypes = vi.fn(useEncounterTypes).mockReturnValue({
   data: mockEncounterTypes,
@@ -205,6 +207,60 @@ describe('EncountersTable', () => {
         patient: mockFhirPatient,
       }),
     );
+  });
+
+  it('uses visitNoteEncounterTypes config for edit workspace routing', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return {
+        ...(getDefaultsFromConfigSchema(esmPatientChartSchema) as ChartConfig),
+        visitNoteEncounterTypes: ['Custom Visit Note Type'],
+      };
+    });
+    mockUserHasAccess.mockImplementation((privilege) => privilege == null);
+
+    const customVisitNoteEncounter = {
+      ...mockEncountersAlice[1],
+      encounterType: {
+        ...mockEncountersAlice[1].encounterType,
+        display: 'Custom Visit Note Type',
+      },
+      form: null,
+    };
+
+    const formBackedEncounter = mockEncountersAlice[0];
+
+    renderEncountersTable({
+      paginatedEncounters: [customVisitNoteEncounter, formBackedEncounter],
+      totalCount: 2,
+    });
+
+    const customVisitNoteRow = screen.getByRole('row', {
+      name: /03-Aug-2021, 12:47 AM Facility Visit Custom Visit Note Type -- User One Options/i,
+    });
+    await user.click(within(customVisitNoteRow).getByRole('button', { name: /expand current row/i }));
+    const expandedCustomVisitNoteRow = customVisitNoteRow.nextElementSibling as HTMLElement;
+    await user.click(within(expandedCustomVisitNoteRow).getByRole('button', { name: /edit this encounter/i }));
+
+    const formBackedEncounterRow = screen.getByRole('row', {
+      name: /18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
+    await user.click(within(formBackedEncounterRow).getByRole('button', { name: /expand current row/i }));
+    const expandedFormBackedEncounterRow = formBackedEncounterRow.nextElementSibling as HTMLElement;
+    await user.click(within(expandedFormBackedEncounterRow).getByRole('button', { name: /edit this encounter/i }));
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('visit-notes-form-workspace', {
+      encounter: expect.objectContaining({ encounterType: 'Custom Visit Note Type' }),
+      formContext: 'editing',
+      patientUuid: mockPatientAlice.uuid,
+    });
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith('patient-form-entry-workspace', {
+      form: expect.objectContaining({ display: 'POC Consent Form' }),
+      encounterUuid: formBackedEncounter.uuid,
+    });
   });
 });
 
