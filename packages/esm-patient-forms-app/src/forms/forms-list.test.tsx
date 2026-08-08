@@ -4,6 +4,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithSwr } from 'tools';
 import FormsList, { type FormsListProps } from './forms-list.component';
+import { FormsProvider } from '../hooks/use-forms-context';
 
 vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
@@ -16,7 +17,11 @@ const defaultProps: FormsListProps & { reset: () => void } = {
 };
 
 function renderFormsList(props = {}) {
-  renderWithSwr(<FormsList {...defaultProps} {...props} />);
+  renderWithSwr(
+    <FormsProvider>
+      <FormsList {...defaultProps} {...props} />
+    </FormsProvider>,
+  );
 }
 
 beforeEach(async () => {
