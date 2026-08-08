@@ -27,6 +27,8 @@ interface PaginatedBiometricsProps {
   patientUuid: string;
 }
 
+const noopSortRow = () => 0;
+
 const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   tableRows,
   pageSize,
@@ -45,17 +47,15 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
     sortDirection: 'NONE',
   });
 
-  const handleSorting = (
-    cellA: any,
-    cellB: any,
-    { key, sortDirection }: { key: string; sortDirection: DataTableSortState },
+  // Carbon only ever sorts the rows it was handed, which is a single page. We sort
+  // the full dataset ourselves instead, so the comparator stays inert and the sort
+  // state is read from the header's click handler, which Carbon calls exactly once
+  // per click with the state it is transitioning to.
+  const handleSortHeaderClick = (
+    _event: unknown,
+    { sortHeaderKey, sortDirection }: { sortHeaderKey: string; sortDirection: DataTableSortState },
   ) => {
-    if (sortDirection === 'NONE') {
-      setSortParams({ key: '', sortDirection });
-    } else {
-      setSortParams({ key, sortDirection });
-    }
-    return 0;
+    setSortParams({ key: sortDirection === 'NONE' ? '' : sortHeaderKey, sortDirection });
   };
 
   const sortedData: Array<BiometricsTableRow> = useMemo(() => {
@@ -69,9 +69,11 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       return tableRows;
     }
 
+    // `sortFunc` compares in ascending order, so it maps directly onto the ASC
+    // sort direction and needs inverting for DESC.
     const sortedRows = tableRows.slice().sort((rowA, rowB) => {
       const sortingNum = header.sortFunc(rowA, rowB);
-      return sortParams.sortDirection === 'DESC' ? sortingNum : -sortingNum;
+      return sortParams.sortDirection === 'DESC' ? -sortingNum : sortingNum;
     });
 
     return sortedRows;
@@ -92,7 +94,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         overflowMenuOnHover={!isTablet}
         rows={paginatedBiometrics}
         size={isTablet ? 'lg' : 'sm'}
-        sortRow={handleSorting}
+        sortRow={noopSortRow}
         useZebraStyles
       >
         {({ getHeaderProps, getTableProps, headers, rows }) => (
@@ -104,6 +106,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                     <TableHeader
                       {...getHeaderProps({
                         header,
+                        onClick: handleSortHeaderClick,
                       })}
                     >
                       {header.header}
