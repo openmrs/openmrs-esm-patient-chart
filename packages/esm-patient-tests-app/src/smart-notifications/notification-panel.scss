@@ -1,0 +1,187 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.panel {
+  // Carbon's HeaderPanel supplies the fixed position, the 3rem header offset and the open/close
+  // transition. Only the width and the light theme are ours — the default panel is 16rem and
+  // inherits the g100 header theme, which is too narrow and too dark for an inbox.
+  background-color: $ui-background;
+  color: $ui-05;
+
+  &:global(.cds--header-panel--expanded) {
+    display: flex;
+    flex-direction: column;
+    inline-size: 25rem;
+    max-inline-size: 100vw;
+    overflow: hidden;
+  }
+}
+
+.header {
+  align-items: flex-start;
+  border-bottom: 1px solid $ui-03;
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-05 layout.$spacing-03 layout.$spacing-04 layout.$spacing-05;
+}
+
+.title {
+  @include type.type-style('heading-03');
+  color: $ui-05;
+}
+
+.subtitle {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-02;
+}
+
+.closeButton {
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.sectionLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+  letter-spacing: 0.04em;
+  padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-02;
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+}
+
+.row {
+  align-items: flex-start;
+  background: none;
+  border: none;
+  border-bottom: 1px solid $ui-03;
+  cursor: pointer;
+  display: flex;
+  gap: layout.$spacing-04;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    background-color: $ui-02;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $interactive-01;
+    outline-offset: -2px;
+  }
+}
+
+// Unread rows carry a leading accent and a bolder patient name; once opened, a row keeps its place
+// in the inbox but stops competing for attention.
+.rowUnread {
+  box-shadow: inset layout.$spacing-02 0 0 0 $interactive-01;
+
+  .rowPatient {
+    font-weight: 600;
+  }
+}
+
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+
+  // PatientPhoto defaults to 56px, which is oversized for a list row.
+  :global(img),
+  :global(svg) {
+    block-size: layout.$spacing-07;
+    inline-size: layout.$spacing-07;
+  }
+}
+
+.rowBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  min-width: 0;
+}
+
+.rowMeta {
+  align-items: center;
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.rowKind {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.rowTime {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-left: auto;
+}
+
+.rowPatient {
+  @include type.type-style('body-compact-01');
+  color: $ui-05;
+}
+
+.rowTest {
+  @include type.type-style('body-compact-01');
+  color: $ui-05;
+}
+
+.rowRange {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.chevron {
+  align-self: center;
+  color: $text-02;
+  flex-shrink: 0;
+}
+
+.loading {
+  padding: layout.$spacing-05;
+}
+
+.error {
+  @include type.type-style('body-compact-01');
+  color: $danger;
+  padding: layout.$spacing-05;
+}
+
+.emptyState {
+  padding: layout.$spacing-07 layout.$spacing-05;
+  text-align: center;
+}
+
+.emptyStateTitle {
+  @include type.type-style('heading-compact-01');
+  color: $ui-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.emptyStateBody {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.footer {
+  @include type.type-style('label-01');
+  border-top: 1px solid $ui-03;
+  color: $text-02;
+  padding: layout.$spacing-04 layout.$spacing-05;
+
+  strong {
+    color: $ui-05;
+    font-weight: 600;
+  }
+}

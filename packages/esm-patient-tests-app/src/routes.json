@@ -35,9 +35,19 @@
       "component": "labOrderPanel",
       "slots": ["order-basket-slot", "result-order-basket-slot"],
       "order": 2
+    },
+    {
+      "name": "smart-notification-bell",
+      "component": "notificationBell",
+      "slot": "top-nav-actions-slot",
+      "order": 35
     }
   ],
   "modals": [
+    {
+      "name": "smart-notification-detail-modal",
+      "component": "smartNotificationDetailModal"
+    },
     {
       "name": "timeline-results-modal",
       "component": "timelineResultsModal"

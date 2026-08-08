@@ -7,11 +7,13 @@ import {
   ComboBox,
   Form,
   Grid,
+  InlineNotification,
   Layer,
   Select,
   SelectItem,
   TextArea,
   TextInput,
+  Toggle,
 } from '@carbon/react';
 import { Controller, type ControllerRenderProps, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,16 +35,18 @@ import {
   showSnackbar,
   useConfig,
   useLayoutType,
+  useSession,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
 import { prepTestOrderPostData, useOrderReasons } from '../api';
-import { ordersEqual } from './test-order';
+import { setOptIn, setOptInUser } from '../../smart-notifications/opt-in-store';
+import { ordersEqual, type SmartTestOrderBasketItem } from './test-order';
 import { type ConfigObject } from '../../config-schema';
 import styles from './test-order-form.scss';
 
 export interface LabOrderFormProps {
   closeWorkspace: Workspace2DefinitionProps['closeWorkspace'];
-  initialOrder: TestOrderBasketItem;
+  initialOrder: SmartTestOrderBasketItem;
   onCancel: () => void;
 
   /**
@@ -77,6 +81,16 @@ export function LabOrderForm({
   const config = useConfig<ConfigObject>();
   const { orderType } = useOrderType(orderTypeUuid);
   const { mutate: mutateOrders } = useMutatePatientOrders(patient.id);
+  const session = useSession();
+  const userUuid = session?.user?.uuid;
+
+  // "Notify me when resulted" is recorded against the clinician who ticks it, so point the opt-in
+  // store at whoever is signed in before this form writes to it.
+  useEffect(() => {
+    if (userUuid) {
+      setOptInUser(userUuid);
+    }
+  }, [userUuid]);
   const orderReasonRequired = useMemo(
     () =>
       (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {})
@@ -93,6 +107,7 @@ export function LabOrderForm({
             message: t('priorityRequired', 'Priority is required'),
           }),
           accessionNumber: z.string().nullish(),
+          notifyWhenResulted: z.boolean().optional(),
           testType: z.object(
             { label: z.string(), conceptUuid: z.string() },
             {
@@ -122,16 +137,31 @@ export function LabOrderForm({
     formState: { errors, defaultValues, isDirty, isSubmitting },
     setValue,
     watch,
-  } = useForm<TestOrderBasketItem>({
+  } = useForm<SmartTestOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
       accessionNumber: null,
+      notifyWhenResulted: false,
       ...initialOrder,
     },
   });
 
-  const isScheduledDateRequired = watch('urgency') === 'ON_SCHEDULED_DATE';
+  const urgency = watch('urgency');
+  const isScheduledDateRequired = urgency === 'ON_SCHEDULED_DATE';
+  const showNotifyToggle = config.smartNotifications?.enabled;
+
+  // Explains what will actually happen to this order once it is resulted, so the clinician can see
+  // why a routine test needs the opt-in and a STAT one doesn't.
+  const notifyHelperText = useMemo(() => {
+    if (urgency === 'STAT') {
+      return t(
+        'notifyHelperStat',
+        'Stat — the clinician is actively waiting. A notification fires the moment results are entered.',
+      );
+    }
+    return t('notifyHelperRoutine', 'Routine — filed silently to the chart unless the entered value is critical.');
+  }, [t, urgency]);
 
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
@@ -149,13 +179,13 @@ export function LabOrderForm({
   }, []);
 
   const saveLabOrderToBasket = useCallback(
-    (data: TestOrderBasketItem) => {
-      const finalizedOrder: TestOrderBasketItem = {
+    (data: SmartTestOrderBasketItem) => {
+      const finalizedOrder: SmartTestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
 
-      const newOrders = [...orders];
+      const newOrders = [...orders] as Array<SmartTestOrderBasketItem>;
       const existingOrder = orders.find((order) => ordersEqual(order, finalizedOrder));
 
       if (existingOrder) {
@@ -168,16 +198,22 @@ export function LabOrderForm({
         newOrders.push(finalizedOrder);
       }
 
+      // Recorded here rather than in prepTestOrderPostData: the prep function is a pure mapper that
+      // the basket may resolve to a different implementation for this grouping, and it runs while
+      // building the payload — before the POST resolves — so it would also record opt-ins for orders
+      // that failed to save. Always passes the boolean so un-ticking clears a prior opt-in.
+      setOptIn(patient.id, finalizedOrder.testType?.conceptUuid, Boolean(finalizedOrder.notifyWhenResulted));
+
       setOrders(newOrders);
 
       closeWorkspace({ discardUnsavedChanges: true });
     },
-    [orders, setOrders, closeWorkspace, initialOrder],
+    [orders, setOrders, closeWorkspace, initialOrder, patient.id],
   );
 
   const submitLabOrderToServer = useCallback(
-    (data: TestOrderBasketItem) => {
-      const finalizedOrder: TestOrderBasketItem = {
+    (data: SmartTestOrderBasketItem) => {
+      const finalizedOrder: SmartTestOrderBasketItem = {
         ...initialOrder,
         ...data,
       };
@@ -185,6 +221,10 @@ export function LabOrderForm({
         prepTestOrderPostData(finalizedOrder, patient.id, finalizedOrder?.encounterUuid, orderToEditOrdererUuid),
       )
         .then(() => {
+          // This path posts directly rather than going through the basket, so the opt-in is recorded
+          // once the order is known to have saved.
+          setOptIn(patient.id, finalizedOrder.testType?.conceptUuid, Boolean(finalizedOrder.notifyWhenResulted));
+
           clearOrders();
           mutateOrders();
 
@@ -215,7 +255,7 @@ export function LabOrderForm({
     [clearOrders, closeWorkspace, initialOrder, mutateOrders, patient.id, orderToEditOrdererUuid, t],
   );
 
-  const onError = (errors: FieldErrors<TestOrderBasketItem>) => {
+  const onError = (errors: FieldErrors<SmartTestOrderBasketItem>) => {
     console.error('Error in lab order form', errors);
   };
 
@@ -308,6 +348,41 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {showNotifyToggle && (
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="notifyWhenResulted"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Toggle
+                      className={styles.notifyToggle}
+                      id="notifyWhenResultedToggle"
+                      labelA={t('off', 'Off')}
+                      labelB={t('on', 'On')}
+                      labelText={t('notifyMeWhenResulted', 'Notify me when resulted')}
+                      onToggle={onChange}
+                      size="sm"
+                      toggled={Boolean(value)}
+                    />
+                  )}
+                />
+                <InlineNotification
+                  className={styles.notifyCallout}
+                  hideCloseButton
+                  kind="info"
+                  lowContrast
+                  subtitle={t(
+                    'notifyWhenResultedExplainer',
+                    "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
+                  )}
+                  title=""
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+        )}
         {isScheduledDateRequired && (
           <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
@@ -381,6 +456,7 @@ export function LabOrderForm({
             </InputWrapper>
           </Column>
         </Grid>
+        {showNotifyToggle && <p className={styles.notifyHelperText}>{notifyHelperText}</p>}
       </div>
       <ButtonSet className={classNames(styles.buttonSet, isTablet ? styles.tabletButtonSet : styles.desktopButtonSet)}>
         <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
