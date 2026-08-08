@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
   saveVisit,
   showSnackbar,
   updateVisit,
@@ -95,6 +96,7 @@ const mockUseVisit = vi.mocked(useVisit);
 const mockUseVisitTypes = vi.mocked(useVisitTypes);
 const mockUseLocations = vi.mocked(useLocations);
 const mockUseEmrConfiguration = vi.mocked(useEmrConfiguration);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
 
 // from ./visit-form.resource
 const mockOnVisitCreatedOrUpdatedCallback = vi.fn();
@@ -216,6 +218,32 @@ mockSaveVisit.mockResolvedValue({
     },
   },
 } as unknown as FetchResponse<Visit>);
+
+// mockPastVisitWithEncounters has specific (non-full-day) start/stop times so it can
+// exercise manual-time validation. This variant spans the exact same calendar day
+// (00:00:00.000 to 23:59:59.999) so tests can exercise the full-day-visit default.
+const mockFullDayPastVisit: Visit = {
+  ...mockPastVisitWithEncounters,
+  startDatetime: dayjs(mockPastVisitWithEncounters.startDatetime).startOf('day').toISOString(),
+  stopDatetime: dayjs(mockPastVisitWithEncounters.startDatetime).endOf('day').toISOString(),
+};
+
+// Simulates the backend truncating/rounding milliseconds on a REST API round-trip: the
+// stopDatetime still falls in the last minute of the day (23:59), but isn't byte-for-byte
+// the exact 23:59:59.999 that dayjs(...).endOf('day') would compute on the frontend.
+const mockFullDayPastVisitWithTruncatedStopTime: Visit = {
+  ...mockFullDayPastVisit,
+  stopDatetime: dayjs(mockFullDayPastVisit.stopDatetime).millisecond(0).toISOString(),
+};
+
+// Spans 3 calendar days (day 0 at 00:00:00.000 to day 2 at 23:59:59.999). Both boundary
+// times individually look like "full day" boundaries, but the visit does not fall on a
+// single calendar day, so it must not be defaulted to the full-day checkbox.
+const mockFullDayPastVisitSpanningMultipleDays: Visit = {
+  ...mockPastVisitWithEncounters,
+  startDatetime: dayjs(mockPastVisitWithEncounters.startDatetime).startOf('day').toISOString(),
+  stopDatetime: dayjs(mockPastVisitWithEncounters.startDatetime).add(2, 'day').endOf('day').toISOString(),
+};
 
 describe('Visit form', () => {
   beforeEach(() => {
@@ -369,6 +397,41 @@ describe('Visit form', () => {
     rerender(<VisitForm {...props} />);
 
     await waitFor(() => expect(screen.getByRole('radio', { name: /^Outpatient Visit$/i })).toBeChecked());
+  });
+
+  it('keeps the full day visit toggle checked (set programmatically, not by a user click) when default values update', async () => {
+    const user = userEvent.setup();
+    mockUseDefaultVisitLocation.mockReturnValue({
+      display: 'Outpatient Clinic',
+      uuid: 'location-a',
+    });
+
+    const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
+      ...defaultProps,
+      groupProps: {
+        ...defaultProps.groupProps,
+        visitContext: null,
+      },
+    };
+    const { rerender } = render(<VisitForm {...props} />);
+
+    // Switching to "In the past" sets isFullDayVisit programmatically (via the workspace's own
+    // effect), not via a user click on the toggle itself. Let this fully settle first.
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // Only now does the default visit location resolve to a different value, in a later, separate
+    // render cycle - well after the status switch has already settled. This changes defaultValues'
+    // identity and triggers the workspace's reset() effect independently of the status effect,
+    // which previously clobbered isFullDayVisit back to false because it was set via setValue()
+    // without shouldDirty: true, so keepDirtyValues didn't protect it.
+    mockUseDefaultVisitLocation.mockReturnValue({
+      display: 'Inpatient Ward',
+      uuid: 'location-b',
+    });
+    rerender(<VisitForm {...props} />);
+
+    await waitFor(() => expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked());
   });
 
   it('displays an error message when the visit start time is in the future', async () => {
@@ -960,6 +1023,411 @@ describe('Visit form', () => {
     expect(screen.queryByText(/This patient already has an active visit/i)).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
   });
+
+  it('defaults the full day visit checkbox to checked and hides the end date/time and start time fields when editing a past visit whose stored times genuinely span a full day', () => {
+    renderVisitForm(mockFullDayPastVisit);
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).toBeChecked();
+
+    expect(screen.getByText(/visit date/i)).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/^date$/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/start date/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /start time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /start time format/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/end date/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /end time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /end time format/i })).not.toBeInTheDocument();
+  });
+
+  it('defaults the full day visit checkbox to checked even when the stored stop time has truncated milliseconds after a REST API round-trip', () => {
+    renderVisitForm(mockFullDayPastVisitWithTruncatedStopTime);
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+  });
+
+  it('does not default the full day visit checkbox to checked for a visit that spans multiple calendar days, even though both boundary times individually look like full-day boundaries', () => {
+    renderVisitForm(mockFullDayPastVisitSpanningMultipleDays);
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).not.toBeChecked();
+
+    expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /start time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /start time format/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/end date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /end time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /end time format/i })).toBeInTheDocument();
+  });
+
+  it('defaults the full day visit checkbox to unchecked and shows both date/time field groups when editing a past visit with specific manual times', () => {
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).not.toBeChecked();
+
+    expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /start time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /start time format/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/end date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /end time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /end time format/i })).toBeInTheDocument();
+  });
+
+  it('defaults the full day visit checkbox to checked when a new visit is switched to the "In the past" status', async () => {
+    const user = userEvent.setup();
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).toBeChecked();
+
+    expect(screen.getByLabelText(/^date$/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/start date/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /start time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /start time format/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/end date/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /end time/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /end time format/i })).not.toBeInTheDocument();
+  });
+
+  it('re-defaults the full day visit checkbox to checked from config after the user unchecks it, switches away from "In the past", and switches back', async () => {
+    const user = userEvent.setup();
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    expect(fullDayVisitCheckbox).toBeChecked();
+
+    // Manually uncheck it, then leave "In the past" (the isFullDayVisit field is reset to its
+    // non-past default of false here, even though the checkbox itself isn't rendered for
+    // "ongoing") and come back.
+    await user.click(fullDayVisitCheckbox);
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('tab', { name: /ongoing/i }));
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+
+    // Re-entering "In the past" re-applies config.defaultToFullDayVisit rather than reflecting
+    // whatever the checkbox happened to be left at during the earlier "past" session.
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+  });
+
+  it('does not default the full day visit checkbox to checked when config.defaultToFullDayVisit is false', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      defaultToFullDayVisit: false,
+      visitAttributeTypes: [
+        {
+          uuid: visitAttributes.punctuality.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+        {
+          uuid: visitAttributes.insurancePolicyNumber.uuid,
+          required: false,
+          displayInThePatientBanner: true,
+        },
+      ],
+    });
+
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /in the past/i }));
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+  });
+
+  it('reveals the end date/time and start time fields again when the full day visit checkbox is unchecked', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockFullDayPastVisit);
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    await user.click(fullDayVisitCheckbox);
+
+    expect(fullDayVisitCheckbox).not.toBeChecked();
+    expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /start time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /start time format/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/end date/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /end time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /end time format/i })).toBeInTheDocument();
+  });
+
+  it('excludes today from the selectable date range for the visit date field when the full day visit checkbox is checked', () => {
+    renderVisitForm(mockFullDayPastVisit);
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    const dateFieldCalls = mockOpenmrsDatePicker.mock.calls.filter((call) => call[0]?.id === 'visitStartDateInput');
+    const { maxDate } = dateFieldCalls[dateFieldCalls.length - 1][0];
+
+    // Today must fall strictly after the allowed max date, i.e. today is not selectable.
+    expect(dayjs(maxDate as dayjs.ConfigType).isBefore(dayjs().startOf('day'))).toBe(true);
+  });
+
+  it('still allows today as a selectable date for the start date field in manual (non-full-day) mode', async () => {
+    const user = userEvent.setup();
+    // Some earlier tests in this file leave mockUseVisit/mockUseAllowOverlappingVisits configured
+    // with an active visit that hides the form fields; restore the defaults so this test isn't
+    // order-dependent on that state.
+    mockUseVisit.mockReturnValue({ activeVisit: null } as ReturnType<typeof useVisit>);
+    mockUseAllowOverlappingVisits.mockReturnValue({ allowOverlappingVisits: true, isLoading: false });
+
+    renderVisitForm();
+
+    await user.click(screen.getByRole('tab', { name: /ongoing/i }));
+
+    const dateFieldCalls = mockOpenmrsDatePicker.mock.calls.filter((call) => call[0]?.id === 'visitStartDateInput');
+    const { maxDate } = dateFieldCalls[dateFieldCalls.length - 1][0];
+
+    expect(dayjs(maxDate as dayjs.ConfigType).isSame(dayjs(), 'day')).toBe(true);
+  });
+
+  it('auto-corrects the selected date back to yesterday when the full day visit checkbox is checked while today is selected', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    // mockPastVisitWithEncounters defaults to manual (unchecked) mode with the start date field visible.
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    const startDateInput = screen.getByLabelText(/start date/i);
+    fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
+
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+
+    const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
+    await waitFor(() => {
+      expect(dateInput.value).toBe(dayjs().subtract(1, 'day').format('DD/MM/YYYY'));
+    });
+  });
+
+  it('restores today as the selected date when the full day visit checkbox is unchecked again after auto-correcting it to yesterday', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    const startDateInput = screen.getByLabelText(/start date/i);
+    fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    await user.click(fullDayVisitCheckbox);
+
+    const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
+    await waitFor(() => {
+      expect(dateInput.value).toBe(dayjs().subtract(1, 'day').format('DD/MM/YYYY'));
+    });
+
+    await user.click(fullDayVisitCheckbox);
+
+    const restoredStartDateInput = screen.getByLabelText(/start date/i) as HTMLInputElement;
+    await waitFor(() => {
+      expect(restoredStartDateInput.value).toBe(dayjs().format('DD/MM/YYYY'));
+    });
+  });
+
+  it('does not restore the pre-auto-correct date when the user picks a different date while full day mode is on', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    const startDateInput = screen.getByLabelText(/start date/i);
+    fireEvent.change(startDateInput, { target: { value: dayjs().format('YYYY-MM-DD') } });
+
+    const fullDayVisitCheckbox = screen.getByRole('switch', { name: /full day visit/i });
+    await user.click(fullDayVisitCheckbox);
+
+    const dateInput = screen.getByLabelText(/^date$/i) as HTMLInputElement;
+    await waitFor(() => {
+      expect(dateInput.value).toBe(dayjs().subtract(1, 'day').format('DD/MM/YYYY'));
+    });
+
+    // Deliberately pick a different date while still in full-day mode.
+    const deliberatelyChosenDate = dayjs().subtract(5, 'day');
+    fireEvent.change(dateInput, { target: { value: deliberatelyChosenDate.format('YYYY-MM-DD') } });
+    await waitFor(() => {
+      expect((screen.getByLabelText(/^date$/i) as HTMLInputElement).value).toBe(
+        deliberatelyChosenDate.format('DD/MM/YYYY'),
+      );
+    });
+
+    await user.click(fullDayVisitCheckbox);
+
+    // The user's deliberate edit must be preserved, not silently reverted to today.
+    const finalStartDateInput = screen.getByLabelText(/start date/i) as HTMLInputElement;
+    await waitFor(() => {
+      expect(finalStartDateInput.value).toBe(deliberatelyChosenDate.format('DD/MM/YYYY'));
+    });
+  });
+
+  it('submits a full-day start/stop datetime range when saving a past visit with the full day visit checkbox checked', async () => {
+    const user = userEvent.setup();
+
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
+        },
+      },
+    } as unknown as FetchResponse<Visit>);
+
+    renderVisitForm(mockFullDayPastVisit);
+
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+    const expectedStartDatetime = dayjs(mockFullDayPastVisit.startDatetime).startOf('day').toDate();
+    const expectedStopDatetime = dayjs(mockFullDayPastVisit.startDatetime).endOf('day').toDate();
+
+    expect(mockUpdateVisit).toHaveBeenCalledWith(
+      mockFullDayPastVisit.uuid,
+      expect.objectContaining({
+        startDatetime: expectedStartDatetime,
+        stopDatetime: expectedStopDatetime,
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it('attaches the "end time must be after most recent encounter" error to the visible Date field, not the hidden visitStopTime field, when editing a multi-day visit switched to full-day mode', async () => {
+    const user = userEvent.setup();
+    renderVisitForm(mockFullDayPastVisitSpanningMultipleDays);
+
+    // mockFullDayPastVisitSpanningMultipleDays spans multiple calendar days, so it doesn't default to full-day.
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+    expect(screen.getByRole('switch', { name: /full day visit/i })).toBeChecked();
+
+    // mockFullDayPastVisitSpanningMultipleDays's encounters (inherited from mockPastVisitWithEncounters) fall on
+    // 2022-01-01. Moving the full-day date to the day before means the computed end-of-day time
+    // no longer covers the visit's most recent encounter.
+    const dayBeforeEncounters = dayjs(mockPastVisitWithEncounters.startDatetime)
+      .subtract(1, 'day')
+      .format('YYYY-MM-DD');
+    const dateInput = screen.getByLabelText(/^date$/i);
+    fireEvent.change(dateInput, { target: { value: dayBeforeEncounters } });
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+    // The save must be blocked...
+    await waitFor(() => expect(mockUpdateVisit).not.toHaveBeenCalled());
+
+    // ...and the error must be attached to the visible "Date" field (visitStartDate), not
+    // silently stuck on the hidden visitStopTime field, where it would never be shown to the
+    // user and the save would appear to fail for no visible reason.
+    const dateFieldCalls = mockOpenmrsDatePicker.mock.calls.filter((call) => call[0]?.id === 'visitStartDateInput');
+    const { invalid, invalidText } = dateFieldCalls[dateFieldCalls.length - 1][0];
+    expect(invalid).toBe(true);
+    expect(invalidText).toMatch(/end time must be on or after/i);
+  });
+
+  it('preserves the existing manual start/end time behavior when the full day visit checkbox is unchecked', async () => {
+    const user = userEvent.setup();
+
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
+        },
+      },
+    } as unknown as FetchResponse<Visit>);
+
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    // mockPastVisitWithEncounters has specific (non-full-day) start/stop times, so the
+    // checkbox already defaults to unchecked here — no need to click it.
+    expect(screen.getByRole('switch', { name: /full day visit/i })).not.toBeChecked();
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+    expect(mockUpdateVisit).toHaveBeenCalledWith(
+      mockPastVisitWithEncounters.uuid,
+      expect.objectContaining({
+        startDatetime: new Date(mockPastVisitWithEncounters.startDatetime),
+        stopDatetime: new Date(mockPastVisitWithEncounters.stopDatetime),
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it('shows inline invalid time feedback in manual mode and still saves after the full day visit checkbox is checked', async () => {
+    const user = userEvent.setup();
+
+    mockUpdateVisit.mockResolvedValue({
+      status: 201,
+      data: {
+        uuid: visitUuid,
+        visitType: {
+          display: 'Facility Visit',
+        },
+      },
+    } as unknown as FetchResponse<Visit>);
+
+    // mockPastVisitWithEncounters has manual (non-full-day) times, so the time fields start visible.
+    renderVisitForm(mockPastVisitWithEncounters);
+
+    // Type an invalid time into the (still visible) start time field.
+    const startTimeInput = screen.getByRole('textbox', { name: /start time/i });
+    await user.clear(startTimeInput);
+    await user.type(startTimeInput, '99:99');
+
+    await waitFor(() => {
+      expect(screen.getByText(/^invalid$/i)).toBeInTheDocument();
+    });
+
+    // Set the required visit type and location.
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await user.click(locationPicker);
+    await user.click(screen.getByText('Inpatient Ward'));
+
+    // Now check the full day visit checkbox, which hides the time fields while the stale invalid
+    // value remains in form state.
+    await user.click(screen.getByRole('switch', { name: /full day visit/i }));
+
+    await user.click(screen.getByRole('button', { name: /Update visit/i }));
+
+    // The invalid, now-hidden time must not block the save.
+    expect(screen.queryByText(/^invalid$/i)).not.toBeInTheDocument();
+    const expectedStartDatetime = dayjs(mockPastVisitWithEncounters.startDatetime).startOf('day').toDate();
+    const expectedStopDatetime = dayjs(mockPastVisitWithEncounters.startDatetime).endOf('day').toDate();
+    expect(mockUpdateVisit).toHaveBeenCalledWith(
+      mockPastVisitWithEncounters.uuid,
+      expect.objectContaining({
+        startDatetime: expectedStartDatetime,
+        stopDatetime: expectedStopDatetime,
+      }),
+      expect.any(Object),
+    );
+  });
 });
 
 // Note: For some reason, DatePicker and TimePicker don't get validated properly
@@ -998,6 +1466,7 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       error: { issues: badStartTimePastStopTimeIssues },
     } = visitFormSchema.safeParse({
       ...defaultValues,
+      isFullDayVisit: false,
       visitStartDate: badStartTimePastStopTimeFields.date,
       visitStartTime: badStartTimePastStopTimeFields.time,
       visitStartTimeFormat: badStartTimePastStopTimeFields.timeFormat,
@@ -1050,6 +1519,7 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       error: { issues: badStopTimeInFutureIssues },
     } = visitFormSchema.safeParse({
       ...defaultValues,
+      isFullDayVisit: false,
       visitStopDate: badStopTimeInFutureFields.date,
       visitStopTime: badStopTimeInFutureFields.time,
       visitStopTimeFormat: badStopTimeInFutureFields.timeFormat,
@@ -1068,6 +1538,7 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       error: { issues: badStopTimeBeforeLastEncounterIssues },
     } = visitFormSchema.safeParse({
       ...defaultValues,
+      isFullDayVisit: false,
       visitStopDate: badStopTimeBeforeLastEncounterFields.date,
       visitStopTime: badStopTimeBeforeLastEncounterFields.time,
       visitStopTimeFormat: badStopTimeBeforeLastEncounterFields.timeFormat,
@@ -1075,6 +1546,104 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
     expect(badStopTimeBeforeLastEncounterIssues).toContainEqual(
       expect.objectContaining({
         message: 'End time must be on or after ' + lastEncounterDatetime.toDate().toLocaleString(),
+      }),
+    );
+  });
+
+  it('rejects an invalid time format for manual (non-full-day) past visits', () => {
+    const {
+      result: {
+        current: { visitFormSchema, defaultValues },
+      },
+    } = renderHook(() => useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters));
+
+    const { error } = visitFormSchema.safeParse({
+      ...defaultValues,
+      isFullDayVisit: false,
+      visitStartTime: '99:99',
+    });
+
+    expect(error.issues).toContainEqual(
+      expect.objectContaining({
+        message: 'Invalid',
+        path: ['visitStartTime'],
+      }),
+    );
+  });
+
+  it('accepts cleared time fields when the full day visit checkbox is checked', () => {
+    const {
+      result: {
+        current: { visitFormSchema, defaultValues },
+      },
+    } = renderHook(() => useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters));
+
+    const { error } = visitFormSchema.safeParse({
+      ...defaultValues,
+      isFullDayVisit: true,
+      visitStartTime: undefined,
+      visitStopTime: undefined,
+    });
+
+    const timeFormatIssues = (error?.issues ?? []).filter(
+      (issue) => issue.path.includes('visitStartTime') || issue.path.includes('visitStopTime'),
+    );
+    expect(timeFormatIssues).toHaveLength(0);
+  });
+
+  it('blocks a full-day visit whose computed end-of-day time is still in the future', () => {
+    const {
+      result: {
+        current: { visitFormSchema, defaultValues },
+      },
+    } = renderHook(() => useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters));
+
+    // Picking today as the full-day date means the computed stop time (end of today)
+    // is necessarily still in the future relative to "now".
+    const { error } = visitFormSchema.safeParse({
+      ...defaultValues,
+      isFullDayVisit: true,
+      visitStartDate: new Date(),
+      visitStartTime: undefined,
+      visitStopTime: undefined,
+    });
+
+    // path must point to the visible "Date" field (visitStartDate), not the hidden
+    // visitStopTime field - otherwise the error blocks saving with no visible message anywhere.
+    expect(error?.issues).toContainEqual(
+      expect.objectContaining({
+        message: 'End time cannot be in the future',
+        path: ['visitStartDate'],
+      }),
+    );
+  });
+
+  it('blocks a full-day visit whose encounters fall outside the selected calendar day', () => {
+    const {
+      result: {
+        current: { visitFormSchema, defaultValues },
+      },
+    } = renderHook(() => useVisitFormSchemaAndDefaultValues(mockPastVisitWithEncounters));
+
+    // mockPastVisitWithEncounters has its last encounter on 2022-01-01T11:30:00.000+0000.
+    // Selecting the previous day as the full-day date means the computed end-of-day time
+    // falls before that encounter, so the visit doesn't actually cover all its encounters.
+    const dayBeforeEncounters = dayjs(mockPastVisitWithEncounters.startDatetime).subtract(1, 'day').toDate();
+
+    const { error } = visitFormSchema.safeParse({
+      ...defaultValues,
+      isFullDayVisit: true,
+      visitStartDate: dayBeforeEncounters,
+      visitStartTime: undefined,
+      visitStopTime: undefined,
+    });
+
+    // path must point to the visible "Date" field (visitStartDate), not the hidden
+    // visitStopTime field - otherwise the error blocks saving with no visible message anywhere.
+    expect(error?.issues).toContainEqual(
+      expect.objectContaining({
+        message: expect.stringContaining('End time must be on or after'),
+        path: ['visitStartDate'],
       }),
     );
   });
