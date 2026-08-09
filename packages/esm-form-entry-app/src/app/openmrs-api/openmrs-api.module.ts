@@ -8,6 +8,7 @@ import { PersonResourceService } from './person-resource.service';
 import { ProviderResourceService } from './provider-resource.service';
 import { LocationResourceService } from './location-resource.service';
 import { ConceptResourceService } from './concept-resource.service';
+import { ConceptReferenceRangeResourceService } from './concept-reference-range-resource.service';
 import { EncounterResourceService } from './encounter-resource.service';
 import { VisitResourceService } from './visit-resource.service';
 import { PatientService } from './patient-service';
@@ -25,6 +26,7 @@ import { ConceptService } from '../services/concept.service';
     ProviderResourceService,
     LocationResourceService,
     ConceptResourceService,
+    ConceptReferenceRangeResourceService,
     EncounterResourceService,
     VisitResourceService,
     PatientService,
