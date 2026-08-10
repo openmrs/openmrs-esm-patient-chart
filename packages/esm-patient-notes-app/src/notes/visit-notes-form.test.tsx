@@ -16,8 +16,13 @@ import {
   useConfig,
   useSession,
   useFeatureFlag,
+  type Visit,
+  type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
-import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
+import {
+  type PatientWorkspace2DefinitionProps,
+  type PatientWorkspaceGroupProps,
+} from '@openmrs/esm-patient-common-lib';
 import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -28,9 +33,12 @@ import {
 } from '__mocks__';
 import { configSchema, type ConfigObject } from '../config-schema';
 import { mockPatient, getByTextWithMarkup } from 'tools';
-import VisitNotesForm, { type VisitNotesFormProps } from './visit-notes-form.workspace';
+import ExportedVisitNotesFormWorkspace, {
+  type ExportedVisitNotesFormWorkspaceProps,
+} from './exported-visit-notes-form.workspace';
+import VisitNotesFormWorkspace, { type VisitNotesFormWorkspaceProps } from './visit-notes-form.workspace';
 
-const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = {
+const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormWorkspaceProps, {}> = {
   closeWorkspace: vi.fn(),
   workspaceProps: {
     formContext: 'creating' as const,
@@ -49,12 +57,31 @@ const defaultProps: PatientWorkspace2DefinitionProps<VisitNotesFormProps, {}> = 
   showActionMenu: true,
 };
 
-function renderVisitNotesForm(workspaceProps: Partial<VisitNotesFormProps> = {}) {
+function renderVisitNotesForm(
+  workspaceProps: Partial<VisitNotesFormWorkspaceProps> = {},
+  groupProps: Partial<PatientWorkspaceGroupProps> = {},
+) {
   const props = {
     ...defaultProps,
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
+    groupProps: { ...defaultProps.groupProps, ...groupProps },
   };
-  render(<VisitNotesForm {...props} />);
+  render(<VisitNotesFormWorkspace {...props} />);
+}
+
+function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
+  const props: Workspace2DefinitionProps<ExportedVisitNotesFormWorkspaceProps, {}, {}> = {
+    ...defaultProps,
+    groupProps: {},
+    workspaceProps: {
+      formContext: 'creating',
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      visitContext: null,
+      ...workspaceProps,
+    },
+  };
+  render(<ExportedVisitNotesFormWorkspace {...props} />);
 }
 
 const mockFetchDiagnosisConceptsByName = vi.mocked(fetchDiagnosisConceptsByName);
@@ -226,6 +253,75 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
   expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), expect.objectContaining(successPayload));
   mockConsoleError.mockRestore();
+});
+
+test('attaches the visit from the visit context to a newly created note', async () => {
+  const user = userEvent.setup();
+
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm({}, { visitContext: { uuid: 'visit-context-uuid' } as Visit });
+
+  const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
+  await user.type(searchBox, 'Diabetes Mellitus');
+  await user.click(await screen.findByText('Diabetes Mellitus'));
+
+  await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+  expect(mockSaveVisitNote).toHaveBeenCalledWith(
+    new AbortController(),
+    expect.objectContaining({ visit: 'visit-context-uuid' }),
+  );
+});
+
+test('omits the visit when there is no visit context', async () => {
+  const user = userEvent.setup();
+
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
+  await user.type(searchBox, 'Diabetes Mellitus');
+  await user.click(await screen.findByText('Diabetes Mellitus'));
+
+  await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+  expect(mockSaveVisitNote).toHaveBeenCalledWith(
+    new AbortController(),
+    expect.not.objectContaining({ visit: expect.anything() }),
+  );
+});
+
+test('attaches the visit supplied by an out-of-chart launcher to a newly created note', async () => {
+  const user = userEvent.setup();
+
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, body: 'Condition created' } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderExportedVisitNotesForm({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
+
+  const searchBox = screen.getByPlaceholderText('Choose a primary diagnosis');
+  await user.type(searchBox, 'Diabetes Mellitus');
+  await user.click(await screen.findByText('Diabetes Mellitus'));
+
+  await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
+  await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+  expect(mockSaveVisitNote).toHaveBeenCalledWith(
+    new AbortController(),
+    expect.objectContaining({ visit: 'visit-context-uuid' }),
+  );
 });
 
 test('renders an error snackbar if there was a problem recording a condition', async () => {
