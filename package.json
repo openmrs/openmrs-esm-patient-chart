@@ -27,6 +27,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@openmrs/eslint-config": "^2.0.0",
     "@openmrs/esm-framework": "next",
     "@playwright/test": "^1.51.1",
     "@swc/cli": "^0.1.62",
@@ -40,21 +41,13 @@
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
     "@types/webpack-env": "^1.18.8",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
     "@vitest/coverage-v8": "^4.1.2",
     "babel-preset-minify": "^0.5.2",
     "concurrently": "^8.2.1",
-    "cross-env": "^10.1.0",
     "d3-selection": "^3.0.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jest-dom": "^5.4.0",
-    "eslint-plugin-playwright": "^0.16.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-testing-library": "^6.2.2",
+    "eslint": "^9.39.0",
     "happy-dom": "^20.0.0",
     "husky": "^8.0.3",
     "i18next": "^25.0.0",
@@ -76,10 +69,6 @@
     "typescript": "^5.0.0",
     "vitest": "^4.1.2",
     "webpack-dev-server": "^5.2.4"
-  },
-  "lint-staged": {
-    "packages/**/src/**/*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
-    "*.{css,scss,ts,tsx}": "prettier --write --list-different"
   },
   "resolutions": {
     "sass": "^1.54.3",
