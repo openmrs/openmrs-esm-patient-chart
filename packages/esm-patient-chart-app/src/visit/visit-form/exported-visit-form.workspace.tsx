@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -163,6 +164,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     handleSubmit,
     control,
     getValues,
+    setValue,
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = methods;
@@ -179,6 +181,26 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
       keepTouched: true,
     });
   }, [defaultValues, reset]);
+
+  // When creating a new visit (not editing an existing one), the user can switch the visit status
+  // to "past" via the content switcher. defaultValues only defaults isFullDayVisit to true when
+  // visitToEdit is itself already a past visit, so this applies config.defaultToFullDayVisit for
+  // that case too (without affecting the edit flow, which is excluded via !visitToEdit), and
+  // resets the checkbox back to its non-past default (false) when the user switches away from
+  // "past" again, so a stale checked/unchecked state doesn't leak into a later switch back.
+  // shouldDirty: true is required here - defaultValues.isFullDayVisit is always false for a new
+  // visit (it's derived from visitToEdit, not the live watched visitStatus), so without marking
+  // this field dirty, a later defaultValues-driven reset() (e.g. once the default visit location
+  // finishes resolving asynchronously) would silently clobber this value back to false via
+  // keepDirtyValues, even though the field was never actually touched by the user.
+  useEffect(() => {
+    if (visitToEdit) {
+      return;
+    }
+    setValue('isFullDayVisit', visitStatus === 'past' ? config.defaultToFullDayVisit : false, {
+      shouldDirty: true,
+    });
+  }, [visitStatus, visitToEdit, setValue, config.defaultToFullDayVisit]);
 
   const getErrorDescription = useCallback(
     (error: unknown) => {
@@ -283,13 +305,19 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
         visitStopDate,
         visitStopTime,
         visitStopTimeFormat,
+        isFullDayVisit,
       } = data;
 
       const { handleCreateExtraVisitInfo, attributes: extraAttributes } = extraVisitInfo ?? {};
       const hasStartTime = ['ongoing', 'past'].includes(visitStatus);
       const hasStopTime = 'past' === visitStatus;
-      const startDatetime = convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
-      const stopDatetime = convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
+      const isFullDay = isFullDayVisit && visitStatus === 'past';
+      const startDatetime = isFullDay
+        ? dayjs(visitStartDate).startOf('day').toDate()
+        : convertToDate(visitStartDate, visitStartTime, visitStartTimeFormat);
+      const stopDatetime = isFullDay
+        ? dayjs(visitStartDate).endOf('day').toDate()
+        : convertToDate(visitStopDate, visitStopTime, visitStopTimeFormat);
 
       // For new visits, include attributes in the payload for atomic creation (avoids orphaned visits).
       // For edits, attributes are managed separately (backend rejects inline updates with maxOccurs).
