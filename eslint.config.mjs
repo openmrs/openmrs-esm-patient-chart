@@ -4,7 +4,6 @@ export default [
   {
     ignores: [
       '**/dist/**',
-      '**/*.d.ts',
       '.yarn/**',
       '__mocks__/**',
       // The Angular workspace keeps its own ESLint config and runs through `ng lint`.
@@ -20,6 +19,7 @@ export default [
       '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'always', allowObjectTypes: 'always' }],
       '@typescript-eslint/no-unsafe-function-type': 'error',
       '@typescript-eslint/no-wrapper-object-types': 'error',
+      '@typescript-eslint/triple-slash-reference': 'error',
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
