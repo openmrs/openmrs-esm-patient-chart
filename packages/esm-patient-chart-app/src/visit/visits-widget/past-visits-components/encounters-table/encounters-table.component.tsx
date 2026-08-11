@@ -32,7 +32,6 @@ import {
   TrashCanIcon,
   useConfig,
   useLayoutType,
-  userHasAccess,
   useSession,
   type EncounterType,
   ExtensionSlot,
@@ -42,7 +41,12 @@ import {
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
-import { confirmAndDeleteEncounter, isVisitNoteEncounter, launchEditEncounterWorkspace } from './encounter-actions';
+import {
+  canModifyEncounter,
+  confirmAndDeleteEncounter,
+  isVisitNoteEncounter,
+  launchEditEncounterWorkspace,
+} from './encounter-actions';
 import {
   downloadPdf,
   mapEncounter,
@@ -83,7 +87,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
+  const config = useConfig<ChartConfig>();
   const [isPrinting, setIsPrinting] = useState(false);
 
   const paginatedMappedEncounters = useMemo(
@@ -220,16 +224,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
 
-                    const encounterAgeInMinutes =
-                      (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
-
-                    const canDeleteEncounter =
-                      userHasAccess(encounter.editPrivilege, session?.user) &&
-                      (encounterEditableDuration === 0 ||
-                        (encounterEditableDuration > 0 && encounterAgeInMinutes <= encounterEditableDuration) ||
-                        encounterEditableDurationOverridePrivileges.some((privilege) =>
-                          userHasAccess(privilege, session?.user),
-                        ));
+                    const canDeleteEncounter = canModifyEncounter(encounter, session?.user, config);
 
                     const canEditEncounter =
                       canDeleteEncounter && (encounter.form?.uuid || isVisitNoteEncounter(encounter));

@@ -1,7 +1,8 @@
 import type { TFunction } from 'i18next';
 import type { useSWRConfig } from 'swr';
-import { launchWorkspace2, showModal, showSnackbar } from '@openmrs/esm-framework';
+import { launchWorkspace2, type LoggedInUser, showModal, showSnackbar, userHasAccess } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig } from '../../../../config-schema';
 import { deleteEncounter, type MappedEncounter } from './encounters-table.resource';
 
 /**
@@ -13,8 +14,33 @@ export function isVisitNoteEncounter(encounter: MappedEncounter): boolean {
 }
 
 /**
- * Opens the appropriate workspace for editing an encounter.
+ * An encounter can be modified by users holding its edit privilege, but only while it is within the
+ * configured editable window, unless they hold one of the privileges that overrides that window.
  */
+export function canModifyEncounter(
+  encounter: MappedEncounter,
+  user: LoggedInUser,
+  {
+    encounterEditableDuration,
+    encounterEditableDurationOverridePrivileges,
+  }: Pick<ChartConfig, 'encounterEditableDuration' | 'encounterEditableDurationOverridePrivileges'>,
+): boolean {
+  if (!userHasAccess(encounter.editPrivilege, user)) {
+    return false;
+  }
+
+  if (encounterEditableDuration === 0) {
+    return true;
+  }
+
+  const encounterAgeInMinutes = (Date.now() - new Date(encounter.rawDatetime).getTime()) / (1000 * 60);
+
+  return (
+    encounterAgeInMinutes <= encounterEditableDuration ||
+    encounterEditableDurationOverridePrivileges.some((privilege) => userHasAccess(privilege, user))
+  );
+}
+
 export function launchEditEncounterWorkspace(encounter: MappedEncounter, patientUuid: string) {
   if (isVisitNoteEncounter(encounter)) {
     launchWorkspace2('visit-notes-form-workspace', {
@@ -39,10 +65,6 @@ interface ConfirmAndDeleteEncounterArgs {
   mutateVisitContext?: () => void;
 }
 
-/**
- * Prompts for confirmation and, once confirmed, deletes the encounter and revalidates the visit and
- * encounter data.
- */
 export function confirmAndDeleteEncounter({
   encounterUuid,
   encounterTypeName,

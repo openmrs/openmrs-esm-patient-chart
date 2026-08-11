@@ -2,14 +2,25 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig, userHasAccess, type Visit } from '@openmrs/esm-framework';
+import {
+  type Encounter,
+  ExtensionSlot,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useFeatureFlag,
+  userHasAccess,
+  type Visit,
+} from '@openmrs/esm-framework';
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { esmPatientChartSchema } from '../../../../config-schema';
+import { jsonSchemaResourceName } from '../../../../constants';
 import VisitTimeline from './visit-timeline.component';
 
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockUseConfig = vi.mocked(useConfig);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockUserHasAccess = vi.mocked(userHasAccess);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
@@ -22,13 +33,30 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => ({
 // encounter has observations but no form. Between them they cover both expanded-panel states.
 const [admissionEncounter, visitNoteEncounter, consultationEncounter] = mockEncountersAlice;
 
-function renderVisitTimeline(encounters = mockEncountersAlice) {
+// Printing and the embedded form view are only offered for forms carrying a JSON schema resource
+const encounterWithJsonSchemaForm = {
+  ...admissionEncounter,
+  form: {
+    ...admissionEncounter.form,
+    resources: [
+      {
+        uuid: 'embedded-form-resource',
+        name: jsonSchemaResourceName,
+        dataType: 'AmpathJsonSchema',
+        valueReference: 'embedded-schema-reference',
+      },
+    ],
+  },
+} as Encounter;
+
+function renderVisitTimeline(encounters: Array<Encounter> = mockEncountersAlice) {
   const visit = { ...mockVisit, encounters } as Visit;
   return renderWithSwr(<VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} />);
 }
 
 beforeEach(() => {
   mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
+  mockUseFeatureFlag.mockReturnValue(false);
   mockUserHasAccess.mockReturnValue(true);
   mockUsePatientChartStore.mockReturnValue({
     patientUuid: mockPatientAlice.uuid,
@@ -117,9 +145,58 @@ describe('VisitTimeline', () => {
   });
 
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {
-    mockUserHasAccess.mockReturnValue(false);
-    renderVisitTimeline([admissionEncounter]);
+    const privilegedEncounter = {
+      ...admissionEncounter,
+      encounterType: { ...admissionEncounter.encounterType, editPrivilege: { display: 'Edit Encounters' } },
+    } as Encounter;
+    // Only the encounter's edit privilege is withheld, so the menu can't be hidden for any other reason
+    mockUserHasAccess.mockImplementation((privilege) => privilege !== 'Edit Encounters');
+
+    renderVisitTimeline([privilegedEncounter]);
 
     expect(screen.queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
+  });
+
+  it('offers a print action for an encounter recorded through a JSON schema form', async () => {
+    const user = userEvent.setup();
+    renderVisitTimeline([encounterWithJsonSchemaForm]);
+
+    await user.click(screen.getByRole('button', { name: /options/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const menuItems = within(actionsMenu).getAllByRole('menuitem', { hidden: true });
+
+    expect(menuItems.map((menuItem) => menuItem.textContent)).toEqual([
+      'Edit this encounter',
+      'Print this encounter',
+      'Delete this encounter',
+    ]);
+  });
+
+  it('renders a JSON schema form in the embedded form view, with the visit context, when the feature flag is on', async () => {
+    const user = userEvent.setup();
+    mockUseFeatureFlag.mockReturnValue(true);
+
+    renderVisitTimeline([encounterWithJsonSchemaForm]);
+
+    await user.click(screen.getByRole('button', { name: /expand encounter/i }));
+
+    const formWidgetCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'form-widget-slot');
+
+    expect(formWidgetCall?.[0]?.state).toEqual(
+      expect.objectContaining({
+        additionalProps: { mode: 'embedded-view' },
+        encounterUuid: encounterWithJsonSchemaForm.uuid,
+        formUuid: encounterWithJsonSchemaForm.form.uuid,
+        patient: mockFhirPatient,
+        patientUuid: mockPatientAlice.uuid,
+        visitStartDatetime: mockVisit.startDatetime,
+        visitStopDatetime: mockVisit.stopDatetime,
+        visitTypeUuid: mockVisit.visitType.uuid,
+        visitUuid: mockVisit.uuid,
+      }),
+    );
+    // The observations panel is what the embedded form view replaces
+    expect(screen.queryByText(/recorded via poc consent form/i)).not.toBeInTheDocument();
   });
 });
