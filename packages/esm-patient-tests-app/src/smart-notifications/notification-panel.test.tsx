@@ -2,7 +2,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal } from '@openmrs/esm-framework';
+import { PatientPhoto, showModal } from '@openmrs/esm-framework';
 import { mockCriticalSmartNotification, mockSmartNotification } from '__mocks__';
 import { mockPatient } from 'tools';
 import translations from '../../translations/en.json';
@@ -141,6 +141,18 @@ describe('NotificationPanel', () => {
       smartNotificationDetailModalName,
       expect.objectContaining({ notification: mockCriticalSmartNotification, patient: mockPatient }),
     );
+  });
+
+  it('draws the row avatar and name from the same patient', () => {
+    // Sourcing the name from the chart patient and the photo from the notification would pair one
+    // patient's face with another's name. The fixture deliberately disagrees with the chart patient
+    // so this fails if the two ever come from different places again.
+    renderPanel({ notifications: [{ ...mockSmartNotification, patientUuid: 'some-other-patient-uuid' }] });
+
+    expect(vi.mocked(PatientPhoto).mock.calls[0][0]).toMatchObject({
+      patientName: 'John Wilson',
+      patientUuid: mockPatient.id,
+    });
   });
 
   it('marks a notification read when its detail is opened', async () => {

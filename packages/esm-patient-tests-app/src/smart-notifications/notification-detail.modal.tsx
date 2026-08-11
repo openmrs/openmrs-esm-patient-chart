@@ -21,6 +21,9 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
   const session = useSession();
   const relativeTime = formatRelativeTime(notification.resultDate, t);
   const identifier = getPreferredIdentifier(patient);
+  // Displayed identity comes wholly from `patient` — name and photo from one source. The
+  // notification's own `patientUuid` still drives behaviour below (which record to mark reviewed,
+  // which chart to open), because that is about the notification's subject rather than its label.
   const patientName = patient ? getPatientName(patient) : '';
 
   const handleMarkAsReviewed = useCallback(() => {
@@ -48,7 +51,7 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({ close
       <ModalBody className={styles.modalBody}>
         <div className={styles.patientRow}>
           <span className={styles.modalAvatar}>
-            <PatientPhoto patientName={patientName} patientUuid={notification.patientUuid} />
+            <PatientPhoto patientName={patientName} patientUuid={patient?.id} />
           </span>
           <div>
             <p className={styles.patientName}>{patientName}</p>

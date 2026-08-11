@@ -35,6 +35,12 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
    */
   const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // Every notification in this inbox belongs to the open chart, because the resource fetches orders
+  // and observations for one patient uuid. Identity is therefore taken wholly from `patient` — name
+  // and photo from the same source — rather than half from the notification, which would silently
+  // pair one patient's photo with another's name the day a cross-patient inbox lands (a V2
+  // follow-up). Whoever builds that should carry identity on SmartNotification and read it here.
   const patientName = patient ? getPatientName(patient) : '';
 
   // Move focus into the panel on open and keep Tab inside it, so the inbox behaves like the dialog
@@ -142,7 +148,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                     type="button"
                   >
                     <span className={styles.avatar}>
-                      <PatientPhoto patientName={patientName} patientUuid={notification.patientUuid} />
+                      <PatientPhoto patientName={patientName} patientUuid={patient?.id} />
                     </span>
                     <span className={styles.rowBody}>
                       <span className={styles.rowMeta}>

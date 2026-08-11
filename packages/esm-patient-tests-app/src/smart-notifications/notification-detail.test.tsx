@@ -2,7 +2,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { navigate, useSession } from '@openmrs/esm-framework';
+import { navigate, PatientPhoto, useSession } from '@openmrs/esm-framework';
 import { mockCriticalSmartNotification, mockSessionDataResponse, mockSmartNotification } from '__mocks__';
 import { mockPatient } from 'tools';
 import { _resetReviewStore, getReviewedNotifications, setReviewUser } from './review-store';
@@ -45,6 +45,17 @@ describe('NotificationDetailModal', () => {
 
     expect(screen.getByText('John Wilson')).toBeInTheDocument();
     expect(screen.getByText(/OpenMRS ID 100GEJ/)).toBeInTheDocument();
+  });
+
+  it('draws the avatar and name from the same patient', () => {
+    // The fixture's patientUuid deliberately disagrees with the chart patient, so this fails if the
+    // name and the photo are ever sourced from different places.
+    renderModal({ notification: { ...mockSmartNotification, patientUuid: 'some-other-patient-uuid' } });
+
+    expect(vi.mocked(PatientPhoto).mock.calls[0][0]).toMatchObject({
+      patientName: 'John Wilson',
+      patientUuid: mockPatient.id,
+    });
   });
 
   it('shows the test, result, ordering clinician, location and order number', () => {
