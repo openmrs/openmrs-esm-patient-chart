@@ -7,7 +7,6 @@ import {
   ComboBox,
   Form,
   Grid,
-  InlineNotification,
   Layer,
   Select,
   SelectItem,
@@ -149,6 +148,7 @@ export function LabOrderForm({
 
   const urgency = watch('urgency');
   const isScheduledDateRequired = urgency === 'ON_SCHEDULED_DATE';
+  const isStatOrder = urgency === 'STAT';
   const showNotifyToggle = config.smartNotifications?.enabled;
 
   // Explains what will actually happen to this order once it is resulted, so the clinician can see
@@ -358,26 +358,20 @@ export function LabOrderForm({
                   render={({ field: { onChange, value } }) => (
                     <Toggle
                       className={styles.notifyToggle}
+                      /* A Stat order already notifies on every result, so this is not a choice the
+                         clinician has to make. Showing it on and disabled says so plainly, rather
+                         than offering a control that would change nothing. The stored value is left
+                         untouched, so switching back to Routine reveals their real preference. */
+                      disabled={isStatOrder}
                       id="notifyWhenResultedToggle"
                       labelA={t('off', 'Off')}
                       labelB={t('on', 'On')}
-                      labelText={t('notifyMeWhenResulted', 'Notify me when resulted')}
+                      labelText={t('notifyAlsoForNonCritical', 'Also notify me for non-critical results')}
                       onToggle={onChange}
                       size="sm"
-                      toggled={Boolean(value)}
+                      toggled={isStatOrder || Boolean(value)}
                     />
                   )}
-                />
-                <InlineNotification
-                  className={styles.notifyCallout}
-                  hideCloseButton
-                  kind="info"
-                  lowContrast
-                  subtitle={t(
-                    'notifyWhenResultedExplainer',
-                    "Turning this on sends you a notification the moment this order is resulted, even if the value isn't critical.",
-                  )}
-                  title=""
                 />
               </InputWrapper>
             </Column>

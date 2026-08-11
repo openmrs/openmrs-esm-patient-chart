@@ -341,7 +341,7 @@ describe('AddLabOrder', () => {
   });
 });
 
-describe('AddLabOrder — notify me when resulted', () => {
+describe('AddLabOrder — also notify me for non-critical results', () => {
   const defaultConfig: ConfigObject = {
     ...getDefaultsFromConfigSchema(configSchema),
     orders: {
@@ -366,15 +366,47 @@ describe('AddLabOrder — notify me when resulted', () => {
     await user.click(screen.getByRole('button', { name: /order form/i }));
   }
 
-  test('renders the opt-in toggle, off by default, with its explanatory callout', async () => {
+  test('renders the opt-in toggle off and editable for a routine order', async () => {
     const user = userEvent.setup();
 
     await openOrderForm(user);
 
-    const toggle = screen.getByRole('switch', { name: /notify me when resulted/i });
+    const toggle = screen.getByRole('switch', { name: /also notify me for non-critical results/i });
     expect(toggle).toBeInTheDocument();
     expect(toggle).not.toBeChecked();
-    expect(screen.getByText(/sends you a notification the moment this order is resulted/i)).toBeInTheDocument();
+    expect(toggle).toBeEnabled();
+  });
+
+  test('shows the toggle on and disabled for a Stat order, which notifies regardless', async () => {
+    const user = userEvent.setup();
+
+    await openOrderForm(user);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Priority' }), 'STAT');
+
+    // Stat notifies on every result, so there is no choice left to offer.
+    const toggle = screen.getByRole('switch', { name: /also notify me for non-critical results/i });
+    expect(toggle).toBeChecked();
+    expect(toggle).toBeDisabled();
+  });
+
+  test('leaves the stored preference untouched while Stat forces the toggle on', async () => {
+    const user = userEvent.setup();
+    const { result: hookResult } = renderHook(() =>
+      useOrderBasket(mockPatient, 'test-lab-order-type-uuid', ((x) => x) as unknown as PostDataPrepLabOrderFunction),
+    );
+
+    await openOrderForm(user);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Priority' }), 'STAT');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Priority' }), 'ROUTINE');
+
+    // Switching back reveals the clinician's own choice, not a value Stat wrote on their behalf.
+    expect(screen.getByRole('switch', { name: /also notify me for non-critical results/i })).not.toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: 'Save order' }));
+
+    await waitFor(() => {
+      expect(hookResult.current.orders).toEqual([expect.objectContaining({ notifyWhenResulted: false })]);
+    });
   });
 
   test('explains what will happen based on the selected priority', async () => {
@@ -396,7 +428,7 @@ describe('AddLabOrder — notify me when resulted', () => {
     );
 
     await openOrderForm(user);
-    await user.click(screen.getByRole('switch', { name: /notify me when resulted/i }));
+    await user.click(screen.getByRole('switch', { name: /also notify me for non-critical results/i }));
     await user.click(screen.getByRole('button', { name: 'Save order' }));
 
     await waitFor(() => {
@@ -427,7 +459,7 @@ describe('AddLabOrder — notify me when resulted', () => {
 
     await openOrderForm(user);
 
-    expect(screen.queryByRole('switch', { name: /notify me when resulted/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: /also notify me for non-critical results/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/filed silently to the chart/i)).not.toBeInTheDocument();
   });
 
@@ -435,7 +467,7 @@ describe('AddLabOrder — notify me when resulted', () => {
     const user = userEvent.setup();
 
     await openOrderForm(user);
-    await user.click(screen.getByRole('switch', { name: /notify me when resulted/i }));
+    await user.click(screen.getByRole('switch', { name: /also notify me for non-critical results/i }));
     await user.click(screen.getByRole('button', { name: 'Save order' }));
 
     await waitFor(() => {
