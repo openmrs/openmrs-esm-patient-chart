@@ -382,6 +382,7 @@ describe('AddTaskForm', () => {
             }),
             dueDate: expect.objectContaining({
               type: 'DATE',
+              date: baseTask.dueDate.date,
             }),
           }),
         );
