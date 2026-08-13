@@ -1,8 +1,8 @@
 import React from 'react';
-import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type NotificationTag } from './notification-model';
 import styles from './notification-tag.scss';
+import classNames from 'classnames';
 
 type CarbonTagType = 'red' | 'magenta' | 'purple' | 'gray';
 
@@ -38,9 +38,17 @@ const PriorityTag: React.FC<PriorityTagProps> = ({ tag }) => {
   const label = usePriorityTagLabel(tag);
 
   return (
-    <Tag className={styles.priorityTag} size="sm" type={tagTypes[tag]}>
+    <span
+      className={classNames(
+        'cds--tag',
+        'cds--tag--sm',
+        'cds--layout--size-sm',
+        `cds--tag--${tagTypes[tag]}`,
+        styles.priorityTag,
+      )}
+    >
       {label}
-    </Tag>
+    </span>
   );
 };
 
