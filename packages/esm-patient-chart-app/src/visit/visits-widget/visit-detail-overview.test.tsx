@@ -146,7 +146,7 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
 
-    await screen.getByRole('button', { name: /expand current row/i }).click();
+    await user.click(screen.getByRole('button', { name: /expand current row/i }));
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
@@ -163,6 +163,7 @@ describe('VisitDetailOverview', () => {
   });
 
   it('should render only the visit summary tab when showAllEncountersTab is false', async () => {
+    const user = userEvent.setup();
     mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),
@@ -180,7 +181,7 @@ describe('VisitDetailOverview', () => {
     expect(visitsTab).toHaveAttribute('aria-selected', 'true');
     expect(screen.queryByText('/All encounters/i')).not.toBeInTheDocument();
 
-    await screen.getByRole('button', { name: /expand current row/i }).click();
+    await user.click(screen.getByRole('button', { name: /expand current row/i }));
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
