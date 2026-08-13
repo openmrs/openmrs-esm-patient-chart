@@ -2,33 +2,20 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.panel {
-  // Carbon's HeaderPanel supplies the fixed position, the 3rem header offset and the open/close
-  // transition. Only the width and the light theme are ours — the default panel is 16rem and
-  // inherits the g100 header theme, which is too narrow and too dark for an inbox.
-  background-color: $ui-background;
-  color: $ui-05;
-
-  &:global(.cds--header-panel--expanded) {
-    display: flex;
-    flex-direction: column;
-    inline-size: 25rem;
-    max-inline-size: 100vw;
-    overflow: hidden;
-  }
+// The app shell's HeaderPanel supplies the geometry, the open/close transition and the
+// "Notifications" heading. These rules style only the content we render inside it.
+.rows {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .header {
-  align-items: flex-start;
+  align-items: center;
   border-bottom: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
-  padding: layout.$spacing-05 layout.$spacing-03 layout.$spacing-04 layout.$spacing-05;
-}
-
-.title {
-  @include type.type-style('heading-03');
-  color: $ui-05;
+  padding: 0 layout.$spacing-03 layout.$spacing-04 layout.$spacing-05;
 }
 
 .subtitle {

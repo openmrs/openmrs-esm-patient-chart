@@ -1,80 +1,45 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import classNames from 'classnames';
-import { Button, HeaderPanel, SkeletonText } from '@carbon/react';
-import { ChevronRightIcon, CloseIcon, getPatientName, PatientPhoto, showModal } from '@openmrs/esm-framework';
+import { Button, SkeletonText } from '@carbon/react';
+import {
+  ChevronRightIcon,
+  CloseIcon,
+  getPatientName,
+  PatientPhoto,
+  showModal,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { type ConfigObject } from '../config-schema';
 import { interpretationLabel, type SmartNotification } from './notification-model';
 import { smartNotificationDetailModalName } from './constants';
-import { markNotificationRead } from './read-store';
+import { useCloseNotificationsPanel } from './panel-controls';
+import { markNotificationRead, useReadNotifications } from './read-store';
+import { useSmartNotifications } from './smart-notifications.resource';
+import { useChartPatient } from './use-chart-patient';
 import PriorityTag from './notification-tag.component';
 import RelativeTime from './relative-time.component';
 import styles from './notification-panel.scss';
 
-interface NotificationPanelProps {
-  error: Error | undefined;
-  isLoading: boolean;
-  notifications: Array<SmartNotification>;
-  onClose: () => void;
+interface NotificationRowsProps {
   patient: fhir.Patient;
-  /** Notification id -> the time it was opened. Read rows stay listed but stop drawing attention. */
-  read: Record<string, string>;
+  patientUuid: string;
 }
 
-const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-const NotificationPanel: React.FC<NotificationPanelProps> = ({
-  error,
-  isLoading,
-  notifications,
-  onClose,
-  patient,
-  read,
-}) => {
+const NotificationRows: React.FC<NotificationRowsProps> = ({ patient, patientUuid }) => {
   /* Key used by interpretationLabel in notification-model.ts, which the i18next parser does not scan.
    * t('noInterpretation', 'No interpretation')
    */
   const { t } = useTranslation();
-  const panelRef = useRef<HTMLDivElement>(null);
+  const { error, isLoading, notifications } = useSmartNotifications(patientUuid);
+  const read = useReadNotifications();
+  const closePanel = useCloseNotificationsPanel();
 
-  // Every notification in this inbox belongs to the open chart, because the resource fetches orders
-  // and observations for one patient uuid. Identity is therefore taken wholly from `patient` — name
-  // and photo from the same source — rather than half from the notification, which would silently
-  // pair one patient's photo with another's name the day a cross-patient inbox lands (a V2
-  // follow-up). Whoever builds that should carry identity on SmartNotification and read it here.
+  // Every notification here belongs to the open chart, because the resource fetches orders and
+  // observations for one patient uuid. Identity is therefore taken wholly from `patient` — name and
+  // photo from the same source — rather than half from the notification, which would silently pair
+  // one patient's photo with another's name the day a cross-patient inbox lands (a V2 follow-up).
   const patientName = patient ? getPatientName(patient) : '';
-
-  // Move focus into the panel on open and keep Tab inside it, so the inbox behaves like the dialog
-  // it is announced as. Carbon's HeaderPanel handles the geometry but not the focus contract.
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) {
-      return;
-    }
-
-    panel.focus();
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab') {
-        return;
-      }
-      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(focusableSelector));
-      if (!focusable.length) {
-        return;
-      }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    panel.addEventListener('keydown', handleKeyDown);
-    return () => panel.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const handleOpenDetail = useCallback(
     (notification: SmartNotification) => {
@@ -89,103 +54,91 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
     [patient],
   );
 
-  // HeaderPanel spreads unknown props onto its <div>, but its prop types don't declare them, so the
-  // dialog semantics go in through a spread rather than as literal attributes.
-  const dialogProps = { role: 'dialog', tabIndex: -1 };
-
   return (
-    <HeaderPanel
-      aria-label={t('notifications', 'Notifications')}
-      className={styles.panel}
-      expanded
-      ref={panelRef}
-      {...dialogProps}
-    >
+    <div className={styles.rows}>
       <div className={styles.header}>
-        <div>
-          <h2 className={styles.title}>{t('notifications', 'Notifications')}</h2>
-          <p className={styles.subtitle}>
-            {t('notificationsNeedReview', '{{count}} notifications need review', { count: notifications.length })}
-          </p>
-        </div>
-        <Button
-          className={styles.closeButton}
-          hasIconOnly
-          iconDescription={t('closeNotifications', 'Close notifications')}
-          kind="ghost"
-          onClick={onClose}
-          renderIcon={CloseIcon}
-          size="sm"
-        />
-      </div>
-
-      <div className={styles.body}>
-        {isLoading ? (
-          <div className={styles.loading}>
-            <SkeletonText paragraph lineCount={3} />
-          </div>
-        ) : error ? (
-          <p className={styles.error}>{t('errorLoadingNotifications', "Couldn't load notifications.")}</p>
-        ) : notifications.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyStateTitle}>{t('noNotifications', 'Nothing needs your attention')}</p>
-            <p className={styles.emptyStateBody}>
-              {t(
-                'noNotificationsBody',
-                'Results that need action show up here. Routine, in-range results are filed straight to the chart.',
-              )}
-            </p>
-          </div>
-        ) : (
-          <>
-            <h3 className={styles.sectionLabel}>{t('requiresAttention', 'Requires attention')}</h3>
-            <ul className={styles.list}>
-              {notifications.map((notification) => (
-                <li key={notification.id}>
-                  <button
-                    className={classNames(styles.row, { [styles.rowUnread]: !read[notification.id] })}
-                    onClick={() => handleOpenDetail(notification)}
-                    type="button"
-                  >
-                    <span className={styles.avatar}>
-                      <PatientPhoto patientName={patientName} patientUuid={patient?.id} />
-                    </span>
-                    <span className={styles.rowBody}>
-                      <span className={styles.rowMeta}>
-                        <PriorityTag tag={notification.tag} />
-                        <span className={styles.rowKind}>{t('labResult', 'Lab result')}</span>
-                        <RelativeTime className={styles.rowTime} date={notification.resultDate} />
-                      </span>
-                      <span className={styles.rowPatient}>{patientName}</span>
-                      <span className={styles.rowTest}>
-                        {notification.value
-                          ? t('testAndValue', '{{test}} — {{value}}', {
-                              test: notification.testLabel,
-                              value: [notification.value, notification.units].filter(Boolean).join(' '),
-                              // Units and concept names contain characters i18next escapes by
-                              // default, which React then renders literally as "U&#x2F;L". React
-                              // escapes on render anyway, so this only avoids double-escaping.
-                              interpolation: { escapeValue: false },
-                            })
-                          : notification.testLabel}
-                      </span>
-                      <span className={styles.rowRange}>
-                        {notification.rejectionReason ??
-                          t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
-                            interpretation: interpretationLabel(notification.interpretation, t),
-                            range: notification.referenceRangeText,
-                            interpolation: { escapeValue: false },
-                          })}
-                      </span>
-                    </span>
-                    <ChevronRightIcon aria-hidden="true" className={styles.chevron} size={16} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </>
+        <p className={styles.subtitle}>
+          {t('notificationsNeedReview', '{{count}} notifications need review', { count: notifications.length })}
+        </p>
+        {/* The shell's panel has no close affordance of its own yet, so we keep ours. */}
+        {closePanel && (
+          <Button
+            className={styles.closeButton}
+            hasIconOnly
+            iconDescription={t('closeNotifications', 'Close notifications')}
+            kind="ghost"
+            onClick={closePanel}
+            renderIcon={CloseIcon}
+            size="sm"
+          />
         )}
       </div>
+
+      {isLoading ? (
+        <div className={styles.loading}>
+          <SkeletonText paragraph lineCount={3} />
+        </div>
+      ) : error ? (
+        <p className={styles.error}>{t('errorLoadingNotifications', "Couldn't load notifications.")}</p>
+      ) : notifications.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyStateTitle}>{t('noNotifications', 'Nothing needs your attention')}</p>
+          <p className={styles.emptyStateBody}>
+            {t(
+              'noNotificationsBody',
+              'Results that need action show up here. Routine, in-range results are filed straight to the chart.',
+            )}
+          </p>
+        </div>
+      ) : (
+        <>
+          <h3 className={styles.sectionLabel}>{t('requiresAttention', 'Requires attention')}</h3>
+          <ul className={styles.list}>
+            {notifications.map((notification) => (
+              <li key={notification.id}>
+                <button
+                  className={classNames(styles.row, { [styles.rowUnread]: !read[notification.id] })}
+                  onClick={() => handleOpenDetail(notification)}
+                  type="button"
+                >
+                  <span className={styles.avatar}>
+                    <PatientPhoto patientName={patientName} patientUuid={patient?.id} />
+                  </span>
+                  <span className={styles.rowBody}>
+                    <span className={styles.rowMeta}>
+                      <PriorityTag tag={notification.tag} />
+                      <span className={styles.rowKind}>{t('labResult', 'Lab result')}</span>
+                      <RelativeTime className={styles.rowTime} date={notification.resultDate} />
+                    </span>
+                    <span className={styles.rowPatient}>{patientName}</span>
+                    <span className={styles.rowTest}>
+                      {notification.value
+                        ? t('testAndValue', '{{test}} — {{value}}', {
+                            test: notification.testLabel,
+                            value: [notification.value, notification.units].filter(Boolean).join(' '),
+                            // Units and concept names contain characters i18next escapes by default,
+                            // which React then renders literally as "U&#x2F;L". React escapes on
+                            // render anyway, so this only avoids double-escaping.
+                            interpolation: { escapeValue: false },
+                          })
+                        : notification.testLabel}
+                    </span>
+                    <span className={styles.rowRange}>
+                      {notification.rejectionReason ??
+                        t('interpretationAndRange', '{{interpretation}} · Ref {{range}}', {
+                          interpretation: interpretationLabel(notification.interpretation, t),
+                          range: notification.referenceRangeText,
+                          interpolation: { escapeValue: false },
+                        })}
+                    </span>
+                  </span>
+                  <ChevronRightIcon aria-hidden="true" className={styles.chevron} size={16} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <div className={styles.footer}>
         <p>
@@ -196,8 +149,28 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
           )}
         </p>
       </div>
-    </HeaderPanel>
+    </div>
   );
 };
 
-export default NotificationPanel;
+/**
+ * Renders the inbox rows into the app shell's own notifications panel
+ * (`notifications-nav-menu-slot`). The shell owns the panel chrome — the HeaderPanel, its geometry,
+ * the "Notifications" heading and mutual exclusion with the other header panels — so this renders
+ * content only.
+ *
+ * Gated the same way as the bell: notifications are patient-scoped, so with no chart open there is
+ * nothing to list.
+ */
+const NotificationRowsGate: React.FC = () => {
+  const { smartNotifications } = useConfig<ConfigObject>();
+  const { patient, patientUuid } = useChartPatient();
+
+  if (!smartNotifications?.enabled || !patientUuid) {
+    return null;
+  }
+
+  return <NotificationRows patient={patient} patientUuid={patientUuid} />;
+};
+
+export default NotificationRowsGate;

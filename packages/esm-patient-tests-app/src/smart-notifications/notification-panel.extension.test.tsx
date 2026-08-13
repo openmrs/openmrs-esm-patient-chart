@@ -2,43 +2,62 @@ import React from 'react';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PatientPhoto, showModal } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, PatientPhoto, showModal, useConfig } from '@openmrs/esm-framework';
 import { mockCriticalSmartNotification, mockSmartNotification } from '__mocks__';
 import { mockPatient } from 'tools';
 import translations from '../../translations/en.json';
+import { configSchema, type ConfigObject } from '../config-schema';
 import { smartNotificationDetailModalName } from './constants';
-import { _resetReadStore, getReadNotifications, setReadUser } from './read-store';
-import NotificationPanel from './notification-panel.component';
+import { _resetReadStore, getReadNotifications, markNotificationRead, setReadUser } from './read-store';
+import { useSmartNotifications } from './smart-notifications.resource';
+import { useChartPatient } from './use-chart-patient';
+import { _resetPanelControls, setNotificationsPanelClose } from './panel-controls';
+import NotificationRows from './notification-panel.extension';
+
+vi.mock('./smart-notifications.resource', () => ({ useSmartNotifications: vi.fn() }));
+vi.mock('./use-chart-patient', () => ({ useChartPatient: vi.fn() }));
+
+const mockUseSmartNotifications = vi.mocked(useSmartNotifications);
+const mockUseChartPatient = vi.mocked(useChartPatient);
 
 const mockShowModal = showModal as Mock;
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
-function renderPanel(props: Partial<React.ComponentProps<typeof NotificationPanel>> = {}) {
-  return render(
-    <NotificationPanel
-      error={undefined}
-      isLoading={false}
-      notifications={[mockSmartNotification]}
-      onClose={vi.fn()}
-      patient={mockPatient}
-      read={{}}
-      {...props}
-    />,
-  );
+function renderPanel({
+  notifications = [mockSmartNotification],
+  read = {},
+  error = undefined,
+  isLoading = false,
+}: {
+  notifications?: Array<unknown>;
+  read?: Record<string, string>;
+  error?: Error;
+  isLoading?: boolean;
+} = {}) {
+  mockUseSmartNotifications.mockReturnValue({
+    notifications: notifications as never,
+    read,
+    unreadCount: notifications.length,
+    isLoading,
+    error,
+    mutate: vi.fn(),
+  });
+  // Read state comes from the store, not a prop, so seed it the way opening a row would.
+  setReadUser('user-uuid-1');
+  Object.keys(read).forEach((id) => markNotificationRead(id));
+  return render(<NotificationRows />);
 }
 
-describe('NotificationPanel', () => {
+describe('NotificationRows', () => {
   beforeEach(() => {
     localStorage.clear();
     _resetReadStore();
+    _resetPanelControls();
+    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema) } as ConfigObject);
+    mockUseChartPatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id });
     vi.useFakeTimers({ toFake: ['Date'] });
     // Pin "now" a minute after the fixture result so the relative timestamp is stable.
     vi.setSystemTime(new Date('2026-06-29T09:30:30.000Z'));
-  });
-
-  it('is announced as a dialog named "Notifications"', () => {
-    renderPanel();
-
-    expect(screen.getByRole('dialog', { name: 'Notifications' })).toBeInTheDocument();
   });
 
   it('summarises how many notifications need review', () => {
@@ -184,19 +203,29 @@ describe('NotificationPanel', () => {
     expect(screen.queryByText('Nothing needs your attention')).not.toBeInTheDocument();
   });
 
-  it('closes when the close button is used', async () => {
+  it('closes the panel through the callback the bell published', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    const onClose = vi.fn();
-    renderPanel({ onClose });
+    const close = vi.fn();
+    // The bell owns togglePanel and publishes this; the rows sit in a different slot.
+    setNotificationsPanelClose(close);
+    renderPanel();
 
     await user.click(screen.getByRole('button', { name: /close notifications/i }));
 
-    expect(onClose).toHaveBeenCalled();
+    expect(close).toHaveBeenCalled();
   });
 
-  it('moves focus to the dialog on open so it is announced before its controls', () => {
+  it('hides the close button when the panel is closed and nothing is published', () => {
     renderPanel();
 
-    expect(screen.getByRole('dialog', { name: 'Notifications' })).toHaveFocus();
+    expect(screen.queryByRole('button', { name: /close notifications/i })).not.toBeInTheDocument();
+  });
+
+  it('renders nothing outside a patient chart', () => {
+    mockUseChartPatient.mockReturnValue({ patient: null, patientUuid: null });
+
+    const { container } = renderPanel();
+
+    expect(container).toBeEmptyDOMElement();
   });
 });

@@ -71,6 +71,11 @@ export const notificationBell = getAsyncLifecycle(
   options,
 );
 
+export const notificationRows = getAsyncLifecycle(
+  () => import('./smart-notifications/notification-panel.extension'),
+  options,
+);
+
 export const smartNotificationDetailModal = getAsyncLifecycle(
   () => import('./smart-notifications/notification-detail.modal'),
   options,

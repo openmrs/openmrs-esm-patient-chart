@@ -46,3 +46,9 @@ export const smartNotificationDetailModalName = 'smart-notification-detail-modal
  * misleading.
  */
 export const reviewedBannerWindowMs = 24 * 60 * 60 * 1000;
+
+/**
+ * The app shell keys its header panels by name and shows one at a time. This is the name its
+ * notifications panel is registered under, and what `isActivePanel` / `togglePanel` expect.
+ */
+export const notificationsPanelName = 'notificationsMenu';

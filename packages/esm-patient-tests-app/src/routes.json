@@ -39,8 +39,12 @@
     {
       "name": "smart-notification-bell",
       "component": "notificationBell",
-      "slot": "top-nav-actions-slot",
-      "order": 35
+      "slot": "notifications-menu-button-slot"
+    },
+    {
+      "name": "smart-notification-rows",
+      "component": "notificationRows",
+      "slot": "notifications-nav-menu-slot"
     }
   ],
   "modals": [

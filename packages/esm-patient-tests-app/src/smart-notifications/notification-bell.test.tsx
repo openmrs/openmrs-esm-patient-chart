@@ -1,52 +1,24 @@
 import React from 'react';
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig, useOnClickOutside, useSession } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { mockSessionDataResponse, mockSmartNotification, mockCriticalSmartNotification } from '__mocks__';
 import { mockPatient } from 'tools';
 import { configSchema, type ConfigObject } from '../config-schema';
+import { notificationsPanelName } from './constants';
+import { _resetPanelControls } from './panel-controls';
 import { useSmartNotifications } from './smart-notifications.resource';
 import { useChartPatient } from './use-chart-patient';
 import NotificationBell from './notification-bell.extension';
 
 vi.mock('./smart-notifications.resource', () => ({ useSmartNotifications: vi.fn() }));
 vi.mock('./use-chart-patient', () => ({ useChartPatient: vi.fn() }));
-vi.mock('./notification-panel.component', () => ({
-  default: ({ onClose }: { onClose: () => void }) => (
-    <div data-testid="notification-panel">
-      <button onClick={onClose} type="button">
-        Panel close
-      </button>
-    </div>
-  ),
-}));
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
-const mockUseOnClickOutside = useOnClickOutside as Mock;
 const mockUseSession = vi.mocked(useSession);
 const mockUseSmartNotifications = vi.mocked(useSmartNotifications);
 const mockUseChartPatient = vi.mocked(useChartPatient);
-
-// The framework's test double for useOnClickOutside is a no-op, so swap in a minimal real
-// implementation for the tests that exercise dismissal.
-const useRealOnClickOutside = <T extends HTMLElement>(handler: (event: MouseEvent) => void, active: boolean) => {
-  const ref = React.useRef<T>(null);
-  React.useEffect(() => {
-    if (!active) {
-      return;
-    }
-    const listener = (event: MouseEvent) => {
-      if (ref.current && event.target instanceof Node && ref.current.contains(event.target)) {
-        return;
-      }
-      handler(event);
-    };
-    window.addEventListener('mousedown', listener);
-    return () => window.removeEventListener('mousedown', listener);
-  }, [handler, active]);
-  return ref;
-};
 
 function mockNotifications(notifications: Array<unknown> = [], read: Record<string, string> = {}) {
   mockUseSmartNotifications.mockReturnValue({
@@ -59,18 +31,25 @@ function mockNotifications(notifications: Array<unknown> = [], read: Record<stri
   });
 }
 
+/** Stands in for the app shell, which owns which header panel is open. */
+function renderBell({ openPanel = null }: { openPanel?: string | null } = {}) {
+  const togglePanel = vi.fn();
+  const isActivePanel = vi.fn((panelName: string) => panelName === openPanel);
+  const view = render(<NotificationBell isActivePanel={isActivePanel} togglePanel={togglePanel} />);
+  return { ...view, togglePanel, isActivePanel };
+}
+
 describe('NotificationBell', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
-    } as ConfigObject);
+    _resetPanelControls();
+    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(configSchema) } as ConfigObject);
     mockUseSession.mockReturnValue(mockSessionDataResponse.data);
     mockUseChartPatient.mockReturnValue({ patient: mockPatient, patientUuid: mockPatient.id });
     mockNotifications([]);
   });
 
   it('renders a bell labelled "Notifications"', () => {
-    render(<NotificationBell />);
+    renderBell();
 
     expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
   });
@@ -78,18 +57,17 @@ describe('NotificationBell', () => {
   it('shows the unread count as a badge', () => {
     mockNotifications([mockSmartNotification, mockCriticalSmartNotification]);
 
-    render(<NotificationBell />);
+    renderBell();
 
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
   it('counts only unread notifications, not everything in the inbox', () => {
-    // Reading a notification silences the badge but leaves the row in the list.
     mockNotifications([mockSmartNotification, mockCriticalSmartNotification], {
       [mockSmartNotification.id]: '2026-06-29T09:31:00.000Z',
     });
 
-    render(<NotificationBell />);
+    renderBell();
 
     expect(screen.getByText('1')).toBeInTheDocument();
   });
@@ -97,25 +75,17 @@ describe('NotificationBell', () => {
   it('shows no badge once every notification has been read', () => {
     mockNotifications([mockSmartNotification], { [mockSmartNotification.id]: '2026-06-29T09:31:00.000Z' });
 
-    render(<NotificationBell />);
+    renderBell();
 
-    expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
     expect(screen.queryByText('1')).not.toBeInTheDocument();
   });
 
   it('caps the badge at 9+ so it cannot overflow the header', () => {
     mockNotifications(new Array(12).fill(0).map((_, index) => ({ ...mockSmartNotification, id: `n-${index}` })));
 
-    render(<NotificationBell />);
+    renderBell();
 
     expect(screen.getByText('9+')).toBeInTheDocument();
-  });
-
-  it('shows no badge when nothing needs attention', () => {
-    render(<NotificationBell />);
-
-    expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 
   it('does not render when smartNotifications is disabled', () => {
@@ -129,7 +99,7 @@ describe('NotificationBell', () => {
       },
     } as ConfigObject);
 
-    const { container } = render(<NotificationBell />);
+    const { container } = renderBell();
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -137,74 +107,46 @@ describe('NotificationBell', () => {
   it('does not render outside a patient chart', () => {
     mockUseChartPatient.mockReturnValue({ patient: null, patientUuid: null });
 
-    const { container } = render(<NotificationBell />);
+    const { container } = renderBell();
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('toggles the panel open and closed on click', async () => {
+  it('asks the shell to toggle its notifications panel, rather than rendering one itself', async () => {
     const user = userEvent.setup();
     mockNotifications([mockSmartNotification]);
 
-    render(<NotificationBell />);
-    const bell = screen.getByRole('button', { name: /notifications/i });
+    const { togglePanel } = renderBell();
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
 
-    expect(screen.queryByTestId('notification-panel')).not.toBeInTheDocument();
-    await user.click(bell);
-    expect(screen.getByTestId('notification-panel')).toBeInTheDocument();
-    await user.click(bell);
-    expect(screen.queryByTestId('notification-panel')).not.toBeInTheDocument();
+    expect(togglePanel).toHaveBeenCalledWith(notificationsPanelName);
   });
 
-  it('closes the panel on Escape', async () => {
+  it('reflects the shell as the source of truth for whether the panel is open', () => {
+    mockNotifications([mockSmartNotification]);
+
+    renderBell({ openPanel: notificationsPanelName });
+
+    expect(screen.getByRole('button', { name: /notifications/i })).toHaveClass('cds--header__action--active');
+  });
+
+  it('closes the panel on Escape while it is open', async () => {
     const user = userEvent.setup();
     mockNotifications([mockSmartNotification]);
 
-    render(<NotificationBell />);
-    await user.click(screen.getByRole('button', { name: /notifications/i }));
-    expect(screen.getByTestId('notification-panel')).toBeInTheDocument();
-
+    const { togglePanel } = renderBell({ openPanel: notificationsPanelName });
     await user.keyboard('{Escape}');
 
-    expect(screen.queryByTestId('notification-panel')).not.toBeInTheDocument();
+    expect(togglePanel).toHaveBeenCalledWith(notificationsPanelName);
   });
 
-  it('closes the panel on an outside click', async () => {
+  it('ignores Escape when the panel is already closed', async () => {
     const user = userEvent.setup();
     mockNotifications([mockSmartNotification]);
-    mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
 
-    render(
-      <div>
-        <NotificationBell />
-        <button type="button">Outside</button>
-      </div>,
-    );
-    await user.click(screen.getByRole('button', { name: /notifications/i }));
-    expect(screen.getByTestId('notification-panel')).toBeInTheDocument();
+    const { togglePanel } = renderBell();
+    await user.keyboard('{Escape}');
 
-    await user.click(screen.getByRole('button', { name: /outside/i }));
-
-    expect(screen.queryByTestId('notification-panel')).not.toBeInTheDocument();
-  });
-
-  it('keeps the panel open when the click lands inside the detail modal', async () => {
-    const user = userEvent.setup();
-    mockNotifications([mockSmartNotification]);
-    mockUseOnClickOutside.mockImplementation(useRealOnClickOutside);
-
-    render(
-      <div>
-        <NotificationBell />
-        <div role="dialog">
-          <button type="button">In modal</button>
-        </div>
-      </div>,
-    );
-    await user.click(screen.getByRole('button', { name: /notifications/i }));
-
-    await user.click(screen.getByRole('button', { name: /in modal/i }));
-
-    expect(screen.getByTestId('notification-panel')).toBeInTheDocument();
+    expect(togglePanel).not.toHaveBeenCalled();
   });
 });
