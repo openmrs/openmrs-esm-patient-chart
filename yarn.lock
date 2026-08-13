@@ -4918,28 +4918,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-api@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-api@npm:10.0.1-pre.5136"
+"@openmrs/esm-api@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-api@npm:10.0.1-pre.5141"
   dependencies:
     lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@openmrs/esm-config": ^10.0.1-pre.5136
-    "@openmrs/esm-error-handling": ^10.0.1-pre.5136
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-navigation": ^10.0.1-pre.5136
-  checksum: 10/8684385834304f6e7b9d3d662ceb5cf2783240c7ad1dba3243cd6b7c70f997790800cd7a06bbcd5a404e9f11f345968bf9aed71568b7fdee8f1495e22bd83ec3
+    "@openmrs/esm-config": ^10.0.1-pre.5141
+    "@openmrs/esm-error-handling": ^10.0.1-pre.5141
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-navigation": ^10.0.1-pre.5141
+  checksum: 10/775b5b0146783544f193ce3d2482512c357611b6e4ef06d1a46dceb4b33f50c5ba30198538b501cd249b59234c2cabb82ac25c8771a4aabf886790230dfcf8a8
   languageName: node
   linkType: hard
 
-"@openmrs/esm-app-shell@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-app-shell@npm:10.0.1-pre.5136"
+"@openmrs/esm-app-shell@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-app-shell@npm:10.0.1-pre.5141"
   dependencies:
     "@carbon/react": "npm:^1.92.1"
     "@internationalized/date": "npm:^3.8.0"
-    "@openmrs/esm-framework": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-styleguide": "npm:10.0.1-pre.5136"
+    "@openmrs/esm-framework": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-styleguide": "npm:10.0.1-pre.5141"
     "@rspack/cli": "npm:1.7.9"
     "@rspack/core": "npm:1.7.9"
     dayjs: "npm:^1.11.13"
@@ -4959,70 +4959,70 @@ __metadata:
     swc-loader: "npm:0.2.7"
     swr: "npm:2.2.5"
     webpack-pwa-manifest: "npm:4.3.0"
-  checksum: 10/42330b053e98bdd90632610d0dff643c308bac6a2d37594406e859b3e22c25bd0560c709e26a0c4d946fd545386f9c4eb2d385e7c23477177202e84422900e7a
+  checksum: 10/0e8d0fed7943d1aeed2fac32c8170c9f685734ab4d60cf340e0f1b939146cd24dc87170969985cb2ac116d7c88acfb49556a9921672f8b9ecefde5e079cead7a
   languageName: node
   linkType: hard
 
-"@openmrs/esm-config@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-config@npm:10.0.1-pre.5136"
+"@openmrs/esm-config@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-config@npm:10.0.1-pre.5141"
   dependencies:
     lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
     single-spa: 6.x
-  checksum: 10/3392c7a40123bcb4fe4e40875f6737d6223fca17f201cc551695ae259154b539c480a263a475feb45c7b8d636f2060d3cf58e48f829265111d3433dc0bb44ce9
+  checksum: 10/7e3e21a6af8186dfc3bf947e9306f05fc85a8fc4b8db8950f956453fa8132d43156151b77f309e5503e04af6feaa2834aeb865abe8ea4d23a34b5e472bc8e164
   languageName: node
   linkType: hard
 
-"@openmrs/esm-context@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-context@npm:10.0.1-pre.5136"
+"@openmrs/esm-context@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-context@npm:10.0.1-pre.5141"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-  checksum: 10/93f1aff3ec86cee8842d77d010a66b03230c0e8637365e606eb0a2246d01d34d7e5b2d72a29211da90d8eb2e9e59d0f1cf3282bec2540d2abd333510c255239a
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+  checksum: 10/481b36650156e05517cbf405b12b2d986a15796ba032b409eac9cfbf78bfa847ee971201c97f4a6d03e467b27f5f3df98db939e95e411b0cfdc6d79f493477a8
   languageName: node
   linkType: hard
 
-"@openmrs/esm-dynamic-loading@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-dynamic-loading@npm:10.0.1-pre.5136"
+"@openmrs/esm-dynamic-loading@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-dynamic-loading@npm:10.0.1-pre.5141"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-translations": ^10.0.1-pre.5136
-  checksum: 10/f06cfd03325cedfeb027bffb2b3de8ebcf83bc467215d9daab025f3525cb0d1a5f3a5f053ca6e78e332e18f47b640714ae0225db32ebdcf7c80cf834960d6f9d
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-translations": ^10.0.1-pre.5141
+  checksum: 10/4c346825be228acc131d8ff323046bd3b763672f00e8598b4fb2c98a48ee2ae46b0f186efc8891f0d4cf3b643b3b56db5b69901cbb530e68497a39edc24be984
   languageName: node
   linkType: hard
 
-"@openmrs/esm-emr-api@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-emr-api@npm:10.0.1-pre.5136"
+"@openmrs/esm-emr-api@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-emr-api@npm:10.0.1-pre.5141"
   dependencies:
     "@types/fhir": "npm:0.0.31"
     lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5136
-    "@openmrs/esm-offline": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-  checksum: 10/150b0ab3145e40e2f7a3ff208fbb7a39adb1a0dfe9a48b43f4bd5fa03e1f986010da2e97ae9942c98db102df2eecaf5ee1c00759e67db4b19ce21a77589fdb19
+    "@openmrs/esm-api": ^10.0.1-pre.5141
+    "@openmrs/esm-offline": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+  checksum: 10/7a75a0f33d895d2cc4f36f676709ebecd1d6f813eae272803ea26d134b49a5a1cd74acced4c9a580a03a3308035cf74621bd4b044573bab461e0e8cbd9a0cd03
   languageName: node
   linkType: hard
 
-"@openmrs/esm-error-handling@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-error-handling@npm:10.0.1-pre.5136"
+"@openmrs/esm-error-handling@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-error-handling@npm:10.0.1-pre.5141"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-  checksum: 10/edbab0f50fd28ebade1edcd4259a62aebcb061116b7e44236f41413702c6b6ee5ad7eef4a19fc10b16d8476310bfc361cd3e8bf9b71d395176ae421e84665f65
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+  checksum: 10/5c0116d09bb708cf8966ce294f1144be28585defa28bb33ca2b62e5c8875085c1400917647de7bb67b06b8f9e60e8b0c65a7362ae9db649147d78982ba3b66ec
   languageName: node
   linkType: hard
 
-"@openmrs/esm-expression-evaluator@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-expression-evaluator@npm:10.0.1-pre.5136"
+"@openmrs/esm-expression-evaluator@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-expression-evaluator@npm:10.0.1-pre.5141"
   dependencies:
     "@jsep-plugin/arrow": "npm:^1.0.6"
     "@jsep-plugin/new": "npm:^1.0.4"
@@ -5031,35 +5031,35 @@ __metadata:
     "@jsep-plugin/template": "npm:^1.0.5"
     "@jsep-plugin/ternary": "npm:^1.1.4"
     jsep: "npm:^1.4.0"
-  checksum: 10/f1513d55cc282ea788245d4206866788a05b3b75a4e82c25cadfc9811b68915e8cdd1933b38c8cecd8bd362cfa9cce44af7cd16f28babc4d449f2650ff103b2d
+  checksum: 10/0be50097cc75ea160362b1870ad02a0b5c2e118f8f1ccc323898d8ad3a737b71951e1d7254cccdfac4c3209be14e770fc27b15a31ec14d47a55fbe85ad4337b8
   languageName: node
   linkType: hard
 
-"@openmrs/esm-extensions@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-extensions@npm:10.0.1-pre.5136"
+"@openmrs/esm-extensions@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-extensions@npm:10.0.1-pre.5141"
   dependencies:
     lodash-es: "npm:^4.17.21"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5136
-    "@openmrs/esm-config": ^10.0.1-pre.5136
-    "@openmrs/esm-expression-evaluator": ^10.0.1-pre.5136
-    "@openmrs/esm-feature-flags": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
+    "@openmrs/esm-api": ^10.0.1-pre.5141
+    "@openmrs/esm-config": ^10.0.1-pre.5141
+    "@openmrs/esm-expression-evaluator": ^10.0.1-pre.5141
+    "@openmrs/esm-feature-flags": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
     single-spa: 6.x
-  checksum: 10/49ebb95f6d80a3cd79d03bf2a9d8c645ac5018e7b389463b736512151bc67653d89fd6cb1943bfcccc37d24b2aa45283277ac7e41937b7de1049fca8ae23d35a
+  checksum: 10/dee0881c52696483ccda336d30346efaa5444f7858d467c5fc6b71c380c97316c28e4c567ed62fd2e9d7ecf66acd2809ede8c2a8ec932e0ea702cd6670d5c1f5
   languageName: node
   linkType: hard
 
-"@openmrs/esm-feature-flags@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-feature-flags@npm:10.0.1-pre.5136"
+"@openmrs/esm-feature-flags@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-feature-flags@npm:10.0.1-pre.5141"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
     single-spa: 6.x
-  checksum: 10/860f1744fb997139bfeb063edca57c36857c606e5821576ea15d38e14ef976cc3833b90a6754a7c463e3944546a5e0fef1b0874a6b9e69290e2ef90eac98829a
+  checksum: 10/cee219777fefbc1705f4af39c185deb174fd8defbb0020332e222faacadad32882ce71a96167b2ca518bd727d54f7d55108363c8de910dc2c74e3d30eefc5900
   languageName: node
   linkType: hard
 
@@ -5182,28 +5182,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-framework@npm:10.0.1-pre.5136, @openmrs/esm-framework@npm:next":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-framework@npm:10.0.1-pre.5136"
+"@openmrs/esm-framework@npm:10.0.1-pre.5141, @openmrs/esm-framework@npm:next":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-framework@npm:10.0.1-pre.5141"
   dependencies:
-    "@openmrs/esm-api": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-config": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-context": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-dynamic-loading": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-emr-api": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-error-handling": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-expression-evaluator": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-extensions": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-feature-flags": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-globals": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-navigation": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-offline": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-react-utils": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-routes": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-state": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-styleguide": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-translations": "npm:10.0.1-pre.5136"
-    "@openmrs/esm-utils": "npm:10.0.1-pre.5136"
+    "@openmrs/esm-api": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-config": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-context": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-dynamic-loading": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-emr-api": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-error-handling": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-expression-evaluator": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-extensions": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-feature-flags": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-globals": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-navigation": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-offline": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-react-utils": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-routes": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-state": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-styleguide": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-translations": "npm:10.0.1-pre.5141"
+    "@openmrs/esm-utils": "npm:10.0.1-pre.5141"
   peerDependencies:
     dayjs: 1.x
     i18next: 25.x
@@ -5213,7 +5213,7 @@ __metadata:
     rxjs: 6.x
     single-spa: 6.x
     swr: 2.x
-  checksum: 10/3cc77d65553220b890a4facd9e6e484b63da9a42b472075ee96624d7c0ea8181b23d1f61c4bddc037a76776388970a975b63fdadf72424ce7070811f0e9883f8
+  checksum: 10/55683fe521a237c8dd92c84e902d86e91b88254e0d29f473cee675fbad0311f1d5fc357a79efb5662f8c1a384e19c135e4487da1c2b14ff2bbf986ec04be282a
   languageName: node
   linkType: hard
 
@@ -5239,42 +5239,42 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-globals@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-globals@npm:10.0.1-pre.5136"
+"@openmrs/esm-globals@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-globals@npm:10.0.1-pre.5141"
   dependencies:
     "@types/fhir": "npm:0.0.31"
   peerDependencies:
     single-spa: 6.x
-  checksum: 10/bfd4c3de85895689c91f77bf42ae08cd4eddcc50dbc463ab27f9f52a5fb333cad197c902e5c7e2c33f25cc1735fc43bdf2b29d61d35075fd518e9ea30be1501c
+  checksum: 10/2310a97d76b9261e7ca55e03a19a2f2ceb8c88c45b483714785afe29656d5535d2d90736b6a5710202b8ae54557184c74f0cc0d38a49571b0fd2c745de1c70b1
   languageName: node
   linkType: hard
 
-"@openmrs/esm-navigation@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-navigation@npm:10.0.1-pre.5136"
+"@openmrs/esm-navigation@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-navigation@npm:10.0.1-pre.5141"
   dependencies:
     path-to-regexp: "npm:^8.3.0"
   peerDependencies:
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-  checksum: 10/c6a832d7e75e20defc5a02dc3ef0a07b9831176aef68ba055db528321592a1f4549a1a020f3f0b1cc64b61aa13622075fec79da0401e711112fccd120774f157
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+  checksum: 10/35bd131bfd3ebcdd54659421abf4a5a8db5c814b5c3f313b44728eeaff87833c499576c0990ff47f466bedcc4a674a07b10657f52595acd4c815b9f55757d301
   languageName: node
   linkType: hard
 
-"@openmrs/esm-offline@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-offline@npm:10.0.1-pre.5136"
+"@openmrs/esm-offline@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-offline@npm:10.0.1-pre.5141"
   dependencies:
     dexie: "npm:^3.0.3"
     lodash-es: "npm:^4.17.21"
     uuid: "npm:^9.0.1"
     workbox-window: "npm:^6.1.5"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5136
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
+    "@openmrs/esm-api": ^10.0.1-pre.5141
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
     rxjs: 6.x
-  checksum: 10/a520bad3c9c25becf9c9a45120ca1e0908e0386f656f5061467e7b8568f0c05dc9bce0b5f8095630c3f46175d771aa68a8d34161fb06bd2cc90d3ef72d514fa4
+  checksum: 10/2f10b722186915a2c1c37c45186c8e7a818952c636fda82e5fec33d341bfa717f35632ec31786bbc5283a029bd49351d47d94931df2c81bb0844c4dacd36c5f9
   languageName: node
   linkType: hard
 
@@ -5738,24 +5738,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/esm-react-utils@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-react-utils@npm:10.0.1-pre.5136"
+"@openmrs/esm-react-utils@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-react-utils@npm:10.0.1-pre.5141"
   dependencies:
     lodash-es: "npm:^4.17.21"
     single-spa-react: "npm:^6.0.2"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5136
-    "@openmrs/esm-config": ^10.0.1-pre.5136
-    "@openmrs/esm-context": ^10.0.1-pre.5136
-    "@openmrs/esm-emr-api": ^10.0.1-pre.5136
-    "@openmrs/esm-error-handling": ^10.0.1-pre.5136
-    "@openmrs/esm-extensions": ^10.0.1-pre.5136
-    "@openmrs/esm-feature-flags": ^10.0.1-pre.5136
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-navigation": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
+    "@openmrs/esm-api": ^10.0.1-pre.5141
+    "@openmrs/esm-config": ^10.0.1-pre.5141
+    "@openmrs/esm-context": ^10.0.1-pre.5141
+    "@openmrs/esm-emr-api": ^10.0.1-pre.5141
+    "@openmrs/esm-error-handling": ^10.0.1-pre.5141
+    "@openmrs/esm-extensions": ^10.0.1-pre.5141
+    "@openmrs/esm-feature-flags": ^10.0.1-pre.5141
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-navigation": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
     dayjs: 1.x
     i18next: 25.x
     react: 18.x
@@ -5763,40 +5763,40 @@ __metadata:
     react-i18next: 16.x
     rxjs: 6.x
     swr: 2.x
-  checksum: 10/875fb83db41f4f56ed18349288c93dd9d21e7485f33752c1e6b33592ca3388169bfc53350d56767cf8f70f8df7a10f721775b1849707104a669fe9c034aff452
+  checksum: 10/3891b3579e9e59cf8cbe5d2a9d8c24441614661a2ecca644de08e0af467c8a9b44f48b45a46d72a5fe8b0c706e41ced57df54dd5df28ee23a32abc8f057f49ae
   languageName: node
   linkType: hard
 
-"@openmrs/esm-routes@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-routes@npm:10.0.1-pre.5136"
+"@openmrs/esm-routes@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-routes@npm:10.0.1-pre.5141"
   peerDependencies:
-    "@openmrs/esm-config": ^10.0.1-pre.5136
-    "@openmrs/esm-dynamic-loading": ^10.0.1-pre.5136
-    "@openmrs/esm-extensions": ^10.0.1-pre.5136
-    "@openmrs/esm-feature-flags": ^10.0.1-pre.5136
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
+    "@openmrs/esm-config": ^10.0.1-pre.5141
+    "@openmrs/esm-dynamic-loading": ^10.0.1-pre.5141
+    "@openmrs/esm-extensions": ^10.0.1-pre.5141
+    "@openmrs/esm-feature-flags": ^10.0.1-pre.5141
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
     single-spa: 6.x
-  checksum: 10/eb6bf92af129d7f08829cdf15782c97128b4786f97438c1148aeb016563a40e7d3d4698029ad9c518d1b92a106b7cc64684d6208f0ca7fa338beca61eb51c676
+  checksum: 10/05f7a76a191acb29c3c73e630ec129b06c470b86ebb127c49b15339f0af029b8df2d6fe0cac48ab98d25d3621a50f518d35f8ad015fa0aa18fe8ebde6243d42b
   languageName: node
   linkType: hard
 
-"@openmrs/esm-state@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-state@npm:10.0.1-pre.5136"
+"@openmrs/esm-state@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-state@npm:10.0.1-pre.5141"
   dependencies:
     zustand: "npm:^4.5.5"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
-  checksum: 10/d12c8eaf91f337b7f5478e2c50cedd27b23c9b9baeb0755c9971027e9765111ffa0e4b31008b9f1219d9e149d7e48d55f4a8bc898ce80fab735df925ec295819
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
+  checksum: 10/bda8ca01b179756212ed376797196a7d91cc4f423351ce2aaa9d3b9e774f15567f5dbdca92d0a1325769fb64b78012f80a2e1c908b8392ef10175df458317d47
   languageName: node
   linkType: hard
 
-"@openmrs/esm-styleguide@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-styleguide@npm:10.0.1-pre.5136"
+"@openmrs/esm-styleguide@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-styleguide@npm:10.0.1-pre.5141"
   dependencies:
     "@carbon/charts": "npm:^1.27.0"
     "@carbon/react": "npm:^1.92.1"
@@ -5807,18 +5807,18 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     react-aria-components: "npm:^1.7.1"
   peerDependencies:
-    "@openmrs/esm-api": ^10.0.1-pre.5136
-    "@openmrs/esm-config": ^10.0.1-pre.5136
-    "@openmrs/esm-emr-api": ^10.0.1-pre.5136
-    "@openmrs/esm-error-handling": ^10.0.1-pre.5136
-    "@openmrs/esm-extensions": ^10.0.1-pre.5136
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
-    "@openmrs/esm-navigation": ^10.0.1-pre.5136
-    "@openmrs/esm-react-utils": ^10.0.1-pre.5136
-    "@openmrs/esm-routes": ^10.0.1-pre.5136
-    "@openmrs/esm-state": ^10.0.1-pre.5136
-    "@openmrs/esm-translations": ^10.0.1-pre.5136
-    "@openmrs/esm-utils": ^10.0.1-pre.5136
+    "@openmrs/esm-api": ^10.0.1-pre.5141
+    "@openmrs/esm-config": ^10.0.1-pre.5141
+    "@openmrs/esm-emr-api": ^10.0.1-pre.5141
+    "@openmrs/esm-error-handling": ^10.0.1-pre.5141
+    "@openmrs/esm-extensions": ^10.0.1-pre.5141
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
+    "@openmrs/esm-navigation": ^10.0.1-pre.5141
+    "@openmrs/esm-react-utils": ^10.0.1-pre.5141
+    "@openmrs/esm-routes": ^10.0.1-pre.5141
+    "@openmrs/esm-state": ^10.0.1-pre.5141
+    "@openmrs/esm-translations": ^10.0.1-pre.5141
+    "@openmrs/esm-utils": ^10.0.1-pre.5141
     dayjs: 1.x
     i18next: 25.x
     react: 18.x
@@ -5826,24 +5826,24 @@ __metadata:
     react-i18next: 16.x
     rxjs: 6.x
     swr: 2.x
-  checksum: 10/2a7dd7ae14050ac67c1fd7429291a0a35dede02b3a454174adfc9d7bbc9920b997615ed7b6a56dc8028f80bdc5f5f23ff78ed954b77ff5a4e81220644a5ea183
+  checksum: 10/4a3e9f059a541e895899faf0be21fc157a1f03818470212baa9a9bab1be068d0d8d99658bd8698728732f63b5ad477515a92b0342cc05f50cf41bb54b6555580
   languageName: node
   linkType: hard
 
-"@openmrs/esm-translations@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-translations@npm:10.0.1-pre.5136"
+"@openmrs/esm-translations@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-translations@npm:10.0.1-pre.5141"
   dependencies:
     i18next: "npm:^25.5.3"
   peerDependencies:
     i18next: 25.x
-  checksum: 10/b6f37df614dc70c56b8ab81992b13a87abc55fa1e6a4d534f0e6257240e947663f99e426a3d9445e8f7df177ee3ba8ac9247b4b8dfe924efeec4a03d8ec33c5d
+  checksum: 10/00f894fb2a30442a6431254e60584491f27f0a6070715086dbb16a52ae4f227d8335a694d3eb3d5193477eb1404b972bce7825776d4a21c008d5e05f4c22999d
   languageName: node
   linkType: hard
 
-"@openmrs/esm-utils@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/esm-utils@npm:10.0.1-pre.5136"
+"@openmrs/esm-utils@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/esm-utils@npm:10.0.1-pre.5141"
   dependencies:
     "@formatjs/intl-durationformat": "npm:^0.7.3"
     "@internationalized/date": "npm:^3.8.0"
@@ -5851,11 +5851,11 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     semver: "npm:^7.7.3"
   peerDependencies:
-    "@openmrs/esm-globals": ^10.0.1-pre.5136
+    "@openmrs/esm-globals": ^10.0.1-pre.5141
     dayjs: 1.x
     i18next: 25.x
     rxjs: 6.x
-  checksum: 10/3dd1531f92251d6ecb48cda613cca9ef39412292e795024b856181fbbd6a419ed175f809bb77487de4d0e043cc204495aae2e1994316f534a11761be9bb46332
+  checksum: 10/daa7754415c368d2f193d2aff673a10943807dcbc0abdb54205f16a506b0a334c177c38459be2b8ca2af254cdc37406d281406bddb65b6ad620b63bb1e4ab66a
   languageName: node
   linkType: hard
 
@@ -5911,9 +5911,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/rspack-config@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/rspack-config@npm:10.0.1-pre.5136"
+"@openmrs/rspack-config@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/rspack-config@npm:10.0.1-pre.5141"
   dependencies:
     "@rspack/cli": "npm:1.7.9"
     "@rspack/core": "npm:1.7.9"
@@ -5929,13 +5929,13 @@ __metadata:
     ts-checker-rspack-plugin: "npm:1.1.4"
     webpack-bundle-analyzer: "npm:4.10.2"
     webpack-stats-plugin: "npm:1.1.3"
-  checksum: 10/d47e090dc6af5d5f5fe2fea7675e79775a9349019e9cce6729e325ea6854565610a9791a8332a1c73f169287e8e78fbb5ccffbc34ccb7662ba33bff5b00d5a90
+  checksum: 10/efe35bc478f08edcb3f7abc3f8a3287c6a89db393e57d80ec9ac31e663530b8326f8217ddead03cb35f32bcedb212afd5bc7503b198585de20fb525bfe79c147
   languageName: node
   linkType: hard
 
-"@openmrs/webpack-config@npm:10.0.1-pre.5136":
-  version: 10.0.1-pre.5136
-  resolution: "@openmrs/webpack-config@npm:10.0.1-pre.5136"
+"@openmrs/webpack-config@npm:10.0.1-pre.5141":
+  version: 10.0.1-pre.5141
+  resolution: "@openmrs/webpack-config@npm:10.0.1-pre.5141"
   dependencies:
     "@swc/core": "npm:1.15.21"
     clean-webpack-plugin: "npm:4.0.0"
@@ -5951,7 +5951,7 @@ __metadata:
     webpack-bundle-analyzer: "npm:4.10.2"
     webpack-cli: "npm:6.0.1"
     webpack-stats-plugin: "npm:1.1.3"
-  checksum: 10/8760592074ab3e65e1ee7a81fbca2388f117368de4ea2409666553d9b20fec10a896fcbd4d0cdf8be793810ace4ab3eb4addd69ad16fd78ad0d8f00bdfad6678
+  checksum: 10/98e1b07df2fb2d5d50e36e422f5026ab541273b1412177d79592254915045f98efb65149056ceecb79deafebfa6ce25b447430013b65684de25a8fb987906852
   languageName: node
   linkType: hard
 
@@ -18804,13 +18804,13 @@ __metadata:
   linkType: hard
 
 "openmrs@npm:next":
-  version: 10.0.1-pre.5136
-  resolution: "openmrs@npm:10.0.1-pre.5136"
+  version: 10.0.1-pre.5141
+  resolution: "openmrs@npm:10.0.1-pre.5141"
   dependencies:
     "@inquirer/prompts": "npm:8.3.2"
-    "@openmrs/esm-app-shell": "npm:10.0.1-pre.5136"
-    "@openmrs/rspack-config": "npm:10.0.1-pre.5136"
-    "@openmrs/webpack-config": "npm:10.0.1-pre.5136"
+    "@openmrs/esm-app-shell": "npm:10.0.1-pre.5141"
+    "@openmrs/rspack-config": "npm:10.0.1-pre.5141"
+    "@openmrs/webpack-config": "npm:10.0.1-pre.5141"
     "@pnpm/npm-conf": "npm:^3.0.2"
     "@rspack/cli": "npm:1.7.9"
     "@rspack/core": "npm:1.7.9"
@@ -18849,7 +18849,7 @@ __metadata:
     openmrs: ./dist/cli.js
     rspack: ./bin/rspack.cjs
     webpack: ./bin/webpack.cjs
-  checksum: 10/0e6a800cd515bfc78bc029cca203dad2cd6e9ccd4c3478e1c45b677c4a118f1c5dc2886830720d479d9a27efaf39423441d909bf929922fff17327ac6bf35771
+  checksum: 10/6afc8b2c71a4ba9c16d4f7cb5ce5ca4966730fcb6ebea569e766238e49ad7221680c5fda6734d05bf79e4a65c0a1e26da869480b14807ec5e1c2d55667f2204c
   languageName: node
   linkType: hard
 
