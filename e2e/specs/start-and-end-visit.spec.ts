@@ -48,6 +48,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('When I select visit status: Ongoing', async () => {
     await chartPage.page.getByRole('tab', { name: /ongoing/i }).click();
   });
+
   await test.step('Then I should see Start date and time picker', async () => {
     // FIXME: make the date input work
     // await expect(chartPage.page.getByRole('textbox', { name: /start date/i })).toBeVisible();
@@ -58,6 +59,7 @@ test('Start and end a new visit', async ({ page, patient, api }) => {
   await test.step('When I select visit status: In the past', async () => {
     await chartPage.page.getByRole('tab', { name: /in the past/i }).click();
   });
+
   await test.step('Then I should see Start date and time picker AND End date and time picker', async () => {
     // FIXME: make the date input work
     // await expect(chartPage.page.getByRole('textbox', { name: /start date/i })).toBeVisible();
@@ -172,7 +174,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await page.getByRole('button', { name: /visit note/i }).click();
   });
 
-  await test.step("And I click the 'start new visit' button in the prompt modal ", async () => {
+  await test.step("And I click the 'start new visit' button in the prompt modal", async () => {
     await chartPage.page.getByRole('button', { name: /start new visit/i }).click();
   });
 
@@ -181,6 +183,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByRole('tab', { name: /ongoing/i })).toBeVisible();
     await expect(chartPage.page.getByRole('tab', { name: /in the past/i })).toBeVisible();
   });
+
   await test.step('When I select visit status: new', async () => {
     const newTab = chartPage.page.getByRole('tab', { name: /new/i });
     await newTab.click();
