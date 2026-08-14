@@ -86,7 +86,8 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
-  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges } = useConfig<ChartConfig>();
+  const { encounterEditableDuration, encounterEditableDurationOverridePrivileges, visitNoteEncounterTypes } =
+    useConfig<ChartConfig>();
   const [isPrinting, setIsPrinting] = useState(false);
 
   const paginatedMappedEncounters = useMemo(
@@ -253,7 +254,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     if (!encounter) return null;
 
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
-                      encounter.encounterType === 'Visit Note' && !encounter.form;
+                      visitNoteEncounterTypes.includes(encounter.encounterType) && !encounter.form;
 
                     const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
                       encounter.form?.uuid &&
