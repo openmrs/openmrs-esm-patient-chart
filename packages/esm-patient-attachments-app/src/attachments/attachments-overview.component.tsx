@@ -112,7 +112,9 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
           if (response.status === 401) {
             // Session expired — redirect to login and come back to this page after
             const returnUrl = encodeURIComponent(window.location.href);
-            window.location.href = `/openmrs/login.htm?redirect=${returnUrl}`;
+            // /openmrs/oauth2login, not the legacy /openmrs/login.htm: this deployment sits behind
+            // Keycloak, and the legacy form would be redirected anyway, losing the return path.
+            window.location.href = `/openmrs/oauth2login?redirect=${returnUrl}`;
             return;
           }
 
