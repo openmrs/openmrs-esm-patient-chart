@@ -85,7 +85,12 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
   const openAttachment = useCallback(
     async (attachment: Attachment) => {
       const orthancUrl = attachment.description ?? '';
-      if (orthancUrl.includes(':8889')) {
+      // Recognise the viewer link by what it IS, not by where it happens to be hosted. Testing
+      // for ':8889' (Orthanc's loopback debug port) only ever matches a local dev stack; on a
+      // real deployment the stored link is the public one, so that check alone is never true.
+      const isOrthancViewerUrl =
+        orthancUrl.includes('stone-webviewer') || orthancUrl.includes('orthancId=') || orthancUrl.includes(':8889');
+      if (isOrthancViewerUrl) {
         const normalizedUrl = orthancUrl.replace(/&amp;/g, '&');
         const studyIdMatch = normalizedUrl.match(/[?&]study=([^&#+]+)/) || normalizedUrl.match(/#\/studies\/([^?&]+)/);
         const orthancIdMatch = normalizedUrl.match(/[?&]orthancId=([^&]+)/);
