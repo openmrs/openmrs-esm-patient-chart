@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig, useSession } from '@openmrs/esm-framework';
@@ -150,19 +150,34 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     });
   });
 
-  it('snaps same-day date-only start dates to the current wall-clock time before saving', () => {
-    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
-    const now = new Date('2026-05-21T12:34:56.000Z');
+  describe('getOrderStartDateForSubmission', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-05-21T12:34:56.000Z'));
+    });
 
-    expect(getOrderStartDateForSubmission(selectedDate, undefined, now)).toBe(now);
-  });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
 
-  it('keeps applying the minimum start date after snapping same-day start dates', () => {
-    const selectedDate = new Date('2026-05-21T00:00:00.000Z');
-    const now = new Date('2026-05-21T12:34:56.000Z');
-    const startDateMin = new Date('2026-05-21T13:00:00.000Z');
+    it('leaves the start date unset for a same-day (today) selection so the posting layer supplies it', () => {
+      const selectedDate = new Date('2026-05-21T00:00:00.000Z');
 
-    expect(getOrderStartDateForSubmission(selectedDate, startDateMin, now)).toBe(startDateMin);
+      expect(getOrderStartDateForSubmission(selectedDate, undefined)).toBeUndefined();
+    });
+
+    it('preserves an explicitly selected non-today start date', () => {
+      const selectedDate = new Date('2026-05-25T00:00:00.000Z');
+
+      expect(getOrderStartDateForSubmission(selectedDate, undefined)).toBe(selectedDate);
+    });
+
+    it('raises an explicitly selected start date below the minimum up to the minimum', () => {
+      const selectedDate = new Date('2026-05-19T00:00:00.000Z');
+      const startDateMin = new Date('2026-05-20T00:00:00.000Z');
+
+      expect(getOrderStartDateForSubmission(selectedDate, startDateMin)).toBe(startDateMin);
+    });
   });
 
   it('auto-calculates quantity when dose, frequency, and duration are filled', async () => {

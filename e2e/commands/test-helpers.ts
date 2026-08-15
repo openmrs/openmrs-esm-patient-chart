@@ -1,4 +1,4 @@
-import { type Locator } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 export async function getAfterContent(element: Locator): Promise<string> {
   return await element.evaluate((el) => {
@@ -9,6 +9,40 @@ export async function getAfterContent(element: Locator): Promise<string> {
 
 export async function getBackgroundColor(element: Locator): Promise<string> {
   return await element.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+}
+
+// Background color + trailing ↑/↓ indicator the vitals table renders for each interpretation level
+// (the NumericObservation `cell` variant in @openmrs/esm-styleguide). The indicator is emitted as CSS
+// `::after` content, which the browser also folds into the cell's accessible name — so the same string
+// both locates the cell by role/name and is asserted as the `::after` content.
+export const interpretationCellStyles = {
+  normal: { backgroundColor: 'rgba(0, 0, 0, 0)', indicator: '' },
+  high: { backgroundColor: 'rgb(255, 242, 232)', indicator: ' ↑' },
+  low: { backgroundColor: 'rgb(255, 242, 232)', indicator: ' ↓' },
+  critically_high: { backgroundColor: 'rgb(255, 215, 217)', indicator: ' ↑↑' },
+  critically_low: { backgroundColor: 'rgb(255, 215, 217)', indicator: ' ↓↓' },
+} as const;
+
+export type VitalInterpretation = keyof typeof interpretationCellStyles;
+
+// Asserts that the vitals-table cell displaying `displayValue` (e.g. `38.5` or `145 / 100`) is styled
+// for the given interpretation. The colored background and the indicator live on the inner `div`
+// rendered by NumericObservation, so the styling is read from there. The accessible name is matched
+// exactly: an unflagged cell's name is just its value, which would otherwise substring-match the
+// blood-pressure cell (`100` in `100 / 60`) or the timestamp cell (`25` in a `10:25` time).
+export async function expectCellInterpretation(
+  page: Page,
+  displayValue: string,
+  interpretation: VitalInterpretation,
+): Promise<void> {
+  const { backgroundColor, indicator } = interpretationCellStyles[interpretation];
+  const styledContent = page
+    .getByRole('cell', { name: `${displayValue}${indicator}`, exact: true })
+    .locator('div')
+    .first();
+
+  expect(await getBackgroundColor(styledContent)).toBe(backgroundColor);
+  expect(await getAfterContent(styledContent)).toBe(interpretation === 'normal' ? 'none' : `"${indicator}"`);
 }
 
 export async function calculateBirthdate(age: { years?: number; months?: number }): Promise<string> {

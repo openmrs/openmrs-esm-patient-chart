@@ -9,6 +9,7 @@
   "deceased": "已故的",
   "district": "区县",
   "from_lower": "从",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "邮政编码",
   "started": "已开始",
   "state": "省份",
