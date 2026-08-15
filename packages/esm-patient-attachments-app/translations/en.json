@@ -21,7 +21,7 @@
   "deletePdf": "Delete PDF",
   "dicomError": "DICOM Viewer Error",
   "dicomStudyIdError": "Could not extract study ID from DICOM attachment.",
-  "dicomTokenError": "dicomTokenError",
+  "dicomTokenError": "Could not open DICOM viewer: {{error}}",
   "edit": "Edit",
   "enterAttachmentDescription": "Enter attachment description",
   "enterAttachmentName": "Enter attachment name",

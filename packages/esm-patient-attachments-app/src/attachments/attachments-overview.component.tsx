@@ -117,7 +117,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({ patientUuid }
         } catch (err) {
           showSnackbar({
             title: t('dicomError', 'DICOM Viewer Error'),
-            subtitle: t('dicomTokenError', `Could not open DICOM viewer: ${(err as Error).message}`),
+            subtitle: t('dicomTokenError', 'Could not open DICOM viewer: {{error}}', { error: (err as Error).message }),
             kind: 'error',
           });
         }
