@@ -91,6 +91,15 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-patient-forms-app
 
+[o:openmrs:p:openmrs3:r:esm-patient-growth-chart]
+file_filter            = packages/esm-patient-growth-chart-app/translations/<lang>.json
+source_file            = packages/esm-patient-growth-chart-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-patient-growth-chart
+
 [o:openmrs:p:openmrs3:r:esm-patient-immunizations-app]
 file_filter            = packages/esm-patient-immunizations-app/translations/<lang>.json
 source_file            = packages/esm-patient-immunizations-app/translations/en.json
