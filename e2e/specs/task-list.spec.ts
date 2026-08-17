@@ -173,7 +173,7 @@ test.describe('Task List workspace', () => {
     });
 
     await test.step('And the task should no longer appear in the task list', async () => {
-      await expect(page.getByText(taskName)).not.toBeVisible();
+      await expect(page.getByText(taskName)).toBeHidden();
     });
   });
 });

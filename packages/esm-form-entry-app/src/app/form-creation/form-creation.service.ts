@@ -12,7 +12,8 @@ import {
 } from '@openmrs/ngx-formentry';
 import { Session } from '@openmrs/esm-framework';
 import { ConfigResourceService } from '../services/config-resource.service';
-import { Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
+import { ConceptReferenceRange, Encounter, FormSchema, Identifier, PreFilledQuestions } from '../types';
+import { applyConceptReferenceRanges } from '../form-schema/concept-reference-ranges';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
@@ -49,6 +50,12 @@ export interface CreateFormParams {
    * Pre-filled questions
    */
   preFilledQuestions?: PreFilledQuestions;
+
+  /**
+   * The concept reference ranges which apply to the patient, keyed by concept UUID.
+   * Used to constrain the numeric questions of the form.
+   */
+  conceptReferenceRanges?: Map<string, ConceptReferenceRange>;
 }
 
 const loadedCustomDataSources: Record<string, unknown> = {};
@@ -59,10 +66,11 @@ const loadedCustomDataSources: Record<string, unknown> = {};
  * by the form engine.
  * The creation of the form encompasses the following tasks:
  * 1) Hooking up the data sources used by the form engine.
- * 2) Setting up special node handling.
- * 3) Filling the form with either:
- * 3.1) default values for new forms (-> create mode).
- * 3.2) existing values from an existing encounter (-> edit mode).
+ * 2) Constraining numeric questions to the concept reference ranges which apply to the patient.
+ * 3) Setting up special node handling.
+ * 4) Filling the form with either:
+ * 4.1) default values for new forms (-> create mode).
+ * 4.2) existing values from an existing encounter (-> edit mode).
  */
 @Injectable()
 export class FormCreationService {
@@ -85,9 +93,10 @@ export class FormCreationService {
    * @returns The new {@link Form} instance.
    */
   public async initAndCreateForm(createFormParams: CreateFormParams) {
-    const { formSchema, encounter, patientIdentifiers } = createFormParams;
+    const { formSchema, encounter, patientIdentifiers, conceptReferenceRanges } = createFormParams;
 
     await this.wireDataSources(createFormParams, formSchema);
+    applyConceptReferenceRanges(formSchema, conceptReferenceRanges);
 
     const form = this.formFactory.createForm(formSchema, this.dataSources.dataSources);
     this.setUpWHOCascading(form);

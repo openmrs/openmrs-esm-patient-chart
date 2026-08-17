@@ -89,12 +89,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await expect(incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i })).toBeVisible();
     });
 
@@ -181,6 +179,7 @@ test.describe('Drug Order Tests', () => {
     await test.step('When I visit the medications page', async () => {
       await medicationsPage.goTo(patient.uuid);
     });
+
     await test.step('When I click the overflow menu in the table row with the newly created medication', async () => {
       await page
         .getByRole('row')
@@ -412,12 +411,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
       await expect(page.getByText(/order form/i)).toBeVisible();
     });
@@ -505,12 +502,10 @@ test.describe('Drug Order Tests', () => {
         .getByRole('listitem')
         .filter({ hasText: /aspirin 325mg — 325mg — tablet/i });
 
-      await expect(incompleteAspirinBasketItem)
-        .toBeVisible({ timeout: 5_000 })
-        .catch(async () => {
-          await orderBasketLauncher.click();
-          await expect(incompleteAspirinBasketItem).toBeVisible();
-        });
+      await incompleteAspirinBasketItem
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => orderBasketLauncher.click());
+      await expect(incompleteAspirinBasketItem).toBeVisible();
       await incompleteAspirinBasketItem.getByRole('status', { name: /incomplete/i }).click();
       await expect(page.getByText(/order form/i)).toBeVisible();
     });
