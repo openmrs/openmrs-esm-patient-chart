@@ -27,7 +27,7 @@ yarn start --sources 'packages/esm-patient-growth-chart-app'
 
 ## Related
 
-- Ticket: [O3-5331](https://openmrs.atlassian.net/browse/O3-5077)
+- Ticket: [O3-5331](https://openmrs.atlassian.net/browse/O3-5331)
 - Requirements: [Growth Chart — Confluence](https://openmrs.atlassian.net/wiki/spaces/projects/pages/355401741/O3+Growth+Chart)
 - Architecture discussion: [OpenMRS Talk](https://talk.openmrs.org/t/o3-growth-chart/47879)
 

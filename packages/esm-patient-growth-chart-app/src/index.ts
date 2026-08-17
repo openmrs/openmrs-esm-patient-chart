@@ -1,4 +1,5 @@
-import { getSyncLifecycle, defineConfigSchema, createDashboard } from '@openmrs/esm-framework';
+import { getSyncLifecycle, defineConfigSchema } from '@openmrs/esm-framework';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { moduleName } from './constants';
 import { dashboardMeta } from './dashboard.meta';
@@ -17,6 +18,6 @@ export function startupApp() {
 
 // Extensions
 // t('Growth chart', 'Growth chart')
-export const growthChartDashboardLink = getSyncLifecycle(createDashboard({ ...dashboardMeta }), options);
+export const growthChartDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta }), options);
 
 export const growthChartMain = getSyncLifecycle(patientGrowthChartAppComponent, options);

@@ -24,6 +24,7 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 - [Task list](packages/esm-patient-task-list-app/README.md)
 - [Tests](packages/esm-patient-tests-app/README.md)
 - [Vitals and Biometrics](packages/esm-patient-vitals-app/README.md)
+- [Growth chart](packages/esm-patient-growth-chart-app/README.md)
 
 In addition to these widgets, several other microfrontends exist that encapsulate cross-cutting concerns. These are:
 
