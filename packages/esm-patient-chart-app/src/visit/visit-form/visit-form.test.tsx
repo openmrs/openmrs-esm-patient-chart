@@ -1078,6 +1078,81 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       }),
     );
   });
+
+  describe('start / stop ordering for a new past visit', () => {
+    // A brand-new visit has no encounters, which isolates the start-before-stop
+    // rule from the first / last encounter bounds.
+    function parseVisit(start: dayjs.Dayjs, stop: dayjs.Dayjs) {
+      const {
+        result: {
+          current: { visitFormSchema, defaultValues },
+        },
+      } = renderHook(() => useVisitFormSchemaAndDefaultValues(null));
+
+      const startFields = convertToDateTimeFields(start);
+      const stopFields = convertToDateTimeFields(stop);
+
+      return visitFormSchema.safeParse({
+        ...defaultValues,
+        visitStatus: 'past',
+        visitType: mockVisitTypes[0].uuid,
+        visitLocation: { display: mockLocations[0].display, uuid: mockLocations[0].uuid },
+        visitAttributes: {},
+        visitStartDate: startFields.date,
+        visitStartTime: startFields.time,
+        visitStartTimeFormat: startFields.timeFormat,
+        visitStopDate: stopFields.date,
+        visitStopTime: stopFields.time,
+        visitStopTimeFormat: stopFields.timeFormat,
+      });
+    }
+
+    it('flags the stop time when the stop time precedes the start time on the same day', () => {
+      const day = dayjs().subtract(1, 'day');
+      const result = parseVisit(day.hour(15).minute(0), day.hour(13).minute(0));
+
+      expect(result.success).toBe(false);
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: 'End time must be after start time',
+          path: ['visitStopTime'],
+        }),
+      );
+    });
+
+    it('flags the stop date when the stop date precedes the start date', () => {
+      const day = dayjs().subtract(1, 'day');
+      const result = parseVisit(day.hour(10).minute(0), day.subtract(2, 'day').hour(10).minute(0));
+
+      expect(result.success).toBe(false);
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: 'End time must be after start time',
+          path: ['visitStopDate'],
+        }),
+      );
+    });
+
+    it('rejects a visit whose stop datetime equals its start datetime', () => {
+      const day = dayjs().subtract(1, 'day');
+      const result = parseVisit(day.hour(10).minute(0), day.hour(10).minute(0));
+
+      expect(result.success).toBe(false);
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: 'End time must be after start time',
+          path: ['visitStopTime'],
+        }),
+      );
+    });
+
+    it('accepts a visit whose stop datetime is after its start datetime', () => {
+      const day = dayjs().subtract(1, 'day');
+      const result = parseVisit(day.hour(9).minute(0), day.hour(11).minute(0));
+
+      expect(result.success).toBe(true);
+    });
+  });
 });
 
 describe('computeEarliestAllowedStartDate', () => {
