@@ -12,7 +12,7 @@ import styles from './growth-chart-main.scss';
 
 interface GrowthChartProps {
   patientUuid: string;
-  patient: fhir.Patient;
+  patient?: fhir.Patient;
 }
 
 const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid, patient }) => {
@@ -27,10 +27,10 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid, patient }) => {
     setShowUpdatePrompt(true);
   };
 
-  const birthDate = patient.birthDate ? dayjs(patient.birthDate) : null;
+  const birthDate = patient?.birthDate ? dayjs(patient.birthDate) : null;
   const ageInMonths = birthDate?.isValid() ? dayjs().diff(birthDate, 'month', true) : null;
 
-  const genderToUse = selectedGender ?? patient.gender?.toLowerCase();
+  const genderToUse = selectedGender ?? patient?.gender?.toLowerCase();
   const isSupportedGender = genderToUse === 'male' || genderToUse === 'female';
 
   if (isLoading) {
