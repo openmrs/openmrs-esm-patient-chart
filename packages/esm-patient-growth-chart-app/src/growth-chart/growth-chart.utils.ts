@@ -1,8 +1,17 @@
+import dayjs from 'dayjs';
 import type { TFunction } from 'i18next';
-import { ScaleTypes, ToolbarControlTypes } from '@carbon/charts/interfaces';
+import { ToolbarControlTypes } from '@carbon/charts';
+import { type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import { getCoreTranslation } from '@openmrs/esm-framework';
+import type { Observation } from './growth-chart.resource';
 import boysWeightData from '../who-data/boys/weight-for-age.json';
 import girlsWeightData from '../who-data/girls/weight-for-age.json';
+
+interface ChartDatum {
+  group: string;
+  age: number;
+  value: number;
+}
 
 export const getReferenceSeries = (gender?: string) => {
   const supportedGender = gender?.toLowerCase();
@@ -12,7 +21,7 @@ export const getReferenceSeries = (gender?: string) => {
     return [];
   }
 
-  const referenceSeries: Array<{ group: string; age: number; value: number }> = [];
+  const referenceSeries: Array<ChartDatum> = [];
   const percentiles = ['P3', 'P15', 'P50', 'P85', 'P97'];
 
   whoData.forEach((point) => {
@@ -28,7 +37,51 @@ export const getReferenceSeries = (gender?: string) => {
   return referenceSeries;
 };
 
-export const getChartOptions = (t: TFunction) => {
+export const getPatientSeries = (weights: Array<Observation>, birthDate: dayjs.Dayjs, patientWeightLabel: string) => {
+  return weights
+    .map((observation) => {
+      if (!observation.effectiveDateTime || observation.value == null) {
+        return null;
+      }
+
+      const observationDate = dayjs(observation.effectiveDateTime);
+      if (!observationDate.isValid()) {
+        return null;
+      }
+
+      const ageInMonths = observationDate.diff(birthDate, 'month', true);
+      if (ageInMonths < 0) {
+        return null;
+      }
+
+      return {
+        group: patientWeightLabel,
+        age: ageInMonths,
+        value: observation.value,
+      };
+    })
+    .filter((item): item is ChartDatum => item !== null)
+    .sort((a, b) => a.age - b.age);
+};
+
+export const getChartData = (patient: fhir.Patient, weights: Array<Observation>, t: TFunction) => {
+  if (!patient.birthDate) {
+    return [];
+  }
+
+  const birthDate = dayjs(patient.birthDate);
+  if (!birthDate.isValid()) {
+    return [];
+  }
+
+  const referenceSeries = getReferenceSeries(patient.gender);
+  const patientSeries = getPatientSeries(weights, birthDate, t('patientWeight', 'Patient weight'));
+
+  return [...referenceSeries, ...patientSeries];
+};
+
+export const getChartOptions = (t: TFunction): LineChartOptions => {
+  const patientWeightLabel = t('patientWeight', 'Patient weight');
   const referencePalette = {
     P3: 'var(--cds-support-error)',
     P15: 'var(--cds-support-warning)',
@@ -62,7 +115,7 @@ export const getChartOptions = (t: TFunction) => {
     height: '800px',
     points: {
       radius: ((d) => {
-        if (d.group === t('patientWeight', 'Patient weight')) {
+        if (d.group === patientWeightLabel) {
           return 3;
         }
         return 0;
@@ -74,7 +127,7 @@ export const getChartOptions = (t: TFunction) => {
     color: {
       scale: {
         ...referencePalette,
-        [t('patientWeight', 'Patient weight')]: 'var(--cds-text-primary)',
+        [patientWeightLabel]: 'var(--cds-text-primary)',
       },
     },
     grid: {
@@ -90,12 +143,7 @@ export const getChartOptions = (t: TFunction) => {
         { type: ToolbarControlTypes.EXPORT_JPG },
       ],
     },
-    getIsFilled: (group) => {
-      if (group === t('patientWeight', 'Patient weight')) {
-        return true;
-      }
-      return false;
-    },
+    getIsFilled: (group) => group === patientWeightLabel,
     tooltip: {
       valueFormatter: (value, label) => {
         if (label === t('ageInMonths', 'Age (months)')) {

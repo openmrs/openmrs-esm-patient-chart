@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton, Layer, Tile, Theme, ActionableNotification } from '@carbon/react';
+import { ActionableNotification, DataTableSkeleton, Layer, Theme, Tile } from '@carbon/react';
 import { CardHeader, navigate } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import GrowthChartVisualization from './growth-chart-visualization.component';
 import UnknownGenderState from '../unknown-gender-state/unknown-gender.component';
 import { useGrowthChartData } from './growth-chart.resource';
@@ -16,32 +17,28 @@ interface GrowthChartProps {
 
 const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { data, isLoading, isError } = useGrowthChartData(patient);
+  const { data, isLoading, error } = useGrowthChartData(patient);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+  const headerTitle = t('growthChart', 'Growth chart');
 
   const handleGenderSelected = (gender: string) => {
     setSelectedGender(gender);
     setShowUpdatePrompt(true);
   };
 
-  const ageInMonths = useMemo(() => {
-    const birthDate = dayjs(patient?.birthDate);
-    return birthDate.isValid() ? dayjs().diff(birthDate, 'month', true) : null;
-  }, [patient?.birthDate]);
+  const birthDate = patient.birthDate ? dayjs(patient.birthDate) : null;
+  const ageInMonths = birthDate?.isValid() ? dayjs().diff(birthDate, 'month', true) : null;
 
-  const genderToUse = selectedGender || patient?.gender?.toLowerCase();
-
-  const isSupportedGender = useMemo(() => {
-    return genderToUse === 'male' || genderToUse === 'female';
-  }, [genderToUse]);
+  const genderToUse = selectedGender ?? patient.gender?.toLowerCase();
+  const isSupportedGender = genderToUse === 'male' || genderToUse === 'female';
 
   if (isLoading) {
     return <DataTableSkeleton />;
   }
 
-  if (isError) {
-    return <Tile>{t('errorLoadingData', 'Error loading growth chart data')}</Tile>;
+  if (error) {
+    return <ErrorState error={error} headerTitle={headerTitle} />;
   }
 
   if (!data?.patient) {
@@ -52,7 +49,7 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid, patient }) => {
     return (
       <Theme theme="white">
         <div className={styles.container}>
-          <CardHeader title={t('growthChart', 'Growth chart')} />
+          <CardHeader title={headerTitle} />
           <div className={styles.unavailableStateContainer}>
             <Layer>
               <Tile className={styles.unavailableStateTile}>
@@ -91,7 +88,7 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ patientUuid, patient }) => {
   return (
     <Theme theme="white">
       <div className={styles.container}>
-        <CardHeader title={t('growthChart', 'Growth chart')} />
+        <CardHeader title={headerTitle} />
 
         {showUpdatePrompt && (
           <div className={styles.notificationContainer}>

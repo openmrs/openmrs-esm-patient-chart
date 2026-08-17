@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
-import { getReferenceSeries, getChartOptions } from './growth-chart.utils';
-import { getPatientSeries } from './growth-chart-visualization.component';
+import { getChartOptions, getPatientSeries, getReferenceSeries } from './growth-chart.utils';
 import type { Observation } from './growth-chart.resource';
 import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vitest';
@@ -54,6 +53,14 @@ describe('growth-chart.utils', () => {
           code: 'weight',
         },
       ];
+
+      const result = getPatientSeries(weights, birthDate, patientWeightLabel);
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should filter out observations without a date or value', () => {
+      const weights: Observation[] = [{ id: '1' }];
 
       const result = getPatientSeries(weights, birthDate, patientWeightLabel);
 
