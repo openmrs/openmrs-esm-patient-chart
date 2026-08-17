@@ -2,7 +2,7 @@
 
 A microfrontend for [OpenMRS 3](https://o3-docs.openmrs.org) that records, displays, and manages clinical growth in the patient chart. It is part of the [openmrs-esm-patient-chart](https://github.com/openmrs/openmrs-esm-patient-chart) monorepo.
 
-Jira: [O3-5331](https://openmrs.atlassian.net/browse/O3-5077)
+Jira: [O3-5331](https://openmrs.atlassian.net/browse/O3-5331)
 
 ---
 
