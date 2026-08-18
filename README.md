@@ -12,6 +12,7 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It con
 - [Flags](packages/esm-patient-flags-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Generic patient widgets](packages/esm-generic-patient-widgets-app/README.md)
+- [Growth chart](packages/esm-patient-growth-chart-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
 - [Label printing](packages/esm-patient-label-printing-app/README.md)
 - [Lists](packages/esm-patient-lists-app/README.md)
