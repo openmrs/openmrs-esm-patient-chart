@@ -7,6 +7,7 @@ import React from 'react';
 import {
   ExtensionSlot,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   showModal,
   useConfig,
   useFeatureFlag,
@@ -38,6 +39,7 @@ const testProps: EncountersTableProps = {
 };
 
 const mockShowModal = vi.mocked(showModal);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 const mockUserHasAccess = vi.mocked(userHasAccess).mockReturnValue(true);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
@@ -340,6 +342,80 @@ describe('Encounter editability', () => {
   });
 });
 
+describe('Edit Encounter', () => {
+  const admissionRowName = /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i;
+  const visitNoteRowName = /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i;
+  const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockEncountersAlice;
+
+  beforeEach(() => {
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
+    mockUserHasAccess.mockReturnValue(true);
+  });
+
+  it('calls onEditEncounter instead of launching a workspace for a form-backed encounter', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderEncountersTable({ onEditEncounter });
+
+    await clickEditEncounter(admissionRowName);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockAdmissionEncounter.uuid, encounterType: 'Admission' }),
+      false,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('calls onEditEncounter flagging visit note encounters', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderEncountersTable({ onEditEncounter });
+
+    await clickEditEncounter(visitNoteRowName);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note', form: null }),
+      true,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('launches the form entry workspace when onEditEncounter is not provided', async () => {
+    renderEncountersTable();
+
+    await clickEditEncounter(admissionRowName);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+      form: mockAdmissionEncounter.form,
+      encounterUuid: mockAdmissionEncounter.uuid,
+    });
+  });
+
+  it('launches the visit notes workspace for visit notes when onEditEncounter is not provided', async () => {
+    renderEncountersTable();
+
+    await clickEditEncounter(visitNoteRowName);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'visit-notes-form-workspace',
+      expect.objectContaining({
+        encounter: expect.objectContaining({ id: mockVisitNoteEncounter.uuid }),
+        formContext: 'editing',
+        patientUuid: mockPatientAlice.uuid,
+      }),
+    );
+  });
+});
+
 describe('Delete Encounter', () => {
   beforeEach(() => {
     mockUseConfig.mockImplementation((options) => {
@@ -379,6 +455,14 @@ describe('Delete Encounter', () => {
 
 function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
   renderWithSwr(<EncountersTable {...testProps} {...props} />);
+}
+
+async function clickEditEncounter(rowName: RegExp) {
+  const user = userEvent.setup();
+  const row = screen.getByRole('row', { name: rowName });
+  await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+  const expandedRow = row.nextElementSibling as HTMLElement;
+  await user.click(within(expandedRow).getByRole('button', { name: /edit this encounter/i }));
 }
 
 describe('EncountersTable print functionality', () => {
