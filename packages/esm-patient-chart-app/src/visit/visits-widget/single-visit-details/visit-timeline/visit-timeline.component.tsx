@@ -36,8 +36,10 @@ interface VisitTimelineProps {
   patientUuid: string;
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
-   * `visitCustomRepresentation` asks for. The framework's `defaultVisitCustomRepresentation` is not
-   * enough: it omits `obs` and `form.resources`, leaving expanded panels empty.
+   * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
+   * `defaultVisitCustomRepresentation` is not enough: it omits `obs`, `form.resources`, and
+   * `encounterType.editPrivilege`, leaving expanded panels empty and the edit and delete actions
+   * offered regardless of privilege.
    */
   visit: Visit;
 }

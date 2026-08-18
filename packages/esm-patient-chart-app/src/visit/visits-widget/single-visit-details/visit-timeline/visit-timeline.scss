@@ -20,7 +20,7 @@
   margin-top: layout.$spacing-04;
   display: flex;
   flex-direction: column;
-  gap: layout.$spacing-05;
+  gap: layout.$spacing-03;
   margin-bottom: layout.$spacing-05;
   position: relative;
 }
@@ -48,6 +48,12 @@
 .layer {
   display: flex;
   margin-inline-start: auto;
+
+  :global(.cds--overflow-menu) {
+    height: layout.$spacing-06;
+    min-height: unset;
+    width: layout.$spacing-06;
+  }
 }
 
 .menuItem {
