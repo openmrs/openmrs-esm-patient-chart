@@ -3,6 +3,7 @@ export * from './attachments-page';
 export * from './chart-page';
 export * from './conditions-page';
 export * from './immunizations-page';
+export * from './laboratory-page';
 export * from './mark-patient-deceased-page';
 export * from './medications-page';
 export * from './orders-page';
