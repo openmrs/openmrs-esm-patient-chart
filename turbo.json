@@ -49,10 +49,25 @@
         "$TURBO_ROOT$/eslint.config.mjs"
       ]
     },
+    "//#lint": {
+      "inputs": [
+        "e2e/**/*.{ts,tsx}",
+        "eslint.config.mjs"
+      ]
+    },
     "typescript": {
       "dependsOn": ["^typescript"],
       "inputs": [
         "src/**",
+        "tsconfig.json"
+      ]
+    },
+    "//#typescript": {
+      "inputs": [
+        "e2e/**",
+        "packages/esm-patient-common-lib/package.json",
+        "packages/esm-patient-common-lib/src/**",
+        "playwright.config.ts",
         "tsconfig.json"
       ]
     },
