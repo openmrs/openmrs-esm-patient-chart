@@ -65,6 +65,7 @@
     "//#typescript": {
       "inputs": [
         "e2e/**",
+        "packages/esm-patient-common-lib/package.json",
         "packages/esm-patient-common-lib/src/**",
         "playwright.config.ts",
         "tsconfig.json"
