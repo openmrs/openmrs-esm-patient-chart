@@ -16,7 +16,7 @@ import {
 import type { ChartConfig } from '../../../config-schema';
 import type { Note, Order, OrderItem } from '../visit.resource';
 import { dedupeDiagnoses } from '../../dedupe-diagnoses';
-import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
+import { encounterHasJsonSchemaForm, type EncountersTableProps } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -27,11 +27,12 @@ import styles from './visit-summary.scss';
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
+  onEditEncounter?: EncountersTableProps['onEditEncounter'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -145,7 +146,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visit={visit} patientUuid={patientUuid} />
+            <VisitTimeline visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
@@ -157,7 +158,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} />
+            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

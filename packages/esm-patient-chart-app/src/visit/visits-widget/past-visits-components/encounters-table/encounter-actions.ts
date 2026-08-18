@@ -3,7 +3,7 @@ import type { useSWRConfig } from 'swr';
 import { launchWorkspace2, type LoggedInUser, showModal, showSnackbar, userHasAccess } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
-import { deleteEncounter, type MappedEncounter } from './encounters-table.resource';
+import { deleteEncounter, type EncountersTableProps, type MappedEncounter } from './encounters-table.resource';
 
 /**
  * A "Visit Note" encounter created outside of a form is edited through the visit notes workspace
@@ -41,8 +41,18 @@ export function canModifyEncounter(
   );
 }
 
-export function launchEditEncounterWorkspace(encounter: MappedEncounter, patientUuid: string) {
-  if (isVisitNoteEncounter(encounter)) {
+/**
+ * Hands the encounter to the host's `onEditEncounter` if it supplied one, and otherwise launches the
+ * chart's own edit workspace for it.
+ */
+export function editEncounter(
+  encounter: MappedEncounter,
+  patientUuid: string,
+  onEditEncounter?: EncountersTableProps['onEditEncounter'],
+) {
+  if (onEditEncounter) {
+    onEditEncounter(encounter, isVisitNoteEncounter(encounter));
+  } else if (isVisitNoteEncounter(encounter)) {
     launchWorkspace2('visit-notes-form-workspace', {
       encounter,
       formContext: 'editing',

@@ -44,8 +44,8 @@ import { jsonSchemaResourceName } from '../../../../constants';
 import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
+  editEncounter,
   isVisitNoteEncounter,
-  launchEditEncounterWorkspace,
 } from './encounter-actions';
 import {
   downloadPdf,
@@ -77,6 +77,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   totalCount,
   isSelectable,
   canPrintEncounters,
+  onEditEncounter,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
@@ -251,7 +252,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => launchEditEncounterWorkspace(encounter, patientUuid)}
+                                      onClick={() => editEncounter(encounter, patientUuid, onEditEncounter)}
                                     />
                                   )}
                                   {canPrintEncounter && (
@@ -308,7 +309,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 {canEditEncounter && (
                                   <Button
                                     kind="ghost"
-                                    onClick={() => launchEditEncounterWorkspace(encounter, patientUuid)}
+                                    onClick={() => editEncounter(encounter, patientUuid, onEditEncounter)}
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}

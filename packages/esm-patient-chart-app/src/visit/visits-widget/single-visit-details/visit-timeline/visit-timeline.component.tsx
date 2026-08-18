@@ -21,19 +21,21 @@ import { type ChartConfig } from '../../../../config-schema';
 import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
+  editEncounter,
   isVisitNoteEncounter,
-  launchEditEncounterWorkspace,
 } from '../../past-visits-components/encounters-table/encounter-actions';
 import {
   downloadPdf,
   encounterHasJsonSchemaForm,
   mapEncounter,
+  type EncountersTableProps,
 } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visit-timeline.scss';
 
 interface VisitTimelineProps {
   patientUuid: string;
+  onEditEncounter?: EncountersTableProps['onEditEncounter'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
    * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
@@ -44,7 +46,7 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
@@ -173,7 +175,7 @@ function VisitTimeline({ patientUuid, visit }: VisitTimelineProps) {
                           <OverflowMenuItem
                             className={styles.menuItem}
                             itemText={t('editThisEncounter', 'Edit this encounter')}
-                            onClick={() => launchEditEncounterWorkspace(mappedEncounter, patientUuid)}
+                            onClick={() => editEncounter(mappedEncounter, patientUuid, onEditEncounter)}
                           />
                         )}
                         {canPrintEncounter && (

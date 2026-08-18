@@ -6,6 +6,7 @@ import {
   type Encounter,
   ExtensionSlot,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   useConfig,
   useFeatureFlag,
   userHasAccess,
@@ -16,9 +17,11 @@ import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } fro
 import { renderWithSwr } from 'tools';
 import { esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
+import { type MappedEncounter } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import VisitTimeline from './visit-timeline.component';
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 const mockUseConfig = vi.mocked(useConfig);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockUserHasAccess = vi.mocked(userHasAccess);
@@ -49,9 +52,25 @@ const encounterWithJsonSchemaForm = {
   },
 } as Encounter;
 
-function renderVisitTimeline(encounters: Array<Encounter> = mockEncountersAlice) {
+function renderVisitTimeline(
+  encounters: Array<Encounter> = mockEncountersAlice,
+  onEditEncounter?: (encounter: MappedEncounter, isVisitNote: boolean) => void,
+) {
   const visit = { ...mockVisit, encounters } as Visit;
-  return renderWithSwr(<VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} />);
+  return renderWithSwr(
+    <VisitTimeline visit={visit} patientUuid={mockPatientAlice.uuid} onEditEncounter={onEditEncounter} />,
+  );
+}
+
+async function clickEditEncounter() {
+  const user = userEvent.setup();
+  await user.click(screen.getByRole('button', { name: /options/i }));
+
+  const actionsMenu = screen.getByRole('menu', { hidden: true });
+  const editItem = within(actionsMenu)
+    .getAllByRole('menuitem', { hidden: true })
+    .find((menuItem) => /edit this encounter/i.test(menuItem.textContent));
+  await user.click(editItem);
 }
 
 beforeEach(() => {
@@ -142,6 +161,31 @@ describe('VisitTimeline', () => {
     expect(menuItems).toHaveLength(2);
     expect(menuItems[0]).toHaveTextContent(/edit this encounter/i);
     expect(menuItems[1]).toHaveTextContent(/delete this encounter/i);
+  });
+
+  it('calls onEditEncounter instead of launching a workspace when the prop is provided', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderVisitTimeline([admissionEncounter], onEditEncounter);
+    await clickEditEncounter();
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: admissionEncounter.uuid, encounterType: 'Admission' }),
+      false,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('launches the form entry workspace when no onEditEncounter prop is provided', async () => {
+    renderVisitTimeline([admissionEncounter]);
+    await clickEditEncounter();
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+      form: admissionEncounter.form,
+      encounterUuid: admissionEncounter.uuid,
+    });
   });
 
   it('hides the actions menu when the user lacks the privilege to edit the encounter', () => {
