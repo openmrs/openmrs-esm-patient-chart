@@ -21,9 +21,11 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     const patientSearchTerm = patient.person.display;
 
     // The Laboratory app renders every status tab's table into the DOM simultaneously, so all
-    // interactions are scoped to the active tab's panel to avoid cross-tab matches. This filters the
-    // given tab's table to the seeded patient and returns the scoped panel locator.
+    // interactions are scoped to the active tab's panel to avoid cross-tab matches. This selects the
+    // given tab, filters its table to the seeded patient, and returns the scoped panel locator. The
+    // tab is located by the same `LaboratoryTab` literal as its panel, so both go through the union.
     const searchPatientInTab = async (tabName: LaboratoryTab): Promise<Locator> => {
+      await page.getByRole('tab', { name: tabName }).click();
       const panel = page.getByRole('tabpanel', { name: tabName });
       await panel.getByPlaceholder(/search this list/i).fill(patientSearchTerm);
       await expect(panel.getByRole('row').filter({ hasText: patientSearchTerm })).toBeVisible();
@@ -73,7 +75,6 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     });
 
     await test.step('When I switch to the `In progress` tab and expand my patient’s request', async () => {
-      await page.getByRole('tab', { name: /in progress/i }).click();
       inProgressPanel = await searchAndExpandInTab('In progress');
     });
 
@@ -95,7 +96,6 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     });
 
     await test.step('And the resulted request should move to the `Completed` tab', async () => {
-      await page.getByRole('tab', { name: /completed/i }).click();
       await searchPatientInTab('Completed');
     });
 
