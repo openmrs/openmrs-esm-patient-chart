@@ -20,10 +20,16 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     // with, or be a substring of, another patient's row and trip Playwright's strict mode.
     const patientSearchTerm = patient.person.display;
 
+    // Every tab reference in this spec goes through this locator, so all of them are typed by
+    // `LaboratoryTab`. `getByRole` matches the accessible name as a substring, and none of the tab
+    // titles the Laboratory app registers is a substring of another, so each literal is unambiguous.
+    const worklistTab = (tabName: LaboratoryTab) => page.getByRole('tab', { name: tabName });
+
     // The Laboratory app renders every status tab's table into the DOM simultaneously, so all
-    // interactions are scoped to the active tab's panel to avoid cross-tab matches. This filters the
-    // given tab's table to the seeded patient and returns the scoped panel locator.
+    // interactions are scoped to the active tab's panel to avoid cross-tab matches. This selects the
+    // given tab, filters its table to the seeded patient, and returns the scoped panel locator.
     const searchPatientInTab = async (tabName: LaboratoryTab): Promise<Locator> => {
+      await worklistTab(tabName).click();
       const panel = page.getByRole('tabpanel', { name: tabName });
       await panel.getByPlaceholder(/search this list/i).fill(patientSearchTerm);
       await expect(panel.getByRole('row').filter({ hasText: patientSearchTerm })).toBeVisible();
@@ -46,7 +52,7 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
 
     await test.step('When I navigate to the Laboratory app', async () => {
       await laboratoryPage.goTo();
-      await expect(page.getByRole('tab', { name: /tests ordered/i })).toBeVisible();
+      await expect(worklistTab('Tests ordered')).toBeVisible();
     });
 
     await test.step('And I search for my patient under the `Tests ordered` tab and expand their request', async () => {
@@ -73,7 +79,6 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     });
 
     await test.step('When I switch to the `In progress` tab and expand my patient’s request', async () => {
-      await page.getByRole('tab', { name: /in progress/i }).click();
       inProgressPanel = await searchAndExpandInTab('In progress');
     });
 
@@ -95,7 +100,6 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     });
 
     await test.step('And the resulted request should move to the `Completed` tab', async () => {
-      await page.getByRole('tab', { name: /completed/i }).click();
       await searchPatientInTab('Completed');
     });
 
