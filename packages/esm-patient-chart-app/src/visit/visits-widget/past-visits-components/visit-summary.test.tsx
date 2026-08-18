@@ -150,6 +150,24 @@ describe('VisitSummary encounter editing', () => {
     mockUserHasAccess.mockReturnValue(true);
   });
 
+  it('passes onEditEncounter down to the encounters tab', async () => {
+    const user = userEvent.setup();
+    const onEditEncounter = vi.fn();
+
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={mockVisitWithEncounters} onEditEncounter={onEditEncounter} />,
+    );
+
+    await user.click(screen.getByRole('tab', { name: /encounters/i }));
+    await clickEditEncounter(/visit note/i);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note' }),
+      true,
+    );
+  });
+
   it('passes onEditEncounter down to the timeline', async () => {
     const user = userEvent.setup();
     const onEditEncounter = vi.fn();

@@ -58,7 +58,7 @@ import EncounterObservations from '../../encounter-observations';
 import styles from './encounters-table.scss';
 
 /**
- * This components is used by the AllEncountersTable and the completed forms tables to display
+ * This components is used by the AllEncountersTable and VisitEncountersTable to display
  * a table of encounters, with the actual data, pagination and filtering logic passed in
  * as props.
  */
