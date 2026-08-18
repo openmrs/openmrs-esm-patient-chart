@@ -2,6 +2,7 @@ export * from './allergies-page';
 export * from './attachments-page';
 export * from './chart-page';
 export * from './conditions-page';
+export * from './growth-chart-page';
 export * from './immunizations-page';
 export * from './mark-patient-deceased-page';
 export * from './medications-page';
