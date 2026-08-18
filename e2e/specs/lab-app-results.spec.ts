@@ -20,9 +20,9 @@ test.describe('Adding laboratory results via the Laboratory app', () => {
     // with, or be a substring of, another patient's row and trip Playwright's strict mode.
     const patientSearchTerm = patient.person.display;
 
-    // Every tab reference in this spec goes through this locator, so each tab name is written once,
-    // as a `LaboratoryTab` literal. `getByRole` matches the accessible name as a substring, and none
-    // of the tab titles the Laboratory app registers is a substring of another, so each is unambiguous.
+    // Every tab reference in this spec goes through this locator, so all of them are typed by
+    // `LaboratoryTab`. `getByRole` matches the accessible name as a substring, and none of the tab
+    // titles the Laboratory app registers is a substring of another, so each literal is unambiguous.
     const worklistTab = (tabName: LaboratoryTab) => page.getByRole('tab', { name: tabName });
 
     // The Laboratory app renders every status tab's table into the DOM simultaneously, so all
