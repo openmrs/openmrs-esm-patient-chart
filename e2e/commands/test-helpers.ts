@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { ResultsViewerPage } from '../pages/results-viewer-page';
 
 export async function getAfterContent(element: Locator): Promise<string> {
   return await element.evaluate((el) => {
@@ -43,6 +44,23 @@ export async function expectCellInterpretation(
 
   expect(await getBackgroundColor(styledContent)).toBe(backgroundColor);
   expect(await getAfterContent(styledContent)).toBe(interpretation === 'normal' ? 'none' : `"${indicator}"`);
+}
+
+// Verifies a saved lab result for `conceptName` with `value` is visible in the patient's Results
+// Viewer under the "Individual tests" tab. Shared by the lab-orders and lab-app-results specs, which
+// both finish by confirming the entered result actually persisted and renders. The row is matched on
+// both the concept name and the value so a stale or empty row cannot satisfy it.
+export async function expectLabResultInResultsViewer(
+  page: Page,
+  patientUuid: string,
+  conceptName: string,
+  value: string,
+): Promise<void> {
+  const resultsViewerPage = new ResultsViewerPage(page);
+  await resultsViewerPage.goTo(patientUuid);
+  await page.getByRole('tab', { name: /individual tests/i }).click();
+  const row = page.getByRole('row').filter({ hasText: conceptName }).filter({ hasText: value }).first();
+  await expect(row).toBeVisible();
 }
 
 export async function calculateBirthdate(age: { years?: number; months?: number }): Promise<string> {
