@@ -76,6 +76,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   totalCount,
   isSelectable,
   canPrintEncounters,
+  onEditEncounter,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
@@ -255,6 +256,23 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                     const isVisitNoteEncounter = (encounter: MappedEncounter) =>
                       encounter.encounterType === 'Visit Note' && !encounter.form;
 
+                    const editEncounter = () => {
+                      if (onEditEncounter) {
+                        onEditEncounter(encounter, isVisitNoteEncounter(encounter));
+                      } else if (isVisitNoteEncounter(encounter)) {
+                        launchWorkspace2('visit-notes-form-workspace', {
+                          encounter,
+                          formContext: 'editing',
+                          patientUuid,
+                        });
+                      } else {
+                        launchWorkspace2('patient-form-entry-workspace', {
+                          form: encounter.form,
+                          encounterUuid: encounter.id,
+                        });
+                      }
+                    };
+
                     const supportsEmbeddedFormView = (encounter: MappedEncounter) =>
                       encounter.form?.uuid &&
                       encounter.form.resources?.some((resource) => resource.name === jsonSchemaResourceName);
@@ -295,20 +313,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     <OverflowMenuItem
                                       className={styles.menuItem}
                                       itemText={t('editThisEncounter', 'Edit this encounter')}
-                                      onClick={() => {
-                                        if (isVisitNoteEncounter(encounter)) {
-                                          launchWorkspace2('visit-notes-form-workspace', {
-                                            encounter,
-                                            formContext: 'editing',
-                                            patientUuid,
-                                          });
-                                        } else {
-                                          launchWorkspace2('patient-form-entry-workspace', {
-                                            form: encounter.form,
-                                            encounterUuid: encounter.id,
-                                          });
-                                        }
-                                      }}
+                                      onClick={editEncounter}
                                     />
                                   )}
                                   {canPrintEncounter && (
@@ -365,20 +370,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                 {canEditEncounter && (
                                   <Button
                                     kind="ghost"
-                                    onClick={() => {
-                                      if (isVisitNoteEncounter(encounter)) {
-                                        launchWorkspace2('visit-notes-form-workspace', {
-                                          encounter,
-                                          formContext: 'editing',
-                                          patientUuid,
-                                        });
-                                      } else {
-                                        launchWorkspace2('patient-form-entry-workspace', {
-                                          form: encounter.form,
-                                          encounterUuid: encounter.id,
-                                        });
-                                      }
-                                    }}
+                                    onClick={editEncounter}
                                     renderIcon={(props: ComponentProps<typeof EditIcon>) => (
                                       <EditIcon size={16} {...props} />
                                     )}
