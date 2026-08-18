@@ -1,0 +1,19 @@
+{
+  "ageInMonths": "Возраст (месяцев)",
+  "editPatientDetails": "Редактировать пациента",
+  "errorDataUnavailable": "Данные пациента недоступны",
+  "femaleReference": "Женский",
+  "Growth chart": "Карта физического развития",
+  "growthChart": "Карта физического развития",
+  "growthChartAgeUnavailable": "Карта физического развития для детей от рождения до 5 лет.",
+  "growthChartUnavailable": "Карта физического развития недоступна",
+  "maleReference": "Мужской",
+  "noGrowthChartsToDisplay": "Отсутствуют данные физического развития для отображения",
+  "patientWeight": "Вес пациента",
+  "referenceChart": "Референсный график",
+  "referenceChartPrompt": "Выберите референсный график.",
+  "showingReferenceChart": "Показан {{selectedReferenceChart}}. Пол пациента {{patientGender}}.",
+  "unknownGender": "Пол пациента неизвестен или иной.",
+  "weightForAge": "Вес/возраст, от рождения до 5 лет",
+  "weightKg": "Вес (кг)"
+}

@@ -132,3 +132,119 @@ describe('Service: FormCreationService', () => {
     expect(dataSources.dataSources['endpoint']).toBe(customEndpointDataSource);
   });
 });
+
+describe('Service: FormCreationService, concept reference ranges', () => {
+  const session: any = {
+    sessionLocation: { uuid: 'location-uuid' },
+    currentProvider: { uuid: 'provider-uuid' },
+  };
+
+  function buildSchema() {
+    return {
+      uuid: 'form-uuid',
+      display: 'Vitals',
+      encounterType: { uuid: 'type-uuid', display: 'Vitals' },
+      pages: [
+        {
+          label: 'Vitals',
+          sections: [
+            {
+              label: 'Vitals',
+              isExpanded: 'true',
+              questions: [
+                {
+                  label: 'Temperature',
+                  id: 'temperature',
+                  type: 'obs',
+                  questionOptions: { rendering: 'number', concept: 'temperature-uuid' },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    } as any;
+  }
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        FormCreationService,
+        SingleSpaPropsService,
+        {
+          provide: FormDataSourceService,
+          useValue: {
+            getDataSources: () => ({
+              location: {},
+              provider: {},
+              drug: {},
+              problem: {},
+              conceptAnswers: {},
+              diagnoses: {},
+              recentObs: () => Promise.resolve({}),
+            }),
+            getPatientObject: () => ({}),
+          },
+        },
+        { provide: MonthlyScheduleResourceService, useValue: {} },
+        {
+          provide: ConfigResourceService,
+          useValue: { getConfig: () => ({ dataSources: {}, customDataSources: [] }) },
+        },
+      ],
+      imports: [FormEntryModule, TranslateModule.forRoot()],
+    });
+
+    singleSpaPropsSubject.next({
+      patient: { id: 'patient-uuid' },
+      patientUuid: 'patient-uuid',
+      formUuid: 'form-uuid',
+    } as any);
+  });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  });
+
+  it('should reject values outside of the reference range which applies to the patient', async () => {
+    const service: FormCreationService = TestBed.inject(FormCreationService);
+
+    const form = await service.initAndCreateForm({
+      formSchema: buildSchema(),
+      session,
+      patientIdentifiers: [],
+      conceptReferenceRanges: new Map([
+        ['temperature-uuid', { uuid: 'range-uuid', concept: 'temperature-uuid', lowAbsolute: 25, hiAbsolute: 43 }],
+      ]),
+    });
+
+    const control = form.searchNodeByQuestionId('temperature')[0].control;
+
+    control.setValue(50);
+    expect(control.valid).toBe(false);
+
+    control.setValue(20);
+    expect(control.valid).toBe(false);
+
+    control.setValue(37);
+    expect(control.valid).toBe(true);
+  });
+
+  it('should leave the question unconstrained when the patient has no reference range', async () => {
+    const service: FormCreationService = TestBed.inject(FormCreationService);
+
+    const form = await service.initAndCreateForm({
+      formSchema: buildSchema(),
+      session,
+      patientIdentifiers: [],
+      conceptReferenceRanges: new Map(),
+    });
+
+    const control = form.searchNodeByQuestionId('temperature')[0].control;
+
+    control.setValue(50);
+    expect(control.valid).toBe(true);
+  });
+});

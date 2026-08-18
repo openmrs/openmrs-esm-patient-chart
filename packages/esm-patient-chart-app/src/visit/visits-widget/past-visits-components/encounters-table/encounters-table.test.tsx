@@ -1,12 +1,9 @@
-/* eslint-disable testing-library/no-node-access */
 import { vi, describe, it, expect, test, beforeEach, afterEach } from 'vitest';
-/* Please re-enable this ESLint rule if you are able to find a practical way to test the overflow menu buttons
-   without using parentElement and the expanded row functionality without using nextElementSibling. */
-
 import React from 'react';
 import {
   ExtensionSlot,
   getDefaultsFromConfigSchema,
+  launchWorkspace2,
   showModal,
   useConfig,
   useFeatureFlag,
@@ -38,6 +35,7 @@ const testProps: EncountersTableProps = {
 };
 
 const mockShowModal = vi.mocked(showModal);
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 const mockUserHasAccess = vi.mocked(userHasAccess).mockReturnValue(true);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
@@ -209,10 +207,21 @@ describe('EncountersTable', () => {
 });
 
 describe('Encounter editability', () => {
+  const admissionRowName = /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i;
+  const visitNoteRowName = /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i;
+  const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockEncountersAlice;
+
   let dateNowSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => new Date('2022-01-18T20:00:00.000Z').getTime());
+    mockUseConfig.mockImplementation((options) => {
+      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
+        return { htmlFormEntryForms: [] };
+      }
+      return getDefaultsFromConfigSchema(esmPatientChartSchema);
+    });
+    mockUserHasAccess.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -220,12 +229,6 @@ describe('Encounter editability', () => {
   });
 
   it('displays edit and delete encounter buttons by default', async () => {
-    mockUseConfig.mockImplementation((options) => {
-      if (options?.externalModuleName === '@openmrs/esm-patient-forms-app') {
-        return { htmlFormEntryForms: [] };
-      }
-      return getDefaultsFromConfigSchema(esmPatientChartSchema);
-    });
     mockUserHasAccess.mockImplementation((privilege) => privilege == null);
     const user = userEvent.setup();
 
@@ -237,17 +240,16 @@ describe('Encounter editability', () => {
 
     // Check overflow menu buttons
     await user.click(within(row).getByRole('button', { name: /options/i }));
-    const overflowMenu = screen.getAllByText('Focus sentinel')[0].parentElement;
+    const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
     await user.click(within(row).getByRole('button', { name: /options/i }));
-    expect(screen.queryByText('Focus sentinel')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
-    const expandedRow = row.nextElementSibling as HTMLElement;
-    expect(within(expandedRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(within(expandedRow).getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
   });
 
   it('displays edit and delete encounter buttons only if the encounter is within the editable duration', async () => {
@@ -274,20 +276,17 @@ describe('Encounter editability', () => {
 
     // Check overflow menu buttons
     await user.click(within(todayRow).getByRole('button', { name: /options/i }));
-    const overflowMenu = screen.getAllByText('Focus sentinel')[0].parentElement;
+    const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
     await user.click(within(todayRow).getByRole('button', { name: /options/i }));
-    expect(screen.queryByText('Focus sentinel')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
     await user.click(within(todayRow).getByRole('button', { name: /expand current row/i }));
-    const expandedTodayRow = todayRow.nextElementSibling as HTMLElement;
-    await user.click(within(expandedTodayRow).getByRole('button', { name: /edit this encounter/i }));
-    expect(within(expandedTodayRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(
-      within(expandedTodayRow).getByRole('button', { name: /danger\s*Delete this encounter/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
+    await user.click(within(todayRow).getByRole('button', { name: /collapse current row/i }));
 
     // Check old encounter -- should not be editable
     const oldRow = screen.getByRole('row', {
@@ -295,11 +294,8 @@ describe('Encounter editability', () => {
     });
     expect(within(oldRow).queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
-    const expandedOldRow = oldRow.nextElementSibling as HTMLElement;
-    expect(within(expandedOldRow).queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
-    expect(
-      within(expandedOldRow).queryByRole('button', { name: /danger\s*Delete this encounter/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /danger\s*Delete this encounter/i })).not.toBeInTheDocument();
   });
 
   it('displays edit and delete buttons if the user has the override privilege, even if the encounter is outside the editable duration', async () => {
@@ -326,17 +322,99 @@ describe('Encounter editability', () => {
 
     // Check overflow menu buttons
     await user.click(within(oldRow).getByRole('button', { name: /options/i }));
-    const overflowMenu = screen.getAllByText('Focus sentinel')[0].parentElement;
+    const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
     await user.click(within(oldRow).getByRole('button', { name: /options/i }));
-    expect(screen.queryByText('Focus sentinel')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
-    const expandedOldRow = oldRow.nextElementSibling as HTMLElement;
-    expect(within(expandedOldRow).getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
-    expect(within(expandedOldRow).getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /edit this encounter/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /danger\s*Delete this encounter/i })).toBeInTheDocument();
+  });
+
+  it('calls onEditEncounter instead of launching a workspace when the prop is provided', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderEncountersTable({ onEditEncounter });
+
+    await clickEditEncounterViaOverflowMenu(admissionRowName);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockAdmissionEncounter.uuid, encounterType: 'Admission' }),
+      false,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('flags formless visit note encounters as visit notes when calling onEditEncounter', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderEncountersTable({ onEditEncounter });
+
+    await clickEditEncounter(visitNoteRowName);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note', form: null }),
+      true,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('does not flag form-backed visit note encounters as visit notes when calling onEditEncounter', async () => {
+    const onEditEncounter = vi.fn();
+
+    renderEncountersTable({
+      onEditEncounter,
+      paginatedEncounters: [{ ...mockVisitNoteEncounter, form: mockAdmissionEncounter.form }],
+      totalCount: 1,
+    });
+
+    await clickEditEncounter(
+      /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note POC Consent Form User One Options/i,
+    );
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: mockVisitNoteEncounter.uuid,
+        encounterType: 'Visit Note',
+        form: mockAdmissionEncounter.form,
+      }),
+      false,
+    );
+    expect(mockLaunchWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('launches the form entry workspace when no onEditEncounter prop is provided', async () => {
+    renderEncountersTable();
+
+    await clickEditEncounter(admissionRowName);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+      form: mockAdmissionEncounter.form,
+      encounterUuid: mockAdmissionEncounter.uuid,
+    });
+  });
+
+  it('launches the visit notes workspace for visit notes when no onEditEncounter prop is provided', async () => {
+    renderEncountersTable();
+
+    await clickEditEncounter(visitNoteRowName);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(
+      'visit-notes-form-workspace',
+      expect.objectContaining({
+        encounter: expect.objectContaining({ id: mockVisitNoteEncounter.uuid }),
+        formContext: 'editing',
+        patientUuid: mockPatientAlice.uuid,
+      }),
+    );
   });
 });
 
@@ -364,8 +442,7 @@ describe('Delete Encounter', () => {
     });
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
-    const expandedRow = row.nextElementSibling as HTMLElement;
-    await user.click(within(expandedRow).getByRole('button', { name: /danger\s*Delete this encounter/i }));
+    await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
 
     expect(mockShowModal).toHaveBeenCalledTimes(1);
     expect(mockShowModal).toHaveBeenCalledWith(
@@ -379,6 +456,21 @@ describe('Delete Encounter', () => {
 
 function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {
   renderWithSwr(<EncountersTable {...testProps} {...props} />);
+}
+
+async function clickEditEncounter(rowName: RegExp) {
+  const user = userEvent.setup();
+  const row = screen.getByRole('row', { name: rowName });
+  await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+  await user.click(screen.getByRole('button', { name: /edit this encounter/i }));
+}
+
+async function clickEditEncounterViaOverflowMenu(rowName: RegExp) {
+  const user = userEvent.setup();
+  const row = screen.getByRole('row', { name: rowName });
+  await user.click(within(row).getByRole('button', { name: /options/i }));
+  const overflowMenu = screen.getByRole('menu', { hidden: true });
+  await user.click(within(overflowMenu).getByText(/edit this encounter/i));
 }
 
 describe('EncountersTable print functionality', () => {
