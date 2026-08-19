@@ -97,6 +97,11 @@ export const configSchemaSwitchable = {
     _description: 'Display Encounter type column',
     _default: false,
   },
+  fullWidth: {
+    _type: Type.Boolean,
+    _description: 'Whether the widget should span the full width of the dashboard',
+    _default: false,
+  },
 };
 
 export interface ConfigObjectSwitchable {
@@ -119,4 +124,5 @@ export interface ConfigObjectSwitchable {
   encounterTypes: Array<string>;
   dateFormat: 'date' | 'time' | 'dateTime';
   showEncounterType: boolean;
+  fullWidth: boolean;
 }
