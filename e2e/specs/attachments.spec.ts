@@ -24,10 +24,7 @@ test('Add and remove an attachment', async ({ page, patient }) => {
   });
 
   await test.step('And I choose the attachment file to upload', async () => {
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
+    await page.locator('input[type="file"]').setInputFiles(filePath);
   });
 
   await test.step('And I verify the image name field is pre-filled', async () => {
@@ -155,10 +152,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('And I choose the PDF file to upload', async () => {
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
+    await page.locator('input[type="file"]').setInputFiles(filePath);
   });
 
   await test.step('And I verify the file name field is pre-filled', async () => {
