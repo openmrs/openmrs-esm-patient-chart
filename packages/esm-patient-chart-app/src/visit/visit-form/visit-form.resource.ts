@@ -344,7 +344,7 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
               message: t('futureEndTime', 'End time cannot be in the future'),
               path: ['visitStopTime'],
             });
-          } else if (visitStartDateTime !== null && visitStopDateTime <= visitStartDateTime) {
+          } else if (visitStartDateTime !== null && visitStopDateTime < visitStartDateTime) {
             // When both fall on the same day it is the time, not the date, that is out of
             // order, so flag the time field. Otherwise the stop date itself is the culprit.
             const isSameDay = dayjs(visitStopDate).isSame(visitStartDate, 'day');

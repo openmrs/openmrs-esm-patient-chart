@@ -1133,17 +1133,14 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
       );
     });
 
-    it('rejects a visit whose stop datetime equals its start datetime', () => {
+    // Equal endpoints have to stay valid: core rejects only a stop *before* the start, and
+    // the form's hh:mm fields drop seconds, so a short but real visit can collapse onto a
+    // single minute once it is loaded for editing.
+    it('accepts a visit whose stop datetime equals its start datetime', () => {
       const day = dayjs().subtract(1, 'day');
       const result = parseVisit(day.hour(10).minute(0), day.hour(10).minute(0));
 
-      expect(result.success).toBe(false);
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({
-          message: 'End time must be after start time',
-          path: ['visitStopTime'],
-        }),
-      );
+      expect(result.success).toBe(true);
     });
 
     it('accepts a visit whose stop datetime is after its start datetime', () => {
@@ -1152,6 +1149,36 @@ describe('useVisitFormSchemaAndDefaultValues', () => {
 
       expect(result.success).toBe(true);
     });
+  });
+
+  // The EMR API closes a stale visit that has no non-voided encounters by setting its
+  // stopDatetime to its startDatetime. Rejecting equal endpoints would make every such
+  // visit unsubmittable the moment it is opened, blocking edits to unrelated fields.
+  it('lets a visit closed with stopDatetime equal to startDatetime be re-saved unchanged', () => {
+    const closedAt = dayjs().subtract(3, 'day').hour(9).minute(30).second(0).millisecond(0);
+    const emrApiClosedVisit = {
+      ...mockVisitWithAttributes,
+      encounters: [],
+      startDatetime: closedAt.toISOString(),
+      stopDatetime: closedAt.toISOString(),
+    } as unknown as Visit;
+
+    const {
+      result: {
+        current: { visitFormSchema, defaultValues },
+      },
+    } = renderHook(() => useVisitFormSchemaAndDefaultValues(emrApiClosedVisit));
+
+    expect(defaultValues.visitStatus).toBe('past');
+
+    const result = visitFormSchema.safeParse({
+      ...defaultValues,
+      visitType: mockVisitTypes[0].uuid,
+      visitLocation: { display: mockLocations[0].display, uuid: mockLocations[0].uuid },
+      visitAttributes: {},
+    });
+
+    expect(result.success).toBe(true);
   });
 });
 
