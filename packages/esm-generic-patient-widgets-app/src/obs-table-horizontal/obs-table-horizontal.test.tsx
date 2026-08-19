@@ -172,6 +172,37 @@ describe('ObsTableHorizontal', () => {
     expect(screen.getByText('182')).toBeInTheDocument();
     expect(screen.getByText('72')).toBeInTheDocument();
   });
+
+  it('honors decimalPlaces: 0 for fractional values', () => {
+    const observations = [
+      {
+        id: 'obs-frac',
+        code: { text: 'Height', coding: [{ code: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }] },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-02-01T00:00:00Z',
+        valueQuantity: { value: 182.4 },
+        encounter: { reference: 'Encounter/234', name: 'Outpatient' },
+      },
+    ] as Array<ObsResult>;
+    mockUseObs.mockReturnValue({
+      data: { observations, concepts: mockConceptData, encounters: [mockEncounters[1]] },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
+      title: 'Vitals',
+      editable: false,
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height', decimalPlaces: 0 }],
+    });
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    expect(screen.getByText('182')).toBeInTheDocument();
+  });
 });
 
 describe('ObsTableHorizontal editable mode', () => {
@@ -656,6 +687,51 @@ describe('ObsTableHorizontal editable mode', () => {
         title: 'Observation saved successfully',
       }),
     );
+  });
+
+  it('should save a zero value for a numeric observation', async () => {
+    const user = userEvent.setup();
+    const mockMutate = vi.fn().mockResolvedValue(undefined);
+
+    mockUseObs.mockReturnValue({
+      data: { observations: mockObsData, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaHorizontal) as object),
+      title: 'Vitals',
+      editable: true,
+      data: [
+        { concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Height' },
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight' },
+      ],
+    });
+
+    render(<ObsTableHorizontal patientUuid="patient-123" />);
+
+    const heightCell = screen.getByRole('cell', { name: /182/ });
+    await user.hover(heightCell);
+    const editButton = within(heightCell).getByRole('button', { name: 'Edit' });
+    await user.click(editButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+    });
+
+    const input = screen.getByRole('spinbutton');
+    await user.clear(input);
+    await user.type(input, '0');
+
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpdateObservation).toHaveBeenCalledWith('obs-1', 0);
+    });
+    expect(mockMutate).toHaveBeenCalled();
   });
 
   it('should not save when value is unchanged', async () => {
