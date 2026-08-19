@@ -60,7 +60,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       headers.splice(1, 0, {
         key: 'encounter',
         header: t('encounterType', 'Encounter type'),
-        sortFunc: (rowA: Row, rowB: Row) => rowA.encounter.localeCompare(rowB.encounter) as 1 | -1,
+        sortFunc: (rowA: Row, rowB: Row) => (rowA.encounter ?? '').localeCompare(rowB.encounter ?? '') as 1 | -1,
       });
     }
     headers.push(
