@@ -143,11 +143,37 @@ describe('VisitSummary', () => {
 
 describe('VisitSummary encounter editing', () => {
   const mockVisitWithEncounters = visitOverviewDetailMockDataNotEmpty.data.results[0];
-  const [mockAdmissionEncounter] = mockVisitWithEncounters.encounters;
+  const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockVisitWithEncounters.encounters;
 
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
     mockUserHasAccess.mockReturnValue(true);
+  });
+
+  it('passes onEditEncounter down to the timeline', async () => {
+    const user = userEvent.setup();
+    const onEditEncounter = vi.fn();
+    // The timeline offers one actions menu per encounter, so keep the visit to the one being edited
+    const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
+
+    renderWithSwr(
+      <VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} onEditEncounter={onEditEncounter} />,
+    );
+
+    // The timeline is the tab the visit summary opens on
+    await user.click(screen.getByRole('button', { name: /options/i }));
+
+    const actionsMenu = screen.getByRole('menu', { hidden: true });
+    const editItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((menuItem) => /edit this encounter/i.test(menuItem.textContent));
+    await user.click(editItem);
+
+    expect(onEditEncounter).toHaveBeenCalledTimes(1);
+    expect(onEditEncounter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note' }),
+      true,
+    );
   });
 
   it('passes onEditEncounter down to the completed forms tab', async () => {

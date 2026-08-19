@@ -146,7 +146,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditE
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            <VisitTimeline visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
