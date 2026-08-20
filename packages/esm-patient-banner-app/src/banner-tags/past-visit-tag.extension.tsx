@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
-import { type Visit, formatDate, formatDatetime, parseDate, useFeatureFlag } from '@openmrs/esm-framework';
-import { usePatientChartStore, useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
+import { type Visit, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useIsInPastVisitContext } from '../hooks/useIsInPastVisitContext';
 import styles from './past-visit-tag.scss';
 
 interface PastVisitTagProps {
@@ -10,12 +11,10 @@ interface PastVisitTagProps {
 }
 
 function PastVisitTag({ patientUuid }: PastVisitTagProps) {
-  const { systemVisitEnabled } = useSystemVisitSetting();
-  const isRdeEnabled = useFeatureFlag('rde');
+  const isInPastVisitContext = useIsInPastVisitContext(patientUuid);
   const { visitContext } = usePatientChartStore(patientUuid);
-  const isPastVisit = Boolean(visitContext && visitContext.stopDatetime);
 
-  return systemVisitEnabled && isRdeEnabled && isPastVisit ? <PastVisitTagContent visitContext={visitContext} /> : null;
+  return isInPastVisitContext ? <PastVisitTagContent visitContext={visitContext} /> : null;
 }
 
 interface PastVisitTagContentProps {
