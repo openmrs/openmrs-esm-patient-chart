@@ -11,7 +11,7 @@ describe('OpenmrsApiService', () => {
   );
 
   it('should be created', () => {
-    const service: OpenmrsEsmApiService = TestBed.get(OpenmrsEsmApiService);
+    const service: OpenmrsEsmApiService = TestBed.inject(OpenmrsEsmApiService);
     expect(service).toBeTruthy();
   });
 });

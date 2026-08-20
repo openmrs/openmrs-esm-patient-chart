@@ -16,16 +16,12 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
   const { t } = useTranslation();
   const { drugOrderTypeUUID } = useConfig<ChartConfig>();
 
-  const isPastMedication = (order: OrderItem['order']) => {
-    if (!order) {
+  const isDiscontinued = (order: OrderItem['order']) => {
+    if (!order?.dateStopped) {
       return false;
     }
 
-    return (
-      order.action === 'DISCONTINUE' ||
-      (order.dateStopped && new Date(order.dateStopped) <= new Date()) ||
-      (order.autoExpireDate && new Date(order.autoExpireDate) <= new Date())
-    );
+    return new Date(order.dateStopped) < new Date();
   };
 
   const drugOrders = medications?.filter((medication) => {
@@ -54,7 +50,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                     {medication?.order?.doseUnits?.display && (
                       <>&mdash; {medication?.order?.doseUnits?.display?.toLowerCase()}</>
                     )}{' '}
-                    {isPastMedication(medication.order) && (
+                    {isDiscontinued(medication.order) && (
                       <Tooltip align="right" label={<>{formatDate(new Date(medication.order.dateStopped))}</>}>
                         <Tag type="gray" className={styles.tag}>
                           {t('discontinued', 'Discontinued')}

@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, restBaseUrl, useConfig, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig, type FetchResponse } from '@openmrs/esm-framework';
 import {
   type DrugOrderBasketItem,
   type DrugOrderPost,
@@ -21,16 +21,40 @@ const customRepresentation =
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
 
-/**
- * Sorts orders by date activated in descending order.
- *
- * @param orders The orders to sort.
- * @returns The sorted orders.
- */
-function sortOrdersByDateActivated(orders: Order[]) {
-  return orders?.sort(
-    (order1, order2) => new Date(order2.dateActivated).getTime() - new Date(order1.dateActivated).getTime(),
-  );
+function orderStartTime(order: Order) {
+  return new Date(order.scheduledDate || order.dateActivated).getTime();
+}
+
+export function bucketMedicationOrders(drugOrders: Order[] | null | undefined, now = new Date()) {
+  const futureOrders: Order[] = [];
+  const activeOrders: Order[] = [];
+  const pastOrders: Order[] = [];
+
+  if (!drugOrders) {
+    return { futureOrders, activeOrders, pastOrders };
+  }
+
+  drugOrders.forEach((order) => {
+    const dateStopped = order.dateStopped ? new Date(order.dateStopped) : null;
+    const autoExpireDate = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
+    const dateScheduled = order.scheduledDate ? new Date(order.scheduledDate) : null;
+
+    if (dateScheduled && dateScheduled > now && !dateStopped) {
+      futureOrders.push(order);
+    } else if ((autoExpireDate && autoExpireDate <= now) || (dateStopped && dateStopped <= now)) {
+      pastOrders.push(order);
+    } else {
+      activeOrders.push(order);
+    }
+  });
+
+  // Soonest first for upcoming so clinicians see what's next at the top.
+  futureOrders.sort((a, b) => orderStartTime(a) - orderStartTime(b));
+  // Most recent first for active and past.
+  activeOrders.sort((a, b) => orderStartTime(b) - orderStartTime(a));
+  pastOrders.sort((a, b) => orderStartTime(b) - orderStartTime(a));
+
+  return { futureOrders, activeOrders, pastOrders };
 }
 
 /**
@@ -38,96 +62,46 @@ function sortOrdersByDateActivated(orders: Order[]) {
  *
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  */
-export function usePatientOrders(patientUuid: string) {
+export function useMedicationOrders(patientUuid: string) {
   const { drugOrderTypeUUID } = useConfig<ConfigObject>();
-  const { mutate } = useSWRConfig();
-
-  const ordersUrl = `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`;
-
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
-    patientUuid ? ordersUrl : null,
-    openmrsFetch,
-  );
-
-  const mutateOrders = useCallback(
-    () =>
-      mutate(
-        (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/order?patient=${patientUuid}`),
-        undefined,
-        { revalidate: true },
-      ),
-    [mutate, patientUuid],
-  );
-
-  const drugOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
-
-  return {
-    data: data ? drugOrders : null,
-    error,
-    isLoading,
-    isValidating,
-    mutate: mutateOrders,
-  };
-}
-
-/**
- * Hook to get active patient orders.
- *
- * @param patientUuid The UUID of the patient whose active orders should be fetched.
- */
-export function useActivePatientOrders(patientUuid: string) {
-  const { drugOrderTypeUUID } = useConfig<ConfigObject>();
-  const { mutate } = useSWRConfig();
-
   const ordersUrl = useMemo(
     () =>
       patientUuid
-        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&excludeCanceledAndExpired=true&v=${customRepresentation}`
+        ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&orderTypes=${drugOrderTypeUUID}&v=${customRepresentation}&excludeDiscontinueOrders=true`
         : null,
     [patientUuid, drugOrderTypeUUID],
   );
+
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientOrderFetchResponse>, Error>(
     ordersUrl,
     openmrsFetch,
   );
 
-  const activeOrders = useMemo(() => sortOrdersByDateActivated(data?.data?.results) ?? null, [data]);
+  const drugOrders = useMemo(() => data?.data?.results ?? null, [data]);
+
+  // Re-evaluate buckets once a minute so an order whose scheduledDate or
+  // dateStopped has just crossed "now" moves between buckets without waiting
+  // for the next SWR revalidation. `now` is read fresh inside the memo so
+  // bucketing triggered by a data refresh also gets a current timestamp.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const { futureOrders, activeOrders, pastOrders } = useMemo(
+    () => bucketMedicationOrders(drugOrders, new Date()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [drugOrders, tick],
+  );
 
   return {
-    data: activeOrders,
+    futureOrders,
+    activeOrders,
+    pastOrders,
     error,
     isLoading,
     isValidating,
-    mutate,
-  };
-}
-
-/**
- * Hook to get past patient orders.
- *
- * @param patientUuid The UUID of the patient whose past orders should be fetched.
- */
-export function usePastPatientOrders(patientUuid: string) {
-  const { data: allOrders, error, isLoading, isValidating, mutate } = usePatientOrders(patientUuid);
-  const { data: activeOrders } = useActivePatientOrders(patientUuid);
-
-  const pastOrders = useMemo(() => {
-    if (!allOrders || !activeOrders) {
-      return [];
-    }
-
-    const filteredDrugOrders = allOrders.filter(
-      (order) => !activeOrders.some((activeOrder) => activeOrder.uuid === order.uuid),
-    );
-    return sortOrdersByDateActivated(filteredDrugOrders);
-  }, [allOrders, activeOrders]);
-
-  return {
-    data: pastOrders,
-    error,
-    isLoading,
-    isValidating,
-    mutate,
   };
 }
 
@@ -140,6 +114,13 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   encounterUuid,
   orderingProviderUuid,
 ): DrugOrderPost => {
+  const orderStartDate = order.scheduledDate ? new Date(order.scheduledDate) : null;
+  const startDateFragment = orderStartDate
+    ? orderStartDate > new Date()
+      ? { scheduledDate: toOmrsIsoString(orderStartDate), urgency: 'ON_SCHEDULED_DATE' as const }
+      : { dateActivated: toOmrsIsoString(orderStartDate) }
+    : {};
+
   if (order.action === 'NEW') {
     return {
       action: 'NEW',
@@ -165,11 +146,12 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'RENEW') {
     return {
-      action: 'NEW',
+      action: 'RENEW',
       previousOrder: order.previousOrder,
       patient: patientUuid,
       type: 'drugorder',
@@ -193,6 +175,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order.drug.concept.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'REVISE') {
@@ -221,6 +204,7 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
         : 'org.openmrs.SimpleDosingInstructions',
       dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
       concept: order?.drug?.concept?.uuid,
+      ...startDateFragment,
       orderReasonNonCoded: order.indication,
     };
   } else if (order.action === 'DISCONTINUE') {
@@ -241,6 +225,12 @@ export const prepMedicationOrderPostData: PostDataPrepFunction = (
   }
 };
 
+function getFutureScheduledDate(order: Order, now = new Date()) {
+  const scheduledDate =
+    order.urgency === 'ON_SCHEDULED_DATE' && order.scheduledDate ? new Date(order.scheduledDate) : null;
+  return scheduledDate && scheduledDate > now ? scheduledDate : null;
+}
+
 /**
  * The inverse of prepMedicationOrderPostData - converts an Order into a DrugOrderBasketItem
  * See also the same function defined in esm-patient-orders-app/src/utils/index.ts
@@ -249,6 +239,8 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
   if (!order.drug) {
     throw new Error('Drug order is missing drug information.');
   }
+
+  const futureScheduledDate = getFutureScheduledDate(order);
 
   return {
     uuid: order.uuid,
@@ -283,7 +275,10 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
     patientInstructions: order.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? order.dosingInstructions : '',
     asNeeded: order.asNeeded,
     asNeededCondition: order.asNeededCondition ?? null,
-    startDate: action === 'DISCONTINUE' ? order.dateActivated : new Date(),
+    scheduledDate:
+      action === 'RENEW' || action === 'REVISE'
+        ? futureScheduledDate ?? new Date()
+        : new Date(order.scheduledDate || order.dateActivated),
     duration: order.duration,
     durationUnit: order.durationUnits
       ? {
@@ -301,6 +296,7 @@ export function buildMedicationOrder(order: Order, action: OrderAction): DrugOrd
         }
       : null,
     encounterUuid: order.encounter?.uuid,
+    previousOrderDateActivated: action === 'REVISE' ? order.dateActivated : undefined,
     visit: order.encounter.visit,
   };
 }

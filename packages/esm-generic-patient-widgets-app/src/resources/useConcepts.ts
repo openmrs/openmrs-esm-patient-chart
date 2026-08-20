@@ -1,6 +1,7 @@
 import { openmrsFetch, type FetchResponse, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
-import chunk from 'lodash/chunk';
 import useSWRImmutable from 'swr/immutable';
+
+const conceptRepresentation = 'custom:(uuid,display,datatype,answers)';
 
 export interface ConceptReferenceResponse {
   [key: string]: {
@@ -17,20 +18,24 @@ export interface ConceptReferenceResponse {
 }
 
 export function useConcepts(conceptUuids: Array<string>) {
-  const { data, error, isLoading } = useSWRImmutable<Array<FetchResponse<ConceptReferenceResponse>>, Error>(
-    conceptUuids && conceptUuids.length > 0 ? getConceptReferenceUrls(conceptUuids) : null,
-    (key: Array<string>) => Promise.all(key.map((url) => openmrsFetch<ConceptReferenceResponse>(url))),
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptReferenceResponse>, Error>(
+    conceptUuids && conceptUuids.length > 0
+      ? [`${restBaseUrl}/conceptreferences?v=${conceptRepresentation}`, conceptUuids]
+      : null,
+    ([url, refs]) =>
+      openmrsFetch<ConceptReferenceResponse>(url, {
+        headers: { 'Content-Type': 'application/json' },
+        body: { references: refs },
+        method: 'POST',
+      }),
   );
 
-  const res: ConceptReferenceResponse = data?.reduce((acc, response) => ({ ...acc, ...response.data }), {});
-  const concepts = res
-    ? Object.values(res).map((value) => ({
-        uuid: value.uuid,
-        display: value.display,
-        dataType: value.datatype.name,
-        answers: value.answers,
-      }))
-    : [];
+  const concepts = Object.values(data?.data ?? {}).map((value) => ({
+    uuid: value.uuid,
+    display: value.display,
+    dataType: value.datatype.name,
+    answers: value.answers,
+  }));
 
   if (error) {
     showSnackbar({
@@ -41,11 +46,4 @@ export function useConcepts(conceptUuids: Array<string>) {
   }
 
   return { concepts, isLoading };
-}
-
-function getConceptReferenceUrls(conceptUuids: Array<string>) {
-  return chunk(conceptUuids, 10).map(
-    (partition) =>
-      `${restBaseUrl}/conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display,datatype,answers)`,
-  );
 }

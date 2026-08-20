@@ -1,4 +1,13 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * happy-dom's `Date` instances do not satisfy `instanceof Date` against
+ * the host realm's `Date` constructor, which breaks `expect.objectContaining`
+ * matchers on payloads built with `new Date()` in production code.
+ */
 import React from 'react';
+import dayjs from 'dayjs';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen } from '@testing-library/react';
 import {
@@ -20,14 +29,14 @@ import ProgramsForm, { type ProgramsFormProps } from './programs-form.workspace'
 import { type ConfigObject, configSchema } from '../config-schema';
 import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-common-lib';
 
-const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
-const mockUseEnrollments = jest.mocked(useEnrollments);
-const mockCreateProgramEnrollment = jest.mocked(createProgramEnrollment);
-const mockUpdateProgramEnrollment = jest.mocked(updateProgramEnrollment);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseLocations = jest.mocked(useLocations);
-const mockCloseWorkspace = jest.fn();
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUseAvailablePrograms = vi.mocked(useAvailablePrograms);
+const mockUseEnrollments = vi.mocked(useEnrollments);
+const mockCreateProgramEnrollment = vi.mocked(createProgramEnrollment);
+const mockUpdateProgramEnrollment = vi.mocked(updateProgramEnrollment);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseLocations = vi.mocked(useLocations);
+const mockCloseWorkspace = vi.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 
 const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
@@ -38,7 +47,7 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
     mutateVisitContext: null,
   },
   workspaceName: '',
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceProps: {},
   windowProps: {},
   windowName: '',
@@ -46,12 +55,12 @@ const testProps: PatientWorkspace2DefinitionProps<ProgramsFormProps, {}> = {
   showActionMenu: true,
 };
 
-jest.mock('./programs.resource', () => ({
-  createProgramEnrollment: jest.fn(),
-  updateProgramEnrollment: jest.fn(),
-  useAvailablePrograms: jest.fn(),
-  useEnrollments: jest.fn(),
-  findLastState: jest.fn(),
+vi.mock('./programs.resource', () => ({
+  createProgramEnrollment: vi.fn(),
+  updateProgramEnrollment: vi.fn(),
+  useAvailablePrograms: vi.fn(),
+  useEnrollments: vi.fn(),
+  findLastState: vi.fn(),
 }));
 
 mockUseLocations.mockReturnValue(mockLocationsResponse);
@@ -69,7 +78,7 @@ mockUseEnrollments.mockReturnValue({
   isLoading: false,
   isValidating: false,
   activeEnrollments: [],
-  mutateEnrollments: jest.fn(),
+  mutateEnrollments: vi.fn(),
 });
 
 mockCreateProgramEnrollment.mockResolvedValue({
@@ -163,6 +172,100 @@ describe('ProgramsForm', () => {
         kind: 'success',
         title: 'Program enrollment updated',
       }),
+    );
+  });
+
+  it('does not submit the form when completion date is before enrollment date', async () => {
+    const user = userEvent.setup();
+
+    // mockEnrolledProgramsResponse[0] has dateEnrolled: '2020-01-16'
+    renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
+
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.click(completionDateInput);
+    await user.paste('2019-12-01');
+    await user.tab();
+
+    await user.click(saveButton);
+
+    expect(screen.getByText(/completion date cannot be before the enrollment date/i)).toBeInTheDocument();
+    expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
+    expect(mockUpdateProgramEnrollment).not.toHaveBeenCalled();
+  });
+
+  it('submits the form when the completion date is on the same day as the enrollment date', async () => {
+    const user = userEvent.setup();
+
+    // In create mode the enrollment date defaults to `new Date()`, which carries a
+    // time-of-day, while the date picker emits midnight. This guards that same-day
+    // completion is allowed and saved rather than rejected as "before enrollment".
+    const today = dayjs().format('YYYY-MM-DD');
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.click(completionDateInput);
+    await user.paste(today);
+    await user.tab();
+
+    await user.click(saveButton);
+
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledTimes(1);
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dateCompleted: expect.stringMatching(new RegExp(`^${today}`)),
+        program: oncologyScreeningProgramUuid,
+        patient: mockPatient.id,
+      }),
+      new AbortController(),
+    );
+  });
+
+  it('preserves a stored completion time that falls later than the enrollment time on the same day', async () => {
+    const user = userEvent.setup();
+
+    // The backend only rejects completion strictly before enrollment, so a stored same-day
+    // completion time later than the enrollment time is valid and must survive a resave
+    // that only touches an unrelated field.
+    const sameDayEnrollment = {
+      ...mockEnrolledProgramsResponse[0],
+      dateEnrolled: '2020-01-16T09:00:00.000+0000',
+      dateCompleted: '2020-01-16T17:00:00.000+0000',
+    };
+
+    mockUseEnrollments.mockReturnValue({
+      data: [sameDayEnrollment],
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      activeEnrollments: [],
+      mutateEnrollments: vi.fn(),
+    });
+
+    mockUpdateProgramEnrollment.mockResolvedValue({
+      status: 200,
+      statusText: 'OK',
+    } as unknown as FetchResponse);
+
+    renderProgramsForm(sameDayEnrollment.uuid);
+
+    await user.click(screen.getByRole('radio', { name: 'location_2' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+    expect(mockUpdateProgramEnrollment).toHaveBeenCalledTimes(1);
+    expect(mockUpdateProgramEnrollment).toHaveBeenCalledWith(
+      sameDayEnrollment.uuid,
+      expect.objectContaining({
+        dateCompleted: dayjs('2020-01-16T17:00:00.000+0000').format(),
+      }),
+      new AbortController(),
     );
   });
 

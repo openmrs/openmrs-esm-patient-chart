@@ -159,6 +159,10 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.panelHeaderOverlay {
+  top: 0;
+}
+
 .panelHeader + div .grid > div:first-child {
   border-top: none;
 }

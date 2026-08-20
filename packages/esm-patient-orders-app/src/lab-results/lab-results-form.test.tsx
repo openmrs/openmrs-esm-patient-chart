@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -25,26 +32,26 @@ import { configSchema, type ConfigObject } from '../config-schema';
 import { type Encounter } from '../types/encounter';
 import { mockPatient } from 'tools';
 
-const mockUseOrderConceptByUuids = jest.mocked(useOrderConceptsByUuids);
-const mockUseLabEncounter = jest.mocked(useLabEncounter);
-const mockUseObservation = jest.mocked(useObservation);
-const mockUseCompletedLabResultsArray = jest.mocked(useCompletedLabResultsArray);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseOrderBasket = jest.mocked(useOrderBasket);
+const mockUseOrderConceptByUuids = vi.mocked(useOrderConceptsByUuids);
+const mockUseLabEncounter = vi.mocked(useLabEncounter);
+const mockUseObservation = vi.mocked(useObservation);
+const mockUseCompletedLabResultsArray = vi.mocked(useCompletedLabResultsArray);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseOrderBasket = vi.mocked(useOrderBasket);
 
-jest.mock('./lab-results.resource', () => ({
-  ...jest.requireActual('./lab-results.resource'),
-  useOrderConceptByUuid: jest.fn(),
-  useOrderConceptsByUuids: jest.fn(),
-  useLabEncounter: jest.fn(),
-  useObservation: jest.fn(),
-  updateOrderResult: jest.fn().mockResolvedValue({}),
-  useCompletedLabResultsArray: jest.fn(),
+vi.mock('./lab-results.resource', async () => ({
+  ...((await vi.importActual('./lab-results.resource')) as object),
+  useOrderConceptByUuid: vi.fn(),
+  useOrderConceptsByUuids: vi.fn(),
+  useLabEncounter: vi.fn(),
+  useObservation: vi.fn(),
+  updateOrderResult: vi.fn().mockResolvedValue({}),
+  useCompletedLabResultsArray: vi.fn(),
 }));
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useOrderBasket: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  useOrderBasket: vi.fn(),
 }));
 
 const mockOrder = {
@@ -57,7 +64,7 @@ const mockOrder = {
   orderer: { uuid: 'orderer-uuid' },
 };
 
-const mockCloseWorkspace = jest.fn();
+const mockCloseWorkspace = vi.fn();
 
 const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
   closeWorkspace: mockCloseWorkspace,
@@ -71,7 +78,7 @@ const testProps: PatientWorkspace2DefinitionProps<LabResultsFormProps, {}> = {
     visitContext: null,
     mutateVisitContext: null,
   },
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
@@ -86,7 +93,7 @@ const exportedTestProps = {
   } satisfies ExportedLabResultsFormProps,
   windowProps: {},
   groupProps: {},
-  launchChildWorkspace: jest.fn(),
+  launchChildWorkspace: vi.fn(),
   workspaceName: '',
   windowName: '',
   isRootWorkspace: false,
@@ -101,8 +108,8 @@ describe('LabResultsForm', () => {
     });
     mockUseOrderBasket.mockReturnValue({
       orders: [],
-      setOrders: jest.fn(),
-      clearOrders: jest.fn(),
+      setOrders: vi.fn(),
+      clearOrders: vi.fn(),
     });
     mockUseOrderConceptByUuids.mockReturnValue({
       concepts: [
@@ -124,27 +131,27 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseLabEncounter.mockReturnValue({
       encounter: { obs: [] } as Encounter,
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseObservation.mockReturnValue({
       data: null,
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     mockUseCompletedLabResultsArray.mockReturnValue({
       completeLabResults: [],
       isLoading: false,
       error: null,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
   });
 
@@ -215,8 +222,8 @@ describe('LabResultsForm', () => {
           isOrderIncomplete: false,
         },
       ] as Array<TestOrderBasketItem>,
-      setOrders: jest.fn(),
-      clearOrders: jest.fn(),
+      setOrders: vi.fn(),
+      clearOrders: vi.fn(),
     });
 
     render(<LabResultsForm {...testProps} />);
@@ -282,7 +289,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -363,7 +370,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -401,7 +408,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -454,7 +461,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -527,10 +534,10 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
-    const mockCloseWorkspace = jest.fn();
-    const mockCloseWorkspaceWithSavedChanges = jest.fn();
+    const mockCloseWorkspace = vi.fn();
+    const mockCloseWorkspaceWithSavedChanges = vi.fn();
 
     render(<LabResultsForm {...testProps} closeWorkspace={mockCloseWorkspace} />);
 
@@ -596,7 +603,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -645,7 +652,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<LabResultsForm {...testProps} />);
@@ -722,7 +729,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<LabResultsForm {...testProps} />);
@@ -828,7 +835,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<LabResultsForm {...testProps} />);
@@ -911,7 +918,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
     render(<LabResultsForm {...testProps} />);
 
@@ -1002,7 +1009,7 @@ describe('LabResultsForm', () => {
       isLoading: false,
       error: null,
       isValidating: false,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     });
 
     render(<LabResultsForm {...testProps} />);

@@ -8,6 +8,7 @@
   "doseNumberWithinSeries": "დოზის ნომერი სერიებში",
   "doses": "Doses",
   "due": "Due",
+  "duplicateDoseWarning": "Dose {{dose}} has already been recorded for this vaccine",
   "error": "შეცდომა",
   "errorSaving": "ვაქცინაციის შენახვის შეცდომა",
   "expirationDate": "ვადა",

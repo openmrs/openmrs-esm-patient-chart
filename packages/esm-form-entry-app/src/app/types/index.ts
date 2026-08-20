@@ -146,6 +146,11 @@ export interface FormSchema {
   translations?: Record<string, string>;
   uuid: string;
   version: string;
+  /**
+   * Maps the concept references used throughout the schema to the concepts they resolve to.
+   * Added by the o3forms module, so it is not present on every schema.
+   */
+  conceptReferences?: Record<string, { uuid?: string | null; display?: string | null }>;
 }
 
 export interface FormMetadataObject {
@@ -185,6 +190,27 @@ interface QuestionOptions {
   concept?: string;
   answers?: Array<QuestionOptionsAnswer>;
   useMostRecentValue: boolean | 'true';
+  min?: string;
+  max?: string;
+}
+
+/**
+ * A reference range as returned by the `conceptreferencerange` REST resource. Which range applies
+ * is evaluated by the backend against patient factors such as age or gender, which is why these
+ * are fetched per patient.
+ */
+export interface ConceptReferenceRange {
+  uuid: string;
+  display?: string;
+  /** The UUID of the concept the range belongs to. */
+  concept: string;
+  hiNormal?: number | null;
+  hiAbsolute?: number | null;
+  hiCritical?: number | null;
+  lowNormal?: number | null;
+  lowAbsolute?: number | null;
+  lowCritical?: number | null;
+  units?: string | null;
 }
 
 interface QuestionOptionsAnswer {
@@ -261,6 +287,20 @@ export interface Concept {
   answers: Array<Concept>;
   setMembers: Array<Concept>;
   display: string;
+  mappings?: Array<ConceptMapping>;
+}
+
+export interface ConceptMapping {
+  conceptMapType?: {
+    uuid?: string;
+    display?: string;
+  };
+  conceptReferenceTerm?: {
+    code?: string;
+    conceptSource?: {
+      uuid?: string;
+    };
+  };
 }
 
 export interface Visit {

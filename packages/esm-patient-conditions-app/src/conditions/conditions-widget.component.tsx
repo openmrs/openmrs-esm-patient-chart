@@ -1,4 +1,4 @@
-import React, { type Dispatch, useCallback, useEffect, useRef, useState } from 'react';
+import React, { type Dispatch, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import classNames from 'classnames';
@@ -8,6 +8,7 @@ import {
   FormGroup,
   FormLabel,
   InlineLoading,
+  InlineNotification,
   Layer,
   RadioButton,
   RadioButtonGroup,
@@ -73,9 +74,10 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     formState: { errors },
     getValues,
     watch,
+    setValue,
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
-  const searchInputRef = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -87,12 +89,31 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConditionsSearch(debouncedSearchTerm);
 
-  const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
-    setSelectedCondition(selectedCondition);
-  }, []);
+  const duplicateCondition = useMemo(() => {
+    if (!selectedCondition || !conditions?.length) {
+      return null;
+    }
+    const uuid = selectedCondition.uuid;
+    return (
+      conditions.find((c) => c.conceptId === uuid && c.clinicalStatus.toLowerCase() === 'active') ??
+      conditions.find((c) => c.conceptId === uuid) ??
+      null
+    );
+  }, [selectedCondition, conditions]);
+
+  const isActiveDuplicate = duplicateCondition?.clinicalStatus.toLowerCase() === 'active';
+
+  const handleConditionChange = useCallback(
+    (selectedCondition: CodedCondition) => {
+      setSelectedCondition(selectedCondition);
+      setValue('conditionUuid', selectedCondition.uuid, { shouldValidate: true });
+    },
+    [setValue],
+  );
 
   const handleCreate = useCallback(async () => {
     if (!selectedCondition) {
+      setIsSubmittingForm(false);
       return;
     }
 
@@ -189,7 +210,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   };
 
   useEffect(() => {
-    if (errors?.conditionName) {
+    if (errors?.conditionUuid) {
       focusOnSearchInput();
     }
     if (isSubmittingForm) {
@@ -222,39 +243,35 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                     <Search
                       autoFocus
                       className={classNames({
-                        [styles.conditionsError]: errors?.conditionName,
+                        [styles.conditionsError]: errors?.conditionUuid,
                       })}
                       disabled={isEditing}
                       id="conditionsSearch"
-                      aria-labelledby={errors?.conditionName ? 'conditionsSearchError' : undefined}
+                      aria-labelledby={errors?.conditionUuid ? 'conditionsSearchError' : undefined}
                       labelText={t('enterCondition', 'Enter condition')}
                       onChange={(event) => {
                         const val = event.target.value;
                         onChange(val);
+                        setSelectedCondition(null);
+                        setValue('conditionUuid', '');
                         handleSearchTermChange(val);
                       }}
                       onClear={() => {
                         setSearchTerm('');
                         setSelectedCondition(null);
+                        setValue('conditionUuid', '');
                       }}
                       placeholder={t('searchConditions', 'Search conditions')}
                       ref={searchInputRef}
-                      renderIcon={errors?.conditionName && ((props) => <WarningFilled fill="red" {...props} />)}
-                      value={(() => {
-                        if (selectedCondition) {
-                          return selectedCondition.display;
-                        }
-                        if (debouncedSearchTerm) {
-                          return value;
-                        }
-                      })()}
+                      renderIcon={errors?.conditionUuid && ((props) => <WarningFilled fill="red" {...props} />)}
+                      value={selectedCondition?.display ?? value ?? ''}
                     />
                   </ResponsiveWrapper>
                 )}
               />
-              {errors?.conditionName && (
+              {errors?.conditionUuid && (
                 <p id="conditionsSearchError" className={styles.errorMessage}>
-                  {errors.conditionName.message}
+                  {errors.conditionUuid.message}
                 </p>
               )}
               <SearchResults
@@ -265,6 +282,28 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 t={t}
                 value={searchTerm}
               />
+              {selectedCondition && duplicateCondition && (
+                <InlineNotification
+                  hideCloseButton
+                  kind="warning"
+                  lowContrast
+                  className={styles.duplicateWarning}
+                  title={t('possibleDuplicate', 'Possible duplicate')}
+                  subtitle={
+                    isActiveDuplicate
+                      ? t(
+                          'duplicateActiveConditionSubtitle',
+                          "{{conditionName}} is already on this patient's active problem list. Saving will create a duplicate.",
+                          { conditionName: selectedCondition.display, interpolation: { escapeValue: false } },
+                        )
+                      : t(
+                          'duplicateInactiveConditionSubtitle',
+                          '{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.',
+                          { conditionName: selectedCondition.display, interpolation: { escapeValue: false } },
+                        )
+                  }
+                />
+              )}
             </>
           )}
         </FormGroup>

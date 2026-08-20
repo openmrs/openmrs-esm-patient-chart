@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
 import { catchError, mergeMap, switchMap } from 'rxjs/operators';
-import { EncounterAdapter, Form, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
-import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
+import { EncounterAdapter, Form, NodeBase, PersonAttributeAdapter } from '@openmrs/ngx-formentry';
 import { Form as ReactForm } from '@openmrs/esm-patient-common-lib';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';

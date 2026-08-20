@@ -1,9 +1,10 @@
 import React from 'react';
+import { vi, it, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AttachmentsOverview from './attachments-overview.component';
 import { useAttachments } from '@openmrs/esm-framework';
 
-const mockUseAttachments = jest.mocked(useAttachments);
+const mockUseAttachments = vi.mocked(useAttachments);
 
 it('renders a loading skeleton when attachments are loading', () => {
   mockUseAttachments.mockReturnValue({
@@ -11,7 +12,7 @@ it('renders a loading skeleton when attachments are loading', () => {
     error: null,
     isLoading: true,
     isValidating: false,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   });
 
   render(<AttachmentsOverview patientUuid="test-uuid" />);
@@ -26,7 +27,7 @@ it('renders an empty state if attachments are not available', () => {
     error: null,
     isLoading: false,
     isValidating: false,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   });
 
   render(<AttachmentsOverview patientUuid="test-uuid" />);

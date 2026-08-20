@@ -291,13 +291,12 @@ const OrderBasket: React.FC<OrderBasketProps> = ({
                   orderBasketExtensionProps.visibleOrderPanels.includes(orderType.orderTypeUuid),
               )
               .map((orderType) => (
-                <div className={styles.orderPanel} key={orderType.orderTypeUuid}>
-                  <GeneralOrderPanel
-                    {...orderType}
-                    launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
-                    patient={patient}
-                  />
-                </div>
+                <GeneralOrderPanel
+                  key={orderType.orderTypeUuid}
+                  {...orderType}
+                  launchGeneralOrderForm={orderBasketExtensionProps.launchGeneralOrderForm}
+                  patient={patient}
+                />
               ))}
         </div>
         <div>

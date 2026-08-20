@@ -127,7 +127,8 @@ export type FormFields = {
 };
 
 export function useConditions(patientUuid: string) {
-  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
+  const conditionsCategory = 'http://terminology.hl7.org/CodeSystem/condition-category|problem-list-item';
+  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&category=${conditionsCategory}&_count=100`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
     patientUuid ? conditionsUrl : null,
     openmrsFetch,

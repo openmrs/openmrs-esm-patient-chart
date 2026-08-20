@@ -13,24 +13,27 @@ import {
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
-import type { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
-import { type Note, type Order, type OrderItem } from '../visit.resource';
+import type { ChartConfig } from '../../../config-schema';
+import type { Note, Order, OrderItem } from '../visit.resource';
+import { dedupeDiagnoses } from '../../dedupe-diagnoses';
+import { encounterHasJsonSchemaForm, type EncountersTableProps } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
+import VisitCompletedFormsTable from './encounters-table/visit-completed-forms-table.component';
 import VisitEncountersTable from './encounters-table/visit-encounters-table.component';
 import VisitTimeline from '../single-visit-details/visit-timeline/visit-timeline.component';
-import { type ChartConfig } from '../../../config-schema';
 import styles from './visit-summary.scss';
 
 interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
+  onEditEncounter?: EncountersTableProps['onEditEncounter'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -83,23 +86,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
       }
     });
 
-    // Sort the diagnoses by rank, so that primary diagnoses come first
-    diagnoses.sort((a, b) => a.rank - b.rank);
-
     // Sort medications by dateActivated DESC (newest first) to align with backend ordering
     medications.sort((a, b) => new Date(b.order.dateActivated).getTime() - new Date(a.order.dateActivated).getTime());
 
-    return [diagnoses, notes, medications];
+    return [dedupeDiagnoses(diagnoses), notes, medications];
   }, [config.notesConceptUuids, visit?.encounters]);
 
-  const encounterIds = useMemo(
-    () => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [],
+  const encounterIds = useMemo(() => visit?.encounters?.map((e) => `Encounter/${e.uuid}`) ?? [], [visit?.encounters]);
+
+  const hasCompletedForms = useMemo(
+    () => visit?.encounters?.some(encounterHasJsonSchemaForm) ?? false,
     [visit?.encounters],
-  );
-  
-  const testsFilter = useMemo<ExternalOverviewProps['filter']>(
-    () => ([entry]) => encounterIds.includes(entry.encounter?.reference),
-    [encounterIds],
   );
 
   return (
@@ -136,10 +133,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
           >
             {t('medications', 'Medications')}
           </Tab>
+          <Tab className={styles.tab} id="completed-forms-tab" disabled={!hasCompletedForms && config.disableEmptyTabs}>
+            {t('completedForms', 'Completed forms')}
+          </Tab>
           <Tab
             className={styles.tab}
             id="encounters-tab"
-            disabled={visit?.encounters.length <= 0 && config.disableEmptyTabs}
+            disabled={(visit?.encounters?.length ?? 0) <= 0 && config.disableEmptyTabs}
           >
             {t('encounters_title', 'Encounters')}
           </Tab>
@@ -154,7 +154,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+            <VisitTimeline visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
@@ -166,7 +166,10 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid }) => {
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} />
+            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+          </TabPanel>
+          <TabPanel>
+            <VisitEncountersTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

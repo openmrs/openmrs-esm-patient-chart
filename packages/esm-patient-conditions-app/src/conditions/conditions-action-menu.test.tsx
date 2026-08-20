@@ -1,13 +1,14 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
 import { type Condition } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
-const mockShowModal = jest.mocked(showModal);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
+const mockShowModal = vi.mocked(showModal);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 const mockCondition: Condition = {
   clinicalStatus: 'active',
@@ -73,7 +74,7 @@ describe('ConditionsActionMenu', () => {
     await user.click(screen.getByText('Edit'));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('conditions-form-workspace', {
-      workspaceTitle: 'Edit a Condition',
+      workspaceTitle: 'Edit condition',
       condition: specificCondition,
       formContext: 'editing',
     });

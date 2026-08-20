@@ -321,3 +321,99 @@ test('Add high and critically high range patient vitals', async ({ page, patient
     expect(afterContentLow).toBe('" ↑↑"');
   });
 });
+
+test('Show an error when saving vitals with no values entered', async ({ page, patient }) => {
+  const vitalsPage = new BiometricsAndVitalsPage(page);
+  const saveButton = vitalsPage.page.getByRole('button', { name: /save and close/i });
+
+  await test.step('When I visit the vitals and biometrics page', async () => {
+    await vitalsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Record vital signs` link to launch the form', async () => {
+    await vitalsPage.page.getByText(/record vital signs/i).click();
+  });
+
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
+    await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step('And the `Save and close` button should be disabled while the form is pristine', async () => {
+    await expect(saveButton).toBeDisabled();
+  });
+
+  await test.step('When I type a note and then erase it', async () => {
+    await vitalsPage.page.getByPlaceholder(/type any additional notes here/i).fill('Test notes');
+    await vitalsPage.page.getByPlaceholder(/type any additional notes here/i).clear();
+  });
+
+  await test.step('And I click on the `Save and close` button', async () => {
+    await expect(saveButton).toBeEnabled();
+    await saveButton.click();
+  });
+
+  await test.step('Then I should see an error notification prompting me to fill at least one field', async () => {
+    await expect(vitalsPage.page.getByText(/please fill at least one field/i)).toBeVisible();
+  });
+
+  await test.step('And no vitals should be recorded for the patient', async () => {
+    await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeHidden();
+  });
+});
+
+test('Show an error when saving vitals with a value outside the allowed range', async ({ page, patient, api }) => {
+  const vitalsPage = new BiometricsAndVitalsPage(page);
+  let hiAbsolute: number;
+
+  await test.step('Given the oxygen saturation concept defines an absolute maximum below the value under test', async () => {
+    const oxygenSaturationConceptUuid = '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const res = await api.get(`concept/${oxygenSaturationConceptUuid}?v=custom:(hiAbsolute)`);
+    hiAbsolute = (await res.json()).hiAbsolute;
+    expect(
+      hiAbsolute,
+      `The oxygen saturation concept must define a hiAbsolute below 101 for this test to be valid; got ${hiAbsolute}. Check the concept dictionary in the e2e environment.`,
+    ).toBeLessThan(101);
+  });
+
+  await test.step('When I visit the vitals and biometrics page', async () => {
+    await vitalsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click the `Record vital signs` link to launch the form', async () => {
+    await vitalsPage.page.getByText(/record vital signs/i).click();
+  });
+
+  await test.step('Then I should see the `Record Vitals and Biometrics` form launch in the workspace', async () => {
+    await expect(vitalsPage.page.getByText(/record vitals and biometrics/i)).toBeVisible();
+  });
+
+  await test.step('And the absolute ranges should have loaded into the form', async () => {
+    // The range check no-ops until the conceptreferencerange request resolves;
+    // the input's max attribute is populated from that same response.
+    await expect(vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i })).toHaveAttribute(
+      'max',
+      String(hiAbsolute),
+    );
+  });
+
+  await test.step('When I fill `101` as the oxygen saturation', async () => {
+    await vitalsPage.page.getByRole('spinbutton', { name: /oxygen saturation/i }).fill('101');
+  });
+
+  await test.step('And I click on the `Save and close` button', async () => {
+    await vitalsPage.page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a field-level error indicating the allowed range', async () => {
+    await expect(vitalsPage.page.getByText(/value must be between/i)).toBeVisible();
+  });
+
+  await test.step('And I should see an error notification about invalid values', async () => {
+    await expect(vitalsPage.page.getByText(/error saving vitals and biometrics/i)).toBeVisible();
+    await expect(vitalsPage.page.getByText(/some of the values entered are invalid/i)).toBeVisible();
+  });
+
+  await test.step('And no vitals should be recorded for the patient', async () => {
+    await expect(vitalsPage.page.getByText(/vitals and biometrics saved/i)).toBeHidden();
+  });
+});

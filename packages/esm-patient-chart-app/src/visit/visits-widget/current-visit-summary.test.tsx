@@ -1,16 +1,17 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { getConfig } from '@openmrs/esm-framework';
 import { mockPatient, waitForLoadingToFinish } from 'tools';
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import CurrentVisitSummary from './current-visit-summary.extension';
 
-const mockGetConfig = jest.mocked(getConfig);
-const mockUsePatientChartStore = jest.mocked(usePatientChartStore);
+const mockGetConfig = vi.mocked(getConfig);
+const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(),
 }));
 
 describe('CurrentVisitSummary', () => {
@@ -20,8 +21,8 @@ describe('CurrentVisitSummary', () => {
       patient: mockPatient,
       visitContext: null,
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.getByText(/current visit/i)).toBeInTheDocument();
@@ -34,8 +35,8 @@ describe('CurrentVisitSummary', () => {
       patient: mockPatient,
       visitContext: null,
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);
     expect(screen.queryByText(/current visit/i)).not.toBeInTheDocument();
@@ -66,8 +67,8 @@ describe('CurrentVisitSummary', () => {
         },
       },
       mutateVisitContext: null,
-      setPatient: jest.fn(),
-      setVisitContext: jest.fn(),
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
     });
 
     render(<CurrentVisitSummary patientUuid={mockPatient.id} />);

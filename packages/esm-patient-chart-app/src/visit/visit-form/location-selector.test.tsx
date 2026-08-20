@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -15,11 +16,11 @@ import { type VisitFormData } from './visit-form.resource';
 import { useDefaultFacilityLocation } from '../hooks/useDefaultFacilityLocation';
 import LocationSelector from './location-selector.component';
 
-const mockSession = jest.mocked(useSession);
-const mockUseLocations = jest.mocked(useLocations);
-const mockUseConfig = jest.mocked(useConfig<ChartConfig>);
-const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
-const mockUseDefaultFacilityLocation = jest.mocked(useDefaultFacilityLocation);
+const mockSession = vi.mocked(useSession);
+const mockUseLocations = vi.mocked(useLocations);
+const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
+const mockUseDefaultFacilityLocation = vi.mocked(useDefaultFacilityLocation);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 
@@ -88,7 +89,7 @@ describe('LocationSelector', () => {
   });
 
   it('should not restrict locations by the Visit Location tag when the EMR API module is not installed', () => {
-    const consoleError = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientChartSchema),

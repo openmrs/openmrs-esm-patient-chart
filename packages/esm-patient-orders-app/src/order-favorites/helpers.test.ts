@@ -1,4 +1,5 @@
 import type { Drug } from '@openmrs/esm-patient-common-lib';
+import { vi, describe, it, expect } from 'vitest';
 import { buildFavoriteOrder } from './helpers';
 
 const makeDrug = (overrides: Partial<Drug> = {}): Drug =>

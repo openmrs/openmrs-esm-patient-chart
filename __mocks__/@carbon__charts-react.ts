@@ -1,4 +1,6 @@
-export const LineChart = jest.fn(() => null);
+import { vi } from 'vitest';
+
+export const LineChart = vi.fn(() => null);
 
 export const ScaleTypes = {
   TIME: 'time',

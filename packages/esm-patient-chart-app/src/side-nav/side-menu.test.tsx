@@ -1,9 +1,10 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import SideMenu from './side-menu.component';
 
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
 describe('Side menu', () => {
   it('is rendered when viewport == large-desktop', () => {

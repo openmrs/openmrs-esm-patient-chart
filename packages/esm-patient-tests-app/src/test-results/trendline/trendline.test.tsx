@@ -1,13 +1,14 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useObstreeData } from './trendline-resource';
 import Trendline from './trendline.component';
 
-const mockLineChart = jest.fn((_props: unknown) => null);
+const mockLineChart = vi.fn((_props: unknown) => null);
 
-jest.mock('@carbon/charts-react', () => {
-  const actual = jest.requireActual('@carbon/charts-react');
+vi.mock('@carbon/charts-react', async () => {
+  const actual = (await vi.importActual('@carbon/charts-react')) as object;
   return {
     ...actual,
     LineChart: (props: unknown) => {
@@ -17,11 +18,11 @@ jest.mock('@carbon/charts-react', () => {
   };
 });
 
-const mockUseObstreeData = jest.mocked(useObstreeData);
+const mockUseObstreeData = vi.mocked(useObstreeData);
 
-jest.mock('./trendline-resource', () => ({
-  ...jest.requireActual('./trendline-resource'),
-  useObstreeData: jest.fn(),
+vi.mock('./trendline-resource', async () => ({
+  ...((await vi.importActual('./trendline-resource')) as object),
+  useObstreeData: vi.fn(),
 }));
 
 describe('Trendline', () => {

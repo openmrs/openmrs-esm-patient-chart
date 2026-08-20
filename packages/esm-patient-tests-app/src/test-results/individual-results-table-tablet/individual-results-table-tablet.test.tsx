@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
@@ -6,10 +7,10 @@ import { mockResults } from '__mocks__';
 import { FilterProvider, type Roots } from '../filter/filter-context';
 import IndividualResultsTableTablet from './individual-results-table-tablet.component';
 
-const mockIsDesktop = jest.mocked(isDesktop);
-const mockUseLayoutType = jest.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
+const mockUseLayoutType = vi.mocked(useLayoutType);
 
-jest.mock('./usePanelData');
+vi.mock('./usePanelData');
 
 describe('PanelView', () => {
   beforeEach(() => {
@@ -52,8 +53,8 @@ describe('PanelView', () => {
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hiv viral load/i })).toBeInTheDocument();
     // This observation belongs to two panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('row', { name: /platelets.*56/i })).toHaveLength(2);
+    expect(screen.getByRole('row', { name: /hiv viral load.*600/i })).toBeInTheDocument();
   });
 
   it('filters the panel view when searching for a test', async () => {
@@ -71,8 +72,8 @@ describe('PanelView', () => {
     expect(screen.getByRole('heading', { name: /complete blood count/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hematology/i })).toBeInTheDocument();
     // This observation belongs to both panels
-    expect(screen.getAllByRole('row', { name: /platelets 56/i })).toHaveLength(2);
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('row', { name: /platelets.*56/i })).toHaveLength(2);
+    expect(screen.getByRole('row', { name: /hiv viral load.*600/i })).toBeInTheDocument();
 
     await user.click(searchButton);
 
@@ -82,8 +83,8 @@ describe('PanelView', () => {
     await user.type(searchBox, 'hiv viral load');
     await user.keyboard('{Enter}');
 
-    expect(screen.queryByRole('row', { name: /platelets 56/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.queryByRole('row', { name: /platelets.*56/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv viral load.*600/i })).toBeInTheDocument();
   });
 
   it('selecting a test opens the timeline view on tablet', async () => {
@@ -108,6 +109,29 @@ describe('PanelView', () => {
     await user.click(backButton);
 
     expect(backButton).not.toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv viral load 600/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv viral load.*600/i })).toBeInTheDocument();
+  });
+
+  it('applies the overlay sticky header fix when opening a panel overlay on tablet', async () => {
+    const user = userEvent.setup();
+
+    mockUseLayoutType.mockReturnValue('tablet');
+    mockIsDesktop.mockReturnValue(false);
+
+    render(
+      <FilterProvider roots={mockResults as Roots} isLoading={false}>
+        <IndividualResultsTableTablet expanded={false} patientUuid="test-patient" />
+      </FilterProvider>,
+    );
+
+    const hivViralLoadCell = screen.getByRole('cell', { name: /hiv viral load/i });
+    await user.click(hivViralLoadCell);
+
+    // The panel header in the overlay should have the panelHeaderOverlay class
+    // which sets top: 0 instead of the default top: 6rem
+    // eslint-disable-next-line testing-library/no-node-access
+    const panelHeader = document.querySelector('[data-panel-name="HIV viral load"]');
+    expect(panelHeader).toBeInTheDocument();
+    expect(panelHeader).toHaveClass('panelHeaderOverlay');
   });
 });

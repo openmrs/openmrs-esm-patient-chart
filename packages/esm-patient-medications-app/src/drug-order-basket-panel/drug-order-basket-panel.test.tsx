@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type OrderBasketExtensionProps, type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
@@ -7,18 +8,18 @@ import { mockDrugSearchResultApiData, mockFhirPatient, mockPatientDrugOrdersApiD
 import { getTemplateOrderBasketItem } from '../add-drug-order/drug-search/drug-search.resource';
 import DrugOrderBasketPanel from './drug-order-basket-panel.extension';
 
-const mockUseOrderBasket = jest.fn();
+const mockUseOrderBasket = vi.fn();
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
   useOrderBasket: () => mockUseOrderBasket(),
 }));
 
 const testProps: OrderBasketExtensionProps = {
   patient: mockFhirPatient,
-  launchDrugOrderForm: jest.fn(),
-  launchLabOrderForm: jest.fn(),
-  launchGeneralOrderForm: jest.fn(),
+  launchDrugOrderForm: vi.fn(),
+  launchLabOrderForm: vi.fn(),
+  launchGeneralOrderForm: vi.fn(),
 };
 
 describe('OrderBasketPanel', () => {
@@ -39,7 +40,7 @@ describe('OrderBasketPanel', () => {
     medications[2].action = 'RENEW';
     medications[3].action = 'DISCONTINUE';
     let orders = [...medications];
-    const mockSetOrders = jest.fn((newOrders: Array<DrugOrderBasketItem>) => {
+    const mockSetOrders = vi.fn((newOrders: Array<DrugOrderBasketItem>) => {
       orders = newOrders;
     });
     mockUseOrderBasket.mockImplementation(() => ({

@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, test } from 'vitest';
 import {
   invalidateVisitHistory,
   invalidatePatientEncounters,
@@ -5,7 +6,7 @@ import {
   invalidateCurrentVisit,
 } from './revalidation-utils';
 
-const mockMutate = jest.fn();
+const mockMutate = vi.fn();
 
 describe('revalidation-utils', () => {
   describe('invalidateVisitHistory', () => {

@@ -11,7 +11,7 @@ import {
   TableRow,
   type DataTableSortState,
 } from '@carbon/react';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { NumericObservation, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
@@ -24,6 +24,7 @@ interface PaginatedBiometricsProps {
   urlLabel: string;
   tableHeaders: Array<BiometricsTableHeader>;
   patient: fhir.Patient;
+  patientUuid: string;
 }
 
 const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
@@ -33,6 +34,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   urlLabel,
   tableHeaders,
   patient,
+  patientUuid,
 }) => {
   const isTablet = useLayoutType() === 'tablet';
 
@@ -77,6 +79,11 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
+  const headerByKey = useMemo(
+    () => new Map<string, BiometricsTableHeader>(tableHeaders.map((h) => [h.key, h])),
+    [tableHeaders],
+  );
+
   return (
     <>
       <DataTable
@@ -106,16 +113,39 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                    ))}
-                    <TableCell className="cds--table-column-menu" id="actions">
-                      <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {rows.map((row) => {
+                  const biometricsObj = paginatedBiometrics.find((obj) => obj.id === row.id);
+
+                  return (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => {
+                        if (cell.info.header === 'dateRender') {
+                          return <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>;
+                        }
+
+                        const interpretationKey = cell.info.header + 'Interpretation';
+                        const interpretation = biometricsObj?.[interpretationKey];
+                        const conceptUuid = headerByKey.get(cell.info.header)?.conceptUuid;
+                        const rawValue = cell.value?.content ?? cell.value;
+
+                        return (
+                          <TableCell key={cell.id} className={styles.numericObsCell}>
+                            <NumericObservation
+                              value={rawValue}
+                              interpretation={interpretation}
+                              conceptUuid={conceptUuid}
+                              patientUuid={patientUuid}
+                              variant="cell"
+                            />
+                          </TableCell>
+                        );
+                      })}
+                      <TableCell className="cds--table-column-menu" id="actions">
+                        <VitalsAndBiometricsActionMenu patient={patient} encounterUuid={row.id} />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

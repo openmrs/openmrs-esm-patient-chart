@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -13,11 +14,11 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockUseVisitNotes = jest.mocked(useVisitNotes);
-const mockUseConfig = jest.mocked(useConfig);
+const mockUseVisitNotes = vi.mocked(useVisitNotes);
+const mockUseConfig = vi.mocked(useConfig);
 
-jest.mock('./visit-notes.resource', () => {
-  return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+vi.mock('./visit-notes.resource', () => {
+  return { useVisitNotes: vi.fn().mockReturnValue([{}]) };
 });
 
 describe('NotesOverview', () => {
@@ -31,7 +32,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
@@ -57,7 +58,7 @@ describe('NotesOverview', () => {
       error: error,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);
@@ -72,7 +73,7 @@ describe('NotesOverview', () => {
       error: null,
       isLoading: false,
       isValidating: false,
-      mutateVisitNotes: jest.fn(),
+      mutateVisitNotes: vi.fn(),
     });
 
     renderWithSwr(<NotesOverview {...testProps} />);

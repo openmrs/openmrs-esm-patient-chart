@@ -143,6 +143,12 @@
       }
     },
     {
+      "name": "visit-summary",
+      "component": "visitSummary",
+      "online": true,
+      "offline": true
+    },
+    {
       "name": "edit-visit-action-button",
       "slot": "visit-detail-overview-actions",
       "component": "editVisitDetailsActionButton",

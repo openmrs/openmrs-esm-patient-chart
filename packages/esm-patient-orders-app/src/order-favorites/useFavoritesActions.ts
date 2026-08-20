@@ -82,7 +82,10 @@ export function useFavoritesActions() {
       return persistFavorites(updatedFavorites, {
         successTitle: isSingleDelete ? t('orderUnpinned', 'Order unpinned') : t('ordersUnpinned', 'Orders unpinned'),
         successSubtitle: isSingleDelete
-          ? t('orderUnpinnedSubtitle', '{{drugName}} removed from your pinned orders', { drugName: itemName })
+          ? t('orderUnpinnedSubtitle', '{{drugName}} removed from your pinned orders', {
+              drugName: itemName,
+              interpolation: { escapeValue: false },
+            })
           : t('ordersUnpinnedSubtitle', '{{count}} orders removed from your pinned orders', {
               count: favoritesToDelete.length,
             }),

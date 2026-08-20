@@ -118,15 +118,23 @@ const allergyFormSchema = (t: TFunction, otherConceptUuid: string) =>
       }
     });
 
-function AllergyFormWorkspace({
-  closeWorkspace,
-  groupProps: { patient, patientUuid },
-  workspaceProps: { allergy, formContext },
-}: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>) {
+export interface AllergyFormProps {
+  allergy?: Allergy;
+  closeWorkspace: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>['closeWorkspace'];
+  formContext: 'creating' | 'editing';
+  patient: fhir.Patient;
+  patientUuid: string;
+}
+
+// Presentational form, decoupled from how the patient context is sourced. The patient chart and
+// the exported (out-of-chart) workspace each resolve `patient`/`patientUuid` their own way and
+// render this. We never call `usePatient()` here: per O3-4505, only the root chart component loads
+// the patient, to avoid an SWR re-render cascade.
+export function AllergyForm({ allergy, closeWorkspace, formContext, patient, patientUuid }: AllergyFormProps) {
   const { allergens } = useAllergens();
   const { allergicReactions, isLoading: isLoadingReactions } = useAllergicReactions();
   const { concepts } = useConfig<AllergiesConfigObject>();
-  const { allergies, mutate } = useAllergies(patient.id);
+  const { allergies, mutate } = useAllergies(patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const formValuesLoadedRef = useRef(false);
@@ -602,6 +610,26 @@ function AllergyFormWorkspace({
         </div>
       </Form>
     </Workspace2>
+  );
+}
+
+// Chart wrapper: inside the patient chart, `patient`/`patientUuid` come from the chart's workspace
+// group. Hosts outside the chart use `exportedAllergyFormWorkspace` instead, which sources the
+// patient from window props. The optional chaining guards against this workspace being launched
+// without the chart group (it should not be): a non-functional form beats an uncaught TypeError.
+function AllergyFormWorkspace({
+  closeWorkspace,
+  groupProps,
+  workspaceProps: { allergy, formContext },
+}: PatientWorkspace2DefinitionProps<AllergyFormWorkspaceProps, {}>) {
+  return (
+    <AllergyForm
+      allergy={allergy}
+      closeWorkspace={closeWorkspace}
+      formContext={formContext}
+      patient={groupProps?.patient}
+      patientUuid={groupProps?.patientUuid}
+    />
   );
 }
 

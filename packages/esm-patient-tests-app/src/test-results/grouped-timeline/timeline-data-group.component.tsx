@@ -74,9 +74,13 @@ function usePanelDates(subRows: any[]) {
 const PanelHeader: React.FC<{
   panelName: string;
   panelDates: ReturnType<typeof usePanelDates>;
-}> = ({ panelName, panelDates }) => {
+  inOverlay?: boolean;
+}> = ({ panelName, panelDates, inOverlay }) => {
   return (
-    <div className={styles.panelHeader} data-panel-name={panelName}>
+    <div
+      className={classNames(styles.panelHeader, { [styles.panelHeaderOverlay]: inOverlay })}
+      data-panel-name={panelName}
+    >
       <div className={styles.dateHeaderContainer}>
         <div className={styles.dateHeaderInner} style={{ overflowX: 'auto' }}>
           <Grid
@@ -183,12 +187,13 @@ const GridItems = React.memo<{
   zebra: boolean;
 }>(({ sortedTimes, obs, zebra }) => (
   <>
-    {sortedTimes.map((_, i) => {
-      if (!obs[i]) {
+    {sortedTimes.map((time, i) => {
+      const entry = obs.find((o: any) => o?.obsDatetime === time);
+      if (!entry) {
         return <TimelineCell key={i} text={''} zebra={zebra} />;
       }
 
-      return <TimelineCell key={i} text={obs[i].value} interpretation={obs[i].interpretation} zebra={zebra} />;
+      return <TimelineCell key={i} text={entry.value} interpretation={entry.interpretation} zebra={zebra} />;
     })}
   </>
 ));
@@ -234,6 +239,7 @@ export default function TimelineDataGroup({
   subRows,
   xScroll,
   setXScroll,
+  inOverlay,
 }: TimelineDataGroupProps) {
   const panelDates = usePanelDates(subRows);
 
@@ -259,7 +265,7 @@ export default function TimelineDataGroup({
   return (
     <>
       <div>
-        <PanelHeader panelName={parent.display} panelDates={panelDates} />
+        <PanelHeader panelName={parent.display} panelDates={panelDates} inOverlay={inOverlay} />
         <div className={styles.gridContainer} ref={ref}>
           <DataRows
             patientUuid={patientUuid}

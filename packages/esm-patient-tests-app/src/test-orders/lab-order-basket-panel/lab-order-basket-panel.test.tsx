@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, expect, test } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { useOrderType } from '@openmrs/esm-patient-common-lib';
@@ -9,14 +10,14 @@ import LabOrderBasketPanel from './lab-order-basket-panel.extension';
 import { mockPatient } from 'tools';
 import { mockVisit } from '__mocks__';
 
-const mockUseOrderBasket = jest.fn();
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseOrderType = jest.mocked(useOrderType);
+const mockUseOrderBasket = vi.fn();
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseOrderType = vi.mocked(useOrderType);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
   useOrderBasket: () => mockUseOrderBasket(),
-  useOrderType: jest.fn(),
+  useOrderType: vi.fn(),
 }));
 
 mockUseConfig.mockReturnValue({
@@ -40,9 +41,9 @@ mockUseOrderType.mockReturnValue({
 
 const testProps: OrderBasketExtensionProps = {
   patient: mockPatient,
-  launchDrugOrderForm: jest.fn(),
-  launchLabOrderForm: jest.fn(),
-  launchGeneralOrderForm: jest.fn(),
+  launchDrugOrderForm: vi.fn(),
+  launchLabOrderForm: vi.fn(),
+  launchGeneralOrderForm: vi.fn(),
 };
 
 describe('LabOrderBasketPanel', () => {
@@ -80,7 +81,7 @@ describe('LabOrderBasketPanel', () => {
       },
     ];
     let orders = [...labs];
-    const mockSetOrders = jest.fn((newOrders: Array<TestOrderBasketItem>) => {
+    const mockSetOrders = vi.fn((newOrders: Array<TestOrderBasketItem>) => {
       orders = newOrders;
     });
     mockUseOrderBasket.mockImplementation(() => ({

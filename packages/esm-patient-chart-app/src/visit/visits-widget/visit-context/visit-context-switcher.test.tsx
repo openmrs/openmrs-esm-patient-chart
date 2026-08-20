@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSystemVisitSetting } from '@openmrs/esm-patient-common-lib';
@@ -6,46 +7,42 @@ import { mockCurrentVisit, mockVisit2, mockVisit3 } from '__mocks__';
 import { useInfiniteVisits } from '../visit.resource';
 import VisitContextSwitcherModal from './visit-context-switcher.modal';
 
-const mockUseSystemVisitSetting = jest.fn(useSystemVisitSetting).mockReturnValue({
+const mockUseSystemVisitSetting = vi.fn(useSystemVisitSetting).mockReturnValue({
   errorFetchingSystemVisitSetting: null,
   isLoadingSystemVisitSetting: false,
   systemVisitEnabled: true,
 });
 
-const mockUseInfiniteVisits = jest.fn(useInfiniteVisits).mockReturnValue({
+const mockUseInfiniteVisits = vi.fn(useInfiniteVisits).mockReturnValue({
   visits: [mockCurrentVisit, mockVisit2, mockVisit3],
   error: null,
-  mutate: jest.fn(),
+  mutate: vi.fn(),
   isValidating: false,
   isLoading: false,
   totalCount: 3,
   hasMore: false,
-  loadMore: jest.fn(),
+  loadMore: vi.fn(),
   nextUri: '',
 });
 
-jest.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
+vi.mock('@openmrs/esm-patient-common-lib/src/useSystemVisitSetting', () => ({
   useSystemVisitSetting: () => mockUseSystemVisitSetting(),
 }));
 
-jest.mock('../visit.resource', () => ({
+vi.mock('../visit.resource', () => ({
   useInfiniteVisits: () => mockUseInfiniteVisits('some-uuid'),
 }));
 
-const mockSetVisitContext = jest.fn();
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  usePatientChartStore: jest.fn(() => ({
+const mockSetVisitContext = vi.fn();
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  usePatientChartStore: vi.fn(() => ({
     visitContext: null,
     setVisitContext: mockSetVisitContext,
   })),
 }));
 
 describe('VisitContextSwitcherModal', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should display a list of past visits', () => {
     mockUseSystemVisitSetting.mockReturnValueOnce({
       systemVisitEnabled: false,
@@ -78,5 +75,5 @@ describe('VisitContextSwitcherModal', () => {
 });
 
 function renderVisitContextSwitcherModal() {
-  render(<VisitContextSwitcherModal patientUuid="some-uuid" closeModal={jest.fn()} />);
+  render(<VisitContextSwitcherModal patientUuid="some-uuid" closeModal={vi.fn()} />);
 }

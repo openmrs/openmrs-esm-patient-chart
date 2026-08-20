@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
 import { launchWorkspace2, openmrsFetch } from '@openmrs/esm-framework';
@@ -7,8 +8,8 @@ import { mockCareProgramsResponse, mockEnrolledInAllProgramsResponse, mockEnroll
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import ProgramsOverview from './programs-overview.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockLaunchWorkspace = jest.mocked(launchWorkspace2);
+const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
 
 const testProps = {
   basePath: `/patient/${mockPatient.id}/chart`,

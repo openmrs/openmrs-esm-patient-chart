@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
-test('Add and delete a visit note', async ({ page, patient }) => {
+test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
   const visitsPage = new VisitsPage(page);
 
@@ -11,7 +11,7 @@ test('Add and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('And I click the `Visit note` button on the siderail', async () => {
-    await page.getByRole('button', { name: /note/i }).click();
+    await page.getByRole('button', { name: /visit note/i }).click();
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
@@ -37,11 +37,7 @@ test('Add and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByText(/add attachment/i)).toBeVisible();
     await page.getByRole('tab', { name: /upload files/i }).click();
 
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: /drag and drop files here or click to upload/i }).click();
-    const fileChooser = await fileChooserPromise;
-
-    await fileChooser.setFiles('./e2e/support/upload/brainScan.jpeg');
+    await page.locator('input[type="file"]').setInputFiles('./e2e/support/upload/brainScan.jpeg');
     await page.getByLabel(/image name/i).fill('Cross-sectional brain scan');
     await page.getByRole('button', { name: /add attachment/i }).click();
     await expect(page.getByText(/cross-sectional brain scan/i)).toBeVisible();
@@ -74,6 +70,43 @@ test('Add and delete a visit note', async ({ page, patient }) => {
 
   await test.step('Then I should see the newly added visit note', async () => {
     await expect(page.getByText(/this is a note/i)).toBeVisible();
+  });
+
+  await test.step('When I click the `All encounters` tab', async () => {
+    await page.getByRole('tab', { name: /all encounters/i }).click();
+  });
+
+  await test.step('And I open the overflow menu in the visit note row and select `Edit this encounter`', async () => {
+    await page
+      .getByRole('row')
+      .filter({ hasText: /visit note/i })
+      .getByRole('button', { name: /options/i })
+      .click();
+    await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
+  });
+
+  await test.step('Then the visit note form should open in edit mode with the existing note prefilled', async () => {
+    await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
+  });
+
+  await test.step('When I change the note text and click `Save and close`', async () => {
+    await page.getByPlaceholder('Write any notes here').fill('This is an edited note');
+    await page.getByRole('button', { name: /save and close/i }).click();
+  });
+
+  await test.step('Then I should see a success notification', async () => {
+    await expect(page.getByText(/visit note saved/i)).toBeVisible();
+  });
+
+  await test.step('When I reload the visits dashboard and open the `Notes` tab', async () => {
+    await visitsPage.goTo(patient.uuid);
+    await page.getByRole('button', { name: /expand current row/i }).click();
+    await page.getByRole('tab', { name: /notes/i }).click();
+  });
+
+  await test.step('Then I should see the edited note and not the original note', async () => {
+    await expect(page.getByText('This is an edited note')).toBeVisible();
+    await expect(page.getByText('This is a note', { exact: true })).toBeHidden();
   });
 
   await test.step('When I click the `All encounters` tab', async () => {

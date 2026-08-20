@@ -25,7 +25,7 @@ test('Delete a visit from the visit history table', async ({ page, api, patient,
   });
 
   await test.step('When I click on the "Delete visit" button to confirm', async () => {
-    await page.getByRole('button', { name: 'danger Delete visit' }).click();
+    await page.getByRole('button', { name: /delete visit/i }).click();
   });
 
   await test.step('Then I should see a success notification', async () => {

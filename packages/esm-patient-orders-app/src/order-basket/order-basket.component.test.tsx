@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { type LayoutType, useSession, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useOrderBasket, useMutatePatientOrders } from '@openmrs/esm-patient-common-lib';
@@ -6,23 +7,23 @@ import { mockSessionDataResponse } from '__mocks__';
 import { useOrderEncounterForSystemWithVisitDisabled, useProviders } from '../api/api';
 import OrderBasket from './order-basket.component';
 
-const mockUseSession = jest.mocked(useSession);
-const mockUseConfig = jest.mocked(useConfig);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUseOrderBasket = jest.mocked(useOrderBasket);
-const mockUseMutatePatientOrders = jest.mocked(useMutatePatientOrders);
-const mockUseOrderEncounterForSystemWithVisitDisabled = jest.mocked(useOrderEncounterForSystemWithVisitDisabled);
-const mockUseProviders = jest.mocked(useProviders);
+const mockUseSession = vi.mocked(useSession);
+const mockUseConfig = vi.mocked(useConfig);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockUseMutatePatientOrders = vi.mocked(useMutatePatientOrders);
+const mockUseOrderEncounterForSystemWithVisitDisabled = vi.mocked(useOrderEncounterForSystemWithVisitDisabled);
+const mockUseProviders = vi.mocked(useProviders);
 
-jest.mock('@openmrs/esm-patient-common-lib', () => ({
-  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
-  useOrderBasket: jest.fn(),
-  useMutatePatientOrders: jest.fn(),
+vi.mock('@openmrs/esm-patient-common-lib', async () => ({
+  ...((await vi.importActual('@openmrs/esm-patient-common-lib')) as object),
+  useOrderBasket: vi.fn(),
+  useMutatePatientOrders: vi.fn(),
 }));
 
-jest.mock('../api/api', () => ({
-  useOrderEncounterForSystemWithVisitDisabled: jest.fn(),
-  useProviders: jest.fn(),
+vi.mock('../api/api', () => ({
+  useOrderEncounterForSystemWithVisitDisabled: vi.fn(),
+  useProviders: vi.fn(),
 }));
 
 const mockPatientUuid = 'patient-uuid-123';
@@ -36,14 +37,14 @@ const mockVisitContext = {
   visitType: { display: 'Facility Visit' },
 } as any;
 
-const mockCloseWorkspace = jest.fn(() => Promise.resolve(true));
-const mockMutateVisitContext = jest.fn();
+const mockCloseWorkspace = vi.fn(() => Promise.resolve(true));
+const mockMutateVisitContext = vi.fn();
 
 const mockOrderBasketExtensionProps = {
   patient: mockPatient,
-  launchDrugOrderForm: jest.fn(),
-  launchLabOrderForm: jest.fn(),
-  launchGeneralOrderForm: jest.fn(),
+  launchDrugOrderForm: vi.fn(),
+  launchLabOrderForm: vi.fn(),
+  launchGeneralOrderForm: vi.fn(),
 };
 
 const defaultMockConfig = {
@@ -55,24 +56,24 @@ const defaultMockConfig = {
 
 describe('OrderBasket', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockUseLayoutType.mockReturnValue('desktop' as LayoutType);
     mockUseConfig.mockReturnValue(defaultMockConfig);
     mockUseOrderBasket.mockReturnValue({
       orders: [],
-      clearOrders: jest.fn(),
-      setOrders: jest.fn(),
+      clearOrders: vi.fn(),
+      setOrders: vi.fn(),
     } as any);
     mockUseMutatePatientOrders.mockReturnValue({
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     } as any);
     mockUseOrderEncounterForSystemWithVisitDisabled.mockReturnValue({
       visitRequired: false,
       isLoading: false,
       encounterUuid: null,
       error: null,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
     } as any);
     mockUseProviders.mockReturnValue({
       providers: [],

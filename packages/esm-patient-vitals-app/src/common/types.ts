@@ -110,11 +110,15 @@ export interface PatientVitalsAndBiometrics {
   spo2?: number;
   spo2RenderInterpretation?: ObservationInterpretation;
   height?: number;
+  heightRenderInterpretation?: ObservationInterpretation;
   weight?: number;
+  weightRenderInterpretation?: ObservationInterpretation;
   bmi?: number | null;
+  bmiRenderInterpretation?: ObservationInterpretation;
   respiratoryRate?: number;
   respiratoryRateRenderInterpretation?: ObservationInterpretation;
   muac?: number;
+  muacRenderInterpretation?: ObservationInterpretation;
 }
 
 export interface VitalsResponse {

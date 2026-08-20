@@ -29,7 +29,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await expect(biometricsPage.page.getByRole('spinbutton', { name: /bmi/i })).toHaveValue('22.5');
   });
 
-  await test.step('When I fill `25` as the mid upper arm circumference ', async () => {
+  await test.step('When I fill `25` as the mid upper arm circumference', async () => {
     await biometricsPage.page.getByRole('spinbutton', { name: /muac/i }).fill('25');
   });
 

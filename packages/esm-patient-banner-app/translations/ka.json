@@ -9,6 +9,7 @@
   "deceased": "გარდაცვლილია",
   "district": "რაიონი",
   "from_lower": "საიდან",
+  "pastVisitWithDate": "Past visit: {{date}}",
   "postalCode": "საფოსტო კოდი",
   "started": "დაწყებულია",
   "state": "შტატი",

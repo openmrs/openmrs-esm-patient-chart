@@ -17,9 +17,10 @@ import { showModal, useLayoutType, formatDate, parseDate } from '@openmrs/esm-fr
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { type GroupedObservation } from '../../types';
 import styles from './individual-results-table.scss';
+import { formatResultDate } from '../helpers';
 
 interface IndividualResultsTableProps {
-  patientUuid;
+  patientUuid: string;
   isLoading: boolean;
   subRows: GroupedObservation;
   index: number;
@@ -81,7 +82,8 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
 
   const tableHeaders = useMemo(() => {
     return [
-      { key: 'testName', header: t('testName', 'Test Name') },
+      { key: 'testName', header: t('testName', 'Test name') },
+      { key: 'resultDate', header: t('resultDate', 'Result date') },
       {
         key: 'value',
         header: t('value', 'Value'),
@@ -92,8 +94,7 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
 
   const tableRows = useMemo(
     () =>
-      subRows?.entries.length &&
-      subRows.entries.map((row, i) => {
+      subRows?.entries?.map((row, i) => {
         // Use observation-level range/units if available, otherwise fallback to node-level
         // MappedObservation has range and units fields, but they may come from node-level
         const displayRange = row.range ?? '';
@@ -119,13 +120,14 @@ const IndividualResultsTable: React.FC<IndividualResultsTableProps> = ({
               )}
             </span>
           ),
+          resultDate: formatResultDate(row.obsDatetime),
           value: {
             value: `${row.value} ${displayUnits}`,
             interpretation: row?.interpretation,
           },
           referenceRange: referenceRangeDisplay,
         };
-      }),
+      }) ?? [],
     [index, subRows, launchResultsDialog],
   );
 

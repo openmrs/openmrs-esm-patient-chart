@@ -19,12 +19,12 @@
     "test": {
       "inputs": [
         "src/**",
-        "__mocks__/**",
-        "mock.ts",
-        "mock-jest.ts",
-        "mock-jest.tsx",
         "vitest.config.ts",
-        "setup-tests.ts"
+        "$TURBO_ROOT$/tools/vitest.shared.ts",
+        "$TURBO_ROOT$/tools/setup-tests.ts",
+        "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/index.ts",
+        "$TURBO_ROOT$/__mocks__/**"
       ]
     },
     "test:watch": {
@@ -34,25 +34,40 @@
     "coverage": {
       "inputs": [
         "src/**",
-        "__mocks__/**",
-        "mock.ts",
-        "mock-jest.ts",
-        "mock-jest.tsx",
         "vitest.config.ts",
-        "setup-tests.ts"
+        "$TURBO_ROOT$/tools/vitest.shared.ts",
+        "$TURBO_ROOT$/tools/setup-tests.ts",
+        "$TURBO_ROOT$/tools/test-utils.tsx",
+        "$TURBO_ROOT$/tools/index.ts",
+        "$TURBO_ROOT$/__mocks__/**"
       ],
       "outputs": ["coverage/**"]
     },
     "lint": {
       "inputs": [
         "src/**/*.{ts,tsx}",
-        "$TURBO_ROOT$/.eslintrc"
+        "$TURBO_ROOT$/eslint.config.mjs"
+      ]
+    },
+    "//#lint": {
+      "inputs": [
+        "e2e/**/*.{ts,tsx}",
+        "eslint.config.mjs"
       ]
     },
     "typescript": {
       "dependsOn": ["^typescript"],
       "inputs": [
         "src/**",
+        "tsconfig.json"
+      ]
+    },
+    "//#typescript": {
+      "inputs": [
+        "e2e/**",
+        "packages/esm-patient-common-lib/package.json",
+        "packages/esm-patient-common-lib/src/**",
+        "playwright.config.ts",
         "tsconfig.json"
       ]
     },

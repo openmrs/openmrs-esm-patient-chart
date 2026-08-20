@@ -1,4 +1,8 @@
 import React from 'react';
+import i18n from 'i18next';
+import type * as I18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,8 +15,9 @@ import {
   mockVitalsConceptMetadata,
   mockVitalsConfig,
 } from '__mocks__';
+import enTranslations from '../../translations/en.json';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics } from '../common';
+import { type PatientVitalsAndBiometrics, useVitalsAndBiometrics, useVitalsConceptMetadata } from '../common';
 import VitalsHeader from './vitals-header.extension';
 
 const testProps = {
@@ -22,37 +27,57 @@ const testProps = {
   patient: mockPatient,
 };
 
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseVitalsAndBiometrics = jest.mocked(useVitalsAndBiometrics);
-const mockNumericObservation = jest.mocked(NumericObservation);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseVitalsAndBiometrics = vi.mocked(useVitalsAndBiometrics);
+const mockNumericObservation = vi.mocked(NumericObservation);
+const mockUseVitalsConceptMetadata = vi.mocked(useVitalsConceptMetadata);
 
-const mockLaunchWorkspaceRequiringVisit = jest.fn();
-const mockUseLaunchWorkspaceRequiringVisit = jest.fn().mockImplementation((name) => {
+const mockLaunchWorkspaceRequiringVisit = vi.fn();
+const mockUseLaunchWorkspaceRequiringVisit = vi.fn().mockImplementation((name) => {
   return () => mockLaunchWorkspaceRequiringVisit(name);
 });
 
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const originalModule = (await vi.importActual('@openmrs/esm-patient-common-lib')) as object;
 
   return {
     ...originalModule,
-    useLaunchWorkspaceRequiringVisit: jest.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
+    useLaunchWorkspaceRequiringVisit: vi.fn().mockImplementation(() => mockUseLaunchWorkspaceRequiringVisit),
   };
 });
 
-jest.mock('../common/data.resource', () => {
-  const originalModule = jest.requireActual('../common/data.resource');
+vi.mock('../common/data.resource', async () => {
+  const originalModule = (await vi.importActual('../common/data.resource')) as object;
 
   return {
     ...originalModule,
-    useConceptUnits: jest.fn().mockImplementation(() => ({
+    useConceptUnits: vi.fn().mockImplementation(() => ({
       conceptUnits: mockConceptUnits,
       error: null,
       isLoading: false,
     })),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => mockVitalsConceptMetadata),
-    useVitalsAndBiometrics: jest.fn(),
+    useVitalsConceptMetadata: vi.fn(),
+    useVitalsAndBiometrics: vi.fn(),
   };
+});
+
+// Use the real react-i18next (not the shared passthrough mock, which does not implement
+// pluralization) so the overdue tag renders the actual plural forms from en.json. The alias
+// only matches the bare "react-i18next" specifier, so resolving the absolute path bypasses it.
+vi.mock('react-i18next', async () => {
+  const { createRequire } = await import('node:module');
+  return vi.importActual(createRequire(import.meta.url).resolve('react-i18next'));
+});
+
+// The @openmrs/esm-framework mock stubs `window.i18next`, but @openmrs/esm-translations registers
+// an "initialized" hook that calls `window.i18next.loadNamespaces`. Point the global at the real
+// instance (as the app shell does) so init does not crash.
+window.i18next = i18n;
+
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  interpolation: { escapeValue: false },
+  resources: { en: { translation: enTranslations } },
 });
 
 mockUseConfig.mockReturnValue({
@@ -61,6 +86,12 @@ mockUseConfig.mockReturnValue({
 } as ConfigObject);
 
 describe('VitalsHeader', () => {
+  beforeEach(() => {
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+  });
+
   it('renders an empty state view when there are no vitals data to show', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
       data: [],
@@ -145,7 +176,7 @@ describe('VitalsHeader', () => {
 
     await waitForLoadingToFinish();
 
-    expect(getByTextWithMarkup(/These vitals are 5 day old/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/These vitals are 5 days old/i)).toBeInTheDocument();
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
@@ -312,7 +343,7 @@ describe('VitalsHeader', () => {
   });
 
   it('resolves plural translation keys correctly', async () => {
-    const { createInstance } = jest.requireActual('i18next');
+    const { createInstance } = (await vi.importActual('i18next')) as typeof I18next;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const translations = require('../../translations/en.json');
     const i18n = createInstance();
@@ -371,6 +402,59 @@ describe('VitalsHeader', () => {
       ([props]) => props.conceptUuid && !props.interpretation,
     );
     expect(callsWithoutBpAndWithoutInterpretation.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('shows the reference ranges toggletip button when conceptRangeMap has entries', async () => {
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('button', { name: /view normal ranges/i })).toBeInTheDocument();
+  });
+
+  it('hides the reference ranges toggletip button when conceptRangeMap is empty', async () => {
+    mockUseVitalsConceptMetadata.mockReturnValue({
+      ...mockVitalsConceptMetadata,
+      conceptRangeMap: new Map(),
+    } as ReturnType<typeof useVitalsConceptMetadata>);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.queryByRole('button', { name: /view normal ranges/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the reference ranges panel with correct content when the toggletip button is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockUseVitalsConceptMetadata.mockReturnValue(
+      mockVitalsConceptMetadata as ReturnType<typeof useVitalsConceptMetadata>,
+    );
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [formattedVitals[0]],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<VitalsHeader {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    const toggletipButton = screen.getByRole('button', { name: /view normal ranges/i });
+    await user.click(toggletipButton);
+
+    expect(screen.getByText(/normal ranges/i)).toBeInTheDocument();
+    // Assert on actual range values from mock data to confirm rows are populated
+    expect(screen.getByText('90–120 / 60–80 mmHg')).toBeInTheDocument(); // BP range
+    expect(screen.getByText('60–100 beats/min')).toBeInTheDocument(); // pulse range
   });
 
   it('hides BMI in vitals header when bmiMinimumAge is set and patient is under the minimum age', async () => {
