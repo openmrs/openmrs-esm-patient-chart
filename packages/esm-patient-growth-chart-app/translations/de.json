@@ -1,0 +1,19 @@
+{
+  "ageInMonths": "Alter (Monate)",
+  "editPatientDetails": "Patientendaten bearbeiten",
+  "errorDataUnavailable": "Keine Patientendaten verfügbar",
+  "femaleReference": "Weibliche Referenz",
+  "Growth chart": "Wachstumskurve",
+  "growthChart": "Wachstumskurve",
+  "growthChartAgeUnavailable": "Es stehen Wachstumskurven für Kinder von der Geburt bis zum Alter von 5 Jahren zur Verfügung.",
+  "growthChartUnavailable": "Wachstumskurve nicht verfügbar",
+  "maleReference": "Männliche Referenz",
+  "noGrowthChartsToDisplay": "Es sind keine Wachstumskurven vorhanden",
+  "patientWeight": "Gewicht des Patienten",
+  "referenceChart": "Bezugstabelle",
+  "referenceChartPrompt": "Wählen Sie eine Bezugstabelle aus, um fortzufahren.",
+  "showingReferenceChart": "Es wird das Diagramm {{selectedReferenceChart}} angezeigt. Das erfasste Geschlecht des Patienten lautet {{patientGender}}.",
+  "unknownGender": "Das erfasste Geschlecht dieses Patienten ist unbekannt oder „Sonstiges“.",
+  "weightForAge": "Gewicht im Verhältnis zum Alter, von der Geburt bis zum 5. Lebensjahr",
+  "weightKg": "Gewicht (kg)"
+}

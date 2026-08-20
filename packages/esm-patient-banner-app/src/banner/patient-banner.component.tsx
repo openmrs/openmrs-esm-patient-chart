@@ -89,9 +89,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
       {showContactDetails && (
         <div
           className={classNames(styles.contactDetails, {
-            [styles.deceasedContactDetails]: patient.deceasedBoolean,
             [styles.tabletContactDetails]: isTabletViewport,
           })}
+          data-testid="patient-banner-contact-details"
         >
           <PatientBannerContactDetails deceased={isDeceased} patientId={patient?.id} />
         </div>

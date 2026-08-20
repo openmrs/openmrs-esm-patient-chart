@@ -344,11 +344,14 @@ export function useVisitFormSchemaAndDefaultValues(visitToEdit: Visit, earliestA
               message: t('futureEndTime', 'End time cannot be in the future'),
               path: ['visitStopTime'],
             });
-          } else if (visitStopDateTime < visitStartDateTime) {
+          } else if (visitStartDateTime !== null && visitStopDateTime < visitStartDateTime) {
+            // When both fall on the same day it is the time, not the date, that is out of
+            // order, so flag the time field. Otherwise the stop date itself is the culprit.
+            const isSameDay = dayjs(visitStopDate).isSame(visitStartDate, 'day');
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t('endTimeMustBeAfterStartTime', 'End time must be after start time'),
-              path: ['visitStopDate'],
+              path: [isSameDay ? 'visitStopTime' : 'visitStopDate'],
             });
           } else if (visitStopDateTime.getTime() < lastEncounterDateTime) {
             ctx.addIssue({

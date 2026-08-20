@@ -120,7 +120,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ patientUuid, activeVisit, onC
     if (isEditMode && existingTask) {
       const formattedDueDate =
         existingTask.dueDate?.type === 'DATE' && existingTask.dueDate?.date
-          ? existingTask.dueDate.date.toISOString().split('T')[0]
+          ? existingTask.dueDate.date.toISOString()
           : undefined;
 
       reset({
