@@ -51,7 +51,7 @@ export const configSchemaSwitchable = {
       },
       decimalPlaces: {
         _type: Type.Number,
-        _validator: [validators.inRange(0, 10)],
+        _validators: [validators.inRange(0, 10)],
       },
     },
     _default: [
