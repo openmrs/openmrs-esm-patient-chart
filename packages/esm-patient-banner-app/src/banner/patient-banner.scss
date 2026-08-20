@@ -12,11 +12,6 @@
   background-color: $ui-01;
 }
 
-// Differentiate the header for deceased patients with a somber, dark grey band, lightening the
-// text and icons that sit directly on it. Carbon components that carry their own light surfaces
-// (identifier/status tags, the actions overflow-menu popover, and toggletip/popover content) are
-// excluded from the recolour so their dark-on-light text is never flipped to light-on-light. The
-// exclusions use attribute selectors so CSS Modules leaves the global Carbon class names alone.
 .deceasedPatientContainer {
   background-color: colors.$gray-70;
   // Carbon's ghost-button focus ring defaults to blue ($focus, #0f62fe), which is only 1.56:1
@@ -31,12 +26,8 @@
     outline-color: colors.$white;
   }
 
-  // Lighten the plain name/gender/demographics/contact-details text so it reads on the band. The
-  // exclusions cover both the ROOT and descendants of Carbon components that carry their own light
-  // surfaces — identifier/status tags, the actions overflow-menu popover, and toggletip/popover
-  // content — so their dark-on-light text is never flipped to light-on-light. (li/div are included
-  // because the contact-details panel renders its values in them; without this they'd inherit the
-  // wrapper's $text-02, which is the same grey as the band.)
+  // `li` and `div` include contact-detail values, which would otherwise inherit the wrapper's
+  // $text-02. Attribute selectors keep Carbon component classes global under CSS Modules.
   :is(span, p, a, li, div, h1, h2, h3, h4, h5, h6):not(
       [class*='cds--tag'],
       [class*='cds--tag'] *,
@@ -60,9 +51,7 @@
     fill: colors.$gray-10;
   }
 
-  // The "Show more / Show less" toggle is a Carbon ghost button whose label + chevron are link
-  // blue — readable on the white banner, but far too low-contrast on the dark band. Force both
-  // light. The icon needs !important to beat the base .toggleContactDetailsButton rule below.
+  // !important beats the base icon rule below.
   .toggleContactDetailsButton {
     color: colors.$gray-10;
 

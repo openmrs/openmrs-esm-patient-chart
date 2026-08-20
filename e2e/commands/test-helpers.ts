@@ -12,6 +12,75 @@ export async function getBackgroundColor(element: Locator): Promise<string> {
   return await element.evaluate((el) => window.getComputedStyle(el).backgroundColor);
 }
 
+type ColorProperty = 'backgroundColor' | 'color';
+
+function parseOpaqueRgb(color: string): [number, number, number] {
+  if (!/^rgba?\(/i.test(color)) {
+    throw new Error(`Unsupported computed color format: ${color}`);
+  }
+
+  const components = color
+    .slice(color.indexOf('(') + 1, -1)
+    .replace('/', ' ')
+    .split(/[\s,]+/)
+    .filter(Boolean);
+
+  if (components.length < 3 || components.slice(0, 3).some((component) => component.endsWith('%'))) {
+    throw new Error(`Unsupported computed color format: ${color}`);
+  }
+
+  const [red, green, blue] = components.slice(0, 3).map(Number);
+  const alphaComponent = components[3];
+  const alpha = alphaComponent
+    ? alphaComponent.endsWith('%')
+      ? Number(alphaComponent.slice(0, -1)) / 100
+      : Number(alphaComponent)
+    : 1;
+
+  if ([red, green, blue, alpha].some((component) => !Number.isFinite(component))) {
+    throw new Error(`Unsupported computed color format: ${color}`);
+  }
+
+  if (alpha !== 1) {
+    throw new Error(`Cannot calculate contrast for a non-opaque computed color: ${color}`);
+  }
+
+  return [red, green, blue];
+}
+
+function relativeLuminance([red, green, blue]: [number, number, number]): number {
+  return [red, green, blue]
+    .map((value) => value / 255)
+    .map((value) => (value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4)))
+    .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+}
+
+async function getContrastRatio(
+  firstElement: Locator,
+  secondElement: Locator,
+  firstProperty: ColorProperty,
+  secondProperty: ColorProperty,
+): Promise<number> {
+  const [firstColor, secondColor] = await Promise.all([
+    firstElement.evaluate((element, property) => window.getComputedStyle(element)[property], firstProperty),
+    secondElement.evaluate((element, property) => window.getComputedStyle(element)[property], secondProperty),
+  ]);
+  const [lighter, darker] = [
+    relativeLuminance(parseOpaqueRgb(firstColor)),
+    relativeLuminance(parseOpaqueRgb(secondColor)),
+  ].sort((first, second) => second - first);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+export async function getTextContrastRatio(text: Locator, surface: Locator): Promise<number> {
+  return getContrastRatio(text, surface, 'color', 'backgroundColor');
+}
+
+export async function getBackgroundContrastRatio(element: Locator, surface: Locator): Promise<number> {
+  return getContrastRatio(element, surface, 'backgroundColor', 'backgroundColor');
+}
+
 // Background color + trailing ↑/↓ indicator the vitals table renders for each interpretation level
 // (the NumericObservation `cell` variant in @openmrs/esm-styleguide). The indicator is emitted as CSS
 // `::after` content, which the browser also folds into the cell's accessible name — so the same string
