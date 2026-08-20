@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -12,10 +12,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  type DataTableSortState,
 } from '@carbon/react';
 import { NumericObservation, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { noopSortRow, useTableSorting } from '../common';
 import type { VitalsTableHeader, VitalsTableRow } from './types';
 import { VitalsAndBiometricsActionMenu } from '../components/action-menu/vitals-biometrics-action-menu.component';
 import styles from './paginated-vitals.scss';
@@ -31,8 +31,6 @@ interface PaginatedVitalsProps {
   patient: fhir.Patient;
 }
 
-const noopSortRow = () => 0;
-
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   isPrinting,
   pageSize,
@@ -46,42 +44,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
-  const [sortParams, setSortParams] = useState<{ key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' }>({
-    key: '',
-    sortDirection: 'NONE',
-  });
-
-  // Carbon only ever sorts the rows it was handed, which is a single page. We sort
-  // the full dataset ourselves instead, so the comparator stays inert and the sort
-  // state is read from the header's click handler, which Carbon calls exactly once
-  // per click with the state it is transitioning to.
-  const handleSortHeaderClick = (
-    _event: unknown,
-    { sortHeaderKey, sortDirection }: { sortHeaderKey: string; sortDirection: DataTableSortState },
-  ) => {
-    setSortParams({ key: sortDirection === 'NONE' ? '' : sortHeaderKey, sortDirection });
-  };
-
-  const sortedData: Array<VitalsTableRow> = useMemo(() => {
-    if (sortParams.sortDirection === 'NONE') {
-      return tableRows;
-    }
-
-    const header = tableHeaders.find((header) => header.key === sortParams.key);
-
-    if (!header) {
-      return tableRows;
-    }
-
-    // `sortFunc` compares in ascending order, so it maps directly onto the ASC
-    // sort direction and needs inverting for DESC.
-    const sortedRows = tableRows.slice().sort((rowA, rowB) => {
-      const sortingNum = header.sortFunc(rowA, rowB);
-      return sortParams.sortDirection === 'DESC' ? -sortingNum : sortingNum;
-    });
-
-    return sortedRows;
-  }, [tableHeaders, tableRows, sortParams]);
+  const { handleSortHeaderClick, sortedData } = useTableSorting<VitalsTableRow>(tableRows, tableHeaders);
 
   const { results: paginatedVitals, goTo, currentPage } = usePagination(sortedData, pageSize);
 

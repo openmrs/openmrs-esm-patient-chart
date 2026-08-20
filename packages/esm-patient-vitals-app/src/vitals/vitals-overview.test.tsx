@@ -46,6 +46,13 @@ mockUseConfig.mockReturnValue({
   mockVitalsConfig,
 } as ConfigObject);
 
+const getRowDates = () =>
+  screen
+    .getAllByRole('row')
+    .slice(1) // Exclude the header row
+    .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+    .filter(Boolean);
+
 describe('VitalsOverview', () => {
   it('renders an empty state view if vitals data is unavailable', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
@@ -123,13 +130,6 @@ describe('VitalsOverview', () => {
     await waitForLoadingToFinish();
     expect(screen.getByRole('table', { name: /vitals/i })).toBeInTheDocument();
 
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude the header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
-        .filter(Boolean);
-
     const expectedDescendingOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021', '08 — Apr — 2021'];
     const expectedAscendingOrder = [...expectedDescendingOrder].reverse();
 
@@ -162,21 +162,14 @@ describe('VitalsOverview', () => {
 
     await waitForLoadingToFinish();
 
-    const getVisibleDate = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude the header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
-        .filter(Boolean);
-
-    expect(getVisibleDate()).toEqual(['19 — May — 2021']);
+    expect(getRowDates()).toEqual(['19 — May — 2021']);
 
     const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
 
     await user.click(screen.getByRole('button', { name: /date and time/i }));
 
     expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
-    expect(getVisibleDate()).toEqual(['08 — Apr — 2021']);
+    expect(getRowDates()).toEqual(['08 — Apr — 2021']);
   });
 
   it('restores the unsorted order once the header cycles back to none', async () => {
@@ -193,13 +186,6 @@ describe('VitalsOverview', () => {
     renderWithSwr(<VitalsOverview {...testProps} />);
 
     await waitForLoadingToFinish();
-
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude the header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
-        .filter(Boolean);
 
     const unsortedOrder = ['19 — May — 2021', '10 — May — 2021', '07 — May — 2021'];
     expect(getRowDates()).toEqual(unsortedOrder);

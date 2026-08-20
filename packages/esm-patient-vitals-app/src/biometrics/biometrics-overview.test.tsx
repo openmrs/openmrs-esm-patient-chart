@@ -41,6 +41,13 @@ mockUseConfig.mockReturnValue({
   ...mockBiometricsConfig,
 } as ConfigObject);
 
+const getRowDates = () =>
+  screen
+    .getAllByRole('row')
+    .slice(1) // Exclude the header row
+    .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+    .filter(Boolean);
+
 describe('Biometrics Overview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
     mockUseVitalsAndBiometrics.mockReturnValue({
@@ -115,25 +122,19 @@ describe('Biometrics Overview', () => {
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
 
     const expectedDescendingOrder = [
-      '12 — Aug — 2021, 12:00 AM',
-      '18 — Jun — 2021, 12:00 AM',
-      '10 — Jun — 2021, 12:00 AM',
-      '26 — May — 2021, 12:00 AM',
-      '10 — May — 2021, 12:00 AM',
+      '12 — Aug — 2021',
+      '18 — Jun — 2021',
+      '10 — Jun — 2021',
+      '26 — May — 2021',
+      '10 — May — 2021',
     ];
     const expectedAscendingOrder = [
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '09 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '09 — Dec — 2020',
     ];
-
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}, \d{1,2}:\d{2} (AM|PM)/)?.[0] || '');
 
     // Initial state should be descending
     expect(getRowDates()).toEqual(expectedDescendingOrder);
@@ -172,13 +173,6 @@ describe('Biometrics Overview', () => {
     await waitForLoadingToFinish();
     await screen.findByRole('table', { name: /biometrics/i });
 
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude the header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
-        .filter(Boolean);
-
     await user.click(screen.getByRole('button', { name: /next page/i }));
     expect(getRowDates()).toEqual(['08 — Apr — 2021']);
 
@@ -210,13 +204,6 @@ describe('Biometrics Overview', () => {
 
     await waitForLoadingToFinish();
     await screen.findByRole('table', { name: /biometrics/i });
-
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude the header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
-        .filter(Boolean);
 
     const unsortedOrder = ['12 — Aug — 2021', '18 — Jun — 2021', '10 — Jun — 2021'];
     expect(getRowDates()).toEqual(unsortedOrder);
