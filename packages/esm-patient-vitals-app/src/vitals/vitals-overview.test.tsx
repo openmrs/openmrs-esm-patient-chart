@@ -43,7 +43,7 @@ vi.mock('../common', async () => {
 
 mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
-  mockVitalsConfig,
+  ...mockVitalsConfig,
 } as ConfigObject);
 
 const getRowDates = () =>
