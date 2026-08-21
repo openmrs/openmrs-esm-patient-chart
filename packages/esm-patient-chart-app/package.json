@@ -41,6 +41,7 @@
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
+    "@carbon/icons-react": "11.x",
     "@carbon/react": "1.x",
     "@openmrs/esm-framework": "10.x",
     "@openmrs/esm-patient-common-lib": "*",

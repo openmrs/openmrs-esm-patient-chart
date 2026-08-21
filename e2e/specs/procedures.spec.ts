@@ -143,7 +143,10 @@ test('Record, edit and delete a procedure', async ({ page, patient }) => {
   });
 
   await test.step('When I click the "Delete" button in the modal', async () => {
-    await page.getByRole('button', { name: /danger delete/i }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /(danger\s*)?delete/i })
+      .click();
   });
 
   await test.step('Then I should see a "Procedure deleted" success notification', async () => {
