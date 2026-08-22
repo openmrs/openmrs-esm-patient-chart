@@ -31,6 +31,13 @@ export interface EncountersTableProps {
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   isSelectable: boolean;
   canPrintEncounters: boolean;
+  /**
+   * Called instead of launching the chart's own edit workspaces, with the encounter to edit and whether it is
+   * a visit note (as opposed to a form). Hosts embedding this table outside the chart need to supply this:
+   * the chart's edit workspaces belong to the `patient-chart` workspace group, which is scoped to chart URLs
+   * and whose group props only the chart populates.
+   */
+  onEditEncounter?: (encounter: MappedEncounter, isVisitNote: boolean) => void;
 }
 
 export interface MappedEncounter {
