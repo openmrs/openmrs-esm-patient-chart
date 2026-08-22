@@ -201,6 +201,13 @@ describe('VisitSummary encounter editing', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
     mockUserHasAccess.mockReturnValue(true);
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: mockVisitWithEncounters.encounters,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
   });
 
   it('passes onEditEncounter down to the encounters tab', async () => {
@@ -224,8 +231,15 @@ describe('VisitSummary encounter editing', () => {
   it('passes onEditEncounter down to the timeline', async () => {
     const user = userEvent.setup();
     const onEditEncounter = vi.fn();
-    // The timeline offers one actions menu per encounter, so keep the visit to the one being edited
     const visitWithVisitNoteOnly = { ...mockVisitWithEncounters, encounters: [mockVisitNoteEncounter] };
+
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: [mockVisitNoteEncounter],
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
 
     renderWithSwr(
       <VisitSummary patientUuid={mockPatient.id} visit={visitWithVisitNoteOnly} onEditEncounter={onEditEncounter} />,
@@ -259,9 +273,19 @@ describe('VisitSummary encounter editing', () => {
         resources: [{ uuid: 'r1', name: jsonSchemaResourceName, valueReference: '{}' }],
       },
     };
+    const allEncounters = [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter];
+
+    mockUseVisitEncounters.mockReturnValue({
+      encounters: allEncounters,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
     const visitWithCompletedForm = {
       ...mockVisitWithEncounters,
-      encounters: [...mockVisitWithEncounters.encounters, mockCompletedFormEncounter],
+      encounters: allEncounters,
     };
 
     renderWithSwr(
