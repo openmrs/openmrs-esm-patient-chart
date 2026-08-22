@@ -1,35 +1,7 @@
 import { expect } from '@playwright/test';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import { generateRandomTestOrder, deleteTestOrder, createEncounter, deleteEncounter, getProvider } from '../commands';
-import { type Encounter } from '../commands/types';
-import { test as base } from '../core';
-import { OrdersPage, ResultsViewerPage } from '../pages';
-
-interface ExistingLabOrderFixture {
-  existingLabOrder: {
-    testOrder: Order;
-    encounter: Encounter;
-  };
-}
-
-const test = base.extend<ExistingLabOrderFixture>({
-  existingLabOrder: async ({ api, patient, visit }, use) => {
-    const orderer = await getProvider(api);
-    const encounter = await createEncounter(api, patient.uuid, orderer.uuid, visit);
-    const testOrder = await generateRandomTestOrder(api, patient.uuid, encounter, orderer.uuid);
-
-    try {
-      await use({ testOrder, encounter });
-    } finally {
-      if (testOrder?.uuid) {
-        await deleteTestOrder(api, testOrder.uuid);
-      }
-      if (encounter?.uuid) {
-        await deleteEncounter(api, encounter.uuid);
-      }
-    }
-  },
-});
+import { test } from '../core/lab-fixtures';
+import { expectLabResultInResultsViewer } from '../commands/test-helpers';
+import { OrdersPage } from '../pages';
 
 test.describe('Running laboratory order tests sequentially', () => {
   test('Record a lab order', async ({ page, patient }) => {
@@ -119,11 +91,11 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
 
     await test.step('Then I click on Add results action', async () => {
       await page.getByRole('menuitem', { name: 'Add results' }).click();
-      await expect(page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' })).toBeVisible();
+      await expect(page.getByRole('spinbutton', { name: conceptName })).toBeVisible();
     });
 
     await test.step('Then I fill in the lab result and click save', async () => {
-      await page.getByRole('spinbutton', { name: 'Serum glucose (>= 0 mg/dl)' }).fill('55');
+      await page.getByRole('spinbutton', { name: conceptName }).fill('55');
       await page.getByRole('button', { name: 'Save and close' }).click();
     });
 
@@ -131,18 +103,8 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await expect(page.getByText(/Lab results for .* have been successfully updated/i)).toBeVisible();
     });
 
-    await test.step('When I navigate to the Results Viewer page', async () => {
-      const resultsViewerPage = new ResultsViewerPage(page);
-      await resultsViewerPage.goTo(patient.uuid);
-    });
-
-    await test.step('And I click on the Individual tests tab', async () => {
-      await page.getByRole('tab', { name: /individual tests/i }).click();
-    });
-
-    await test.step('Then I should see the saved lab result in the results viewer', async () => {
-      const row = page.getByRole('row').filter({ hasText: conceptName }).filter({ hasText: '55' }).first();
-      await expect(row).toBeVisible();
+    await test.step('Then I should see the saved lab result in the Results Viewer', async () => {
+      await expectLabResultInResultsViewer(page, patient.uuid, conceptName, '55');
     });
   });
 

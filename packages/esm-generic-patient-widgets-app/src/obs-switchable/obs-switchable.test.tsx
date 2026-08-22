@@ -388,4 +388,174 @@ describe('ObsSwitchable', () => {
       {},
     );
   });
+
+  it('renders obs that have no encounter in their own rows', () => {
+    const observations = [
+      {
+        id: 'obs-a',
+        code: { text: 'Height' },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-02-01T00:00:00Z',
+        valueQuantity: { value: 182 },
+        encounter: { reference: 'Encounter/234' },
+      },
+      {
+        id: 'obs-b',
+        code: { text: 'Height' },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-01-01T00:00:00Z',
+        valueQuantity: { value: 180 },
+      },
+    ] as Array<ObsResult>;
+    mockUseObs.mockReturnValue({
+      data: { observations, concepts: mockConceptData, encounters: [mockEncounters[1]] },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('182');
+    expect(screen.getAllByRole('row')[2]).toHaveTextContent('180');
+  });
+
+  it('sorts by encounter type without crashing when an obs has no encounter', async () => {
+    const observations = [
+      {
+        id: 'obs-a',
+        code: { text: 'Height' },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-02-01T00:00:00Z',
+        valueQuantity: { value: 182 },
+        encounter: { reference: 'Encounter/234', name: 'Outpatient Visit' },
+      },
+      {
+        id: 'obs-b',
+        code: { text: 'Height' },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-01-01T00:00:00Z',
+        valueQuantity: { value: 180 },
+      },
+    ] as Array<ObsResult>;
+    mockUseObs.mockReturnValue({
+      data: { observations, concepts: mockConceptData, encounters: [mockEncounters[1]] },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      showEncounterType: true,
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Encounter type'));
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('row')).toHaveLength(3);
+    });
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('Outpatient Visit');
+    expect(screen.getAllByRole('row')[2]).toHaveTextContent('--');
+  });
+
+  it('honors decimalPlaces: 0 for fractional values', () => {
+    const observations = [
+      {
+        id: 'obs-a',
+        code: { text: 'Height' },
+        conceptUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-02-01T00:00:00Z',
+        valueQuantity: { value: 9.4 },
+        encounter: { reference: 'Encounter/234' },
+      },
+    ] as Array<ObsResult>;
+    mockUseObs.mockReturnValue({
+      data: { observations, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      data: [{ concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', decimalPlaces: 0 }],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    expect(screen.getByText('9')).toBeInTheDocument();
+  });
+
+  it('sorts numeric columns by value, not display string', async () => {
+    const observations = [
+      {
+        id: 'obs-a',
+        code: { text: 'Weight' },
+        conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-02-01T00:00:00Z',
+        valueQuantity: { value: 9.5 },
+        encounter: { reference: 'Encounter/234' },
+      },
+      {
+        id: 'obs-b',
+        code: { text: 'Weight' },
+        conceptUuid: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        dataType: 'Numeric',
+        effectiveDateTime: '2021-01-01T00:00:00Z',
+        valueQuantity: { value: 12.5 },
+        encounter: { reference: 'Encounter/123' },
+      },
+    ] as Array<ObsResult>;
+    mockUseObs.mockReturnValue({
+      data: { observations, concepts: mockConceptData, encounters: mockEncounters },
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseConfig.mockReturnValue({
+      ...(getDefaultsFromConfigSchema(configSchemaSwitchable) as object),
+      title: 'My Stats',
+      data: [{ concept: '2154AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }],
+    });
+
+    render(<ObsSwitchable patientUuid="123" />);
+
+    const user = userEvent.setup();
+    const weightHeader = screen.getByText('Weight');
+
+    // First click: ASC, smallest value first
+    await user.click(weightHeader);
+    await waitFor(() => {
+      expect(screen.getAllByRole('row')[1]).toHaveTextContent('9.50');
+    });
+    expect(screen.getAllByRole('row')[2]).toHaveTextContent('12.50');
+
+    // Second click: DESC, largest value first
+    await user.click(weightHeader);
+    await waitFor(() => {
+      expect(screen.getAllByRole('row')[1]).toHaveTextContent('12.50');
+    });
+    expect(screen.getAllByRole('row')[2]).toHaveTextContent('9.50');
+  });
 });

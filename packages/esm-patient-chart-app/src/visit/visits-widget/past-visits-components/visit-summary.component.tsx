@@ -17,7 +17,8 @@ import {
 import type { ChartConfig } from '../../../config-schema';
 import type { Note, Order, OrderItem } from '../visit.resource';
 import { useVisitEncounters } from '../visit.resource';
-import { encounterHasJsonSchemaForm } from './encounters-table/encounters-table.resource';
+import { encounterHasJsonSchemaForm, type EncountersTableProps } from './encounters-table/encounters-table.resource';
+
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -30,6 +31,7 @@ interface VisitSummaryProps {
   visit: Visit;
   emrapiDiagnoses?: Array<Diagnosis>;
   patientUuid: string;
+  onEditEncounter?: EncountersTableProps['onEditEncounter'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
@@ -40,7 +42,7 @@ const VisitDetailLoading: React.FC = () => {
   return <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 };
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = [], patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = [], patientUuid, onEditEncounter }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -149,7 +151,11 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = []
             {isLoadingEncounters ? (
               <VisitDetailLoading />
             ) : (
-              <VisitTimeline visitUuid={visit.uuid} patientUuid={patientUuid} />
+              <VisitTimeline
+                visit={{ ...visit, encounters: encounters ?? [] }}
+                patientUuid={patientUuid}
+                onEditEncounter={onEditEncounter}
+              />
             )}
           </TabPanel>
           <TabPanel>{isLoadingEncounters ? <VisitDetailLoading /> : <NotesSummary notes={notes} />}</TabPanel>
@@ -167,14 +173,22 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = []
             {isLoadingEncounters ? (
               <VisitDetailLoading />
             ) : (
-              <VisitCompletedFormsTable visit={{ ...visit, encounters: encounters ?? [] }} patientUuid={patientUuid} />
+              <VisitCompletedFormsTable
+                visit={{ ...visit, encounters: encounters ?? [] }}
+                patientUuid={patientUuid}
+                onEditEncounter={onEditEncounter}
+              />
             )}
           </TabPanel>
           <TabPanel>
             {isLoadingEncounters ? (
               <VisitDetailLoading />
             ) : (
-              <VisitEncountersTable visit={{ ...visit, encounters: encounters ?? [] }} patientUuid={patientUuid} />
+              <VisitEncountersTable
+                visit={{ ...visit, encounters: encounters ?? [] }}
+                patientUuid={patientUuid}
+                onEditEncounter={onEditEncounter}
+              />
             )}
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
