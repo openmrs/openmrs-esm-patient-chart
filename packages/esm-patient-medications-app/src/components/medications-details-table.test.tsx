@@ -3,7 +3,11 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { useLaunchWorkspaceRequiringVisit, useOrderBasket } from '@openmrs/esm-patient-common-lib';
+import {
+  useLaunchWorkspaceRequiringVisit,
+  useOrderBasket,
+  useSystemVisitSetting,
+} from '@openmrs/esm-patient-common-lib';
 import { mockFhirPatient, mockOrders } from '__mocks__';
 import MedicationsDetailsTable from './medications-details-table.component';
 
@@ -12,6 +16,7 @@ const mockUseConfig = vi.mocked(useConfig);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockUsePagination = vi.mocked(usePagination);
 const mockUseLaunchWorkspaceRequiringVisit = vi.mocked(useLaunchWorkspaceRequiringVisit);
+const mockUseSystemVisitSetting = vi.mocked(useSystemVisitSetting);
 
 vi.mock('@openmrs/esm-framework', async () => {
   const originalModule = (await vi.importActual('@openmrs/esm-framework')) as object;
@@ -30,6 +35,32 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
     ...originalModule,
     useLaunchWorkspaceRequiringVisit: vi.fn(),
     useOrderBasket: vi.fn(),
+    useSystemVisitSetting: vi.fn(),
+  };
+});
+
+vi.mock('@carbon/react', async () => {
+  const React = await vi.importActual('react');
+  const originalModule = (await vi.importActual('@carbon/react')) as Record<string, unknown>;
+  const OverflowMenu = ({ children, ...props }: any) => (
+    <div>
+      <button aria-label={props['aria-label'] ?? 'Options'} type="button">
+        Options
+      </button>
+      {children}
+    </div>
+  );
+  const OverflowMenuItem = (React as any).forwardRef(({ disabled, itemText, onClick }: any, ref) => (
+    <button disabled={disabled} onClick={onClick} ref={ref} type="button">
+      {itemText}
+    </button>
+  ));
+  OverflowMenuItem.displayName = 'OverflowMenuItem';
+
+  return {
+    ...originalModule,
+    OverflowMenu,
+    OverflowMenuItem,
   };
 });
 
@@ -61,13 +92,21 @@ describe('MedicationsDetailsTable', () => {
         }) as any,
     );
     mockUseLaunchWorkspaceRequiringVisit.mockReturnValue(vi.fn());
+    mockUseSystemVisitSetting.mockReturnValue({
+      systemVisitEnabled: true,
+      isLoadingSystemVisitSetting: false,
+      errorFetchingSystemVisitSetting: null,
+    });
   });
 
-  it('disables modify, renew, and discontinue actions when a medication has no visit context', async () => {
+  it('disables modify, renew, and discontinue actions when visits are required and a medication has no visit context', async () => {
     const user = userEvent.setup();
     const medicationWithoutVisitContext = {
       ...mockOrders[0],
-      encounter: null,
+      encounter: {
+        ...mockOrders[0].encounter,
+        visit: null,
+      },
     };
 
     render(
@@ -81,10 +120,40 @@ describe('MedicationsDetailsTable', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: /options/i }));
+    expect(screen.getByRole('button', { name: /modify/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /renew/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /discontinue/i })).toBeDisabled();
+  });
 
-    expect(screen.getByText(/modify/i).closest('button')).toBeDisabled();
-    expect(screen.getByText(/renew/i).closest('button')).toBeDisabled();
-    expect(screen.getByText(/discontinue/i).closest('button')).toBeDisabled();
+  it('keeps modify, renew, and discontinue actions enabled when visits are not required and a medication has no visit', async () => {
+    const user = userEvent.setup();
+    const medicationWithoutVisitContext = {
+      ...mockOrders[0],
+      encounter: {
+        ...mockOrders[0].encounter,
+        visit: null,
+      },
+    };
+
+    mockUseSystemVisitSetting.mockReturnValue({
+      systemVisitEnabled: false,
+      isLoadingSystemVisitSetting: false,
+      errorFetchingSystemVisitSetting: null,
+    });
+
+    render(
+      <MedicationsDetailsTable
+        patient={mockFhirPatient}
+        medications={[medicationWithoutVisitContext] as any}
+        showAddButton={false}
+        showDiscontinueButton
+        showModifyButton
+        showRenewButton
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /modify/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /renew/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /discontinue/i })).toBeEnabled();
   });
 });
