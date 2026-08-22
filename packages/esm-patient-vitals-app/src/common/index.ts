@@ -17,3 +17,4 @@ export {
   interpretBloodPressure,
 } from './helpers';
 export type { ObservationInterpretation, PatientVitalsAndBiometrics } from './types';
+export { noopSortRow, useTableSorting } from './use-table-sorting';
