@@ -31,6 +31,7 @@ import {
   type Order,
   type OrderBasketWindowProps,
   type PatientWorkspaceGroupProps,
+  useSystemVisitSetting,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
@@ -401,10 +402,10 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
-  const encounterUuid = medication.encounter?.uuid ?? null;
-  const visitContext = medication.encounter?.visit ?? null;
+  const { systemVisitEnabled: visitRequired } = useSystemVisitSetting();
+  const encounterUuid = medication.encounter.uuid;
+  const visitContext = medication.encounter.visit ?? null;
   const visitUuid = visitContext?.uuid;
-  const hasVisitContext = Boolean(encounterUuid && visitUuid);
 
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
@@ -421,7 +422,7 @@ function OrderBasketItemActions({
     [globalMutate, patient, visitContext, visitUuid],
   );
   const handleDiscontinueClick = useCallback(() => {
-    if (!hasVisitContext) {
+    if (visitRequired && !visitContext) {
       return;
     }
 
@@ -432,10 +433,10 @@ function OrderBasketItemActions({
       { encounterUuid },
       workspaceGroupProps,
     );
-  }, [encounterUuid, hasVisitContext, items, medication, setItems, workspaceGroupProps]);
+  }, [encounterUuid, items, medication, setItems, visitContext, visitRequired, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
-    if (!hasVisitContext) {
+    if (visitRequired && !visitContext) {
       return;
     }
 
@@ -448,10 +449,10 @@ function OrderBasketItemActions({
       { encounterUuid },
       workspaceGroupProps,
     );
-  }, [encounterUuid, hasVisitContext, medication, workspaceGroupProps]);
+  }, [encounterUuid, medication, visitContext, visitRequired, workspaceGroupProps]);
 
   const handleRenewClick = useCallback(() => {
-    if (!hasVisitContext) {
+    if (visitRequired && !visitContext) {
       return;
     }
 
@@ -462,7 +463,7 @@ function OrderBasketItemActions({
       { encounterUuid },
       workspaceGroupProps,
     );
-  }, [encounterUuid, hasVisitContext, items, medication, setItems, workspaceGroupProps]);
+  }, [encounterUuid, items, medication, setItems, visitContext, visitRequired, workspaceGroupProps]);
 
   return (
     <OverflowMenu
@@ -478,13 +479,13 @@ function OrderBasketItemActions({
           id="modify"
           itemText={t('modify', 'Modify')}
           onClick={handleModifyClick}
-          disabled={alreadyInBasket || !hasVisitContext}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
         />
       )}
       {showRenewButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || !hasVisitContext}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
           id="renew"
           itemText={t('orderActionRenew', 'Renew')}
           onClick={handleRenewClick}
@@ -493,7 +494,7 @@ function OrderBasketItemActions({
       {showDiscontinueButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || !hasVisitContext}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
           hasDivider
           id="discontinue"
           isDelete

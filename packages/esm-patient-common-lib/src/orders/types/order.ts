@@ -142,7 +142,7 @@ export interface Order {
   drug: Drug | null;
   duration: number | null;
   durationUnits: OpenmrsResource | null;
-  encounter: Encounter | null;
+  encounter: Encounter;
   frequency: OpenmrsResource | null;
   instructions?: string | null;
   numRefills: number | null;
