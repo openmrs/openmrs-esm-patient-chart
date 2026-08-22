@@ -70,7 +70,7 @@ export interface OrderBasketItem {
   orderNumber?: string;
   scheduledDate?: Date;
   encounterUuid?: string;
-  visit: Visit;
+  visit: Visit | null;
 }
 
 export type OrderUrgency = 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
@@ -322,12 +322,12 @@ export interface TestOrderBasketItem extends OrderBasketItem {
 }
 
 export interface OrderBasketWindowProps {
-  encounterUuid: string;
+  encounterUuid: string | null;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
 export interface ExportedOrderBasketWindowProps {
-  encounterUuid: string;
+  encounterUuid: string | null;
   drugOrderWorkspaceName: string;
   labOrderWorkspaceName: string;
   generalOrderWorkspaceName: string;
@@ -339,8 +339,8 @@ export interface ExportedOrderBasketWindowProps {
   allergyFormWorkspaceName?: string;
   patient: fhir.Patient;
   patientUuid: string;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
+  visitContext: Visit | null;
+  mutateVisitContext: (() => void) | null;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
   /**
    * An optional array of order type UUIDs to display. If not provided, all panels are shown.
