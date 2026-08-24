@@ -29,11 +29,12 @@ interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter, mutateVisitContext }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -166,10 +167,20 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditE
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+            <VisitCompletedFormsTable
+              visit={visit}
+              patientUuid={patientUuid}
+              onEditEncounter={onEditEncounter}
+              mutateVisitContext={mutateVisitContext}
+            />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+            <VisitEncountersTable
+              visit={visit}
+              patientUuid={patientUuid}
+              onEditEncounter={onEditEncounter}
+              mutateVisitContext={mutateVisitContext}
+            />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

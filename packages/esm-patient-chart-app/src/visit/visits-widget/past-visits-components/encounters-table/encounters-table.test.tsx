@@ -55,9 +55,12 @@ const mockUseEncounterTypes = vi.fn(useEncounterTypes).mockReturnValue({
 
 const mockUseConfig = vi.mocked(useConfig);
 
+const mockDeleteEncounter = vi.fn();
+
 vi.mock('./encounters-table.resource', async () => ({
   ...((await vi.importActual('./encounters-table.resource')) as object),
   useEncounterTypes: () => mockUseEncounterTypes(),
+  deleteEncounter: (...args: Array<unknown>) => mockDeleteEncounter(...args),
 }));
 
 vi.mock('@openmrs/esm-patient-common-lib', async () => ({
@@ -451,6 +454,37 @@ describe('Delete Encounter', () => {
         encounterTypeName: 'POC Consent Form',
       }),
     );
+  });
+
+  it('revalidates through the mutateVisitContext prop rather than the chart store when one is supplied', async () => {
+    const user = userEvent.setup();
+    const mutateVisitContext = vi.fn();
+    const chartMutateVisitContext = vi.fn();
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatientAlice.uuid,
+      patient: mockFhirPatient,
+      visitContext: null,
+      mutateVisitContext: chartMutateVisitContext,
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
+    } as any);
+    mockDeleteEncounter.mockResolvedValue({});
+    // confirmAndDeleteEncounter calls the disposer showModal hands back.
+    mockShowModal.mockReturnValue(vi.fn());
+
+    renderEncountersTable({ mutateVisitContext });
+
+    const row = screen.getByRole('row', {
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
+    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+    await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
+
+    const [, modalProps] = mockShowModal.mock.calls[0];
+    (modalProps as { onConfirmation: () => void }).onConfirmation();
+
+    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
+    expect(chartMutateVisitContext).not.toHaveBeenCalled();
   });
 });
 

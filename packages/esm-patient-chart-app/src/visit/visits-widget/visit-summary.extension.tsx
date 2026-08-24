@@ -6,20 +6,33 @@ import { type EncountersTableProps } from './past-visits-components/encounters-t
 interface VisitSummaryExtensionProps {
   visit?: Visit;
   patientUuid?: string;
-  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
+  /** Hosts outside the chart should pass these — see `EncountersTableProps`. */
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
 }
 
 /**
  * Renders the visit summary from slot state so apps outside the patient chart (e.g. Service Queues)
  * can attach it to a slot and pass the visit context as state.
  */
-const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({ visit, patientUuid, onEditEncounter }) => {
+const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
+  visit,
+  patientUuid,
+  onEditEncounter,
+  mutateVisitContext,
+}) => {
   if (!visit || !patientUuid) {
     return null;
   }
 
-  return <VisitSummary visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />;
+  return (
+    <VisitSummary
+      visit={visit}
+      patientUuid={patientUuid}
+      onEditEncounter={onEditEncounter}
+      mutateVisitContext={mutateVisitContext}
+    />
+  );
 };
 
 export default VisitSummaryExtension;

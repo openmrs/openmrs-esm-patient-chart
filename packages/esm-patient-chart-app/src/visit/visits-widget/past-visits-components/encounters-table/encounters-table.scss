@@ -11,6 +11,14 @@
   padding: 0;
   border-bottom: none;
 
+  :global(tbody td.cds--table-expand) {
+    padding-inline-start: layout.$spacing-03 !important;
+  }
+
+  :global(tbody tr.cds--parent-row > td:not(.cds--table-expand)) {
+    padding-inline-start: layout.$spacing-05 !important;
+  }
+
   :global(.cds--data-table-header) {
     padding: 0;
   }
