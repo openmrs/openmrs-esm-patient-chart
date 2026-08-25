@@ -73,7 +73,11 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const rowData = normalizedVisits?.map(({ visit, diagnoses }) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
-      row[key] = <CellComponent key={key} visit={visit} patient={patient} diagnoses={diagnoses} />;
+      if (key === 'diagnoses') {
+        row[key] = <VisitDiagnosisCell key={key} visit={visit} patient={patient} diagnoses={diagnoses} />;
+      } else {
+        row[key] = <CellComponent key={key} visit={visit} patient={patient} />;
+      }
     }
     return row;
   });

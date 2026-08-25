@@ -1,6 +1,6 @@
 import { DiagnosisTags, type Diagnosis, type Visit } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
-import { dedupeDiagnoses } from '../../dedupe-diagnoses';
+import { dedupeDiagnoses } from '../dedupe-diagnoses';
 
 interface Props {
   visit: Visit;
