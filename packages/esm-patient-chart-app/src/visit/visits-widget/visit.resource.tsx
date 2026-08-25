@@ -1,14 +1,110 @@
 import {
   openmrsFetch,
   restBaseUrl,
+  type Diagnosis,
+  type FetchResponse,
   type OpenmrsResource,
   type Visit,
   useOpenmrsInfinite,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
+import { useMemo, useRef, useState } from 'react';
+import useSWR from 'swr';
+import { dedupeDiagnoses } from '../dedupe-diagnoses';
 
 const customRepresentation =
   'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+
+const encounterCustomRepresentation =
+  'custom:(uuid,diagnoses:(uuid,display,rank,diagnosis,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display))))';
+
+/** Response shape from the EMRAPI /patient/{uuid}/visit endpoint */
+export interface EmrApiVisitResponse {
+  visit: Visit;
+  diagnoses: Array<Diagnosis>;
+}
+
+/** The actual response shape from the EMRAPI endpoint uses pageOfResults, not results */
+interface EmrApiPaginatedResponse {
+  pageOfResults: Array<EmrApiVisitResponse>;
+  totalCount: number;
+}
+
+/**
+ * Fetches visits and diagnoses from the EMRAPI endpoint.
+ * Diagnoses are deduped within the hook so consumers don't need to handle it.
+ * Pass null for patientUuid to disable fetching.
+ *
+ * Note: The EMRAPI endpoint returns { pageOfResults, totalCount } instead of
+ * the standard OpenMRS { results, totalCount }, so we use useSWR directly
+ * rather than useOpenmrsPagination.
+ */
+export function useEmrApiVisits(patientUuid: string | null, pageSize: number = 10) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const currentPageSize = useRef(pageSize);
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const url = patientUuid
+    ? `${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)&limit=${pageSize}&startIndex=${startIndex}&totalCount=true`
+    : null;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<EmrApiPaginatedResponse>>(
+    url,
+    openmrsFetch,
+  );
+
+  const response = data?.data;
+  const totalCount = response?.totalCount ?? 0;
+
+  const visits = useMemo(
+    () =>
+      response?.pageOfResults?.map((item) => ({
+        visit: item.visit,
+        diagnoses: dedupeDiagnoses(item.diagnoses?.filter((diagnosis) => !diagnosis.voided) ?? []),
+      })) ?? null,
+    [response],
+  );
+
+  const goTo = (page: number) => setCurrentPage(page);
+
+  return {
+    visits,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+    totalCount,
+    currentPage,
+    currentPageSize,
+    totalPages: Math.ceil(totalCount / pageSize),
+    goTo,
+    goToNext: () => setCurrentPage((p) => p + 1),
+    goToPrevious: () => setCurrentPage((p) => Math.max(1, p - 1)),
+    paginated: totalCount > pageSize,
+    showNextButton: currentPage * pageSize < totalCount,
+    showPreviousButton: currentPage > 1,
+  };
+}
+
+/**
+ * On-demand hook to fetch encounters for a specific visit.
+ * Only fetches when visitUuid is provided (i.e., when a visit row is expanded).
+ */
+export function useVisitEncounters(patientUuid: string, visitUuid: string | null) {
+  const url = visitUuid
+    ? `${restBaseUrl}/encounter?patient=${patientUuid}&visit=${visitUuid}&v=${encounterCustomRepresentation}`
+    : null;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+
+  return {
+    encounters: data?.data?.results ?? null,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+}
 
 export function useInfiniteVisits(
   patientUuid: string,
@@ -16,7 +112,7 @@ export function useInfiniteVisits(
   rep: string = customRepresentation,
 ) {
   const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
+    `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${rep}`,
     window.location.toString(),
   );
   for (const key in params) {
@@ -28,17 +124,26 @@ export function useInfiniteVisits(
   return { visits: data, mutate, ...rest };
 }
 
+/**
+ * Standard paginated visits using the OpenMRS REST API.
+ * Pass null for patientUuid to disable fetching.
+ */
 export function usePaginatedVisits(
-  patientUuid: string,
+  patientUuid: string | null,
   pageSize: number,
   params: Record<string, number | string> = {},
 ) {
-  const url = new URL(
-    `${window.openmrsBase}/${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
-    window.location.toString(),
-  );
-  for (const key in params) {
-    url.searchParams.set(key, '' + params[key]);
+  const url = patientUuid
+    ? new URL(
+        `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+        window.location.toString(),
+      )
+    : null;
+
+  if (url) {
+    for (const key in params) {
+      url.searchParams.set(key, '' + params[key]);
+    }
   }
 
   const ret = useOpenmrsPagination<Visit>(url, pageSize);
@@ -61,6 +166,8 @@ export function restoreVisit(visitUuid: string) {
     body: { voided: false },
   });
 }
+
+// ============ Types ============
 
 export interface Order {
   uuid: string;
@@ -123,22 +230,5 @@ export interface OrderItem {
   provider: {
     name: string;
     role: string;
-  };
-}
-
-export interface Diagnosis {
-  certainty: string;
-  display: string;
-  encounter: OpenmrsResource;
-  links: Array<any>;
-  patient: OpenmrsResource;
-  rank: number;
-  resourceVersion: string;
-  uuid: string;
-  voided: boolean;
-  diagnosis: {
-    coded: {
-      display: string;
-    };
   };
 }
