@@ -16,7 +16,7 @@ import { type ConfigObject } from '../config-schema';
 const customRepresentation =
   'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
   'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
-  'orderType:ref,encounter:(uuid,display,visit),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+  'orderType:ref,encounter:(uuid,display,visit,encounterDatetime),orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
   'commentToFulfiller,fulfillerStatus,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
   'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
   'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten,concept)';
