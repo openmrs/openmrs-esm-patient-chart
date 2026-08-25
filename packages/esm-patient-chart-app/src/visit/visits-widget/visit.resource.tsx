@@ -2,12 +2,13 @@ import {
   openmrsFetch,
   restBaseUrl,
   type Diagnosis,
+  type FetchResponse,
   type OpenmrsResource,
   type Visit,
   useOpenmrsInfinite,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { dedupeDiagnoses } from '../dedupe-diagnoses';
 
@@ -23,31 +24,66 @@ export interface EmrApiVisitResponse {
   diagnoses: Array<Diagnosis>;
 }
 
+/** The actual response shape from the EMRAPI endpoint uses pageOfResults, not results */
+interface EmrApiPaginatedResponse {
+  pageOfResults: Array<EmrApiVisitResponse>;
+  totalCount: number;
+}
+
 /**
  * Fetches visits and diagnoses from the EMRAPI endpoint.
  * Diagnoses are deduped within the hook so consumers don't need to handle it.
  * Pass null for patientUuid to disable fetching.
+ *
+ * Note: The EMRAPI endpoint returns { pageOfResults, totalCount } instead of
+ * the standard OpenMRS { results, totalCount }, so we use useSWR directly
+ * rather than useOpenmrsPagination.
  */
 export function useEmrApiVisits(patientUuid: string | null, pageSize: number = 10) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const currentPageSize = useRef(pageSize);
+
+  const startIndex = (currentPage - 1) * pageSize;
   const url = patientUuid
-    ? new URL(
-        `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
-        window.location.toString(),
-      )
+    ? `${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)&limit=${pageSize}&startIndex=${startIndex}&totalCount=true`
     : null;
 
-  const { data, mutate, ...rest } = useOpenmrsPagination<EmrApiVisitResponse>(url, pageSize);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<EmrApiPaginatedResponse>>(
+    url,
+    openmrsFetch,
+  );
+
+  const response = data?.data;
+  const totalCount = response?.totalCount ?? 0;
 
   const visits = useMemo(
     () =>
-      data?.map((item) => ({
+      response?.pageOfResults?.map((item) => ({
         visit: item.visit,
         diagnoses: dedupeDiagnoses(item.diagnoses?.filter((diagnosis) => !diagnosis.voided) ?? []),
       })) ?? null,
-    [data],
+    [response],
   );
 
-  return { visits, mutate, ...rest };
+  const goTo = (page: number) => setCurrentPage(page);
+
+  return {
+    visits,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+    totalCount,
+    currentPage,
+    currentPageSize,
+    totalPages: Math.ceil(totalCount / pageSize),
+    goTo,
+    goToNext: () => setCurrentPage((p) => p + 1),
+    goToPrevious: () => setCurrentPage((p) => Math.max(1, p - 1)),
+    paginated: totalCount > pageSize,
+    showNextButton: currentPage * pageSize < totalCount,
+    showPreviousButton: currentPage > 1,
+  };
 }
 
 /**
