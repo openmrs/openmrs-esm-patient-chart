@@ -5476,7 +5476,7 @@ __metadata:
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     react-error-boundary: "npm:^4.0.13"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5628,7 +5628,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5688,7 +5688,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5713,7 +5713,7 @@ __metadata:
     openmrs: "npm:next"
     react-grid-gallery: "npm:^0.5.6"
     react-html5-camera-photo: "npm:^1.5.11"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5734,7 +5734,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5756,7 +5756,7 @@ __metadata:
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     uuid: "npm:^8.3.2"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
@@ -5780,7 +5780,7 @@ __metadata:
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/eslint-config": "npm:^2.0.0"
     "@openmrs/esm-framework": "npm:next"
-    "@playwright/test": "npm:^1.62.1"
+    "@playwright/test": "npm:1.62.1"
     "@swc/cli": "npm:^0.1.62"
     "@swc/core": "npm:^1.3.89"
     "@testing-library/dom": "npm:^10.4.1"
@@ -5822,8 +5822,8 @@ __metadata:
     swr: "npm:2.2.5"
     turbo: "npm:^2.10.9"
     typescript: "npm:^5.0.0"
-    vitest: "npm:^4.1.11"
-    webpack-dev-server: "npm:^5.2.5"
+    vitest: "npm:4.1.11"
+    webpack-dev-server: "npm:5.2.5"
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
@@ -5836,7 +5836,7 @@ __metadata:
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     uuid: "npm:^8.3.2"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     react: 18.x
@@ -5852,7 +5852,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5872,7 +5872,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5894,7 +5894,7 @@ __metadata:
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5917,7 +5917,7 @@ __metadata:
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.46.2"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
     zod: "npm:^3.23.8"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
@@ -5937,7 +5937,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     react: 18.x
@@ -5953,7 +5953,7 @@ __metadata:
     "@carbon/react": "npm:^1.83.0"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5974,7 +5974,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -5995,7 +5995,7 @@ __metadata:
     html-entities: "npm:^2.5.2"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -6016,7 +6016,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -6038,7 +6038,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.46.2"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
     zod: "npm:^3.23.8"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
@@ -6060,7 +6060,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -6082,7 +6082,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     react-hook-form: "npm:^7.52.0"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
     zod: "npm:^3.23.8"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
@@ -6106,7 +6106,7 @@ __metadata:
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -6127,7 +6127,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
-    vitest: "npm:^4.1.2"
+    vitest: "npm:4.1.11"
   peerDependencies:
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
@@ -6509,7 +6509,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.62.1":
+"@playwright/test@npm:1.62.1":
   version: 1.62.1
   resolution: "@playwright/test@npm:1.62.1"
   dependencies:
@@ -9615,20 +9615,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/expect@npm:4.1.6":
-  version: 4.1.6
-  resolution: "@vitest/expect@npm:4.1.6"
-  dependencies:
-    "@standard-schema/spec": "npm:^1.1.0"
-    "@types/chai": "npm:^5.2.2"
-    "@vitest/spy": "npm:4.1.6"
-    "@vitest/utils": "npm:4.1.6"
-    chai: "npm:^6.2.2"
-    tinyrainbow: "npm:^3.1.0"
-  checksum: 10/20de26292c543f7f5076b59fd50a5fa89217755402de89b62e5d8c104c90441413b87b5c1d310a682a310418c76c0d4bd309dd1faf13b1b2dec79dc3bb90fef0
-  languageName: node
-  linkType: hard
-
 "@vitest/mocker@npm:4.1.11":
   version: 4.1.11
   resolution: "@vitest/mocker@npm:4.1.11"
@@ -9645,25 +9631,6 @@ __metadata:
     vite:
       optional: true
   checksum: 10/00b6e1266d8403194b49313e3a9a1af0dff2c773f4b2df11f4955fa0f244fd4b59484cd23381dfef8af30298e2651c1aaa42b439fdbc871bb4bb911de38a9509
-  languageName: node
-  linkType: hard
-
-"@vitest/mocker@npm:4.1.6":
-  version: 4.1.6
-  resolution: "@vitest/mocker@npm:4.1.6"
-  dependencies:
-    "@vitest/spy": "npm:4.1.6"
-    estree-walker: "npm:^3.0.3"
-    magic-string: "npm:^0.30.21"
-  peerDependencies:
-    msw: ^2.4.9
-    vite: ^6.0.0 || ^7.0.0 || ^8.0.0
-  peerDependenciesMeta:
-    msw:
-      optional: true
-    vite:
-      optional: true
-  checksum: 10/d0669d0b1a8822ec3bc83b5261ead6b05a7e5d8c2077d1f8b9eb0c8507967e54347f16027894be28ca26cf8993e544b8269230a3b78c4eb50c8feb780cb4c688
   languageName: node
   linkType: hard
 
@@ -9695,16 +9662,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/runner@npm:4.1.6":
-  version: 4.1.6
-  resolution: "@vitest/runner@npm:4.1.6"
-  dependencies:
-    "@vitest/utils": "npm:4.1.6"
-    pathe: "npm:^2.0.3"
-  checksum: 10/0e175bb61b10ca6cb79a0734a45b3d8b1570806078d53b4f2aa7dbfabd10307c9566460ee8f263a34ac909e8481da614551eee28eaff834fbecd86b4902b845b
-  languageName: node
-  linkType: hard
-
 "@vitest/snapshot@npm:4.1.11":
   version: 4.1.11
   resolution: "@vitest/snapshot@npm:4.1.11"
@@ -9717,29 +9674,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/snapshot@npm:4.1.6":
-  version: 4.1.6
-  resolution: "@vitest/snapshot@npm:4.1.6"
-  dependencies:
-    "@vitest/pretty-format": "npm:4.1.6"
-    "@vitest/utils": "npm:4.1.6"
-    magic-string: "npm:^0.30.21"
-    pathe: "npm:^2.0.3"
-  checksum: 10/167b96971ae6e31a8a7c42063abf3d48590908bdea8ae24d9e5035cd08690e47e15a12ab96cc017e5ddd6324a994b8096c901c8e87ac6e5e617910a2814717fd
-  languageName: node
-  linkType: hard
-
 "@vitest/spy@npm:4.1.11":
   version: 4.1.11
   resolution: "@vitest/spy@npm:4.1.11"
   checksum: 10/d49a7ed7501080e5f817d61250a169a46fcc7901887e4985a1e08705ce79aea8d1edcffd74f4dc6669ea1bc3d717a39354ce89c67188d81a63dc439d42f195f6
-  languageName: node
-  linkType: hard
-
-"@vitest/spy@npm:4.1.6":
-  version: 4.1.6
-  resolution: "@vitest/spy@npm:4.1.6"
-  checksum: 10/6c1bddbf1eaae42af96d66e31f8c14837203707552f60e7a0f512dc2513d285e3de1fdcf057a79a5588fd20ee382ce5a53c1a69430b2a79eb623fd3517d54878
   languageName: node
   linkType: hard
 
@@ -17758,16 +17696,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"launch-editor@npm:^2.14.1":
-  version: 2.14.1
-  resolution: "launch-editor@npm:2.14.1"
-  dependencies:
-    picocolors: "npm:^1.1.1"
-    shell-quote: "npm:^1.8.4"
-  checksum: 10/335d12ca437280e77070657531c251b6c91c62bc653f70ab66ddd2a6e50131b1b043480411c5b93d54955a0a6eb8ec01e9a5b5cfe2d887341d878d19394a126b
-  languageName: node
-  linkType: hard
-
 "launch-editor@npm:^2.6.1":
   version: 2.10.0
   resolution: "launch-editor@npm:2.10.0"
@@ -22760,7 +22688,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shell-quote@npm:^1.8.1, shell-quote@npm:^1.8.4":
+"shell-quote@npm:^1.8.1":
   version: 1.10.0
   resolution: "shell-quote@npm:1.10.0"
   checksum: 10/d4a22aeefe64919290af753ac6098239d7ffee52a5db62c20edef69794bd10b5f86e298f68be26af9606ac435e890dd391994a5405a90bb8aebef1ff1dde839b
@@ -24806,7 +24734,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^4.1.11":
+"vitest@npm:4.1.11":
   version: 4.1.11
   resolution: "vitest@npm:4.1.11"
   dependencies:
@@ -24871,74 +24799,6 @@ __metadata:
   bin:
     vitest: ./vitest.mjs
   checksum: 10/054f1e25d90d911693b0b93c5b85a7c3105775aa3e39c3279c7d3e7af719e2d94070a898d6d74292445366c1215bb91d07063989ac0965973f0c5ae22ad3b06b
-  languageName: node
-  linkType: hard
-
-"vitest@npm:^4.1.2":
-  version: 4.1.6
-  resolution: "vitest@npm:4.1.6"
-  dependencies:
-    "@vitest/expect": "npm:4.1.6"
-    "@vitest/mocker": "npm:4.1.6"
-    "@vitest/pretty-format": "npm:4.1.6"
-    "@vitest/runner": "npm:4.1.6"
-    "@vitest/snapshot": "npm:4.1.6"
-    "@vitest/spy": "npm:4.1.6"
-    "@vitest/utils": "npm:4.1.6"
-    es-module-lexer: "npm:^2.0.0"
-    expect-type: "npm:^1.3.0"
-    magic-string: "npm:^0.30.21"
-    obug: "npm:^2.1.1"
-    pathe: "npm:^2.0.3"
-    picomatch: "npm:^4.0.3"
-    std-env: "npm:^4.0.0-rc.1"
-    tinybench: "npm:^2.9.0"
-    tinyexec: "npm:^1.0.2"
-    tinyglobby: "npm:^0.2.15"
-    tinyrainbow: "npm:^3.1.0"
-    vite: "npm:^6.0.0 || ^7.0.0 || ^8.0.0"
-    why-is-node-running: "npm:^2.3.0"
-  peerDependencies:
-    "@edge-runtime/vm": "*"
-    "@opentelemetry/api": ^1.9.0
-    "@types/node": ^20.0.0 || ^22.0.0 || >=24.0.0
-    "@vitest/browser-playwright": 4.1.6
-    "@vitest/browser-preview": 4.1.6
-    "@vitest/browser-webdriverio": 4.1.6
-    "@vitest/coverage-istanbul": 4.1.6
-    "@vitest/coverage-v8": 4.1.6
-    "@vitest/ui": 4.1.6
-    happy-dom: "*"
-    jsdom: "*"
-    vite: ^6.0.0 || ^7.0.0 || ^8.0.0
-  peerDependenciesMeta:
-    "@edge-runtime/vm":
-      optional: true
-    "@opentelemetry/api":
-      optional: true
-    "@types/node":
-      optional: true
-    "@vitest/browser-playwright":
-      optional: true
-    "@vitest/browser-preview":
-      optional: true
-    "@vitest/browser-webdriverio":
-      optional: true
-    "@vitest/coverage-istanbul":
-      optional: true
-    "@vitest/coverage-v8":
-      optional: true
-    "@vitest/ui":
-      optional: true
-    happy-dom:
-      optional: true
-    jsdom:
-      optional: true
-    vite:
-      optional: false
-  bin:
-    vitest: vitest.mjs
-  checksum: 10/3816121537930455e5338b5b3305179fa6c68d6cbba50e5d8ca8dcb2c0410887ed38aca61e0d2da9f673af1cc1f20278eef941fc4756644e6f8f96366822b8e6
   languageName: node
   linkType: hard
 
@@ -25181,9 +25041,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^5.2.5":
-  version: 5.2.6
-  resolution: "webpack-dev-server@npm:5.2.6"
+"webpack-dev-server@npm:5.2.5":
+  version: 5.2.5
+  resolution: "webpack-dev-server@npm:5.2.5"
   dependencies:
     "@types/bonjour": "npm:^3.5.13"
     "@types/connect-history-api-fallback": "npm:^1.5.4"
@@ -25203,7 +25063,7 @@ __metadata:
     graceful-fs: "npm:^4.2.6"
     http-proxy-middleware: "npm:^2.0.9"
     ipaddr.js: "npm:^2.1.0"
-    launch-editor: "npm:^2.14.1"
+    launch-editor: "npm:^2.6.1"
     open: "npm:^10.0.3"
     p-retry: "npm:^6.2.0"
     schema-utils: "npm:^4.2.0"
@@ -25222,7 +25082,7 @@ __metadata:
       optional: true
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
-  checksum: 10/19c107cff555dbe2bda044f6faa45cd1f4d6779c6961b05a475b856709aa4d35cafb1c9a7ec2cb6463a7ca28a308d6e6bbc66b38ce8e1afeec5cd70e326a12ce
+  checksum: 10/2bd8e03615c32ecac53e783e2be5670ccac051d051ef4ed7fe944df8fd8745b508c8ebc63bfecfdccd23c2200ca4c373b22ea2da76ce4e1c0a6f58d900c11ecb
   languageName: node
   linkType: hard
 
