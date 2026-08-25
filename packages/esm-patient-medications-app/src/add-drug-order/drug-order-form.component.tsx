@@ -840,6 +840,19 @@ export function DrugOrderForm({
               },
             }}
           />
+          {drugAlreadyPrescribedForNewOrder && (
+            <InlineNotification
+              kind="warning"
+              lowContrast
+              className={styles.inlineNotification}
+              title={t('drugAlreadyPrescribed', 'Already prescribed')}
+              subtitle={t(
+                'drugAlreadyPrescribedNotificationBody',
+                'An active or scheduled order already exists for this drug',
+              )}
+              hideCloseButton
+            />
+          )}
           <ButtonSet className={styles.buttonSet}>
             <Button kind="secondary" onClick={onCancel} size="xl">
               {t('discard', 'Discard')}

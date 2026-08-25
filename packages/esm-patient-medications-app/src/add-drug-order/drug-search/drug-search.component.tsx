@@ -72,7 +72,13 @@ export default function DrugSearch({
       </ResponsiveWrapper>
       <ExtensionSlot
         name="drug-search-slot"
-        state={{ openOrderForm, isSearching: Boolean(debouncedSearchTerm), visit, daysDurationUnit }}
+        state={{
+          openOrderForm,
+          isSearching: Boolean(debouncedSearchTerm),
+          visit,
+          daysDurationUnit,
+          patientUuid: patient?.id,
+        }}
       />
       <OrderBasketSearchResults
         searchTerm={debouncedSearchTerm}

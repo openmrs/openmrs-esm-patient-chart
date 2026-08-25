@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconButton, InlineNotification, SkeletonText } from '@carbon/react';
+import { IconButton, InlineNotification, SkeletonText, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
 import { useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import { getFavoriteKey } from './drug-favorites.resource';
+import { getFavoriteKey, useActiveDrugOrders } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { createDrugFromFavorite, buildBasketItem } from './helpers';
 import type { DrugFavoriteOrder } from './types';
@@ -16,50 +16,68 @@ interface DrugFavoritesListExtensionProps {
   isSearching?: boolean;
   visit: Visit;
   daysDurationUnit?: { uuid: string; display: string };
+  patientUuid?: string;
 }
 
 interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
   isTablet: boolean;
+  alreadyPrescribed: boolean;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onUnpin: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
-const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(({ favorite, isTablet, onClick, onUnpin }) => {
-  const { t } = useTranslation();
+const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
+  ({ favorite, isTablet, alreadyPrescribed, onClick, onUnpin }) => {
+    const { t } = useTranslation();
 
-  return (
-    <div className={styles.favoriteItem}>
-      <button type="button" className={styles.itemButton} onClick={() => onClick(favorite)}>
-        <div className={styles.itemContent}>
-          <p className={styles.itemTitle}>{favorite.displayName}</p>
-          {favorite.attributes.strength && <p className={styles.itemDetails}>{favorite.attributes.strength}</p>}
-        </div>
-      </button>
-      <IconButton
-        kind="ghost"
-        size={isTablet ? 'md' : 'sm'}
-        label={t('unpinOrder', 'Unpin order')}
-        align="left"
-        className={styles.pinButton}
-        onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
-      >
-        <PinFilled className={styles.pinIcon} />
-      </IconButton>
-    </div>
-  );
-});
+    return (
+      <div className={styles.favoriteItem}>
+        <button
+          type="button"
+          className={styles.itemButton}
+          onClick={() => onClick(favorite)}
+          disabled={alreadyPrescribed}
+          aria-disabled={alreadyPrescribed}
+        >
+          <div className={styles.itemContent}>
+            <p className={styles.itemTitle}>{favorite.displayName}</p>
+            {favorite.attributes.strength && <p className={styles.itemDetails}>{favorite.attributes.strength}</p>}
+          </div>
+          {alreadyPrescribed && (
+            <Tag type="green" size="sm">
+              {t('drugAlreadyPrescribed', 'Already prescribed')}
+            </Tag>
+          )}
+        </button>
+        <IconButton
+          kind="ghost"
+          size={isTablet ? 'md' : 'sm'}
+          label={t('unpinOrder', 'Unpin order')}
+          align="left"
+          className={styles.pinButton}
+          onClick={(e: React.MouseEvent) => onUnpin(e, favorite)}
+        >
+          <PinFilled className={styles.pinIcon} />
+        </IconButton>
+      </div>
+    );
+  },
+);
 
 const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   openOrderForm,
   isSearching = false,
   visit,
   daysDurationUnit,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
   const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
+
+  const { prescribedDrugUuids } = useActiveDrugOrders(patientUuid);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -71,10 +89,13 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
   const handleFavoriteClick = useCallback(
     (favorite: DrugFavoriteOrder) => {
+      if (prescribedDrugUuids.has(favorite.drugUuid)) {
+        return;
+      }
       const drug = createDrugFromFavorite(favorite);
       openOrderForm(buildBasketItem(drug, visit, daysDurationUnit));
     },
-    [openOrderForm, visit, daysDurationUnit],
+    [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids],
   );
 
   const handleUnpin = useCallback(
@@ -143,6 +164,7 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
               key={getFavoriteKey(favorite)}
               favorite={favorite}
               isTablet={isTablet}
+              alreadyPrescribed={prescribedDrugUuids.has(favorite.drugUuid)}
               onClick={handleFavoriteClick}
               onUnpin={handleUnpin}
             />
