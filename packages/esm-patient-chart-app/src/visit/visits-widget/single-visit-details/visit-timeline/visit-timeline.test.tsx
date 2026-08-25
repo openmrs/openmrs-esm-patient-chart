@@ -294,4 +294,18 @@ describe('VisitTimeline', () => {
     expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(5);
     expect(screen.getByText(/5 \/ 25 items/i)).toBeInTheDocument();
   });
+
+  // The config validator only logs, so these values still reach the component
+  it.each([
+    [0, 1],
+    [-5, 1],
+    [2.5, 2],
+  ])('renders a page of encounters when visitTimelinePageSize is %s', (visitTimelinePageSize, expectedPageSize) => {
+    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(esmPatientChartSchema), visitTimelinePageSize });
+
+    renderVisitTimeline(buildEncounters(25));
+
+    expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(expectedPageSize);
+    expect(screen.getByText(new RegExp(`${expectedPageSize} / 25 items`, 'i'))).toBeInTheDocument();
+  });
 });

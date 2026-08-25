@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
 
 export const esmPatientChartSchema = {
   defaultFacilityUrl: {
@@ -138,6 +138,9 @@ export const esmPatientChartSchema = {
   },
   visitTimelinePageSize: {
     _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
     _default: 10,
     _description: 'The number of encounters shown per page in the visit summary Timeline',
   },

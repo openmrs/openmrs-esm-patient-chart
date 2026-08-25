@@ -81,11 +81,10 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
     [canPrintEncounters, config, session?.user, visit?.encounters],
   );
 
-  const {
-    currentPage,
-    goTo,
-    results: paginatedTimelineEntries,
-  } = usePagination(timelineEntries, config.visitTimelinePageSize);
+  // A failed config validator only logs, so a misconfigured page size still reaches us and must not break the widget
+  const pageSize = Math.max(1, Math.trunc(config.visitTimelinePageSize));
+
+  const { currentPage, goTo, results: paginatedTimelineEntries } = usePagination(timelineEntries, pageSize);
 
   // goTo clamps to the last page, so deleting the final encounter of a page can't strand the user on an empty one
   useEffect(() => {
@@ -254,7 +253,7 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
         currentItems={paginatedTimelineEntries.length}
         onPageNumberChange={({ page }) => goTo(page)}
         pageNumber={currentPage}
-        pageSize={config.visitTimelinePageSize}
+        pageSize={pageSize}
         totalItems={timelineEntries.length}
       />
     </div>
