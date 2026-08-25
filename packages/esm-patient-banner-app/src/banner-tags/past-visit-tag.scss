@@ -1,0 +1,30 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.tooltipBox {
+  padding: layout.$spacing-02;
+}
+
+.tooltipSmallText {
+  font-size: 80%;
+}
+
+.heading {
+  margin-bottom: layout.$spacing-03;
+}
+
+.definitionToolTip {
+  & > button {
+    border-bottom: none;
+  }
+}
+
+// Compound selector (no type modifier is passed to the Carbon Tag) so this
+// overrides Carbon's low-specificity base `.cds--tag` rule cleanly, without
+// fighting the much higher-specificity `:not()` chains on named type variants
+// (e.g. `.cds--tag--outline:not(...):not(...):not(...)`).
+.pastVisitTag:global(.cds--tag) {
+  background-color: $inverse-support-03;
+  border-color: $inverse-support-03;
+  color: $color-gray-100;
+}

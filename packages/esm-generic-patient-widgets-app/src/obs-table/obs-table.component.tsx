@@ -42,9 +42,10 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
     data: { observations, concepts },
   } = useObs(patientUuid);
 
-  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter.reference))].sort();
+  // Obs without an encounter each form their own group, keyed by their own id.
+  const uniqueEncounterReferences = [...new Set(observations.map((o) => o.encounter?.reference ?? o.id))].sort();
   const obssGroupedByEncounters = uniqueEncounterReferences.map((reference) =>
-    observations.filter((o) => o.encounter.reference === reference),
+    observations.filter((o) => (o.encounter?.reference ?? o.id) === reference),
   );
 
   const tableHeaders: Array<Header> = useMemo(() => {
@@ -59,28 +60,36 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       headers.splice(1, 0, {
         key: 'encounter',
         header: t('encounterType', 'Encounter type'),
-        sortFunc: (rowA: Row, rowB: Row) => rowA.encounter.localeCompare(rowB.encounter) as 1 | -1,
+        sortFunc: (rowA: Row, rowB: Row) => (rowA.encounter ?? '').localeCompare(rowB.encounter ?? '') as 1 | -1,
       });
     }
     headers.push(
-      ...config.data.map(({ concept, label }) => ({
-        key: concept,
-        header: label || concepts.find((c) => c.uuid == concept)?.display,
-        sortFunc: (rowA: Row, rowB: Row) => {
-          const a = rowA[concept];
-          const b = rowB[concept];
-          if (a === b) {
-            return 0;
-          }
-          if (a == null) {
-            return 1;
-          }
-          if (b == null) {
-            return -1;
-          }
-          return a < b ? 1 : -1;
-        },
-      })),
+      ...config.data.map(({ concept, label }) => {
+        const isNumeric = concepts.find((c) => c.uuid == concept)?.dataType === 'Numeric';
+        return {
+          key: concept,
+          header: label || concepts.find((c) => c.uuid == concept)?.display,
+          sortFunc: (rowA: Row, rowB: Row) => {
+            const a = rowA[concept];
+            const b = rowB[concept];
+            if (a === b) {
+              return 0;
+            }
+            if (a == null) {
+              return 1;
+            }
+            if (b == null) {
+              return -1;
+            }
+            // Numeric cells hold a mix of numbers and toFixed strings, so
+            // compare their numeric values rather than the display values.
+            if (isNumeric) {
+              return Number(b) - Number(a);
+            }
+            return a < b ? 1 : -1;
+          },
+        };
+      }),
     );
     return headers;
   }, [t, config.data, config.showEncounterType, concepts]);
@@ -92,7 +101,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
           rawDate: obss[0].effectiveDateTime,
-          encounter: obss[0].encounter.name,
+          encounter: obss[0].encounter?.name,
         };
 
         for (const obs of obss) {
@@ -114,7 +123,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               }
 
               if (value % 1 !== 0) {
-                if (decimalPlaces > 0) {
+                if (decimalPlaces != null) {
                   rowData[obs.conceptUuid] = value.toFixed(decimalPlaces);
                 } else {
                   rowData[obs.conceptUuid] = value.toFixed(2);

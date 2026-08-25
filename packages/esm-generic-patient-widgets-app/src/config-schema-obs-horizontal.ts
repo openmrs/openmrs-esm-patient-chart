@@ -31,7 +31,7 @@ export const configSchemaHorizontal = {
       decimalPlaces: {
         _type: Type.Number,
         _default: 2,
-        _validator: [validators.inRange(0, 10)],
+        _validators: [validators.inRange(0, 10)],
       },
     },
     _default: [

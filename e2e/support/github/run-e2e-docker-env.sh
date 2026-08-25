@@ -25,11 +25,15 @@ echo "Created packed app archives"
 echo "Creating dynamic spa-assemble-config.json..."
 # dynamically assemble our list of frontend modules, prepending the login app and
 # primary navigation apps; apps will all be in the /app directory of the Docker
-# container
+# container.
+# The Laboratory app (@openmrs/esm-laboratory-app) is not part of this monorepo, so
+# it is pulled from npm like the home and primary-navigation apps. It provides the
+# Laboratory worklist UI (Tests ordered / In progress / Completed tabs) exercised by
+# the lab-app-results e2e spec.
 jq -n \
   --arg apps "$apps" \
   --arg app_names "$(echo ${app_names[@]})" \
-  '{"@openmrs/esm-primary-navigation-app": "next", "@openmrs/esm-home-app": "next"} + (
+  '{"@openmrs/esm-primary-navigation-app": "next", "@openmrs/esm-home-app": "next", "@openmrs/esm-laboratory-app": "next"} + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
     | [$apps, $app_files]
     | transpose
