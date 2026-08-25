@@ -2,12 +2,12 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getConfig, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getConfig, getDefaultsFromConfigSchema, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { mockEncounterTypes, visitOverviewDetailMockData } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { esmPatientChartSchema, type ChartConfig } from '../../config-schema';
 import VisitDetailOverview from './visit-detail-overview.component';
-import { useEmrApiVisits, useVisitEncounters } from './visit.resource';
+import { useEmrApiVisits, usePaginatedVisits, useVisitEncounters } from './visit.resource';
 import {
   useEncounterTypes,
   usePaginatedEncounters,
@@ -16,6 +16,7 @@ import {
 
 const mockGetConfig = getConfig as Mock;
 const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
+const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 const mockUseAllEncounters = vi.fn(useAllEncounters).mockReturnValue({
   data: [],
@@ -44,9 +45,28 @@ const mockEmrApiVisitsData = {
   goToPrevious: vi.fn(),
 };
 
+const mockPaginatedVisitsData = {
+  data: [],
+  error: null,
+  mutate: vi.fn(),
+  isValidating: false,
+  isLoading: false,
+  totalPages: 0,
+  totalCount: 0,
+  currentPage: 1,
+  currentPageSize: { current: 10 },
+  paginated: false,
+  showNextButton: false,
+  showPreviousButton: false,
+  goTo: vi.fn(),
+  goToNext: vi.fn(),
+  goToPrevious: vi.fn(),
+};
+
 vi.mock('./visit.resource', async () => ({
   ...((await vi.importActual('./visit.resource')) as object),
   useEmrApiVisits: vi.fn().mockImplementation(() => mockEmrApiVisitsData),
+  usePaginatedVisits: vi.fn().mockImplementation(() => mockPaginatedVisitsData),
   useVisitEncounters: vi.fn().mockReturnValue({
     encounters: null,
     isLoading: false,
@@ -56,6 +76,7 @@ vi.mock('./visit.resource', async () => ({
   }),
 }));
 const mockUseEmrApiVisits = vi.mocked(useEmrApiVisits);
+const mockUsePaginatedVisits = vi.mocked(usePaginatedVisits);
 const mockUseVisitEncounters = vi.mocked(useVisitEncounters);
 
 const mockUsePaginatedEncounters = vi.fn(usePaginatedEncounters).mockReturnValue({
@@ -97,6 +118,8 @@ vi.mock('./past-visits-components/encounters-table/encounters-table.resource', a
 
 describe('VisitDetailOverview', () => {
   beforeEach(() => {
+    // Enable the EMRAPI feature flag so the component uses useEmrApiVisits
+    mockUseFeatureFlag.mockReturnValue(true);
     mockUseEmrApiVisits.mockReturnValue(mockEmrApiVisitsData);
     mockUseVisitEncounters.mockReturnValue({
       encounters: visitOverviewDetailMockData.data.results[0].encounters,

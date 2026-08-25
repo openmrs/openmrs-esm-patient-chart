@@ -26,8 +26,9 @@ export interface EmrApiVisitResponse {
 /**
  * Fetches visits and diagnoses from the EMRAPI endpoint.
  * Diagnoses are deduped within the hook so consumers don't need to handle it.
+ * Pass null for patientUuid to disable fetching.
  */
-export function useEmrApiVisits(patientUuid: string, pageSize: number = 10) {
+export function useEmrApiVisits(patientUuid: string | null, pageSize: number = 10) {
   const url = patientUuid
     ? new URL(
         `${window.openmrsBase}${restBaseUrl}/emrapi/patient/${patientUuid}/visit?v=custom:(visit,diagnoses)`,
@@ -87,20 +88,29 @@ export function useInfiniteVisits(
   return { visits: data, mutate, ...rest };
 }
 
+/**
+ * Standard paginated visits using the OpenMRS REST API.
+ * Pass null for patientUuid to disable fetching.
+ */
 export function usePaginatedVisits(
-  patientUuid: string,
+  patientUuid: string | null,
   pageSize: number,
   params: Record<string, number | string> = {},
 ) {
-  const url = new URL(
-    `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
-    window.location.toString(),
-  );
-  for (const key in params) {
-    url.searchParams.set(key, '' + params[key]);
+  const url = patientUuid
+    ? new URL(
+        `${window.openmrsBase}${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+        window.location.toString(),
+      )
+    : null;
+
+  if (url) {
+    for (const key in params) {
+      url.searchParams.set(key, '' + params[key]);
+    }
   }
 
-  const ret = useOpenmrsPagination<Visit>(patientUuid ? url : null, pageSize);
+  const ret = useOpenmrsPagination<Visit>(url, pageSize);
 
   return ret;
 }

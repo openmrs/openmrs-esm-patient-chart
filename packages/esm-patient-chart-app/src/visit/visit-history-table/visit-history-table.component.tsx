@@ -15,9 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, useFeatureFlag, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useEmrApiVisits } from '../visits-widget/visit.resource';
+import { useEmrApiVisits, usePaginatedVisits } from '../visits-widget/visit.resource';
 import VisitSummary from '../visits-widget/past-visits-components/visit-summary.component';
 import VisitDateCell from './visit-date-cell.component';
 import VisitTypeCell from './visit-type-cell.component';
@@ -32,7 +32,9 @@ interface VisitHistoryTableProps {
 
 /**
  * This shows a list of visit histories in the visit tab in patient chart.
- * Uses the EMRAPI endpoint to fetch lightweight visit data + diagnoses.
+ * When the EMRAPI module is available (feature flag enabled), uses the lightweight
+ * EMRAPI endpoint for fetching visit data + diagnoses.
+ * Otherwise, falls back to the standard usePaginatedVisits hook.
  * Full encounter data is fetched on-demand when a row is expanded (handled by VisitSummary).
  */
 const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, patient }) => {
@@ -42,15 +44,19 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
   const { t } = useTranslation();
   const layout = useLayoutType();
   const desktopLayout = isDesktop(layout);
+  const isEmrapiAvailable = useFeatureFlag('emrapi-module');
 
-  const {
-    visits: emrapiVisits,
-    currentPage,
-    error,
-    isLoading,
-    totalCount,
-    goTo,
-  } = useEmrApiVisits(patientUuid, pageSize);
+  // EMRAPI path: lightweight visits + diagnoses
+  const emrapi = useEmrApiVisits(isEmrapiAvailable ? patientUuid : null, pageSize);
+
+  // Fallback path: standard paginated visits
+  const paginated = usePaginatedVisits(!isEmrapiAvailable ? patientUuid : null, pageSize);
+
+  const currentPage = isEmrapiAvailable ? emrapi.currentPage : paginated.currentPage;
+  const error = isEmrapiAvailable ? emrapi.error : paginated.error;
+  const isLoading = isEmrapiAvailable ? emrapi.isLoading : paginated.isLoading;
+  const totalCount = isEmrapiAvailable ? emrapi.totalCount : paginated.totalCount;
+  const goTo = isEmrapiAvailable ? emrapi.goTo : paginated.goTo;
 
   const columns = [
     { key: 'visitDate', header: t('date', 'Date'), CellComponent: VisitDateCell },
@@ -59,7 +65,12 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
     { key: 'actions', header: '', CellComponent: VisitActionsCell },
   ];
 
-  const rowData = emrapiVisits?.map(({ visit, diagnoses }) => {
+  // Normalize data: EMRAPI returns { visit, diagnoses }[], paginated returns Visit[]
+  const normalizedVisits = isEmrapiAvailable
+    ? emrapi.visits?.map(({ visit, diagnoses }) => ({ visit, diagnoses }))
+    : paginated.data?.map((visit) => ({ visit, diagnoses: [] }));
+
+  const rowData = normalizedVisits?.map(({ visit, diagnoses }) => {
     const row: Record<string, JSX.Element | string> = { id: visit.uuid };
     for (const { key, CellComponent } of columns) {
       row[key] = <CellComponent key={key} visit={visit} patient={patient} diagnoses={diagnoses} />;
@@ -75,7 +86,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
     return <ErrorState error={error} headerTitle={t('pastVisits', 'Past visits')} />;
   }
 
-  if (!emrapiVisits || emrapiVisits.length === 0) {
+  if (!normalizedVisits || normalizedVisits.length === 0) {
     return (
       <div className={styles.emptyStateContainer}>
         <EmptyState headerTitle={t('pastVisits', 'Past visits')} displayText={t('visits', 'visits')} />
@@ -108,7 +119,7 @@ const VisitHistoryTable: React.FC<VisitHistoryTableProps> = ({ patientUuid, pati
                 </TableHead>
                 <TableBody>
                   {rows.map((row, i) => {
-                    const { visit, diagnoses } = emrapiVisits[i];
+                    const { visit, diagnoses } = normalizedVisits[i];
                     return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
