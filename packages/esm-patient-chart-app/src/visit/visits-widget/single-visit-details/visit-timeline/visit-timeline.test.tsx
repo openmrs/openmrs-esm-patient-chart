@@ -15,14 +15,14 @@ import {
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import { esmPatientChartSchema } from '../../../../config-schema';
+import { type ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
 import { type MappedEncounter } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import VisitTimeline from './visit-timeline.component';
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 const mockLaunchWorkspace = vi.mocked(launchWorkspace2);
-const mockUseConfig = vi.mocked(useConfig);
+const mockUseConfig = vi.mocked(useConfig<ChartConfig>);
 const mockUseFeatureFlag = vi.mocked(useFeatureFlag);
 const mockUserHasAccess = vi.mocked(userHasAccess);
 const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
@@ -51,6 +51,20 @@ const encounterWithJsonSchemaForm = {
     ],
   },
 } as Encounter;
+
+// Each encounter is a day older than the one before it, so the timeline renders them in index order
+function buildEncounters(count: number): Array<Encounter> {
+  return Array.from(
+    { length: count },
+    (_, index) =>
+      ({
+        ...admissionEncounter,
+        uuid: `encounter-${index}`,
+        encounterDatetime: new Date(Date.UTC(2024, 0, 1) - index * 24 * 60 * 60 * 1000).toISOString(),
+        encounterType: { ...admissionEncounter.encounterType, display: `Encounter ${index}` },
+      }) as Encounter,
+  );
+}
 
 function renderVisitTimeline(
   encounters: Array<Encounter> = mockEncountersAlice,
@@ -242,5 +256,42 @@ describe('VisitTimeline', () => {
     );
     // The observations panel is what the embedded form view replaces
     expect(screen.queryByText(/recorded via poc consent form/i)).not.toBeInTheDocument();
+  });
+
+  it('renders every encounter of a visit that fits on a single page, with the pager disabled', () => {
+    renderVisitTimeline(buildEncounters(10));
+
+    expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(10);
+    expect(screen.getByRole('button', { name: /next page/i })).toBeDisabled();
+  });
+
+  it('paginates a long visit, ten encounters to a page', async () => {
+    const user = userEvent.setup();
+    renderVisitTimeline(buildEncounters(25));
+
+    expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(10);
+    expect(screen.getByText('Encounter 0')).toBeInTheDocument();
+    expect(screen.queryByText('Encounter 10')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+
+    expect(screen.queryByText('Encounter 0')).not.toBeInTheDocument();
+    expect(screen.getByText('Encounter 10')).toBeInTheDocument();
+    expect(screen.getByText('Encounter 19')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+
+    // The last page holds the remaining five encounters
+    expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(5);
+    expect(screen.getByText('Encounter 24')).toBeInTheDocument();
+  });
+
+  it('takes the number of encounters shown per page from the visitTimelinePageSize config', () => {
+    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(esmPatientChartSchema), visitTimelinePageSize: 5 });
+
+    renderVisitTimeline(buildEncounters(25));
+
+    expect(screen.getAllByRole('button', { name: /expand encounter/i })).toHaveLength(5);
+    expect(screen.getByText(/5 \/ 25 items/i)).toBeInTheDocument();
   });
 });

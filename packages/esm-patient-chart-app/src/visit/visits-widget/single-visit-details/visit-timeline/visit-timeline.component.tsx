@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -12,11 +12,12 @@ import {
   useConfig,
   useFeatureFlag,
   useLayoutType,
+  usePagination,
   userHasAccess,
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
-import { EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
 import {
   canModifyEncounter,
@@ -80,6 +81,17 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
     [canPrintEncounters, config, session?.user, visit?.encounters],
   );
 
+  const {
+    currentPage,
+    goTo,
+    results: paginatedTimelineEntries,
+  } = usePagination(timelineEntries, config.visitTimelinePageSize);
+
+  // goTo clamps to the last page, so deleting the final encounter of a page can't strand the user on an empty one
+  useEffect(() => {
+    goTo(currentPage);
+  }, [currentPage, goTo]);
+
   const toggleEncounter = useCallback((encounterUuid: string) => {
     setExpandedEncounters((previouslyExpanded) => {
       const expanded = new Set(previouslyExpanded);
@@ -116,7 +128,7 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
         <span>{t('timeStarted', 'Time started')}</span>
       </p>
       <div className={styles.timelineEntries}>
-        {timelineEntries.map(
+        {paginatedTimelineEntries.map(
           ({
             canDeleteEncounter,
             canEditEncounter,
@@ -238,6 +250,13 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
         )}
         <div className={styles.timelineLine} />
       </div>
+      <PatientChartPagination
+        currentItems={paginatedTimelineEntries.length}
+        onPageNumberChange={({ page }) => goTo(page)}
+        pageNumber={currentPage}
+        pageSize={config.visitTimelinePageSize}
+        totalItems={timelineEntries.length}
+      />
     </div>
   );
 }

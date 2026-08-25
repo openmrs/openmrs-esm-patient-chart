@@ -136,6 +136,11 @@ export const esmPatientChartSchema = {
     _type: Type.ConceptUuid,
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  visitTimelinePageSize: {
+    _type: Type.Number,
+    _default: 10,
+    _description: 'The number of encounters shown per page in the visit summary Timeline',
+  },
   visitTypeResourceUrl: {
     _type: Type.String,
     _default: '/etl-latest/etl/patient/',
@@ -210,6 +215,7 @@ export interface ChartConfig {
   showRecommendedVisitTypeTab: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
   showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
+  visitTimelinePageSize: number;
   visitTypeResourceUrl: string;
   visitAttributeTypes: Array<{
     displayInThePatientBanner: boolean;
