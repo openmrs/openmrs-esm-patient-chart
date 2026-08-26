@@ -11,6 +11,7 @@ import { ConceptResourceService } from '../openmrs-api/concept-resource.service'
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import type {
   Concept,
+  ConceptMapping,
   FormSchema,
   Identifier,
   Location,
@@ -20,8 +21,26 @@ import type {
   Questions,
 } from '../types';
 
+const conceptWithMappingsRep =
+  'custom:(uuid,name,conceptClass,mappings:(conceptMapType:(uuid,display),conceptReferenceTerm:(code,conceptSource:(uuid))))';
+const sameAsConceptMapTypeUuid = '35543629-7d8c-11e1-909d-c80aa9edcf4e';
+
+function getConceptCode(concept: Concept, conceptSourceUuid: string): string | undefined {
+  const mappingsToSource: Array<ConceptMapping> =
+    concept.mappings?.filter((mapping) => mapping.conceptReferenceTerm?.conceptSource?.uuid === conceptSourceUuid) ??
+    [];
+  const sameAsMapping = mappingsToSource.find(
+    (mapping) =>
+      mapping.conceptMapType?.uuid === sameAsConceptMapTypeUuid ||
+      mapping.conceptMapType?.display?.toUpperCase() === 'SAME-AS',
+  );
+  return (sameAsMapping ?? mappingsToSource[0])?.conceptReferenceTerm?.code;
+}
+
 @Injectable()
 export class FormDataSourceService {
+  private readonly personAttributeUrl = 'http://fhir.openmrs.org/ext/person-attribute';
+
   constructor(
     private providerResourceService: ProviderResourceService,
     private locationResourceService: LocationResourceService,
@@ -260,8 +279,11 @@ export class FormDataSourceService {
     );
   }
 
-  public resolveConcept(uuid: string) {
-    return this.conceptResourceService.getConceptByUuid(uuid).pipe(map(this.mapConcept));
+  public resolveConcept(uuid: string, dataSourceOptions?: Record<string, unknown>) {
+    const conceptSourceUuid = this.getConceptSourceUuid(dataSourceOptions);
+    return this.conceptResourceService
+      .getConceptByUuid(uuid, false, conceptSourceUuid ? conceptWithMappingsRep : undefined)
+      .pipe(map((concept) => this.mapConcept(concept as Concept, conceptSourceUuid)));
   }
 
   public getConceptAnswers(uuid: string) {
@@ -307,27 +329,42 @@ export class FormDataSourceService {
         ),
       );
   }
-  public findDiagnoses(searchText) {
+  public findDiagnoses(searchText: string, dataSourceOptions?: Record<string, unknown>) {
     const allowedConceptClasses = ['8d4918b0-c2cc-11de-8d13-0010c6dffd0f'];
+    const conceptSourceUuid = this.getConceptSourceUuid(dataSourceOptions);
 
     return this.conceptResourceService
-      .searchConcept(searchText)
+      .searchConcept(searchText, false, conceptSourceUuid ? conceptWithMappingsRep : null)
       .pipe(
         map((concepts) =>
           concepts
             .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
-            .map(this.mapConcept),
+            .map((concept) => this.mapConcept(concept, conceptSourceUuid)),
         ),
       );
   }
 
-  public mapConcept(concept?: Concept) {
-    return (
-      concept && {
-        value: concept.uuid,
-        label: concept.name.display,
-      }
-    );
+  public mapConcept(concept?: Concept, conceptSourceUuid?: string) {
+    if (!concept) {
+      return concept;
+    }
+    // mapConcept is also used as an unbound Array.map callback, which passes
+    // the element index as the second argument and no `this` context. Only
+    // dereference the code lookup for an explicitly provided source string.
+    const code =
+      typeof conceptSourceUuid === 'string' && conceptSourceUuid
+        ? getConceptCode(concept, conceptSourceUuid)
+        : undefined;
+    return {
+      value: concept.uuid,
+      label: concept.name.display,
+      ...(code ? { code } : {}),
+    };
+  }
+
+  private getConceptSourceUuid(dataSourceOptions?: Record<string, unknown>): string | undefined {
+    const conceptSourceUuid = dataSourceOptions?.conceptSourceUuid;
+    return typeof conceptSourceUuid === 'string' && conceptSourceUuid ? conceptSourceUuid : undefined;
   }
 
   public getCachedProviderSearchResults() {
@@ -353,7 +390,7 @@ export class FormDataSourceService {
         return 'U';
     }
   }
-  public getPatientObject(patient): PatientModel {
+  public getPatientObject(patient: fhir.Patient): PatientModel {
     return {
       ...patient,
       patientUuid: patient.id,
@@ -362,7 +399,27 @@ export class FormDataSourceService {
       age: this.calculateAge(patient.birthDate),
       gendercreatconstant: patient.gender === 'female' ? 0.85 : patient.gender === 'male' ? 1 : undefined,
       identifiers: this.mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient),
+      attributes: this.mapFHIRPatientExtensionsToPersonAttributes(patient),
     };
+  }
+
+  private mapFHIRPatientExtensionsToPersonAttributes(patient: fhir.Patient): Record<string, string> {
+    const extensions = patient?.extension?.filter((ext) => ext.url === this.personAttributeUrl) ?? [];
+
+    return extensions.reduce<Record<string, string>>((attributes, extension) => {
+      const attributeType = this.getNestedExtensionValue(extension, 'person-attribute-type');
+      const value = this.getNestedExtensionValue(extension, 'person-attribute-value');
+
+      if (attributeType && value) {
+        attributes[attributeType] = value;
+      }
+
+      return attributes;
+    }, {});
+  }
+
+  private getNestedExtensionValue(parent: fhir.Extension, name: string): string | undefined {
+    return parent.extension?.find((ext) => ext.url === `http://fhir.openmrs.org/ext/${name}`)?.valueString;
   }
 
   private calculateAge(birthday) {

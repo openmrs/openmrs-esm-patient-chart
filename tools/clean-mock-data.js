@@ -20,6 +20,7 @@ data = JSON.parse(data).results;
 
 data = trimExcess(data);
 
+// eslint-disable-next-line no-console
 console.log(util.inspect(data, { showHidden: false, depth: null }));
 
 /**

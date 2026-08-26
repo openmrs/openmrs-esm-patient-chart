@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-node-access */
 import { vi, describe, it, expect } from 'vitest';
 import React from 'react';
 import dayjs from 'dayjs';
@@ -41,6 +40,13 @@ mockUseConfig.mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),
   ...mockBiometricsConfig,
 } as ConfigObject);
+
+const getRowDates = () =>
+  screen
+    .getAllByRole('row')
+    .slice(1) // Exclude the header row
+    .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}/)?.[0])
+    .filter(Boolean);
 
 describe('Biometrics Overview', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
@@ -116,28 +122,107 @@ describe('Biometrics Overview', () => {
     const sortRowsButton = screen.getByRole('button', { name: /date and time/i });
 
     const expectedDescendingOrder = [
-      '12 — Aug — 2021, 12:00 AM',
-      '18 — Jun — 2021, 12:00 AM',
-      '10 — Jun — 2021, 12:00 AM',
-      '26 — May — 2021, 12:00 AM',
-      '10 — May — 2021, 12:00 AM',
+      '12 — Aug — 2021',
+      '18 — Jun — 2021',
+      '10 — Jun — 2021',
+      '26 — May — 2021',
+      '10 — May — 2021',
     ];
     const expectedAscendingOrder = [
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '08 — Dec — 2020, 12:00 AM',
-      '09 — Dec — 2020, 12:00 AM',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '08 — Dec — 2020',
+      '09 — Dec — 2020',
     ];
-
-    const getRowDates = () =>
-      screen
-        .getAllByRole('row')
-        .slice(1) // Exclude header row
-        .map((row) => row.textContent?.match(/\d{1,2} — \w{3} — \d{4}, \d{1,2}:\d{2} (AM|PM)/)?.[0] || '');
 
     // Initial state should be descending
     expect(getRowDates()).toEqual(expectedDescendingOrder);
+
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    // The first click sorts in ascending order, putting the oldest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(expectedAscendingOrder);
+
+    // The second click sorts in descending order, putting the newest reading first
+    await user.click(sortRowsButton);
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(expectedDescendingOrder);
+  });
+
+  it('sorts across the whole dataset even when the visible page holds a single row', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+    } as ConfigObject);
+
+    // The overview paginates five rows to a page, so a sixth reading leaves the
+    // second page holding a single row. Carbon's comparator is never invoked
+    // there, because `Array.prototype.sort` performs no comparisons on a
+    // single-element array.
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: formattedBiometrics.slice(0, 6),
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    await screen.findByRole('table', { name: /biometrics/i });
+
+    await user.click(screen.getByRole('button', { name: /next page/i }));
+    expect(getRowDates()).toEqual(['08 — Apr — 2021']);
+
+    const dateColumnHeader = () => screen.getByRole('columnheader', { name: /date and time/i });
+
+    await user.click(screen.getByRole('button', { name: /date and time/i }));
+
+    expect(dateColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(['12 — Aug — 2021']);
+  });
+
+  it('restores the unsorted order once the header cycles back to none', async () => {
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      ...mockBiometricsConfig,
+    } as ConfigObject);
+
+    mockUseVitalsAndBiometrics.mockReturnValue({
+      data: [
+        { id: '0', date: '2021-08-12T00:00:00.000Z', weight: 90 },
+        { id: '1', date: '2021-06-18T00:00:00.000Z', weight: 50 },
+        { id: '2', date: '2021-06-10T00:00:00.000Z', weight: 70 },
+      ],
+    } as ReturnType<typeof useVitalsAndBiometrics>);
+
+    renderWithSwr(<BiometricsOverview {...testProps} />);
+
+    await waitForLoadingToFinish();
+    await screen.findByRole('table', { name: /biometrics/i });
+
+    const unsortedOrder = ['12 — Aug — 2021', '18 — Jun — 2021', '10 — Jun — 2021'];
+    expect(getRowDates()).toEqual(unsortedOrder);
+
+    const sortRowsButton = screen.getByRole('button', { name: /weight/i });
+    const weightColumnHeader = () => screen.getByRole('columnheader', { name: /weight/i });
+
+    await user.click(sortRowsButton);
+    expect(weightColumnHeader()).toHaveAttribute('aria-sort', 'ascending');
+    expect(getRowDates()).toEqual(['18 — Jun — 2021', '10 — Jun — 2021', '12 — Aug — 2021']);
+
+    await user.click(sortRowsButton);
+    expect(weightColumnHeader()).toHaveAttribute('aria-sort', 'descending');
+    expect(getRowDates()).toEqual(['12 — Aug — 2021', '10 — Jun — 2021', '18 — Jun — 2021']);
+
+    // The third click clears the sort, so the rows return to their original order
+    await user.click(sortRowsButton);
+    expect(weightColumnHeader()).toHaveAttribute('aria-sort', 'none');
+    expect(getRowDates()).toEqual(unsortedOrder);
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
