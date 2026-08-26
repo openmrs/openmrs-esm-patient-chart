@@ -39,6 +39,8 @@ function getConceptCode(concept: Concept, conceptSourceUuid: string): string | u
 
 @Injectable()
 export class FormDataSourceService {
+  private readonly personAttributeUrl = 'http://fhir.openmrs.org/ext/person-attribute';
+
   constructor(
     private providerResourceService: ProviderResourceService,
     private locationResourceService: LocationResourceService,
@@ -388,7 +390,7 @@ export class FormDataSourceService {
         return 'U';
     }
   }
-  public getPatientObject(patient): PatientModel {
+  public getPatientObject(patient: fhir.Patient): PatientModel {
     return {
       ...patient,
       patientUuid: patient.id,
@@ -397,7 +399,27 @@ export class FormDataSourceService {
       age: this.calculateAge(patient.birthDate),
       gendercreatconstant: patient.gender === 'female' ? 0.85 : patient.gender === 'male' ? 1 : undefined,
       identifiers: this.mapFHIRPatientIdentifiersToOpenMRSIdentifiers(patient),
+      attributes: this.mapFHIRPatientExtensionsToPersonAttributes(patient),
     };
+  }
+
+  private mapFHIRPatientExtensionsToPersonAttributes(patient: fhir.Patient): Record<string, string> {
+    const extensions = patient?.extension?.filter((ext) => ext.url?.startsWith(this.personAttributeUrl)) ?? [];
+
+    return extensions.reduce<Record<string, string>>((attributes, extension) => {
+      const attributeType = this.getNestedExtensionValue(extension, 'person-attribute-type');
+      const value = this.getNestedExtensionValue(extension, 'person-attribute-value');
+
+      if (attributeType && value) {
+        attributes[attributeType] = value;
+      }
+
+      return attributes;
+    }, {});
+  }
+
+  private getNestedExtensionValue(parent: fhir.Extension, name: string): string | undefined {
+    return parent.extension?.find((ext) => ext.url?.endsWith(name))?.valueString;
   }
 
   private calculateAge(birthday) {

@@ -276,4 +276,74 @@ describe('Service: FormDataSourceService', () => {
       ]);
     });
   });
+
+  describe('person attributes mapping', () => {
+    const personAttributeUrl = 'http://fhir.openmrs.org/ext/person-attribute';
+
+    const personAttributeExtension = (attributeType?: string, value?: string): fhir.Extension => ({
+      url: personAttributeUrl,
+      extension: [
+        ...(attributeType === undefined ? [] : [{ url: `${personAttributeUrl}-type`, valueString: attributeType }]),
+        ...(value === undefined ? [] : [{ url: `${personAttributeUrl}-value`, valueString: value }]),
+      ],
+    });
+
+    const patientWithExtensions = (extension: Array<fhir.Extension>): fhir.Patient => ({
+      resourceType: 'Patient',
+      id: 'patient-uuid',
+      gender: 'female',
+      birthDate: '2000-01-01',
+      extension,
+    });
+
+    it('should map FHIR person-attribute extensions to person attributes', () => {
+      const service: FormDataSourceService = TestBed.inject(FormDataSourceService);
+      const patient = patientWithExtensions([
+        personAttributeExtension('Phone Number', '0716700900'),
+        personAttributeExtension('Email', 'test@example.com'),
+      ]);
+
+      const { attributes } = service.getPatientObject(patient);
+
+      expect(attributes).toEqual({
+        'Phone Number': '0716700900',
+        Email: 'test@example.com',
+      });
+      expect(attributes['Phone Number']).toBe('0716700900');
+    });
+
+    it('should ignore extensions that are not person attributes', () => {
+      const service: FormDataSourceService = TestBed.inject(FormDataSourceService);
+      const patient = patientWithExtensions([
+        { url: 'http://fhir.openmrs.org/ext/some-other-extension', valueString: 'ignored' },
+        personAttributeExtension('Phone Number', '0716700900'),
+      ]);
+
+      const { attributes } = service.getPatientObject(patient);
+
+      expect(attributes).toEqual({ 'Phone Number': '0716700900' });
+    });
+
+    it('should drop person attributes missing a type or a value', () => {
+      const service: FormDataSourceService = TestBed.inject(FormDataSourceService);
+      const patient = patientWithExtensions([
+        personAttributeExtension('Phone Number', undefined),
+        personAttributeExtension(undefined, 'orphan-value'),
+        personAttributeExtension('Email', 'test@example.com'),
+      ]);
+
+      const { attributes } = service.getPatientObject(patient);
+
+      expect(attributes).toEqual({ Email: 'test@example.com' });
+    });
+
+    it('should return an empty object when the patient has no extensions', () => {
+      const service: FormDataSourceService = TestBed.inject(FormDataSourceService);
+      const patient: fhir.Patient = { resourceType: 'Patient', id: 'patient-uuid' };
+
+      const { attributes } = service.getPatientObject(patient);
+
+      expect(attributes).toEqual({});
+    });
+  });
 });
