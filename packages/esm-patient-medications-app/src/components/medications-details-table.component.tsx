@@ -31,6 +31,7 @@ import {
   type Order,
   type OrderBasketWindowProps,
   type PatientWorkspaceGroupProps,
+  useSystemVisitSetting,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
@@ -401,50 +402,68 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+  const { systemVisitEnabled: visitRequired } = useSystemVisitSetting();
+  const encounterUuid = medication.encounter.uuid;
+  const visitContext = medication.encounter.visit ?? null;
+  const visitUuid = visitContext?.uuid;
 
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: medication.encounter.visit,
-      mutateVisitContext: () => {
-        invalidateVisitByUuid(globalMutate, medication.encounter.visit?.uuid);
-        invalidateVisitAndEncounterData(globalMutate, patient.id);
-      },
+      visitContext,
+      mutateVisitContext: visitUuid
+        ? () => {
+            invalidateVisitByUuid(globalMutate, visitUuid);
+            invalidateVisitAndEncounterData(globalMutate, patient.id);
+          }
+        : null,
     }),
-    [patient, medication, globalMutate],
+    [globalMutate, patient, visitContext, visitUuid],
   );
   const handleDiscontinueClick = useCallback(() => {
+    if (visitRequired && !visitContext) {
+      return;
+    }
+
     setItems([...items, buildMedicationOrder(medication, 'DISCONTINUE')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounterUuid: medication.encounter.uuid },
+      { encounterUuid },
       workspaceGroupProps,
     );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  }, [encounterUuid, items, medication, setItems, visitContext, visitRequired, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
+    if (visitRequired && !visitContext) {
+      return;
+    }
+
     launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'add-drug-order',
       {
         order: buildMedicationOrder(medication, 'REVISE'),
         orderToEditOrdererUuid: medication.orderer.uuid,
       },
-      { encounterUuid: medication.encounter.uuid },
+      { encounterUuid },
       workspaceGroupProps,
     );
-  }, [medication, workspaceGroupProps]);
+  }, [encounterUuid, medication, visitContext, visitRequired, workspaceGroupProps]);
 
   const handleRenewClick = useCallback(() => {
+    if (visitRequired && !visitContext) {
+      return;
+    }
+
     setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounterUuid: medication.encounter.uuid },
+      { encounterUuid },
       workspaceGroupProps,
     );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  }, [encounterUuid, items, medication, setItems, visitContext, visitRequired, workspaceGroupProps]);
 
   return (
     <OverflowMenu
@@ -460,13 +479,13 @@ function OrderBasketItemActions({
           id="modify"
           itemText={t('modify', 'Modify')}
           onClick={handleModifyClick}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
         />
       )}
       {showRenewButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
           id="renew"
           itemText={t('orderActionRenew', 'Renew')}
           onClick={handleRenewClick}
@@ -475,7 +494,7 @@ function OrderBasketItemActions({
       {showDiscontinueButton && (
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
           hasDivider
           id="discontinue"
           isDelete

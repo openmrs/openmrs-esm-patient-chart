@@ -44,6 +44,7 @@ import {
   useOrderBasket,
   useOrderTypes,
   usePatientOrders,
+  useSystemVisitSetting,
 } from '@openmrs/esm-patient-common-lib';
 import { prepMedicationOrderPostData } from '@openmrs/esm-patient-medications-app/src/api/api';
 import { prepTestOrderPostData } from '@openmrs/esm-patient-tests-app/src/test-orders/api';
@@ -613,19 +614,27 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   const { orders, setOrders } = useOrderBasket<OrderBasketItem>(patient, grouping, postDataPrepFn);
   const alreadyInBasket = orders.some((x) => x.uuid === orderItem.uuid);
   const { mutate: globalMutate } = useSWRConfig();
+  const { systemVisitEnabled: visitRequired } = useSystemVisitSetting();
+  const encounterUuid = orderItem.encounter.uuid;
+  const visitContext = orderItem.encounter.visit ?? null;
+  const visitUuid = visitContext?.uuid;
 
-  const windowProps = useMemo(() => ({ encounterUuid: orderItem.encounter.uuid }), [orderItem.encounter.uuid]);
+  const windowProps = useMemo(() => ({ encounterUuid }), [encounterUuid]);
   const groupProps = useMemo(
     () => ({
       patient,
       patientUuid: patient.id,
-      visitContext: orderItem.encounter.visit,
-      mutateVisitContext: invalidateVisitByUuid(globalMutate, orderItem.encounter.visit.uuid),
+      visitContext,
+      mutateVisitContext: visitUuid ? () => invalidateVisitByUuid(globalMutate, visitUuid) : null,
     }),
-    [patient, orderItem.encounter.visit, globalMutate],
+    [globalMutate, patient, visitContext, visitUuid],
   );
 
   const handleCancelOrder = useCallback(() => {
+    if (visitRequired && !visitContext) {
+      return;
+    }
+
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       getDrugOrderByUuid(orderItem.uuid)
         .then((res) => {
@@ -646,9 +655,13 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       setOrders([...orders, order]);
       launchWorkspace2('order-basket', {}, windowProps, groupProps);
     }
-  }, [orderItem, setOrders, orders, windowProps, groupProps]);
+  }, [groupProps, orderItem, orders, setOrders, visitContext, visitRequired, windowProps]);
 
   const handleModifyOrder = useCallback(() => {
+    if (visitRequired && !visitContext) {
+      return;
+    }
+
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       // make another call to fetch the order,
       // this time with custom rep to include the drug field
@@ -685,7 +698,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         groupProps,
       );
     }
-  }, [orderItem, windowProps, groupProps]);
+  }, [groupProps, orderItem, visitContext, visitRequired, windowProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
@@ -701,7 +714,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket}
+          disabled={alreadyInBasket || (visitRequired && !visitContext)}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
           onClick={handleModifyOrder}
@@ -721,7 +734,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         )}
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE'}
+          disabled={alreadyInBasket || orderItem?.action === 'DISCONTINUE' || (visitRequired && !visitContext)}
           hasDivider
           id="discontinue"
           isDelete
