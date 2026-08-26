@@ -404,7 +404,7 @@ export class FormDataSourceService {
   }
 
   private mapFHIRPatientExtensionsToPersonAttributes(patient: fhir.Patient): Record<string, string> {
-    const extensions = patient?.extension?.filter((ext) => ext.url?.startsWith(this.personAttributeUrl)) ?? [];
+    const extensions = patient?.extension?.filter((ext) => ext.url === this.personAttributeUrl) ?? [];
 
     return extensions.reduce<Record<string, string>>((attributes, extension) => {
       const attributeType = this.getNestedExtensionValue(extension, 'person-attribute-type');
@@ -419,7 +419,7 @@ export class FormDataSourceService {
   }
 
   private getNestedExtensionValue(parent: fhir.Extension, name: string): string | undefined {
-    return parent.extension?.find((ext) => ext.url?.endsWith(name))?.valueString;
+    return parent.extension?.find((ext) => ext.url === `http://fhir.openmrs.org/ext/${name}`)?.valueString;
   }
 
   private calculateAge(birthday) {
