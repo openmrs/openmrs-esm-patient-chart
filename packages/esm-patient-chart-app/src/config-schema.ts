@@ -1,4 +1,7 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validator } from '@openmrs/esm-framework';
+
+// The Timeline falls back to this when the configured page size is unusable
+export const defaultVisitTimelinePageSize = 10;
 
 export const esmPatientChartSchema = {
   defaultFacilityUrl: {
@@ -136,6 +139,14 @@ export const esmPatientChartSchema = {
     _type: Type.ConceptUuid,
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  visitTimelinePageSize: {
+    _type: Type.Number,
+    _validators: [
+      validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
+    ],
+    _default: defaultVisitTimelinePageSize,
+    _description: 'The number of encounters shown per page in the visit summary Timeline',
+  },
   visitTypeResourceUrl: {
     _type: Type.String,
     _default: '/etl-latest/etl/patient/',
@@ -210,6 +221,7 @@ export interface ChartConfig {
   showRecommendedVisitTypeTab: boolean;
   showServiceQueueFields: boolean; // used by extension from esm-service-queues-app
   showUpcomingAppointments: boolean; // used by extension from esm-appointments-app
+  visitTimelinePageSize: number;
   visitTypeResourceUrl: string;
   visitAttributeTypes: Array<{
     displayInThePatientBanner: boolean;
