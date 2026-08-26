@@ -21,6 +21,7 @@
   "discard": "Discard",
   "discontinued": "Discontinued",
   "dose": "Dose",
+  "drugAlreadyPrescribed": "Already prescribed",
   "drugOrders": "drug orders",
   "editOrderableForOrderType": "Edit {{orderTypeDisplay}}",
   "editResults": "Edit results",

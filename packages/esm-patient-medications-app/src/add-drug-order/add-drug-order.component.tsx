@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useState } from 'react';
+import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
@@ -21,7 +21,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 
 import { type ConfigObject } from '../config-schema';
-import { prepMedicationOrderPostData } from '../api/api';
+import { prepMedicationOrderPostData, useMedicationOrders } from '../api/api';
 import { ordersEqual } from './drug-search/helpers';
 import { useConceptSets } from './drug-search/drug-search.resource';
 import { DrugOrderForm } from './drug-order-form.component';
@@ -90,6 +90,31 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     isLoading: isLoadingConceptSets,
     error: conceptSetsError,
   } = useConceptSets(drugCategoryConceptSets);
+
+  // Fetch active + scheduled drug orders once at this level so all children
+  // (search results, browse, favorites list) share the same SWR cache entry.
+  // useMedicationOrders applies the configured drugOrderTypeUUID filter, which
+  // avoids the HTTP 400 that occurs when drugCustomRepresentation is requested
+  // for non-drug order types (e.g. TestOrder).
+  const {
+    activeOrders,
+    futureOrders,
+    isLoading: isOrdersLoading,
+    error: ordersError,
+  } = useMedicationOrders(patientUuid);
+  // Treat an error the same as loading so pinned items are disabled (fail-closed)
+  // rather than clickable when we cannot confirm the patient's active orders.
+  const isLoadingOrders = isOrdersLoading || !!ordersError;
+  const prescribedDrugUuids = useMemo(
+    () =>
+      new Set(
+        activeOrders
+          .concat(futureOrders)
+          .map((o) => o?.drug?.uuid)
+          .filter(Boolean) as string[],
+      ),
+    [activeOrders, futureOrders],
+  );
 
   const openOrderForm = useCallback(
     (searchResult: DrugOrderBasketItem) => {
@@ -203,6 +228,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
                     searchTerm={searchTerm}
                     onSearchTermChange={setSearchTerm}
                     launchAllergyForm={launchAllergyForm}
+                    prescribedDrugUuids={prescribedDrugUuids}
+                    isLoadingOrders={isLoadingOrders}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -229,6 +256,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
               searchTerm={searchTerm}
               onSearchTermChange={setSearchTerm}
               launchAllergyForm={launchAllergyForm}
+              prescribedDrugUuids={prescribedDrugUuids}
+              isLoadingOrders={isLoadingOrders}
             />
           </div>
         )}

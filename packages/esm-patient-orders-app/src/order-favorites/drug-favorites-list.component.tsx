@@ -38,7 +38,6 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
           className={styles.itemButton}
           onClick={() => onClick(favorite)}
           disabled={alreadyPrescribed}
-          aria-disabled={alreadyPrescribed}
         >
           <div className={styles.itemContent}>
             <p className={styles.itemTitle}>{favorite.displayName}</p>
