@@ -15,7 +15,7 @@ import {
 import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockEncountersAlice, mockFhirPatient, mockPatientAlice, mockVisit } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import { type ChartConfig, esmPatientChartSchema } from '../../../../config-schema';
+import { type ChartConfig, defaultVisitTimelinePageSize, esmPatientChartSchema } from '../../../../config-schema';
 import { jsonSchemaResourceName } from '../../../../constants';
 import { type MappedEncounter } from '../../past-visits-components/encounters-table/encounters-table.resource';
 import VisitTimeline from './visit-timeline.component';
@@ -300,8 +300,12 @@ describe('VisitTimeline', () => {
     [0, 1],
     [-5, 1],
     [2.5, 2],
+    ['not-a-number', defaultVisitTimelinePageSize],
   ])('renders a page of encounters when visitTimelinePageSize is %s', (visitTimelinePageSize, expectedPageSize) => {
-    mockUseConfig.mockReturnValue({ ...getDefaultsFromConfigSchema(esmPatientChartSchema), visitTimelinePageSize });
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientChartSchema),
+      visitTimelinePageSize: visitTimelinePageSize as number,
+    });
 
     renderVisitTimeline(buildEncounters(25));
 

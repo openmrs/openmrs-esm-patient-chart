@@ -1,5 +1,8 @@
 import { Type, validator } from '@openmrs/esm-framework';
 
+// The Timeline falls back to this when the configured page size is unusable
+export const defaultVisitTimelinePageSize = 10;
+
 export const esmPatientChartSchema = {
   defaultFacilityUrl: {
     _type: Type.String,
@@ -141,7 +144,7 @@ export const esmPatientChartSchema = {
     _validators: [
       validator((v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 1, 'Must be a positive integer'),
     ],
-    _default: 10,
+    _default: defaultVisitTimelinePageSize,
     _description: 'The number of encounters shown per page in the visit summary Timeline',
   },
   visitTypeResourceUrl: {

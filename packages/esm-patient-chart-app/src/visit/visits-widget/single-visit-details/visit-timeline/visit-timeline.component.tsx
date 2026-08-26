@@ -18,7 +18,7 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { EmptyState, PatientChartPagination, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig } from '../../../../config-schema';
+import { type ChartConfig, defaultVisitTimelinePageSize } from '../../../../config-schema';
 import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
@@ -82,7 +82,9 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
   );
 
   // A failed config validator only logs, so a misconfigured page size still reaches us and must not break the widget
-  const pageSize = Math.max(1, Math.trunc(config.visitTimelinePageSize));
+  const pageSize = Number.isFinite(config.visitTimelinePageSize)
+    ? Math.max(1, Math.trunc(config.visitTimelinePageSize))
+    : defaultVisitTimelinePageSize;
 
   const { currentPage, goTo, results: paginatedTimelineEntries } = usePagination(timelineEntries, pageSize);
 
