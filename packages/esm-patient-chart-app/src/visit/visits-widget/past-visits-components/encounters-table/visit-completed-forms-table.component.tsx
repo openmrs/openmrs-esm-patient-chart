@@ -7,12 +7,20 @@ interface VisitCompletedFormsTableProps {
   patientUuid: string;
   visit: Visit;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
 }
 
 /**
  * This component shows a table of only completed forms from a single visit of a patient
  */
-const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ patientUuid, visit, onEditEncounter }) => {
+const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
+  patientUuid,
+  visit,
+  onEditEncounter,
+  mutateVisitContext,
+  patient,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -55,6 +63,8 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({ pat
     isSelectable: false,
     canPrintEncounters,
     onEditEncounter,
+    mutateVisitContext,
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;

@@ -29,11 +29,19 @@ interface VisitSummaryProps {
   visit: Visit;
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditEncounter }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({
+  visit,
+  patientUuid,
+  onEditEncounter,
+  mutateVisitContext,
+  patient,
+}) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -154,7 +162,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditE
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VisitTimeline visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+            <VisitTimeline
+              visit={visit}
+              patientUuid={patientUuid}
+              onEditEncounter={onEditEncounter}
+              mutateVisitContext={mutateVisitContext}
+              patient={patient}
+            />
           </TabPanel>
           <TabPanel>
             <NotesSummary notes={notes} />
@@ -166,10 +180,22 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, patientUuid, onEditE
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitCompletedFormsTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+            <VisitCompletedFormsTable
+              visit={visit}
+              patientUuid={patientUuid}
+              onEditEncounter={onEditEncounter}
+              mutateVisitContext={mutateVisitContext}
+              patient={patient}
+            />
           </TabPanel>
           <TabPanel>
-            <VisitEncountersTable visit={visit} patientUuid={patientUuid} onEditEncounter={onEditEncounter} />
+            <VisitEncountersTable
+              visit={visit}
+              patientUuid={patientUuid}
+              onEditEncounter={onEditEncounter}
+              mutateVisitContext={mutateVisitContext}
+              patient={patient}
+            />
           </TabPanel>
           <ExtensionSlot name={visitSummaryPanelSlot}>
             <TabPanel>

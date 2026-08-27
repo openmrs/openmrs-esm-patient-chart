@@ -78,12 +78,14 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
   isSelectable,
   canPrintEncounters,
   onEditEncounter,
+  mutateVisitContext,
+  patient,
 }) => {
   const { t } = useTranslation();
   const pageSizes = [10, 20, 30, 40, 50];
   const desktopLayout = isDesktop(useLayoutType());
   const session = useSession();
-  const { mutateVisitContext, patient } = usePatientChartStore(patientUuid);
+  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
   const { mutate } = useSWRConfig();
   const responsiveSize = desktopLayout ? 'sm' : 'lg';
   const { data: encounterTypes, isLoading: isLoadingEncounterTypes } = useEncounterTypes();
@@ -130,9 +132,16 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
-      confirmAndDeleteEncounter({ encounterUuid, encounterTypeName, patientUuid, t, mutate, mutateVisitContext });
+      confirmAndDeleteEncounter({
+        encounterUuid,
+        encounterTypeName,
+        patientUuid,
+        t,
+        mutate,
+        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
+      });
     },
-    [mutate, mutateVisitContext, patientUuid, t],
+    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
   );
 
   const handlePrintSelected = (selectedRows: Array<any>) => {
@@ -296,7 +305,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                                     visitStartDatetime: encounter.visitStartDatetime ?? null,
                                     visitStopDatetime: encounter.visitStopDatetime ?? null,
                                     patientUuid: patientUuid,
-                                    patient: patient,
+                                    patient: patient ?? chartPatient,
                                     formUuid: encounter.form.uuid,
                                     encounterUuid: encounter.id,
                                     promptBeforeClosing: () => {},
