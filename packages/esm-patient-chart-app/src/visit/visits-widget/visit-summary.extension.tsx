@@ -6,9 +6,12 @@ import { type EncountersTableProps } from './past-visits-components/encounters-t
 interface VisitSummaryExtensionProps {
   visit?: Visit;
   patientUuid?: string;
-  /** Hosts outside the chart should pass these — see `EncountersTableProps`. */
+  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
   mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  /** Hosts outside the chart should pass this — see `EncountersTableProps`. */
+  patient?: EncountersTableProps['patient'];
 }
 
 /**
@@ -20,6 +23,7 @@ const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
   patientUuid,
   onEditEncounter,
   mutateVisitContext,
+  patient,
 }) => {
   if (!visit || !patientUuid) {
     return null;
@@ -31,6 +35,7 @@ const VisitSummaryExtension: React.FC<VisitSummaryExtensionProps> = ({
       patientUuid={patientUuid}
       onEditEncounter={onEditEncounter}
       mutateVisitContext={mutateVisitContext}
+      patient={patient}
     />
   );
 };

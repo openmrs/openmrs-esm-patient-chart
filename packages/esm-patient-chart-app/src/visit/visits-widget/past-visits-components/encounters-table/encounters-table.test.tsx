@@ -486,6 +486,34 @@ describe('Delete Encounter', () => {
     await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
     expect(chartMutateVisitContext).not.toHaveBeenCalled();
   });
+
+  it('falls back to the chart store when no mutateVisitContext prop is supplied', async () => {
+    const user = userEvent.setup();
+    const chartMutateVisitContext = vi.fn();
+    mockUsePatientChartStore.mockReturnValue({
+      patientUuid: mockPatientAlice.uuid,
+      patient: mockFhirPatient,
+      visitContext: null,
+      mutateVisitContext: chartMutateVisitContext,
+      setPatient: vi.fn(),
+      setVisitContext: vi.fn(),
+    } as any);
+    mockDeleteEncounter.mockResolvedValue({});
+    mockShowModal.mockReturnValue(vi.fn());
+
+    renderEncountersTable();
+
+    const row = screen.getByRole('row', {
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+    });
+    await user.click(within(row).getByRole('button', { name: /expand current row/i }));
+    await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
+
+    const [, modalProps] = mockShowModal.mock.calls[0];
+    (modalProps as { onConfirmation: () => void }).onConfirmation();
+
+    await waitFor(() => expect(chartMutateVisitContext).toHaveBeenCalledTimes(1));
+  });
 });
 
 function renderEncountersTable(props: Partial<EncountersTableProps> = {}) {

@@ -8,6 +8,7 @@ interface VisitEncountersTableProps {
   visit: Visit;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
   mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
 }
 
 /**
@@ -18,6 +19,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({
   visit,
   onEditEncounter,
   mutateVisitContext,
+  patient,
 }) => {
   const [pageSize, setPageSize] = useState(10);
   const mappedEncounters = useMemo(
@@ -48,6 +50,7 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({
     canPrintEncounters,
     onEditEncounter,
     mutateVisitContext,
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;

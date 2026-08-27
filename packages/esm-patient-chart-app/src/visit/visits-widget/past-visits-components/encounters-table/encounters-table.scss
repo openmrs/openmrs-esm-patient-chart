@@ -15,7 +15,7 @@
     padding-inline-start: layout.$spacing-03 !important;
   }
 
-  :global(tbody tr.cds--parent-row > td:not(.cds--table-expand)) {
+  :global(tbody tr.cds--parent-row > td:not(.cds--table-expand):not(.cds--table-column-checkbox + td)) {
     padding-inline-start: layout.$spacing-05 !important;
   }
 

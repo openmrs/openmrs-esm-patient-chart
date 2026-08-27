@@ -44,6 +44,12 @@ export interface EncountersTableProps {
    * hosts embedding this table elsewhere need to supply it for deletions to show up.
    */
   mutateVisitContext?: () => void;
+  /**
+   * The patient these encounters belong to, handed to the embedded form view. Inside the chart this comes
+   * from the patient chart store, which `usePatientChartStore` only populates for the chart's own patient,
+   * so hosts embedding this table elsewhere need to supply it for embedded forms to render.
+   */
+  patient?: fhir.Patient;
 }
 
 export interface MappedEncounter {
