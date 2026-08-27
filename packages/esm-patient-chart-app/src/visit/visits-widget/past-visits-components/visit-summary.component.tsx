@@ -33,6 +33,8 @@ interface VisitSummaryProps {
   emrapiDiagnoses?: Array<Diagnosis>;
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
@@ -43,12 +45,23 @@ const VisitDetailLoading: React.FC = () => {
   return <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 };
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = [], patientUuid, onEditEncounter }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({
+  visit,
+  emrapiDiagnoses = [],
+  patientUuid,
+  onEditEncounter,
+  mutateVisitContext,
+  patient,
+}) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
 
-  const { encounters, isLoading: isLoadingEncounters, error: encountersError } = useVisitEncounters(patientUuid, visit.uuid);
+  const {
+    encounters,
+    isLoading: isLoadingEncounters,
+    error: encountersError,
+  } = useVisitEncounters(patientUuid, visit.uuid);
 
   const notes: Array<Note> = useMemo(() => {
     if (!encounters) return [];
@@ -158,6 +171,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = []
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
+                mutateVisitContext={mutateVisitContext}
+                patient={patient}
               />
             )}
           </TabPanel>
@@ -198,6 +213,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = []
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
+                mutateVisitContext={mutateVisitContext}
+                patient={patient}
               />
             )}
           </TabPanel>
@@ -211,6 +228,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = []
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
+                mutateVisitContext={mutateVisitContext}
+                patient={patient}
               />
             )}
           </TabPanel>
