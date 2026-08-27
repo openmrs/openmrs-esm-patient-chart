@@ -37,6 +37,8 @@ import styles from './visit-timeline.scss';
 interface VisitTimelineProps {
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
    * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
@@ -47,12 +49,12 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { mutateVisitContext, patient } = usePatientChartStore(patientUuid);
+  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
@@ -107,9 +109,16 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
-      confirmAndDeleteEncounter({ encounterUuid, encounterTypeName, patientUuid, t, mutate, mutateVisitContext });
+      confirmAndDeleteEncounter({
+        encounterUuid,
+        encounterTypeName,
+        patientUuid,
+        t,
+        mutate,
+        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
+      });
     },
-    [mutate, mutateVisitContext, patientUuid, t],
+    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {
@@ -227,7 +236,7 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
                           visitStartDatetime: visit.startDatetime ?? null,
                           visitStopDatetime: visit.stopDatetime ?? null,
                           patientUuid,
-                          patient,
+                          patient: patient ?? chartPatient,
                           formUuid: encounter.form.uuid,
                           encounterUuid: encounter.uuid,
                           promptBeforeClosing: () => {},
