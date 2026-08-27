@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { type ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
@@ -12,12 +12,13 @@ import {
   useConfig,
   useFeatureFlag,
   useLayoutType,
+  usePagination,
   userHasAccess,
   useSession,
   type Visit,
 } from '@openmrs/esm-framework';
-import { EmptyState, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
-import { type ChartConfig } from '../../../../config-schema';
+import { EmptyState, PatientChartPagination, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { type ChartConfig, defaultVisitTimelinePageSize } from '../../../../config-schema';
 import {
   canModifyEncounter,
   confirmAndDeleteEncounter,
@@ -36,6 +37,8 @@ import styles from './visit-timeline.scss';
 interface VisitTimelineProps {
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
   /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
    * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
@@ -46,12 +49,12 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUuid, visit }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { mutate } = useSWRConfig();
-  const { mutateVisitContext, patient } = usePatientChartStore(patientUuid);
+  const { mutateVisitContext: chartMutateVisitContext, patient: chartPatient } = usePatientChartStore(patientUuid);
   const config = useConfig<ChartConfig>();
   const enableEmbeddedFormView = useFeatureFlag('enable-embedded-form-view');
   const canPrintEncounters = userHasAccess('App: Print encounter forms', session?.user);
@@ -80,6 +83,18 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
     [canPrintEncounters, config, session?.user, visit?.encounters],
   );
 
+  // A failed config validator only logs, so a misconfigured page size still reaches us and must not break the widget
+  const pageSize = Number.isFinite(config.visitTimelinePageSize)
+    ? Math.max(1, Math.trunc(config.visitTimelinePageSize))
+    : defaultVisitTimelinePageSize;
+
+  const { currentPage, goTo, results: paginatedTimelineEntries } = usePagination(timelineEntries, pageSize);
+
+  // goTo clamps to the last page, so deleting the final encounter of a page can't strand the user on an empty one
+  useEffect(() => {
+    goTo(currentPage);
+  }, [currentPage, goTo]);
+
   const toggleEncounter = useCallback((encounterUuid: string) => {
     setExpandedEncounters((previouslyExpanded) => {
       const expanded = new Set(previouslyExpanded);
@@ -94,9 +109,16 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
 
   const handleDeleteEncounter = useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
-      confirmAndDeleteEncounter({ encounterUuid, encounterTypeName, patientUuid, t, mutate, mutateVisitContext });
+      confirmAndDeleteEncounter({
+        encounterUuid,
+        encounterTypeName,
+        patientUuid,
+        t,
+        mutate,
+        mutateVisitContext: mutateVisitContext ?? chartMutateVisitContext,
+      });
     },
-    [mutate, mutateVisitContext, patientUuid, t],
+    [chartMutateVisitContext, mutate, mutateVisitContext, patientUuid, t],
   );
 
   if (timelineEntries.length === 0) {
@@ -116,7 +138,7 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
         <span>{t('timeStarted', 'Time started')}</span>
       </p>
       <div className={styles.timelineEntries}>
-        {timelineEntries.map(
+        {paginatedTimelineEntries.map(
           ({
             canDeleteEncounter,
             canEditEncounter,
@@ -214,7 +236,7 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
                           visitStartDatetime: visit.startDatetime ?? null,
                           visitStopDatetime: visit.stopDatetime ?? null,
                           patientUuid,
-                          patient,
+                          patient: patient ?? chartPatient,
                           formUuid: encounter.form.uuid,
                           encounterUuid: encounter.uuid,
                           promptBeforeClosing: () => {},
@@ -238,6 +260,13 @@ function VisitTimeline({ onEditEncounter, patientUuid, visit }: VisitTimelinePro
         )}
         <div className={styles.timelineLine} />
       </div>
+      <PatientChartPagination
+        currentItems={paginatedTimelineEntries.length}
+        onPageNumberChange={({ page }) => goTo(page)}
+        pageNumber={currentPage}
+        pageSize={pageSize}
+        totalItems={timelineEntries.length}
+      />
     </div>
   );
 }

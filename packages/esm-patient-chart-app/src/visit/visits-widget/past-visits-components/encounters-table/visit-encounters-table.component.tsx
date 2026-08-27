@@ -7,12 +7,20 @@ interface VisitEncountersTableProps {
   patientUuid: string;
   visit: Visit;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
+  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
+  patient?: EncountersTableProps['patient'];
 }
 
 /**
  * This component shows a table of encounters from a single visit of a patient
  */
-const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid, visit, onEditEncounter }) => {
+const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({
+  patientUuid,
+  visit,
+  onEditEncounter,
+  mutateVisitContext,
+  patient,
+}) => {
   const [pageSize, setPageSize] = useState(10);
   const mappedEncounters = useMemo(
     () =>
@@ -41,6 +49,8 @@ const VisitEncountersTable: React.FC<VisitEncountersTableProps> = ({ patientUuid
     isSelectable: false,
     canPrintEncounters,
     onEditEncounter,
+    mutateVisitContext,
+    patient,
   };
 
   return <EncountersTable {...encountersTableProps} />;
