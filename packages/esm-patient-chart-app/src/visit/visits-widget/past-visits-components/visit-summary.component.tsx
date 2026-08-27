@@ -33,8 +33,6 @@ interface VisitSummaryProps {
   emrapiDiagnoses?: Array<Diagnosis>;
   patientUuid: string;
   onEditEncounter?: EncountersTableProps['onEditEncounter'];
-  mutateVisitContext?: EncountersTableProps['mutateVisitContext'];
-  patient?: EncountersTableProps['patient'];
 }
 
 const visitSummaryPanelSlot = 'visit-summary-panels';
@@ -45,14 +43,7 @@ const VisitDetailLoading: React.FC = () => {
   return <InlineLoading description={t('loadingVisitDetails', 'Loading visit details...')} />;
 };
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({
-  visit,
-  emrapiDiagnoses = [],
-  patientUuid,
-  onEditEncounter,
-  mutateVisitContext,
-  patient,
-}) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ visit, emrapiDiagnoses = [], patientUuid, onEditEncounter }) => {
   const config = useConfig<ChartConfig>();
   const { t } = useTranslation();
   const extensions = useAssignedExtensions(visitSummaryPanelSlot);
@@ -171,8 +162,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
-                mutateVisitContext={mutateVisitContext}
-                patient={patient}
               />
             )}
           </TabPanel>
@@ -213,8 +202,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
-                mutateVisitContext={mutateVisitContext}
-                patient={patient}
               />
             )}
           </TabPanel>
@@ -228,8 +215,6 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
                 visit={{ ...visit, encounters: encounters ?? [] }}
                 patientUuid={patientUuid}
                 onEditEncounter={onEditEncounter}
-                mutateVisitContext={mutateVisitContext}
-                patient={patient}
               />
             )}
           </TabPanel>
