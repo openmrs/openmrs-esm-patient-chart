@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { DashboardExtension } from '@openmrs/esm-styleguide';
+import { DashboardExtension } from '@openmrs/esm-framework';
 import { type DashboardLinkConfig } from '../types';
 
 export function createDashboardLink(db: DashboardLinkConfig) {
