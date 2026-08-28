@@ -493,6 +493,7 @@ export interface PatientModel {
   age: number;
   gendercreatconstant?: number;
   identifiers: Array<Identifier>;
+  attributes: Record<string, string>;
   patientUuid: string;
   [key: string]: any;
 }
