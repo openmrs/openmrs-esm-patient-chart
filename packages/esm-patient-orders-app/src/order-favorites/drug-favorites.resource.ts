@@ -1,33 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { getLoggedInUser, openmrsFetch, restBaseUrl, setUserProperties } from '@openmrs/esm-framework';
-import { careSettingUuid, drugCustomRepresentation, type Order } from '@openmrs/esm-patient-common-lib';
 import type { DrugFavoriteOrder, UserResponse } from './types';
-
-export function useActiveDrugOrders(patientUuid: string | undefined) {
-  const url = patientUuid
-    ? `${restBaseUrl}/order?patient=${patientUuid}&careSetting=${careSettingUuid}&v=${drugCustomRepresentation}&excludeDiscontinueOrders=true`
-    : null;
-
-  const { data, isLoading } = useSWR<{ data: { results: Order[] } }>(url, openmrsFetch);
-
-  const prescribedDrugUuids = useMemo(() => {
-    if (isLoading || !data) return new Set<string>();
-    const now = new Date();
-    return new Set<string>(
-      data.data.results
-        .filter((order) => {
-          if (!order.drug?.uuid) return false;
-          const stopped = order.dateStopped ? new Date(order.dateStopped) : null;
-          const expired = order.autoExpireDate ? new Date(order.autoExpireDate) : null;
-          return !(stopped && stopped <= now) && !(expired && expired <= now);
-        })
-        .map((order) => order.drug!.uuid),
-    );
-  }, [data, isLoading]);
-
-  return { prescribedDrugUuids, isLoading };
-}
 
 export const FAVORITES_PROPERTY_KEY = 'order_favorites_drugs';
 

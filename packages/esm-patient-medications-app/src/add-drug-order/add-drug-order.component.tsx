@@ -102,9 +102,6 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
     isLoading: isOrdersLoading,
     error: ordersError,
   } = useMedicationOrders(patientUuid);
-  // Treat an error the same as loading so pinned items are disabled (fail-closed)
-  // rather than clickable when we cannot confirm the patient's active orders.
-  const isLoadingOrders = isOrdersLoading || !!ordersError;
   const prescribedDrugUuids = useMemo(
     () =>
       new Set(
@@ -229,7 +226,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
                     onSearchTermChange={setSearchTerm}
                     launchAllergyForm={launchAllergyForm}
                     prescribedDrugUuids={prescribedDrugUuids}
-                    isLoadingOrders={isLoadingOrders}
+                    isLoadingOrders={isOrdersLoading}
+                    ordersError={ordersError}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -257,7 +255,8 @@ const AddDrugOrder: React.FC<AddDrugOrderProps> = ({
               onSearchTermChange={setSearchTerm}
               launchAllergyForm={launchAllergyForm}
               prescribedDrugUuids={prescribedDrugUuids}
-              isLoadingOrders={isLoadingOrders}
+              isLoadingOrders={isOrdersLoading}
+              ordersError={ordersError}
             />
           </div>
         )}

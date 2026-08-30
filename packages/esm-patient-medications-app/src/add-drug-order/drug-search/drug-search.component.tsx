@@ -25,6 +25,7 @@ export interface DrugSearchProps {
   launchAllergyForm?: () => void;
   prescribedDrugUuids?: Set<string>;
   isLoadingOrders?: boolean;
+  ordersError?: Error;
 }
 
 export default function DrugSearch({
@@ -37,6 +38,7 @@ export default function DrugSearch({
   launchAllergyForm,
   prescribedDrugUuids = new Set<string>(),
   isLoadingOrders = false,
+  ordersError,
 }: DrugSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -81,9 +83,9 @@ export default function DrugSearch({
           isSearching: Boolean(debouncedSearchTerm),
           visit,
           daysDurationUnit,
-          patientUuid: patient?.id,
           prescribedDrugUuids,
           isLoadingOrders,
+          ordersError,
         }}
       />
       <OrderBasketSearchResults

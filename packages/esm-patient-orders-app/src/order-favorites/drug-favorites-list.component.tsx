@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp, PinFilled } from '@carbon/react/icons';
 import { useConfig, useLayoutType, type Visit } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import type { DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
-import { getFavoriteKey, useActiveDrugOrders } from './drug-favorites.resource';
+import { getFavoriteKey } from './drug-favorites.resource';
 import { useFavoritesActions } from './useFavoritesActions';
 import { createDrugFromFavorite, buildBasketItem } from './helpers';
 import type { DrugFavoriteOrder } from './types';
@@ -16,19 +16,23 @@ interface DrugFavoritesListExtensionProps {
   isSearching?: boolean;
   visit: Visit;
   daysDurationUnit?: { uuid: string; display: string };
-  patientUuid?: string;
+  prescribedDrugUuids?: Set<string>;
+  isLoadingOrders?: boolean;
+  ordersError?: Error;
 }
 
 interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
   isTablet: boolean;
   alreadyPrescribed: boolean;
+  isLoadingOrders: boolean;
+  hasOrdersError: boolean;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onUnpin: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
-  ({ favorite, isTablet, alreadyPrescribed, onClick, onUnpin }) => {
+  ({ favorite, isTablet, alreadyPrescribed, isLoadingOrders, hasOrdersError, onClick, onUnpin }) => {
     const { t } = useTranslation();
 
     return (
@@ -37,7 +41,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
           type="button"
           className={styles.itemButton}
           onClick={() => onClick(favorite)}
-          disabled={alreadyPrescribed}
+          disabled={isLoadingOrders || hasOrdersError || alreadyPrescribed}
         >
           <div className={styles.itemContent}>
             <p className={styles.itemTitle}>{favorite.displayName}</p>
@@ -69,14 +73,14 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
   isSearching = false,
   visit,
   daysDurationUnit,
-  patientUuid,
+  prescribedDrugUuids = new Set<string>(),
+  isLoadingOrders = false,
+  ordersError,
 }) => {
   const { t } = useTranslation();
   const { enableDrugOrderFavorites } = useConfig<ConfigObject>();
   const isTablet = useLayoutType() === 'tablet';
   const { favorites, error, isLoading, deleteMultipleFavorites } = useFavoritesActions();
-
-  const { prescribedDrugUuids } = useActiveDrugOrders(patientUuid);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -88,13 +92,13 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
   const handleFavoriteClick = useCallback(
     (favorite: DrugFavoriteOrder) => {
-      if (prescribedDrugUuids.has(favorite.drugUuid)) {
+      if (isLoadingOrders || ordersError || prescribedDrugUuids.has(favorite.drugUuid)) {
         return;
       }
       const drug = createDrugFromFavorite(favorite);
       openOrderForm(buildBasketItem(drug, visit, daysDurationUnit));
     },
-    [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids],
+    [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids, isLoadingOrders, ordersError],
   );
 
   const handleUnpin = useCallback(
@@ -164,6 +168,8 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
               favorite={favorite}
               isTablet={isTablet}
               alreadyPrescribed={prescribedDrugUuids.has(favorite.drugUuid)}
+              isLoadingOrders={isLoadingOrders}
+              hasOrdersError={Boolean(ordersError)}
               onClick={handleFavoriteClick}
               onUnpin={handleUnpin}
             />
