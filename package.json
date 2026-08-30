@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "clean:dist": "turbo run clean --color --concurrency=5",
     "lint": "eslint e2e --fix --max-warnings=0",
     "typescript": "tsc -p e2e",
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-chart npm publish --access public --tag latest",
