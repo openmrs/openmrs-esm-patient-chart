@@ -59,6 +59,15 @@
   padding: 0;
   cursor: pointer;
   text-align: left;
+
+  &:disabled {
+    cursor: not-allowed;
+
+    .itemTitle,
+    .itemDetails {
+      color: colors.$gray-40;
+    }
+  }
 }
 
 .itemContent {
