@@ -17,7 +17,7 @@ export const esmPatientChartSchema = {
   disableEmptyTabs: {
     _type: Type.Boolean,
     _default: false,
-    _description: 'Disable notes/tests/medications/encounters tabs when empty',
+    _description: 'Disable notes/tests/medications/completed forms tabs when empty',
   },
   encounterEditableDuration: {
     _type: Type.Number,
