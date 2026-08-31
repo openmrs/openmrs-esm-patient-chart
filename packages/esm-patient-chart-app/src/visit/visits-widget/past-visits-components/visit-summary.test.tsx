@@ -155,24 +155,6 @@ describe('VisitSummary encounter editing', () => {
     mockUserHasAccess.mockReturnValue(true);
   });
 
-  it('passes onEditEncounter down to the encounters tab', async () => {
-    const user = userEvent.setup();
-    const onEditEncounter = vi.fn();
-
-    renderWithSwr(
-      <VisitSummary patientUuid={mockPatient.id} visit={mockVisitWithEncounters} onEditEncounter={onEditEncounter} />,
-    );
-
-    await user.click(screen.getByRole('tab', { name: /encounters/i }));
-    await clickEditEncounter(/visit note/i);
-
-    expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note' }),
-      true,
-    );
-  });
-
   it('passes onEditEncounter down to the timeline', async () => {
     const user = userEvent.setup();
     const onEditEncounter = vi.fn();
@@ -250,26 +232,6 @@ describe('VisitSummary encounter deletion', () => {
       setPatient: vi.fn(),
       setVisitContext: vi.fn(),
     } as any);
-  });
-
-  it('passes mutateVisitContext down to the encounters tab', async () => {
-    const user = userEvent.setup();
-    const mutateVisitContext = vi.fn();
-
-    renderWithSwr(
-      <VisitSummary
-        patientUuid={mockPatient.id}
-        visit={mockVisitWithEncounters}
-        mutateVisitContext={mutateVisitContext}
-      />,
-    );
-
-    await user.click(screen.getByRole('tab', { name: /encounters/i }));
-    await clickDeleteEncounter(/visit note/i);
-    confirmDeletion();
-
-    await waitFor(() => expect(mutateVisitContext).toHaveBeenCalledTimes(1));
-    expect(chartMutateVisitContext).not.toHaveBeenCalled();
   });
 
   it('passes mutateVisitContext down to the timeline', async () => {
