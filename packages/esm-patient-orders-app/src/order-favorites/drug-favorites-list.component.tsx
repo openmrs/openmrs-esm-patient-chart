@@ -25,14 +25,13 @@ interface FavoriteListItemProps {
   favorite: DrugFavoriteOrder;
   isTablet: boolean;
   alreadyPrescribed: boolean;
-  isLoadingOrders: boolean;
   hasOrdersError: boolean;
   onClick: (favorite: DrugFavoriteOrder) => void;
   onUnpin: (e: React.MouseEvent, favorite: DrugFavoriteOrder) => void;
 }
 
 const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
-  ({ favorite, isTablet, alreadyPrescribed, isLoadingOrders, hasOrdersError, onClick, onUnpin }) => {
+  ({ favorite, isTablet, alreadyPrescribed, hasOrdersError, onClick, onUnpin }) => {
     const { t } = useTranslation();
 
     return (
@@ -41,7 +40,7 @@ const FavoriteListItem: React.FC<FavoriteListItemProps> = React.memo(
           type="button"
           className={styles.itemButton}
           onClick={() => onClick(favorite)}
-          disabled={isLoadingOrders || hasOrdersError || alreadyPrescribed}
+          disabled={hasOrdersError || alreadyPrescribed}
         >
           <div className={styles.itemContent}>
             <p className={styles.itemTitle}>{favorite.displayName}</p>
@@ -92,13 +91,13 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
 
   const handleFavoriteClick = useCallback(
     (favorite: DrugFavoriteOrder) => {
-      if (isLoadingOrders || ordersError || prescribedDrugUuids.has(favorite.drugUuid)) {
+      if (ordersError || prescribedDrugUuids.has(favorite.drugUuid)) {
         return;
       }
       const drug = createDrugFromFavorite(favorite);
       openOrderForm(buildBasketItem(drug, visit, daysDurationUnit));
     },
-    [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids, isLoadingOrders, ordersError],
+    [openOrderForm, visit, daysDurationUnit, prescribedDrugUuids, ordersError],
   );
 
   const handleUnpin = useCallback(
@@ -142,6 +141,18 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
     return null;
   }
 
+  if (isLoadingOrders) {
+    return (
+      <div className={styles.container}>
+        <SkeletonText heading width="200px" />
+        <div className={styles.skeletonCards}>
+          <SkeletonText width="100%" />
+          <SkeletonText width="100%" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -160,6 +171,14 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
           {isCollapsed ? <ChevronDown /> : <ChevronUp />}
         </IconButton>
       </div>
+      {ordersError && (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          title={t('errorLoadingMedicationOrders', 'Error loading medication orders')}
+          hideCloseButton
+        />
+      )}
       {!isCollapsed && (
         <div className={styles.listContainer}>
           {favorites.map((favorite) => (
@@ -168,7 +187,6 @@ const DrugFavoritesListExtension: React.FC<DrugFavoritesListExtensionProps> = ({
               favorite={favorite}
               isTablet={isTablet}
               alreadyPrescribed={prescribedDrugUuids.has(favorite.drugUuid)}
-              isLoadingOrders={isLoadingOrders}
               hasOrdersError={Boolean(ordersError)}
               onClick={handleFavoriteClick}
               onUnpin={handleUnpin}

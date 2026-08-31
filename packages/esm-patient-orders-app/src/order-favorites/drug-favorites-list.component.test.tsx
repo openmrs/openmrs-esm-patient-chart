@@ -50,28 +50,66 @@ describe('DrugFavoritesListExtension', () => {
     expect(defaultProps.openOrderForm).not.toHaveBeenCalled();
   });
 
-  it('disables favorites while order status is loading', async () => {
+  it('opens the order form for an eligible favorite', async () => {
     const user = userEvent.setup();
-    render(<DrugFavoritesListExtension {...defaultProps} isLoadingOrders />);
+    render(<DrugFavoritesListExtension {...defaultProps} />);
 
     const favoriteButton = screen.getByRole('button', { name: /aspirin 81mg/i });
-    expect(favoriteButton).toBeDisabled();
-    expect(screen.queryByText(/already prescribed/i)).not.toBeInTheDocument();
+    expect(favoriteButton).toBeEnabled();
 
     await user.click(favoriteButton);
-    expect(defaultProps.openOrderForm).not.toHaveBeenCalled();
+    expect(defaultProps.openOrderForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'NEW',
+        drug: expect.objectContaining({ uuid: favorite.drugUuid }),
+      }),
+    );
   });
 
-  it('disables favorites when the shared order lookup fails', async () => {
+  it('shows a section skeleton while order status is loading', () => {
+    render(<DrugFavoritesListExtension {...defaultProps} isLoadingOrders />);
+
+    expect(screen.queryByText(/my pinned drug orders/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /aspirin 81mg/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the favorites and keeps unpinning available when the shared order lookup fails', async () => {
     const user = userEvent.setup();
+    const deleteMultipleFavorites = vi.fn();
+    mockUseFavoritesActions.mockReturnValue({
+      favorites: [favorite],
+      error: undefined,
+      isLoading: false,
+      deleteMultipleFavorites,
+      persistFavorites: vi.fn(),
+    });
     render(<DrugFavoritesListExtension {...defaultProps} ordersError={new Error('Unable to load orders')} />);
 
     const favoriteButton = screen.getByRole('button', { name: /aspirin 81mg/i });
     expect(favoriteButton).toBeDisabled();
     expect(screen.queryByText(/already prescribed/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/error loading medication orders/i)).toBeInTheDocument();
 
     await user.click(favoriteButton);
     expect(defaultProps.openOrderForm).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /unpin order/i }));
+    expect(deleteMultipleFavorites).toHaveBeenCalledWith([favorite]);
+  });
+
+  it('does not show an order-status skeleton or error when there are no favorites', () => {
+    mockUseFavoritesActions.mockReturnValue({
+      favorites: [],
+      error: undefined,
+      isLoading: false,
+      deleteMultipleFavorites: vi.fn(),
+      persistFavorites: vi.fn(),
+    });
+
+    const { rerender } = render(<DrugFavoritesListExtension {...defaultProps} isLoadingOrders />);
+    expect(screen.queryByText(/my pinned drug orders/i)).not.toBeInTheDocument();
+
+    rerender(<DrugFavoritesListExtension {...defaultProps} ordersError={new Error('Unable to load orders')} />);
+    expect(screen.queryByText(/error loading medication orders/i)).not.toBeInTheDocument();
   });
 
   it('shows a loading state while favorites are loading', () => {
