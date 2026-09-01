@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "A dosagem é obrigatória",
   "dose": "Dose",
   "drugAlreadyPrescribed": "Já prescrito",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Nome do medicamento",
   "drugOrders": "Pedidos de medicamentos",
   "drugRequiredErrorMessage": "O medicamento é obrigatório",

@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "Edit",
   "editCondition": "Edit condition",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "កាលបរិច្ឆេទបញ្ចប់",
   "enterCondition": "បញ្ចូលលក្ខខណ្ឌ",
   "errorCreatingCondition": "Error creating condition",

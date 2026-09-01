@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "დოზა",
   "drugAlreadyPrescribed": "უკვე გამოწერილია",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Drug name",
   "drugOrders": "წამლის შეკვეთები",
   "drugRequiredErrorMessage": "Drug is required",

@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "Modifier",
   "editCondition": "Edit condition",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "Date de fin",
   "enterCondition": "Entrer une condition médicale",
   "errorCreatingCondition": "Erreur d'ajout de la condition médicale",

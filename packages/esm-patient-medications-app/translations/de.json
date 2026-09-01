@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Dosierung ist erforderlich",
   "dose": "Dosis",
   "drugAlreadyPrescribed": "Bereits verschrieben",
+  "drugAlreadyPrescribedNotificationBody": "Für dieses Medikament liegt bereits ein aktiver oder geplanter Auftrag vor",
   "drugName": "Arzneimittelname",
   "drugOrders": "Medikamentenbestellungen",
   "drugRequiredErrorMessage": "Medikament ist erforderlich",
