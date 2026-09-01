@@ -55,9 +55,15 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             <iframe className={styles.pdfViewer} src={attachmentToPreview.src} title="PDFViewer" />
           ) : null}
         </div>
-        <OverflowMenu align="left" className={styles.overflowMenu} flipped size={responsiveSize}>
+        <OverflowMenu
+          align="left"
+          aria-label={t('attachmentActions', 'Attachment actions')}
+          className={styles.overflowMenu}
+          flipped
+          iconDescription={t('attachmentActions', 'Attachment actions')}
+          size={responsiveSize}
+        >
           <OverflowMenuItem
-            aria-label={t('options', 'Options')}
             className={styles.menuItem}
             hasDivider
             isDelete

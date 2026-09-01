@@ -85,7 +85,7 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await page
         .getByRole('row')
         .filter({ has: page.getByRole('cell', { name: conceptName, exact: true }) })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 
@@ -124,7 +124,7 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await page
         .getByRole('row')
         .filter({ hasText: conceptName })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 
@@ -162,7 +162,7 @@ test.describe('Modify and discontinue laboratory order tests sequentially', () =
       await page
         .getByRole('row')
         .filter({ hasText: conceptName })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 

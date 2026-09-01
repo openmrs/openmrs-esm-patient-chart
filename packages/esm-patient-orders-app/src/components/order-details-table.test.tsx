@@ -549,7 +549,7 @@ describe('OrderDetailsTable', () => {
     await screen.findByRole('table');
 
     expect(screen.getByText(/ORD-DECLINED/i)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /actions menu/i })).not.toBeInTheDocument();
   });
 
   it('renders an empty state when there are order types but no orders', async () => {
@@ -582,7 +582,7 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    expect(screen.getByRole('button', { name: /options/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
   });
 });
 

@@ -59,7 +59,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
@@ -111,13 +111,13 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {
     await page.getByRole('menuitem', { name: /delete/i }).click();
-    await page.getByRole('button', { name: /delete/i }).click();
+    await page.getByRole('button', { name: /danger delete/i }).click();
   });
 
   await test.step('Then I should see a success toast notification', async () => {

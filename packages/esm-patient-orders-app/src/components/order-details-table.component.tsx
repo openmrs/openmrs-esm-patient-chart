@@ -698,7 +698,13 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu aria-label={t('actionsMenu', 'Actions menu')} align="left" flipped selectorPrimaryFocus="#modify">
+      <OverflowMenu
+        aria-label={t('actionsMenu', 'Actions menu')}
+        iconDescription={t('actionsMenu', 'Actions menu')}
+        align="left"
+        flipped
+        selectorPrimaryFocus="#modify"
+      >
         <OverflowMenuItem
           className={styles.menuItem}
           disabled={alreadyInBasket}

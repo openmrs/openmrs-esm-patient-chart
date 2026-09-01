@@ -204,7 +204,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('And the preview should have a delete option in the overflow menu', async () => {
-    await page.getByRole('button', { name: /options/i }).click();
+    await page.getByRole('button', { name: /attachment actions/i }).click();
     await expect(page.getByText(/delete pdf/i)).toBeVisible();
     await page.keyboard.press('Escape');
   });

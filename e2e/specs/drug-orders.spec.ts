@@ -184,7 +184,7 @@ test.describe('Drug Order Tests', () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 
@@ -260,7 +260,7 @@ test.describe('Drug Order Tests', () => {
 
     await test.step('And I open the options menu for the created medication', async () => {
       const row = page.getByRole('row').filter({ hasText: existingDrugOrder.drugOrder.drug.display }).first();
-      await row.getByRole('button', { name: /options/i }).click();
+      await row.getByRole('button', { name: /actions menu/i }).click();
     });
 
     await test.step('And I click on the "Renew" action', async () => {
@@ -306,7 +306,7 @@ test.describe('Drug Order Tests', () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
       await page.getByRole('menuitem', { name: /discontinue/i }).click();
     });
@@ -347,7 +347,7 @@ test.describe('Drug Order Tests', () => {
       await page
         .getByRole('row')
         .filter({ hasText: existingDrugOrder.drugOrder.drug.display })
-        .getByRole('button', { name: /options/i })
+        .getByRole('button', { name: /actions menu/i })
         .click();
     });
 

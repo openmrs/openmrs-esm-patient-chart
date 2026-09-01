@@ -190,6 +190,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
                       <OverflowMenu
                         align="left"
                         aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+                        iconDescription={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                         flipped
                         size={responsiveSize}
                       >
