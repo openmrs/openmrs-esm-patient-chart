@@ -90,7 +90,7 @@ test('Record, edit and delete a procedure', async ({ page, patient }) => {
       .proceduresTable()
       .locator('tbody tr')
       .filter({ hasText: /orbital surgery/i })
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete procedure/i })
       .click();
   });
 
@@ -130,7 +130,7 @@ test('Record, edit and delete a procedure', async ({ page, patient }) => {
       .proceduresTable()
       .locator('tbody tr')
       .filter({ hasText: /orbital surgery/i })
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete procedure/i })
       .click();
   });
 
