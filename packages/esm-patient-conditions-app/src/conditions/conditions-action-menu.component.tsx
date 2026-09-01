@@ -35,6 +35,7 @@ export const ConditionsActionMenu = ({ condition, patientUuid }: conditionsActio
   return (
     <Layer className={styles.layer}>
       <OverflowMenu
+        aria-label={t('editOrDeleteCondition', 'Edit or delete condition')}
         iconDescription={t('editOrDeleteCondition', 'Edit or delete condition')}
         align="left"
         size={isTablet ? 'lg' : 'sm'}

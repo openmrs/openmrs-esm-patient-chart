@@ -252,6 +252,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({
                             <Layer className={styles.layer}>
                               {(canDeleteEncounter || canPrintEncounter) && (
                                 <OverflowMenu
+                                  aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                   iconDescription={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                                   flipped
                                   size={responsiveSize}

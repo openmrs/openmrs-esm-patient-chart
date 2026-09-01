@@ -246,6 +246,7 @@ describe('Encounter editability', () => {
     // Check overflow menu buttons
     await user.click(within(row).getByRole('button', { name: /encounter table actions menu/i }));
     const overflowMenu = screen.getByRole('menu', { hidden: true });
+    expect(overflowMenu).toHaveAttribute('aria-label', 'Encounter table actions menu');
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
     await user.click(within(row).getByRole('button', { name: /encounter table actions menu/i }));
