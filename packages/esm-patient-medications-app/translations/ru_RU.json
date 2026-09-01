@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Требуется указать дозировку",
   "dose": "Доза",
   "drugAlreadyPrescribed": "Уже назначено",
+  "drugAlreadyPrescribedNotificationBody": "Для медикамента уже существует активное или запланированное назначение",
   "drugName": "Название препарата",
   "drugOrders": "Назначения",
   "drugRequiredErrorMessage": "Требуется указать медикамент",

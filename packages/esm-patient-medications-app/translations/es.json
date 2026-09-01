@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Se requiere la dosis",
   "dose": "Dosis",
   "drugAlreadyPrescribed": "Ya prescrito",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Nombre del fármaco",
   "drugOrders": "Órdenes de medicamentos",
   "drugRequiredErrorMessage": "Se requiere el fármaco",

@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "编辑",
   "editCondition": "Edit condition",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "结束日期",
   "enterCondition": "输入病情",
   "errorCreatingCondition": "创建病情时出错",

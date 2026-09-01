@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} foi registrada anteriormente e agora está inativa. Considere reativar o registro existente em vez de criar um novo.",
   "edit": "Editar",
   "editCondition": "Editar condição",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "Data de término",
   "enterCondition": "Inserir condição",
   "errorCreatingCondition": "Erro ao criar condição",

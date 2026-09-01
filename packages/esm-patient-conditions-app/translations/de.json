@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} wurde bereits erfasst und ist derzeit inaktiv. Erwägen Sie, den bestehenden Datensatz wieder zu aktivieren, anstatt einen neuen anzulegen.",
   "edit": "Bearbeiten",
   "editCondition": "Erkrankung bearbeiten",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "Enddatum",
   "enterCondition": "Erkrankung einfügen",
   "errorCreatingCondition": "Fehler beim Erstellen der Erkrankung",

@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "ჩასწორება",
   "editCondition": "Edit condition",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "დასრულების თარიღი",
   "enterCondition": "შეიყვანეთ მდგომარეობა",
   "errorCreatingCondition": "მდგომარეობის შექმნის შეცდომა",

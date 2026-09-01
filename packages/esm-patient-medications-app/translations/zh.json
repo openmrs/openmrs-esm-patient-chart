@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "剂量为必填项",
   "dose": "剂量",
   "drugAlreadyPrescribed": "已经开具处方",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "药物名称",
   "drugOrders": "药物医嘱",
   "drugRequiredErrorMessage": "药物为必填项",

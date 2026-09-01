@@ -25,6 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} was previously recorded and is now inactive. Consider reactivating the existing record instead of creating a new one.",
   "edit": "ערוך",
   "editCondition": "Edit condition",
+  "editOrDeleteCondition": "Edit or delete condition",
   "endDate": "תאריך סיום",
   "enterCondition": "הזן מצב",
   "errorCreatingCondition": "שגיאה ביצירת מצב",

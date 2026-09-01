@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "Dosis",
   "drugAlreadyPrescribed": "Sudah diresepkan",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Drug name",
   "drugOrders": "Pesanan obat",
   "drugRequiredErrorMessage": "Drug is required",

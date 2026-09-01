@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "កំរិតប្រើប្រាស់",
   "drugAlreadyPrescribed": "បានចេញវេជ្ជបញ្ជារួចហើយ",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Drug name",
   "drugOrders": "Drug orders",
   "drugRequiredErrorMessage": "Drug is required",

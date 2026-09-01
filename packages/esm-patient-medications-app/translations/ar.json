@@ -26,6 +26,7 @@
   "dosageRequiredErrorMessage": "Dosage is required",
   "dose": "الجرعة",
   "drugAlreadyPrescribed": "تم وصفها بالفعل",
+  "drugAlreadyPrescribedNotificationBody": "An active or scheduled order already exists for this drug",
   "drugName": "Drug name",
   "drugOrders": "Drug orders",
   "drugRequiredErrorMessage": "Drug is required",
