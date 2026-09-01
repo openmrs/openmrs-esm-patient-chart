@@ -80,7 +80,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await page
       .getByRole('row')
       .filter({ hasText: /visit note/i })
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /encounter table actions menu/i })
       .click();
     await page.getByRole('menuitem', { name: /edit this encounter/i }).click();
   });
@@ -117,7 +117,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await page
       .getByRole('row')
       .filter({ hasText: /visit note/i })
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /encounter table actions menu/i })
       .click();
   });
 

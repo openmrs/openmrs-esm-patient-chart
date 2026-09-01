@@ -59,7 +59,7 @@ test('Add, edit and delete an allergy', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu in the table row with the newly added allergy', async () => {
-    await dataRow.getByRole('button', { name: /options/i }).click();
+    await dataRow.getByRole('button', { name: /edit or delete allergy/i }).click();
   });
 
   await test.step('And I click on the `Edit` button', async () => {
@@ -112,7 +112,7 @@ test('Add, edit and delete an allergy', async ({ page, patient }) => {
   });
 
   await test.step('When I click the overflow menu in the table row with the updated allergy', async () => {
-    await dataRow.getByRole('button', { name: /options/i }).click();
+    await dataRow.getByRole('button', { name: /edit or delete allergy/i }).click();
   });
 
   await test.step('And I click on the `Delete` button', async () => {

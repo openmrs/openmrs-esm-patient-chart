@@ -166,7 +166,7 @@ describe('VisitSummary encounter editing', () => {
     );
 
     // The timeline is the tab the visit summary opens on
-    await user.click(screen.getByRole('button', { name: /options/i }));
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
 
     const actionsMenu = screen.getByRole('menu', { hidden: true });
     const editItem = within(actionsMenu)
@@ -249,7 +249,7 @@ describe('VisitSummary encounter deletion', () => {
     );
 
     // The timeline is the tab the visit summary opens on
-    await user.click(screen.getByRole('button', { name: /options/i }));
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
 
     const actionsMenu = screen.getByRole('menu', { hidden: true });
     const deleteItem = within(actionsMenu)

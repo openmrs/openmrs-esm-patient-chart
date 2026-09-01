@@ -78,7 +78,7 @@ function renderVisitTimeline(
 
 async function clickEditEncounter() {
   const user = userEvent.setup();
-  await user.click(screen.getByRole('button', { name: /options/i }));
+  await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
 
   const actionsMenu = screen.getByRole('menu', { hidden: true });
   const editItem = within(actionsMenu)
@@ -167,7 +167,7 @@ describe('VisitTimeline', () => {
     const user = userEvent.setup();
     renderVisitTimeline([admissionEncounter]);
 
-    await user.click(screen.getByRole('button', { name: /options/i }));
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
 
     const actionsMenu = screen.getByRole('menu', { hidden: true });
     const menuItems = within(actionsMenu).getAllByRole('menuitem', { hidden: true });
@@ -212,14 +212,14 @@ describe('VisitTimeline', () => {
 
     renderVisitTimeline([privilegedEncounter]);
 
-    expect(screen.queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /encounter table actions menu/i })).not.toBeInTheDocument();
   });
 
   it('offers a print action for an encounter recorded through a JSON schema form', async () => {
     const user = userEvent.setup();
     renderVisitTimeline([encounterWithJsonSchemaForm]);
 
-    await user.click(screen.getByRole('button', { name: /options/i }));
+    await user.click(screen.getByRole('button', { name: /encounter table actions menu/i }));
 
     const actionsMenu = screen.getByRole('menu', { hidden: true });
     const menuItems = within(actionsMenu).getAllByRole('menuitem', { hidden: true });

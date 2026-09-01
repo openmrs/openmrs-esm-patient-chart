@@ -189,7 +189,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
                     <Layer className={styles.layer}>
                       <OverflowMenu
                         align="left"
-                        aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+                        iconDescription={t('encounterTableActionsMenu', 'Encounter table actions menu')}
                         flipped
                         size={responsiveSize}
                       >

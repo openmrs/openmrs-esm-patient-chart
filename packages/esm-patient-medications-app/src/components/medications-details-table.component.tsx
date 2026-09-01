@@ -448,7 +448,7 @@ function OrderBasketItemActions({
 
   return (
     <OverflowMenu
-      aria-label={t('actionsMenu', 'Actions menu')}
+      iconDescription={t('actionsMenu', 'Actions menu')}
       align="left"
       selectorPrimaryFocus={'#modify'}
       flipped

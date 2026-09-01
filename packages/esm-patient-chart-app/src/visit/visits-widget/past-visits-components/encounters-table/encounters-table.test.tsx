@@ -100,9 +100,9 @@ describe('EncountersTable', () => {
 
     const expectedColumnHeaders = [/date & time/, /visit type/, /encounter type/, /form name/, /provider/];
     const expectedTableRows = [
-      /select row 18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- options/,
-      /select row 03\-aug\-2021, 12:47 am facility visit visit note \-\- user one options/,
-      /select row 05\-jul\-2021, 10:07 am facility visit consultation covid 19 dennis the doctor options/,
+      /select row 18\-jan\-2022, 04:25 pm facility visit admission poc consent form \-\- encounter table actions menu/,
+      /select row 03\-aug\-2021, 12:47 am facility visit visit note \-\- user one encounter table actions menu/,
+      /select row 05\-jul\-2021, 10:07 am facility visit consultation covid 19 dennis the doctor encounter table actions menu/,
     ];
 
     expectedColumnHeaders.forEach((header) => {
@@ -210,8 +210,10 @@ describe('EncountersTable', () => {
 });
 
 describe('Encounter editability', () => {
-  const admissionRowName = /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i;
-  const visitNoteRowName = /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i;
+  const admissionRowName =
+    /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i;
+  const visitNoteRowName =
+    /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Encounter table actions menu/i;
   const [mockAdmissionEncounter, mockVisitNoteEncounter] = mockEncountersAlice;
 
   let dateNowSpy: ReturnType<typeof vi.spyOn>;
@@ -238,15 +240,15 @@ describe('Encounter editability', () => {
     renderEncountersTable();
 
     const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
     });
 
     // Check overflow menu buttons
-    await user.click(within(row).getByRole('button', { name: /options/i }));
+    await user.click(within(row).getByRole('button', { name: /encounter table actions menu/i }));
     const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
-    await user.click(within(row).getByRole('button', { name: /options/i }));
+    await user.click(within(row).getByRole('button', { name: /encounter table actions menu/i }));
     expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
@@ -274,15 +276,15 @@ describe('Encounter editability', () => {
 
     // Check today's encounter -- should be editable
     const todayRow = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
     });
 
     // Check overflow menu buttons
-    await user.click(within(todayRow).getByRole('button', { name: /options/i }));
+    await user.click(within(todayRow).getByRole('button', { name: /encounter table actions menu/i }));
     const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
-    await user.click(within(todayRow).getByRole('button', { name: /options/i }));
+    await user.click(within(todayRow).getByRole('button', { name: /encounter table actions menu/i }));
     expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
@@ -295,7 +297,7 @@ describe('Encounter editability', () => {
     const oldRow = screen.getByRole('row', {
       name: /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One/i,
     });
-    expect(within(oldRow).queryByRole('button', { name: /options/i })).not.toBeInTheDocument();
+    expect(within(oldRow).queryByRole('button', { name: /encounter table actions menu/i })).not.toBeInTheDocument();
     await user.click(within(oldRow).getByRole('button', { name: /expand current row/i }));
     expect(screen.queryByRole('button', { name: /edit this encounter/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /danger\s*Delete this encounter/i })).not.toBeInTheDocument();
@@ -320,15 +322,15 @@ describe('Encounter editability', () => {
     renderEncountersTable();
 
     const oldRow = screen.getByRole('row', {
-      name: /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Options/i,
+      name: /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note -- User One Encounter table actions menu/i,
     });
 
     // Check overflow menu buttons
-    await user.click(within(oldRow).getByRole('button', { name: /options/i }));
+    await user.click(within(oldRow).getByRole('button', { name: /encounter table actions menu/i }));
     const overflowMenu = screen.getByRole('menu', { hidden: true });
     expect(within(overflowMenu).getByText(/edit this encounter/i)).toBeInTheDocument();
     expect(within(overflowMenu).getByText(/Delete this encounter/i)).toBeInTheDocument();
-    await user.click(within(oldRow).getByRole('button', { name: /options/i }));
+    await user.click(within(oldRow).getByRole('button', { name: /encounter table actions menu/i }));
     expect(screen.queryByRole('menu', { hidden: true })).not.toBeInTheDocument();
 
     // Check big buttons in expanded row
@@ -377,7 +379,7 @@ describe('Encounter editability', () => {
     });
 
     await clickEditEncounter(
-      /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note POC Consent Form User One Options/i,
+      /Select row 03-Aug-2021, 12:47 AM Facility Visit Visit Note POC Consent Form User One Encounter table actions menu/i,
     );
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
@@ -441,7 +443,7 @@ describe('Delete Encounter', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
 
     const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
     });
 
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
@@ -475,7 +477,7 @@ describe('Delete Encounter', () => {
     renderEncountersTable({ mutateVisitContext });
 
     const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
     });
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
@@ -504,7 +506,7 @@ describe('Delete Encounter', () => {
     renderEncountersTable();
 
     const row = screen.getByRole('row', {
-      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Options/i,
+      name: /Select row 18-Jan-2022, 04:25 PM Facility Visit Admission POC Consent Form -- Encounter table actions menu/i,
     });
     await user.click(within(row).getByRole('button', { name: /expand current row/i }));
     await user.click(screen.getByRole('button', { name: /danger\s*Delete this encounter/i }));
@@ -530,7 +532,7 @@ async function clickEditEncounter(rowName: RegExp) {
 async function clickEditEncounterViaOverflowMenu(rowName: RegExp) {
   const user = userEvent.setup();
   const row = screen.getByRole('row', { name: rowName });
-  await user.click(within(row).getByRole('button', { name: /options/i }));
+  await user.click(within(row).getByRole('button', { name: /encounter table actions menu/i }));
   const overflowMenu = screen.getByRole('menu', { hidden: true });
   await user.click(within(overflowMenu).getByText(/edit this encounter/i));
 }

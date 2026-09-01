@@ -59,7 +59,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
@@ -111,7 +111,7 @@ test('Add, edit and delete patient biometrics', async ({ page, patient }) => {
     await biometricsPage
       .biometricsTable()
       .locator('tbody > tr')
-      .getByRole('button', { name: /options/i })
+      .getByRole('button', { name: /edit or delete vitals and biometrics/i })
       .click();
   });
 
