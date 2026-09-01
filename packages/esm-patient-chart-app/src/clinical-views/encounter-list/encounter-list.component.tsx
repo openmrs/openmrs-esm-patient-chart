@@ -189,7 +189,14 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         Array.isArray(tableRow.actions) && tableRow.actions.length > 0 ? tableRow.actions : defaultActions;
 
       tableRow['actions'] = (
-        <OverflowMenu align="left" flipped className={styles.flippedOverflowMenu} data-testid="actions-id">
+        <OverflowMenu
+          align="left"
+          aria-label={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+          flipped
+          className={styles.flippedOverflowMenu}
+          data-testid="actions-id"
+          iconDescription={t('encounterTableActionsMenu', 'Encounter table actions menu')}
+        >
           {actions.map((actionItem: Action, index: number) => {
             const form = formsJson && actionItem?.form?.name ? formsJson.name === actionItem.form.name : null;
 
