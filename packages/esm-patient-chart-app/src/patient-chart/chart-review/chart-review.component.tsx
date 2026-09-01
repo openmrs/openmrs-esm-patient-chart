@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
-import { type ConfigObject, useExtensionStore, registerExtensionSlot } from '@openmrs/esm-framework';
+import {
+  type ConfigObject,
+  useAssignedExtensions,
+  useExtensionStore,
+  registerExtensionSlot,
+} from '@openmrs/esm-framework';
 import { DashboardView, type DashboardConfig, type LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
 
@@ -81,14 +86,13 @@ interface ChartReviewProps {
 
 const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, setDashboardLayoutMode }) => {
   const extensionStore = useExtensionStore();
+  const assignedExtensions = useAssignedExtensions('patient-chart-dashboard-slot');
 
-  const dashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions
+  const dashboards = assignedExtensions
     .flatMap((e) => {
       if (e.config?.slotName) {
         if (e.config.slotName in extensionStore.slots) {
-          return extensionStore.slots[e.config.slotName].assignedExtensions.map((e) =>
-            getDashboardDefinition(e.meta, e.config, e.moduleName, e.name),
-          );
+          return getDashboardDefinition(e.meta, e.config, e.moduleName, e.name);
         } else {
           registerExtensionSlot('@openmrs/esm-patient-chart-app', e.config.slotName);
           // Since we register the new extension slot, we need to force a re-render with the
