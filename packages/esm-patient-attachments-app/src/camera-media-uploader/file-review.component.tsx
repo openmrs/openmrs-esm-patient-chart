@@ -167,7 +167,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   );
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form className={styles.reviewForm} onSubmit={handleSubmit(onSubmit)}>
       <ModalBody className={styles.overview}>
         {uploadedFile.fileType === 'image' ? (
           <img src={uploadedFile.base64Content} alt={t('imagePlaceholder', 'Image placeholder')} />
@@ -221,7 +221,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
           </Stack>
         </div>
       </ModalBody>
-      <ModalFooter>
+      <ModalFooter className={styles.stickyFooter} data-testid="add-attachment-footer">
         <UserHasAccess privilege="Create Attachments">
           <Button kind="secondary" onClick={handleCancelUpload} size="lg">
             {getCoreTranslation('cancel')}

@@ -238,3 +238,41 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
     await expect(page.getByRole('button', { name: /close preview/i })).toBeHidden();
   });
 });
+
+test('The `Add attachment` submit control stays reachable on a small mobile viewport', async ({ page, patient }) => {
+  const attachmentsPage = new AttachmentsPage(page);
+  const filePath = './e2e/support/upload/brainScan.jpeg';
+
+  // A small mobile-width, short-height viewport approximates a phone screen with the
+  // on-screen keyboard open (which shrinks the visible viewport height without resizing
+  // the underlying layout on some Android browsers) - see spec.md User Story 1.
+  await page.setViewportSize({ width: 375, height: 400 });
+
+  await test.step('When I go to the Attachments page on a small mobile viewport', async () => {
+    await attachmentsPage.goTo(patient.uuid);
+  });
+
+  await test.step('And I click on the `Record attachments` link', async () => {
+    await page.getByRole('button', { name: /record attachments/i }).click();
+  });
+
+  await test.step('And I choose the attachment file to upload', async () => {
+    await page.getByRole('tab', { name: /upload files/i }).click();
+    await page.locator('input[type="file"]').setInputFiles(filePath);
+  });
+
+  await test.step('And I focus the image name field, simulating the on-screen keyboard opening', async () => {
+    await page.getByLabel(/image name/i).click();
+  });
+
+  await test.step('Then the `Add attachment` submit button is visible without scrolling', async () => {
+    const submitButton = page.getByRole('button', { name: /add attachment/i });
+    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toBeInViewport();
+  });
+
+  await test.step('And clicking it completes the upload', async () => {
+    await page.getByRole('button', { name: /add attachment/i }).click();
+    await expect(page.getByText(/upload complete/i)).toBeVisible();
+  });
+});

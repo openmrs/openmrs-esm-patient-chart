@@ -27,6 +27,26 @@
   }
 }
 
+// Bounds the review form to the dynamic (keyboard-aware) viewport height and makes it
+// independently scrollable, so the footer below is always reachable by scrolling here -
+// even if an ancestor `.cds--modal-container` doesn't itself shrink when the on-screen
+// keyboard opens.
+.reviewForm {
+  display: flex;
+  flex-direction: column;
+  max-height: 100dvh;
+  overflow-y: auto;
+}
+
+// Keeps the submit control glued to the bottom of the scrollable area above, so it stays
+// visible without requiring the user to scroll further or dismiss the keyboard.
+.stickyFooter {
+  position: sticky;
+  bottom: 0;
+  background-color: vars.$ui-02;
+  z-index: 1;
+}
+
 .captionFrame {
   margin-bottom: 0.3rem;
 }
