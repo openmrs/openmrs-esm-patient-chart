@@ -92,7 +92,9 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
     .flatMap((e) => {
       if (e.config?.slotName) {
         if (e.config.slotName in extensionStore.slots) {
-          return getDashboardDefinition(e.meta, e.config, e.moduleName, e.name);
+          return getAssignedExtensions(e.config.slotName).map((e) =>
+            getDashboardDefinition(e.meta, e.config, e.moduleName, e.name),
+          );
         } else {
           registerExtensionSlot('@openmrs/esm-patient-chart-app', e.config.slotName);
           // Since we register the new extension slot, we need to force a re-render with the
