@@ -49,7 +49,7 @@
 
   counter-reset: section;
 
-  h3 {
+  .sectionHeader {
     counter-increment: section;
 
     &::before {
