@@ -2,9 +2,10 @@ import React, { useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   type ConfigObject,
+  getAssignedExtensions,
+  registerExtensionSlot,
   useAssignedExtensions,
   useExtensionStore,
-  registerExtensionSlot,
 } from '@openmrs/esm-framework';
 import { DashboardView, type DashboardConfig, type LayoutMode } from './dashboard-view.component';
 import { basePath } from '../../constants';
