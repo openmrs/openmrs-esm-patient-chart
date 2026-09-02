@@ -5,14 +5,14 @@ import { screen, render } from '@testing-library/react';
 import {
   type AssignedExtension,
   type ExtensionSlotState,
+  useAssignedExtensions,
   useExtensionStore,
-  useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
+const mockUseAssignedExtensions = vi.mocked(useAssignedExtensions);
 const mockUseExtensionStore = vi.mocked(useExtensionStore);
-const mockUseExtensionSlotMeta = vi.mocked(useExtensionSlotMeta);
 
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
@@ -24,14 +24,6 @@ vi.mock('react-router-dom', async () => ({
     },
   }),
 }));
-
-function slotMetaFromStore(store, slotName) {
-  return Object.fromEntries(
-    store.slots[slotName].assignedExtensions.map((e) => {
-      return [e.name, e.meta];
-    }),
-  );
-}
 
 describe('ChartReview', () => {
   test('renders a grid-based layout', () => {
@@ -64,7 +56,7 @@ describe('ChartReview', () => {
     };
 
     mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
-    mockUseExtensionSlotMeta.mockImplementation((slotName) => slotMetaFromStore(mockStore, slotName));
+    mockUseAssignedExtensions.mockImplementation((slotName) => mockStore.slots[slotName]?.assignedExtensions ?? []);
 
     render(
       <BrowserRouter>
