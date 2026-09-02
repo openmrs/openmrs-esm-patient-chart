@@ -11,6 +11,8 @@ export interface AllergiesConfigObject {
     allergyReactionUuid: string;
     otherConceptUuid: string;
   };
+  severityStyleMap: Record<string, 'high' | 'moderate' | 'low'>;
+  enableSeverityBackgroundColoring: boolean;
 }
 
 export const configSchema = {
@@ -47,5 +49,17 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+  },
+  severityStyleMap: {
+    _type: Type.Object,
+    _default: {
+      severe: 'high',
+      moderate: 'moderate',
+      mild: 'low',
+    },
+  },
+  enableSeverityBackgroundColoring: {
+    _type: Type.Boolean,
+    _default: false,
   },
 };
