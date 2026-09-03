@@ -65,3 +65,18 @@ export const editLabResultsModal = getAsyncLifecycle(
   () => import('./edit-test-results/modal/edit-lab-results.modal'),
   options,
 );
+
+export const notificationBell = getAsyncLifecycle(
+  () => import('./smart-notifications/notification-bell.extension'),
+  options,
+);
+
+export const notificationRows = getAsyncLifecycle(
+  () => import('./smart-notifications/notification-panel.extension'),
+  options,
+);
+
+export const smartNotificationDetailModal = getAsyncLifecycle(
+  () => import('./smart-notifications/notification-detail.modal'),
+  options,
+);
