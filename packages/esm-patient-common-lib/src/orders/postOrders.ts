@@ -42,22 +42,22 @@ function assertValidDate(date: Date, rawValue: string): Date {
 }
 
 /**
- * The earliest explicit `dateActivated` among the prepped orders, or `undefined` when none set
+ * The latest explicit `dateActivated` among the prepped orders, or `undefined` when none set
  * one. Orders left without a `dateActivated` are stamped by the server at request time, so they
  * impose no lower bound on the encounter datetime.
  */
-function earliestDateActivated(orders: ReadonlyArray<OrderPost>): Date | undefined {
-  let earliest: Date | undefined;
+function latestDateActivated(orders: ReadonlyArray<OrderPost>): Date | undefined {
+  let latest: Date | undefined;
   for (const order of orders) {
     if (!order.dateActivated) {
       continue;
     }
     const dateActivated = assertValidDate(new Date(order.dateActivated), order.dateActivated);
-    if (!earliest || dateActivated < earliest) {
-      earliest = dateActivated;
+    if (!latest || dateActivated > latest) {
+      latest = dateActivated;
     }
   }
-  return earliest;
+  return latest;
 }
 
 export async function postOrdersOnNewEncounter(
@@ -70,11 +70,12 @@ export async function postOrdersOnNewEncounter(
 ) {
   const orders = getOrdersPayloadFromOrderBasket(patientUuid, ordererUuid);
 
-  // The backend enforces `dateActivated >= encounterDatetime`, so the encounter must sit at or
-  // before the earliest explicitly-requested order activation. Orders without a `dateActivated`
+  // Use the most recent explicitly-requested activation for the encounter. This is especially
+  // important for renewed orders: the new encounter belongs to the renewal date, not the previous
+  // order's activation date. Orders without a `dateActivated`
   // are "start now": in a real-time (open) visit we leave encounterDatetime unset too, so the
   // server stamps the encounter and those orders at the same request-time clock.
-  let encounterDatetime = earliestDateActivated(orders);
+  let encounterDatetime = latestDateActivated(orders);
 
   // A stopped (retrospective) visit ended in the past, so the server's "now" would fall outside
   // the visit window. Pin the encounter to the visit start when nothing else set it.
