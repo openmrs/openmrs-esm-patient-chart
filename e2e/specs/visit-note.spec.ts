@@ -18,14 +18,20 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByText('Visit Note', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I select `Asthma` as the primary diagnosis', async () => {
-    await page.getByPlaceholder('Choose a primary diagnosis').fill('Asthma');
+  await test.step('When I add `Asthma` as a primary, confirmed diagnosis', async () => {
+    await page.getByPlaceholder('Choose a diagnosis').fill('Asthma');
     await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
+    const asthmaCard = page.getByRole('group', { name: 'Asthma' });
+    await asthmaCard.getByRole('radio', { name: 'Primary' }).click();
+    await asthmaCard.getByRole('radio', { name: 'Confirmed' }).click();
   });
 
-  await test.step('And I select `GI upset` as the secondary diagnosis', async () => {
-    await page.getByPlaceholder('Choose a secondary diagnosis').fill('GI upset');
+  await test.step('And I add `GI upset` as a secondary, provisional diagnosis', async () => {
+    await page.getByPlaceholder('Choose a diagnosis').fill('GI upset');
     await page.getByRole('menuitem', { name: /gi upset/i }).click();
+    const giUpsetCard = page.getByRole('group', { name: /gi upset/i });
+    await giUpsetCard.getByRole('radio', { name: 'Secondary' }).click();
+    await giUpsetCard.getByRole('radio', { name: 'Provisional' }).click();
   });
 
   await test.step('And I add a visit note', async () => {
@@ -107,6 +113,13 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   await test.step('Then I should see the edited note and not the original note', async () => {
     await expect(page.getByText('This is an edited note')).toBeVisible();
     await expect(page.getByText('This is a note', { exact: true })).toBeHidden();
+  });
+
+  await test.step('And both diagnoses should have survived the edit round-trip', async () => {
+    // Editing a note deletes and recreates its diagnoses server-side; a silent failure
+    // in the recreate half would otherwise go unnoticed by this spec
+    await expect(page.getByText(/asthma/i).first()).toBeVisible();
+    await expect(page.getByText(/gi upset/i).first()).toBeVisible();
   });
 
   await test.step('When I click the `All encounters` tab', async () => {

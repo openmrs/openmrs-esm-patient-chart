@@ -209,9 +209,16 @@
   margin-top: layout.$spacing-02;
 }
 
-.tag {
-  margin-right: layout.$spacing-03;
-  margin-left: 0;
+.diagnosisHelperText {
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-03;
+}
+
+.diagnosisCount {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin: layout.$spacing-05 0 layout.$spacing-03;
 }
 
 .uploadButton {
