@@ -225,9 +225,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     const item = createNewOrderBasketItem();
     renderDrugOrderForm(item);
 
-    const slotCall = mockExtensionSlot.mock.calls.find(
-      (call) => call[0].name === 'drug-order-form-side-effects-slot',
-    );
+    const slotCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'drug-order-form-side-effects-slot');
     expect(slotCall).toBeTruthy();
     expect(slotCall?.[0].state).toEqual({ drugUuid: item.drug.uuid });
   });
