@@ -2,7 +2,13 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ExtensionSlot, getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
+  useConfig,
+  useSession,
+} from '@openmrs/esm-framework';
 import { type DrugOrderBasketItem } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from 'tools';
 import { mockDrugSearchResultApiData, mockSessionDataResponse } from '__mocks__';
@@ -213,9 +219,7 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     const item = createNewOrderBasketItem();
     renderDrugOrderForm(item);
 
-    const slotCall = mockExtensionSlot.mock.calls.find(
-      (call) => call[0].name === 'drug-order-form-side-effects-slot',
-    );
+    const slotCall = mockExtensionSlot.mock.calls.find((call) => call[0].name === 'drug-order-form-side-effects-slot');
     expect(slotCall).toBeTruthy();
     expect(slotCall?.[0].state).toEqual({ drugUuid: item.drug.uuid });
   });
