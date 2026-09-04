@@ -62,15 +62,35 @@ describe('postOrdersOnNewEncounter', () => {
     expectOrdersActivatedAtOrAfterEncounter(body);
   });
 
-  it('pins the encounter to the earliest explicit dateActivated in an open visit', async () => {
-    seedBasket([{ action: 'NEW', dateActivated: '2026-05-12T09:00:00.000Z' }, { action: 'NEW' }]);
+  it('pins a renewed order encounter to the new activation date rather than the previous order date', async () => {
+    seedBasket([
+      {
+        action: 'RENEW',
+        previousOrder: 'order-activated-2026-07-01',
+        dateActivated: '2026-09-02T09:00:00.000Z',
+      },
+    ]);
 
     const body = await postAndCaptureEncounter(openVisit);
 
-    expect((body.encounterDatetime as Date).toISOString()).toBe('2026-05-12T09:00:00.000Z');
-    // The back-dated order keeps its date; the "start now" order stays server-stamped.
-    expect(body.orders[0].dateActivated).toBe('2026-05-12T09:00:00.000Z');
-    expect(body.orders[1].dateActivated).toBeUndefined();
+    expect((body.encounterDatetime as Date).toISOString()).toBe('2026-09-02T09:00:00.000Z');
+    expect(body.orders[0].dateActivated).toBe('2026-09-02T09:00:00.000Z');
+    expectOrdersActivatedAtOrAfterEncounter(body);
+  });
+
+  it('uses the latest explicit activation date and aligns earlier orders with the encounter', async () => {
+    seedBasket([
+      { action: 'NEW', dateActivated: '2026-05-12T09:00:00.000Z' },
+      { action: 'RENEW', previousOrder: 'previous-order-uuid', dateActivated: '2026-09-02T09:00:00.000Z' },
+      { action: 'NEW' },
+    ]);
+
+    const body = await postAndCaptureEncounter(openVisit);
+
+    expect((body.encounterDatetime as Date).toISOString()).toBe('2026-09-02T09:00:00.000Z');
+    expect(body.orders[0].dateActivated).toBe(toOmrsIsoString(body.encounterDatetime as Date));
+    expect(body.orders[1].dateActivated).toBe('2026-09-02T09:00:00.000Z');
+    expect(body.orders[2].dateActivated).toBeUndefined();
     expectOrdersActivatedAtOrAfterEncounter(body);
   });
 
