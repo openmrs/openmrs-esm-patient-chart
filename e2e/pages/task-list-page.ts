@@ -68,12 +68,14 @@ export class TaskListPage {
 
   /** Confirm deletion in the confirmation modal. */
   async confirmDeleteTask() {
-    // Carbon's `kind="danger"` buttons prepend a visually-hidden "danger" span
-    // (for screen readers), so the accessible name is "dangerDelete" rather than
-    // "Delete". Match the dangerDescription prefix to find the button reliably.
+    // Carbon's `kind="danger"` buttons historically prepended a visually-hidden "danger" span
+    // (e.g. in Carbon 1.92.1 bundled in the local dev shell), making the accessible name "danger Delete".
+    // Newer Carbon releases in the nightly CI image omit this span, exposing plain "Delete".
+    // Scoping to `role="dialog"` and matching `/delete/i` makes the selector version-agnostic and prevents
+    // collisions with other Delete buttons outside the modal.
     await this.page
       .getByRole('dialog')
-      .getByRole('button', { name: /danger\s*delete/i })
+      .getByRole('button', { name: /delete/i })
       .click();
   }
 }

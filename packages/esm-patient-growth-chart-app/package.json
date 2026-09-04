@@ -40,10 +40,10 @@
   },
   "dependencies": {
     "@carbon/charts": "^1.27.3",
-    "@carbon/charts-react": "^1.27.3",
-    "@carbon/react": "^1.83.0"
+    "@carbon/charts-react": "^1.27.3"
   },
   "peerDependencies": {
+    "@carbon/react": "1.x",
     "@openmrs/esm-framework": "10.x",
     "@openmrs/esm-patient-common-lib": "12.x",
     "dayjs": "1.x",
