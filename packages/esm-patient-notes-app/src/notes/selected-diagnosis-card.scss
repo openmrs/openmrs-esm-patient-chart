@@ -1,0 +1,133 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.diagnosisCard {
+  border: 1px solid colors.$gray-20;
+  background-color: colors.$gray-10;
+  padding: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.diagnosisCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: layout.$spacing-03;
+}
+
+.diagnosisCardTitle {
+  @include type.type-style('heading-compact-01');
+}
+
+.diagnosisCardInvalid {
+  border-color: colors.$red-60;
+}
+
+.diagnosisCardError {
+  @include type.type-style('label-01');
+  color: colors.$red-60;
+  margin-top: layout.$spacing-03;
+}
+
+.toggleGroups {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-04;
+}
+
+.toggleGroup {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toggleGroupLegend {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  text-transform: uppercase;
+  letter-spacing: 0.02rem;
+  margin-bottom: layout.$spacing-02;
+}
+
+.toggleGroupButtons {
+  display: inline-flex;
+}
+
+.toggleButton {
+  @include type.type-style('body-compact-01');
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: layout.$spacing-02;
+  // Equal widths keep the stacked Order and Certainty groups aligned as a 2x2 grid
+  min-width: 7rem;
+  padding: layout.$spacing-03 layout.$spacing-04;
+  background-color: white;
+  border: 1px solid colors.$gray-50;
+  cursor: pointer;
+
+  // Overlap adjacent borders; the selected segment is raised so its outline wins on
+  // all four sides (border-left: none would clip a selected right-hand segment)
+  & + & {
+    margin-left: -1px;
+  }
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+
+  &:focus-visible {
+    outline: 2px solid colors.$blue-60;
+    outline-offset: -2px;
+    z-index: 2;
+    position: relative;
+  }
+}
+
+.toggleButtonSelectedRed {
+  font-weight: 600;
+  background-color: colors.$red-10;
+  border-color: colors.$red-60;
+  color: colors.$red-70;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background-color: colors.$red-10;
+  }
+}
+
+.toggleButtonSelectedBlue {
+  font-weight: 600;
+  background-color: colors.$blue-10;
+  border-color: colors.$blue-60;
+  color: colors.$blue-70;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background-color: colors.$blue-10;
+  }
+}
+
+.toggleButtonSelectedGreen {
+  font-weight: 600;
+  background-color: colors.$green-10;
+  border-color: colors.$green-60;
+  color: colors.$green-70;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background-color: colors.$green-10;
+  }
+}
+
+.toggleButtonCheck {
+  flex-shrink: 0;
+}
+
+.toggleButtonCheckHidden {
+  visibility: hidden;
+}

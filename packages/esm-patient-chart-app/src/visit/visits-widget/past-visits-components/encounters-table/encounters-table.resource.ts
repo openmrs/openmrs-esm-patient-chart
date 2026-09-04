@@ -115,13 +115,10 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
       noToday: true,
     }),
     rawDatetime: encounter.encounterDatetime,
-    diagnoses:
-      encounter.diagnoses
-        ?.filter((diagnosis) => !diagnosis.voided)
-        .map((diagnosis) => ({
-          ...diagnosis,
-          certainty: diagnosis.certainty || 'PROVISIONAL',
-        })) || [],
+    // Certainty is passed through as stored (no PROVISIONAL fallback): the visit note
+    // form renders a missing/unknown certainty as unset so the clinician chooses
+    // explicitly rather than a fabricated value being silently re-saved (O3-5823).
+    diagnoses: encounter.diagnoses?.filter((diagnosis) => !diagnosis.voided) || [],
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
     form: encounter.form as Form,
