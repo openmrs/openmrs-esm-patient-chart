@@ -658,10 +658,6 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
   }, [groupProps, orderItem, orders, setOrders, visitContext, visitRequired, windowProps]);
 
   const handleModifyOrder = useCallback(() => {
-    if (visitRequired && !visitContext) {
-      return;
-    }
-
     if (orderItem.type === ORDER_TYPES.DRUG_ORDER) {
       // make another call to fetch the order,
       // this time with custom rep to include the drug field
@@ -698,7 +694,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
         groupProps,
       );
     }
-  }, [groupProps, orderItem, visitContext, visitRequired, windowProps]);
+  }, [groupProps, orderItem, windowProps]);
 
   const handleAddOrEditTestResults = useCallback(() => {
     launchWorkspace2('test-results-form-workspace', { order: orderItem, patient });
@@ -720,7 +716,7 @@ function OrderBasketItemActions({ orderItem, patient }: OrderBasketItemActionsPr
       >
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled={alreadyInBasket || (visitRequired && !visitContext)}
+          disabled={alreadyInBasket}
           id="modify"
           itemText={t('modifyOrder', 'Modify order')}
           onClick={handleModifyOrder}

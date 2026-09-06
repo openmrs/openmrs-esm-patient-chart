@@ -436,10 +436,6 @@ function OrderBasketItemActions({
   }, [encounterUuid, items, medication, setItems, visitContext, visitRequired, workspaceGroupProps]);
 
   const handleModifyClick = useCallback(() => {
-    if (visitRequired && !visitContext) {
-      return;
-    }
-
     launchWorkspace2<AddDrugOrderWorkspaceProps, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'add-drug-order',
       {
@@ -449,7 +445,7 @@ function OrderBasketItemActions({
       { encounterUuid },
       workspaceGroupProps,
     );
-  }, [encounterUuid, medication, visitContext, visitRequired, workspaceGroupProps]);
+  }, [encounterUuid, medication, workspaceGroupProps]);
 
   const handleRenewClick = useCallback(() => {
     if (visitRequired && !visitContext) {
@@ -480,7 +476,7 @@ function OrderBasketItemActions({
           id="modify"
           itemText={t('modify', 'Modify')}
           onClick={handleModifyClick}
-          disabled={alreadyInBasket || (visitRequired && !visitContext)}
+          disabled={alreadyInBasket}
         />
       )}
       {showRenewButton && (

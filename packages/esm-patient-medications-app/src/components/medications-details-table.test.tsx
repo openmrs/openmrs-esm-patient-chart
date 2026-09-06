@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen, render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
@@ -39,31 +39,6 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
   };
 });
 
-vi.mock('@carbon/react', async () => {
-  const React = await vi.importActual('react');
-  const originalModule = (await vi.importActual('@carbon/react')) as Record<string, unknown>;
-  const OverflowMenu = ({ children, ...props }: any) => (
-    <div>
-      <button aria-label={props['aria-label'] ?? 'Options'} type="button">
-        Options
-      </button>
-      {children}
-    </div>
-  );
-  const OverflowMenuItem = (React as any).forwardRef(({ disabled, itemText, onClick }: any, ref) => (
-    <button disabled={disabled} onClick={onClick} ref={ref} type="button">
-      {itemText}
-    </button>
-  ));
-  OverflowMenuItem.displayName = 'OverflowMenuItem';
-
-  return {
-    ...originalModule,
-    OverflowMenu,
-    OverflowMenuItem,
-  };
-});
-
 vi.mock('../print/print.component', () => ({
   __esModule: true,
   default: function MockPrintComponent() {
@@ -99,7 +74,7 @@ describe('MedicationsDetailsTable', () => {
     });
   });
 
-  it('disables modify, renew, and discontinue actions when visits are required and a medication has no visit context', async () => {
+  it('disables renew and discontinue actions while keeping modify enabled when visits are required and a medication has no visit context', async () => {
     const user = userEvent.setup();
     const medicationWithoutVisitContext = {
       ...mockOrders[0],
@@ -120,9 +95,16 @@ describe('MedicationsDetailsTable', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: /modify/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /renew/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /discontinue/i })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = findMenuItemByText(actionsMenu, /modify/i);
+    const renewItem = findMenuItemByText(actionsMenu, /renew/i);
+    const discontinueItem = findMenuItemByText(actionsMenu, /discontinue/i);
+
+    expect(modifyItem).toBeEnabled();
+    expect(renewItem).toBeDisabled();
+    expect(discontinueItem).toBeDisabled();
   });
 
   it('keeps modify, renew, and discontinue actions enabled when visits are not required and a medication has no visit', async () => {
@@ -152,8 +134,21 @@ describe('MedicationsDetailsTable', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: /modify/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /renew/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /discontinue/i })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = findMenuItemByText(actionsMenu, /modify/i);
+    const renewItem = findMenuItemByText(actionsMenu, /renew/i);
+    const discontinueItem = findMenuItemByText(actionsMenu, /discontinue/i);
+
+    expect(modifyItem).toBeEnabled();
+    expect(renewItem).toBeEnabled();
+    expect(discontinueItem).toBeEnabled();
   });
 });
+
+function findMenuItemByText(menu: HTMLElement, textRegex: RegExp) {
+  return within(menu)
+    .getAllByRole('menuitem', { hidden: true })
+    .find((item) => textRegex.test(item.textContent));
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { useReactToPrint } from 'react-to-print';
-import { screen, render } from '@testing-library/react';
+import { screen, render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
@@ -34,31 +34,6 @@ const mockUseReactToPrint = vi.mocked(useReactToPrint);
 
 mockSession.mockReturnValue(mockSessionDataResponse.data);
 mockOpenmrsFetch.mockImplementation(vi.fn());
-
-vi.mock('@carbon/react', async () => {
-  const React = await vi.importActual('react');
-  const originalModule = (await vi.importActual('@carbon/react')) as Record<string, unknown>;
-  const OverflowMenu = ({ children, ...props }: any) => (
-    <div>
-      <button aria-label={props['aria-label'] ?? 'Options'} type="button">
-        Options
-      </button>
-      {children}
-    </div>
-  );
-  const OverflowMenuItem = (React as any).forwardRef(({ disabled, itemText, onClick }: any, ref) => (
-    <button disabled={disabled} onClick={onClick} ref={ref} type="button">
-      {itemText}
-    </button>
-  ));
-  OverflowMenuItem.displayName = 'OverflowMenuItem';
-
-  return {
-    ...originalModule,
-    OverflowMenu,
-    OverflowMenuItem,
-  };
-});
 
 vi.mock('react-to-print', async () => ({
   ...((await vi.importActual('react-to-print')) as object),
@@ -618,7 +593,8 @@ describe('OrderDetailsTable', () => {
     expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
   });
 
-  it('disables modify and cancel actions when visits are required and an order has no visit context', async () => {
+  it('disables cancel action while keeping modify enabled when visits are required and an order has no visit context', async () => {
+    const user = userEvent.setup();
     const orderWithoutVisitContext = {
       ...mockOrders[0],
       encounter: {
@@ -638,11 +614,22 @@ describe('OrderDetailsTable', () => {
     renderOrderDetailsTable();
 
     await screen.findByRole('table');
-    expect(screen.getByRole('button', { name: /modify order/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /cancel order/i })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /modify order/i.test(item.textContent));
+    const cancelItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /cancel order/i.test(item.textContent));
+
+    expect(modifyItem).toBeEnabled();
+    expect(cancelItem).toBeDisabled();
   });
 
   it('keeps modify and cancel actions enabled when visits are not required and an order has no visit', async () => {
+    const user = userEvent.setup();
     const orderWithoutVisitContext = {
       ...mockOrders[0],
       encounter: {
@@ -667,8 +654,18 @@ describe('OrderDetailsTable', () => {
     renderOrderDetailsTable();
 
     await screen.findByRole('table');
-    expect(screen.getByRole('button', { name: /modify order/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /cancel order/i })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /modify order/i.test(item.textContent));
+    const cancelItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /cancel order/i.test(item.textContent));
+
+    expect(modifyItem).toBeEnabled();
+    expect(cancelItem).toBeEnabled();
   });
 });
 

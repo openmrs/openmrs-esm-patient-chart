@@ -322,12 +322,12 @@ export interface TestOrderBasketItem extends OrderBasketItem {
 }
 
 export interface OrderBasketWindowProps {
-  encounterUuid: string | null;
+  encounterUuid: string;
   onOrderBasketSubmitted?: (encounterUuid: string, postedOrders: Array<Order>) => void;
 }
 
 export interface ExportedOrderBasketWindowProps {
-  encounterUuid: string | null;
+  encounterUuid: string;
   drugOrderWorkspaceName: string;
   labOrderWorkspaceName: string;
   generalOrderWorkspaceName: string;
