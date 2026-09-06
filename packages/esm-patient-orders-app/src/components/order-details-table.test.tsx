@@ -1,7 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { useReactToPrint } from 'react-to-print';
-import { screen, render } from '@testing-library/react';
+import { screen, render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   type ConfigObject,
@@ -16,6 +16,7 @@ import {
   useOrderTypes,
   usePatientOrders,
   useOrderBasket,
+  useSystemVisitSetting,
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from '../config-schema';
 import { mockOrders, mockSessionDataResponse } from '__mocks__';
@@ -25,6 +26,7 @@ import OrderDetailsTable from './order-details-table.component';
 const mockUsePatientOrders = vi.mocked(usePatientOrders);
 const mockUseOrderTypes = vi.mocked(useOrderTypes);
 const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockUseSystemVisitSetting = vi.mocked(useSystemVisitSetting);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSession = vi.mocked(useSession);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
@@ -47,6 +49,7 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
     useOrderTypes: vi.fn(),
     usePatient: vi.fn(),
     useOrderBasket: vi.fn(),
+    useSystemVisitSetting: vi.fn(),
   };
 });
 
@@ -132,6 +135,11 @@ describe('OrderDetailsTable', () => {
       isLoading: false,
       isValidating: false,
       mutate: vi.fn(),
+    });
+    mockUseSystemVisitSetting.mockReturnValue({
+      systemVisitEnabled: true,
+      isLoadingSystemVisitSetting: false,
+      errorFetchingSystemVisitSetting: null,
     });
   });
 
@@ -462,7 +470,7 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const addButton = screen.getByRole('button', { name: /add/i });
+    const addButton = screen.getByRole('button', { name: /add addicon/i });
     expect(addButton).toBeInTheDocument();
   });
 
@@ -479,7 +487,7 @@ describe('OrderDetailsTable', () => {
 
     await screen.findByRole('table');
 
-    const addButton = screen.queryByRole('button', { name: /add/i });
+    const addButton = screen.queryByRole('button', { name: /^add$/i });
     expect(addButton).not.toBeInTheDocument();
   });
 
@@ -583,6 +591,81 @@ describe('OrderDetailsTable', () => {
     await screen.findByRole('table');
 
     expect(screen.getByRole('button', { name: /actions menu/i })).toBeInTheDocument();
+  });
+
+  it('disables cancel action while keeping modify enabled when visits are required and an order has no visit context', async () => {
+    const user = userEvent.setup();
+    const orderWithoutVisitContext = {
+      ...mockOrders[0],
+      encounter: {
+        ...mockOrders[0].encounter,
+        visit: null,
+      },
+    };
+
+    mockUsePatientOrders.mockReturnValue({
+      data: [orderWithoutVisitContext] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /modify order/i.test(item.textContent));
+    const cancelItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /cancel order/i.test(item.textContent));
+
+    expect(modifyItem).toBeEnabled();
+    expect(cancelItem).toBeDisabled();
+  });
+
+  it('keeps modify and cancel actions enabled when visits are not required and an order has no visit', async () => {
+    const user = userEvent.setup();
+    const orderWithoutVisitContext = {
+      ...mockOrders[0],
+      encounter: {
+        ...mockOrders[0].encounter,
+        visit: null,
+      },
+    };
+
+    mockUseSystemVisitSetting.mockReturnValue({
+      systemVisitEnabled: false,
+      isLoadingSystemVisitSetting: false,
+      errorFetchingSystemVisitSetting: null,
+    });
+    mockUsePatientOrders.mockReturnValue({
+      data: [orderWithoutVisitContext] as unknown as Array<Order>,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderOrderDetailsTable();
+
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: /actions menu/i }));
+
+    const actionsMenu = await screen.findByRole('menu', { hidden: true });
+    const modifyItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /modify order/i.test(item.textContent));
+    const cancelItem = within(actionsMenu)
+      .getAllByRole('menuitem', { hidden: true })
+      .find((item) => /cancel order/i.test(item.textContent));
+
+    expect(modifyItem).toBeEnabled();
+    expect(cancelItem).toBeEnabled();
   });
 });
 

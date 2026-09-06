@@ -13,8 +13,8 @@ import { useSystemVisitSetting } from './useSystemVisitSetting';
 export interface PatientWorkspaceGroupProps {
   patient: fhir.Patient;
   patientUuid: string;
-  visitContext: Visit;
-  mutateVisitContext: () => void;
+  visitContext: Visit | null;
+  mutateVisitContext: (() => void) | null;
 }
 
 export interface PatientChartWorkspaceActionButtonProps {
