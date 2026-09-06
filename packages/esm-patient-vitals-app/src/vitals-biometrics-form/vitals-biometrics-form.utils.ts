@@ -54,44 +54,44 @@ export function extractNumbers(str: string) {
 
 export function getMuacColorCode(age: number, muac: number, setColorCode: (color) => void) {
   switch (true) {
-    // children 5 years and below with a muac equal to 14
+    // children 5 years and below (0-5 inclusive)
     case age <= 5 && muac <= 11.5 && muac > 0:
       setColorCode('red');
       break;
-    case age < 5 && muac > 11.5 && muac < 12.5:
+    case age <= 5 && muac > 11.5 && muac < 12.5:
       setColorCode('yellow');
       break;
-    case age < 5 && muac > 12.5:
+    case age <= 5 && muac >= 12.5:
       setColorCode('green');
       break;
-    // above 5 but less than 10
-    case age > 5 && age < 10 && muac <= 13.5 && muac > 0:
+    // above 5, up to and including 10
+    case age > 5 && age <= 10 && muac <= 13.5 && muac > 0:
       setColorCode('red');
       break;
-    case age > 5 && age < 10 && muac > 13.5 && muac < 14.5:
+    case age > 5 && age <= 10 && muac > 13.5 && muac < 14.5:
       setColorCode('yellow');
       break;
-    case age > 5 && age < 10 && muac > 14.5:
+    case age > 5 && age <= 10 && muac >= 14.5:
       setColorCode('green');
       break;
-    //above 10 but less than 18
-    case age > 10 && age < 18 && muac <= 16.5 && muac > 0:
+    // above 10, up to and including 18
+    case age > 10 && age <= 18 && muac <= 16.5 && muac > 0:
       setColorCode('red');
       break;
-    case age > 10 && age < 18 && muac > 16.5 && muac < 19.0:
+    case age > 10 && age <= 18 && muac > 16.5 && muac < 19.0:
       setColorCode('yellow');
       break;
-    case age > 10 && age < 18 && muac > 19.0:
+    case age > 10 && age <= 18 && muac >= 19.0:
       setColorCode('green');
       break;
     // above 18
     case age > 18 && muac <= 19.5 && muac > 0:
       setColorCode('red');
       break;
-    case age > 18 && muac > 19.0 && muac < 22.0:
+    case age > 18 && muac > 19.5 && muac < 22.0:
       setColorCode('yellow');
       break;
-    case age > 18 && muac > 22.0:
+    case age > 18 && muac >= 22.0:
       setColorCode('green');
       break;
   }
