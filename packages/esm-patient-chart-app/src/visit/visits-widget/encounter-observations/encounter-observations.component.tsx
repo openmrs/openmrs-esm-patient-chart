@@ -25,6 +25,8 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     if (
       obs.value !== null &&
       typeof obs.value === 'object' &&
+      'uuid' in obs.value &&
+      typeof obs.value.uuid === 'string' &&
       'display' in obs.value &&
       typeof obs.value.display === 'string'
     ) {
@@ -57,7 +59,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
               <span className={styles.parentConcept}>{obs.concept.display}</span>
               <span />
               {obs.groupMembers.map((member) => (
-                <React.Fragment key={index}>
+                <React.Fragment key={member.uuid}>
                   <span className={styles.childConcept}>{member.concept.display}</span>
                   <span>{getAnswer(member)}</span>
                 </React.Fragment>
