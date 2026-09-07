@@ -25,6 +25,7 @@ const makeObservation = (overrides: Partial<Obs> = {}): Obs =>
 beforeEach(() => {
   mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(esmPatientChartSchema));
 });
+
 describe('EncounterObservations', () => {
   it('uses the display value for reference observations such as locations', () => {
     render(<EncounterObservations observations={[makeObservation()]} />);
