@@ -441,7 +441,7 @@ function OrderBasketItemActions({
     launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
       'order-basket',
       {},
-      { encounterUuid: medication.encounter.uuid },
+      { encounterUuid: '' },
       workspaceGroupProps,
     );
   }, [items, setItems, medication, workspaceGroupProps]);
