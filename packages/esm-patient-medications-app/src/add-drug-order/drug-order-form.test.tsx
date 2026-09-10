@@ -84,12 +84,17 @@ function createNewOrderBasketItem(overrides?: Partial<DrugOrderBasketItem>): Dru
 }
 
 const completeMedicationOrderFields: Partial<DrugOrderBasketItem> = {
+  isFreeTextDosage: false,
+  scheduledDate: new Date(),
   dosage: 1,
   unit: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
   route: { valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Oral' },
   frequency: { valueCoded: 'once-daily-uuid', value: 'Once daily', frequencyPerDay: 1 },
   duration: 7,
   durationUnit: { valueCoded: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Days' },
+  asNeeded: false,
+  asNeededCondition: '',
+  patientInstructions: '',
   indication: 'Pain',
   pillsDispensed: 7,
   quantityUnits: { valueCoded: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', value: 'Tablet' },
@@ -314,6 +319,70 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     const quantityInput = screen.getByRole('spinbutton', { name: /quantity to dispense/i });
     expect(quantityInput).not.toHaveValue();
     expect(screen.queryByText(/auto-calculated/i)).not.toBeInTheDocument();
+  });
+
+  it('preserves both dosage drafts when switching between dosage modes', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem());
+
+    const doseInput = screen.getByRole('spinbutton', { name: /dose/i });
+    await user.clear(doseInput);
+    await user.type(doseInput, '1');
+
+    const patientInstructions = screen.getByPlaceholderText(/additional dosing instructions/i);
+    await user.type(patientInstructions, 'Take after eating');
+
+    const freeTextToggle = screen.getByRole('switch', { name: /free text dosage/i });
+    await user.click(freeTextToggle);
+
+    const freeTextDosage = screen.getByPlaceholderText(/^free text dosage$/i);
+    await user.type(freeTextDosage, 'Take one tablet when needed');
+
+    await user.click(freeTextToggle);
+    expect(screen.getByRole('spinbutton', { name: /dose/i })).toHaveValue(1);
+    expect(screen.getByPlaceholderText(/additional dosing instructions/i)).toHaveValue('Take after eating');
+
+    await user.click(freeTextToggle);
+    expect(screen.getByPlaceholderText(/^free text dosage$/i)).toHaveValue('Take one tablet when needed');
+  });
+
+  it('does not show simple dosage details while entering free-text dosage', async () => {
+    const user = userEvent.setup();
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields));
+
+    expect(screen.getAllByText(/1 tablet/i).length).toBeGreaterThan(0);
+
+    await user.click(screen.getByRole('switch', { name: /free text dosage/i }));
+
+    expect(screen.queryByText(/1 tablet/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/oral/i)).not.toBeInTheDocument();
+  });
+
+  it('clears submitted dosage, prescription, and dispensing drafts after save', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
+
+    await user.type(screen.getByPlaceholderText(/additional dosing instructions/i), 'Take after eating');
+    const indication = screen.getByPlaceholderText(/e\.g\. "Hypertension"/i);
+    await user.clear(indication);
+    await user.type(indication, 'Pain');
+
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]).toMatchObject({
+      patientInstructions: 'Take after eating',
+      indication: 'Pain',
+      pillsDispensed: 7,
+      quantityUnits: expect.objectContaining({ value: 'Tablet' }),
+      numRefills: 0,
+    });
+    expect(screen.getByPlaceholderText(/additional dosing instructions/i)).toHaveValue('');
+    expect(screen.getByPlaceholderText(/e\.g\. "Hypertension"/i)).toHaveValue('');
+    expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).not.toHaveValue();
+    expect(screen.getByRole('combobox', { name: /quantity unit/i })).toHaveValue('');
+    expect(screen.getByRole('spinbutton', { name: /prescription refills/i })).not.toHaveValue();
   });
 
   it('does not auto-calculate when quantity unit differs from dose unit', async () => {
