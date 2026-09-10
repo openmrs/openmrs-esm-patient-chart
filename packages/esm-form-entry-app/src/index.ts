@@ -63,4 +63,12 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const formWidget = () => import('./bootstrap');
+/**
+ * Returns a fresh set of single-spa lifecycle functions for each call so that
+ * multiple concurrent form instances each get their own independent Angular
+ * application, DOM binding, and props context.
+ */
+export const formWidget = async () => {
+  const { createLifecycles } = await import('./bootstrap');
+  return createLifecycles();
+};
