@@ -8,7 +8,7 @@ import VisitDiagnosisTags from './visit-diagnosis-tags.component';
 const mockUseConfig = vi.mocked(useConfig);
 
 describe('VisitDiagnosisTags', () => {
-  it('shows the diagnosis certainty on hover and to screen readers, but adds no label for unknown values', () => {
+  it('surfaces the diagnosis certainty as a tooltip and to screen readers, but adds no label for unknown values', () => {
     mockUseConfig.mockReturnValue({ diagnosisTags: { primaryColor: 'red', secondaryColor: 'blue' } });
 
     const diagnoses: Array<DedupedDiagnosis> = [
@@ -19,10 +19,21 @@ describe('VisitDiagnosisTags', () => {
 
     render(<VisitDiagnosisTags diagnoses={diagnoses} />);
 
-    expect(screen.getByTitle('Confirmed')).toHaveTextContent('Pneumonia (Confirmed)');
-    expect(screen.getByTitle('Provisional')).toHaveTextContent('Malaria (Provisional)');
-    // The unknown-certainty tag renders, but only the two known-certainty tags carry a tooltip
+    // Screen-reader text accompanies each known certainty
+    expect(screen.getByText('(Confirmed)')).toBeInTheDocument();
+    expect(screen.getByText('(Provisional)')).toBeInTheDocument();
+
+    // The tooltip host wraps the tag, is keyboard-focusable, and carries the label the
+    // CSS tooltip renders
+    const confirmedHost = screen.getByText((_, element) => element?.getAttribute('data-certainty') === 'Confirmed');
+    expect(confirmedHost).toHaveTextContent('Pneumonia (Confirmed)');
+    expect(confirmedHost).toHaveAttribute('tabindex', '0');
+    const provisionalHost = screen.getByText((_, element) => element?.getAttribute('data-certainty') === 'Provisional');
+    expect(provisionalHost).toHaveTextContent('Malaria (Provisional)');
+
+    // Unknown certainty: tag renders with no tooltip and no screen-reader suffix
     expect(screen.getByText('Fatigue')).toBeInTheDocument();
-    expect(screen.getAllByTitle(/.+/)).toHaveLength(2);
+    expect(screen.queryByText('(REFUTED)')).not.toBeInTheDocument();
+    expect(screen.queryByText((_, element) => element?.getAttribute('data-certainty') === 'REFUTED')).not.toBeInTheDocument();
   });
 });
