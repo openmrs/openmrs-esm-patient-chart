@@ -1,6 +1,7 @@
-import { DiagnosisTags, type Visit } from '@openmrs/esm-framework';
+import { type Visit } from '@openmrs/esm-framework';
 import React from 'react';
 import { dedupeDiagnoses } from '../dedupe-diagnoses';
+import VisitDiagnosisTags from '../visit-diagnosis-tags.component';
 
 interface Props {
   visit: Visit;
@@ -12,7 +13,7 @@ const VisitDiagnosisCell: React.FC<Props> = ({ visit }) => {
     visit.encounters.flatMap((encounter) => encounter.diagnoses).filter((diagnosis) => !diagnosis.voided),
   );
 
-  return <DiagnosisTags diagnoses={diagnoses} />;
+  return <VisitDiagnosisTags diagnoses={diagnoses} />;
 };
 
 export default VisitDiagnosisCell;

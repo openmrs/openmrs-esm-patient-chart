@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import {
   type Diagnosis,
-  DiagnosisTags,
   Extension,
   ExtensionSlot,
   formatTime,
@@ -16,6 +15,7 @@ import {
 import type { ChartConfig } from '../../../config-schema';
 import type { Note, Order, OrderItem } from '../visit.resource';
 import { dedupeDiagnoses } from '../../dedupe-diagnoses';
+import VisitDiagnosisTags from '../../visit-diagnosis-tags.component';
 import { encounterHasJsonSchemaForm, type EncountersTableProps } from './encounters-table/encounters-table.resource';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -111,7 +111,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          <DiagnosisTags diagnoses={diagnoses} />
+          <VisitDiagnosisTags diagnoses={diagnoses} />
         ) : (
           <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
