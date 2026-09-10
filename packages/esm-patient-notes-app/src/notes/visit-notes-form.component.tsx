@@ -152,7 +152,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       if (selectedDiagnoses.some((diagnosis) => !isCompleteDiagnosis(diagnosis))) {
         diagnosisErrors.diagnoses = {
           type: 'custom',
-          message: t('diagnosisOrderAndCertaintyRequired', 'Choose order and certainty for each diagnosis'),
+          message: t('diagnosisRankAndCertaintyRequired', 'Choose rank and certainty for each diagnosis'),
         };
       }
       if (isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1)) {
@@ -590,7 +590,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
-                        {t('diagnosisSearchHelperText', 'Choose order and certainty on each diagnosis selected.')}
+                        {t('diagnosisSearchHelperText', 'Choose rank and certainty on each diagnosis selected.')}
                       </p>
                       <p className={styles.diagnosisCount}>
                         {t('diagnosisCountOnNote', '{{count}} diagnoses on this note', {

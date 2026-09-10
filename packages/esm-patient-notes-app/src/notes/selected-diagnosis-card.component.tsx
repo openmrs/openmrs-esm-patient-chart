@@ -59,7 +59,7 @@ export default function SelectedDiagnosisCard({ diagnosis, invalid, onRemove, on
       </div>
       <div className={styles.toggleGroups}>
         <DiagnosisToggleGroup
-          legend={t('order', 'Order')}
+          legend={t('rank', 'Rank')}
           options={[
             {
               label: t('primary', 'Primary'),
@@ -95,7 +95,7 @@ export default function SelectedDiagnosisCard({ diagnosis, invalid, onRemove, on
       </div>
       {invalid && (
         <p className={styles.diagnosisCardError} role="alert">
-          {t('diagnosisOrderAndCertaintyRequired', 'Choose order and certainty for each diagnosis')}
+          {t('diagnosisRankAndCertaintyRequired', 'Choose rank and certainty for each diagnosis')}
         </p>
       )}
     </div>

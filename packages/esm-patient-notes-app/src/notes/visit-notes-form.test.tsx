@@ -174,8 +174,8 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeInTheDocument();
-  // The order/certainty helper text only appears once a diagnosis has been added
-  expect(screen.queryByText(/choose order and certainty on each diagnosis selected/i)).not.toBeInTheDocument();
+  // The rank/certainty helper text only appears once a diagnosis has been added
+  expect(screen.queryByText(/choose rank and certainty on each diagnosis selected/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -201,7 +201,7 @@ test('typing in the diagnosis search input triggers a search', async () => {
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   // The test i18n mock interpolates but does not pluralize, so match the count only
   expect(screen.getByText(/1 diagnos/i)).toBeInTheDocument();
-  expect(screen.getByText(/choose order and certainty on each diagnosis selected/i)).toBeInTheDocument();
+  expect(screen.getByText(/choose rank and certainty on each diagnosis selected/i)).toBeInTheDocument();
   for (const radioName of ['Primary', 'Secondary', 'Confirmed', 'Provisional']) {
     expect(within(card).getByRole('radio', { name: radioName })).not.toBeChecked();
   }
@@ -285,13 +285,13 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   // with the error rendered inside the offending card
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
   await user.click(submitButton);
-  expect(within(card).getByText(/choose order and certainty for each diagnosis/i)).toBeInTheDocument();
+  expect(within(card).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
   // Completing the card clears its inline error without another submit
   await user.click(within(card).getByRole('radio', { name: 'Primary' }));
   await user.click(within(card).getByRole('radio', { name: 'Provisional' }));
-  expect(within(card).queryByText(/choose order and certainty for each diagnosis/i)).not.toBeInTheDocument();
+  expect(within(card).queryByText(/choose rank and certainty for each diagnosis/i)).not.toBeInTheDocument();
 
   await user.clear(clinicalNote);
   await user.type(clinicalNote, 'Sample clinical note');
@@ -764,7 +764,7 @@ test('renders out-of-enum rank and certainty from other writers as unset and blo
   await user.type(clinicalNote, ' updated');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
 
-  expect(within(card).getByText(/choose order and certainty for each diagnosis/i)).toBeInTheDocument();
+  expect(within(card).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
   expect(mockUpdateVisitNote).not.toHaveBeenCalled();
 });
 
@@ -783,7 +783,7 @@ test('shows the primary-required and incomplete-diagnosis errors together on a s
 
   // Both validation failures surface on the same submit: no two-stage whack-a-mole
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
-  expect(within(incompleteCard).getByText(/choose order and certainty for each diagnosis/i)).toBeInTheDocument();
+  expect(within(incompleteCard).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 });
 
