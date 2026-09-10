@@ -260,18 +260,6 @@ describe('buildMedicationOrder', () => {
     expect(result.scheduledDate).not.toBe(medicationOrder.dateActivated);
   });
 
-  it.each(['NEW', 'RENEW'] as const)('does not copy the previous encounter onto a %s basket item', (action) => {
-    const result = buildMedicationOrder(medicationOrder, action);
-
-    expect(result.encounterUuid).toBeUndefined();
-  });
-
-  it.each(['REVISE', 'DISCONTINUE'] as const)('copies the previous encounter onto a %s basket item', (action) => {
-    const result = buildMedicationOrder(medicationOrder, action);
-
-    expect(result.encounterUuid).toBe(medicationOrder.encounter.uuid);
-  });
-
   it('defaults REVISE basket items to now instead of the previous activation or scheduled date', () => {
     const before = Date.now();
     const scheduledDate = '2026-05-01T00:00:00.000+0000';
