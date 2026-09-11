@@ -19,9 +19,26 @@ interface DeleteVisitActionItemProps {
    * If true, renders as IconButton instead
    */
   compact?: boolean;
+
+  /**
+   * Optional callback run after the visit is successfully deleted, so a host (e.g. the RDE visit
+   * dashboard) can refresh its visit list. Passed through the slot state.
+   */
+  onVisitDeleted?: () => void;
+
+  /**
+   * Optional callback run after the deletion is undone, so a host can refresh its visit list again.
+   * Passed through the slot state.
+   */
+  onVisitRestored?: () => void;
 }
 
-const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, compact }) => {
+const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({
+  visit,
+  compact,
+  onVisitDeleted,
+  onVisitRestored,
+}) => {
   const { t } = useTranslation();
   const { canEditPastVisits } = useEncounterPrivileges();
   const isTablet = useLayoutType() === 'tablet';
@@ -31,6 +48,8 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, co
     const dispose = showModal('delete-visit-dialog', {
       visit,
       closeModal: () => dispose(),
+      onVisitDeleted,
+      onVisitRestored,
     });
   };
 
@@ -47,7 +66,7 @@ const DeleteVisitActionItem: React.FC<DeleteVisitActionItemProps> = ({ visit, co
           label={getCoreTranslation('delete')}
           kind="ghost"
           size={responsiveSize}
-          align="top-end"
+          align="left"
         >
           <TrashCanIcon size={16} />
         </IconButton>

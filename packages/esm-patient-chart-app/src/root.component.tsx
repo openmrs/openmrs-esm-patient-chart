@@ -1,21 +1,18 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { dashboardPath, spaRoot, basePath } from './constants';
+import { dashboardPath, spaRoot, basePath, rdePath } from './constants';
 import PatientChart from './patient-chart/patient-chart.component';
-import styles from './root.scss';
+import RdePage from './rde/rde-page.component';
 
 export default function Root() {
   return (
-    <>
-      <div className={styles.patientChartWrapper}>
-        <BrowserRouter basename={spaRoot}>
-          <Routes>
-            <Route path={basePath} element={<PatientChart />} />
-            <Route path={dashboardPath} element={<PatientChart />} />
-          </Routes>
-        </BrowserRouter>
-      </div>
-    </>
+    <BrowserRouter basename={spaRoot}>
+      <Routes>
+        <Route path={basePath} element={<PatientChart />} />
+        <Route path={dashboardPath} element={<PatientChart />} />
+        <Route path={rdePath} element={<RdePage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
