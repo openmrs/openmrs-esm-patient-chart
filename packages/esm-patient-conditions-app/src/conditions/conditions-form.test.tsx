@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
-import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mockFhirConditionsResponse, searchedCondition } from '__mocks__';
 import { getByTextWithMarkup, mockPatient } from 'tools';
 import { createCondition, useConditions, useConditionsSearch } from './conditions.resource';
@@ -122,7 +122,7 @@ describe('Conditions form', () => {
     renderConditionsForm();
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    expect(screen.queryByRole('menuitem', { name: /Headache/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Headache/i })).not.toBeInTheDocument();
     expect(screen.queryByDisplayValue('Headache')).not.toBeInTheDocument();
 
     await user.type(conditionSearchInput, 'Headache');
@@ -134,7 +134,7 @@ describe('Conditions form', () => {
     renderConditionsForm();
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
-    expect(screen.queryByRole('menuitem', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
     expect(screen.queryByDisplayValue(/Post-acute sequelae of COVID-19/i)).not.toBeInTheDocument();
 
     await user.type(conditionSearchInput, 'Post-acute sequelae of COVID-19');
@@ -167,7 +167,7 @@ describe('Conditions form', () => {
     expect(cancelButton).toBeEnabled();
 
     await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /headache/i }));
     await user.click(activeStatusInput);
     await user.click(onsetDateInput);
     await user.paste('2020-05-05');
@@ -211,7 +211,7 @@ describe('Conditions form', () => {
 
     mockCreateCondition.mockRejectedValue(error);
     await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
+    await user.click(screen.getByRole('button', { name: /Headache/i }));
     await user.click(onsetDateInput);
     await user.paste('2020-05-05');
     await user.click(activeStatusInput);
@@ -241,7 +241,7 @@ describe('Conditions form', () => {
     expect(screen.queryByText(/a clinical status is required/i)).not.toBeInTheDocument();
 
     await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /headache/i }));
     await user.click(submitButton);
 
     expect(screen.queryByText(/a condition is required/i)).not.toBeInTheDocument();
@@ -295,6 +295,7 @@ describe('Conditions form', () => {
     mockOpenmrsFetch.mockResolvedValue({ data: mockFhirConditionsResponse } as FetchResponse);
 
     renderConditionsForm({ condition: conditionToEdit, formContext: 'editing' });
+    expect(screen.getByText('Edit condition')).toBeInTheDocument();
 
     expect(screen.queryByRole('searchbox', { name: /enter condition/i })).not.toBeInTheDocument();
 
@@ -344,7 +345,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Hypertension');
-    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+    await user.click(screen.getByRole('button', { name: /hypertension/i }));
 
     expect(screen.getByText(/hypertension is already on this patient's active problem list/i)).toBeInTheDocument();
 
@@ -389,7 +390,7 @@ describe('Duplicate condition detection', () => {
 
       const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
       await user.type(conditionSearchInput, "Huntington's");
-      await user.click(screen.getByRole('menuitem', { name: /huntington's chorea/i }));
+      await user.click(screen.getByRole('button', { name: /huntington's chorea/i }));
 
       expect(
         screen.getByText(/huntington's chorea is already on this patient's active problem list/i),
@@ -434,7 +435,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Hypertension');
-    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+    await user.click(screen.getByRole('button', { name: /hypertension/i }));
 
     expect(screen.getByText(/was previously recorded and is now inactive/i)).toBeInTheDocument();
     expect(
@@ -474,7 +475,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
+    await user.click(screen.getByRole('button', { name: /headache/i }));
 
     expect(screen.queryByText(/already on this patient.*active problem list/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
@@ -510,7 +511,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Hypertension');
-    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+    await user.click(screen.getByRole('button', { name: /hypertension/i }));
 
     expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
 
@@ -557,7 +558,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Hypertension');
-    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+    await user.click(screen.getByRole('button', { name: /hypertension/i }));
 
     expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
     expect(screen.queryByText(/was previously recorded and is now inactive/i)).not.toBeInTheDocument();
@@ -596,7 +597,7 @@ describe('Duplicate condition detection', () => {
 
     const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     await user.type(conditionSearchInput, 'Hypertension');
-    await user.click(screen.getByRole('menuitem', { name: /hypertension/i }));
+    await user.click(screen.getByRole('button', { name: /hypertension/i }));
 
     expect(screen.getByText(/already on this patient.*active problem list/i)).toBeInTheDocument();
 
@@ -609,4 +610,48 @@ describe('Duplicate condition detection', () => {
       expect(mockCreateCondition).toHaveBeenCalled();
     });
   });
+});
+
+it.each(['small-desktop', 'tablet'] as const)('supports keyboard selection on %s', async (layout) => {
+  vi.mocked(useLayoutType).mockReturnValue(layout);
+  mockUseConditionsSearch.mockReturnValue({
+    searchResults: [
+      searchedCondition[0],
+      { ...searchedCondition[0], uuid: 'second-condition', display: 'Second condition' },
+    ],
+    error: null,
+    isSearching: false,
+  });
+  const user = userEvent.setup();
+  renderConditionsForm();
+  expect(screen.getByText('Record condition')).toBeInTheDocument();
+  const input = screen.getByRole('searchbox', { name: /enter condition/i });
+  await user.type(input, 'Headache');
+  const result = screen.getByRole('button', { name: /headache/i });
+  await user.keyboard('{ArrowDown}');
+  expect(result).toHaveFocus();
+  const second = screen.getByRole('button', { name: 'Second condition' });
+  await user.keyboard('{ArrowDown}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{ArrowDown}');
+  expect(result).toHaveFocus();
+  await user.keyboard('{End}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{Home}');
+  expect(result).toHaveFocus();
+  await user.keyboard('{Escape}');
+  expect(input).toHaveFocus();
+  await user.keyboard('{ArrowUp}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{ArrowUp}{Enter}');
+  expect(input).toHaveFocus();
+  expect(input).toHaveValue('Headache');
+  expect(screen.queryByRole('list', { name: 'Condition search results' })).not.toBeInTheDocument();
+});
+
+it.each(['small-desktop', 'tablet'] as const)('uses the edit title on %s', (layout) => {
+  vi.mocked(useLayoutType).mockReturnValue(layout);
+  renderConditionsForm({ formContext: 'editing' });
+  expect(screen.getByText('Edit condition')).toBeInTheDocument();
+  expect(screen.queryByText('Record condition')).not.toBeInTheDocument();
 });
