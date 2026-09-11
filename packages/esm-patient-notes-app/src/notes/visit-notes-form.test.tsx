@@ -8,7 +8,7 @@
 import React from 'react';
 import { vi, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import {
   type Encounter,
   getDefaultsFromConfigSchema,
@@ -674,3 +674,28 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
     ...ConfigMock,
   });
 });
+
+test.each(['primary', 'secondary'].flatMap((rank) => ['result', 'outside', 'body'].map((target) => [rank, target])))(
+  'allows continued typing after %s diagnosis results refresh when the user chooses %s',
+  async (rank, target) => {
+    mockFetchDiagnosisConceptsByName.mockImplementation((query) =>
+      query.endsWith('x') ? new Promise(() => {}) : Promise.resolve(diagnosisSearchResponse.results),
+    );
+    renderVisitNotesForm();
+    const user = userEvent.setup();
+    const input = screen.getByPlaceholderText(`Choose a ${rank} diagnosis`);
+    await user.type(input, 'Diabetes');
+    const result = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+    await user.type(input, 'x');
+    await user.keyboard('{ArrowDown}');
+    expect(result).toHaveFocus();
+    const outside = screen.getByRole('textbox', { name: /Write your notes/i });
+    if (target === 'outside') await user.click(outside);
+    if (target === 'body') await user.click(screen.getByText('Search for a primary diagnosis', { exact: true }));
+    await waitFor(() => expect(result).not.toBeInTheDocument());
+    expect(target === 'outside' ? outside : target === 'body' ? document.body : input).toHaveFocus();
+    await user.keyboard('yz');
+    expect(input).toHaveValue(target === 'result' ? 'Diabetesxyz' : 'Diabetesx');
+    expect(outside).toHaveValue(target === 'outside' ? 'yz' : '');
+  },
+);

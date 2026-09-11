@@ -831,6 +831,16 @@ function DiagnosesDisplay({
   t,
   value,
 }: DiagnosesDisplayProps) {
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  const setResultsRef = useCallback(
+    (node: HTMLUListElement | null) => {
+      if (!node && resultsRef.current?.contains(document.activeElement)) {
+        document.getElementById(fieldName)?.focus();
+      }
+      resultsRef.current = node;
+    },
+    [fieldName],
+  );
   if (!value) {
     return null;
   }
@@ -842,6 +852,7 @@ function DiagnosesDisplay({
   if (!isSearching && searchResults?.length > 0) {
     return (
       <ul
+        ref={setResultsRef}
         id={`${fieldName}-results`}
         className={styles.diagnosisList}
         aria-label={t('diagnosisSearchResults', 'Diagnosis search results')}
