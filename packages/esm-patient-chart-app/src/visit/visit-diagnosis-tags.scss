@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  // Separate the pills themselves rather than growing their internal padding
+  gap: layout.$spacing-02;
+}
+
+.certaintySuffix {
+  @include type.type-style('label-01');
+  margin-left: layout.$spacing-01;
+  white-space: nowrap;
+}

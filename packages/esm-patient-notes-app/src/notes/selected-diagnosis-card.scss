@@ -1,0 +1,48 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+// One compact row per diagnosis: the name, then the two exception checkboxes (Primary,
+// Confirmed), then remove. Unchecked means secondary/provisional are presumed, so the row
+// needs no legends, no per-card error state, and no second line.
+.diagnosisCard {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-03;
+  padding: layout.$spacing-02 layout.$spacing-03 layout.$spacing-02 layout.$spacing-05;
+  background-color: $ui-01;
+  border-inline-start: 3px solid $interactive-01;
+}
+
+.diagnosisCardTitle {
+  @include type.type-style('heading-compact-01');
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.diagnosisCardPresumed {
+  @include type.type-style('label-01');
+  color: $text-02;
+  display: block;
+  margin-top: layout.$spacing-01;
+}
+
+.diagnosisCardControls {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-05;
+  flex: 0 0 auto;
+
+  // Carbon renders each checkbox as a block-level form item; inline them on the row and
+  // strip the stacked-form margins so the row stays one line tall.
+  :global(.cds--form-item) {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
+  :global(.cds--checkbox-label-text) {
+    @include type.type-style('body-compact-01');
+  }
+}

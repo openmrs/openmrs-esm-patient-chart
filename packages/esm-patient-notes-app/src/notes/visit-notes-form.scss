@@ -39,7 +39,7 @@
 .diagnosesText {
   @include type.type-style('body-compact-01');
   color: colors.$gray-70;
-  margin-bottom: layout.$spacing-05;
+  margin: layout.$spacing-03 0 layout.$spacing-05;
 }
 
 .emptyResults {
@@ -159,18 +159,6 @@
   margin-top: layout.$spacing-03;
 }
 
-.diagnoserrorOutline {
-  :global(.cds--search-input):focus {
-    outline: 2.5px solid colors.$red-60;
-  }
-
-  :global(.cds--search-magnifier) {
-    svg {
-      fill: colors.$red-60;
-    }
-  }
-}
-
 .errorMessage {
   @include type.type-style('label-02');
   color: colors.$red-60;
@@ -209,9 +197,16 @@
   margin-top: layout.$spacing-02;
 }
 
-.tag {
-  margin-right: layout.$spacing-03;
-  margin-left: 0;
+.diagnosisHelperText {
+  @include type.type-style('helper-text-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-03;
+}
+
+.diagnosisCount {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin: layout.$spacing-05 0 layout.$spacing-03;
 }
 
 .uploadButton {
