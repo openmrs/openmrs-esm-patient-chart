@@ -5322,8 +5322,8 @@ __metadata:
   linkType: soft
 
 "@openmrs/esm-form-engine-lib@npm:next":
-  version: 4.2.2-pre.2554
-  resolution: "@openmrs/esm-form-engine-lib@npm:4.2.2-pre.2554"
+  version: 4.2.2-pre.2560
+  resolution: "@openmrs/esm-form-engine-lib@npm:4.2.2-pre.2560"
   dependencies:
     classnames: "npm:^2.5.1"
     lodash-es: "npm:^4.17.21"
@@ -5340,7 +5340,7 @@ __metadata:
     react: 18.x
     react-i18next: 16.x
     swr: 2.x
-  checksum: 10/c2415ed1da97b42586f5ba9094cd25f6f5132c9a85d19d3307ce3450c37246826df22cf9e4507c5a3d0427f1e8bfcd5842bfd6370d707e387cff911735cc40aa
+  checksum: 10/d6f40aff8cdb907cd1fb7b9c5d194a6aa8871f28579e15282e6be5a3ddbe188b3a19edb132d80c4eb4ec541843431867de08920f5093c581c60ac9f246b0fcd8
   languageName: node
   linkType: hard
 
