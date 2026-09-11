@@ -8,13 +8,14 @@
 import React from 'react';
 import { vi, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import {
   type Encounter,
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
   useSession,
+  useLayoutType,
   useFeatureFlag,
   type Visit,
   type Workspace2DefinitionProps,
@@ -117,6 +118,7 @@ mockUseConfig.mockReturnValue({
 
 beforeEach(() => {
   mockedUseFeatureFlag.mockReturnValue(false);
+  vi.mocked(useLayoutType).mockReturnValue('small-desktop');
 });
 
 test('does not render the date picker when RDE is disabled', () => {
@@ -157,9 +159,9 @@ test('typing in the diagnosis search input triggers a search', async () => {
   await user.type(searchBox, 'Diabetes Mellitus');
 
   // Wait for the search results to appear
-  const targetSearchResult = await screen.findByRole('menuitem', { name: 'Diabetes Mellitus' });
+  const targetSearchResult = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
   expect(targetSearchResult).toBeInTheDocument();
-  expect(screen.getByRole('menuitem', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
   // clicking on a search result displays the selected diagnosis as a tag
   await user.click(targetSearchResult);
@@ -172,6 +174,54 @@ test('typing in the diagnosis search input triggers a search', async () => {
   await user.click(closeTagButton);
   // no selected diagnoses left
   expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
+});
+
+test.each(['primary', 'secondary'])('selects a %s diagnosis using only the keyboard', async (rank) => {
+  const user = userEvent.setup();
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  renderVisitNotesForm();
+
+  const search = screen.getByPlaceholderText(`Choose a ${rank} diagnosis`);
+  await user.type(search, 'Diabetes');
+  const first = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+  const second = screen.getByRole('button', { name: 'Diabetes Mellitus, Type II' });
+
+  await user.keyboard('{ArrowDown}');
+  expect(first).toHaveFocus();
+  await user.keyboard('{ArrowDown}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{ArrowUp}');
+  expect(first).toHaveFocus();
+  await user.keyboard('{End}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{Home}');
+  expect(first).toHaveFocus();
+  await user.keyboard('{Escape}');
+  expect(search).toHaveFocus();
+  expect(screen.getByText(/No diagnosis selected/)).toBeInTheDocument();
+
+  await user.keyboard('{ArrowUp}');
+  expect(second).toHaveFocus();
+  await user.keyboard('{Enter}');
+  expect(screen.getByTitle('Diabetes Mellitus, Type II')).toBeInTheDocument();
+  expect(search).toHaveFocus();
+  expect(search).toHaveValue('');
+
+  await user.type(search, 'Diabetes');
+  await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+  expect(screen.queryByRole('button', { name: 'Diabetes Mellitus, Type II' })).not.toBeInTheDocument();
+  await user.keyboard('{ArrowDown}{Enter}');
+  expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+});
+
+test.each(['small-desktop', 'tablet'] as const)('uses creation wording on %s', (layout) => {
+  vi.mocked(useLayoutType).mockReturnValue(layout);
+  renderVisitNotesForm();
+  expect(screen.getAllByText('Add visit note', { exact: true })).toHaveLength(layout === 'tablet' ? 2 : 1);
+  expect(screen.queryByText('Edit visit note')).not.toBeInTheDocument();
+  if (layout === 'tablet') {
+    expect(screen.getByRole('heading', { name: 'Add visit note', level: 2 })).toBeInTheDocument();
+  }
 });
 
 test('renders an error message when no matching diagnoses are found', async () => {
@@ -364,47 +414,54 @@ test('renders an error snackbar if there was a problem recording a condition', a
   });
 });
 
-test('initializes form with existing encounter data when in edit mode', () => {
-  mockedUseFeatureFlag.mockReturnValue(true);
+test.each(['small-desktop', 'tablet'] as const)(
+  'initializes the edit form with existing encounter data on %s',
+  (layout) => {
+    vi.mocked(useLayoutType).mockReturnValue(layout);
+    mockedUseFeatureFlag.mockReturnValue(true);
 
-  const mockEncounter = {
-    id: '123',
-    uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
-    obs: [
-      {
-        concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-        value: 'Existing clinical note',
-      },
-    ],
-    diagnoses: [
-      {
-        uuid: '456',
-        diagnosis: {
-          coded: { uuid: '789', display: 'Diabetes Mellitus' },
+    const mockEncounter = {
+      id: '123',
+      uuid: '123',
+      datetime: '20/03/2024',
+      rawDatetime: '2024-03-20T10:00:00.000Z',
+      obs: [
+        {
+          concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+          value: 'Existing clinical note',
         },
-        certainty: 'PROVISIONAL',
-        rank: 1,
-        display: 'Diabetes Mellitus',
-      },
-    ],
-  };
+      ],
+      diagnoses: [
+        {
+          uuid: '456',
+          diagnosis: {
+            coded: { uuid: '789', display: 'Diabetes Mellitus' },
+          },
+          certainty: 'PROVISIONAL',
+          rank: 1,
+          display: 'Diabetes Mellitus',
+        },
+      ],
+    };
 
-  renderVisitNotesForm({
-    formContext: 'editing',
-    encounter: mockEncounter as any as Encounter, // TODO: fix
-  });
+    renderVisitNotesForm({
+      formContext: 'editing',
+      encounter: mockEncounter as any as Encounter, // TODO: fix
+    });
 
-  // Verify date is pre-filled
-  expect(screen.getByLabelText(/visit date/i)).toHaveValue('20/03/2024');
+    expect(screen.getAllByText('Edit visit note')).toHaveLength(layout === 'tablet' ? 2 : 1);
+    expect(screen.queryByText('Add visit note')).not.toBeInTheDocument();
 
-  // Verify clinical note is pre-filled
-  expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
+    // Verify date is pre-filled
+    expect(screen.getByLabelText(/visit date/i)).toHaveValue('20/03/2024');
 
-  // Verify diagnosis is pre-filled
-  expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
-});
+    // Verify clinical note is pre-filled
+    expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
+
+    // Verify diagnosis is pre-filled
+    expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
+  },
+);
 
 test('updates existing visit note when in edit mode', async () => {
   const user = userEvent.setup();
@@ -617,3 +674,28 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
     ...ConfigMock,
   });
 });
+
+test.each(['primary', 'secondary'].flatMap((rank) => ['result', 'outside', 'body'].map((target) => [rank, target])))(
+  'allows continued typing after %s diagnosis results refresh when the user chooses %s',
+  async (rank, target) => {
+    mockFetchDiagnosisConceptsByName.mockImplementation((query) =>
+      query.endsWith('x') ? new Promise(() => {}) : Promise.resolve(diagnosisSearchResponse.results),
+    );
+    renderVisitNotesForm();
+    const user = userEvent.setup();
+    const input = screen.getByPlaceholderText(`Choose a ${rank} diagnosis`);
+    await user.type(input, 'Diabetes');
+    const result = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+    await user.type(input, 'x');
+    await user.keyboard('{ArrowDown}');
+    expect(result).toHaveFocus();
+    const outside = screen.getByRole('textbox', { name: /Write your notes/i });
+    if (target === 'outside') await user.click(outside);
+    if (target === 'body') await user.click(screen.getByText('Search for a primary diagnosis', { exact: true }));
+    await waitFor(() => expect(result).not.toBeInTheDocument());
+    expect(target === 'outside' ? outside : target === 'body' ? document.body : input).toHaveFocus();
+    await user.keyboard('yz');
+    expect(input).toHaveValue(target === 'result' ? 'Diabetesxyz' : 'Diabetesx');
+    expect(outside).toHaveValue(target === 'outside' ? 'yz' : '');
+  },
+);
