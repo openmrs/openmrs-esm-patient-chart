@@ -251,7 +251,7 @@ test('Verify visit context when starting / ending / deleting / restoring active 
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
-    await expect(page.getByText('Visit Note', { exact: true })).toBeVisible();
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
   await test.step('When I close the workspace', async () => {
