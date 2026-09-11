@@ -22,16 +22,15 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await page.getByPlaceholder('Choose a diagnosis').fill('Asthma');
     await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
-    await asthmaCard.getByRole('radio', { name: 'Primary' }).click();
-    await asthmaCard.getByRole('radio', { name: 'Confirmed' }).click();
+    await asthmaCard.getByRole('checkbox', { name: 'Primary' }).check();
+    await asthmaCard.getByRole('checkbox', { name: 'Confirmed' }).check();
   });
 
-  await test.step('And I add `GI upset` as a secondary, provisional diagnosis', async () => {
+  await test.step('And I add `GI upset`, leaving it presumed secondary and provisional', async () => {
     await page.getByPlaceholder('Choose a diagnosis').fill('GI upset');
     await page.getByRole('menuitem', { name: /gi upset/i }).click();
-    const giUpsetCard = page.getByRole('group', { name: /gi upset/i });
-    await giUpsetCard.getByRole('radio', { name: 'Secondary' }).click();
-    await giUpsetCard.getByRole('radio', { name: 'Provisional' }).click();
+    // Unticked checkboxes mean secondary + provisional are presumed — no clicks needed.
+    await expect(page.getByRole('group', { name: /gi upset/i })).toBeVisible();
   });
 
   await test.step('And I add a visit note', async () => {

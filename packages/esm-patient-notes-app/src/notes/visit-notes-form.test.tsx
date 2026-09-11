@@ -91,13 +91,14 @@ function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotes
 }
 
 /**
- * Searches for a diagnosis, adds it to the note, and (optionally) chooses its order and
- * certainty on the resulting diagnosis card. Order and certainty start unset by design.
+ * Searches for a diagnosis, adds it to the note, and (optionally) ticks the Primary and/or
+ * Confirmed checkbox on the resulting diagnosis card. Unticked, the diagnosis is presumed
+ * secondary and provisional by design.
  */
 async function addDiagnosis(
   user: ReturnType<typeof userEvent.setup>,
   name: string,
-  { order, certainty }: { order?: 'Primary' | 'Secondary'; certainty?: 'Confirmed' | 'Provisional' } = {},
+  { primary, confirmed }: { primary?: boolean; confirmed?: boolean } = {},
 ) {
   const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
   await user.clear(searchBox);
@@ -105,11 +106,11 @@ async function addDiagnosis(
   await user.click(await screen.findByRole('menuitem', { name }));
 
   const card = screen.getByRole('group', { name });
-  if (order) {
-    await user.click(within(card).getByRole('radio', { name: order }));
+  if (primary) {
+    await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   }
-  if (certainty) {
-    await user.click(within(card).getByRole('radio', { name: certainty }));
+  if (confirmed) {
+    await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
   }
   return card;
 }
@@ -174,8 +175,8 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeInTheDocument();
-  // The rank/certainty helper text only appears once a diagnosis has been added
-  expect(screen.queryByText(/choose rank and certainty on each diagnosis selected/i)).not.toBeInTheDocument();
+  // The defaults helper text only appears once a diagnosis has been added
+  expect(screen.queryByText(/unticked diagnoses are recorded as secondary and provisional/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -196,21 +197,21 @@ test('typing in the diagnosis search input triggers a search', async () => {
   expect(targetSearchResult).toBeInTheDocument();
   expect(screen.getByRole('menuitem', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
-  // clicking on a search result displays the selected diagnosis as a card with unset order and certainty
+  // Clicking a search result displays the selected diagnosis as a compact card whose two
+  // checkboxes start unticked: secondary and provisional are presumed
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   // The test i18n mock interpolates but does not pluralize, so match the count only
   expect(screen.getByText(/1 diagnos/i)).toBeInTheDocument();
-  expect(screen.getByText(/choose rank and certainty on each diagnosis selected/i)).toBeInTheDocument();
-  for (const radioName of ['Primary', 'Secondary', 'Confirmed', 'Provisional']) {
-    expect(within(card).getByRole('radio', { name: radioName })).not.toBeChecked();
-  }
+  expect(screen.getByText(/unticked diagnoses are recorded as secondary and provisional/i)).toBeInTheDocument();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
 
-  // choosing order and certainty reflects on the toggles
-  await user.click(within(card).getByRole('radio', { name: 'Primary' }));
-  await user.click(within(card).getByRole('radio', { name: 'Confirmed' }));
-  expect(within(card).getByRole('radio', { name: 'Primary' })).toBeChecked();
-  expect(within(card).getByRole('radio', { name: 'Confirmed' })).toBeChecked();
+  // ticking the exception checkboxes reflects on the card
+  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
+  await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
 
   // Clicking the remove button on the card removes the selected diagnosis
   await user.click(within(card).getByRole('button', { name: /remove diabetes mellitus/i }));
@@ -281,17 +282,15 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
 
-  // Adding a diagnosis without choosing its order and certainty blocks submission,
-  // with the error rendered inside the offending card
+  // An unticked diagnosis is presumed secondary, so the primary requirement still blocks
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
   await user.click(submitButton);
-  expect(within(card).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
+  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
-  // Completing the card clears its inline error without another submit
-  await user.click(within(card).getByRole('radio', { name: 'Primary' }));
-  await user.click(within(card).getByRole('radio', { name: 'Provisional' }));
-  expect(within(card).queryByText(/choose rank and certainty for each diagnosis/i)).not.toBeInTheDocument();
+  // Ticking Primary clears the error without another submit; certainty stays provisional
+  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
 
   await user.clear(clinicalNote);
   await user.type(clinicalNote, 'Sample clinical note');
@@ -327,7 +326,7 @@ test('attaches the visit from the visit context to a newly created note', async 
 
   renderVisitNotesForm({}, { visitContext: { uuid: 'visit-context-uuid' } as Visit });
 
-  await addDiagnosis(user, 'Diabetes Mellitus', { order: 'Primary', certainty: 'Provisional' });
+  await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 
   await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
@@ -348,7 +347,7 @@ test('omits the visit when there is no visit context', async () => {
 
   renderVisitNotesForm();
 
-  await addDiagnosis(user, 'Diabetes Mellitus', { order: 'Primary', certainty: 'Provisional' });
+  await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 
   await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
@@ -369,7 +368,7 @@ test('attaches the visit supplied by an out-of-chart launcher to a newly created
 
   renderExportedVisitNotesForm({ visitContext: { uuid: 'visit-context-uuid' } as Visit });
 
-  await addDiagnosis(user, 'Diabetes Mellitus', { order: 'Primary', certainty: 'Provisional' });
+  await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 
   await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
@@ -398,7 +397,7 @@ test('renders an error snackbar if there was a problem recording a condition', a
 
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
 
-  await addDiagnosis(user, 'Diabetes Mellitus', { order: 'Primary', certainty: 'Provisional' });
+  await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
 
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.clear(clinicalNote);
@@ -453,10 +452,11 @@ test('initializes form with existing encounter data when in edit mode', () => {
   // Verify clinical note is pre-filled
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
 
-  // Verify diagnosis is pre-filled with its stored order and certainty selected
+  // Verify diagnosis is pre-filled from its stored rank and certainty: rank 1 ticks
+  // Primary, and PROVISIONAL leaves Confirmed unticked
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  expect(within(card).getByRole('radio', { name: 'Primary' })).toBeChecked();
-  expect(within(card).getByRole('radio', { name: 'Provisional' })).toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
 });
 
 test('updates existing visit note when in edit mode', async () => {
@@ -612,12 +612,12 @@ test('preserves CONFIRMED certainty on diagnoses when re-saving a visit note in 
   });
 
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  expect(within(card).getByRole('radio', { name: 'Confirmed' })).toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
 
   // Toggling certainty counts as an unsaved change (enabling Save), and toggling back
   // must still transmit the original CONFIRMED value
-  await user.click(within(card).getByRole('radio', { name: 'Provisional' }));
-  await user.click(within(card).getByRole('radio', { name: 'Confirmed' }));
+  await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
+  await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
 
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
   await user.click(submitButton);
@@ -728,8 +728,15 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
   });
 });
 
-test('renders out-of-enum rank and certainty from other writers as unset and blocks saving until chosen', async () => {
+test('presumes secondary and provisional for out-of-enum rank and certainty from other writers', async () => {
   const user = userEvent.setup();
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+
   const mockEncounter = {
     id: '123',
     uuid: '123',
@@ -748,46 +755,75 @@ test('renders out-of-enum rank and certainty from other writers as unset and blo
     ],
   };
 
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200, body: 'Visit note updated' } as unknown as Awaited<
+    ReturnType<typeof updateVisitNote>
+  >);
+
   renderVisitNotesForm({
     formContext: 'editing',
     encounter: mockEncounter as unknown as Encounter,
   });
 
+  // Out-of-enum values fall back to the same presumption the checkboxes express
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  for (const radioName of ['Primary', 'Secondary', 'Confirmed', 'Provisional']) {
-    expect(within(card).getByRole('radio', { name: radioName })).not.toBeChecked();
-  }
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+  expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
 
-  // Removing a pre-loaded diagnosis counts as an unsaved change, enabling Save; here we
-  // instead submit directly after touching the note so validation is exercised
+  // Saving proceeds with the presumed values rather than blocking on a per-card choice
   const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await user.type(clinicalNote, ' updated');
   await user.click(screen.getByRole('button', { name: /Save and close/i }));
 
-  expect(within(card).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
-  expect(mockUpdateVisitNote).not.toHaveBeenCalled();
+  await waitFor(() =>
+    expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+      expect.any(AbortController),
+      expect.objectContaining({
+        certainty: 'PROVISIONAL',
+        rank: 2,
+        diagnosis: { coded: '789' },
+      }),
+    ),
+  );
+
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+  });
 });
 
-test('shows the primary-required and incomplete-diagnosis errors together on a single submit', async () => {
+test('saves unticked diagnoses with the presumed secondary and provisional values', async () => {
   const user = userEvent.setup();
 
+  mockSaveVisitNote.mockResolvedValueOnce({
+    status: 201,
+    data: { uuid: 'new-encounter-uuid' },
+  } as unknown as Awaited<ReturnType<typeof saveVisitNote>>);
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
 
   renderVisitNotesForm();
 
-  // A complete secondary diagnosis and an untouched one
-  await addDiagnosis(user, 'Diabetes Mellitus', { order: 'Secondary', certainty: 'Confirmed' });
-  const incompleteCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
+  // One explicit primary+confirmed diagnosis, one left entirely unticked
+  await addDiagnosis(user, 'Diabetes Mellitus', { primary: true, confirmed: true });
+  await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
+  await user.type(screen.getByRole('textbox', { name: /Write your notes/i }), 'Sample clinical note');
   await user.click(screen.getByRole('button', { name: /save and close/i }));
 
-  // Both validation failures surface on the same submit: no two-stage whack-a-mole
-  expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
-  expect(within(incompleteCard).getByText(/choose rank and certainty for each diagnosis/i)).toBeInTheDocument();
-  expect(mockSaveVisitNote).not.toHaveBeenCalled();
+  await waitFor(() =>
+    expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+      expect.any(AbortController),
+      expect.objectContaining({ certainty: 'CONFIRMED', rank: 1 }),
+    ),
+  );
+  // The unticked card transmits the presumed defaults, not empty values
+  expect(mockSavePatientDiagnosis).toHaveBeenCalledWith(
+    expect.any(AbortController),
+    expect.objectContaining({ certainty: 'PROVISIONAL', rank: 2 }),
+  );
+  expect(mockSavePatientDiagnosis).toHaveBeenCalledTimes(2);
 });
 
-test('toggles order and certainty independently across multiple diagnosis cards', async () => {
+test('ticks Primary and Confirmed independently across multiple diagnosis cards', async () => {
   const user = userEvent.setup();
 
   mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
@@ -797,19 +833,17 @@ test('toggles order and certainty independently across multiple diagnosis cards'
   const firstCard = await addDiagnosis(user, 'Diabetes Mellitus');
   const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
-  await user.click(within(firstCard).getByRole('radio', { name: 'Primary' }));
-  await user.click(within(firstCard).getByRole('radio', { name: 'Confirmed' }));
+  await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
+  await user.click(within(firstCard).getByRole('checkbox', { name: 'Confirmed' }));
 
-  expect(within(firstCard).getByRole('radio', { name: 'Primary' })).toBeChecked();
-  expect(within(firstCard).getByRole('radio', { name: 'Confirmed' })).toBeChecked();
-  for (const radioName of ['Primary', 'Secondary', 'Confirmed', 'Provisional']) {
-    expect(within(secondCard).getByRole('radio', { name: radioName })).not.toBeChecked();
-  }
+  expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(within(firstCard).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
+  expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+  expect(within(secondCard).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
 
-  // Switching a choice within a group deselects the other option
-  await user.click(within(firstCard).getByRole('radio', { name: 'Secondary' }));
-  expect(within(firstCard).getByRole('radio', { name: 'Primary' })).not.toBeChecked();
-  expect(within(firstCard).getByRole('radio', { name: 'Secondary' })).toBeChecked();
+  // Unticking returns the diagnosis to the presumed secondary rank
+  await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
+  expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
 
   expect(screen.getByText(/2 diagnos/i)).toBeInTheDocument();
 });

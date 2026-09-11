@@ -54,11 +54,7 @@ import {
   updateVisitNote,
   useVisitNotes,
 } from './visit-notes.resource';
-import SelectedDiagnosisCard, {
-  type DiagnosisDraft,
-  isCompleteDiagnosis,
-  nextDraftId,
-} from './selected-diagnosis-card.component';
+import SelectedDiagnosisCard, { type DiagnosisDraft, nextDraftId } from './selected-diagnosis-card.component';
 import styles from './visit-notes-form.scss';
 
 type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
@@ -145,29 +141,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     async (data, context, options) => {
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
 
-      // Both checks run in one pass so the user never fixes one only to be bounced by the
-      // other on the next submit. The completeness error renders inside each incomplete
-      // card; the primary-required error renders at the search box.
-      const diagnosisErrors: Record<string, { type: string; message: string }> = {};
-      if (selectedDiagnoses.some((diagnosis) => !isCompleteDiagnosis(diagnosis))) {
-        diagnosisErrors.diagnoses = {
-          type: 'custom',
-          message: t('diagnosisRankAndCertaintyRequired', 'Choose rank and certainty for each diagnosis'),
-        };
-      }
+      // Every diagnosis is always complete (secondary/provisional are presumed defaults),
+      // so the only diagnosis-level rule left is the primary requirement, rendered at the
+      // search box.
       if (isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1)) {
-        diagnosisErrors.diagnosisSearch = {
-          type: 'custom',
-          message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
-        };
-      }
-
-      if (Object.keys(diagnosisErrors).length > 0) {
         return {
           ...zodResult,
           errors: {
             ...zodResult.errors,
-            ...diagnosisErrors,
+            diagnosisSearch: {
+              type: 'custom',
+              message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
+            },
           },
         };
       }
@@ -180,7 +165,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const {
     clearErrors,
     control,
-    formState: { errors, dirtyFields, isSubmitted, isSubmitting },
+    formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
     setValue,
     watch,
@@ -204,10 +189,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             draftId: nextDraftId(),
             patient: patientUuid,
             diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
-            // Values outside the known enums (possible from other REST writers) render as
-            // unset so the clinician must choose explicitly rather than us guessing.
-            certainty: d.certainty === 'CONFIRMED' || d.certainty === 'PROVISIONAL' ? d.certainty : undefined,
-            rank: d.rank === 1 || d.rank === 2 ? d.rank : undefined,
+            // Values outside the known enums (possible from other REST writers) fall back to
+            // the same presumption the checkboxes express: secondary and provisional.
+            certainty: d.certainty === 'CONFIRMED' ? ('CONFIRMED' as const) : ('PROVISIONAL' as const),
+            rank: d.rank === 1 ? (1 as const) : (2 as const),
             display: d.display,
           }),
         );
@@ -263,8 +248,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    // Order and certainty deliberately start unset: the clinician must choose both on the
-    // diagnosis card before the note can be saved (O3-5823).
+    // Secondary and provisional are the presumed defaults; the card's Primary and Confirmed
+    // checkboxes record the exceptions (O3-5823).
     (concept: Concept): DiagnosisDraft => ({
       draftId: nextDraftId(),
       display: concept.display,
@@ -272,6 +257,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         coded: concept.uuid,
       },
       patient: patientUuid,
+      rank: 2,
+      certainty: 'PROVISIONAL',
     }),
     [patientUuid],
   );
@@ -358,13 +345,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     (data: VisitNotesFormData) => {
       const { noteDate, clinicalNote, images } = data;
 
-      // The resolver blocks submission until every diagnosis has both order and certainty
-      // chosen (and a primary exists when required); this guard is a type-narrowing backstop.
-      const completedDiagnoses = selectedDiagnoses.filter(isCompleteDiagnosis);
-      if (completedDiagnoses.length !== selectedDiagnoses.length) {
-        return;
-      }
-
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
 
@@ -426,7 +406,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         })
         .then((encounterUuid) => {
           return Promise.all(
-            completedDiagnoses.map((diagnosis) => {
+            selectedDiagnoses.map((diagnosis) => {
               const diagnosesPayload: DiagnosisPayload = {
                 encounter: encounterUuid,
                 patient: patientUuid,
@@ -590,7 +570,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
-                        {t('diagnosisSearchHelperText', 'Choose rank and certainty on each diagnosis selected.')}
+                        {t(
+                          'diagnosisDefaultsHelperText',
+                          'Tick Primary and Confirmed where they apply — unticked diagnoses are recorded as secondary and provisional.',
+                        )}
                       </p>
                       <p className={styles.diagnosisCount}>
                         {t('diagnosisCountOnNote', '{{count}} diagnoses on this note', {
@@ -601,7 +584,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
                           diagnosis={diagnosis}
-                          invalid={isSubmitted && !isCompleteDiagnosis(diagnosis)}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}
                         />

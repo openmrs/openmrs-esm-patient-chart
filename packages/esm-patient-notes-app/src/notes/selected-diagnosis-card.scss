@@ -1,133 +1,41 @@
-@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
+// One compact row per diagnosis: the name, then the two exception checkboxes (Primary,
+// Confirmed), then remove. Unchecked means secondary/provisional are presumed, so the row
+// needs no legends, no per-card error state, and no second line.
 .diagnosisCard {
-  border: 1px solid colors.$gray-20;
-  background-color: colors.$gray-10;
-  padding: layout.$spacing-05;
-  margin-bottom: layout.$spacing-03;
-}
-
-.diagnosisCardHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: layout.$spacing-03;
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-03;
+  padding: layout.$spacing-02 layout.$spacing-03 layout.$spacing-02 layout.$spacing-05;
+  background-color: $ui-01;
+  border-inline-start: 3px solid $interactive-01;
 }
 
 .diagnosisCardTitle {
   @include type.type-style('heading-compact-01');
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.diagnosisCardInvalid {
-  border-color: colors.$red-60;
-}
-
-.diagnosisCardError {
-  @include type.type-style('label-01');
-  color: colors.$red-60;
-  margin-top: layout.$spacing-03;
-}
-
-.toggleGroups {
+.diagnosisCardControls {
   display: flex;
-  flex-direction: column;
-  gap: layout.$spacing-04;
-}
-
-.toggleGroup {
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-
-.toggleGroupLegend {
-  @include type.type-style('label-01');
-  color: colors.$gray-70;
-  text-transform: uppercase;
-  letter-spacing: 0.02rem;
-  margin-bottom: layout.$spacing-02;
-}
-
-.toggleGroupButtons {
-  display: inline-flex;
-}
-
-.toggleButton {
-  @include type.type-style('body-compact-01');
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: layout.$spacing-02;
-  // Equal widths keep the stacked Order and Certainty groups aligned as a 2x2 grid
-  min-width: 7rem;
-  padding: layout.$spacing-03 layout.$spacing-04;
-  background-color: white;
-  border: 1px solid colors.$gray-50;
-  cursor: pointer;
+  gap: layout.$spacing-05;
+  flex: 0 0 auto;
 
-  // Overlap adjacent borders; the selected segment is raised so its outline wins on
-  // all four sides (border-left: none would clip a selected right-hand segment)
-  & + & {
-    margin-left: -1px;
+  // Carbon renders each checkbox as a block-level form item; inline them on the row and
+  // strip the stacked-form margins so the row stays one line tall.
+  :global(.cds--form-item) {
+    flex: 0 0 auto;
+    margin: 0;
   }
 
-  &:hover {
-    background-color: colors.$gray-10;
+  :global(.cds--checkbox-label-text) {
+    @include type.type-style('body-compact-01');
   }
-
-  &:focus-visible {
-    outline: 2px solid colors.$blue-60;
-    outline-offset: -2px;
-    z-index: 2;
-    position: relative;
-  }
-}
-
-.toggleButtonSelectedRed {
-  font-weight: 600;
-  background-color: colors.$red-10;
-  border-color: colors.$red-60;
-  color: colors.$red-70;
-  position: relative;
-  z-index: 1;
-
-  &:hover {
-    background-color: colors.$red-10;
-  }
-}
-
-.toggleButtonSelectedBlue {
-  font-weight: 600;
-  background-color: colors.$blue-10;
-  border-color: colors.$blue-60;
-  color: colors.$blue-70;
-  position: relative;
-  z-index: 1;
-
-  &:hover {
-    background-color: colors.$blue-10;
-  }
-}
-
-.toggleButtonSelectedGreen {
-  font-weight: 600;
-  background-color: colors.$green-10;
-  border-color: colors.$green-60;
-  color: colors.$green-70;
-  position: relative;
-  z-index: 1;
-
-  &:hover {
-    background-color: colors.$green-10;
-  }
-}
-
-.toggleButtonCheck {
-  flex-shrink: 0;
-}
-
-.toggleButtonCheckHidden {
-  visibility: hidden;
 }
