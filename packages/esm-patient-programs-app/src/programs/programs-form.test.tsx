@@ -138,6 +138,7 @@ describe('ProgramsForm', () => {
     const user = userEvent.setup();
 
     renderProgramsForm(mockEnrolledProgramsResponse[0].uuid);
+    expect(screen.getByText('Edit program enrollment')).toBeInTheDocument();
 
     const enrollButton = screen.getByRole('button', { name: /save and close/i });
 
