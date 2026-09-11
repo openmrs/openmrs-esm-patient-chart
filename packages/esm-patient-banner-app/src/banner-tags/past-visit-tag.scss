@@ -1,22 +1,12 @@
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-.tooltipBox {
-  padding: layout.$spacing-02;
-}
-
 .tooltipSmallText {
   font-size: 80%;
 }
 
 .heading {
   margin-bottom: layout.$spacing-03;
-}
-
-.definitionToolTip {
-  & > button {
-    border-bottom: none;
-  }
 }
 
 // Compound selector (no type modifier is passed to the Carbon Tag) so this
