@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type Control } from 'react-hook-form';
+import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import {
   Button,
@@ -23,7 +23,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
+import { Add, CloseFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -73,7 +73,6 @@ interface DiagnosesDisplayProps {
 
 interface DiagnosisSearchProps {
   control: Control<VisitNotesFormData>;
-  error?: object;
   handleSearch: () => void;
   labelText: string;
   name: 'diagnosisSearch';
@@ -142,18 +141,22 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
 
       // Every diagnosis is always complete (secondary/provisional are presumed defaults),
-      // so the only diagnosis-level rule left is the primary requirement, rendered at the
-      // search box.
+      // so the only diagnosis-level rule left is the primary requirement. It is keyed off
+      // the search field so the message renders beside the Primary controls instead of
+      // beneath the search input (which also stole focus there).
       if (isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1)) {
         return {
           ...zodResult,
+          // `diagnoses` is deliberately not a registered field (no input should adopt this
+          // error), which RHF's typed field paths cannot express — hence the cast. The
+          // message itself renders from state beside the Primary controls.
           errors: {
             ...zodResult.errors,
-            diagnosisSearch: {
+            diagnoses: {
               type: 'custom',
               message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
             },
-          },
+          } as unknown as FieldErrors<VisitNotesFormData>,
         };
       }
 
@@ -163,9 +166,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   );
 
   const {
-    clearErrors,
     control,
-    formState: { errors, dirtyFields, isSubmitting },
+    formState: { dirtyFields, isSubmitted, isSubmitting },
     handleSubmit,
     setValue,
     watch,
@@ -221,7 +223,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const debouncedSearch = useMemo(
     () =>
       debounce((fieldQuery) => {
-        clearErrors('diagnosisSearch');
         if (fieldQuery) {
           setIsLoadingDiagnoses(true);
 
@@ -236,7 +237,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             });
         }
       }, SEARCH_TIMEOUT_MS),
-    [config.diagnosisConceptClass, clearErrors],
+    [config.diagnosisConceptClass],
   );
 
   const handleSearch = useCallback(() => {
@@ -250,14 +251,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const createDiagnosis = useCallback(
     // Secondary and provisional are the presumed defaults; the card's Primary and Confirmed
     // checkboxes record the exceptions (O3-5823).
-    (concept: Concept): DiagnosisDraft => ({
+    (concept: Concept, rank: 1 | 2): DiagnosisDraft => ({
       draftId: nextDraftId(),
       display: concept.display,
       diagnosis: {
         coded: concept.uuid,
       },
       patient: patientUuid,
-      rank: 2,
+      rank,
       certainty: 'PROVISIONAL',
     }),
     [patientUuid],
@@ -267,16 +268,19 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     (conceptDiagnosisToAdd: Concept) => {
       setValue('diagnosisSearch', '');
       setSearchResults([]);
-      setSelectedDiagnoses((diagnoses) =>
+      setSelectedDiagnoses((diagnoses) => {
         // Guards against a double-click on the same result racing the render-time filter
-        diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)
-          ? diagnoses
-          : [...diagnoses, createDiagnosis(conceptDiagnosisToAdd)],
-      );
+        if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
+          return diagnoses;
+        }
+        // When a primary diagnosis is required and none is marked yet, default this one to
+        // primary (still changeable) so a single-diagnosis note needs no extra step
+        const rank = isPrimaryDiagnosisRequired && !diagnoses.some((diagnosis) => diagnosis.rank === 1) ? 1 : 2;
+        return [...diagnoses, createDiagnosis(conceptDiagnosisToAdd, rank)];
+      });
       setDiagnosesTouched(true);
-      clearErrors('diagnosisSearch');
     },
-    [createDiagnosis, setValue, clearErrors],
+    [createDiagnosis, setValue, isPrimaryDiagnosisRequired],
   );
 
   const handleRemoveDiagnosis = useCallback((diagnosisToRemove: DiagnosisDraft) => {
@@ -296,11 +300,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         ),
       );
       setDiagnosesTouched(true);
-      if (patch.rank === 1) {
-        clearErrors('diagnosisSearch');
-      }
     },
-    [clearErrors],
+    [],
   );
 
   const isDiagnosisNotSelected = (diagnosis: Concept) =>
@@ -493,6 +494,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0 || diagnosesTouched;
 
+  // Rendered beside the Primary controls (not beneath the search input); computed live so
+  // the message and invalid state clear the moment a primary is ticked
+  const showPrimaryRequiredError =
+    isSubmitted && isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1);
+
   return (
     <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
@@ -546,7 +552,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     labelText={t('searchForDiagnosis', 'Search for a diagnosis to add')}
                     placeholder={t('diagnosisInputPlaceholder', 'Choose a diagnosis')}
                     handleSearch={handleSearch}
-                    error={errors?.diagnosisSearch}
                     setIsSearching={setIsSearching}
                   />
                   {error ? (
@@ -567,12 +572,20 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
+                  {showPrimaryRequiredError && (
+                    <p className={styles.errorMessage} role="alert">
+                      {t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
+                    </p>
+                  )}
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
                         {t(
                           'diagnosisDefaultsHelperText',
                           'Tick Primary and Confirmed where they apply — unticked diagnoses are recorded as secondary and provisional.',
+                        )}
+                        {isPrimaryDiagnosisRequired && (
+                          <> {t('primaryRequiredHelperText', 'At least one diagnosis must be marked primary.')}</>
                         )}
                       </p>
                       <p className={styles.diagnosisCount}>
@@ -584,6 +597,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
                           diagnosis={diagnosis}
+                          primaryInvalid={showPrimaryRequiredError}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}
                         />
@@ -692,21 +706,9 @@ function DiagnosisSearch({
   labelText,
   placeholder,
   handleSearch,
-  error,
   setIsSearching,
 }: DiagnosisSearchProps) {
   const isTablet = useLayoutType() === 'tablet';
-  const inputRef = useRef(null);
-
-  const searchInputFocus = () => {
-    inputRef.current.focus();
-  };
-
-  useEffect(() => {
-    if (error) {
-      searchInputFocus();
-    }
-  }, [error]);
 
   return (
     <Controller
@@ -716,13 +718,10 @@ function DiagnosisSearch({
         <>
           <ResponsiveWrapper>
             <Search
-              ref={inputRef}
               size={isTablet ? 'lg' : 'md'}
               id={name}
               labelText={labelText}
-              className={error && styles.diagnoserrorOutline}
               placeholder={placeholder}
-              renderIcon={error && ((props) => <WarningFilled fill="red" {...props} />)}
               onChange={(e) => {
                 setIsSearching(true);
                 onChange(e);

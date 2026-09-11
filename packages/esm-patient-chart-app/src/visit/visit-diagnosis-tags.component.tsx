@@ -18,14 +18,15 @@ interface VisitDiagnosisTagsProps {
 
 /**
  * Renders visit-level diagnosis tags with the same rank-based colors as the styleguide's
- * DiagnosisTags (sharing its `diagnosisTags` color config), and additionally surfaces the
- * diagnosis certainty as an instant tooltip on hover or keyboard focus, plus as
- * screen-reader text. Interim local rendering until DiagnosisTags itself can display
- * certainty (O3-5823).
+ * DiagnosisTags (sharing its `diagnosisTags` color config), with the diagnosis certainty
+ * displayed alongside the name — visible text rather than a tooltip, so it also reaches
+ * touch devices. Interim local rendering until DiagnosisTags itself can display certainty
+ * (O3-5823).
  *
  * The tag markup is rendered directly with Carbon's public tag classes because Carbon's
- * `Tag` component reserves the `title` prop for its filter-close button and force-writes
- * its own `title` onto the label, so it cannot carry a certainty tooltip.
+ * `Tag` component force-writes its own `title` onto the label span, which prevents
+ * composing the label from name + certainty while keeping the full-name reveal for
+ * truncated diagnoses.
  */
 const VisitDiagnosisTags: React.FC<VisitDiagnosisTagsProps> = ({ diagnoses }) => {
   const { t } = useTranslation();
@@ -44,19 +45,18 @@ const VisitDiagnosisTags: React.FC<VisitDiagnosisTagsProps> = ({ diagnoses }) =>
               : null;
         const color =
           diagnosis.rank === 1 ? diagnosisTags?.primaryColor ?? 'red' : diagnosisTags?.secondaryColor ?? 'blue';
-        const tag = (
-          <span className={classNames('cds--tag', 'cds--tag--md', 'cds--layout--size-md', `cds--tag--${color}`)}>
-            <span className="cds--tag__label">{diagnosis.display}</span>
-            {certaintyLabel && <span className={styles.visuallyHidden}>{` (${certaintyLabel})`}</span>}
-          </span>
-        );
 
-        return certaintyLabel ? (
-          <span key={diagnosis.uuid} className={styles.certaintyTooltip} data-certainty={certaintyLabel} tabIndex={0}>
-            {tag}
+        return (
+          <span
+            key={diagnosis.uuid}
+            className={classNames('cds--tag', 'cds--tag--md', 'cds--layout--size-md', `cds--tag--${color}`)}
+          >
+            {/* title keeps the full name revealable when a long diagnosis is truncated */}
+            <span className="cds--tag__label" title={diagnosis.display}>
+              {diagnosis.display}
+            </span>
+            {certaintyLabel && <span className={styles.certaintySuffix}>({certaintyLabel})</span>}
           </span>
-        ) : (
-          <span key={diagnosis.uuid}>{tag}</span>
         );
       })}
     </div>

@@ -106,11 +106,18 @@ async function addDiagnosis(
   await user.click(await screen.findByRole('menuitem', { name }));
 
   const card = screen.getByRole('group', { name });
-  if (primary) {
-    await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
+  // Options are target states (the form may have pre-ticked Primary on the first diagnosis)
+  const setCheckbox = async (checkboxName: string, desired: boolean) => {
+    const checkbox = within(card).getByRole('checkbox', { name: checkboxName });
+    if ((checkbox as HTMLInputElement).checked !== desired) {
+      await user.click(checkbox);
+    }
+  };
+  if (primary != null) {
+    await setCheckbox('Primary', primary);
   }
-  if (confirmed) {
-    await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
+  if (confirmed != null) {
+    await setCheckbox('Confirmed', confirmed);
   }
   return card;
 }
@@ -197,21 +204,29 @@ test('typing in the diagnosis search input triggers a search', async () => {
   expect(targetSearchResult).toBeInTheDocument();
   expect(screen.getByRole('menuitem', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
-  // Clicking a search result displays the selected diagnosis as a compact card whose two
-  // checkboxes start unticked: secondary and provisional are presumed
+  // Clicking a search result displays the selected diagnosis as a compact card. The first
+  // diagnosis defaults to primary (a primary is required by config); certainty is presumed
+  // provisional, spelled out on the row
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   // The test i18n mock interpolates but does not pluralize, so match the count only
   expect(screen.getByText(/1 diagnos/i)).toBeInTheDocument();
   expect(screen.getByText(/unticked diagnoses are recorded as secondary and provisional/i)).toBeInTheDocument();
-  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+  expect(screen.getByText(/at least one diagnosis must be marked primary/i)).toBeInTheDocument();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
+  expect(within(card).getByText('Provisional')).toBeInTheDocument();
 
-  // ticking the exception checkboxes reflects on the card
+  // Unticking Primary spells out both presumed values on the row
+  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
+  expect(within(card).getByText('Secondary · Provisional')).toBeInTheDocument();
+
+  // Ticking both exception checkboxes removes the presumed-values text entirely
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
+  expect(within(card).queryByText(/provisional|secondary/i)).not.toBeInTheDocument();
 
   // Clicking the remove button on the card removes the selected diagnosis
   await user.click(within(card).getByRole('button', { name: /remove diabetes mellitus/i }));
@@ -282,13 +297,18 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
 
-  // An unticked diagnosis is presumed secondary, so the primary requirement still blocks
+  // The first diagnosis added defaults to primary, clearing the requirement with no extra step
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+
+  // Deliberately unticking the only primary re-raises the error on submit, beside the controls
+  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   await user.click(submitButton);
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
-  // Ticking Primary clears the error without another submit; certainty stays provisional
+  // Re-ticking Primary clears the error without another submit; certainty stays provisional
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
 
@@ -830,20 +850,23 @@ test('ticks Primary and Confirmed independently across multiple diagnosis cards'
 
   renderVisitNotesForm();
 
+  // The first diagnosis defaults to primary; the second stays presumed secondary/provisional
   const firstCard = await addDiagnosis(user, 'Diabetes Mellitus');
   const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
-  await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Confirmed' }));
 
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
   expect(within(firstCard).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(secondCard).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
+  expect(within(secondCard).getByText('Secondary · Provisional')).toBeInTheDocument();
 
-  // Unticking returns the diagnosis to the presumed secondary rank
+  // Unticking returns the diagnosis to the presumed secondary rank, without affecting the other card
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+  expect(within(firstCard).getByText(/secondary/i)).toBeInTheDocument();
+  expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
 
   expect(screen.getByText(/2 diagnos/i)).toBeInTheDocument();
 });

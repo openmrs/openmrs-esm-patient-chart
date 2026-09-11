@@ -22,6 +22,13 @@
   overflow-wrap: anywhere;
 }
 
+.diagnosisCardPresumed {
+  @include type.type-style('label-01');
+  color: $text-02;
+  display: block;
+  margin-top: layout.$spacing-01;
+}
+
 .diagnosisCardControls {
   display: flex;
   align-items: center;

@@ -1,4 +1,3 @@
-@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 
@@ -6,51 +5,12 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  // Separate the pills themselves rather than growing their internal padding
+  gap: layout.$spacing-02;
 }
 
-// Instant certainty tooltip, shown on hover and keyboard focus. Rendered in-page (unlike
-// a native title tooltip, which is OS-drawn, delayed, and easy to miss).
-.certaintyTooltip {
-  position: relative;
-  display: inline-flex;
-
-  &::after {
-    @include type.type-style('body-compact-01');
-    content: attr(data-certainty);
-    position: absolute;
-    top: calc(100% + #{layout.$spacing-01});
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: colors.$gray-80;
-    color: colors.$white-0;
-    padding: layout.$spacing-01 layout.$spacing-03;
-    border-radius: 2px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 70ms;
-    z-index: 100;
-  }
-
-  &:hover::after,
-  &:focus-visible::after {
-    opacity: 1;
-  }
-
-  &:focus-visible {
-    outline: 2px solid colors.$blue-60;
-    outline-offset: 1px;
-  }
-}
-
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+.certaintySuffix {
+  @include type.type-style('label-01');
+  margin-left: layout.$spacing-01;
   white-space: nowrap;
-  border: 0;
 }

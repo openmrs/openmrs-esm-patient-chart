@@ -39,7 +39,7 @@
 .diagnosesText {
   @include type.type-style('body-compact-01');
   color: colors.$gray-70;
-  margin-bottom: layout.$spacing-05;
+  margin: layout.$spacing-03 0 layout.$spacing-05;
 }
 
 .emptyResults {
@@ -157,18 +157,6 @@
 .errorMessage {
   color: colors.$red-60;
   margin-top: layout.$spacing-03;
-}
-
-.diagnoserrorOutline {
-  :global(.cds--search-input):focus {
-    outline: 2.5px solid colors.$red-60;
-  }
-
-  :global(.cds--search-magnifier) {
-    svg {
-      fill: colors.$red-60;
-    }
-  }
 }
 
 .errorMessage {
