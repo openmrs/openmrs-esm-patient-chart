@@ -162,6 +162,10 @@
 
 .row {
   margin: layout.$spacing-03 0 layout.$spacing-08;
+
+  &:has(.diagnosisList) {
+    margin-bottom: layout.$spacing-05;
+  }
 }
 
 .skeleton {
