@@ -87,6 +87,22 @@ describe('dedupeDiagnoses', () => {
     expect(result[0].certainty).toBe('CONFIRMED');
   });
 
+  it('merges out-of-enum certainty values deterministically, regardless of encounter order', () => {
+    const provisional = codedDiagnosis('diabetes-uuid', 'Diabetes mellitus', 2, 'PROVISIONAL');
+    const presumed = codedDiagnosis('diabetes-uuid', 'Diabetes mellitus', 2, 'PRESUMED');
+
+    for (const input of [
+      [provisional, presumed],
+      [presumed, provisional],
+    ]) {
+      const result = dedupeDiagnoses(input);
+
+      expect(result).toHaveLength(1);
+      // Known enum values outrank unknown writers' values
+      expect(result[0].certainty).toBe('PROVISIONAL');
+    }
+  });
+
   it('takes the defined certainty when a duplicate has none, in either order', () => {
     const withCertainty = codedDiagnosis('diabetes-uuid', 'Diabetes mellitus', 1, 'PROVISIONAL');
     const withoutCertainty = codedDiagnosis('diabetes-uuid', 'Diabetes mellitus', 2);

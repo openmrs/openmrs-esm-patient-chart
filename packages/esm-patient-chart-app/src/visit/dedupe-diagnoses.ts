@@ -40,8 +40,7 @@ export function dedupeDiagnoses(diagnoses: Array<Diagnosis>): Array<DedupedDiagn
       result.push(entry);
     } else {
       existing.rank = minRank(existing.rank, rank);
-      existing.certainty =
-        existing.certainty === 'CONFIRMED' || certainty === 'CONFIRMED' ? 'CONFIRMED' : existing.certainty ?? certainty;
+      existing.certainty = strongerCertainty(existing.certainty, certainty);
     }
   }
 
@@ -56,4 +55,21 @@ function minRank(a: number | undefined, b: number | undefined): number | undefin
     return a;
   }
   return Math.min(a, b);
+}
+
+/**
+ * Deterministic certainty precedence: CONFIRMED > PROVISIONAL > any other stored value >
+ * unset. Values of equal precedence (two out-of-enum values from other writers) tie-break
+ * lexicographically, so the merge result never depends on encounter order.
+ */
+function strongerCertainty(a: string | undefined, b: string | undefined): string | undefined {
+  const precedence = (value: string | undefined) =>
+    value === 'CONFIRMED' ? 3 : value === 'PROVISIONAL' ? 2 : value != null ? 1 : 0;
+  if (precedence(a) !== precedence(b)) {
+    return precedence(a) > precedence(b) ? a : b;
+  }
+  if (a != null && b != null) {
+    return a <= b ? a : b;
+  }
+  return a ?? b;
 }
