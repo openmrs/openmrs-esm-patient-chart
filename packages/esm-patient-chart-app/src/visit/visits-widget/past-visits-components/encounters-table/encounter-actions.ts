@@ -11,6 +11,7 @@ import {
 } from '@openmrs/esm-framework';
 import { invalidateVisitAndEncounterData, PRIVILEGE_EDIT_PAST_VISITS } from '@openmrs/esm-patient-common-lib';
 import { type ChartConfig } from '../../../../config-schema';
+import { rdeEncounterWorkspace, rdeOpenedFrom } from '../../../../constants';
 import { deleteEncounter, type MappedEncounter } from './encounters-table.resource';
 
 /**
@@ -55,6 +56,7 @@ export function editEncounter({
   visitContext,
   onEncounterSaved,
   additionalProps,
+  openedFrom,
 }: {
   patient: fhir.Patient;
   /** The visit the encounter belongs to, which is not necessarily the active visit */
@@ -62,9 +64,15 @@ export function editEncounter({
   encounter: Encounter;
   onEncounterSaved?: (encounter?: Encounter) => void;
   additionalProps?: Record<string, unknown>;
+  /**
+   * Where the table is rendered from. When set to {@link rdeOpenedFrom}, the RDE page's own copy of the
+   * encounter workspace is used, since the chart's belongs to the `patient-chart` workspace group scoped
+   * to chart URLs.
+   */
+  openedFrom?: string;
 }) {
   launchWorkspace2(
-    'encounter-workspace',
+    openedFrom === rdeOpenedFrom ? rdeEncounterWorkspace : 'encounter-workspace',
     {},
     { patient, patientUuid: patient.id, visitContext, encounter, onEncounterSaved, additionalProps },
   );
