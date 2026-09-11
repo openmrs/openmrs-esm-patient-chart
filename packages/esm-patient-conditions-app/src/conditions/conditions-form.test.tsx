@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
@@ -655,3 +656,29 @@ it.each(['small-desktop', 'tablet'] as const)('uses the edit title on %s', (layo
   expect(screen.getByText('Edit condition')).toBeInTheDocument();
   expect(screen.queryByText('Record condition')).not.toBeInTheDocument();
 });
+
+it.each(['result', 'outside', 'body'])(
+  'allows continued keyboard use after results refresh when the user chooses %s',
+  async (target) => {
+    mockUseConditionsSearch.mockReturnValue({ searchResults: searchedCondition, error: null, isSearching: false });
+    const { rerender } = render(<ConditionsForm {...defaultProps} />);
+    const user = userEvent.setup();
+    const input = screen.getByRole('searchbox');
+    await user.type(input, 'Headache');
+    const result = screen.getByRole('button', { name: searchedCondition[0].display });
+    await user.keyboard('{ArrowDown}');
+    expect(result).toHaveFocus();
+
+    const outside = screen.getByRole('radio', { name: /^inactive/i });
+    if (target === 'outside') await user.click(outside);
+    if (target === 'body') await user.click(screen.getByText('Record condition', { exact: true }));
+
+    mockUseConditionsSearch.mockReturnValue({ searchResults: [], error: null, isSearching: true });
+    rerender(<ConditionsForm {...defaultProps} />);
+    expect(result).not.toBeInTheDocument();
+    expect(target === 'outside' ? outside : target === 'body' ? document.body : input).toHaveFocus();
+    await user.keyboard('s');
+    expect(input).toHaveValue(target === 'result' ? 'Headaches' : 'Headache');
+    if (target === 'outside') expect(outside).toBeChecked();
+  },
+);

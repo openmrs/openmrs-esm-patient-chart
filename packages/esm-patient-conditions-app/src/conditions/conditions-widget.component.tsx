@@ -49,7 +49,7 @@ interface RequiredFieldLabelProps {
 }
 
 interface SearchResultsProps {
-  resultsRef: React.RefObject<HTMLUListElement>;
+  resultsRef: React.Ref<HTMLUListElement>;
   onKeyDown: React.KeyboardEventHandler<HTMLUListElement>;
   isSearching: boolean;
   onConditionChange: (condition: CodedCondition) => void;
@@ -80,7 +80,13 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   } = useFormContext<ConditionsFormSchema>();
   const session = useSession();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const resultsRef = useRef<HTMLUListElement>(null);
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  const setResultsRef = useCallback((node: HTMLUListElement | null) => {
+    if (!node && resultsRef.current?.contains(document.activeElement)) {
+      searchInputRef.current?.focus();
+    }
+    resultsRef.current = node;
+  }, []);
   const clinicalStatus = watch('clinicalStatus');
   const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
 
@@ -288,7 +294,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 </p>
               )}
               <SearchResults
-                resultsRef={resultsRef}
+                resultsRef={setResultsRef}
                 onKeyDown={(event) => {
                   if (event.key === 'Escape') {
                     event.preventDefault();
