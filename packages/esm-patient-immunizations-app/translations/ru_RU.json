@@ -9,6 +9,7 @@
   "doses": "Дозы",
   "due": "Пропущено",
   "duplicateDoseWarning": "Доза {{dose}} уже была записана для этой вакцины",
+  "editImmunization": "Edit immunization",
   "error": "Ошибка",
   "errorSaving": "Ошибка при сохранении вакцинации",
   "expirationDate": "Дата истечения срока",
