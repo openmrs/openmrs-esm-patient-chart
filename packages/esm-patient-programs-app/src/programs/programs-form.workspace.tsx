@@ -349,7 +349,14 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
   }
 
   return (
-    <Workspace2 title={t('programEnrollmentWorkspaceTitle', 'Program enrollment')} hasUnsavedChanges={isDirty}>
+    <Workspace2
+      title={
+        inEditMode
+          ? t('editProgramEnrollment', 'Edit program enrollment')
+          : t('programEnrollmentWorkspaceTitle', 'Program enrollment')
+      }
+      hasUnsavedChanges={isDirty}
+    >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <Stack className={styles.formContainer} gap={7}>
           {!availablePrograms.length && (
