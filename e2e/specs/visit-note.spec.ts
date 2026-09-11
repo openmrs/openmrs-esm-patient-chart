@@ -22,8 +22,12 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await page.getByPlaceholder('Choose a diagnosis').fill('Asthma');
     await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
-    await asthmaCard.getByRole('checkbox', { name: 'Primary' }).check();
-    await asthmaCard.getByRole('checkbox', { name: 'Confirmed' }).check();
+    // Carbon renders the checkbox input visually hidden behind its styled label, which fails
+    // Playwright's actionability check — click the label text instead (see task-list.spec.ts).
+    await asthmaCard.getByText('Primary', { exact: true }).click();
+    await asthmaCard.getByText('Confirmed', { exact: true }).click();
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
   });
 
   await test.step('And I add `GI upset`, leaving it presumed secondary and provisional', async () => {
