@@ -9,6 +9,7 @@
   "doses": "Doses",
   "due": "Prevista",
   "duplicateDoseWarning": "A dose {{dose}} já foi registrada para esta vacina",
+  "editImmunization": "Edit immunization",
   "error": "Erro",
   "errorSaving": "Erro ao salvar a vacinação",
   "expirationDate": "Data de expiração",
