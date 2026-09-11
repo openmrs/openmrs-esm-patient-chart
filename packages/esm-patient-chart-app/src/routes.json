@@ -169,6 +169,22 @@
       "order": 1
     },
     {
+      "name": "rde-edit-visit-action-button",
+      "slot": "rde-visit-detail-overview-actions",
+      "component": "editVisitDetailsActionButton",
+      "online": true,
+      "offline": true,
+      "order": 0
+    },
+    {
+      "name": "rde-delete-visit-action-button",
+      "slot": "rde-visit-detail-overview-actions",
+      "component": "deleteVisitActionButton",
+      "online": true,
+      "offline": true,
+      "order": 1
+    },
+    {
       "name": "active-visit-action-button",
       "slot": "active-visit-actions",
       "component": "activeVisitActionsComponent",
@@ -218,7 +234,7 @@
   "pages": [
     {
       "component": "root",
-      "routeRegex": "^patient\/.+\/chart",
+      "routeRegex": "^patient\/.+\/(chart|rde)",
       "online": true,
       "offline": true
     }
@@ -243,6 +259,16 @@
       "name": "encounter-workspace",
       "component": "encounterWorkspace",
       "window": "encounter-window"
+    },
+    {
+      "name": "rde-visit-form-workspace",
+      "component": "exportedVisitForm",
+      "window": "rde-visit"
+    },
+    {
+      "name": "rde-encounter-workspace",
+      "component": "encounterWorkspace",
+      "window": "rde-encounter-window"
     }
   ],
   "workspaceWindows2": [
@@ -262,12 +288,24 @@
       "name": "encounter-window",
       "icon": "encounterActionButton",
       "group": "patient-chart"
+    },
+    {
+      "name": "rde-visit",
+      "group": "rde-group"
+    },
+    {
+      "name": "rde-encounter-window",
+      "group": "rde-group"
     }
   ],
   "workspaceGroups2": [
     {
       "name": "patient-chart",
       "scopePattern": "/patient/([^/]+)/chart"
+    },
+    {
+      "name": "rde-group",
+      "scopePattern": "/patient/([^/]+)/rde"
     }
   ]
 }

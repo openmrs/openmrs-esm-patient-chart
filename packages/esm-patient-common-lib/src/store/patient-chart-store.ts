@@ -22,13 +22,17 @@ export interface PatientChartStore {
 
 const patientChartStoreName = 'patient-chart-global-store';
 
-const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStoreName, {
-  patientUuid: null,
-  patient: null,
-  activeVisit: null,
-  workspaceGroupVisitUuid: null,
-  workspaceGroupProps: null,
-});
+const patientChartStore = createGlobalStore<PatientChartStore>(
+  patientChartStoreName,
+  {
+    patientUuid: null,
+    patient: null,
+    activeVisit: null,
+    workspaceGroupVisitUuid: null,
+    workspaceGroupProps: null,
+  },
+  'none',
+);
 
 const patientChartStoreActions = {
   setPatient(_, patient: fhir.Patient) {

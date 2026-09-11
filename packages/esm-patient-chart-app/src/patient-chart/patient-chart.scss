@@ -6,6 +6,53 @@ $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
 $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
 
+.patientChartWrapper {
+  display: flex;
+  position: relative;
+}
+
+.patientChartWrapper {
+  & > nav {
+    padding-bottom: layout.$spacing-09;
+    scrollbar-width: none;
+  }
+
+  :global(.cds--side-nav__overlay-active) {
+    background-color: transparent;
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) .patientChartWrapper {
+  margin-left: var(--omrs-sidenav-width);
+}
+
+// Tablet side nav scrolling
+:global(.omrs-breakpoint-lt-desktop) {
+  .patientChartWrapper {
+    :global(.cds--side-nav) {
+      height: calc(100vh - layout.$spacing-09 - var(--bottom-nav-height));
+    }
+  }
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .patientChartWrapper {
+    :global(.cds--side-nav) {
+      right: 0;
+      :global(.active-left-nav-link) {
+        border-right: layout.$spacing-02 solid var(--brand-01);
+        border-left: unset;
+      }
+    }
+  }
+
+  :global(.omrs-breakpoint-gt-tablet) .patientChartWrapper {
+    margin-right: var(--omrs-sidenav-width);
+    margin-left: unset;
+  }
+}
+
 .patientInfoSlot {
   > div:not(:last-child) {
     border-bottom: 1px solid colors.$gray-20;

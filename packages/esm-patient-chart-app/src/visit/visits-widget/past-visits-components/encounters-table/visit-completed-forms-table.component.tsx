@@ -8,6 +8,7 @@ interface VisitCompletedFormsTableProps {
   visit: Visit;
   patient: EncountersTableProps['patient'];
   onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
+  openedFrom?: EncountersTableProps['openedFrom'];
 }
 
 /**
@@ -18,6 +19,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
   visit,
   patient,
   onEncounterSaved,
+  openedFrom,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -62,6 +64,7 @@ const VisitCompletedFormsTable: React.FC<VisitCompletedFormsTableProps> = ({
     canPrintEncounters,
     onEncounterSaved,
     patient,
+    openedFrom,
   };
 
   return <EncountersTable {...encountersTableProps} />;

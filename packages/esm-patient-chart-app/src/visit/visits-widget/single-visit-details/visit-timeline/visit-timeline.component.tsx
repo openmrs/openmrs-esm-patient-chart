@@ -38,6 +38,11 @@ interface VisitTimelineProps {
   patient: EncountersTableProps['patient'];
   onEncounterSaved?: EncountersTableProps['onEncounterSaved'];
   /**
+   * Where this timeline is rendered from. When `'RDE'`, the edit action opens the RDE page's own copy of
+   * the encounter workspace instead of the chart's. See `rdeOpenedFrom` in `constants.ts`.
+   */
+  openedFrom?: EncountersTableProps['openedFrom'];
+  /**
    * Rendered straight from `visit.encounters`, so the visit must be fetched with the fields
    * the visits widget's `customRepresentation` (in `visit.resource.tsx`) asks for. The framework's
    * `defaultVisitCustomRepresentation` is not enough: it omits `obs`, `form.resources`, and
@@ -47,7 +52,7 @@ interface VisitTimelineProps {
   visit: Visit;
 }
 
-function VisitTimeline({ onEncounterSaved, patient, patientUuid, visit }: VisitTimelineProps) {
+function VisitTimeline({ onEncounterSaved, patient, patientUuid, visit, openedFrom }: VisitTimelineProps) {
   const { t } = useTranslation();
   const session = useSession();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
@@ -200,6 +205,7 @@ function VisitTimeline({ onEncounterSaved, patient, patientUuid, visit }: VisitT
                                 encounter,
                                 visitContext: visit,
                                 onEncounterSaved,
+                                openedFrom,
                               })
                             }
                           />

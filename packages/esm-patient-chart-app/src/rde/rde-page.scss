@@ -1,0 +1,29 @@
+// The page fills the viewport below the top nav (3rem / 48px tall) and never scrolls as a whole:
+// the banner and tab bar stay pinned, and scrolling happens inside the tab panel's own regions.
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 3rem);
+  overflow: hidden;
+
+  // Patient banner: pinned, natural height.
+  > aside {
+    flex: 0 0 auto;
+  }
+
+  // Carbon renders the tab bar as a sibling of the tab panel; keep it pinned too.
+  :global(.cds--tabs) {
+    flex: 0 0 auto;
+  }
+}
+
+// The active tab panel takes the remaining height and lets its content own the scrolling.
+.tabPanel {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

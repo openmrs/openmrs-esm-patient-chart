@@ -8,11 +8,16 @@ import styles from './start-visit-dialog.scss';
 interface DeleteVisitDialogProps {
   closeModal: () => void;
   visit: Visit;
+  /** Optional callback run after the visit is successfully deleted (e.g. to refresh a host list). */
+  onVisitDeleted?: () => void;
 }
 
-const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, visit }) => {
+const DeleteVisitDialog: React.FC<DeleteVisitDialogProps> = ({ closeModal, visit, onVisitDeleted }) => {
   const { t } = useTranslation();
-  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, closeModal);
+  const { isDeletingVisit, initiateDeletingVisit } = useDeleteVisit(visit, () => {
+    onVisitDeleted?.();
+    closeModal();
+  });
 
   return (
     <div>
