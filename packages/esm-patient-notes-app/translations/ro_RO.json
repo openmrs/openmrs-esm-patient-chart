@@ -1,7 +1,7 @@
 {
   "add": "Adauga",
   "addImage": "Adauga imagine",
-  "addVisitNote": "Adauga nota vizita",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Scrie notitele tale",
   "clinicalNotePlaceholder": "Scrie orice nota aici",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "Diagnostic",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Renunta",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "Niciun diagnostic selectat — Introdu un diagnostic mai jos",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "Introdu diagnosticul primar",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "Este acum vizibila in pagina de consultatii",
   "visitNotes": "Note vizita",
   "visitNoteSaved": "Nota de vizita salvata",
-  "visitNoteSaveError": "Eroare la salvarea notei de vizita",
-  "visitNoteWorkspaceTitle": "Nota Vizita"
+  "visitNoteSaveError": "Eroare la salvarea notei de vizita"
 }

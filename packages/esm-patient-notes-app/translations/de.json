@@ -1,7 +1,7 @@
 {
   "add": "Hinzufügen",
   "addImage": "Bild hinzufügen",
-  "addVisitNote": "Eine Aufenthaltsnotiz hinzufügen",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Schreiben Sie Ihre Notizen",
   "clinicalNotePlaceholder": "Trage hier deine Notizen ein",
   "confirmDeleteStickyNote": "Löschen der Haftnotiz bestätigen",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Haftnotiz löschen",
   "deleting": "Löschen",
   "diagnoses": "Diagnosen",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Verwerfen",
   "editStickyNote": "Haftnotiz bearbeiten",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "Es wurde keine Diagnose ausgewählt – Geben Sie unten eine Diagnose ein",
   "enterNotePlaceholder": "Gib hier deine Haftnotiz ein...",
   "enterPrimaryDiagnoses": "Hauptdiagnose eintragen",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "Es ist nun auf der Seite Ereignisse zu sehen",
   "visitNotes": "Aufenthaltsnotizen",
   "visitNoteSaved": "Aufenthaltsnotiz gespeichert",
-  "visitNoteSaveError": "Fehler beim Speichern der Aufenthaltsnotiz",
-  "visitNoteWorkspaceTitle": "Aufenthaltsnotiz"
+  "visitNoteSaveError": "Fehler beim Speichern der Aufenthaltsnotiz"
 }
