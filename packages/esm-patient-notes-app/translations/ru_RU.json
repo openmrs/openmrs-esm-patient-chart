@@ -1,7 +1,7 @@
 {
   "add": "Добавить",
   "addImage": "Добавить изображение",
-  "addVisitNote": "Примечание к визиту",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Напишите текст вашей записи",
   "clinicalNotePlaceholder": "Введите любой текст здесь",
   "confirmDeleteStickyNote": "Подтвердите удаление",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Удалить заметку",
   "deleting": "Удаление",
   "diagnoses": "Диагнозы",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Отменить",
   "editStickyNote": "Редактировать",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "Диагноз не выбран — введите диагноз",
   "enterNotePlaceholder": "Введите вашу заметку...",
   "enterPrimaryDiagnoses": "Укажите основные диагнозы",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "Отображается в разделе событий",
   "visitNotes": "Примечания",
   "visitNoteSaved": "Примечание сохранено",
-  "visitNoteSaveError": "Ошибка при сохранении примечания",
-  "visitNoteWorkspaceTitle": "Примечание к визиту"
+  "visitNoteSaveError": "Ошибка при сохранении примечания"
 }
