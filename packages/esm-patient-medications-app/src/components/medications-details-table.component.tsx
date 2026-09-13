@@ -33,6 +33,7 @@ import {
   type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
+  useStartVisitIfNeeded,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -401,6 +402,7 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+  const startVisitIfNeeded = useStartVisitIfNeeded(patient.id);
 
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
@@ -436,15 +438,16 @@ function OrderBasketItemActions({
     );
   }, [medication, workspaceGroupProps]);
 
-  const handleRenewClick = useCallback(() => {
+  const handleRenewClick = useCallback(async () => {
+    const canProceed = await startVisitIfNeeded();
+    if (!canProceed) {
+      setItems([]);
+      return;
+    }
+
     setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
-    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
-      'order-basket',
-      {},
-      { encounterUuid: medication.encounter.uuid },
-      workspaceGroupProps,
-    );
-  }, [items, setItems, medication, workspaceGroupProps]);
+    launchWorkspace2('order-basket');
+  }, [startVisitIfNeeded, items, setItems, medication]);
 
   return (
     <OverflowMenu
