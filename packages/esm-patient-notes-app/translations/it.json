@@ -1,7 +1,7 @@
 {
   "add": "Aggiungi",
   "addImage": "Aggiungi immagine",
-  "addVisitNote": "Aggiungi una nota di visita",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Scrivi le tue note",
   "clinicalNotePlaceholder": "Scrivi qui eventuali note",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "Diagnosi",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Scarta",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "Nessuna diagnosi selezionata — Inserisci una diagnosi qui sotto",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "Inserisci diagnosi primaria",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "Ora è visibile nella pagina degli incontri",
   "visitNotes": "Note di visita",
   "visitNoteSaved": "Nota di visita salvata",
-  "visitNoteSaveError": "Errore nel salvataggio della nota di visita",
-  "visitNoteWorkspaceTitle": "Nota di visita"
+  "visitNoteSaveError": "Errore nel salvataggio della nota di visita"
 }

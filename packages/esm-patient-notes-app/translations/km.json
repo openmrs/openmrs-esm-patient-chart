@@ -1,7 +1,7 @@
 {
   "add": "បន្ថែម",
   "addImage": "បន្ថែមរូបភាព",
-  "addVisitNote": "បន្ថែមកំណត់សម្គាល់នៃការមកពិនិត្យ",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "សរសេរកំណត់ចំណាំរបស់អ្នក។",
   "clinicalNotePlaceholder": "សរសេរកំណត់ចំណាំណាមួយនៅទីនេះ",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "ធ្វើរោគវិនិច្ឆ័យ",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "បោះបង់",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "មិនបានជ្រើសរើសការធ្វើរោគវិនិច្ឆ័យទេ — បញ្ចូលការធ្វើរោគវិនិច្ឆ័យខាងក្រោម",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "Enter Primary diagnoses",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "ឥឡូវនេះវាអាចមើលឃើញនៅលើទំព័រមកជួបពិនិត្យ",
   "visitNotes": "កំណត់សម្គាល់នៃរាល់ការមកពិនិត្យ",
   "visitNoteSaved": "បានរក្សាទុកកំណត់សម្គាល់នៃការមកពិនិត្យដោយជោគជ័យ",
-  "visitNoteSaveError": "កំហុសក្នុងការរក្សាទុកកំណត់សម្គាល់នៃការមកពិនិត្យ",
-  "visitNoteWorkspaceTitle": "Visit Note"
+  "visitNoteSaveError": "កំហុសក្នុងការរក្សាទុកកំណត់សម្គាល់នៃការមកពិនិត្យ"
 }

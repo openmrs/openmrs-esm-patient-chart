@@ -1,7 +1,7 @@
 {
   "add": "أضف",
   "addImage": "أضف صورة",
-  "addVisitNote": "أضف ملاحظة للزيارة",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "اكتب ملاحظاتك",
   "clinicalNotePlaceholder": "اكتب أي ملاحظات هنا",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "التشخيصات",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "تجاهل",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "لم يتم اختيار تشخيص — أدخل تشخيصًا أدناه",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "أدخل التشخيص الرئيسي",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "أصبحت مرئية الآن في صفحة اللقاءات",
   "visitNotes": "ملاحظات الزيارة",
   "visitNoteSaved": "تم حفظ ملاحظة الزيارة",
-  "visitNoteSaveError": "خطأ في حفظ ملاحظة الزيارة",
-  "visitNoteWorkspaceTitle": "ملاحظة الزيارة"
+  "visitNoteSaveError": "خطأ في حفظ ملاحظة الزيارة"
 }
