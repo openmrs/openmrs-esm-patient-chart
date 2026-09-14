@@ -1,7 +1,7 @@
 {
   "add": "დამატება",
   "addImage": "გამოსახულების დამატება",
-  "addVisitNote": "ვიზიტის შენიშვნის დამატება",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "დაწერეთ თქვენი შენიშვნები",
   "clinicalNotePlaceholder": "დაწერეთ აქ ნებისმიერი შენიშვნა",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "დიაგნოზები",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "მოცილება",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "შეიყვანე ძირითადი დიაგნოზი",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotes": "ვიზიტის შენიშვნები",
   "visitNoteSaved": "ვიზიტის შენიშვნა შენახულია",
-  "visitNoteSaveError": "ვიზიტის შენიშვნის შენახვის შეცდომა",
-  "visitNoteWorkspaceTitle": "ვიზიტის შენიშვნა"
+  "visitNoteSaveError": "ვიზიტის შენიშვნის შენახვის შეცდომა"
 }

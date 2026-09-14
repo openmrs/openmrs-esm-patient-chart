@@ -152,7 +152,7 @@ test('Record, edit and delete an immunization', async ({ page, patient }) => {
   });
 
   await test.step('Then the immunization form should launch in edit mode with the current values pre-filled', async () => {
-    await expect(page.getByText(/immunization form/i)).toBeVisible();
+    await expect(page.getByText('Edit immunization', { exact: true })).toBeVisible();
   });
 
   await test.step('Then the vaccine field should show "Hepatitis B vaccination" and be disabled', async () => {

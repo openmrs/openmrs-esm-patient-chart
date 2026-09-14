@@ -25,7 +25,7 @@
   "duplicateInactiveConditionSubtitle": "{{conditionName}} было ранее зарегистрировано и сейчас неактивно. Рассмотрите возможность реактивации существующей записи вместо создания новой.",
   "edit": "Редактировать",
   "editCondition": "Редактировать запись",
-  "editOrDeleteCondition": "Edit or delete condition",
+  "editOrDeleteCondition": "Изменить или удалить",
   "endDate": "Дата окончания",
   "enterCondition": "Введите наименование",
   "errorCreatingCondition": "Ошибка при создании записи",

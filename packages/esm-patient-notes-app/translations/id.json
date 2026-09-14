@@ -1,7 +1,7 @@
 {
   "add": "Tambah",
   "addImage": "Tambahkan gambar",
-  "addVisitNote": "Tambahkan catatan kunjungan",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Tulis catatan Anda",
   "clinicalNotePlaceholder": "Tulis catatan apa pun di sini",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "Delete sticky note",
   "deleting": "Deleting",
   "diagnoses": "Diagnosis",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Buang",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "Tidak ada diagnosis yang dipilih — Masukkan diagnosis di bawah",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "enterPrimaryDiagnoses": "Masukkan diagnosis utama",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "Sekarang terlihat di halaman Pertemuan",
   "visitNotes": "Catatan kunjungan",
   "visitNoteSaved": "Catatan kunjungan disimpan",
-  "visitNoteSaveError": "Kesalahan menyimpan catatan kunjungan",
-  "visitNoteWorkspaceTitle": "Catatan Kunjungan"
+  "visitNoteSaveError": "Kesalahan menyimpan catatan kunjungan"
 }

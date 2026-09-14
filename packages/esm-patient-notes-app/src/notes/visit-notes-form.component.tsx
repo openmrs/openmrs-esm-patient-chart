@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -500,7 +500,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     isSubmitted && isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1);
 
   return (
-    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
+    <Workspace2
+      title={isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
+      hasUnsavedChanges={hasUserUnsavedChanges}
+    >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
@@ -512,7 +515,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
         <div className={styles.formContainer}>
           <Stack gap={2}>
-            {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
+            {isTablet ? (
+              <h2 className={styles.heading}>
+                {isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
+              </h2>
+            ) : null}
             {isRetrospectiveDataEntryEnabled && (
               <Row className={styles.row}>
                 <Column sm={1}>
@@ -727,6 +734,15 @@ function DiagnosisSearch({
                 onChange(e);
                 handleSearch();
               }}
+              onKeyDown={(event) => {
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                  const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
+                  if (results?.length) {
+                    event.preventDefault();
+                    results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
+                  }
+                }
+              }}
               value={value}
               onBlur={onBlur}
             />
@@ -747,6 +763,15 @@ function DiagnosesDisplay({
   t,
   value,
 }: DiagnosesDisplayProps) {
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  // When loading unmounts a focused result, return focus to the search input rather than
+  // dropping it on <body>; leave focus alone when the user has moved elsewhere
+  const setResultsRef = useCallback((node: HTMLUListElement | null) => {
+    if (!node && resultsRef.current?.contains(document.activeElement)) {
+      document.getElementById('diagnosisSearch')?.focus();
+    }
+    resultsRef.current = node;
+  }, []);
   if (!value) {
     return null;
   }
@@ -757,15 +782,44 @@ function DiagnosesDisplay({
 
   if (!isSearching && searchResults?.length > 0) {
     return (
-      <ul className={styles.diagnosisList}>
+      <ul
+        ref={setResultsRef}
+        id="diagnosisSearch-results"
+        className={styles.diagnosisList}
+        aria-label={t('diagnosisSearchResults', 'Diagnosis search results')}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            document.getElementById('diagnosisSearch')?.focus();
+          } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+            const results = Array.from(event.currentTarget.querySelectorAll('button'));
+            const index = results.findIndex((result) => result === document.activeElement);
+            if (index < 0) {
+              return;
+            }
+            event.preventDefault();
+            const nextIndex =
+              event.key === 'Home'
+                ? 0
+                : event.key === 'End'
+                  ? results.length - 1
+                  : (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length;
+            results[nextIndex].focus();
+          }
+        }}
+      >
         {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
-          <li
-            className={styles.diagnosis}
-            key={diagnosis.uuid}
-            onClick={() => onAddDiagnosis(diagnosis)}
-            role="menuitem"
-          >
-            {diagnosis.display}
+          <li className={styles.diagnosis} key={diagnosis.uuid}>
+            <button
+              type="button"
+              className={styles.diagnosisButton}
+              onClick={() => {
+                onAddDiagnosis(diagnosis);
+                document.getElementById('diagnosisSearch')?.focus();
+              }}
+            >
+              {diagnosis.display}
+            </button>
           </li>
         ))}
       </ul>

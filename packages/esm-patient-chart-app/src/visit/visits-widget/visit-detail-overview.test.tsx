@@ -32,7 +32,7 @@ const mockPaginatedVisitsData: ReturnType<typeof usePaginatedVisits> = {
   totalPages: 1,
   totalCount: 1,
   currentPage: 1,
-  currentPageSize: { current: 10 },
+  currentPageSize: 10,
   paginated: false,
   showNextButton: false,
   showPreviousButton: false,

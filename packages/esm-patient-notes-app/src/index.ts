@@ -30,7 +30,6 @@ export function startupApp() {
 export const notesOverview = getSyncLifecycle(notesOverviewExtension, options);
 export const visitNotesActionButton = getSyncLifecycle(visitNotesActionButtonExtension, options);
 
-// t('visitNoteWorkspaceTitle', 'Visit Note')
 export const visitNotesFormWorkspace = getAsyncLifecycle(() => import('./notes/visit-notes-form.workspace'), options);
 
 export const exportedVisitNotesFormWorkspace = getAsyncLifecycle(

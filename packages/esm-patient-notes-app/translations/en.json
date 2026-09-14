@@ -1,7 +1,7 @@
 {
   "add": "Add",
   "addImage": "Add image",
-  "addVisitNote": "Add a visit note",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "Write your notes",
   "clinicalNotePlaceholder": "Write any notes here",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
@@ -16,8 +16,10 @@
   "diagnosisCountOnNote_other": "{{count}} diagnoses on this note",
   "diagnosisDefaultsHelperText": "Tick Primary and Confirmed where they apply — unticked diagnoses are recorded as secondary and provisional.",
   "diagnosisInputPlaceholder": "Choose a diagnosis",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "Discard",
   "editStickyNote": "Edit sticky note",
+  "editVisitNote": "Edit visit note",
   "enterNotePlaceholder": "Enter your sticky note here...",
   "error": "Error",
   "errorDeletingStickyNote": "Error deleting sticky note",
@@ -54,6 +56,5 @@
   "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved",
-  "visitNoteSaveError": "Error saving visit note",
-  "visitNoteWorkspaceTitle": "Visit Note"
+  "visitNoteSaveError": "Error saving visit note"
 }

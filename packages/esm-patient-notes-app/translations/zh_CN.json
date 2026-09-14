@@ -1,7 +1,7 @@
 {
   "add": "添加",
   "addImage": "添加图像",
-  "addVisitNote": "添加就诊记录",
+  "addVisitNote": "Add visit note",
   "clinicalNoteLabel": "撰写您的记录",
   "clinicalNotePlaceholder": "在这里记录任何内容",
   "confirmDeleteStickyNote": "确认删除便签",
@@ -10,8 +10,10 @@
   "deleteStickyNote": "删除便签",
   "deleting": "删除中",
   "diagnoses": "诊断",
+  "diagnosisSearchResults": "Diagnosis search results",
   "discard": "放弃",
   "editStickyNote": "编辑便签",
+  "editVisitNote": "Edit visit note",
   "emptyDiagnosisText": "未选择诊断 — 请在下方输入诊断",
   "enterNotePlaceholder": "在此输入记录",
   "enterPrimaryDiagnoses": "输入主要诊断",
@@ -50,6 +52,5 @@
   "visitNoteNowVisible": "现在在问诊页面上可见",
   "visitNotes": "就诊记录",
   "visitNoteSaved": "就诊记录已保存",
-  "visitNoteSaveError": "保存就诊记录时出现错误",
-  "visitNoteWorkspaceTitle": "就诊记录"
+  "visitNoteSaveError": "保存就诊记录时出现错误"
 }

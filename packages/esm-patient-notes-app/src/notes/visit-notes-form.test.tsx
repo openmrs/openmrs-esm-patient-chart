@@ -103,7 +103,7 @@ async function addDiagnosis(
   const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
   await user.clear(searchBox);
   await user.type(searchBox, name);
-  await user.click(await screen.findByRole('menuitem', { name }));
+  await user.click(await screen.findByRole('button', { name }));
 
   const card = screen.getByRole('group', { name });
   // Options are target states (the form may have pre-ticked Primary on the first diagnosis)
@@ -180,6 +180,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
 
   renderVisitNotesForm();
 
+  expect(screen.getByText('Add visit note', { exact: true })).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeInTheDocument();
   // The defaults helper text only appears once a diagnosis has been added
@@ -200,9 +201,9 @@ test('typing in the diagnosis search input triggers a search', async () => {
   await user.type(searchBox, 'Diabetes Mellitus');
 
   // Wait for the search results to appear
-  const targetSearchResult = await screen.findByRole('menuitem', { name: 'Diabetes Mellitus' });
+  const targetSearchResult = await screen.findByRole('button', { name: 'Diabetes Mellitus' });
   expect(targetSearchResult).toBeInTheDocument();
-  expect(screen.getByRole('menuitem', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
   // Clicking a search result displays the selected diagnosis as a compact card. The first
   // diagnosis defaults to primary (a primary is required by config); certainty is presumed
@@ -468,6 +469,9 @@ test('initializes form with existing encounter data when in edit mode', () => {
 
   // Verify date is pre-filled
   expect(screen.getByLabelText(/visit date/i)).toHaveValue('20/03/2024');
+
+  // Verify edit mode is reflected in the workspace title
+  expect(screen.getByText('Edit visit note', { exact: true })).toBeInTheDocument();
 
   // Verify clinical note is pre-filled
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toHaveValue('Existing clinical note');
@@ -869,4 +873,29 @@ test('ticks Primary and Confirmed independently across multiple diagnosis cards'
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
 
   expect(screen.getByText(/2 diagnos/i)).toBeInTheDocument();
+});
+
+test('supports selecting a diagnosis search result with the keyboard', async () => {
+  const user = userEvent.setup();
+
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+
+  renderVisitNotesForm();
+
+  const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
+  await user.type(searchBox, 'Diabetes Mellitus');
+  await screen.findByRole('button', { name: 'Diabetes Mellitus' });
+
+  // ArrowDown moves focus from the input into the results list; Enter selects and
+  // returns focus to the input
+  await user.keyboard('{ArrowDown}');
+  expect(screen.getByRole('button', { name: 'Diabetes Mellitus' })).toHaveFocus();
+  await user.keyboard('{ArrowDown}');
+  expect(screen.getByRole('button', { name: 'Diabetes Mellitus, Type II' })).toHaveFocus();
+  await user.keyboard('{ArrowUp}');
+  expect(screen.getByRole('button', { name: 'Diabetes Mellitus' })).toHaveFocus();
+  await user.keyboard('{Enter}');
+
+  expect(screen.getByRole('group', { name: 'Diabetes Mellitus' })).toBeInTheDocument();
+  expect(searchBox).toHaveFocus();
 });

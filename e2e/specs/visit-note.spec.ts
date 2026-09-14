@@ -15,12 +15,17 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
-    await expect(page.getByText('Visit Note', { exact: true })).toBeVisible();
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
   await test.step('When I add `Asthma` as a primary, confirmed diagnosis', async () => {
     await page.getByPlaceholder('Choose a diagnosis').fill('Asthma');
-    await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
+    // Search results are keyboard-accessible buttons: ArrowDown focuses the first result,
+    // Enter selects it and returns focus to the input
+    await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeVisible();
+    await page.getByPlaceholder('Choose a diagnosis').press('ArrowDown');
+    await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
+    await page.keyboard.press('Enter');
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
     // The first diagnosis defaults to primary when a primary is required
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
@@ -32,7 +37,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
 
   await test.step('And I add `GI upset`, leaving it presumed secondary and provisional', async () => {
     await page.getByPlaceholder('Choose a diagnosis').fill('GI upset');
-    await page.getByRole('menuitem', { name: /gi upset/i }).click();
+    await page.getByRole('button', { name: /gi upset/i }).click();
     // Unticked checkboxes mean secondary + provisional are presumed — no clicks needed.
     await expect(page.getByRole('group', { name: /gi upset/i })).toBeVisible();
   });
@@ -95,6 +100,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('Then the visit note form should open in edit mode with the existing note prefilled', async () => {
+    await expect(page.getByText('Edit visit note', { exact: true })).toBeVisible();
     await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
   });
 

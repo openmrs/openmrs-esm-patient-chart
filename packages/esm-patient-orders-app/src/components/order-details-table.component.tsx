@@ -337,6 +337,25 @@ const OrderDetailsTable: React.FC<OrderDetailsProps> = ({
       onBeforeGetContentResolve.current = null;
       setIsPrinting(false);
     },
+    pageStyle: `
+      @page {
+        /* Remove browser default header (title) and footer (url) */
+        margin: 0;
+      }
+      @media print {
+        html,
+        body {
+          /* Tell browsers to print background colors */
+          -webkit-print-color-adjust: exact;
+          color-adjust: exact;
+          margin: 0 !important;
+          width: fit-content;
+          padding: 0 !important;
+          overflow: hidden;
+          page-break-inside: avoid;
+        }
+      }
+    `,
   });
 
   const orderTypesToDisplay = useMemo(

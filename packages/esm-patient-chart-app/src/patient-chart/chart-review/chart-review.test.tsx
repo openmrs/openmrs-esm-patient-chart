@@ -2,12 +2,7 @@ import React from 'react';
 import { vi, describe, expect, test } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
-import {
-  type AssignedExtension,
-  type ExtensionSlotState,
-  useAssignedExtensions,
-  useExtensionStore,
-} from '@openmrs/esm-framework';
+import { useAssignedExtensions, useExtensionStore } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import ChartReview from './chart-review.component';
 
@@ -30,7 +25,7 @@ describe('ChartReview', () => {
     const mockStore = {
       slots: {
         'patient-chart-dashboard-slot': {
-          assignedExtensions: [
+          candidateExtensions: [
             {
               name: 'charts-summary-dashboard',
               meta: {
@@ -47,16 +42,16 @@ describe('ChartReview', () => {
                 title: 'Test Results',
               },
             },
-          ] as unknown as AssignedExtension[],
+          ],
         },
         'patient-chart-summary-dashboard-slot': {
-          assignedExtensions: [],
+          candidateExtensions: [],
         },
-      } as Record<string, ExtensionSlotState>,
+      },
     };
 
     mockUseExtensionStore.mockReturnValue(mockStore as unknown as ReturnType<typeof useExtensionStore>);
-    mockUseAssignedExtensions.mockImplementation((slotName) => mockStore.slots[slotName]?.assignedExtensions ?? []);
+    mockUseAssignedExtensions.mockImplementation((slotName) => mockStore.slots[slotName]?.candidateExtensions ?? []);
 
     render(
       <BrowserRouter>
