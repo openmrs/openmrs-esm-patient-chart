@@ -15,6 +15,21 @@
   outline-offset: 1px;
 }
 
+// Body-portaled, viewport-positioned: escapes the table's overflow:auto scroll container
+// and the chart's transformed ancestors (both clip or misplace in-place popovers)
+.tagTooltip {
+  @include type.type-style('body-compact-01');
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 9000;
+  max-width: 18rem;
+  padding: layout.$spacing-01 layout.$spacing-03;
+  border-radius: 2px;
+  background-color: colors.$gray-80;
+  color: colors.$white-0;
+  pointer-events: none;
+}
+
 .certaintySuffix {
   @include type.type-style('label-01');
   margin-left: layout.$spacing-01;
