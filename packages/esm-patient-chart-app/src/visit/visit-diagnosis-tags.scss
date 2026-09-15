@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 
@@ -9,8 +10,15 @@
   gap: layout.$spacing-02;
 }
 
+.diagnosisTag:focus-visible {
+  outline: 2px solid colors.$blue-60;
+  outline-offset: 1px;
+}
+
 .certaintySuffix {
   @include type.type-style('label-01');
   margin-left: layout.$spacing-01;
   white-space: nowrap;
+  // The name truncates; the certainty must stay fully visible inside the tag
+  flex-shrink: 0;
 }

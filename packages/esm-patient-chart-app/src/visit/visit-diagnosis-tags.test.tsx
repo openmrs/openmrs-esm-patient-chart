@@ -23,12 +23,15 @@ describe('VisitDiagnosisTags', () => {
     expect(screen.getByText('(Confirmed)')).toBeInTheDocument();
     expect(screen.getByText('(Provisional)')).toBeInTheDocument();
 
-    // The full diagnosis name stays revealable when truncated
-    expect(screen.getByTitle('Pneumonia')).toHaveTextContent('Pneumonia');
-    expect(screen.getByTitle('Malaria')).toHaveTextContent('Malaria');
+    // Each pill is keyboard-focusable and carries a Carbon tooltip describing it with the
+    // full name, so truncated names stay revealable on hover and focus
+    const [pneumoniaTag, malariaTag, fatigueTag] = screen.getAllByTestId('diagnosis-tag');
+    expect(pneumoniaTag).toHaveAccessibleDescription('Pneumonia');
+    expect(pneumoniaTag).toHaveAttribute('tabindex', '0');
+    expect(malariaTag).toHaveAccessibleDescription('Malaria');
 
     // Unknown certainty: tag renders with the name only
-    expect(screen.getByTitle('Fatigue')).toBeInTheDocument();
+    expect(fatigueTag).toHaveTextContent('Fatigue');
     expect(screen.queryByText('(REFUTED)')).not.toBeInTheDocument();
   });
 });

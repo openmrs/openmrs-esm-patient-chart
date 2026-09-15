@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { type DedupedDiagnosis } from './dedupe-diagnoses';
 import styles from './visit-diagnosis-tags.scss';
@@ -25,8 +26,8 @@ interface VisitDiagnosisTagsProps {
  *
  * The tag markup is rendered directly with Carbon's public tag classes because Carbon's
  * `Tag` component force-writes its own `title` onto the label span, which prevents
- * composing the label from name + certainty while keeping the full-name reveal for
- * truncated diagnoses.
+ * composing the label from name + certainty; the full-name reveal for truncated
+ * diagnoses is a Carbon Tooltip on the whole pill instead (hover and keyboard focus).
  */
 const VisitDiagnosisTags: React.FC<VisitDiagnosisTagsProps> = ({ diagnoses }) => {
   const { t } = useTranslation();
@@ -47,16 +48,25 @@ const VisitDiagnosisTags: React.FC<VisitDiagnosisTagsProps> = ({ diagnoses }) =>
           diagnosis.rank === 1 ? diagnosisTags?.primaryColor ?? 'red' : diagnosisTags?.secondaryColor ?? 'blue';
 
         return (
-          <span
-            key={diagnosis.uuid}
-            className={classNames('cds--tag', 'cds--tag--md', 'cds--layout--size-md', `cds--tag--${color}`)}
-          >
-            {/* title keeps the full name revealable when a long diagnosis is truncated */}
-            <span className="cds--tag__label" title={diagnosis.display}>
-              {diagnosis.display}
+          // The tooltip reveals the full name (the label truncates, the certainty suffix
+          // does not) on hover and keyboard focus; `description` keeps the pill's own
+          // text — name and certainty — announced to screen readers
+          <Tooltip key={diagnosis.uuid} align="bottom" autoAlign description={diagnosis.display}>
+            <span
+              className={classNames(
+                'cds--tag',
+                'cds--tag--md',
+                'cds--layout--size-md',
+                `cds--tag--${color}`,
+                styles.diagnosisTag,
+              )}
+              data-testid="diagnosis-tag"
+              tabIndex={0}
+            >
+              <span className="cds--tag__label">{diagnosis.display}</span>
+              {certaintyLabel && <span className={styles.certaintySuffix}>({certaintyLabel})</span>}
             </span>
-            {certaintyLabel && <span className={styles.certaintySuffix}>({certaintyLabel})</span>}
-          </span>
+          </Tooltip>
         );
       })}
     </div>

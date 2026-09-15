@@ -104,8 +104,8 @@ describe('VisitSummary', () => {
 
     render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
-    const malariaTag = screen.getByText(/^malaria, confirmed$/i);
-    const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i);
+    const malariaTag = screen.getByText(/^malaria, confirmed$/i, { selector: '.cds--tag__label' });
+    const hivTag = screen.getByText(/human immunodeficiency virus \(hiv\)/i, { selector: '.cds--tag__label' });
 
     expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
     expect(malariaTag).toBeInTheDocument();
@@ -120,8 +120,8 @@ describe('VisitSummary', () => {
     render(<VisitSummary patientUuid={mockPatient.id} visit={mockVisit} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Malaria, confirmed$/)).toBeInTheDocument();
-    expect(screen.getByText(/HUMAN IMMUNODEFICIENCY VIRUS/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Malaria, confirmed$/, { selector: '.cds--tag__label' })).toBeInTheDocument();
+    expect(screen.getByText(/HUMAN IMMUNODEFICIENCY VIRUS/i, { selector: '.cds--tag__label' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Medication/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Notes/i })).toBeInTheDocument();
