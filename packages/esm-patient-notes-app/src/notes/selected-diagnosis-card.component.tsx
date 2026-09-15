@@ -28,18 +28,11 @@ export function nextDraftId(): number {
 
 interface SelectedDiagnosisCardProps {
   diagnosis: DiagnosisDraft;
-  /** Marks the Primary checkbox invalid while the note is missing a required primary diagnosis. */
-  primaryInvalid?: boolean;
   onRemove: (diagnosis: DiagnosisDraft) => void;
   onUpdate: (diagnosis: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => void;
 }
 
-export default function SelectedDiagnosisCard({
-  diagnosis,
-  primaryInvalid = false,
-  onRemove,
-  onUpdate,
-}: SelectedDiagnosisCardProps) {
+export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }: SelectedDiagnosisCardProps) {
   const { t } = useTranslation();
 
   // The values presumed by the unticked checkboxes, spelled out so the row always states
@@ -61,7 +54,6 @@ export default function SelectedDiagnosisCard({
         <Checkbox
           checked={diagnosis.rank === 1}
           id={`diagnosis-${diagnosis.draftId}-primary`}
-          invalid={primaryInvalid}
           labelText={t('primary', 'Primary')}
           onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
         />

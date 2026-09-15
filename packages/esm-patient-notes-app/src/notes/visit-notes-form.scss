@@ -174,13 +174,9 @@
 }
 
 .errorMessage {
-  color: colors.$red-60;
-  margin-top: layout.$spacing-03;
-}
-
-.errorMessage {
   @include type.type-style('label-02');
   color: colors.$red-60;
+  margin-top: layout.$spacing-03;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {

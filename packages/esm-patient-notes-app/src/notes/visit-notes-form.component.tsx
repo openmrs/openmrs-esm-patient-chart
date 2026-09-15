@@ -141,15 +141,15 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
 
       // Every diagnosis is always complete (secondary/provisional are presumed defaults),
-      // so the only diagnosis-level rule left is the primary requirement. It is keyed off
-      // the search field so the message renders beside the Primary controls instead of
-      // beneath the search input (which also stole focus there).
+      // so the only diagnosis-level rule left is the primary requirement. It belongs to the
+      // diagnosis group as a whole, so the message renders once below the diagnosis list
+      // rather than beneath the search input (which also stole focus there).
       if (isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1)) {
         return {
           ...zodResult,
           // `diagnoses` is deliberately not a registered field (no input should adopt this
           // error), which RHF's typed field paths cannot express — hence the cast. The
-          // message itself renders from state beside the Primary controls.
+          // message itself renders from state below the diagnosis list.
           errors: {
             ...zodResult.errors,
             diagnoses: {
@@ -490,12 +490,27 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     ],
   );
 
-  const onError = (errors) => console.error(errors);
+  const onError = useCallback(
+    (errors: FieldErrors<VisitNotesFormData>) => {
+      console.error(errors);
+      // A failed save lands focus on the first Primary checkbox so the missing primary can
+      // be fixed in place (or on the search input when nothing has been selected yet)
+      if ('diagnoses' in errors) {
+        const firstDraftId = selectedDiagnoses[0]?.draftId;
+        const target =
+          firstDraftId === undefined
+            ? document.getElementById('diagnosisSearch')
+            : document.getElementById(`diagnosis-${firstDraftId}-primary`);
+        target?.focus();
+      }
+    },
+    [selectedDiagnoses],
+  );
 
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0 || diagnosesTouched;
 
-  // Rendered beside the Primary controls (not beneath the search input); computed live so
-  // the message and invalid state clear the moment a primary is ticked
+  // A single group-level message rendered below the diagnosis list (the unchecked Primary
+  // boxes themselves stay neutral); computed live so it clears the moment a primary is ticked
   const showPrimaryRequiredError =
     isSubmitted && isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1);
 
@@ -579,11 +594,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     t={t}
                     value={watch('diagnosisSearch')}
                   />
-                  {showPrimaryRequiredError && (
-                    <p className={styles.errorMessage} role="alert">
-                      {t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
-                    </p>
-                  )}
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
@@ -604,7 +614,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}
                           diagnosis={diagnosis}
-                          primaryInvalid={showPrimaryRequiredError}
                           onRemove={handleRemoveDiagnosis}
                           onUpdate={handleUpdateDiagnosis}
                         />
@@ -613,6 +622,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   ) : (
                     <p className={styles.diagnosesText}>
                       {t('noDiagnosisSelectedText', 'No diagnosis selected — Enter a diagnosis above')}
+                    </p>
+                  )}
+                  {showPrimaryRequiredError && (
+                    <p className={styles.errorMessage} role="alert">
+                      {t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
                     </p>
                   )}
                 </FormGroup>

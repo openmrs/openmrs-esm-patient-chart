@@ -296,17 +296,22 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
   await user.click(submitButton);
 
+  // With nothing selected yet, the failed save reports the requirement and focuses the search input
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(screen.getByPlaceholderText('Choose a diagnosis')).toHaveFocus();
 
   // The first diagnosis added defaults to primary, clearing the requirement with no extra step
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
   expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
 
-  // Deliberately unticking the only primary re-raises the error on submit, beside the controls
+  // Deliberately unticking the only primary re-raises the group-level error on submit; the
+  // Primary checkbox stays neutral (no invalid state) and receives focus for the fix
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   await user.click(submitButton);
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
   // Re-ticking Primary clears the error without another submit; certainty stays provisional
@@ -744,6 +749,23 @@ test('requires primary diagnosis when isPrimaryDiagnosisRequired is true', async
 
   // Should not attempt to save
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
+
+  // The requirement belongs to the diagnosis group: with several diagnoses and no primary,
+  // the message renders once, both Primary checkboxes stay neutral, and the failed save
+  // focuses the first one
+  const firstCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: false });
+  const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II', { primary: false });
+  await user.click(submitButton);
+
+  expect(screen.getAllByText(/choose at least one primary diagnosis/i)).toHaveLength(1);
+  expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
+  expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
+  expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
+  expect(mockSaveVisitNote).not.toHaveBeenCalled();
+
+  // Ticking any primary clears the group message without another submit
+  await user.click(within(secondCard).getByRole('checkbox', { name: 'Primary' }));
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
 
   // Reset mock for other tests
   mockUseConfig.mockReturnValue({
