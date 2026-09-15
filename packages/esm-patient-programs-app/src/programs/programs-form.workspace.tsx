@@ -38,6 +38,7 @@ import {
   updateProgramEnrollment,
   useAvailablePrograms,
   useEnrollments,
+  useProgramDetails,
 } from './programs.resource';
 import styles from './programs-form.scss';
 
@@ -45,7 +46,7 @@ export interface ProgramsFormProps {
   programEnrollmentId?: string;
 }
 
-const createProgramsFormSchema = (t: TFunction) =>
+const createProgramsFormSchema = (t: TFunction, programsWithOutcomes: string[] = []) =>
   z
     .object({
       selectedProgram: z.string().refine((value) => !!value, t('programRequired', 'Program is required')),
@@ -53,6 +54,7 @@ const createProgramsFormSchema = (t: TFunction) =>
       completionDate: z.date().optional().nullable(),
       enrollmentLocation: z.string(),
       selectedProgramStatus: z.string(),
+      selectedOutcome: z.string().optional(),
     })
     .superRefine((data, ctx) => {
       if (
@@ -67,6 +69,13 @@ const createProgramsFormSchema = (t: TFunction) =>
             'Completion date cannot be before the enrollment date',
           ),
           path: ['completionDate'],
+        });
+      }
+      if (data.completionDate && programsWithOutcomes.includes(data.selectedProgram) && !data.selectedOutcome) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('programOutcomeRequired', 'Program outcome is required when completing a program'),
+          path: ['selectedOutcome'],
         });
       }
     });
@@ -85,9 +94,15 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
   const { data: enrollments, mutateEnrollments } = useEnrollments(patientUuid);
   const { showProgramStatusField } = useConfig<ConfigObject>();
   const inEditMode = Boolean(programEnrollmentId);
+  const programsWithOutcomes = useMemo(
+    () => (availablePrograms ?? []).filter((program) => program.outcomesConcept?.uuid).map((program) => program.uuid),
+    [availablePrograms],
+  );
 
-  const programsFormSchema = useMemo(() => createProgramsFormSchema(t), [t]);
-
+  const programsFormSchema = useMemo(
+    () => createProgramsFormSchema(t, programsWithOutcomes),
+    [t, programsWithOutcomes],
+  );
   const currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid === programEnrollmentId)[0];
   const currentProgram = currentEnrollment
     ? {
@@ -95,7 +110,6 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
         ...currentEnrollment.program,
       }
     : null;
-
   const eligiblePrograms = currentProgram
     ? [currentProgram]
     : availablePrograms.filter((program) => {
@@ -126,18 +140,37 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
       completionDate: currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
       enrollmentLocation: getLocationUuid() ?? '',
       selectedProgramStatus: currentState?.state.uuid ?? '',
+      selectedOutcome: currentEnrollment?.outcome?.uuid ?? '',
     },
   });
 
   const selectedProgram = useWatch({ control, name: 'selectedProgram' });
 
+  const selectedProgramData =
+    availablePrograms?.find((program) => program.uuid === selectedProgram) ??
+    (currentProgram?.uuid === selectedProgram
+      ? currentProgram
+      : eligiblePrograms.find((program) => program.uuid === selectedProgram));
+
+  const { program: selectedProgramDetails, isLoading: outcomesLoading } = useProgramDetails(selectedProgramData?.uuid);
+
+  const outcomes = selectedProgramDetails?.outcomesConcept?.setMembers ?? [];
+
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
-      const { selectedProgram, enrollmentDate, completionDate, enrollmentLocation, selectedProgramStatus } = data;
+      const {
+        selectedProgram,
+        enrollmentDate,
+        completionDate,
+        enrollmentLocation,
+        selectedProgramStatus,
+        selectedOutcome,
+      } = data;
 
       const payload = {
         patient: patientUuid,
         program: selectedProgram,
+        outcome: selectedOutcome ? { uuid: selectedOutcome } : null,
         dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
         // The date picker emits midnight timestamps, which the backend would reject as "before" a
         // same-day enrollment. Align those to the enrollment timestamp, but preserve stored
@@ -286,6 +319,32 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
     workflowStates = currentProgram.allWorkflows[0].states;
   }
 
+  const programOutcomeDropdown = (
+    <Controller
+      name="selectedOutcome"
+      control={control}
+      render={({ field: { onChange, value } }) => (
+        <Select
+          aria-label={t('programOutcome', 'Program outcome')}
+          id="programOutcome"
+          invalid={!!errors?.selectedOutcome}
+          invalidText={errors?.selectedOutcome?.message}
+          labelText={t('programOutcome', 'Program outcome')}
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+          disabled={outcomesLoading}
+        >
+          <SelectItem text={t('chooseOutcome', 'Choose an outcome')} value="" />
+          {outcomes.map((outcome) => (
+            <SelectItem key={outcome.uuid} text={outcome.display} value={outcome.uuid}>
+              {outcome.display}
+            </SelectItem>
+          ))}
+        </Select>
+      )}
+    />
+  );
+
   const programStatusDropdown = (
     <Controller
       name="selectedProgramStatus"
@@ -345,6 +404,14 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
       style: { width: '50%' },
       legendText: '',
       value: programStatusDropdown,
+    });
+  }
+
+  if (outcomes.length > 0) {
+    formGroups.push({
+      style: { width: '50%' },
+      legendText: '',
+      value: programOutcomeDropdown,
     });
   }
 

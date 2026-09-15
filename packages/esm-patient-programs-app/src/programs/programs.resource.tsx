@@ -1,9 +1,10 @@
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { filter, includes, map, uniqBy } from 'lodash-es';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import type { PatientProgram, Program, ProgramWorkflowState, ProgramsFetchResponse } from '../types';
 
-export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
+export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),outcome:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
 
 export function useEnrollments(patientUuid: string) {
   const enrollmentsUrl = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
@@ -31,7 +32,7 @@ export function useEnrollments(patientUuid: string) {
 
 export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Program> } }, Error>(
-    `${restBaseUrl}/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
+    `${restBaseUrl}/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display),outcomesConcept:(uuid,display))`,
     openmrsFetch,
   );
 
@@ -50,17 +51,34 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
   };
 }
 
+export function useProgramDetails(programUuid?: string) {
+  const url = programUuid ? `${restBaseUrl}/program/${programUuid}?v=full` : null;
+
+  const { data, error, isLoading } = useSWRImmutable<
+    {
+      data: Program;
+    },
+    Error
+  >(url, openmrsFetch);
+
+  return {
+    program: data?.data,
+    error,
+    isLoading,
+  };
+}
+
 export function createProgramEnrollment(payload, abortController) {
   if (!payload) {
     return null;
   }
-  const { program, patient, dateEnrolled, dateCompleted, location, states } = payload;
+  const { program, patient, dateEnrolled, dateCompleted, location, states, outcome } = payload;
   return openmrsFetch(`${restBaseUrl}/programenrollment`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: { program, patient, dateEnrolled, dateCompleted, location, states },
+    body: { program, patient, dateEnrolled, dateCompleted, location, states, outcome },
     signal: abortController.signal,
   });
 }
@@ -69,13 +87,13 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
   if (!payload && !payload.program) {
     return null;
   }
-  const { dateEnrolled, dateCompleted, location, states } = payload;
+  const { dateEnrolled, dateCompleted, location, states, outcome } = payload;
   return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: { dateEnrolled, dateCompleted, location, states },
+    body: { dateEnrolled, dateCompleted, location, states, outcome },
     signal: abortController.signal,
   });
 }

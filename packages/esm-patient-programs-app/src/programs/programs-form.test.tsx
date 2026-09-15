@@ -24,6 +24,7 @@ import {
   updateProgramEnrollment,
   useAvailablePrograms,
   useEnrollments,
+  useProgramDetails,
 } from './programs.resource';
 import ProgramsForm, { type ProgramsFormProps } from './programs-form.workspace';
 import { type ConfigObject, configSchema } from '../config-schema';
@@ -31,6 +32,7 @@ import { type PatientWorkspace2DefinitionProps } from '@openmrs/esm-patient-comm
 
 const mockUseAvailablePrograms = vi.mocked(useAvailablePrograms);
 const mockUseEnrollments = vi.mocked(useEnrollments);
+const mockUseProgramDetails = vi.mocked(useProgramDetails);
 const mockCreateProgramEnrollment = vi.mocked(createProgramEnrollment);
 const mockUpdateProgramEnrollment = vi.mocked(updateProgramEnrollment);
 const mockShowSnackbar = vi.mocked(showSnackbar);
@@ -60,6 +62,7 @@ vi.mock('./programs.resource', () => ({
   updateProgramEnrollment: vi.fn(),
   useAvailablePrograms: vi.fn(),
   useEnrollments: vi.fn(),
+  useProgramDetails: vi.fn(() => ({ program: undefined, isLoading: false, error: undefined })),
   findLastState: vi.fn(),
 }));
 
@@ -67,7 +70,7 @@ mockUseLocations.mockReturnValue(mockLocationsResponse);
 
 mockUseAvailablePrograms.mockReturnValue({
   data: mockCareProgramsResponse,
-  eligiblePrograms: [],
+  eligiblePrograms: mockCareProgramsResponse,
   error: null,
   isLoading: false,
 });
@@ -267,6 +270,171 @@ describe('ProgramsForm', () => {
       }),
       new AbortController(),
     );
+  });
+
+  it('renders the outcome dropdown for a program with configured outcomes', async () => {
+    const user = userEvent.setup();
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    mockUseProgramDetails.mockReturnValue({
+      program: {
+        ...mockCareProgramsResponse[1],
+        outcomesConcept: {
+          uuid: 'outcome-concept-uuid',
+          display: 'Program Outcome',
+          setMembers: [
+            {
+              uuid: 'outcome-completed',
+              display: 'Completed Successfully',
+            },
+          ],
+        },
+      },
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+
+    expect(screen.getByRole('combobox', { name: /program outcome/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /completed successfully/i })).toBeInTheDocument();
+  });
+
+  it('requires an outcome when completing a program that has configured outcomes', async () => {
+    const user = userEvent.setup();
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    mockUseAvailablePrograms.mockReturnValue({
+      data: [
+        ...mockCareProgramsResponse.slice(0, 1),
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        ...mockCareProgramsResponse.slice(2),
+      ],
+      eligiblePrograms: [
+        ...mockCareProgramsResponse.slice(0, 1),
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        ...mockCareProgramsResponse.slice(2),
+      ],
+      error: null,
+      isLoading: false,
+    });
+
+    mockUseProgramDetails.mockReturnValue({
+      program: {
+        ...mockCareProgramsResponse[1],
+        outcomesConcept: {
+          uuid: 'outcome-concept-uuid',
+          display: 'Program Outcome',
+          setMembers: [
+            {
+              uuid: 'outcome-completed',
+              display: 'Completed Successfully',
+            },
+          ],
+        },
+      },
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.click(completionDateInput);
+    await user.paste(dayjs().format('YYYY-MM-DD'));
+    await user.tab();
+    await user.click(saveButton);
+
+    expect(screen.getByText(/program outcome is required when completing a program/i)).toBeInTheDocument();
+    expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
+  });
+
+  it('submits the selected outcome when completing a program', async () => {
+    const user = userEvent.setup();
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    mockUseProgramDetails.mockReturnValue({
+      program: {
+        ...mockCareProgramsResponse[1],
+        outcomesConcept: {
+          uuid: 'outcome-concept-uuid',
+          display: 'Program Outcome',
+          setMembers: [
+            {
+              uuid: 'outcome-completed',
+              display: 'Completed Successfully',
+            },
+          ],
+        },
+      },
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const completionDateInput = screen.getByRole('textbox', { name: /date completed/i });
+    const outcomeInput = screen.getByRole('combobox', { name: /program outcome/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+    await user.click(completionDateInput);
+    await user.paste(dayjs().format('YYYY-MM-DD'));
+    await user.tab();
+    await user.selectOptions(outcomeInput, ['outcome-completed']);
+    await user.click(saveButton);
+
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledTimes(1);
+    expect(mockCreateProgramEnrollment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        program: oncologyScreeningProgramUuid,
+        outcome: { uuid: 'outcome-completed' },
+      }),
+      new AbortController(),
+    );
+  });
+
+  it('does not render the outcome dropdown for a program without configured outcomes', async () => {
+    const user = userEvent.setup();
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    mockUseProgramDetails.mockReturnValue({
+      program: {
+        ...mockCareProgramsResponse[1],
+        outcomesConcept: undefined,
+      },
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+
+    expect(screen.queryByRole('combobox', { name: /program outcome/i })).not.toBeInTheDocument();
   });
 
   it('renders the programs status field if the config property is set to true', async () => {

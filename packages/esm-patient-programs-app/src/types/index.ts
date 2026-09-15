@@ -15,7 +15,7 @@ export interface PatientProgram {
     links?: Links;
   };
   voided?: boolean;
-  outcome?: null;
+  outcome?: DisplayMetadata;
   states?: ProgramWorkflowState[];
   links?: Links;
   resourceVersion?: string;
@@ -52,6 +52,7 @@ export interface Program {
   uuid: string;
   display: string;
   name: string;
+  outcomesConcept?: DisplayMetadata & { setMembers?: Array<{ uuid: string; display: string }> };
   allWorkflows: Array<{
     uuid: string;
     concept: DisplayMetadata;
