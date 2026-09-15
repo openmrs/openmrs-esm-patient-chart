@@ -51,7 +51,9 @@ const VisitDiagnosisTags: React.FC<VisitDiagnosisTagsProps> = ({ diagnoses }) =>
           // The tooltip reveals the full name (the label truncates, the certainty suffix
           // does not) on hover and keyboard focus; `description` keeps the pill's own
           // text — name and certainty — announced to screen readers
-          <Tooltip key={diagnosis.uuid} align="bottom" autoAlign description={diagnosis.display}>
+          // No autoAlign: its fixed-position placement breaks inside the chart's
+          // transformed ancestors; static bottom alignment stays anchored to the pill
+          <Tooltip key={diagnosis.uuid} align="bottom" description={diagnosis.display}>
             <span
               className={classNames(
                 'cds--tag',
