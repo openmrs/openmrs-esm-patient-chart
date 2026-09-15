@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import {
   Button,
@@ -80,16 +80,42 @@ interface DiagnosisSearchProps {
   setIsSearching: (isSearching: boolean) => void;
 }
 
-const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) => {
+const hasPrimaryDiagnosis = (diagnoses: Array<DiagnosisDraft>) => diagnoses.some((diagnosis) => diagnosis.rank === 1);
+
+const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean, isPrimaryDiagnosisRequired: boolean) => {
   return z.object({
     noteDate: isRetrospectiveDataEntryEnabled ? z.date() : z.date().optional(),
     diagnosisSearch: z.string().optional(),
+    // Every diagnosis is always complete (secondary/provisional are presumed defaults), so the
+    // only diagnosis-level rule is the primary requirement, which belongs to the list as a whole
+    diagnoses: z
+      .array(z.custom<DiagnosisDraft>())
+      .refine((diagnoses) => !isPrimaryDiagnosisRequired || hasPrimaryDiagnosis(diagnoses), {
+        message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
+      }),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
   });
 };
 
 const SEARCH_TIMEOUT_MS = 500;
+
+/**
+ * The diagnoses already recorded on the note being edited. Values outside the known enums
+ * (possible from other REST writers) fall back to the same presumption the checkboxes express:
+ * secondary and provisional.
+ */
+const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
+  (encounter?.diagnoses ?? []).map(
+    (d): DiagnosisDraft => ({
+      draftId: nextDraftId(),
+      patient: patientUuid,
+      diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
+      certainty: d.certainty === 'CONFIRMED' ? 'CONFIRMED' : 'PROVISIONAL',
+      rank: d.rank === 1 ? 1 : 2,
+      display: d.display,
+    }),
+  );
 
 export interface VisitNotesFormProps {
   encounter?: Encounter;
@@ -122,9 +148,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     config.visitNoteConfig;
   const [isLoadingDiagnoses, setIsLoadingDiagnoses] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedDiagnoses, setSelectedDiagnoses] = useState<Array<DiagnosisDraft>>([]);
-  // Diagnosis edits live outside react-hook-form, so track them separately for unsaved-changes state.
-  const [diagnosesTouched, setDiagnosesTouched] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<Concept>>(null);
   const [rows, setRows] = useState<number>();
   const [error, setError] = useState<Error>(null);
@@ -132,50 +155,25 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
-    () => createSchema(t, isRetrospectiveDataEntryEnabled),
-    [t, isRetrospectiveDataEntryEnabled],
+    () => createSchema(t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired),
+    [t, isRetrospectiveDataEntryEnabled, isPrimaryDiagnosisRequired],
   );
 
-  const customResolver = useCallback(
-    async (data, context, options) => {
-      const zodResult = await zodResolver(visitNoteFormSchema)(data, context, options);
-
-      // Every diagnosis is always complete (secondary/provisional are presumed defaults),
-      // so the only diagnosis-level rule left is the primary requirement. It belongs to the
-      // diagnosis group as a whole, so the message renders once below the diagnosis list
-      // rather than beneath the search input (which also stole focus there).
-      if (isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1)) {
-        return {
-          ...zodResult,
-          // `diagnoses` is deliberately not a registered field (no input should adopt this
-          // error), which RHF's typed field paths cannot express — hence the cast. The
-          // message itself renders from state below the diagnosis list.
-          errors: {
-            ...zodResult.errors,
-            diagnoses: {
-              type: 'custom',
-              message: t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis'),
-            },
-          } as unknown as FieldErrors<VisitNotesFormData>,
-        };
-      }
-
-      return zodResult;
-    },
-    [visitNoteFormSchema, isPrimaryDiagnosisRequired, selectedDiagnoses, t],
-  );
+  const [initialDiagnoses] = useState(() => toDiagnosisDrafts(encounter, patientUuid));
 
   const {
     control,
-    formState: { dirtyFields, isSubmitted, isSubmitting },
+    formState: { dirtyFields, isSubmitting },
+    getValues,
     handleSubmit,
     setValue,
     watch,
   } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
-    resolver: customResolver,
+    resolver: zodResolver(visitNoteFormSchema),
     defaultValues: {
       diagnosisSearch: '',
+      diagnoses: initialDiagnoses,
       noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
         ? String(encounter?.obs?.find((obs) => obs.concept.uuid === encounterNoteTextConceptUuid)?.value || '')
@@ -183,29 +181,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     },
   });
 
-  useEffect(() => {
-    if (encounter?.diagnoses?.length) {
-      try {
-        const transformedDiagnoses = encounter.diagnoses.map(
-          (d): DiagnosisDraft => ({
-            draftId: nextDraftId(),
-            patient: patientUuid,
-            diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
-            // Values outside the known enums (possible from other REST writers) fall back to
-            // the same presumption the checkboxes express: secondary and provisional.
-            certainty: d.certainty === 'CONFIRMED' ? ('CONFIRMED' as const) : ('PROVISIONAL' as const),
-            rank: d.rank === 1 ? (1 as const) : (2 as const),
-            display: d.display,
-          }),
-        );
-
-        setSelectedDiagnoses(transformedDiagnoses);
-      } catch (err) {
-        setError(new Error(t('errorTransformingDiagnoses', 'Error transforming diagnoses')));
-        createErrorHandler();
-      }
-    }
-  }, [encounter, patientUuid, t]);
+  const {
+    field: { value: selectedDiagnoses, onChange: setSelectedDiagnoses },
+    fieldState: { error: diagnosesError },
+  } = useController({ name: 'diagnoses', control });
 
   const currentImages = watch('images');
 
@@ -266,42 +245,41 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const handleAddDiagnosis = useCallback(
     (conceptDiagnosisToAdd: Concept) => {
-      setValue('diagnosisSearch', '');
+      setValue('diagnosisSearch', '', { shouldDirty: true });
       setSearchResults([]);
-      setSelectedDiagnoses((diagnoses) => {
-        // Guards against a double-click on the same result racing the render-time filter
-        if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
-          return diagnoses;
-        }
-        // When a primary diagnosis is required and none is marked yet, default this one to
-        // primary (still changeable) so a single-diagnosis note needs no extra step
-        const rank = isPrimaryDiagnosisRequired && !diagnoses.some((diagnosis) => diagnosis.rank === 1) ? 1 : 2;
-        return [...diagnoses, createDiagnosis(conceptDiagnosisToAdd, rank)];
-      });
-      setDiagnosesTouched(true);
+      const diagnoses = getValues('diagnoses');
+      // Guards against a double-click on the same result racing the render-time filter
+      if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
+        return;
+      }
+      // When a primary diagnosis is required and none is marked yet, default this one to
+      // primary (still changeable) so a single-diagnosis note needs no extra step
+      const rank = isPrimaryDiagnosisRequired && !hasPrimaryDiagnosis(diagnoses) ? 1 : 2;
+      setSelectedDiagnoses([...diagnoses, createDiagnosis(conceptDiagnosisToAdd, rank)]);
     },
-    [createDiagnosis, setValue, isPrimaryDiagnosisRequired],
+    [createDiagnosis, getValues, isPrimaryDiagnosisRequired, setSelectedDiagnoses, setValue],
   );
 
-  const handleRemoveDiagnosis = useCallback((diagnosisToRemove: DiagnosisDraft) => {
-    setSelectedDiagnoses((diagnoses) =>
-      diagnoses.filter((diagnosis) => diagnosis.draftId !== diagnosisToRemove.draftId),
-    );
-    setDiagnosesTouched(true);
-    // The focused remove button unmounts with its card; return focus to the search input
-    document.getElementById('diagnosisSearch')?.focus();
-  }, []);
+  const handleRemoveDiagnosis = useCallback(
+    (diagnosisToRemove: DiagnosisDraft) => {
+      setSelectedDiagnoses(
+        getValues('diagnoses').filter((diagnosis) => diagnosis.draftId !== diagnosisToRemove.draftId),
+      );
+      // The focused remove button unmounts with its card; return focus to the search input
+      document.getElementById('diagnosisSearch')?.focus();
+    },
+    [getValues, setSelectedDiagnoses],
+  );
 
   const handleUpdateDiagnosis = useCallback(
     (diagnosisToUpdate: DiagnosisDraft, patch: Partial<Pick<DiagnosisDraft, 'rank' | 'certainty'>>) => {
-      setSelectedDiagnoses((diagnoses) =>
-        diagnoses.map((diagnosis) =>
+      setSelectedDiagnoses(
+        getValues('diagnoses').map((diagnosis) =>
           diagnosis.draftId === diagnosisToUpdate.draftId ? { ...diagnosis, ...patch } : diagnosis,
         ),
       );
-      setDiagnosesTouched(true);
     },
-    [],
+    [getValues, setSelectedDiagnoses],
   );
 
   const isDiagnosisNotSelected = (diagnosis: Concept) =>
@@ -344,7 +322,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
-      const { noteDate, clinicalNote, images } = data;
+      const { noteDate, clinicalNote, images, diagnoses } = data;
 
       let finalNoteDate = dayjs(noteDate);
       const now = new Date();
@@ -407,7 +385,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         })
         .then((encounterUuid) => {
           return Promise.all(
-            selectedDiagnoses.map((diagnosis) => {
+            diagnoses.map((diagnosis) => {
               const diagnosesPayload: DiagnosisPayload = {
                 encounter: encounterUuid,
                 patient: patientUuid,
@@ -485,7 +463,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       mutateVisitNotes,
       patientUuid,
       providerUuid,
-      selectedDiagnoses,
       t,
     ],
   );
@@ -495,8 +472,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       console.error(errors);
       // A failed save lands focus on the first Primary checkbox so the missing primary can
       // be fixed in place (or on the search input when nothing has been selected yet)
-      if ('diagnoses' in errors) {
-        const firstDraftId = selectedDiagnoses[0]?.draftId;
+      if (errors.diagnoses) {
+        const firstDraftId = getValues('diagnoses')[0]?.draftId;
         const target =
           firstDraftId === undefined
             ? document.getElementById('diagnosisSearch')
@@ -504,15 +481,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         target?.focus();
       }
     },
-    [selectedDiagnoses],
+    [getValues],
   );
 
-  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0 || diagnosesTouched;
-
-  // A single group-level message rendered below the diagnosis list (the unchecked Primary
-  // boxes themselves stay neutral); computed live so it clears the moment a primary is ticked
-  const showPrimaryRequiredError =
-    isSubmitted && isPrimaryDiagnosisRequired && !selectedDiagnoses.some((diagnosis) => diagnosis.rank === 1);
+  const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
   return (
     <Workspace2
@@ -624,9 +596,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       {t('noDiagnosisSelectedText', 'No diagnosis selected — Enter a diagnosis above')}
                     </p>
                   )}
-                  {showPrimaryRequiredError && (
+                  {diagnosesError?.message && (
                     <p className={styles.errorMessage} role="alert">
-                      {t('primaryDiagnosisRequired', 'Choose at least one primary diagnosis')}
+                      {diagnosesError.message}
                     </p>
                   )}
                 </FormGroup>

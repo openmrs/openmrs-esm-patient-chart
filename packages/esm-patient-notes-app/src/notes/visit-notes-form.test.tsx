@@ -16,6 +16,7 @@ import {
   useConfig,
   useSession,
   useFeatureFlag,
+  Workspace2,
   type Visit,
   type Workspace2DefinitionProps,
 } from '@openmrs/esm-framework';
@@ -643,12 +644,17 @@ test('preserves CONFIRMED certainty on diagnoses when re-saving a visit note in 
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
 
-  // Toggling certainty counts as an unsaved change (enabling Save), and toggling back
-  // must still transmit the original CONFIRMED value
+  // Toggling certainty off and back on leaves the diagnoses unchanged, so Save stays disabled
+  // until a real edit is made; the original CONFIRMED value must still be transmitted
   await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
+  expect(screen.getByRole('button', { name: /Save and close/i })).toBeEnabled();
+  expect(vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges).toBe(true);
   await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
-
   const submitButton = screen.getByRole('button', { name: /Save and close/i });
+  expect(submitButton).toBeDisabled();
+  expect(vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges).toBe(false);
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' (edited)');
+
   await user.click(submitButton);
 
   // The edit path deletes and recreates the encounter's diagnoses, so certainty set by
@@ -895,6 +901,45 @@ test('ticks Primary and Confirmed independently across multiple diagnosis cards'
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
 
   expect(screen.getByText(/2 diagnos/i)).toBeInTheDocument();
+});
+
+test('validates diagnosis changes only after submit and clears the group error live', async () => {
+  const user = userEvent.setup();
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  renderVisitNotesForm();
+
+  const firstCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: false });
+  const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II', { primary: false });
+  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  expect(await screen.findByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+  expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
+  expect(mockSaveVisitNote).not.toHaveBeenCalled();
+
+  await user.click(within(secondCard).getByRole('checkbox', { name: 'Primary' }));
+  await waitFor(() => expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument());
+  await user.click(within(secondCard).getByRole('checkbox', { name: 'Primary' }));
+  expect(await screen.findByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
+});
+
+test('tracks added and removed diagnoses as form changes and returns to clean when the draft is empty', async () => {
+  const user = userEvent.setup();
+  mockFetchDiagnosisConceptsByName.mockResolvedValue(diagnosisSearchResponse.results);
+  renderVisitNotesForm();
+  const save = screen.getByRole('button', { name: /save and close/i });
+  const isProtected = () => vi.mocked(Workspace2).mock.lastCall?.[0].hasUnsavedChanges;
+  expect(save).toBeDisabled();
+  expect(isProtected()).toBe(false);
+
+  await addDiagnosis(user, 'Diabetes Mellitus');
+  expect(save).toBeEnabled();
+  expect(isProtected()).toBe(true);
+
+  await user.click(screen.getByRole('button', { name: 'Remove Diabetes Mellitus' }));
+  expect(save).toBeDisabled();
+  expect(isProtected()).toBe(false);
+  expect(screen.getByPlaceholderText('Choose a diagnosis')).toHaveFocus();
 });
 
 test('supports selecting a diagnosis search result with the keyboard', async () => {

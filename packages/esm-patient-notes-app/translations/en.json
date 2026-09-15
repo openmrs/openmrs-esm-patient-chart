@@ -27,7 +27,6 @@
   "errorFetchingConcepts": "There was a problem fetching concepts",
   "errorLoadingStickyNote": "Couldn't load sticky note.",
   "errorSavingStickyNote": "Error saving sticky note",
-  "errorTransformingDiagnoses": "Error transforming diagnoses",
   "image": "Image",
   "imageRemoved": "Image removed",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",
