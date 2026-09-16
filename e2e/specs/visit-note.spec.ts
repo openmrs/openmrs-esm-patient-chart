@@ -70,9 +70,8 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the newly added diagnoses', async () => {
-    // .first(): the diagnosis tag's tooltip repeats the name, so the text matches twice
-    await expect(page.getByText(/asthma/i).first()).toBeVisible();
-    await expect(page.getByText(/gi upset/i).first()).toBeVisible();
+    await expect(page.getByText(/asthma/i)).toBeVisible();
+    await expect(page.getByText(/gi upset/i)).toBeVisible();
   });
 
   await test.step('When I expand the visit row', async () => {
