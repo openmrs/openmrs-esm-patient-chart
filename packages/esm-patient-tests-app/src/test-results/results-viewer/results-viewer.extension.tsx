@@ -13,6 +13,7 @@ import { FilterContext, FilterProvider } from '../filter';
 import { useGetManyObstreeData } from '../grouped-timeline';
 import IndividualResultsTableTablet from '../individual-results-table-tablet/individual-results-table-tablet.component';
 import TreeView from '../tree-view/tree-view.component';
+import ReviewedBanner from '../../smart-notifications/reviewed-banner.component';
 import styles from './results-viewer.scss';
 
 type panelOpts = 'tree' | 'panel';
@@ -99,6 +100,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
     return (
       <div className={styles.resultsContainer}>
         <div ref={headerRef} className={styles.headerSentinel} />
+        <ReviewedBanner patientUuid={patientUuid} />
         <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             filteredResultsCount ? `(${filteredResultsCount})` : ''
@@ -128,6 +130,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid }) => {
   return (
     <div className={styles.resultsContainer}>
       <div className={styles.headerSentinel} ref={headerRef} />
+      <ReviewedBanner patientUuid={patientUuid} />
       <div className={classNames(styles.resultsHeader, { [styles.resultsHeaderScrolled]: !isHeaderVisible })}>
         <div className={classNames(styles.leftSection, styles.leftHeaderSection)}>
           <h4>{t('tests', 'Tests')}</h4>

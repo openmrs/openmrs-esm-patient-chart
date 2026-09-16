@@ -1,0 +1,31 @@
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.bellContainer {
+  display: flex;
+  position: relative;
+}
+
+.bellButton {
+  position: relative;
+}
+
+.bellBadge {
+  align-items: center;
+  background-color: $danger;
+  // A white ring separates the badge from the bell glyph on any header colour a distro picks.
+  border: 1px solid $ui-02;
+  border-radius: 50%;
+  color: $ui-02;
+  display: flex;
+  font-size: 0.625rem;
+  font-weight: 600;
+  height: layout.$spacing-05;
+  justify-content: center;
+  line-height: 1;
+  min-width: layout.$spacing-05;
+  padding: 0 layout.$spacing-01;
+  position: absolute;
+  right: layout.$spacing-03;
+  top: layout.$spacing-03;
+}

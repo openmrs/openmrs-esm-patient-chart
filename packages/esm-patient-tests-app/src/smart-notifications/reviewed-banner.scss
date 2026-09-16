@@ -1,0 +1,14 @@
+@use '@carbon/layout';
+
+.banner {
+  margin-bottom: layout.$spacing-03;
+  max-width: none;
+  width: 100%;
+
+  // Stack the title above the "Reviewed by … · just now" line rather than running them together.
+  :global(.cds--inline-notification__text-wrapper) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: layout.$spacing-01;
+  }
+}
