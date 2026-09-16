@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
 import { type Visit, formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { useIsInPastVisitContext } from '../hooks/useIsInPastVisitContext';
 import styles from './visit-tag.scss';
 
 interface VisitTagProps {
@@ -12,10 +12,11 @@ interface VisitTagProps {
 
 function VisitTag({ patientUuid, patient }: VisitTagProps) {
   const { activeVisit, isLoading } = useVisit(patientUuid);
-  const { visitContext } = usePatientChartStore(patientUuid);
   const isNotDeceased = !patient?.deceasedDateTime;
-  const isPastVisitContext = Boolean(visitContext && visitContext.stopDatetime);
-  return !isLoading && activeVisit && isNotDeceased && !isPastVisitContext ? (
+  // Hidden only when the past visit tag renders in its place, so the banner
+  // always shows exactly one visit tag while an active visit exists.
+  const isInPastVisitContext = useIsInPastVisitContext(patientUuid);
+  return !isLoading && activeVisit && isNotDeceased && !isInPastVisitContext ? (
     <ActiveVisitTag activeVisit={activeVisit} />
   ) : null;
 }
