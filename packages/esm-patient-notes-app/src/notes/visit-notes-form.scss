@@ -111,8 +111,22 @@
     align-items: center;
     justify-content: center;
 
+    &:hover,
+    &:focus,
+    &:active {
+      color: colors.$gray-90;
+    }
+
+    &:focus {
+      background-color: colors.$white;
+    }
+
     &:hover {
       background-color: colors.$gray-20;
+    }
+
+    &:active {
+      background-color: colors.$gray-30;
     }
   }
 }
