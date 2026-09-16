@@ -740,7 +740,7 @@ test.each([false, true])(
     if (editNote) {
       await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Updated note');
     }
-    await user.click(screen.getByRole('button', { name: /remove image/i }));
+    await user.click(screen.getByRole('button', { name: 'Remove image: Visit note image' }));
 
     expect(screen.queryByRole('img', { name: 'Visit note image' })).not.toBeInTheDocument();
     if (editNote) {
@@ -792,10 +792,31 @@ test.each(['creating', 'editing'] as const)(
     expect(screen.getAllByRole('img')).toHaveLength(3);
     expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
 
-    await user.click(screen.getAllByRole('button', { name: /remove image/i })[1]);
+    await user.click(screen.getByRole('button', { name: 'Remove image: blue.png' }));
     expect(screen.queryByRole('img', { name: 'blue.png' })).not.toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'red.png' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'camera' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
   },
 );
+
+test('labels image removal with the description, filename or image number', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+  const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+  const files: UploadedFile[] = [
+    { fileName: 'first.png', fileDescription: 'Front view' },
+    { fileName: 'second.png', fileDescription: ' ' },
+    { fileName: '', fileDescription: '' },
+  ].map((file) => ({ ...file, fileType: 'image/png', base64Content: 'data:image/png;base64,aW1hZ2U=' }));
+
+  await act(async () => {
+    await Promise.all(files.map(modal.saveFile));
+  });
+
+  expect(screen.getByRole('button', { name: 'Remove image: Front view' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: second.png' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: 3' })).toBeInTheDocument();
+});

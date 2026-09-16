@@ -731,7 +731,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         <Button
                           kind="secondary"
                           size="sm"
-                          aria-label={t('removeImage', 'Remove image')}
+                          aria-label={t('removeImage', 'Remove image: {{name}}', {
+                            name: image.fileDescription?.trim() || image.fileName?.trim() || index + 1,
+                          })}
                           className={styles.removeButton}
                           onClick={() => handleRemoveImage(index)}
                         >
