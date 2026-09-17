@@ -54,7 +54,11 @@ import {
   updateVisitNote,
   useVisitNotes,
 } from './visit-notes.resource';
-import SelectedDiagnosisCard, { type DiagnosisDraft, nextDraftId } from './selected-diagnosis-card.component';
+import SelectedDiagnosisCard, {
+  DiagnosisListHeader,
+  type DiagnosisDraft,
+  nextDraftId,
+} from './selected-diagnosis-card.component';
 import styles from './visit-notes-form.scss';
 
 type VisitNotesFormData = Omit<z.infer<ReturnType<typeof createSchema>>, 'images'> & {
@@ -228,16 +232,17 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    // Secondary and provisional are the presumed defaults; the card's Primary and Confirmed
-    // checkboxes record the exceptions (O3-5823).
-    (concept: Concept, rank: 1 | 2): DiagnosisDraft => ({
+    // Secondary and provisional are the presumed defaults; the row's Primary and Confirmed
+    // checkboxes record the exceptions, always as an explicit choice — nothing is
+    // auto-ticked on the clinician's behalf (O3-5823).
+    (concept: Concept): DiagnosisDraft => ({
       draftId: nextDraftId(),
       display: concept.display,
       diagnosis: {
         coded: concept.uuid,
       },
       patient: patientUuid,
-      rank,
+      rank: 2,
       certainty: 'PROVISIONAL',
     }),
     [patientUuid],
@@ -252,12 +257,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
         return;
       }
-      // When a primary diagnosis is required and none is marked yet, default this one to
-      // primary (still changeable) so a single-diagnosis note needs no extra step
-      const rank = isPrimaryDiagnosisRequired && !hasPrimaryDiagnosis(diagnoses) ? 1 : 2;
-      setSelectedDiagnoses([...diagnoses, createDiagnosis(conceptDiagnosisToAdd, rank)]);
+      setSelectedDiagnoses([...diagnoses, createDiagnosis(conceptDiagnosisToAdd)]);
     },
-    [createDiagnosis, getValues, isPrimaryDiagnosisRequired, setSelectedDiagnoses, setValue],
+    [createDiagnosis, getValues, setSelectedDiagnoses, setValue],
   );
 
   const handleRemoveDiagnosis = useCallback(
@@ -568,20 +570,18 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   />
                   {selectedDiagnoses.length > 0 ? (
                     <>
+                      {/* The Primary/Confirmed column headers already say where to tick, so the
+                          helper only needs to state what unticked means */}
                       <p className={styles.diagnosisHelperText}>
                         {t(
-                          'diagnosisDefaultsHelperText',
-                          'Tick Primary and Confirmed where they apply — unticked diagnoses are recorded as secondary and provisional.',
+                          'untickedDiagnosesHelperText',
+                          'Unticked diagnoses are recorded as secondary and provisional.',
                         )}
                         {isPrimaryDiagnosisRequired && (
-                          <> {t('primaryRequiredHelperText', 'At least one diagnosis must be marked primary.')}</>
+                          <> {t('onePrimaryRequiredHelperText', 'At least one primary is required.')}</>
                         )}
                       </p>
-                      <p className={styles.diagnosisCount}>
-                        {t('diagnosisCountOnNote', '{{count}} diagnoses on this note', {
-                          count: selectedDiagnoses.length,
-                        })}
-                      </p>
+                      <DiagnosisListHeader />
                       {selectedDiagnoses.map((diagnosis) => (
                         <SelectedDiagnosisCard
                           key={diagnosis.draftId}

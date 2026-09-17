@@ -26,6 +26,23 @@ export function nextDraftId(): number {
   return ++lastDraftId;
 }
 
+/**
+ * Column headers for the diagnosis rows below. Rendered once above the list rather than
+ * per row; hidden from assistive tech because every checkbox carries its own hidden label.
+ */
+export function DiagnosisListHeader() {
+  const { t } = useTranslation();
+
+  return (
+    <div aria-hidden="true" className={styles.diagnosisListHeader}>
+      <span />
+      <span>{t('primary', 'Primary')}</span>
+      <span>{t('confirmed', 'Confirmed')}</span>
+      <span />
+    </div>
+  );
+}
+
 interface SelectedDiagnosisCardProps {
   diagnosis: DiagnosisDraft;
   onRemove: (diagnosis: DiagnosisDraft) => void;
@@ -35,44 +52,32 @@ interface SelectedDiagnosisCardProps {
 export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }: SelectedDiagnosisCardProps) {
   const { t } = useTranslation();
 
-  // The values presumed by the unticked checkboxes, spelled out so the row always states
-  // what will be recorded without referring back to the helper text
-  const presumedValues = [
-    diagnosis.rank === 2 ? t('secondary', 'Secondary') : null,
-    diagnosis.certainty === 'PROVISIONAL' ? t('provisional', 'Provisional') : null,
-  ].filter(Boolean);
-
   return (
-    <div className={styles.diagnosisCard} role="group" aria-label={diagnosis.display}>
-      <span className={styles.diagnosisCardTitle}>
-        {diagnosis.display}
-        {presumedValues.length > 0 && (
-          <span className={styles.diagnosisCardPresumed}>{presumedValues.join(' · ')}</span>
-        )}
-      </span>
-      <div className={styles.diagnosisCardControls}>
-        <Checkbox
-          checked={diagnosis.rank === 1}
-          id={`diagnosis-${diagnosis.draftId}-primary`}
-          labelText={t('primary', 'Primary')}
-          onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
-        />
-        <Checkbox
-          checked={diagnosis.certainty === 'CONFIRMED'}
-          id={`diagnosis-${diagnosis.draftId}-confirmed`}
-          labelText={t('confirmed', 'Confirmed')}
-          onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'CONFIRMED' : 'PROVISIONAL' })}
-        />
-        <Button
-          hasIconOnly
-          iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
-          kind="ghost"
-          onClick={() => onRemove(diagnosis)}
-          renderIcon={(props) => <Close size={16} {...props} />}
-          size="sm"
-          tooltipAlignment="end"
-        />
-      </div>
+    <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
+      <span className={styles.diagnosisName}>{diagnosis.display}</span>
+      <Checkbox
+        checked={diagnosis.rank === 1}
+        hideLabel
+        id={`diagnosis-${diagnosis.draftId}-primary`}
+        labelText={t('primary', 'Primary')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
+      />
+      <Checkbox
+        checked={diagnosis.certainty === 'CONFIRMED'}
+        hideLabel
+        id={`diagnosis-${diagnosis.draftId}-confirmed`}
+        labelText={t('confirmed', 'Confirmed')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'CONFIRMED' : 'PROVISIONAL' })}
+      />
+      <Button
+        hasIconOnly
+        iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
+        kind="ghost"
+        onClick={() => onRemove(diagnosis)}
+        renderIcon={(props) => <Close size={16} {...props} />}
+        size="sm"
+        tooltipAlignment="end"
+      />
     </div>
   );
 }

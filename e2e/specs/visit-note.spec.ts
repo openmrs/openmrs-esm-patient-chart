@@ -27,11 +27,14 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
-    // The first diagnosis defaults to primary when a primary is required
+    // Nothing is auto-ticked: rank and certainty are explicit choices on each row.
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
+    // Carbon renders the checkbox input visually hidden behind its styled box (and the
+    // column layout hides the per-row label text), so check() needs force to skip the
+    // visibility actionability check.
+    await asthmaCard.getByRole('checkbox', { name: 'Primary' }).check({ force: true });
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-    // Carbon renders the checkbox input visually hidden behind its styled label, which fails
-    // Playwright's actionability check — click the label text instead (see task-list.spec.ts).
-    await asthmaCard.getByText('Confirmed', { exact: true }).click();
+    await asthmaCard.getByRole('checkbox', { name: 'Confirmed' }).check({ force: true });
     await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
   });
 

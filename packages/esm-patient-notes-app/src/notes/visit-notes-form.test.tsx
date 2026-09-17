@@ -107,7 +107,7 @@ async function addDiagnosis(
   await user.click(await screen.findByRole('button', { name }));
 
   const card = screen.getByRole('group', { name });
-  // Options are target states (the form may have pre-ticked Primary on the first diagnosis)
+  // Options are target states (edit mode may render checkboxes already ticked from stored values)
   const setCheckbox = async (checkboxName: string, desired: boolean) => {
     const checkbox = within(card).getByRole('checkbox', { name: checkboxName });
     if ((checkbox as HTMLInputElement).checked !== desired) {
@@ -206,29 +206,21 @@ test('typing in the diagnosis search input triggers a search', async () => {
   expect(targetSearchResult).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Diabetes Mellitus, Type II' })).toBeInTheDocument();
 
-  // Clicking a search result displays the selected diagnosis as a compact card. The first
-  // diagnosis defaults to primary (a primary is required by config); certainty is presumed
-  // provisional, spelled out on the row
+  // Clicking a search result displays the selected diagnosis as a compact row under the
+  // Primary/Confirmed column headers. Nothing is auto-ticked: rank and certainty stay
+  // explicit choices, presumed secondary/provisional until ticked
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  // The test i18n mock interpolates but does not pluralize, so match the count only
-  expect(screen.getByText(/1 diagnos/i)).toBeInTheDocument();
   expect(screen.getByText(/unticked diagnoses are recorded as secondary and provisional/i)).toBeInTheDocument();
-  expect(screen.getByText(/at least one diagnosis must be marked primary/i)).toBeInTheDocument();
-  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
+  expect(screen.getByText(/at least one primary is required/i)).toBeInTheDocument();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
-  expect(within(card).getByText('Provisional')).toBeInTheDocument();
 
-  // Unticking Primary spells out both presumed values on the row
-  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
-  expect(within(card).getByText('Secondary · Provisional')).toBeInTheDocument();
-
-  // Ticking both exception checkboxes removes the presumed-values text entirely
+  // Ticking both exception checkboxes records the diagnosis as primary and confirmed
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   await user.click(within(card).getByRole('checkbox', { name: 'Confirmed' }));
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
-  expect(within(card).queryByText(/provisional|secondary/i)).not.toBeInTheDocument();
 
   // Clicking the remove button on the card removes the selected diagnosis
   await user.click(within(card).getByRole('button', { name: /remove diabetes mellitus/i }));
@@ -301,21 +293,19 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
   expect(screen.getByPlaceholderText('Choose a diagnosis')).toHaveFocus();
 
-  // The first diagnosis added defaults to primary, clearing the requirement with no extra step
+  // A newly added diagnosis is never auto-ticked primary — the choice stays explicit
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
-  expect(within(card).getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-  expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
+  expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
 
-  // Deliberately unticking the only primary re-raises the group-level error on submit; the
-  // Primary checkbox stays neutral (no invalid state) and receives focus for the fix
-  await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
+  // Submitting with no primary raises the group-level error below the list; the Primary
+  // checkbox stays neutral (no invalid state) and receives focus for the fix
   await user.click(submitButton);
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toHaveAttribute('data-invalid');
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).toHaveFocus();
   expect(mockSaveVisitNote).not.toHaveBeenCalled();
 
-  // Re-ticking Primary clears the error without another submit; certainty stays provisional
+  // Ticking Primary clears the error without another submit; certainty stays provisional
   await user.click(within(card).getByRole('checkbox', { name: 'Primary' }));
   expect(screen.queryByText(/choose at least one primary diagnosis/i)).not.toBeInTheDocument();
 
@@ -882,8 +872,8 @@ test('ticks Primary and Confirmed independently across multiple diagnosis cards'
 
   renderVisitNotesForm();
 
-  // The first diagnosis defaults to primary; the second stays presumed secondary/provisional
-  const firstCard = await addDiagnosis(user, 'Diabetes Mellitus');
+  // Both rows start unticked (nothing is auto-marked primary); ticking one row leaves the other alone
+  const firstCard = await addDiagnosis(user, 'Diabetes Mellitus', { primary: true });
   const secondCard = await addDiagnosis(user, 'Diabetes Mellitus, Type II');
 
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Confirmed' }));
@@ -892,15 +882,11 @@ test('ticks Primary and Confirmed independently across multiple diagnosis cards'
   expect(within(firstCard).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(secondCard).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
-  expect(within(secondCard).getByText('Secondary · Provisional')).toBeInTheDocument();
 
   // Unticking returns the diagnosis to the presumed secondary rank, without affecting the other card
   await user.click(within(firstCard).getByRole('checkbox', { name: 'Primary' }));
   expect(within(firstCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-  expect(within(firstCard).getByText(/secondary/i)).toBeInTheDocument();
   expect(within(secondCard).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-
-  expect(screen.getByText(/2 diagnos/i)).toBeInTheDocument();
 });
 
 test('validates diagnosis changes only after submit and clears the group error live', async () => {

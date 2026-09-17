@@ -218,12 +218,6 @@
   margin-top: layout.$spacing-03;
 }
 
-.diagnosisCount {
-  @include type.type-style('body-compact-01');
-  color: colors.$gray-70;
-  margin: layout.$spacing-05 0 layout.$spacing-03;
-}
-
 .uploadButton {
   margin-top: layout.$spacing-05;
 }

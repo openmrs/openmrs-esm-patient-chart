@@ -2,51 +2,46 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-// Two rows per diagnosis: the name (and its presumed values) gets the full width, with
-// the exception checkboxes (Primary, Confirmed) and remove underneath, so long names are
-// not squeezed between the controls.
-.diagnosisCard {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: layout.$spacing-03;
+// One compact row per diagnosis, with the Primary/Confirmed checkboxes aligned into
+// labelled columns (headers rendered once above the list) instead of per-row labels and
+// per-row presumed-value text — review feedback: the per-diagnosis lines read as noisy.
+$diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
+
+.diagnosisListHeader {
+  display: grid;
+  grid-template-columns: $diagnosis-columns;
+  align-items: end;
+  column-gap: layout.$spacing-03;
   margin-top: layout.$spacing-03;
-  padding: layout.$spacing-03 layout.$spacing-03 layout.$spacing-03 layout.$spacing-05;
-  background-color: $ui-01;
-  border-inline-start: 3px solid $interactive-01;
-}
 
-.diagnosisCardTitle {
-  @include type.type-style('heading-compact-01');
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.diagnosisCardPresumed {
-  @include type.type-style('label-01');
-  color: $text-02;
-  display: block;
-  margin-top: layout.$spacing-01;
-}
-
-.diagnosisCardControls {
-  display: flex;
-  align-items: center;
-  gap: layout.$spacing-05;
-
-  // Keep the remove button at the row's far end
-  > :global(.cds--btn) {
-    margin-inline-start: auto;
+  > span {
+    @include type.type-style('label-01');
+    color: $text-02;
+    text-align: center;
   }
+}
 
-  // Carbon renders each checkbox as a block-level form item; inline them on the row and
-  // strip the stacked-form margins so the row stays one line tall.
+.diagnosisRow {
+  display: grid;
+  grid-template-columns: $diagnosis-columns;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+  padding: layout.$spacing-02 0;
+
+  // Center each checkbox under its column header and strip Carbon's stacked-form margins
   :global(.cds--form-item) {
     flex: 0 0 auto;
     margin: 0;
+    justify-self: center;
   }
 
-  :global(.cds--checkbox-label-text) {
-    @include type.type-style('body-compact-01');
+  > :global(.cds--btn) {
+    justify-self: end;
   }
+}
+
+.diagnosisName {
+  @include type.type-style('body-compact-01');
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
