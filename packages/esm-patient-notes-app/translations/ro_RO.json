@@ -34,6 +34,7 @@
   "primaryDiagnosis": "Diagnostic primar",
   "primaryDiagnosisInputPlaceholder": "Alege un diagnostic primar",
   "primaryDiagnosisRequired": "Alege cel putin un diagnostic primar",
+  "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Salveaza si inchide",
   "saving": "Se salveaza",

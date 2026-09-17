@@ -34,6 +34,7 @@
   "primaryDiagnosis": "主要诊断",
   "primaryDiagnosisInputPlaceholder": "选择一个主要诊断",
   "primaryDiagnosisRequired": "选择至少一个主要诊断",
+  "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "保存并关闭",
   "saving": "保存中",
