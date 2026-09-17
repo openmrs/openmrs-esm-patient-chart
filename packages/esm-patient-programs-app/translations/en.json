@@ -36,6 +36,8 @@
   "programEnrollmentWorkspaceTitle": "Record program enrollment",
   "programName": "Program name",
   "programOutcome": "Program outcome",
+  "programOutcomeLoadError": "Unable to load program outcomes",
+  "programOutcomeLoadErrorDescription": "Program outcomes could not be loaded. Please try again before saving.",
   "programOutcomeRequired": "Program outcome is required when completing a program",
   "programRequired": "Program is required",
   "Programs": "Programs",

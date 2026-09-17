@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -129,6 +129,7 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
   const {
     control,
     handleSubmit,
+    setValue,
     watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ProgramsFormData>({
@@ -146,15 +147,31 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
 
   const selectedProgram = useWatch({ control, name: 'selectedProgram' });
 
+  const previousSelectedProgram = useRef(selectedProgram);
+
+  useEffect(() => {
+    if (previousSelectedProgram.current && previousSelectedProgram.current !== selectedProgram) {
+      setValue('selectedOutcome', '');
+    }
+
+    previousSelectedProgram.current = selectedProgram;
+  }, [selectedProgram, setValue]);
+
   const selectedProgramData =
     availablePrograms?.find((program) => program.uuid === selectedProgram) ??
     (currentProgram?.uuid === selectedProgram
       ? currentProgram
       : eligiblePrograms.find((program) => program.uuid === selectedProgram));
 
-  const { program: selectedProgramDetails, isLoading: outcomesLoading } = useProgramDetails(selectedProgramData?.uuid);
+  const {
+    program: selectedProgramDetails,
+    isLoading: outcomesLoading,
+    error: outcomesError,
+  } = useProgramDetails(selectedProgramData?.uuid);
 
   const outcomes = selectedProgramDetails?.outcomesConcept?.setMembers ?? [];
+  const programHasConfiguredOutcomes = Boolean(selectedProgramData?.outcomesConcept?.uuid);
+  const outcomesUnavailable = programHasConfiguredOutcomes && Boolean(outcomesError);
 
   const onSubmit = useCallback(
     async (data: ProgramsFormData) => {
@@ -413,6 +430,23 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
       legendText: '',
       value: programOutcomeDropdown,
     });
+  } else if (outcomesUnavailable) {
+    formGroups.push({
+      style: { width: '50%' },
+      legendText: '',
+      value: (
+        <InlineNotification
+          className={styles.notification}
+          kind="error"
+          lowContrast
+          title={t('programOutcomeLoadError', 'Unable to load program outcomes')}
+          subtitle={t(
+            'programOutcomeLoadErrorDescription',
+            'Program outcomes could not be loaded. Please try again before saving.',
+          )}
+        />
+      ),
+    });
   }
 
   return (
@@ -438,7 +472,12 @@ const ProgramsForm: React.FC<PatientWorkspace2DefinitionProps<ProgramsFormProps,
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {getCoreTranslation('cancel')}
           </Button>
-          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          <Button
+            className={styles.button}
+            disabled={isSubmitting || (programHasConfiguredOutcomes && (outcomesLoading || outcomesUnavailable))}
+            kind="primary"
+            type="submit"
+          >
             {isSubmitting ? (
               <InlineLoading description={t('saving', 'Saving') + '...'} />
             ) : (

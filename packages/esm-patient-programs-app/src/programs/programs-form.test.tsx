@@ -304,6 +304,82 @@ describe('ProgramsForm', () => {
     expect(screen.getByRole('option', { name: /completed successfully/i })).toBeInTheDocument();
   });
 
+  it('clears the selected outcome when changing programs', async () => {
+    const user = userEvent.setup();
+    const firstProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+    const secondProgramUuid = mockCareProgramsResponse[2].uuid;
+
+    mockUseAvailablePrograms.mockReturnValue({
+      data: [
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        {
+          ...mockCareProgramsResponse[2],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid-2',
+            display: 'Program Outcome 2',
+          },
+        },
+      ],
+      eligiblePrograms: [
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        {
+          ...mockCareProgramsResponse[2],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid-2',
+            display: 'Program Outcome 2',
+          },
+        },
+      ],
+      error: null,
+      isLoading: false,
+    });
+
+    mockUseProgramDetails.mockReturnValue({
+      program: {
+        ...mockCareProgramsResponse[1],
+        outcomesConcept: {
+          uuid: 'outcome-concept-uuid',
+          display: 'Program Outcome',
+          setMembers: [
+            {
+              uuid: 'outcome-completed',
+              display: 'Completed Successfully',
+            },
+          ],
+        },
+      },
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+
+    await user.selectOptions(programNameInput, [firstProgramUuid]);
+
+    const outcomeInput = screen.getByRole('combobox', { name: /program outcome/i });
+
+    await user.selectOptions(outcomeInput, ['outcome-completed']);
+    expect(outcomeInput).toHaveValue('outcome-completed');
+
+    await user.selectOptions(programNameInput, [secondProgramUuid]);
+
+    expect(outcomeInput).toHaveValue('');
+  });
+
   it('requires an outcome when completing a program that has configured outcomes', async () => {
     const user = userEvent.setup();
     const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
@@ -366,6 +442,58 @@ describe('ProgramsForm', () => {
     await user.click(saveButton);
 
     expect(screen.getByText(/program outcome is required when completing a program/i)).toBeInTheDocument();
+    expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
+  });
+
+  it('shows an error and disables saving when program outcomes fail to load', async () => {
+    const user = userEvent.setup();
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
+
+    mockUseAvailablePrograms.mockReturnValue({
+      data: [
+        ...mockCareProgramsResponse.slice(0, 1),
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        ...mockCareProgramsResponse.slice(2),
+      ],
+      eligiblePrograms: [
+        ...mockCareProgramsResponse.slice(0, 1),
+        {
+          ...mockCareProgramsResponse[1],
+          outcomesConcept: {
+            uuid: 'outcome-concept-uuid',
+            display: 'Program Outcome',
+          },
+        },
+        ...mockCareProgramsResponse.slice(2),
+      ],
+      error: null,
+      isLoading: false,
+    });
+
+    mockUseProgramDetails.mockReturnValue({
+      program: undefined,
+      isLoading: false,
+      error: new Error('Failed to load program outcomes'),
+    });
+
+    renderProgramsForm();
+
+    const programNameInput = screen.getByRole('combobox', { name: /program name/i });
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+
+    await user.selectOptions(programNameInput, [oncologyScreeningProgramUuid]);
+
+    expect(screen.getByText(/unable to load program outcomes/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/program outcomes could not be loaded\. please try again before saving/i),
+    ).toBeInTheDocument();
+    expect(saveButton).toBeDisabled();
     expect(mockCreateProgramEnrollment).not.toHaveBeenCalled();
   });
 
