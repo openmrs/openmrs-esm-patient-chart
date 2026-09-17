@@ -115,13 +115,7 @@ export function mapEncounter(encounter: Encounter): MappedEncounter {
       noToday: true,
     }),
     rawDatetime: encounter.encounterDatetime,
-    diagnoses:
-      encounter.diagnoses
-        ?.filter((diagnosis) => !diagnosis.voided)
-        .map((diagnosis) => ({
-          ...diagnosis,
-          certainty: diagnosis.certainty || 'PROVISIONAL',
-        })) || [],
+    diagnoses: encounter.diagnoses?.filter((diagnosis) => !diagnosis.voided) || [],
     encounterType: encounter.encounterType?.display,
     editPrivilege: encounter.encounterType?.editPrivilege?.display,
     form: encounter.form as Form,
