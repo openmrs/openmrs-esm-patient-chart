@@ -34,6 +34,7 @@
   "primaryDiagnosis": "ძირითადი დიაგნოზი",
   "primaryDiagnosisInputPlaceholder": "აირჩიეთ ძირითადი დიაგნოზი",
   "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
+  "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "შენახვა და დახურვა",
   "saving": "მიმდინარეობს შენახვა",

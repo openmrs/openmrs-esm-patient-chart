@@ -34,6 +34,7 @@
   "primaryDiagnosis": "Diagnosis utama",
   "primaryDiagnosisInputPlaceholder": "Pilih diagnosis utama",
   "primaryDiagnosisRequired": "Pilih setidaknya satu diagnosis utama",
+  "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Simpan dan tutup",
   "saving": "Menyimpan",

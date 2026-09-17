@@ -34,6 +34,7 @@
   "primaryDiagnosis": "Diagnostic principal",
   "primaryDiagnosisInputPlaceholder": "Choisissez un diagnostic principal",
   "primaryDiagnosisRequired": "Choisissez au moins un diagnostic principal",
+  "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Enregistrer et fermer",
   "saving": "Enregistrement en cours",
