@@ -24,7 +24,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
+import { Add, Close, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -168,12 +168,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     control,
     formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
+    getValues,
     setValue,
     watch,
   } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
     resolver: customResolver,
     defaultValues: {
+      images: [],
       primaryDiagnosisSearch: '',
       noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
@@ -334,7 +336,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           file.fileName = `${file.fileName}.png`;
         }
 
-        setValue('images', currentImages ? [...currentImages, file] : [file]);
+        setValue('images', [...getValues('images'), file], { shouldDirty: true });
         close();
         return Promise.resolve();
       },
@@ -348,12 +350,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       collectDescription: true,
       multipleFiles: true,
     });
-  }, [allowedFileExtensions, currentImages, setValue]);
+  }, [allowedFileExtensions, getValues, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
     updatedImages.splice(index, 1);
-    setValue('images', updatedImages);
+    setValue('images', updatedImages, { shouldDirty: true });
 
     showSnackbar({
       title: t('imageRemoved', 'Image removed'),
@@ -726,8 +728,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                             alt={image.fileDescription ?? image.fileName}
                           />
                         </div>
-                        <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                          <CloseFilled size={16} className={styles.closeIcon} />
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          aria-label={t('removeImage', 'Remove image: {{name}}', {
+                            name: image.fileDescription?.trim() || image.fileName?.trim() || index + 1,
+                          })}
+                          className={styles.removeButton}
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <Close size={16} />
                         </Button>
                       </div>
                     ))}
