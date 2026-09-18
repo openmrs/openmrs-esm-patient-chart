@@ -53,6 +53,7 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
+  useVisitNoteImages,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
@@ -211,6 +212,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [encounter, patientUuid, t]);
 
   const currentImages = watch('images');
+  const { images: savedImages, isLoading: isLoadingSavedImages } = useVisitNoteImages(
+    patientUuid,
+    isEditing ? encounter.id : undefined,
+  );
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
@@ -431,8 +436,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             return encounterUuid;
           }
         })
-        .then((encounterUuid) => {
-          return Promise.all(
+        .then((encounterUuid) =>
+          Promise.all(
             combinedDiagnoses.map((diagnosis) => {
               const diagnosesPayload: DiagnosisPayload = {
                 encounter: encounterUuid,
@@ -446,9 +451,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               };
               return savePatientDiagnosis(abortController, diagnosesPayload);
             }),
-          );
-        })
-        .then(() => {
+          ).then(() => encounterUuid),
+        )
+        .then((encounterUuid) => {
+          // Only images added in this session are in the form state. Images already saved on the
+          // note are shown from the server and never re-uploaded.
           if (images?.length) {
             return Promise.all(
               images.map((image) => {
@@ -459,7 +466,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   fileType: image.fileType,
                   fileDescription: image.fileDescription || '',
                 };
-                return createAttachment(patientUuid, imageToUpload);
+                return createAttachment(patientUuid, imageToUpload, encounterUuid);
               }),
             );
           } else {
@@ -718,7 +725,24 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   >
                     {t('addImage', 'Add image')}
                   </Button>
+                  {isLoadingSavedImages && (
+                    <InlineLoading
+                      className={styles.savedImagesLoading}
+                      description={t('loadingSavedImages', 'Loading saved images') + '...'}
+                    />
+                  )}
                   <div className={styles.imgThumbnailGrid}>
+                    {savedImages.map((image) => (
+                      <div key={image.id} className={styles.imgThumbnailItem}>
+                        <div className={styles.imgThumbnailContainer}>
+                          <img
+                            className={styles.imgThumbnail}
+                            src={image.src}
+                            alt={image.description || image.filename || t('savedImage', 'Saved image')}
+                          />
+                        </div>
+                      </div>
+                    ))}
                     {currentImages?.map((image, index) => (
                       <div key={index} className={styles.imgThumbnailItem}>
                         <div className={styles.imgThumbnailContainer}>

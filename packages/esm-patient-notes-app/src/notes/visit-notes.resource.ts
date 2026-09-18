@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { attachmentUrl, openmrsFetch, restBaseUrl, useAttachments, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import type {
   Concept,
@@ -10,6 +11,36 @@ import type {
   RESTPatientNote,
   VisitNotePayload,
 } from '../types';
+
+export interface SavedVisitNoteImage {
+  id: string;
+  src: string;
+  description?: string;
+  filename?: string;
+}
+
+/**
+ * The images already recorded on a visit note's encounter. Nothing is fetched until an
+ * encounter UUID is known, so the create form makes no request.
+ */
+export function useVisitNoteImages(patientUuid: string, encounterUuid?: string) {
+  const { data, isLoading, error } = useAttachments(encounterUuid ? patientUuid : null, false, encounterUuid);
+
+  const images = useMemo<Array<SavedVisitNoteImage>>(
+    () =>
+      data
+        .filter((attachment) => attachment.bytesContentFamily === 'IMAGE')
+        .map((attachment) => ({
+          id: attachment.uuid,
+          src: `${window.openmrsBase}${attachmentUrl}/${attachment.uuid}/bytes`,
+          description: attachment.comment,
+          filename: attachment.filename,
+        })),
+    [data],
+  );
+
+  return { images, isLoading, error };
+}
 
 interface UseVisitNotes {
   visitNotes: Array<PatientNote> | null;
