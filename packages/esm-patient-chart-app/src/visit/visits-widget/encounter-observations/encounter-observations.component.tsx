@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, SkeletonText } from '@carbon/react';
-import { type Obs, useConfig } from '@openmrs/esm-framework';
-import { type ComplexObs, getAttachmentLabel, getAttachmentUrl, isAttachmentObs } from './attachment-obs';
+import { type Obs, showModal, useConfig } from '@openmrs/esm-framework';
+import { type ComplexObs, getAttachmentLabel, getAttachmentUrl, isAttachmentObs, toAttachment } from './attachment-obs';
 import styles from './styles.scss';
 
 interface EncounterObservationsProps {
@@ -26,8 +26,20 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     // A file attachment. Its REST display only carries the attachments module's storage marker,
     // so show the caption or file name and let the user open the file.
     if (isAttachmentObs(obs as ComplexObs)) {
+      const attachment = toAttachment(obs as ComplexObs);
+      // The href keeps the file reachable in a new tab; a plain click opens the in-app preview.
       return (
-        <Link href={getAttachmentUrl(obs as ComplexObs)} target="_blank" rel="noopener noreferrer">
+        <Link
+          href={getAttachmentUrl(obs as ComplexObs)}
+          onClick={(event: React.MouseEvent) => {
+            event.preventDefault();
+            const dispose = showModal('attachment-preview-modal', {
+              attachment,
+              size: 'lg',
+              closeModal: () => dispose(),
+            });
+          }}
+        >
           {getAttachmentLabel(obs as ComplexObs)}
         </Link>
       );

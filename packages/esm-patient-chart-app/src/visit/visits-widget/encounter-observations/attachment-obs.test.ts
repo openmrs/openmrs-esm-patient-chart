@@ -3,8 +3,10 @@ import {
   type ComplexObs,
   getAttachmentFileName,
   getAttachmentLabel,
+  getAttachmentMimeType,
   getAttachmentUrl,
   isAttachmentObs,
+  toAttachment,
 } from './attachment-obs';
 
 const obs = (valueComplex: string | null, extra: Partial<ComplexObs> = {}): ComplexObs =>
@@ -64,5 +66,37 @@ describe('getAttachmentLabel', () => {
 describe('getAttachmentUrl', () => {
   it('points at the attachment bytes endpoint for the obs', () => {
     expect(getAttachmentUrl(obs('m3ks | x | y | z'))).toBe('/openmrs/ws/rest/v1/attachment/obs-uuid/bytes');
+  });
+});
+
+describe('toAttachment', () => {
+  it('shapes an image obs the way the attachments preview expects', () => {
+    expect(
+      toAttachment(
+        obs('m3ks | instructions.default | image/jpeg | brainScan.jpeg |key/brainScan.jpeg', {
+          comment: 'Brain scan',
+          obsDatetime: '2026-09-18T10:00:00.000+0000',
+        }),
+      ),
+    ).toEqual({
+      id: 'obs-uuid',
+      src: '/openmrs/ws/rest/v1/attachment/obs-uuid/bytes',
+      filename: 'brainScan.jpeg',
+      description: 'Brain scan',
+      dateTime: '2026-09-18T10:00:00.000+0000',
+      bytesMimeType: 'image/jpeg',
+      bytesContentFamily: 'IMAGE',
+    });
+  });
+
+  it('classifies PDFs and anything else, and drops a blank caption', () => {
+    expect(
+      toAttachment(obs('m3ks | instructions.default | application/pdf | consent.pdf', { comment: ' ' })),
+    ).toMatchObject({ bytesContentFamily: 'PDF', description: undefined });
+    expect(toAttachment(obs('m3ks | instructions.default | text/plain | notes.txt'))).toMatchObject({
+      bytesContentFamily: 'OTHER',
+      bytesMimeType: 'text/plain',
+    });
+    expect(getAttachmentMimeType(obs('photo.png image |complex_obs/photo.png'))).toBe('');
   });
 });

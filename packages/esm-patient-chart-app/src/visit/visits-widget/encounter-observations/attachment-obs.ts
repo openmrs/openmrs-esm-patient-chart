@@ -1,4 +1,5 @@
-import { type Obs, restBaseUrl } from '@openmrs/esm-framework';
+import { type Attachment, type Obs } from '@openmrs/esm-framework';
+import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 
 /**
  * A complex obs as the REST API returns it when the representation asks for `valueComplex` and
@@ -54,5 +55,35 @@ export function getAttachmentLabel(obs: ComplexObs): string {
 }
 
 export function getAttachmentUrl(obs: ComplexObs): string {
-  return `${window.openmrsBase}${restBaseUrl}/attachment/${obs.uuid}/bytes`;
+  return getAttachmentBytesUrl(obs.uuid);
+}
+
+/** The mime type the attachments module recorded, or an empty string for obs it did not write. */
+export function getAttachmentMimeType(obs: ComplexObs): string {
+  const parts = (obs.valueComplex ?? '').split(METADATA_SEPARATOR);
+  return parts[0] === ATTACHMENTS_PREFIX && parts.length > 2 ? parts[2].trim() : '';
+}
+
+function getContentFamily(mimeType: string): Attachment['bytesContentFamily'] {
+  if (mimeType.startsWith('image/')) {
+    return 'IMAGE';
+  }
+  if (mimeType === 'application/pdf') {
+    return 'PDF';
+  }
+  return 'OTHER';
+}
+
+/** Shapes the obs the way the attachments app's preview expects an attachment. */
+export function toAttachment(obs: ComplexObs): Attachment {
+  const mimeType = getAttachmentMimeType(obs);
+  return {
+    id: obs.uuid,
+    src: getAttachmentUrl(obs),
+    filename: getAttachmentFileName(obs),
+    description: obs.comment?.trim() || undefined,
+    dateTime: obs.obsDatetime,
+    bytesMimeType: mimeType,
+    bytesContentFamily: getContentFamily(mimeType),
+  };
 }

@@ -1,3 +1,4 @@
+export * from './attachments';
 export * from './cards';
 export * from './compare';
 export * from './dashboards/createDashboardLink';

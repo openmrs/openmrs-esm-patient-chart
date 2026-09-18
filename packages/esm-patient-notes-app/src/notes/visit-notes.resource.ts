@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { attachmentUrl, openmrsFetch, restBaseUrl, useAttachments, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useAttachments, useConfig } from '@openmrs/esm-framework';
+import { getAttachmentBytesUrl } from '@openmrs/esm-patient-common-lib';
 import { type ConfigObject } from '../config-schema';
 import type {
   Concept,
@@ -32,7 +33,7 @@ export function useVisitNoteImages(patientUuid: string, encounterUuid?: string) 
         .filter((attachment) => attachment.bytesContentFamily === 'IMAGE')
         .map((attachment) => ({
           id: attachment.uuid,
-          src: `${window.openmrsBase}${attachmentUrl}/${attachment.uuid}/bytes`,
+          src: getAttachmentBytesUrl(attachment.uuid),
           description: attachment.comment,
           filename: attachment.filename,
         })),

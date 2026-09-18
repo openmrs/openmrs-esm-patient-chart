@@ -1,7 +1,8 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, type Obs, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, type Obs, showModal, useConfig } from '@openmrs/esm-framework';
+import userEvent from '@testing-library/user-event';
 import { type ChartConfig, esmPatientChartSchema } from '../../../config-schema';
 import EncounterObservations from './encounter-observations.component';
 
@@ -83,8 +84,45 @@ describe('EncounterObservations', () => {
 
     const link = screen.getByRole('link', { name: 'Brain scan' });
     expect(link).toHaveAttribute('href', '/openmrs/ws/rest/v1/attachment/att-obs/bytes');
-    expect(link).toHaveAttribute('target', '_blank');
     expect(screen.queryByText('m3ks')).not.toBeInTheDocument();
+  });
+
+  it('opens the attachment preview modal when the link is clicked', async () => {
+    const user = userEvent.setup();
+    const dispose = vi.fn();
+    vi.mocked(showModal).mockReturnValue(dispose);
+    render(
+      <EncounterObservations
+        observations={[
+          makeObservation({
+            uuid: 'att-obs',
+            display: 'ATT IMAGE ATTACHMENT: m3ks',
+            value: { display: 'raw file' } as unknown as Obs['value'],
+            comment: 'Brain scan',
+            valueComplex: 'm3ks | instructions.default | image/jpeg | brainScan.jpeg |complex_obs/2026/brainScan.jpeg',
+          } as Partial<Obs>),
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Brain scan' }));
+
+    expect(showModal).toHaveBeenCalledWith(
+      'attachment-preview-modal',
+      expect.objectContaining({
+        attachment: expect.objectContaining({
+          id: 'att-obs',
+          filename: 'brainScan.jpeg',
+          description: 'Brain scan',
+          bytesContentFamily: 'IMAGE',
+          src: '/openmrs/ws/rest/v1/attachment/att-obs/bytes',
+        }),
+        closeModal: expect.any(Function),
+      }),
+    );
+    const [, props] = vi.mocked(showModal).mock.lastCall as [string, { closeModal: () => void }];
+    props.closeModal();
+    expect(dispose).toHaveBeenCalled();
   });
 
   it('falls back to the file name when an attachment has no caption', () => {
