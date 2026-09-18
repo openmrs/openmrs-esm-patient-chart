@@ -959,3 +959,54 @@ test('tells the user when the saved images could not be loaded', () => {
   expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
   expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
 });
+
+test('saves the note and reports the images the server rejected instead of failing the whole save', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'new-note' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  vi.mocked(createAttachment)
+    .mockResolvedValueOnce({} as Awaited<ReturnType<typeof createAttachment>>)
+    .mockRejectedValueOnce({ responseBody: { error: { message: 'The file content type text/plain is not allowed' } } });
+  renderVisitNotesForm();
+
+  await addImage(user, newImage);
+  await addImage(user, { ...newImage, fileName: 'notes.png', fileDescription: 'Scanned notes' });
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalled());
+  expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
+  expect(createAttachment).toHaveBeenCalledTimes(2);
+  expect(mockShowSnackbar).toHaveBeenCalledWith(
+    expect.objectContaining({
+      kind: 'warning',
+      title: 'Visit note saved, but 1 image was not uploaded',
+      subtitle: 'Scanned notes: The file content type text/plain is not allowed Open the note to add it again.',
+    }),
+  );
+  expect(mockShowSnackbar).not.toHaveBeenCalledWith(expect.objectContaining({ title: 'Error saving visit note' }));
+});
+
+test('still reports a failure to save the note itself as an error and keeps the form open', async () => {
+  const user = userEvent.setup();
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockRejectedValueOnce({ responseBody: { error: { message: 'Encounter datetime is invalid' } } });
+  renderVisitNotesForm();
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Some note');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() =>
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error saving visit note',
+        subtitle: 'Encounter datetime is invalid',
+      }),
+    ),
+  );
+  expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  expect(createAttachment).not.toHaveBeenCalled();
+});
