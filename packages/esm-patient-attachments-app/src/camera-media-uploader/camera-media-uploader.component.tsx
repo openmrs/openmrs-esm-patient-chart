@@ -11,12 +11,16 @@ import UploadStatusComponent from './upload-status.component';
 import styles from './camera-media-uploader.scss';
 
 interface CameraMediaUploaderModalProps {
+  /** File extensions the caller accepts. Defaults to the backend's attachments.allowedFileExtensions. */
+  allowedExtensions?: Array<string>;
   cameraOnly?: boolean;
   closeModal: () => void;
   collectDescription?: boolean;
   multipleFiles?: boolean;
   onCompletion?: () => void;
   saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
+  /** Set to false when saveFile only stages the file instead of uploading it. Defaults to true. */
+  showUploadSnackbar?: boolean;
   title?: string;
 }
 
@@ -25,12 +29,14 @@ interface CameraMediaUploadTabsProps {
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
+  allowedExtensions,
   cameraOnly,
   closeModal,
   collectDescription,
   multipleFiles,
   onCompletion,
   saveFile,
+  showUploadSnackbar = true,
   title,
 }) => {
   const { allowedFileExtensions } = useAllowedFileExtensions();
@@ -77,7 +83,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   return (
     <CameraMediaUploaderContext.Provider
       value={{
-        allowedExtensions: allowedFileExtensions,
+        allowedExtensions: allowedExtensions ?? allowedFileExtensions,
         cameraOnly,
         clearData,
         closeModal,
@@ -91,6 +97,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
         setError,
         setFilesToUpload,
         setUploadFilesToServer,
+        showUploadSnackbar,
         uploadFilesToServer,
       }}
     >

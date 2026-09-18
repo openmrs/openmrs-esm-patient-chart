@@ -16,4 +16,5 @@ export interface CameraMediaUploaderContextType {
   error?: Error;
   setError?: React.Dispatch<React.SetStateAction<Error>>;
   allowedExtensions?: Array<string> | undefined;
+  showUploadSnackbar?: boolean;
 }

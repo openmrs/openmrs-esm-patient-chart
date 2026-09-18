@@ -356,12 +356,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      allowedExtensions:
-        allowedFileExtensions && Array.isArray(allowedFileExtensions)
-          ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
-          : [],
+      // The note only takes images. Leave this undefined until the backend list has loaded so the
+      // dialog falls back to it instead of treating an empty list as "nothing allowed".
+      allowedExtensions: allowedFileExtensions?.filter((ext) => !/pdf/i.test(ext)),
       collectDescription: true,
       multipleFiles: true,
+      // Files are only staged here; they upload when the note is saved.
+      showUploadSnackbar: false,
     });
   }, [allowedFileExtensions, getValues, setValue]);
 
