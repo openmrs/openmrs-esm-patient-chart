@@ -854,7 +854,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           <img
                             className={styles.imgThumbnail}
                             src={image.base64Content}
-                            alt={image.fileDescription ?? image.fileName}
+                            alt={image.fileDescription || image.fileName}
                           />
                         </div>
                         <Button
