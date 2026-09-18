@@ -33,6 +33,10 @@
     {
       "name": "delete-attachment-modal",
       "component": "deleteAttachmentModal"
+    },
+    {
+      "name": "attachment-preview-modal",
+      "component": "attachmentPreviewModal"
     }
   ],
   "pages": []
