@@ -125,6 +125,50 @@ describe('EncounterObservations', () => {
     expect(dispose).toHaveBeenCalled();
   });
 
+  it('leaves modified clicks on an attachment link to the browser', async () => {
+    const user = userEvent.setup();
+    render(
+      <EncounterObservations
+        observations={[
+          makeObservation({
+            uuid: 'att-obs',
+            display: 'ATT IMAGE ATTACHMENT: m3ks',
+            value: { display: 'raw file' } as unknown as Obs['value'],
+            comment: 'Brain scan',
+            valueComplex: 'm3ks | instructions.default | image/jpeg | brainScan.jpeg |complex_obs/2026/brainScan.jpeg',
+          } as Partial<Obs>),
+        ]}
+      />,
+    );
+    const link = screen.getByRole('link', { name: 'Brain scan' });
+
+    await user.keyboard('{Meta>}');
+    await user.click(link);
+    await user.keyboard('{/Meta}');
+    await user.keyboard('{Control>}');
+    await user.click(link);
+    await user.keyboard('{/Control}');
+
+    expect(showModal).not.toHaveBeenCalled();
+  });
+
+  it('keeps showing the value of a complex obs another handler wrote', () => {
+    render(
+      <EncounterObservations
+        observations={[
+          makeObservation({
+            display: 'Discharge summary: Patient discharged in stable condition',
+            value: { display: 'raw file' } as unknown as Obs['value'],
+            valueComplex: 'Patient discharged in stable condition file |complex_obs/summary.txt',
+          } as Partial<Obs>),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('Patient discharged in stable condition')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
   it('falls back to the file name when an attachment has no caption', () => {
     const attachment = makeObservation({
       uuid: 'att-obs',

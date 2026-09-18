@@ -12,8 +12,14 @@ const METADATA_SEPARATOR = ' | ';
 const KEY_SEPARATOR = ' |';
 const CORE_TYPE_SUFFIXES = [' image', ' file'];
 
+/**
+ * True only for complex obs the attachments module wrote, recognised by its marker at the start of
+ * `valueComplex`. Complex obs from other handlers keep their normal display.
+ */
 export function isAttachmentObs(obs: ComplexObs): boolean {
-  return typeof obs.valueComplex === 'string' && obs.valueComplex.length > 0;
+  return (
+    typeof obs.valueComplex === 'string' && obs.valueComplex.startsWith(`${ATTACHMENTS_PREFIX}${METADATA_SEPARATOR}`)
+  );
 }
 
 /**

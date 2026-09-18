@@ -33,6 +33,10 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
         <Link
           href={attachment.src}
           onClick={(event: React.MouseEvent) => {
+            // Modified or non-primary clicks keep the browser's own new-tab behaviour.
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+              return;
+            }
             event.preventDefault();
             const dispose = showModal('attachment-preview-modal', {
               attachment,

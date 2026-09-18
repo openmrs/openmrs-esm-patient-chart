@@ -12,8 +12,11 @@ const obs = (valueComplex: string | null, extra: Partial<ComplexObs> = {}): Comp
   ({ uuid: 'obs-uuid', valueComplex, ...extra }) as ComplexObs;
 
 describe('isAttachmentObs', () => {
-  it('is true only when the obs carries a valueComplex', () => {
+  it('is true only for complex obs written by the attachments module', () => {
     expect(isAttachmentObs(obs('m3ks | instructions.default | image/png | scan.png |complex_obs/scan.png'))).toBe(true);
+    expect(isAttachmentObs(obs('m3ks | instructions.default | application/pdf | summary.pdf'))).toBe(true);
+    expect(isAttachmentObs(obs('discharge summary.pdf file |complex_obs/discharge.pdf'))).toBe(false);
+    expect(isAttachmentObs(obs('A narrative that happens to end with the word file'))).toBe(false);
     expect(isAttachmentObs(obs(null))).toBe(false);
     expect(isAttachmentObs(obs(''))).toBe(false);
     expect(isAttachmentObs({ uuid: 'x', value: 12 } as ComplexObs)).toBe(false);
