@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText } from '@carbon/react';
+import { Link, SkeletonText } from '@carbon/react';
 import { type Obs, useConfig } from '@openmrs/esm-framework';
+import { type ComplexObs, getAttachmentLabel, getAttachmentUrl, isAttachmentObs } from './attachment-obs';
 import styles from './styles.scss';
 
 interface EncounterObservationsProps {
@@ -21,7 +22,17 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     }
   }
 
-  function getAnswer(obs: Obs): string {
+  function getAnswer(obs: Obs): React.ReactNode {
+    // A file attachment. Its REST display only carries the attachments module's storage marker,
+    // so show the caption or file name and let the user open the file.
+    if (isAttachmentObs(obs as ComplexObs)) {
+      return (
+        <Link href={getAttachmentUrl(obs as ComplexObs)} target="_blank" rel="noopener noreferrer">
+          {getAttachmentLabel(obs as ComplexObs)}
+        </Link>
+      );
+    }
+
     if (
       obs.value !== null &&
       typeof obs.value === 'object' &&

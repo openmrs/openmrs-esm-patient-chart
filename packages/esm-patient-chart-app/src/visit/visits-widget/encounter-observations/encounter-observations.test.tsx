@@ -68,4 +68,36 @@ describe('EncounterObservations', () => {
     expect(screen.getByText('Admission details')).toBeInTheDocument();
     expect(screen.getByText('Inpatient Ward')).toBeInTheDocument();
   });
+
+  it('shows an attachment as a link to the file, labelled with its caption', () => {
+    const attachment = makeObservation({
+      uuid: 'att-obs',
+      display: 'ATT IMAGE ATTACHMENT: m3ks',
+      concept: { uuid: 'att-image-concept', display: 'ATT IMAGE ATTACHMENT' },
+      value: { display: 'raw file' } as unknown as Obs['value'],
+      comment: 'Brain scan',
+      valueComplex: 'm3ks | instructions.default | image/jpeg | brainScan.jpeg |complex_obs/2026/brainScan.jpeg',
+    } as Partial<Obs>);
+
+    render(<EncounterObservations observations={[attachment]} />);
+
+    const link = screen.getByRole('link', { name: 'Brain scan' });
+    expect(link).toHaveAttribute('href', '/openmrs/ws/rest/v1/attachment/att-obs/bytes');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(screen.queryByText('m3ks')).not.toBeInTheDocument();
+  });
+
+  it('falls back to the file name when an attachment has no caption', () => {
+    const attachment = makeObservation({
+      uuid: 'att-obs',
+      display: 'ATT IMAGE ATTACHMENT: m3ks',
+      value: { display: 'raw file' } as unknown as Obs['value'],
+      comment: '',
+      valueComplex: 'm3ks | instructions.default | image/png | box2.png |complex_obs/2026/box2.png',
+    } as Partial<Obs>);
+
+    render(<EncounterObservations observations={[attachment]} />);
+
+    expect(screen.getByRole('link', { name: 'box2.png' })).toBeInTheDocument();
+  });
 });
