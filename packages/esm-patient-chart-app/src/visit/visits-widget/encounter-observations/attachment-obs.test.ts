@@ -4,7 +4,6 @@ import {
   getAttachmentFileName,
   getAttachmentLabel,
   getAttachmentMimeType,
-  getAttachmentUrl,
   isAttachmentObs,
   toAttachment,
 } from './attachment-obs';
@@ -60,12 +59,6 @@ describe('getAttachmentLabel', () => {
   it('uses the file name when the caption is blank', () => {
     expect(getAttachmentLabel(obs(stored, { comment: '  ' }))).toBe('scan.png');
     expect(getAttachmentLabel(obs(stored))).toBe('scan.png');
-  });
-});
-
-describe('getAttachmentUrl', () => {
-  it('points at the attachment bytes endpoint for the obs', () => {
-    expect(getAttachmentUrl(obs('m3ks | x | y | z'))).toBe('/openmrs/ws/rest/v1/attachment/obs-uuid/bytes');
   });
 });
 

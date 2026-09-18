@@ -17,9 +17,10 @@ export function isAttachmentObs(obs: ComplexObs): boolean {
 }
 
 /**
- * Pulls the original file name out of an obs `valueComplex`. Mirrors the parsing in the attachments
- * module's ValueComplex, which stores `m3ks | instructions | mime type | file name |storage key`, and
- * falls back to core's own `file name image |storage key` layout for obs the module did not write.
+ * Pulls the original file name out of an obs `valueComplex`. Follows the layouts the attachments
+ * module's ValueComplex writes, `m3ks | instructions | mime type | file name |storage key` and the
+ * older form without a key, and falls back to core's own `file name image |storage key` layout for
+ * obs the module did not write.
  */
 export function getAttachmentFileName(obs: ComplexObs): string {
   const valueComplex = obs.valueComplex ?? '';
@@ -54,10 +55,6 @@ export function getAttachmentLabel(obs: ComplexObs): string {
   return obs.comment?.trim() || getAttachmentFileName(obs);
 }
 
-export function getAttachmentUrl(obs: ComplexObs): string {
-  return getAttachmentBytesUrl(obs.uuid);
-}
-
 /** The mime type the attachments module recorded, or an empty string for obs it did not write. */
 export function getAttachmentMimeType(obs: ComplexObs): string {
   const parts = (obs.valueComplex ?? '').split(METADATA_SEPARATOR);
@@ -79,7 +76,7 @@ export function toAttachment(obs: ComplexObs): Attachment {
   const mimeType = getAttachmentMimeType(obs);
   return {
     id: obs.uuid,
-    src: getAttachmentUrl(obs),
+    src: getAttachmentBytesUrl(obs.uuid),
     filename: getAttachmentFileName(obs),
     description: obs.comment?.trim() || undefined,
     dateTime: obs.obsDatetime,
