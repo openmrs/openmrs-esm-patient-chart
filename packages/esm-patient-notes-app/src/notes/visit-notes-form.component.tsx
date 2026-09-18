@@ -212,10 +212,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [encounter, patientUuid, t]);
 
   const currentImages = watch('images');
-  const { images: savedImages, isLoading: isLoadingSavedImages } = useVisitNoteImages(
-    patientUuid,
-    isEditing ? encounter.id : undefined,
-  );
+  const {
+    images: savedImages,
+    isLoading: isLoadingSavedImages,
+    error: savedImagesError,
+  } = useVisitNoteImages(patientUuid, isEditing ? encounter.id : undefined);
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
@@ -729,6 +730,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     <InlineLoading
                       className={styles.savedImagesLoading}
                       description={t('loadingSavedImages', 'Loading saved images') + '...'}
+                    />
+                  )}
+                  {savedImagesError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('savedImagesLoadError', "Couldn't load the images saved on this note")}
+                      subtitle={t('savedImagesLoadErrorHint', 'Check the Attachments page before adding them again.')}
                     />
                   )}
                   <div className={styles.imgThumbnailGrid}>

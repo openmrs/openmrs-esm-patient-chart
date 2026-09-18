@@ -6,7 +6,7 @@
  * fails the cross-realm equality check used here.
  */
 import React from 'react';
-import { vi, expect, test, beforeEach } from 'vitest';
+import { vi, expect, test, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor, act } from '@testing-library/react';
 import {
@@ -844,6 +844,14 @@ const newImage: UploadedFile = {
   fileDescription: 'Wound photo',
 };
 
+const defaultConfig: ConfigObject = { ...getDefaultsFromConfigSchema(configSchema), ...ConfigMock };
+const noSavedImages = { images: [], isLoading: false, error: null };
+
+afterEach(() => {
+  mockUseConfig.mockReturnValue(defaultConfig);
+  vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
+});
+
 // The image tests save notes without a diagnosis, so the config must not require one.
 function allowNotesWithoutDiagnosis() {
   mockUseConfig.mockReturnValue({
@@ -943,4 +951,11 @@ test('shows a loading indicator while the saved images load', () => {
   vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: true, error: null });
   renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
   expect(screen.getByText(/loading saved images/i)).toBeInTheDocument();
+});
+
+test('tells the user when the saved images could not be loaded', () => {
+  vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: false, error: new Error('boom') });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+  expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
+  expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
 });

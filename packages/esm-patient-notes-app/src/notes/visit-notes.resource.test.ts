@@ -41,7 +41,7 @@ test('asks for the attachments on the note encounter and keeps only the images',
   expect(result.current.images).toEqual([
     {
       id: 'att-image',
-      src: `${window.openmrsBase}/ws/rest/v1/attachment/att-image/bytes`,
+      src: '/openmrs/ws/rest/v1/attachment/att-image/bytes',
       description: 'Front view',
       filename: 'front.png',
     },
