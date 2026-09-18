@@ -34,7 +34,7 @@
   "primaryDiagnosis": "Основной диагноз",
   "primaryDiagnosisInputPlaceholder": "Выберите основной диагноз",
   "primaryDiagnosisRequired": "Выберите хотя бы один основной диагноз",
-  "removeImage": "Remove image: {{name}}",
+  "removeImage": "Удалить изображение: {{name}}",
   "retry": "Повторить",
   "saveAndClose": "Сохранить и закрыть",
   "saving": "Сохранение",
