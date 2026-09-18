@@ -28,6 +28,14 @@ interface CameraMediaUploadTabsProps {
   title?: string;
 }
 
+/** Lower-cases and strips a leading dot so 'PNG' and '.png' both mean png. */
+function normalizeExtensions(extensions: Array<string> | undefined) {
+  if (!extensions) {
+    return extensions;
+  }
+  return Array.from(new Set(extensions.map((ext) => ext.trim().replace(/^\./, '').toLowerCase()).filter(Boolean)));
+}
+
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   allowedExtensions,
   cameraOnly,
@@ -83,7 +91,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   return (
     <CameraMediaUploaderContext.Provider
       value={{
-        allowedExtensions: allowedExtensions ?? allowedFileExtensions,
+        allowedExtensions: normalizeExtensions(allowedExtensions ?? allowedFileExtensions),
         cameraOnly,
         clearData,
         closeModal,

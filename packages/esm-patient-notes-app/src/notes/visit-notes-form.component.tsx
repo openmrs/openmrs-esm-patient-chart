@@ -95,6 +95,9 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
 
 const SEARCH_TIMEOUT_MS = 500;
 
+/** Image formats browsers render, so a staged file always has a real thumbnail. */
+const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+
 export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
@@ -349,9 +352,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      // The note only takes images. Leave this undefined until the backend list has loaded so the
-      // dialog falls back to it instead of treating an empty list as "nothing allowed".
-      allowedExtensions: allowedFileExtensions?.filter((ext) => !/pdf/i.test(ext)),
+      // The note only takes images it can show as thumbnails. Leave this undefined until the backend
+      // list has loaded so the dialog falls back to it instead of treating an empty list as "nothing allowed".
+      allowedExtensions: allowedFileExtensions?.filter((ext) => imageExtensions.has(ext.toLowerCase())),
       collectDescription: true,
       multipleFiles: true,
       // Files are only staged here; they upload when the note is saved.
