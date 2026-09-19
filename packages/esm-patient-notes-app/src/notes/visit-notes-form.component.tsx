@@ -457,24 +457,29 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         .then((encounterUuid) => {
           // Only images added in this session are in the form state. Images already saved on the
           // note are shown from the server and never re-uploaded.
-          if (images?.length) {
-            return Promise.all(
-              images.map((image) => {
-                const imageToUpload: UploadedFile = {
-                  base64Content: image.base64Content,
-                  file: image.file,
-                  fileName: image.fileName,
-                  fileType: image.fileType,
-                  fileDescription: image.fileDescription || '',
-                };
-                return createAttachment(patientUuid, imageToUpload, encounterUuid);
-              }),
-            );
-          } else {
-            return Promise.resolve([]);
+          if (!images?.length) {
+            return [];
           }
+          // The note and its diagnoses are already saved by now, so one rejected image must not
+          // fail the whole save: every image that can upload does, and the rest are reported.
+          return Promise.allSettled(
+            images.map((image) => {
+              const imageToUpload: UploadedFile = {
+                base64Content: image.base64Content,
+                file: image.file,
+                fileName: image.fileName,
+                fileType: image.fileType,
+                fileDescription: image.fileDescription || '',
+              };
+              return createAttachment(patientUuid, imageToUpload, encounterUuid);
+            }),
+          ).then((results) =>
+            results.flatMap((result, index) =>
+              result.status === 'rejected' ? [{ image: images[index], reason: result.reason }] : [],
+            ),
+          );
         })
-        .then(() => {
+        .then((failedUploads) => {
           // Invalidate encounter and notes data since we created a new encounter with notes
           // Also invalidate visit history table since the visit now has new encounters
           invalidateVisitAndEncounterData(globalMutate, patientUuid);
@@ -485,6 +490,29 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           }
 
           closeWorkspace({ discardUnsavedChanges: true });
+
+          if (failedUploads.length) {
+            const [{ reason }] = failedUploads;
+            const names = failedUploads
+              .map(({ image }) => image.fileDescription?.trim() || image.fileName?.trim())
+              .filter(Boolean)
+              .join(', ');
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'warning',
+              title: t('visitNoteSavedImagesFailed', 'Visit note saved, but {{count}} image was not uploaded', {
+                count: failedUploads.length,
+              }),
+              subtitle: [names, reason?.responseBody?.error?.message ?? reason?.message]
+                .filter(Boolean)
+                .join(': ')
+                .concat(
+                  ' ',
+                  t('reAddImagesFromNote', 'Open the note to add it again.', { count: failedUploads.length }),
+                ),
+            });
+            return;
+          }
 
           showSnackbar({
             isLowContrast: true,
