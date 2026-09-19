@@ -26,6 +26,7 @@ import {
 import {
   type PatientWorkspace2DefinitionProps,
   type PatientWorkspaceGroupProps,
+  useAllowedFileExtensions,
 } from '@openmrs/esm-patient-common-lib';
 import {
   fetchDiagnosisConceptsByName,
@@ -102,6 +103,14 @@ const mockUseSession = vi.mocked(useSession);
 const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
+
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@openmrs/esm-patient-common-lib');
+  return {
+    ...actual,
+    useAllowedFileExtensions: vi.fn(() => ({ allowedFileExtensions: undefined, error: undefined, isLoading: false })),
+  };
+});
 
 vi.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: vi.fn(),
@@ -850,6 +859,11 @@ const noSavedImages = { images: [], isLoading: false, error: null };
 afterEach(() => {
   mockUseConfig.mockReturnValue(defaultConfig);
   vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: undefined,
+    isLoading: false,
+  });
 });
 
 // The image tests save notes without a diagnosis, so the config must not require one.
@@ -958,4 +972,33 @@ test('tells the user when the saved images could not be loaded', () => {
   renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
   expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
   expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
+});
+
+test('only offers image formats to the picker and stages files without an upload toast', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['jpeg', 'png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+
+  expect(showModal).toHaveBeenCalledWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['jpeg', 'png'], showUploadSnackbar: false }),
+  );
+});
+
+test('lets the picker fall back to the backend list while it is still loading', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+
+  const [, props] = vi.mocked(showModal).mock.lastCall as [string, { allowedExtensions?: Array<string> }];
+  expect(props.allowedExtensions).toBeUndefined();
 });
