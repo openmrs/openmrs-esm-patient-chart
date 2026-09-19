@@ -43,6 +43,8 @@
   "nameIsRequired": "Nama diperlukan",
   "noAttachmentsToDisplay": "Tidak ada lampiran untuk ditampilkan untuk pasien ini",
   "noImageToDisplay": "Tidak ada gambar untuk ditampilkan",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "berhasil dihapus",
   "supportedFiletypes": "File yang didukung adalah {{supportedFiles}}",
   "tableView": "Tampilan tabel",
