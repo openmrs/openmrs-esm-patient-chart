@@ -43,6 +43,8 @@
   "nameIsRequired": "צריך שם",
   "noAttachmentsToDisplay": "אין צרופות להצגה למטופל הזה",
   "noImageToDisplay": "No image to display",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "נמחק בהצלחה",
   "supportedFiletypes": "הקבצים הנתמכים הם {{supportedFiles}}",
   "tableView": "Table view",

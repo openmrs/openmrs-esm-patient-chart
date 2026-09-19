@@ -43,6 +43,8 @@
   "nameIsRequired": "الاسم مطلوب",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "No image to display",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "تم الحذف بنجاح",
   "supportedFiletypes": "Supported files are {{supportedFiles}}",
   "tableView": "Table view",
