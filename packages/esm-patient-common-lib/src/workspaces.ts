@@ -81,6 +81,10 @@ export function useStartVisitIfNeeded(patientUuid: string) {
         } else {
           const dispose = showModal('start-visit-dialog', {
             closeModal: () => dispose(),
+            onCancel: () => {
+              dispose();
+              resolve(false);
+            },
             onVisitStarted: () => resolve(true),
           });
         }
