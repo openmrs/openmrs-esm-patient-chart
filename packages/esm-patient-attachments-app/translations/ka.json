@@ -43,6 +43,8 @@
   "nameIsRequired": "სახელი აუცილებელია",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "გამოსატანი გამოსახულების გარეშე",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "წარმატებით წაიშალა",
   "supportedFiletypes": "მხარდაჭერილი ფაილებია {{supportedFiles}}",
   "tableView": "ცხრილის ხედი",

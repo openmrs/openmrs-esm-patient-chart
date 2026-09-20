@@ -13,8 +13,23 @@
 }
 
 .diagnosis {
-  padding: layout.$spacing-04;
   border-top: 0.0625rem solid colors.$gray-20;
+}
+
+.diagnosisButton {
+  width: 100%;
+  padding: layout.$spacing-04;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid colors.$blue-60;
+    outline-offset: -2px;
+  }
 }
 
 .diagnosis:first-of-type {
@@ -64,6 +79,10 @@
   object-fit: cover;
 }
 
+.savedImagesLoading {
+  margin-top: layout.$spacing-05;
+}
+
 .imgThumbnailGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, 7rem);
@@ -79,19 +98,41 @@
 }
 
 .removeButton {
-  position: absolute;
-  top: layout.$spacing-02;
-  right: layout.$spacing-02;
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  padding-block-start: 0;
-  --cds-layout-size-height-local: 0;
-}
+  &:global(.cds--btn) {
+    position: absolute;
+    top: layout.$spacing-02;
+    right: layout.$spacing-02;
+    width: layout.$spacing-06;
+    height: layout.$spacing-06;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    padding-block: 0;
+    border: 1px solid colors.$gray-40;
+    border-radius: 50%;
+    background-color: colors.$white;
+    color: colors.$gray-90;
+    align-items: center;
+    justify-content: center;
 
-.closeIcon {
-  fill: white !important;
+    &:hover,
+    &:focus,
+    &:active {
+      color: colors.$gray-90;
+    }
+
+    &:focus {
+      background-color: colors.$white;
+    }
+
+    &:hover {
+      background-color: colors.$gray-20;
+    }
+
+    &:active {
+      background-color: colors.$gray-30;
+    }
+  }
 }
 
 .button {
@@ -147,6 +188,10 @@
 
 .row {
   margin: layout.$spacing-03 0 layout.$spacing-08;
+
+  &:has(.diagnosisList) {
+    margin-bottom: layout.$spacing-05;
+  }
 }
 
 .skeleton {
@@ -196,7 +241,7 @@
     }
   }
 
-  .diagnosis {
+  .diagnosisButton {
     padding: layout.$spacing-05 layout.$spacing-04;
   }
 

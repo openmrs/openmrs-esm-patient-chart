@@ -43,6 +43,8 @@
   "nameIsRequired": "O nome é obrigatório",
   "noAttachmentsToDisplay": "Não há anexos a serem exibidos para esse paciente",
   "noImageToDisplay": "Nenhuma imagem para exibir",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "excluído com sucesso",
   "supportedFiletypes": "Os arquivos suportados são {{supportedFiles}}",
   "tableView": "Visualização da tabela",

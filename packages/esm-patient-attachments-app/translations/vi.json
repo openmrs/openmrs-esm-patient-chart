@@ -43,6 +43,8 @@
   "nameIsRequired": "Tên là bắt buộc",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "Không có hình ảnh để hiển thị",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "đã xóa thành công",
   "supportedFiletypes": "Các tập tin được hỗ trợ là {{supportedFiles}}",
   "tableView": "Xem bảng",

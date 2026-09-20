@@ -1,0 +1,28 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.description {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-03;
+}
+
+.body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 20rem;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.pdf {
+  width: 100%;
+  height: 70vh;
+  border: 0;
+}

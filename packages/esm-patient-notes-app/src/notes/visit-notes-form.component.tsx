@@ -24,7 +24,7 @@ import {
   TextArea,
   Tile,
 } from '@carbon/react';
-import { Add, CloseFilled, WarningFilled } from '@carbon/react/icons';
+import { Add, Close, WarningFilled } from '@carbon/react/icons';
 import {
   createAttachment,
   createErrorHandler,
@@ -53,6 +53,7 @@ import {
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
+  useVisitNoteImages,
   useVisitNotes,
 } from './visit-notes.resource';
 import styles from './visit-notes-form.scss';
@@ -168,12 +169,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     control,
     formState: { errors, dirtyFields, isSubmitting },
     handleSubmit,
+    getValues,
     setValue,
     watch,
   } = useForm<VisitNotesFormData>({
     mode: 'onSubmit',
     resolver: customResolver,
     defaultValues: {
+      images: [],
       primaryDiagnosisSearch: '',
       noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
@@ -209,6 +212,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [encounter, patientUuid, t]);
 
   const currentImages = watch('images');
+  const {
+    images: savedImages,
+    isLoading: isLoadingSavedImages,
+    error: savedImagesError,
+  } = useVisitNoteImages(patientUuid, isEditing ? encounter.id : undefined);
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const { mutate: globalMutate } = useSWRConfig();
@@ -334,7 +342,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           file.fileName = `${file.fileName}.png`;
         }
 
-        setValue('images', currentImages ? [...currentImages, file] : [file]);
+        setValue('images', [...getValues('images'), file], { shouldDirty: true });
         close();
         return Promise.resolve();
       },
@@ -348,12 +356,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       collectDescription: true,
       multipleFiles: true,
     });
-  }, [allowedFileExtensions, currentImages, setValue]);
+  }, [allowedFileExtensions, getValues, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
     updatedImages.splice(index, 1);
-    setValue('images', updatedImages);
+    setValue('images', updatedImages, { shouldDirty: true });
 
     showSnackbar({
       title: t('imageRemoved', 'Image removed'),
@@ -429,8 +437,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             return encounterUuid;
           }
         })
-        .then((encounterUuid) => {
-          return Promise.all(
+        .then((encounterUuid) =>
+          Promise.all(
             combinedDiagnoses.map((diagnosis) => {
               const diagnosesPayload: DiagnosisPayload = {
                 encounter: encounterUuid,
@@ -444,9 +452,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               };
               return savePatientDiagnosis(abortController, diagnosesPayload);
             }),
-          );
-        })
-        .then(() => {
+          ).then(() => encounterUuid),
+        )
+        .then((encounterUuid) => {
+          // Only images added in this session are in the form state. Images already saved on the
+          // note are shown from the server and never re-uploaded.
           if (images?.length) {
             return Promise.all(
               images.map((image) => {
@@ -457,7 +467,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   fileType: image.fileType,
                   fileDescription: image.fileDescription || '',
                 };
-                return createAttachment(patientUuid, imageToUpload);
+                return createAttachment(patientUuid, imageToUpload, encounterUuid);
               }),
             );
           } else {
@@ -523,7 +533,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const hasUserUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
   return (
-    <Workspace2 title={t('visitNoteWorkspaceTitle', 'Visit note')} hasUnsavedChanges={hasUserUnsavedChanges}>
+    <Workspace2
+      title={isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
+      hasUnsavedChanges={hasUserUnsavedChanges}
+    >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
         <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
 
@@ -535,7 +548,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
         <div className={styles.formContainer}>
           <Stack gap={2}>
-            {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
+            {isTablet ? (
+              <h2 className={styles.heading}>
+                {isEditing ? t('editVisitNote', 'Edit visit note') : t('addVisitNote', 'Add visit note')}
+              </h2>
+            ) : null}
             {isRetrospectiveDataEntryEnabled && (
               <Row className={styles.row}>
                 <Column sm={1}>
@@ -709,7 +726,34 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   >
                     {t('addImage', 'Add image')}
                   </Button>
+                  {isLoadingSavedImages && (
+                    <InlineLoading
+                      className={styles.savedImagesLoading}
+                      description={t('loadingSavedImages', 'Loading saved images') + '...'}
+                    />
+                  )}
+                  {savedImagesError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('savedImagesLoadError', "Couldn't load the images saved on this note")}
+                      subtitle={t('savedImagesLoadErrorHint', 'Check the Attachments page before adding them again.')}
+                    />
+                  )}
                   <div className={styles.imgThumbnailGrid}>
+                    {savedImages.map((image) => (
+                      <div key={image.id} className={styles.imgThumbnailItem}>
+                        <div className={styles.imgThumbnailContainer}>
+                          <img
+                            className={styles.imgThumbnail}
+                            src={image.src}
+                            alt={image.description || image.filename || t('savedImage', 'Saved image')}
+                          />
+                        </div>
+                      </div>
+                    ))}
                     {currentImages?.map((image, index) => (
                       <div key={index} className={styles.imgThumbnailItem}>
                         <div className={styles.imgThumbnailContainer}>
@@ -719,8 +763,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                             alt={image.fileDescription ?? image.fileName}
                           />
                         </div>
-                        <Button kind="ghost" className={styles.removeButton} onClick={() => handleRemoveImage(index)}>
-                          <CloseFilled size={16} className={styles.closeIcon} />
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          aria-label={t('removeImage', 'Remove image: {{name}}', {
+                            name: image.fileDescription?.trim() || image.fileName?.trim() || index + 1,
+                          })}
+                          className={styles.removeButton}
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <Close size={16} />
                         </Button>
                       </div>
                     ))}
@@ -762,7 +814,7 @@ function DiagnosisSearch({
   setIsSearching,
 }: DiagnosisSearchProps) {
   const isTablet = useLayoutType() === 'tablet';
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const searchInputFocus = () => {
     inputRef.current.focus();
@@ -794,6 +846,15 @@ function DiagnosisSearch({
                 onChange(e);
                 handleSearch(name);
               }}
+              onKeyDown={(event) => {
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                  const results = document.getElementById(`${name}-results`)?.querySelectorAll('button');
+                  if (results?.length) {
+                    event.preventDefault();
+                    results[event.key === 'ArrowDown' ? 0 : results.length - 1].focus();
+                  }
+                }
+              }}
               value={value instanceof Date ? value.toISOString() : value}
               onBlur={onBlur}
             />
@@ -815,6 +876,16 @@ function DiagnosesDisplay({
   t,
   value,
 }: DiagnosesDisplayProps) {
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  const setResultsRef = useCallback(
+    (node: HTMLUListElement | null) => {
+      if (!node && resultsRef.current?.contains(document.activeElement)) {
+        document.getElementById(fieldName)?.focus();
+      }
+      resultsRef.current = node;
+    },
+    [fieldName],
+  );
   if (!value) {
     return null;
   }
@@ -825,15 +896,44 @@ function DiagnosesDisplay({
 
   if (!isSearching && searchResults?.length > 0) {
     return (
-      <ul className={styles.diagnosisList}>
+      <ul
+        ref={setResultsRef}
+        id={`${fieldName}-results`}
+        className={styles.diagnosisList}
+        aria-label={t('diagnosisSearchResults', 'Diagnosis search results')}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            document.getElementById(fieldName)?.focus();
+          } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+            const results = Array.from(event.currentTarget.querySelectorAll('button'));
+            const index = results.findIndex((result) => result === document.activeElement);
+            if (index < 0) {
+              return;
+            }
+            event.preventDefault();
+            const nextIndex =
+              event.key === 'Home'
+                ? 0
+                : event.key === 'End'
+                  ? results.length - 1
+                  : (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length;
+            results[nextIndex].focus();
+          }
+        }}
+      >
         {searchResults.filter(isDiagnosisNotSelected).map((diagnosis) => (
-          <li
-            className={styles.diagnosis}
-            key={diagnosis.uuid}
-            onClick={() => onAddDiagnosis(diagnosis, fieldName)}
-            role="menuitem"
-          >
-            {diagnosis.display}
+          <li className={styles.diagnosis} key={diagnosis.uuid}>
+            <button
+              type="button"
+              className={styles.diagnosisButton}
+              onClick={() => {
+                onAddDiagnosis(diagnosis, fieldName);
+                document.getElementById(fieldName)?.focus();
+              }}
+            >
+              {diagnosis.display}
+            </button>
           </li>
         ))}
       </ul>

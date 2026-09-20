@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { type Attachment, CloseIcon, useLayoutType } from '@openmrs/esm-framework';
+import AttachmentMedia from './attachment-media.component';
 import styles from './attachment-preview.scss';
 import Linkify from 'linkify-react';
 
@@ -19,7 +20,6 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const isPdf = attachmentToPreview.bytesContentFamily === 'PDF';
-  const isImage = attachmentToPreview.bytesContentFamily === 'IMAGE';
   const responsiveSize = isTablet ? 'lg' : 'md';
 
   useEffect(() => {
@@ -49,11 +49,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           size={responsiveSize}
         />
         <div className={styles.attachmentPreview}>
-          {isImage ? (
-            <img src={attachmentToPreview.src} alt={attachmentToPreview.filename} />
-          ) : isPdf ? (
-            <iframe className={styles.pdfViewer} src={attachmentToPreview.src} title="PDFViewer" />
-          ) : null}
+          <AttachmentMedia attachment={attachmentToPreview} pdfClassName={styles.pdfViewer} />
         </div>
         <OverflowMenu
           align="left"
