@@ -6,11 +6,14 @@
  * fails the cross-realm equality check used here.
  */
 import React from 'react';
-import { vi, expect, test, beforeEach } from 'vitest';
+import { vi, expect, test, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render, waitFor, act } from '@testing-library/react';
 import {
   type Encounter,
+  type UploadedFile,
+  createAttachment,
+  showModal,
   getDefaultsFromConfigSchema,
   showSnackbar,
   useConfig,
@@ -24,7 +27,12 @@ import {
   type PatientWorkspace2DefinitionProps,
   type PatientWorkspaceGroupProps,
 } from '@openmrs/esm-patient-common-lib';
-import { fetchDiagnosisConceptsByName, saveVisitNote, updateVisitNote } from './visit-notes.resource';
+import {
+  fetchDiagnosisConceptsByName,
+  saveVisitNote,
+  updateVisitNote,
+  useVisitNoteImages,
+} from './visit-notes.resource';
 import {
   ConfigMock,
   diagnosisSearchResponse,
@@ -105,6 +113,7 @@ vi.mock('./visit-notes.resource', () => ({
     data: mockFetchProviderByUuidResponse.data.uuid,
   })),
   saveVisitNote: vi.fn(),
+  useVisitNoteImages: vi.fn(() => ({ images: [], isLoading: false, error: null })),
   useVisitNotes: vi.fn().mockImplementation(() => ({
     mutateVisitNotes: vi.fn(),
   })),
@@ -699,3 +708,254 @@ test.each(['primary', 'secondary'].flatMap((rank) => ['result', 'outside', 'body
     expect(outside).toHaveValue(target === 'outside' ? 'yz' : '');
   },
 );
+
+test.each([false, true])(
+  'tracks image-only edits and preserves other changes when removing the image (note edited: %s)',
+  async (editNote) => {
+    const user = userEvent.setup();
+    const closeModal = vi.fn();
+    vi.mocked(showModal).mockReturnValue(closeModal);
+    const encounter: Encounter = {
+      uuid: 'existing-note',
+      id: 'existing-note',
+      rawDatetime: '2024-03-20T10:00:00.000Z',
+      obs: [],
+      diagnoses: [],
+    };
+    renderVisitNotesForm({ formContext: 'editing', encounter });
+
+    const saveButton = screen.getByRole('button', { name: /save and close/i });
+    expect(saveButton).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const [, modalProps] = vi.mocked(showModal).mock.calls.find(([name]) => name === 'capture-photo-modal');
+    const { saveFile } = modalProps as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await saveFile({
+        fileName: 'visit-note.png',
+        fileType: 'image/png',
+        file: new File(['image'], 'visit-note.png', { type: 'image/png' }),
+        base64Content: 'data:image/png;base64,aW1hZ2U=',
+        fileDescription: 'Visit note image',
+      });
+    });
+
+    expect(closeModal).toHaveBeenCalled();
+    expect(screen.getByRole('img', { name: 'Visit note image' })).toBeInTheDocument();
+    expect(saveButton).toBeEnabled();
+
+    if (editNote) {
+      await user.type(screen.getByRole('textbox', { name: /write your notes/i }), 'Updated note');
+    }
+    await user.click(screen.getByRole('button', { name: 'Remove image: Visit note image' }));
+
+    expect(screen.queryByRole('img', { name: 'Visit note image' })).not.toBeInTheDocument();
+    if (editNote) {
+      expect(saveButton).toBeEnabled();
+    } else {
+      expect(saveButton).toBeDisabled();
+    }
+  },
+);
+
+test.each(['creating', 'editing'] as const)(
+  'retains every image from a batch and subsequent uploads when %s',
+  async (formContext) => {
+    const user = userEvent.setup();
+    vi.mocked(showModal).mockReturnValue(vi.fn());
+    renderVisitNotesForm({
+      formContext,
+      ...(formContext === 'editing' && {
+        encounter: {
+          uuid: 'existing-note',
+          id: 'existing-note',
+          rawDatetime: '2024-03-20T10:00:00.000Z',
+          obs: [],
+          diagnoses: [],
+        },
+      }),
+    });
+    const files: UploadedFile[] = ['red.png', 'blue.png', 'camera'].map((fileName) => ({
+      fileName,
+      fileType: 'image/png',
+      fileDescription: fileName,
+      base64Content: 'data:image/png;base64,aW1hZ2U=',
+      capturedFromWebcam: fileName === 'camera',
+    }));
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const firstModal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await Promise.all(files.slice(0, 2).map(firstModal.saveFile));
+    });
+    expect(screen.getByRole('img', { name: 'red.png' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'blue.png' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /add image/i }));
+    const nextModal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+    await act(async () => {
+      await nextModal.saveFile(files[2]);
+    });
+    expect(files[2].fileName).toBe('camera.png');
+    expect(screen.getAllByRole('img')).toHaveLength(3);
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Remove image: blue.png' }));
+    expect(screen.queryByRole('img', { name: 'blue.png' })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'red.png' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'camera' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+  },
+);
+
+test('labels image removal with the description, filename or image number', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+  const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+  const files: UploadedFile[] = [
+    { fileName: 'first.png', fileDescription: 'Front view' },
+    { fileName: 'second.png', fileDescription: ' ' },
+    { fileName: '', fileDescription: '' },
+  ].map((file) => ({ ...file, fileType: 'image/png', base64Content: 'data:image/png;base64,aW1hZ2U=' }));
+
+  await act(async () => {
+    await Promise.all(files.map(modal.saveFile));
+  });
+
+  expect(screen.getByRole('button', { name: 'Remove image: Front view' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: second.png' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Remove image: 3' })).toBeInTheDocument();
+});
+
+const existingNote: Encounter = {
+  uuid: 'existing-note',
+  id: 'existing-note',
+  rawDatetime: '2024-03-20T10:00:00.000Z',
+  obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: 'Existing clinical note' }],
+  diagnoses: [],
+} as unknown as Encounter;
+
+const newImage: UploadedFile = {
+  fileName: 'wound.png',
+  fileType: 'image/png',
+  file: new File(['image'], 'wound.png', { type: 'image/png' }),
+  base64Content: 'data:image/png;base64,aW1hZ2U=',
+  fileDescription: 'Wound photo',
+};
+
+const defaultConfig: ConfigObject = { ...getDefaultsFromConfigSchema(configSchema), ...ConfigMock };
+const noSavedImages = { images: [], isLoading: false, error: null };
+
+afterEach(() => {
+  mockUseConfig.mockReturnValue(defaultConfig);
+  vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
+});
+
+// The image tests save notes without a diagnosis, so the config must not require one.
+function allowNotesWithoutDiagnosis() {
+  mockUseConfig.mockReturnValue({
+    ...getDefaultsFromConfigSchema(configSchema),
+    ...ConfigMock,
+    isPrimaryDiagnosisRequired: false,
+  });
+}
+
+async function addImage(user: ReturnType<typeof userEvent.setup>, file: UploadedFile) {
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+  const modal = vi.mocked(showModal).mock.lastCall[1] as { saveFile: (file: UploadedFile) => Promise<void> };
+  await act(async () => {
+    await modal.saveFile(file);
+  });
+}
+
+test('records images added while editing on the note encounter', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+
+  await addImage(user, newImage);
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+  expect(createAttachment).toHaveBeenCalledWith(
+    mockPatient.id,
+    expect.objectContaining({ fileName: 'wound.png', fileDescription: 'Wound photo' }),
+    'existing-note',
+  );
+});
+
+test('records images added to a new note on the encounter it just created', async () => {
+  const user = userEvent.setup();
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  allowNotesWithoutDiagnosis();
+  mockSaveVisitNote.mockResolvedValueOnce({ status: 201, data: { uuid: 'new-note' } } as unknown as Awaited<
+    ReturnType<typeof saveVisitNote>
+  >);
+  renderVisitNotesForm();
+
+  await addImage(user, newImage);
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(createAttachment).toHaveBeenCalledTimes(1));
+  expect(createAttachment).toHaveBeenCalledWith(
+    mockPatient.id,
+    expect.objectContaining({ fileName: 'wound.png' }),
+    'new-note',
+  );
+});
+
+test('shows the images already saved on the note without remove controls and never re-uploads them', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [
+      {
+        id: 'att-1',
+        src: '/openmrs/ws/rest/v1/attachment/att-1/bytes',
+        description: 'Front view',
+        filename: 'front.png',
+      },
+      { id: 'att-2', src: '/openmrs/ws/rest/v1/attachment/att-2/bytes', description: '', filename: 'side.png' },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  allowNotesWithoutDiagnosis();
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+
+  expect(vi.mocked(useVisitNoteImages)).toHaveBeenCalledWith(mockPatient.id, 'existing-note');
+  expect(screen.getByRole('img', { name: 'Front view' })).toHaveAttribute(
+    'src',
+    '/openmrs/ws/rest/v1/attachment/att-1/bytes',
+  );
+  expect(screen.getByRole('img', { name: 'side.png' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /remove image/i })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
+
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' with more detail');
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+
+  await waitFor(() => expect(mockUpdateVisitNote).toHaveBeenCalledTimes(1));
+  expect(createAttachment).not.toHaveBeenCalled();
+});
+
+test('does not request saved images while creating a note', () => {
+  renderVisitNotesForm();
+  expect(vi.mocked(useVisitNoteImages)).toHaveBeenCalledWith(mockPatient.id, undefined);
+});
+
+test('shows a loading indicator while the saved images load', () => {
+  vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: true, error: null });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+  expect(screen.getByText(/loading saved images/i)).toBeInTheDocument();
+});
+
+test('tells the user when the saved images could not be loaded', () => {
+  vi.mocked(useVisitNoteImages).mockReturnValue({ images: [], isLoading: false, error: new Error('boom') });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+  expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
+  expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
+});

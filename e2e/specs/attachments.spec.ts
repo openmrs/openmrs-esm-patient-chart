@@ -192,7 +192,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the PDF preview modal open', async () => {
-    await expect(page.locator('iframe[title="PDFViewer"]')).toBeVisible();
+    await expect(page.getByTitle(displayedFileName)).toBeVisible();
   });
 
   await test.step('And I should see the exact PDF filename displayed in the preview', async () => {
@@ -227,7 +227,7 @@ test('Upload and preview a PDF attachment', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the PDF preview modal open again', async () => {
-    await expect(page.locator('iframe[title="PDFViewer"]')).toBeVisible();
+    await expect(page.getByTitle(displayedFileName)).toBeVisible();
   });
 
   await test.step('When I press the Escape key', async () => {
