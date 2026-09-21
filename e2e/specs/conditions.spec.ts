@@ -16,7 +16,7 @@ test('Record, edit and delete a condition', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the conditions form launch in the workspace', async () => {
-    await expect(conditionsPage.page.getByText(/record a condition/i)).toBeVisible();
+    await expect(conditionsPage.page.getByText('Record condition', { exact: true })).toBeVisible();
   });
 
   await test.step('When I search for `Mental status change` in the search box', async () => {
@@ -24,7 +24,17 @@ test('Record, edit and delete a condition', async ({ page, patient }) => {
   });
 
   await test.step('And I select the condition', async () => {
-    await page.getByRole('menuitem', { name: 'Mental status change' }).click();
+    await expect(page.getByRole('button', { name: 'Mental status change' })).toBeVisible();
+    const results = await page
+      .getByRole('list', { name: 'Condition search results' })
+      .getByRole('button')
+      .allTextContents();
+    await page.getByPlaceholder('Search conditions').press('ArrowDown');
+    for (let index = 0; index < results.indexOf('Mental status change'); index++) {
+      await page.keyboard.press('ArrowDown');
+    }
+    await expect(page.getByRole('button', { name: 'Mental status change' })).toBeFocused();
+    await page.keyboard.press('Enter');
   });
 
   await test.step('And I set `10/07/2023` as the onset date', async () => {
@@ -67,6 +77,7 @@ test('Record, edit and delete a condition', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the Conditions form launch in the workspace in edit mode`', async () => {
+    await expect(page.getByText('Edit condition', { exact: true })).toBeVisible();
     await expect(page.getByRole('cell', { name: /mental status change/i })).toBeVisible();
   });
 

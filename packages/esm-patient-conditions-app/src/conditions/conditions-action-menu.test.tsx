@@ -74,7 +74,6 @@ describe('ConditionsActionMenu', () => {
     await user.click(screen.getByText('Edit'));
 
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith('conditions-form-workspace', {
-      workspaceTitle: 'Edit condition',
       condition: specificCondition,
       formContext: 'editing',
     });

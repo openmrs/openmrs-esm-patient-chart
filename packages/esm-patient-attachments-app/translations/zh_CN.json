@@ -43,6 +43,8 @@
   "nameIsRequired": "名称时必需的",
   "noAttachmentsToDisplay": "此患者没有可显示的附件",
   "noImageToDisplay": "没有可显示的图片",
+  "noPreviewAvailable": "No preview is available for this file.",
+  "openFile": "Open file",
   "successfullyDeleted": "删除成功",
   "supportedFiletypes": "支持的文件有 {{supportedFiles}}",
   "tableView": "表格视图",

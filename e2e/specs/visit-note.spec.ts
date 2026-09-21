@@ -15,17 +15,20 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('Then I should see the visit note form launch in the workspace', async () => {
-    await expect(page.getByText('Visit Note', { exact: true })).toBeVisible();
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
   await test.step('When I select `Asthma` as the primary diagnosis', async () => {
     await page.getByPlaceholder('Choose a primary diagnosis').fill('Asthma');
-    await page.getByRole('menuitem', { name: 'Asthma', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeVisible();
+    await page.getByPlaceholder('Choose a primary diagnosis').press('ArrowDown');
+    await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
+    await page.keyboard.press('Enter');
   });
 
   await test.step('And I select `GI upset` as the secondary diagnosis', async () => {
     await page.getByPlaceholder('Choose a secondary diagnosis').fill('GI upset');
-    await page.getByRole('menuitem', { name: /gi upset/i }).click();
+    await page.getByRole('button', { name: /gi upset/i }).click();
   });
 
   await test.step('And I add a visit note', async () => {
@@ -86,6 +89,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('Then the visit note form should open in edit mode with the existing note prefilled', async () => {
+    await expect(page.getByText('Edit visit note', { exact: true })).toBeVisible();
     await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
   });
 
