@@ -215,7 +215,6 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
   });
 
   it('mounts the side effects extension slot with the selected drug uuid', () => {
-    mockExtensionSlot.mockClear();
     const item = createNewOrderBasketItem();
     renderDrugOrderForm(item);
 
