@@ -39,8 +39,7 @@
   },
   "dependencies": {
     "@carbon/react": "^1.83.0",
-    "@openmrs/esm-patient-common-lib": "next",
-    "lodash-es": "^4.18.1"
+    "@openmrs/esm-patient-common-lib": "next"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "10.x",
