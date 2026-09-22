@@ -149,6 +149,14 @@
   }
 }
 
+.actions {
+  gap: 0;
+
+  .button {
+    margin: 0;
+  }
+}
+
 .tablet {
   padding: layout.$spacing-06 layout.$spacing-05;
   background-color: white;
@@ -261,4 +269,26 @@
 
 .uploadButton {
   margin-top: layout.$spacing-05;
+}
+
+.pendingImage {
+  opacity: 0.4;
+}
+
+.removalStatus {
+  @include type.type-style('label-01');
+  margin-block-start: layout.$spacing-03;
+  color: colors.$gray-70;
+  text-align: center;
+}
+
+.undoButton:global(.cds--btn) {
+  flex-shrink: 0;
+  margin-block: layout.$spacing-03 0;
+}
+
+.removalHint {
+  @include type.type-style('helper-text-01');
+  margin-block-start: layout.$spacing-03;
+  color: colors.$gray-70;
 }

@@ -28,10 +28,7 @@
     {
       "name": "sticky-note-modal",
       "component": "stickyNoteModal"
-    },
-    {
-      "name": "remove-visit-note-image-modal",
-      "component": "removeVisitNoteImageModal"
+
     }
   ],
   "workspaces2": [
