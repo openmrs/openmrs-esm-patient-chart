@@ -110,6 +110,7 @@
   "quantityToDispense": "Quantity to dispense",
   "refills": "Refills",
   "removeFromBasket": "Remove from basket",
+  "renewAll": "Renew all",
   "returnToOrderBasket": "Return to order basket",
   "saveOrder": "Save order",
   "search": "Search",
@@ -129,6 +130,7 @@
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
   "unknown": "Unknown",
+  "unknownEncounterDate": "Unknown date",
   "updated": "Updated",
   "usingADifferentTerm": "using a different term"
 }
