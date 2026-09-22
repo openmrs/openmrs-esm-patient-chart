@@ -1,16 +1,23 @@
 import React from 'react';
-import { vi, describe, it, expect, type Mock } from 'vitest';
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { mockFhirAllergyIntoleranceResponse } from '__mocks__';
 import { mockPatient, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { type AllergiesConfigObject, configSchema } from '../config-schema';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
+import styles from './allergies-detailed-summary.scss';
 
 const mockOpenmrsFetch = openmrsFetch as Mock;
+const mockUseConfig = vi.mocked(useConfig<AllergiesConfigObject>);
 mockOpenmrsFetch.mockImplementation(vi.fn());
 
 describe('AllergiesDetailedSummary', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
+  });
+
   it('renders an empty state view if allergy data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { entry: [] } });
     renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
@@ -72,5 +79,67 @@ describe('AllergiesDetailedSummary', () => {
 
     const expectedNonCodedAllergy = /non-coded allergen severe non-coded allergic reaction non coded allergic note/i;
     expect(screen.getByRole('row', { name: new RegExp(expectedNonCodedAllergy) })).toBeInTheDocument();
+  });
+
+  it('uses configured severity-style mapping for allergen styling', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      severityStyleMap: {
+        severe: 'low',
+        moderate: 'moderate',
+        mild: 'high',
+      },
+    });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
+    await waitForLoadingToFinish();
+
+    const severeAllergen = screen.getByText(/penicillins/i);
+    expect(severeAllergen).toHaveClass(styles.allergySeverityLow);
+  });
+
+  it('uses default severity-style mapping when config is not overridden', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
+    await waitForLoadingToFinish();
+
+    const severeAllergen = screen.getByText(/penicillins/i);
+    expect(severeAllergen).toHaveClass(styles.allergySeverityHigh);
+  });
+
+  it('does not apply severity class for unknown severities', async () => {
+    const customResponse = structuredClone(mockFhirAllergyIntoleranceResponse);
+    customResponse.entry[2].resource.reaction[0].severity = 'unknown';
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: customResponse });
+    renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
+    await waitForLoadingToFinish();
+
+    const unknownSeverityAllergen = screen.getByText(/penicillins/i);
+    expect(unknownSeverityAllergen).not.toHaveClass(styles.allergySeverityHigh);
+    expect(unknownSeverityAllergen).not.toHaveClass(styles.allergySeverityModerate);
+    expect(unknownSeverityAllergen).not.toHaveClass(styles.allergySeverityLow);
+  });
+
+  it('does not apply background severity class by default', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
+    await waitForLoadingToFinish();
+
+    const severeAllergen = screen.getByText(/penicillins/i);
+    expect(severeAllergen).not.toHaveClass(styles.withSeverityBackground);
+  });
+
+  it('applies background severity class when enabled via config', async () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      enableSeverityBackgroundColoring: true,
+    });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    renderWithSwr(<AllergiesDetailedSummary patient={mockPatient} />);
+    await waitForLoadingToFinish();
+
+    const severeAllergen = screen.getByText(/penicillins/i);
+    expect(severeAllergen).toHaveClass(styles.withSeverityBackground);
   });
 });
