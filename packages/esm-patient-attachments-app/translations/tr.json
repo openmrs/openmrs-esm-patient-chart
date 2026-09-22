@@ -39,12 +39,15 @@
   "imagePlaceholder": "Image placeholder",
   "imagePreview": "Image preview",
   "keepAttachment": "Keep attachment",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "name",
   "nameIsRequired": "Name is required",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "No image to display",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "successfully deleted",
   "supportedFiletypes": "Supported files are {{supportedFiles}}",
   "tableView": "Table view",
@@ -57,6 +60,7 @@
   "uploadError": "Error uploading file",
   "uploadFiles": "Upload files",
   "uploading": "Uploading",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Files will be uploaded in the background. You can close this modal.",
   "webcam": "Webcam"
 }

@@ -39,12 +39,15 @@
   "imagePlaceholder": "Giữ chỗ hình ảnh",
   "imagePreview": "Xem trước hình ảnh",
   "keepAttachment": "Keep attachment",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "tên",
   "nameIsRequired": "Tên là bắt buộc",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "Không có hình ảnh để hiển thị",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "đã xóa thành công",
   "supportedFiletypes": "Các tập tin được hỗ trợ là {{supportedFiles}}",
   "tableView": "Xem bảng",
@@ -57,6 +60,7 @@
   "uploadError": "Lỗi tải tập tin lên",
   "uploadFiles": "Tải lên các tập tin",
   "uploading": "Đang tải lên",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Các tập tin sẽ được tải lên ở chế độ nền. Bạn có thể đóng hộp thoại này.",
   "webcam": "Webcam"
 }

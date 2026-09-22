@@ -39,12 +39,15 @@
   "imagePlaceholder": "Placeholder gambar",
   "imagePreview": "Pratinjau gambar",
   "keepAttachment": "Simpan lampiran",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "nama",
   "nameIsRequired": "Nama diperlukan",
   "noAttachmentsToDisplay": "Tidak ada lampiran untuk ditampilkan untuk pasien ini",
   "noImageToDisplay": "Tidak ada gambar untuk ditampilkan",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "berhasil dihapus",
   "supportedFiletypes": "File yang didukung adalah {{supportedFiles}}",
   "tableView": "Tampilan tabel",
@@ -57,6 +60,7 @@
   "uploadError": "Kesalahan mengunggah file",
   "uploadFiles": "Unggah file",
   "uploading": "Mengunggah",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "File akan diunggah di latar belakang. Anda dapat menutup modal ini.",
   "webcam": "Webcam"
 }
