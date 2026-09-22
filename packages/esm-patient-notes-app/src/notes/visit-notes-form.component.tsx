@@ -752,6 +752,28 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                             alt={image.description || image.filename || t('savedImage', 'Saved image')}
                           />
                         </div>
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          disabled={isSubmitting}
+                          aria-label={t('removeImage', 'Remove image: {{name}}', {
+                            name: image.description || image.filename || t('savedImage', 'Saved image'),
+                          })}
+                          className={styles.removeButton}
+                          onClick={() => {
+                            const dispose = showModal('remove-visit-note-image-modal', {
+                              image,
+                              close: () => dispose(),
+                              onRemoved: () => {
+                                mutateAttachments();
+                                mutateVisitNotes();
+                                invalidateVisitAndEncounterData(globalMutate, patientUuid);
+                              },
+                            });
+                          }}
+                        >
+                          <Close size={16} />
+                        </Button>
                       </div>
                     ))}
                     {currentImages?.map((image, index) => (

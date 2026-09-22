@@ -907,7 +907,7 @@ test('records images added to a new note on the encounter it just created', asyn
   );
 });
 
-test('shows the images already saved on the note without remove controls and never re-uploads them', async () => {
+test('shows the images already saved on the note with remove controls and never re-uploads them', async () => {
   const user = userEvent.setup();
   vi.mocked(useVisitNoteImages).mockReturnValue({
     images: [
@@ -932,7 +932,12 @@ test('shows the images already saved on the note without remove controls and nev
     '/openmrs/ws/rest/v1/attachment/att-1/bytes',
   );
   expect(screen.getByRole('img', { name: 'side.png' })).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: /remove image/i })).not.toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /remove image/i })).toHaveLength(2);
+  await user.click(screen.getByRole('button', { name: /remove image: front view/i }));
+  expect(showModal).toHaveBeenCalledWith(
+    'remove-visit-note-image-modal',
+    expect.objectContaining({ image: expect.objectContaining({ id: 'att-1' }), onRemoved: expect.any(Function) }),
+  );
   expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
 
   await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' with more detail');
