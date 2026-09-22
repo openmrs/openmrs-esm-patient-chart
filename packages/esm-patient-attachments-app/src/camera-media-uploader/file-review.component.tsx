@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAllowedFileExtensions } from '@openmrs/esm-patient-common-lib';
-import { getCoreTranslation, type UploadedFile, UserHasAccess } from '@openmrs/esm-framework';
+import { getCoreTranslation, type UploadedFile } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './file-review.scss';
 
@@ -222,14 +222,12 @@ const FilePreview: React.FC<FilePreviewProps> = ({
         </div>
       </ModalBody>
       <ModalFooter>
-        <UserHasAccess privilege="Create Attachments">
-          <Button kind="secondary" onClick={handleCancelUpload} size="lg">
-            {getCoreTranslation('cancel')}
-          </Button>
-          <Button type="submit" size="lg">
-            {title || t('addAttachment', 'Add attachment')}
-          </Button>
-        </UserHasAccess>
+        <Button kind="secondary" onClick={handleCancelUpload} size="lg">
+          {getCoreTranslation('cancel')}
+        </Button>
+        <Button type="submit" size="lg">
+          {title || t('addAttachment', 'Add attachment')}
+        </Button>
       </ModalFooter>
     </Form>
   );
