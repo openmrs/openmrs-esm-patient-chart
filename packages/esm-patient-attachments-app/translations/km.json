@@ -39,12 +39,15 @@
   "imagePlaceholder": "Image placeholder",
   "imagePreview": "Image preview",
   "keepAttachment": "Keep attachment",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "ឈ្មោះ",
   "nameIsRequired": "Name is required",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "No image to display",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "បានលុបចោលដោយជោគជ័យ",
   "supportedFiletypes": "Supported files are {{supportedFiles}}",
   "tableView": "Table view",
@@ -57,6 +60,7 @@
   "uploadError": "Error uploading file",
   "uploadFiles": "Upload files",
   "uploading": "កំពុងបង្ហោះ",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "ឯកសារនឹងត្រូវបានផ្ទុកឡើងក្នុងផ្ទៃខាងក្រោយ។ អ្នកអាចបិទបង្អួចនេះ",
   "webcam": "វេបខេម"
 }
