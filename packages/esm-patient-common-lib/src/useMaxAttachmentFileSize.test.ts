@@ -1,7 +1,7 @@
+import React from 'react';
 import { expect, test, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
-import React from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useMaxAttachmentFileSize } from './useMaxAttachmentFileSize';
 
