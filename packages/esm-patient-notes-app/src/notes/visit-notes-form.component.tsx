@@ -486,45 +486,51 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       };
       return Promise.resolve()
         .then(async () => {
-          for (const imageId of removedImageIds) {
-            await removeVisitNoteImage(imageId);
-            setRemovedImages((removed) => [...removed, imageId]);
-            setValue(
-              'removedImageIds',
-              getValues('removedImageIds').filter((id) => id !== imageId),
-              {
-                shouldDirty: true,
-              },
-            );
-            mutateAttachments();
-            mutateVisitNotes();
-            invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          }
-          const diagnosesChanged =
-            combinedDiagnoses.length !== (encounter?.diagnoses?.length ?? 0) ||
-            combinedDiagnoses.some(
-              (diagnosis) =>
-                !encounter?.diagnoses?.some(
-                  (saved) =>
-                    saved.diagnosis.coded?.uuid === diagnosis.diagnosis.coded &&
-                    saved.rank === diagnosis.rank &&
-                    saved.certainty === diagnosis.certainty,
-                ),
-            );
-          if (!isEditing || diagnosesChanged || Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')) {
-            await saveNote();
+          let removedAny = false;
+          let noteSaveAttempted = false;
+          try {
+            for (const imageId of removedImageIds) {
+              await removeVisitNoteImage(imageId);
+              removedAny = true;
+              setRemovedImages((removed) => [...removed, imageId]);
+              setValue(
+                'removedImageIds',
+                getValues('removedImageIds').filter((id) => id !== imageId),
+                {
+                  shouldDirty: true,
+                },
+              );
+            }
+            const diagnosesChanged =
+              combinedDiagnoses.length !== (encounter?.diagnoses?.length ?? 0) ||
+              combinedDiagnoses.some(
+                (diagnosis) =>
+                  !encounter?.diagnoses?.some(
+                    (saved) =>
+                      saved.diagnosis.coded?.uuid === diagnosis.diagnosis.coded &&
+                      saved.rank === diagnosis.rank &&
+                      saved.certainty === diagnosis.certainty,
+                  ),
+              );
+            if (
+              !isEditing ||
+              diagnosesChanged ||
+              Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')
+            ) {
+              noteSaveAttempted = true;
+              await saveNote();
+            }
+          } finally {
+            if (removedAny || noteSaveAttempted) {
+              invalidateVisitAndEncounterData(globalMutate, patientUuid);
+              mutateVisitNotes();
+              if (removedAny || (noteSaveAttempted && images?.length)) {
+                mutateAttachments();
+              }
+            }
           }
         })
         .then(() => {
-          // Invalidate encounter and notes data since we created a new encounter with notes
-          // Also invalidate visit history table since the visit now has new encounters
-          invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          mutateVisitNotes();
-
-          if (images?.length) {
-            mutateAttachments();
-          }
-
           closeWorkspace({ discardUnsavedChanges: true });
 
           showSnackbar({
@@ -795,49 +801,52 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   <div className={styles.imgThumbnailGrid}>
                     {savedImages
                       .filter((image) => !removedImages.includes(image.id))
-                      .map((image) => (
-                        <div key={image.id} className={styles.imgThumbnailItem}>
-                          <div className={styles.imgThumbnailContainer}>
-                            <img
-                              className={classnames(styles.imgThumbnail, {
-                                [styles.pendingImage]: removedImageIds.includes(image.id),
-                              })}
-                              src={image.src}
-                              alt={image.description || image.filename || t('savedImage', 'Saved image')}
-                            />
+                      .map((image) => {
+                        const isMarkedForRemoval = removedImageIds.includes(image.id);
+                        const name = image.description || image.filename || t('savedImage', 'Saved image');
+                        return (
+                          <div key={image.id} className={styles.imgThumbnailItem}>
+                            <div className={styles.imgThumbnailContainer}>
+                              <img
+                                className={classnames(styles.imgThumbnail, {
+                                  [styles.pendingImage]: isMarkedForRemoval,
+                                })}
+                                src={image.src}
+                                alt={name}
+                              />
+                            </div>
+                            {isMarkedForRemoval && (
+                              <p className={styles.removalStatus}>{t('imageMarkedForRemoval', 'Marked for removal')}</p>
+                            )}
+                            <Button
+                              kind={isMarkedForRemoval ? 'ghost' : 'secondary'}
+                              size="sm"
+                              disabled={isSubmitting}
+                              aria-label={
+                                isMarkedForRemoval
+                                  ? t('undoRemoveImage', 'Undo removal: {{name}}', {
+                                      name: name,
+                                    })
+                                  : t('removeImage', 'Remove image: {{name}}', {
+                                      name: name,
+                                    })
+                              }
+                              className={isMarkedForRemoval ? styles.undoButton : styles.removeButton}
+                              onClick={() =>
+                                setValue(
+                                  'removedImageIds',
+                                  isMarkedForRemoval
+                                    ? removedImageIds.filter((id) => id !== image.id)
+                                    : [...removedImageIds, image.id],
+                                  { shouldDirty: true },
+                                )
+                              }
+                            >
+                              {isMarkedForRemoval ? t('undo', 'Undo') : <Close size={16} />}
+                            </Button>
                           </div>
-                          {removedImageIds.includes(image.id) && (
-                            <p className={styles.removalStatus}>{t('imageMarkedForRemoval', 'Marked for removal')}</p>
-                          )}
-                          <Button
-                            key="remove"
-                            kind={removedImageIds.includes(image.id) ? 'ghost' : 'secondary'}
-                            size="sm"
-                            disabled={isSubmitting}
-                            aria-label={
-                              removedImageIds.includes(image.id)
-                                ? t('undoRemoveImage', 'Undo removal: {{name}}', {
-                                    name: image.description || image.filename || t('savedImage', 'Saved image'),
-                                  })
-                                : t('removeImage', 'Remove image: {{name}}', {
-                                    name: image.description || image.filename || t('savedImage', 'Saved image'),
-                                  })
-                            }
-                            className={removedImageIds.includes(image.id) ? styles.undoButton : styles.removeButton}
-                            onClick={() =>
-                              setValue(
-                                'removedImageIds',
-                                removedImageIds.includes(image.id)
-                                  ? removedImageIds.filter((id) => id !== image.id)
-                                  : [...removedImageIds, image.id],
-                                { shouldDirty: true },
-                              )
-                            }
-                          >
-                            {removedImageIds.includes(image.id) ? t('undo', 'Undo') : <Close size={16} />}
-                          </Button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     {currentImages?.map((image, index) => (
                       <div key={index} className={styles.imgThumbnailItem}>
                         <div className={styles.imgThumbnailContainer}>
@@ -871,8 +880,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             </Row>
           </Stack>
         </div>
-        {saveError && <InlineNotification kind="error" lowContrast hideCloseButton title={saveError} />}
-        <ButtonSet className={classnames(styles.actions, { [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+        {saveError && (
+          <InlineNotification
+            kind="error"
+            lowContrast
+            hideCloseButton
+            title={t('visitNoteSaveError', 'Error saving visit note')}
+            subtitle={saveError}
+          />
+        )}
+        <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}
           </Button>
