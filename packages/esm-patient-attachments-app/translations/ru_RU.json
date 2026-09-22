@@ -43,6 +43,8 @@
   "nameIsRequired": "Укажите название",
   "noAttachmentsToDisplay": "Нет вложений для отображения у этого пациента",
   "noImageToDisplay": "Нет изображений",
+  "noPreviewAvailable": "Предпросмотр этого файла недоступен.",
+  "openFile": "Открыть файл",
   "successfullyDeleted": "успешно удалено",
   "supportedFiletypes": "Поддерживаемые файлы: {{supportedFiles}}",
   "tableView": "Таблица",
