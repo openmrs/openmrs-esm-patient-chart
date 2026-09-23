@@ -79,7 +79,7 @@ function renderVisitNotesForm(
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
     groupProps: { ...defaultProps.groupProps, ...groupProps },
   };
-  render(<VisitNotesFormWorkspace {...props} />);
+  return render(<VisitNotesFormWorkspace {...props} />);
 }
 
 function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
@@ -111,7 +111,7 @@ vi.mock('@openmrs/esm-patient-common-lib', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@openmrs/esm-patient-common-lib');
   return {
     ...actual,
-    useAllowedFileExtensions: vi.fn(() => ({ allowedFileExtensions: undefined, error: undefined, isLoading: false })),
+    useAllowedFileExtensions: vi.fn(() => ({ allowedFileExtensions: ['png'], error: undefined, isLoading: false })),
   };
 });
 
@@ -864,7 +864,7 @@ afterEach(() => {
   mockUseConfig.mockReturnValue(defaultConfig);
   vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
   vi.mocked(useAllowedFileExtensions).mockReturnValue({
-    allowedFileExtensions: undefined,
+    allowedFileExtensions: ['png'],
     error: undefined,
     isLoading: false,
   });
@@ -1125,13 +1125,46 @@ test('only offers image formats to the picker and stages files without an upload
   );
 });
 
-test('lets the picker fall back to the backend list while it is still loading', async () => {
+test('waits for the extension list before opening an image-only picker', async () => {
   const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: undefined,
+    isLoading: true,
+  });
   vi.mocked(showModal).mockReturnValue(vi.fn());
+  const { rerender } = renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  rerender(<VisitNotesFormWorkspace {...defaultProps} />);
+
+  expect(addImage).toBeEnabled();
+  await user.click(addImage);
+  expect(showModal).toHaveBeenCalledExactlyOnceWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['png'], showUploadSnackbar: false }),
+  );
+});
+
+test.each([
+  { allowedFileExtensions: undefined, error: undefined },
+  { allowedFileExtensions: ['png', 'pdf'], error: new Error('Offline') },
+])('does not open the picker when restrictions are unavailable: %o', async (result) => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({ ...result, isLoading: false });
   renderVisitNotesForm();
 
-  await user.click(screen.getByRole('button', { name: /add image/i }));
-
-  const [, props] = vi.mocked(showModal).mock.lastCall as [string, { allowedExtensions?: Array<string> }];
-  expect(props.allowedExtensions).toBeUndefined();
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
 });

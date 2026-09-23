@@ -142,7 +142,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string>();
   const [error, setError] = useState<Error>(null);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const {
+    allowedFileExtensions,
+    error: allowedFileExtensionsError,
+    isLoading: isLoadingAllowedFileExtensions,
+  } = useAllowedFileExtensions();
+  const isImageCaptureDisabled =
+    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || !allowedFileExtensions;
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
@@ -346,6 +352,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   };
 
   const showImageCaptureModal = useCallback(() => {
+    if (isImageCaptureDisabled) {
+      return;
+    }
+
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
@@ -359,15 +369,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      // The note only takes images it can show as thumbnails. Leave this undefined until the backend
-      // list has loaded so the dialog falls back to it instead of treating an empty list as "nothing allowed".
       allowedExtensions: allowedFileExtensions?.filter((ext) => imageExtensions.has(ext.toLowerCase())),
       collectDescription: true,
       multipleFiles: true,
       // Files are only staged here; they upload when the note is saved.
       showUploadSnackbar: false,
     });
-  }, [allowedFileExtensions, getValues, setValue]);
+  }, [allowedFileExtensions, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
@@ -780,6 +788,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   </p>
                   <Button
                     className={styles.uploadButton}
+                    disabled={isImageCaptureDisabled}
                     kind={isTablet ? 'ghost' : 'tertiary'}
                     onClick={showImageCaptureModal}
                     renderIcon={(props) => <Add size={16} {...props} />}
