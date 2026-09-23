@@ -5,6 +5,12 @@ export interface PatientChartStore {
   patient: fhir.Patient;
   visitContext: Visit;
   mutateVisitContext: () => void;
+  /**
+   * The uuid of the visit context the patient-chart workspace group was last launched with.
+   * Workspaces launched before the group catches up with a new visit context are closed when
+   * the group relaunches.
+   */
+  workspaceGroupVisitUuid?: string | null;
 }
 
 const patientChartStoreName = 'patient-chart-global-store';
@@ -14,6 +20,7 @@ const patientChartStore = createGlobalStore<PatientChartStore>(patientChartStore
   patient: null,
   visitContext: null,
   mutateVisitContext: null,
+  workspaceGroupVisitUuid: null,
 });
 
 const patientChartStoreActions = {
@@ -24,6 +31,14 @@ const patientChartStoreActions = {
     return { visitContext, mutateVisitContext };
   },
 } satisfies Actions<PatientChartStore>;
+
+/**
+ * Records the visit context the patient-chart workspace group was last launched with.
+ * Only the patient chart should call this, after it launches its workspace group.
+ */
+export function setPatientChartWorkspaceGroupVisitUuid(workspaceGroupVisitUuid: string | null) {
+  patientChartStore.setState({ workspaceGroupVisitUuid });
+}
 
 /**
  * Hook to access the values and sets of the patient chart store.
@@ -48,6 +63,7 @@ export function usePatientChartStore(patientUuid: string) {
       patient: null,
       patientUuid: null,
       visitContext: null,
+      workspaceGroupVisitUuid: null,
     };
     return fakeStore;
   }
