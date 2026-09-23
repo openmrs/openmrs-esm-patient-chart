@@ -7,7 +7,6 @@ import MediaUploader from './media-uploader.component';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
-  useAllowedFileExtensions: () => ({ allowedFileExtensions: ['png'] }),
   useMaxAttachmentFileSize: vi.fn(),
 }));
 vi.mock('../utils', () => ({ readFileAsString: vi.fn().mockResolvedValue('data:image/png;base64,test') }));
@@ -23,7 +22,7 @@ function renderUploader(maxFileSize: number | undefined, isLoading = false, erro
   });
   const setFilesToUpload = vi.fn();
   const content = () => (
-    <CameraMediaUploaderContext.Provider value={{ setFilesToUpload, multipleFiles: true }}>
+    <CameraMediaUploaderContext.Provider value={{ setFilesToUpload, multipleFiles: true, allowedExtensions: ['png'] }}>
       <MediaUploader />
     </CameraMediaUploaderContext.Provider>
   );

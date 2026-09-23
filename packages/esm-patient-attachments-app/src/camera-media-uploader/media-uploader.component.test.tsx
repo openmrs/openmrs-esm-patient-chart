@@ -5,6 +5,16 @@ import { render, screen } from '@testing-library/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import MediaUploaderComponent from './media-uploader.component';
 
+vi.mock('@openmrs/esm-patient-common-lib', () => ({
+  useMaxAttachmentFileSize: () => ({
+    maxFileSize: 5,
+    error: undefined,
+    isLoading: false,
+    isValidating: false,
+    retry: vi.fn(),
+  }),
+}));
+
 function renderUploader(allowedExtensions: Array<string> | undefined) {
   const setFilesToUpload = vi.fn();
   render(
