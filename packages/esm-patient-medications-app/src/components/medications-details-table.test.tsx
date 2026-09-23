@@ -4,8 +4,8 @@ import { vi, describe, test, expect, beforeEach, type Mock } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchWorkspace2, useSession } from '@openmrs/esm-framework';
-import { type Order } from '@openmrs/esm-patient-common-lib';
-import { _resetOrderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
+import { type DrugOrderBasketItem, type Order } from '@openmrs/esm-patient-common-lib';
+import { _resetOrderBasketStore, orderBasketStore } from '@openmrs/esm-patient-common-lib/src/orders/store';
 import { mockSessionDataResponse } from '__mocks__';
 import { mockPatient, renderWithSwr } from 'tools';
 import MedicationsDetailsTable from './medications-details-table.component';
@@ -94,16 +94,48 @@ async function openActionsMenu(user: ReturnType<typeof userEvent.setup>) {
   return screen.getByRole('menu', { hidden: true });
 }
 
-function getRenewMenuItem(menu: HTMLElement) {
+function getMenuItem(menu: HTMLElement, itemText: string) {
   return within(menu).getByRole('menuitem', {
     hidden: true,
-    name: (_, element) => element.textContent === 'Renew',
+    name: (_, element) => element.textContent === itemText,
   });
 }
 
-async function clickRenew(user: ReturnType<typeof userEvent.setup>) {
+function getRenewMenuItem(menu: HTMLElement) {
+  return getMenuItem(menu, 'Renew');
+}
+
+async function clickMenuItem(user: ReturnType<typeof userEvent.setup>, itemText: string) {
   const menu = await openActionsMenu(user);
-  await user.click(getRenewMenuItem(menu));
+  await user.click(getMenuItem(menu, itemText));
+}
+
+async function clickRenew(user: ReturnType<typeof userEvent.setup>) {
+  await clickMenuItem(user, 'Renew');
+}
+
+/** The medications the basket holds for the patient under test, in basket order. */
+function getBasketedMedications() {
+  return (orderBasketStore.getState().items[mockPatient.id]?.medications ?? []) as Array<DrugOrderBasketItem>;
+}
+
+/**
+ * An order for a different drug that the clinician had already queued before reaching for
+ * Renew. Its uuid differs from the fixture's, so it never makes the row read as already
+ * basketed.
+ */
+function seedBasketWithUnrelatedMedication() {
+  const unrelatedItem = {
+    uuid: 'f00dcafe-unrelated-order',
+    display: 'Ibuprofen 400mg',
+    action: 'NEW',
+  } as unknown as DrugOrderBasketItem;
+
+  orderBasketStore.setState((state) => ({
+    items: { ...state.items, [mockPatient.id]: { medications: [unrelatedItem] } },
+  }));
+
+  return unrelatedItem;
 }
 
 describe('MedicationsDetailsTable - Renew', () => {
@@ -126,14 +158,24 @@ describe('MedicationsDetailsTable - Renew', () => {
     // it lands in whatever visit is current.
     await waitFor(() => expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket'));
 
+    // The queued item is a renewal of this order rather than a copy of it.
+    expect(getBasketedMedications()).toEqual([
+      expect.objectContaining({
+        uuid: medicationFixture.uuid,
+        action: 'RENEW',
+        previousOrder: medicationFixture.uuid,
+      }),
+    ]);
+
     // Back on the medications table, the row now reads as already queued for action: a
     // clinician can no longer pick Renew/Modify/Discontinue on it a second time.
     const reopenedMenu = await openActionsMenu(user);
     expect(getRenewMenuItem(reopenedMenu)).toBeDisabled();
   });
 
-  test('cancelling the visit prompt during Renew leaves the medication untouched', async () => {
+  test('cancelling the visit prompt during Renew leaves the basket untouched', async () => {
     const user = userEvent.setup();
+    const unrelatedItem = seedBasketWithUnrelatedMedication();
     mockStartVisitIfNeeded.mockResolvedValue(false);
     renderMedicationsDetailsTable();
 
@@ -143,9 +185,91 @@ describe('MedicationsDetailsTable - Renew', () => {
     await waitFor(() => expect(mockStartVisitIfNeeded).toHaveBeenCalled());
     expect(mockLaunchWorkspace2).not.toHaveBeenCalled();
 
+    // ...the order they had already queued is still waiting for them, because backing out of
+    // the visit prompt must not discard work the renewal never touched...
+    expect(getBasketedMedications()).toEqual([unrelatedItem]);
+
     // ...and the medication is exactly as renewable as before: Renew is still enabled, not
     // silently left in a "queued" state.
     const reopenedMenu = await openActionsMenu(user);
     expect(getRenewMenuItem(reopenedMenu)).toBeEnabled();
+  });
+
+  test('a renewal is added alongside orders queued while the visit prompt was open', async () => {
+    const user = userEvent.setup();
+    // The visit prompt stays up until the clinician answers it, which is the window in which
+    // the basket can change underneath the renewal.
+    let answerVisitPrompt: (didStartVisit: boolean) => void;
+    mockStartVisitIfNeeded.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        answerVisitPrompt = resolve;
+      }),
+    );
+    renderMedicationsDetailsTable();
+
+    await clickRenew(user);
+    await waitFor(() => expect(mockStartVisitIfNeeded).toHaveBeenCalled());
+
+    // While the prompt is up, another order lands in the basket.
+    const unrelatedItem = seedBasketWithUnrelatedMedication();
+    answerVisitPrompt(true);
+
+    await waitFor(() => expect(mockLaunchWorkspace2).toHaveBeenCalledWith('order-basket'));
+    expect(getBasketedMedications()).toEqual([
+      unrelatedItem,
+      expect.objectContaining({ uuid: medicationFixture.uuid, action: 'RENEW' }),
+    ]);
+  });
+});
+
+// Modify and Discontinue act on the original order, so unlike Renew they are meant to keep
+// carrying its encounter and visit. These pin that difference, so that a change aimed at
+// Renew cannot quietly strip the context these two rely on.
+describe('MedicationsDetailsTable - Modify and Discontinue', () => {
+  beforeEach(() => {
+    _resetOrderBasketStore();
+    mockUseStartVisitIfNeeded.mockReturnValue(mockStartVisitIfNeeded);
+  });
+
+  const expectedGroupProps = expect.objectContaining({
+    patientUuid: mockPatient.id,
+    visitContext: oldClosedVisit,
+  });
+
+  test('modifying an order opens the drug order form against the order’s own encounter and visit', async () => {
+    const user = userEvent.setup();
+    renderMedicationsDetailsTable();
+
+    await clickMenuItem(user, 'Modify');
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'add-drug-order',
+      expect.objectContaining({
+        order: expect.objectContaining({ action: 'REVISE' }),
+        orderToEditOrdererUuid: medicationFixture.orderer.uuid,
+      }),
+      { encounterUuid: medicationFixture.encounter.uuid },
+      expectedGroupProps,
+    );
+    // No visit prompt: modifying happens in the visit the order already belongs to.
+    expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
+  });
+
+  test('discontinuing an order opens the basket against the order’s own encounter and visit', async () => {
+    const user = userEvent.setup();
+    renderMedicationsDetailsTable();
+
+    await clickMenuItem(user, 'Discontinue');
+
+    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
+      'order-basket',
+      {},
+      { encounterUuid: medicationFixture.encounter.uuid },
+      expectedGroupProps,
+    );
+    expect(getBasketedMedications()).toEqual([
+      expect.objectContaining({ uuid: medicationFixture.uuid, action: 'DISCONTINUE' }),
+    ]);
+    expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
   });
 });

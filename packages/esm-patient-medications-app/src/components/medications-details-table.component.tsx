@@ -404,6 +404,14 @@ function OrderBasketItemActions({
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
   const startVisitIfNeeded = useStartVisitIfNeeded(patient.id);
 
+  // Renewing awaits the visit prompt, which stays open for as long as the user takes to answer
+  // it. Reading the basket through a ref means the renewal is appended to whatever the basket
+  // holds by then, rather than to a snapshot taken before the prompt opened.
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
       patient,
@@ -441,13 +449,13 @@ function OrderBasketItemActions({
   const handleRenewClick = useCallback(async () => {
     const canProceed = await startVisitIfNeeded();
     if (!canProceed) {
-      setItems([]);
       return;
     }
 
-    setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
+    setItems([...itemsRef.current, buildMedicationOrder(medication, 'RENEW')]);
+    // Launched without window or group props so that the basket uses the chart's current visit
     launchWorkspace2('order-basket');
-  }, [startVisitIfNeeded, items, setItems, medication]);
+  }, [startVisitIfNeeded, setItems, medication]);
 
   return (
     <OverflowMenu

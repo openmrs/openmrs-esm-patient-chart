@@ -31,9 +31,12 @@ describe('StartVisit', () => {
 
     await user.click(startNewVisitButton);
 
+    // The visit form gets the cancellation callback too, so discarding it reports the same
+    // cancellation to our caller as backing out of this dialog does.
     expect(mockLaunchWorkspace).toHaveBeenCalledWith('start-visit-workspace-form', {
       openedFrom: 'patient-chart-start-visit',
       onVisitStarted,
+      onCancel,
     });
     expect(onCancel).not.toHaveBeenCalled();
     expect(defaultProps.closeModal).toHaveBeenCalled();

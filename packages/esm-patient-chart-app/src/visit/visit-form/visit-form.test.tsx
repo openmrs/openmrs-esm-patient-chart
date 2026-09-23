@@ -797,6 +797,34 @@ describe('Visit form', () => {
     expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 
+  it('tells the caller the visit was cancelled when the form is discarded', async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    mockCloseWorkspace.mockResolvedValueOnce(true);
+
+    renderVisitForm(undefined, { onCancel });
+
+    await user.click(screen.getByRole('button', { name: /Discard/i }));
+
+    await waitFor(() => expect(onCancel).toHaveBeenCalledOnce());
+  });
+
+  it('does not tell the caller the visit was cancelled when the user backs out of discarding unsaved changes', async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    // The user is asked to confirm discarding their unsaved changes and declines, so the form
+    // stays open and there is nothing to cancel.
+    mockCloseWorkspace.mockResolvedValueOnce(false);
+
+    renderVisitForm(undefined, { onCancel });
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    await user.click(screen.getByRole('button', { name: /Discard/i }));
+
+    await waitFor(() => expect(mockCloseWorkspace).toHaveBeenCalled());
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
   it('renders an inline error notification if an optional visit attribute type field fails to load', async () => {
     mockUseVisitAttributeType.mockReturnValue({
       isLoading: false,
@@ -1323,9 +1351,13 @@ describe('useVisitFormSchemaAndDefaultValues birthdate validation', () => {
   });
 });
 
-function renderVisitForm(visitToEdit?: Visit) {
+function renderVisitForm(visitToEdit?: Visit, workspaceProps?: Partial<VisitFormProps>) {
   const props: PatientWorkspace2DefinitionProps<VisitFormProps, {}> = {
     ...defaultProps,
+    workspaceProps: {
+      ...defaultProps.workspaceProps,
+      ...workspaceProps,
+    },
     groupProps: {
       ...defaultProps.groupProps,
       visitContext: visitToEdit ?? null,

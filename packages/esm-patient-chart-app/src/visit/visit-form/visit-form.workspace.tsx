@@ -16,6 +16,7 @@ export interface VisitFormProps {
    */
   openedFrom: string;
   showPatientHeader?: boolean;
+  onCancel?: () => void;
 }
 
 /**
@@ -26,7 +27,7 @@ export interface VisitFormProps {
  * @see exported-visit-form.workspace.tsx
  */
 const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> = ({
-  workspaceProps: { openedFrom, showPatientHeader = false },
+  workspaceProps: { openedFrom, showPatientHeader = false, onCancel },
   groupProps: { patient, patientUuid, visitContext },
   ...rest
 }) => {
@@ -49,6 +50,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
         openedFrom,
         showPatientHeader,
         onVisitStarted,
+        onCancel,
         patient,
         patientUuid,
         visitContext,
