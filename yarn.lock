@@ -6132,8 +6132,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 20.0.1-pre.576
-  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.576"
+  version: 20.0.1-pre.582
+  resolution: "@openmrs/ngx-formentry@npm:20.0.1-pre.582"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
@@ -6154,7 +6154,7 @@ __metadata:
     reflect-metadata: ^0.1.13
     shelljs: ^0.7.8
     tree-model: ^1.0.7
-  checksum: 10/bfc98144ee6aac12620165d16b082fc5dddcd2ce82f3c65dbf61e835a4d1edf6cade0af35a2fef654aafd7ef2468225a451f0f98373070d47591fd07fc35afc6
+  checksum: 10/cd7d7155df26fcd220da06d8d735be21e95394e369b8a548505efb38bafb9d35d4a905e2d1f261063facd26a18da556e2f38dc8d6b79858b2b66c214a6f3efff
   languageName: node
   linkType: hard
 
