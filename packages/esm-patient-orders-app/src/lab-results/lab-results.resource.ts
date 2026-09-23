@@ -258,7 +258,10 @@ export function useCompletedLabResultsArray(order: Order) {
   };
 }
 
-// TODO: the calls to update order and observations for results should be transactional to allow for rollback
+/**
+ * Saves the results and discontinues the order in a single encounter request, so the backend
+ * commits or rolls back both together, then marks the order as fulfilled.
+ */
 export async function updateOrderResult(
   orderUuid: string,
   encounterUuid: string,
@@ -267,17 +270,35 @@ export async function updateOrderResult(
   orderPayload: OrderDiscontinuationPayload,
   abortController: AbortController,
 ) {
-  const saveEncounter = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+  await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: obsPayload,
+    body: { ...obsPayload, orders: [orderPayload] },
   });
 
-  if (saveEncounter.ok) {
-    const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
+  return updateOrderFulfillerDetails(orderUuid, fulfillerPayload, abortController);
+}
+
+/**
+ * Completes an order whose results were saved by an earlier attempt that did not finish.
+ * Discontinues the order only if it is still active, because the backend rejects stopping it twice.
+ */
+export async function completeOrderWithSavedResults(
+  orderUuid: string,
+  fulfillerPayload: any,
+  orderPayload: OrderDiscontinuationPayload,
+  abortController: AbortController,
+) {
+  const { data: savedOrder } = await openmrsFetch<Pick<Order, 'uuid' | 'dateStopped'>>(
+    `${restBaseUrl}/order/${orderUuid}?v=custom:(uuid,dateStopped)`,
+    { signal: abortController.signal },
+  );
+
+  if (!savedOrder.dateStopped) {
+    await openmrsFetch(`${restBaseUrl}/order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -285,20 +306,20 @@ export async function updateOrderResult(
       signal: abortController.signal,
       body: orderPayload,
     });
-
-    if (updateOrderCall.status === 201) {
-      const fulfillOrder = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: abortController.signal,
-        body: fulfillerPayload,
-      });
-      return fulfillOrder;
-    }
   }
-  throw new Error('Failed to update order');
+
+  return updateOrderFulfillerDetails(orderUuid, fulfillerPayload, abortController);
+}
+
+function updateOrderFulfillerDetails(orderUuid: string, fulfillerPayload: any, abortController: AbortController) {
+  return openmrsFetch(`${restBaseUrl}/order/${orderUuid}/fulfillerdetails/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: fulfillerPayload,
+  });
 }
 
 export function createObservationPayload(

@@ -17,6 +17,8 @@ import {
   updateOrderResult,
   type Datatype,
   useCompletedLabResultsArray,
+  completeOrderWithSavedResults,
+  updateObservation,
 } from './lab-results.resource';
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
 import ExportedLabResultsForm, {
@@ -38,6 +40,7 @@ const mockUseObservation = vi.mocked(useObservation);
 const mockUseCompletedLabResultsArray = vi.mocked(useCompletedLabResultsArray);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockUpdateOrderResult = vi.mocked(updateOrderResult);
 
 vi.mock('./lab-results.resource', async () => ({
   ...((await vi.importActual('./lab-results.resource')) as object),
@@ -46,6 +49,8 @@ vi.mock('./lab-results.resource', async () => ({
   useLabEncounter: vi.fn(),
   useObservation: vi.fn(),
   updateOrderResult: vi.fn().mockResolvedValue({}),
+  completeOrderWithSavedResults: vi.fn().mockResolvedValue({}),
+  updateObservation: vi.fn().mockResolvedValue({}),
   useCompletedLabResultsArray: vi.fn(),
 }));
 
@@ -1039,5 +1044,53 @@ describe('LabResultsForm', () => {
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
     expect(saveButton).toBeDisabled();
+  });
+
+  test('refetches the saved results when saving the results fails', async () => {
+    const user = userEvent.setup();
+    const mockMutateResults = vi.fn();
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [],
+      isLoading: false,
+      error: null,
+      mutate: mockMutateResults,
+    });
+    mockUpdateOrderResult.mockRejectedValueOnce(new Error('Internal Server Error'));
+
+    render(<LabResultsForm {...testProps} />);
+
+    await user.type(await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`), '50');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() => expect(mockMutateResults).toHaveBeenCalled());
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  test('updates results saved by an earlier attempt and completes the order instead of saving the results again', async () => {
+    const user = userEvent.setup();
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [{ uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' }],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    } as unknown as ReturnType<typeof useCompletedLabResultsArray>);
+
+    render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await waitFor(() => expect(input).toHaveValue(60));
+    await user.clear(input);
+    await user.type(input, '65');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() => expect(mockCloseWorkspace).toHaveBeenCalled());
+    expect(updateObservation).toHaveBeenCalledWith('saved-obs-uuid', { value: 65 });
+    expect(completeOrderWithSavedResults).toHaveBeenCalledWith(
+      'order-uuid',
+      { fulfillerComment: 'Test Results Entered', fulfillerStatus: 'COMPLETED' },
+      expect.objectContaining({ action: 'DISCONTINUE', previousOrder: 'order-uuid' }),
+      expect.anything(),
+    );
+    expect(updateOrderResult).not.toHaveBeenCalled();
   });
 });
