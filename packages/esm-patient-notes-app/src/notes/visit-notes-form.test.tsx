@@ -13,6 +13,7 @@ import {
   type Encounter,
   type UploadedFile,
   createAttachment,
+  ExtensionSlot,
   showModal,
   getDefaultsFromConfigSchema,
   showSnackbar,
@@ -29,9 +30,11 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import {
   fetchDiagnosisConceptsByName,
+  removeVisitNoteImage,
   saveVisitNote,
   updateVisitNote,
   useVisitNoteImages,
+  useVisitNotes,
 } from './visit-notes.resource';
 import {
   ConfigMock,
@@ -105,6 +108,7 @@ vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
 
 vi.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: vi.fn(),
+  removeVisitNoteImage: vi.fn(),
   updateVisitNote: vi.fn(),
   useLocationUuid: vi.fn().mockImplementation(() => ({
     data: mockFetchLocationByUuidResponse.data.uuid,
@@ -907,7 +911,7 @@ test('records images added to a new note on the encounter it just created', asyn
   );
 });
 
-test('shows the images already saved on the note without remove controls and never re-uploads them', async () => {
+test('shows the images already saved on the note with remove controls and never re-uploads them', async () => {
   const user = userEvent.setup();
   vi.mocked(useVisitNoteImages).mockReturnValue({
     images: [
@@ -932,7 +936,12 @@ test('shows the images already saved on the note without remove controls and nev
     '/openmrs/ws/rest/v1/attachment/att-1/bytes',
   );
   expect(screen.getByRole('img', { name: 'side.png' })).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: /remove image/i })).not.toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /remove image/i })).toHaveLength(2);
+  await user.click(screen.getByRole('button', { name: /remove image: front view/i }));
+  expect(removeVisitNoteImage).not.toHaveBeenCalled();
+  expect(screen.getByText('Marked for removal')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /save and close/i })).toBeEnabled();
+  await user.click(screen.getByRole('button', { name: /undo removal: front view/i }));
   expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
 
   await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' with more detail');
@@ -959,3 +968,128 @@ test('tells the user when the saved images could not be loaded', () => {
   expect(screen.getByText(/couldn't load the images saved on this note/i)).toBeInTheDocument();
   expect(screen.queryByText(/loading saved images/i)).not.toBeInTheDocument();
 });
+
+function setupSavedImages() {
+  allowNotesWithoutDiagnosis();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [
+      { id: 'att-1', src: '/front.png', filename: 'front.png' },
+      { id: 'att-2', src: '/side.png', filename: 'side.png' },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  renderVisitNotesForm({ formContext: 'editing', encounter: existingNote });
+}
+
+test('discarding a staged image removal makes no delete request', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Discard' }));
+  expect(removeVisitNoteImage).not.toHaveBeenCalled();
+  expect(defaultProps.closeWorkspace).toHaveBeenCalledWith();
+});
+
+test('saving only image removals does not rewrite the note or upload images', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(updateVisitNote).not.toHaveBeenCalled();
+  expect(createAttachment).not.toHaveBeenCalled();
+});
+
+test('retries failed removals without repeating successful removals or saving the note early', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  vi.mocked(removeVisitNoteImage).mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('Offline'));
+  mockUpdateVisitNote.mockResolvedValueOnce({ status: 200 } as unknown as Awaited<ReturnType<typeof updateVisitNote>>);
+  await user.type(screen.getByRole('textbox', { name: /write your notes/i }), ' updated');
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  expect(await screen.findByText(/could not save all changes/i)).toBeInTheDocument();
+  expect(defaultProps.closeWorkspace).not.toHaveBeenCalled();
+  expect(updateVisitNote).not.toHaveBeenCalled();
+  expect(screen.queryByRole('button', { name: 'Undo removal: front.png' })).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(vi.mocked(removeVisitNoteImage).mock.calls).toEqual([['att-1'], ['att-2'], ['att-2']]);
+  expect(updateVisitNote).toHaveBeenCalledTimes(1);
+});
+
+test('keeps visit-context header state stable while staging and undoing an image removal', async () => {
+  const user = userEvent.setup();
+  setupSavedImages();
+  const headerStates = () =>
+    vi
+      .mocked(ExtensionSlot)
+      .mock.calls.filter(([props]) => props.name === 'visit-context-header-slot')
+      .map(([props]) => props.state);
+  const initialState = headerStates()[0];
+  expect(initialState).toEqual({ patientUuid: mockPatient.id });
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: 'Undo removal: front.png' }));
+  expect(headerStates().length).toBeGreaterThan(1);
+  expect(headerStates().every((state) => state === initialState)).toBe(true);
+});
+
+test('removing an image preserves saved diagnoses without rewriting the note', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useVisitNoteImages).mockReturnValue({
+    images: [{ id: 'att-1', src: '/front.png', filename: 'front.png' }],
+    isLoading: false,
+    error: null,
+  });
+  const noteWithDiagnoses = {
+    ...existingNote,
+    diagnoses: [
+      {
+        uuid: 'dx-1',
+        display: 'Malaria',
+        rank: 1,
+        certainty: 'CONFIRMED',
+        diagnosis: { coded: { uuid: 'concept-1' } },
+      },
+      {
+        uuid: 'dx-2',
+        display: 'Anemia',
+        rank: 2,
+        certainty: 'PROVISIONAL',
+        diagnosis: { coded: { uuid: 'concept-2' } },
+      },
+    ],
+  } as unknown as Encounter;
+  renderVisitNotesForm({ formContext: 'editing', encounter: noteWithDiagnoses });
+  await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+  await user.click(screen.getByRole('button', { name: /save and close/i }));
+  await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true }));
+  expect(removeVisitNoteImage).toHaveBeenCalledExactlyOnceWith('att-1');
+  expect(updateVisitNote).not.toHaveBeenCalled();
+});
+
+test.each([false, true])(
+  'refreshes notes once after a batch of removals, including partial failure: %s',
+  async (fails) => {
+    const user = userEvent.setup();
+    const refreshNotes = vi.fn();
+    vi.mocked(useVisitNotes).mockReturnValue({
+      mutateVisitNotes: refreshNotes,
+      visitNotes: [],
+      error: null,
+      isLoading: false,
+    });
+    setupSavedImages();
+    vi.mocked(removeVisitNoteImage).mockResolvedValueOnce(undefined);
+    if (fails) vi.mocked(removeVisitNoteImage).mockRejectedValueOnce(new Error('Offline'));
+    await user.click(screen.getByRole('button', { name: 'Remove image: front.png' }));
+    await user.click(screen.getByRole('button', { name: 'Remove image: side.png' }));
+    await user.click(screen.getByRole('button', { name: /save and close/i }));
+    if (fails) await screen.findByText(/could not save all changes/i);
+    else await waitFor(() => expect(defaultProps.closeWorkspace).toHaveBeenCalled());
+    expect(refreshNotes).toHaveBeenCalledTimes(1);
+  },
+);
