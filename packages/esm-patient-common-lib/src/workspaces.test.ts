@@ -88,6 +88,31 @@ describe('useStartVisitIfNeeded', () => {
     expect(settlement).toEqual({ settled: true, value: true });
   });
 
+  it('resolves every pending prompt once the workspace group has the new visit', async () => {
+    mockUseFeatureFlag.mockReturnValue(false);
+    const result = setUpStartVisitIfNeeded();
+
+    let first: Promise<boolean>;
+    let second: Promise<boolean>;
+    act(() => {
+      first = result.current.startVisitIfNeeded();
+      second = result.current.startVisitIfNeeded();
+    });
+    const dialogs = mockShowModal.mock.calls
+      .filter(([name]) => name === 'start-visit-dialog')
+      .map(([, props]) => props as Record<string, any>);
+    expect(dialogs).toHaveLength(2);
+
+    await act(async () => {
+      result.current.store.setVisitContext(visit, null);
+      dialogs.forEach(({ onVisitStarted }) => onVisitStarted());
+    });
+    await act(async () => setPatientChartWorkspaceGroupVisitUuid(visit.uuid));
+
+    await expect(first).resolves.toBe(true);
+    await expect(second).resolves.toBe(true);
+  });
+
   it('waits for the workspace group to have the selected visit before resolving, even after the switcher closes', async () => {
     mockUseFeatureFlag.mockReturnValue(true);
     const result = setUpStartVisitIfNeeded();

@@ -63,12 +63,13 @@ export function useStartVisitIfNeeded(patientUuid: string) {
   // Setting a new visit context makes the patient chart relaunch its workspace group, which closes
   // any workspace opened before the relaunch. So a pending prompt resolves only once the workspace
   // group has the new visit context.
-  const resolveWhenWorkspaceGroupHasVisit = useRef<(() => void) | null>(null);
+  const pendingPromptResolvers = useRef<Array<() => void>>([]);
 
   useEffect(() => {
     if (visitContext && workspaceGroupVisitUuid === visitContext.uuid) {
-      resolveWhenWorkspaceGroupHasVisit.current?.();
-      resolveWhenWorkspaceGroupHasVisit.current = null;
+      const resolvers = pendingPromptResolvers.current;
+      pendingPromptResolvers.current = [];
+      resolvers.forEach((resolvePrompt) => resolvePrompt());
     }
   }, [visitContext, workspaceGroupVisitUuid]);
 
@@ -78,7 +79,7 @@ export function useStartVisitIfNeeded(patientUuid: string) {
     } else {
       return new Promise<boolean>((resolve) => {
         const resolveOnceWorkspaceGroupHasVisit = () => {
-          resolveWhenWorkspaceGroupHasVisit.current = () => resolve(true);
+          pendingPromptResolvers.current.push(() => resolve(true));
         };
 
         if (isRdeEnabled) {
