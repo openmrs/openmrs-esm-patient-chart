@@ -39,12 +39,15 @@
   "imagePlaceholder": "Imagine placeholder",
   "imagePreview": "Previzualizare imagine",
   "keepAttachment": "Păstrează atașamentul",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "Nume",
   "nameIsRequired": "Numele este obligatoriu",
   "noAttachmentsToDisplay": "Nu există atașamente de afișat pentru acest pacient",
   "noImageToDisplay": "Nu există imagine de afișat",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "șters cu succes",
   "supportedFiletypes": "Fișiere acceptate: {{supportedFiles}}",
   "tableView": "Vizualizare tip tabel",
@@ -57,6 +60,7 @@
   "uploadError": "Eroare la încărcarea fișierului",
   "uploadFiles": "Încarcă fișiere",
   "uploading": "Se încarcă",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Fișierele vor fi încărcate în fundal. Poți închide această fereastră.",
   "webcam": "Cameră web"
 }

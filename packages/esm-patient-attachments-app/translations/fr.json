@@ -39,12 +39,15 @@
   "imagePlaceholder": "Espace réservé aux images",
   "imagePreview": "Aperçu de l'image",
   "keepAttachment": "Conserver la pièce jointe",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "Nom",
   "nameIsRequired": "Le nom est requis",
   "noAttachmentsToDisplay": "Aucune pièce jointe pour ce patient",
   "noImageToDisplay": "Aucune image à afficher",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "Supprimé",
   "supportedFiletypes": "Les fichiers compatibles sont {{supportedFiles}}",
   "tableView": "Table",
@@ -57,6 +60,7 @@
   "uploadError": "Erreur lors de l'ajout de l'image",
   "uploadFiles": "Ajouter des fichiers",
   "uploading": "En cours d'ajout",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Les fichiers seront ajoutés en arrière-plan. Vous pouvez fermer cette fenêtre.",
   "webcam": "Caméra Web"
 }

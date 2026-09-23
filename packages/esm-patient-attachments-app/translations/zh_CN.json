@@ -39,12 +39,15 @@
   "imagePlaceholder": "图像占位符",
   "imagePreview": "图像预览",
   "keepAttachment": "保持附件",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "名称",
   "nameIsRequired": "名称时必需的",
   "noAttachmentsToDisplay": "此患者没有可显示的附件",
   "noImageToDisplay": "没有可显示的图片",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "删除成功",
   "supportedFiletypes": "支持的文件有 {{supportedFiles}}",
   "tableView": "表格视图",
@@ -57,6 +60,7 @@
   "uploadError": "上传文件时出现错误",
   "uploadFiles": "上传文件",
   "uploading": "正在上传",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "文件将在后台上传。您可以关闭此窗口。",
   "webcam": "摄像头"
 }
