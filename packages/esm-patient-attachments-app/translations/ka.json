@@ -39,12 +39,15 @@
   "imagePlaceholder": "გამოსახულების ადგილმჭერი",
   "imagePreview": "გამოსახულების მინიატურა",
   "keepAttachment": "მიმაგრებული ფაილების შენარჩუნება",
+  "loadingUploadLimit": "Loading upload size limit...",
   "name": "სახელი",
   "nameIsRequired": "სახელი აუცილებელია",
   "noAttachmentsToDisplay": "There are no attachments to display for this patient",
   "noImageToDisplay": "გამოსატანი გამოსახულების გარეშე",
   "noPreviewAvailable": "No preview is available for this file.",
   "openFile": "Open file",
+  "retry": "Retry",
+  "retryUploadLimit": "Try again before choosing a file.",
   "successfullyDeleted": "წარმატებით წაიშალა",
   "supportedFiletypes": "მხარდაჭერილი ფაილებია {{supportedFiles}}",
   "tableView": "ცხრილის ხედი",
@@ -57,6 +60,7 @@
   "uploadError": "ფაილის ატვირთვის შეცდომა",
   "uploadFiles": "ფაილების ატვირთვა",
   "uploading": "მიმდინარეობს ატვირთვა",
+  "uploadLimitUnavailable": "Could not load the upload size limit",
   "uploadWillContinueInTheBackground": "Files will be uploaded in the background. You can close this modal.",
   "webcam": "ვებკამერა"
 }

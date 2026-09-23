@@ -50,6 +50,7 @@ import type { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../
 import {
   deletePatientDiagnosis,
   fetchDiagnosisConceptsByName,
+  removeVisitNoteImage,
   savePatientDiagnosis,
   saveVisitNote,
   updateVisitNote,
@@ -90,6 +91,7 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
     secondaryDiagnosisSearch: z.string().optional(),
     clinicalNote: z.string().optional(),
     images: z.array(z.any()).optional(),
+    removedImageIds: z.array(z.string()),
   });
 };
 
@@ -121,6 +123,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { isPrimaryDiagnosisRequired, ...config } = useConfig<ConfigObject>();
+  const visitContextHeaderState = useMemo(() => ({ patientUuid }), [patientUuid]);
   const memoizedState = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -133,6 +136,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [searchSecondaryResults, setSearchSecondaryResults] = useState<Array<Concept>>(null);
   const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
   const [rows, setRows] = useState<number>();
+  const [removedImages, setRemovedImages] = useState<string[]>([]);
+  const [saveError, setSaveError] = useState<string>();
   const [error, setError] = useState<Error>(null);
   const { allowedFileExtensions } = useAllowedFileExtensions();
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
@@ -177,6 +182,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     resolver: customResolver,
     defaultValues: {
       images: [],
+      removedImageIds: [],
       primaryDiagnosisSearch: '',
       noteDate: isEditing ? new Date(encounter.rawDatetime) : new Date(),
       clinicalNote: isEditing
@@ -212,6 +218,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [encounter, patientUuid, t]);
 
   const currentImages = watch('images');
+  const removedImageIds = watch('removedImageIds');
   const {
     images: savedImages,
     isLoading: isLoadingSavedImages,
@@ -372,7 +379,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const onSubmit = useCallback(
     (data: VisitNotesFormData) => {
-      const { noteDate, clinicalNote, images } = data;
+      const { noteDate, clinicalNote, images, removedImageIds } = data;
+      setSaveError(undefined);
 
       if (isPrimaryDiagnosisRequired && !selectedPrimaryDiagnoses.length) {
         return;
@@ -418,72 +426,111 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
       const abortController = new AbortController();
 
-      const savePromise = isEditing
-        ? updateVisitNote(abortController, encounter.id, visitNotePayload)
-        : saveVisitNote(abortController, visitNotePayload);
+      const saveNote = () => {
+        const savePromise = isEditing
+          ? updateVisitNote(abortController, encounter.id, visitNotePayload)
+          : saveVisitNote(abortController, visitNotePayload);
 
-      return savePromise
-        .then((response) => {
-          if (response.status === 201 || response.status === 200) {
-            const encounterUuid = encounter?.id || response.data.uuid;
+        return savePromise
+          .then((response) => {
+            if (response.status === 201 || response.status === 200) {
+              const encounterUuid = encounter?.id || response.data.uuid;
 
-            // If editing, first delete existing diagnoses
-            if (isEditing && encounter?.diagnoses?.length) {
-              return Promise.all(
-                encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
-              ).then(() => encounterUuid);
+              // If editing, first delete existing diagnoses
+              if (isEditing && encounter?.diagnoses?.length) {
+                return Promise.all(
+                  encounter.diagnoses.map((diagnosis) => deletePatientDiagnosis(abortController, diagnosis.uuid)),
+                ).then(() => encounterUuid);
+              }
+
+              return encounterUuid;
             }
-
-            return encounterUuid;
-          }
-        })
-        .then((encounterUuid) =>
-          Promise.all(
-            combinedDiagnoses.map((diagnosis) => {
-              const diagnosesPayload: DiagnosisPayload = {
-                encounter: encounterUuid,
-                patient: patientUuid,
-                condition: null,
-                diagnosis: {
-                  coded: diagnosis.diagnosis.coded,
-                },
-                certainty: diagnosis.certainty,
-                rank: diagnosis.rank,
-              };
-              return savePatientDiagnosis(abortController, diagnosesPayload);
-            }),
-          ).then(() => encounterUuid),
-        )
-        .then((encounterUuid) => {
-          // Only images added in this session are in the form state. Images already saved on the
-          // note are shown from the server and never re-uploaded.
-          if (images?.length) {
-            return Promise.all(
-              images.map((image) => {
-                const imageToUpload: UploadedFile = {
-                  base64Content: image.base64Content,
-                  file: image.file,
-                  fileName: image.fileName,
-                  fileType: image.fileType,
-                  fileDescription: image.fileDescription || '',
+          })
+          .then((encounterUuid) =>
+            Promise.all(
+              combinedDiagnoses.map((diagnosis) => {
+                const diagnosesPayload: DiagnosisPayload = {
+                  encounter: encounterUuid,
+                  patient: patientUuid,
+                  condition: null,
+                  diagnosis: {
+                    coded: diagnosis.diagnosis.coded,
+                  },
+                  certainty: diagnosis.certainty,
+                  rank: diagnosis.rank,
                 };
-                return createAttachment(patientUuid, imageToUpload, encounterUuid);
+                return savePatientDiagnosis(abortController, diagnosesPayload);
               }),
-            );
-          } else {
-            return Promise.resolve([]);
+            ).then(() => encounterUuid),
+          )
+          .then((encounterUuid) => {
+            // Only images added in this session are in the form state. Images already saved on the
+            // note are shown from the server and never re-uploaded.
+            if (images?.length) {
+              return Promise.all(
+                images.map((image) => {
+                  const imageToUpload: UploadedFile = {
+                    base64Content: image.base64Content,
+                    file: image.file,
+                    fileName: image.fileName,
+                    fileType: image.fileType,
+                    fileDescription: image.fileDescription || '',
+                  };
+                  return createAttachment(patientUuid, imageToUpload, encounterUuid);
+                }),
+              );
+            } else {
+              return Promise.resolve([]);
+            }
+          });
+      };
+      return Promise.resolve()
+        .then(async () => {
+          let removedAny = false;
+          let noteSaveAttempted = false;
+          try {
+            for (const imageId of removedImageIds) {
+              await removeVisitNoteImage(imageId);
+              removedAny = true;
+              setRemovedImages((removed) => [...removed, imageId]);
+              setValue(
+                'removedImageIds',
+                getValues('removedImageIds').filter((id) => id !== imageId),
+                {
+                  shouldDirty: true,
+                },
+              );
+            }
+            const diagnosesChanged =
+              combinedDiagnoses.length !== (encounter?.diagnoses?.length ?? 0) ||
+              combinedDiagnoses.some(
+                (diagnosis) =>
+                  !encounter?.diagnoses?.some(
+                    (saved) =>
+                      saved.diagnosis.coded?.uuid === diagnosis.diagnosis.coded &&
+                      saved.rank === diagnosis.rank &&
+                      saved.certainty === diagnosis.certainty,
+                  ),
+              );
+            if (
+              !isEditing ||
+              diagnosesChanged ||
+              Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')
+            ) {
+              noteSaveAttempted = true;
+              await saveNote();
+            }
+          } finally {
+            if (removedAny || noteSaveAttempted) {
+              invalidateVisitAndEncounterData(globalMutate, patientUuid);
+              mutateVisitNotes();
+              if (removedAny || (noteSaveAttempted && images?.length)) {
+                mutateAttachments();
+              }
+            }
           }
         })
         .then(() => {
-          // Invalidate encounter and notes data since we created a new encounter with notes
-          // Also invalidate visit history table since the visit now has new encounters
-          invalidateVisitAndEncounterData(globalMutate, patientUuid);
-          mutateVisitNotes();
-
-          if (images?.length) {
-            mutateAttachments();
-          }
-
           closeWorkspace({ discardUnsavedChanges: true });
 
           showSnackbar({
@@ -494,6 +541,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           });
         })
         .catch((err) => {
+          setSaveError(
+            t(
+              'visitNotePartialSaveError',
+              'Could not save all changes. Some changes may already be saved. Try saving again.',
+            ),
+          );
           createErrorHandler();
 
           showSnackbar({
@@ -505,6 +558,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         });
     },
     [
+      dirtyFields,
+      getValues,
+      setValue,
       visitContext?.uuid,
       clinicianEncounterRole,
       closeWorkspace,
@@ -538,7 +594,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       hasUnsavedChanges={hasUserUnsavedChanges}
     >
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit, onError)}>
-        <ExtensionSlot name="visit-context-header-slot" state={{ patientUuid }} />
+        <ExtensionSlot name="visit-context-header-slot" state={visitContextHeaderState} />
 
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -743,17 +799,54 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                     />
                   )}
                   <div className={styles.imgThumbnailGrid}>
-                    {savedImages.map((image) => (
-                      <div key={image.id} className={styles.imgThumbnailItem}>
-                        <div className={styles.imgThumbnailContainer}>
-                          <img
-                            className={styles.imgThumbnail}
-                            src={image.src}
-                            alt={image.description || image.filename || t('savedImage', 'Saved image')}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                    {savedImages
+                      .filter((image) => !removedImages.includes(image.id))
+                      .map((image) => {
+                        const isMarkedForRemoval = removedImageIds.includes(image.id);
+                        const name = image.description || image.filename || t('savedImage', 'Saved image');
+                        return (
+                          <div key={image.id} className={styles.imgThumbnailItem}>
+                            <div className={styles.imgThumbnailContainer}>
+                              <img
+                                className={classnames(styles.imgThumbnail, {
+                                  [styles.pendingImage]: isMarkedForRemoval,
+                                })}
+                                src={image.src}
+                                alt={name}
+                              />
+                            </div>
+                            {isMarkedForRemoval && (
+                              <p className={styles.removalStatus}>{t('imageMarkedForRemoval', 'Marked for removal')}</p>
+                            )}
+                            <Button
+                              kind={isMarkedForRemoval ? 'ghost' : 'secondary'}
+                              size="sm"
+                              disabled={isSubmitting}
+                              aria-label={
+                                isMarkedForRemoval
+                                  ? t('undoRemoveImage', 'Undo removal: {{name}}', {
+                                      name: name,
+                                    })
+                                  : t('removeImage', 'Remove image: {{name}}', {
+                                      name: name,
+                                    })
+                              }
+                              className={isMarkedForRemoval ? styles.undoButton : styles.removeButton}
+                              onClick={() =>
+                                setValue(
+                                  'removedImageIds',
+                                  isMarkedForRemoval
+                                    ? removedImageIds.filter((id) => id !== image.id)
+                                    : [...removedImageIds, image.id],
+                                  { shouldDirty: true },
+                                )
+                              }
+                            >
+                              {isMarkedForRemoval ? t('undo', 'Undo') : <Close size={16} />}
+                            </Button>
+                          </div>
+                        );
+                      })}
                     {currentImages?.map((image, index) => (
                       <div key={index} className={styles.imgThumbnailItem}>
                         <div className={styles.imgThumbnailContainer}>
@@ -777,11 +870,25 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                       </div>
                     ))}
                   </div>
+                  {removedImageIds.length > 0 && (
+                    <p className={styles.removalHint}>
+                      {t('imageRemovalSaveHint', 'Images marked for removal will be deleted when you save.')}
+                    </p>
+                  )}
                 </FormGroup>
               </Column>
             </Row>
           </Stack>
         </div>
+        {saveError && (
+          <InlineNotification
+            kind="error"
+            lowContrast
+            hideCloseButton
+            title={t('visitNoteSaveError', 'Error saving visit note')}
+            subtitle={saveError}
+          />
+        )}
         <ButtonSet className={classnames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
           <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}
