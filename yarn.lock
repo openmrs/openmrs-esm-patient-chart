@@ -5407,7 +5407,6 @@ __metadata:
     tree-model: "npm:^1.0.7"
     tslib: "npm:^2.4.1"
     typescript: "npm:~5.8.3"
-    uuid: "npm:^8.3.2"
     webpack: "npm:~5.94.0"
     zone.js: "npm:~0.15.0"
   peerDependencies:

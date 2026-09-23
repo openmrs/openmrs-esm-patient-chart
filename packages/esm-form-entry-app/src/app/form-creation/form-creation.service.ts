@@ -33,7 +33,6 @@ export interface CreateFormParams {
   /**
    * An optional encounter.
    * If provided, this encounter will be edited by the form.
-   * This can be an offline encounter form the sync queue which hasn't been synchronized yet.
    */
   encounter?: Encounter;
   /**

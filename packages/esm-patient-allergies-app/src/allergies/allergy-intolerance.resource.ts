@@ -58,12 +58,6 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
   };
 }
 
-export function fetchAllergyByUuid(allergyUuid: string) {
-  return openmrsObservableFetch<FHIRAllergy>(`${fhirBaseUrl}/AllergyIntolerance/${allergyUuid}`).pipe(
-    map(({ data }) => mapAllergyProperties(data)),
-  );
-}
-
 export function saveAllergy(
   patientAllergy: PatientAllergyPayload,
   patientUuid: string,
