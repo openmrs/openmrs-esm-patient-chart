@@ -3,10 +3,8 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-// One card per selected diagnosis, laid out on a shared column grid so the Primary/Confirmed
-// checkboxes line up under the column headers rendered once above the list. The name spans the
-// top row with the remove button in the top-right corner; the checkboxes drop to the second
-// row, aligned to their columns, so the name gets the full width to itself.
+// One compact row per diagnosis: the name, the Primary/Confirmed checkboxes, and the remove
+// button sit on a single grid aligned to the column headers rendered once above the list.
 $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
 
 .diagnosisListHeader {
@@ -29,12 +27,11 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
   grid-template-columns: $diagnosis-columns;
   align-items: center;
   column-gap: layout.$spacing-03;
-  row-gap: layout.$spacing-02;
-  padding: layout.$spacing-03;
+  padding: layout.$spacing-02 layout.$spacing-03;
   margin-top: layout.$spacing-02;
   border-radius: 4px;
 
-  // Shade each card by rank, following the allergy list's data-attribute pattern
+  // Shade each row by rank, following the allergy list's data-attribute pattern
   // (data-severity there, data-rank here): primary reads distinct from secondary.
   background-color: colors.$gray-10;
 
@@ -48,34 +45,15 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
     margin: 0;
     justify-self: center;
   }
-}
 
-// Top row: the diagnosis name on the left, the remove button in the top-right corner
-.diagnosisHeader {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: layout.$spacing-03;
+  // The remove button auto-flows into the last column; keep it at the row's far end
+  > :global(.cds--btn) {
+    justify-self: end;
+  }
 }
 
 .diagnosisName {
   @include type.type-style('body-compact-01');
   min-width: 0;
   overflow-wrap: anywhere;
-}
-
-.removeButton {
-  flex: 0 0 auto;
-}
-
-.primaryControl {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.confirmedControl {
-  grid-column: 3;
-  grid-row: 2;
 }
