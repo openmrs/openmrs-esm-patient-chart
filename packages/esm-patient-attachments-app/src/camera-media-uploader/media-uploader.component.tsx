@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { FileUploaderDropContainer, InlineLoading, InlineNotification, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useAllowedFileExtensions, useMaxAttachmentFileSize } from '@openmrs/esm-patient-common-lib';
+import { useMaxAttachmentFileSize } from '@openmrs/esm-patient-common-lib';
 import { readFileAsString } from '../utils';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import styles from './media-uploader.scss';
@@ -16,8 +16,11 @@ const MediaUploaderComponent = () => {
   const { maxFileSize, error: sizeLimitError, isValidating: isLoadingSizeLimit, retry } = useMaxAttachmentFileSize();
   const isSizeLimitUnavailable = Boolean(sizeLimitError) || maxFileSize === undefined;
   const isUploadDisabled = isLoadingSizeLimit || isSizeLimitUnavailable;
-  const { setFilesToUpload, multipleFiles } = useContext(CameraMediaUploaderContext);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const {
+    setFilesToUpload,
+    multipleFiles,
+    allowedExtensions: allowedFileExtensions,
+  } = useContext(CameraMediaUploaderContext);
   const [errorNotification, setErrorNotification] = useState<ErrorNotification>(null);
 
   const upload = useCallback(
@@ -35,17 +38,18 @@ const MediaUploaderComponent = () => {
             )} ${maxFileSize} MB.`,
           });
         } else if (!isFileExtensionAllowed(file.name, allowedFileExtensions)) {
-          const lastExtension = allowedFileExtensions.pop();
+          const otherExtensions = allowedFileExtensions.slice(0, -1);
+          const lastExtension = allowedFileExtensions[allowedFileExtensions.length - 1];
 
           setErrorNotification({
             title: t('unsupportedFileType', 'Unsupported file type'),
             subtitle: t(
               'chooseAnAllowedFileType',
-              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{ lastExtension }}.',
+              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{lastExtension}}.',
               {
                 fileName: file.name,
                 lastExtension: lastExtension,
-                supportedExtensions: allowedFileExtensions.join(', '),
+                supportedExtensions: otherExtensions.join(', '),
               },
             ),
           });

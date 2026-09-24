@@ -97,6 +97,9 @@ const createSchema = (t: TFunction, isRetrospectiveDataEntryEnabled: boolean) =>
 
 const SEARCH_TIMEOUT_MS = 500;
 
+/** Image formats browsers render, so a staged file always has a real thumbnail. */
+const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+
 export interface VisitNotesFormProps {
   encounter?: Encounter;
   formContext: 'creating' | 'editing';
@@ -139,7 +142,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string>();
   const [error, setError] = useState<Error>(null);
-  const { allowedFileExtensions } = useAllowedFileExtensions();
+  const {
+    allowedFileExtensions,
+    error: allowedFileExtensionsError,
+    isLoading: isLoadingAllowedFileExtensions,
+  } = useAllowedFileExtensions();
+  const isImageCaptureDisabled =
+    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || !allowedFileExtensions;
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
@@ -343,6 +352,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   };
 
   const showImageCaptureModal = useCallback(() => {
+    if (isImageCaptureDisabled) {
+      return;
+    }
+
     const close = showModal('capture-photo-modal', {
       saveFile: (file: UploadedFile) => {
         if (file.capturedFromWebcam && !file.fileName.includes('.')) {
@@ -356,14 +369,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      allowedExtensions:
-        allowedFileExtensions && Array.isArray(allowedFileExtensions)
-          ? allowedFileExtensions.filter((ext) => !/pdf/i.test(ext))
-          : [],
+      allowedExtensions: allowedFileExtensions?.filter((ext) => imageExtensions.has(ext.toLowerCase())),
       collectDescription: true,
       multipleFiles: true,
+      // Files are only staged here; they upload when the note is saved.
+      showUploadSnackbar: false,
     });
-  }, [allowedFileExtensions, getValues, setValue]);
+  }, [allowedFileExtensions, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
@@ -776,6 +788,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   </p>
                   <Button
                     className={styles.uploadButton}
+                    disabled={isImageCaptureDisabled}
                     kind={isTablet ? 'ghost' : 'tertiary'}
                     onClick={showImageCaptureModal}
                     renderIcon={(props) => <Add size={16} {...props} />}
@@ -853,7 +866,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                           <img
                             className={styles.imgThumbnail}
                             src={image.base64Content}
-                            alt={image.fileDescription ?? image.fileName}
+                            alt={image.fileDescription || image.fileName}
                           />
                         </div>
                         <Button

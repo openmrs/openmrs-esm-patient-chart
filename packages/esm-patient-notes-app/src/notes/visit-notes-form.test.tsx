@@ -27,6 +27,7 @@ import {
 import {
   type PatientWorkspace2DefinitionProps,
   type PatientWorkspaceGroupProps,
+  useAllowedFileExtensions,
 } from '@openmrs/esm-patient-common-lib';
 import {
   fetchDiagnosisConceptsByName,
@@ -78,7 +79,7 @@ function renderVisitNotesForm(
     workspaceProps: { ...defaultProps.workspaceProps, ...workspaceProps },
     groupProps: { ...defaultProps.groupProps, ...groupProps },
   };
-  render(<VisitNotesFormWorkspace {...props} />);
+  return render(<VisitNotesFormWorkspace {...props} />);
 }
 
 function renderExportedVisitNotesForm(workspaceProps: Partial<ExportedVisitNotesFormWorkspaceProps> = {}) {
@@ -105,6 +106,14 @@ const mockUseSession = vi.mocked(useSession);
 const mockedUseFeatureFlag = vi.mocked(useFeatureFlag);
 
 vi.mock('lodash-es/debounce', () => vi.fn((fn) => fn));
+
+vi.mock('@openmrs/esm-patient-common-lib', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@openmrs/esm-patient-common-lib');
+  return {
+    ...actual,
+    useAllowedFileExtensions: vi.fn(() => ({ allowedFileExtensions: ['png'], error: undefined, isLoading: false })),
+  };
+});
 
 vi.mock('./visit-notes.resource', () => ({
   fetchDiagnosisConceptsByName: vi.fn(),
@@ -854,6 +863,11 @@ const noSavedImages = { images: [], isLoading: false, error: null };
 afterEach(() => {
   mockUseConfig.mockReturnValue(defaultConfig);
   vi.mocked(useVisitNoteImages).mockReturnValue(noSavedImages);
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['png'],
+    error: undefined,
+    isLoading: false,
+  });
 });
 
 // The image tests save notes without a diagnosis, so the config must not require one.
@@ -1093,3 +1107,64 @@ test.each([false, true])(
     expect(refreshNotes).toHaveBeenCalledTimes(1);
   },
 );
+test('only offers image formats to the picker and stages files without an upload toast', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['jpeg', 'png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  renderVisitNotesForm();
+
+  await user.click(screen.getByRole('button', { name: /add image/i }));
+
+  expect(showModal).toHaveBeenCalledWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['jpeg', 'png'], showUploadSnackbar: false }),
+  );
+});
+
+test('waits for the extension list before opening an image-only picker', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: undefined,
+    isLoading: true,
+  });
+  vi.mocked(showModal).mockReturnValue(vi.fn());
+  const { rerender } = renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['png', 'pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  rerender(<VisitNotesFormWorkspace {...defaultProps} />);
+
+  expect(addImage).toBeEnabled();
+  await user.click(addImage);
+  expect(showModal).toHaveBeenCalledExactlyOnceWith(
+    'capture-photo-modal',
+    expect.objectContaining({ allowedExtensions: ['png'], showUploadSnackbar: false }),
+  );
+});
+
+test.each([
+  { allowedFileExtensions: undefined, error: undefined },
+  { allowedFileExtensions: ['png', 'pdf'], error: new Error('Offline') },
+])('does not open the picker when restrictions are unavailable: %o', async (result) => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({ ...result, isLoading: false });
+  renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+});
