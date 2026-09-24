@@ -24,6 +24,7 @@ import {
   isNumeric,
   isPanel,
   isText,
+  type LabOrderConcept,
   updateObservation,
   updateOrderResult,
   useCompletedLabResultsArray,
@@ -43,6 +44,18 @@ export interface LabResultsFormProps {
    * This ensures the orders list stays in sync across the different tabs in the Laboratory app.
    * @see https://github.com/openmrs/openmrs-esm-laboratory-app/pull/117 */
   invalidateLabOrders?: () => void;
+}
+
+function findConceptName(concepts: Array<LabOrderConcept>, conceptUuid: string): string | undefined {
+  for (const concept of concepts) {
+    if (concept.uuid === conceptUuid) {
+      return concept.display;
+    }
+    const memberName = concept.setMembers && findConceptName(concept.setMembers, conceptUuid);
+    if (memberName) {
+      return memberName;
+    }
+  }
 }
 
 const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
@@ -203,34 +216,42 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
       });
     };
 
+    const getErrorMessage = (err: { responseBody?: { error?: { message?: string } }; message?: string }) =>
+      err?.responseBody?.error?.message ?? err?.message;
+
     // Handle update operation for completed lab order results
     if (isEditMode) {
-      const updateTasks = Object.entries(formValues)
-        .filter(([, value]) => value !== undefined && value !== null && value !== '')
-        .map(([conceptUuid, value]) => {
-          let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
-          if (!obs) {
-            for (const result of completeLabResults) {
-              obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
-              if (obs) break;
-            }
+      const valuesToUpdate = Object.entries(formValues).filter(
+        ([, value]) => value !== undefined && value !== null && value !== '',
+      );
+      const updateTasks = valuesToUpdate.map(([conceptUuid, value]) => {
+        let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
+        if (!obs) {
+          for (const result of completeLabResults) {
+            obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
+            if (obs) break;
           }
-          return updateObservation(obs?.uuid, { value });
-        });
-      const updateResults = await Promise.allSettled(updateTasks);
-      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-        if (curr.status === 'rejected') {
-          return [...prev, Object.keys(formValues).at(index)];
         }
-        return prev;
-      }, []);
+        return updateObservation(obs?.uuid, { value });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedConceptUuids = valuesToUpdate
+        .filter((_, index) => updateResults[index].status === 'rejected')
+        .map(([conceptUuid]) => conceptUuid);
 
       // Invalidate caches before closing workspace
       mutateResults();
       mutateObstreeData();
 
-      if (failedObsconceptUuids.length) {
-        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
+      if (failedConceptUuids.length) {
+        showNotification(
+          'error',
+          t('couldNotSaveResultsFor', 'Could not save results for {{tests}}', {
+            tests: failedConceptUuids
+              .map((conceptUuid) => findConceptName(conceptArray, conceptUuid) ?? conceptUuid)
+              .join(', '),
+          }),
+        );
       } else {
         closeWorkspace({ discardUnsavedChanges: true });
         showNotification(
@@ -287,7 +308,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         }),
       );
     } catch (err) {
-      showNotification('error', err?.message);
+      showNotification('error', getErrorMessage(err));
     } finally {
       setShowEmptyFormErrorNotification(false);
     }
