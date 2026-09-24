@@ -26,9 +26,8 @@ $diagnosis-columns: minmax(0, 1fr) 3rem 4.5rem 2rem;
 .diagnosisRow {
   display: grid;
   grid-template-columns: $diagnosis-columns;
-  // Top-align so the checkboxes and remove button sit level with the first line of the name
-  // instead of floating in the middle of a tall, wrapped card
-  align-items: start;
+  // Vertically centre the name and checkboxes within the row
+  align-items: center;
   column-gap: layout.$spacing-02;
   padding: layout.$spacing-03;
   margin-top: layout.$spacing-02;
