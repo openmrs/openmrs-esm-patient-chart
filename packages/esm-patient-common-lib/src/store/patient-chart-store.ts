@@ -7,8 +7,9 @@ export interface PatientChartStore {
   mutateVisitContext: () => void;
   /**
    * The uuid of the visit context the patient-chart workspace group was last launched with.
-   * Workspaces launched before the group catches up with a new visit context are closed when
-   * the group relaunches.
+   * Note that when the visit context is changed, the workspaces group (with stale visit context)
+   * must close and reopen, and during that process its visitContext might differ from 
+   * `store.visitContext`
    */
   workspaceGroupVisitUuid?: string | null;
 }
