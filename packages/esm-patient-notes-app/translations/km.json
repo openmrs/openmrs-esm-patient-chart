@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Primary diagnosis",
   "primaryDiagnosisInputPlaceholder": "Choose a primary diagnosis",
   "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "រក្សាទុក និងបិទ",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "កំណត់សម្គាល់នៃរាល់ការមកពិនិត្យ",
   "visitNoteSaved": "បានរក្សាទុកកំណត់សម្គាល់នៃការមកពិនិត្យដោយជោគជ័យ",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "កំហុសក្នុងការរក្សាទុកកំណត់សម្គាល់នៃការមកពិនិត្យ"
 }

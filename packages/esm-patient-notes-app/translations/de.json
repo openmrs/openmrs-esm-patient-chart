@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Hauptdiagnose",
   "primaryDiagnosisInputPlaceholder": "Wählen Sie eine Hauptdiagnose",
   "primaryDiagnosisRequired": "Wählen Sie mindestens eine Hauptdiagnose",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Erneut versuchen",
   "saveAndClose": "Speichern und Schließen",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "Aufenthaltsnotizen",
   "visitNoteSaved": "Aufenthaltsnotiz gespeichert",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "Fehler beim Speichern der Aufenthaltsnotiz"
 }

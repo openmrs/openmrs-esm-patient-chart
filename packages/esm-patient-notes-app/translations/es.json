@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Diagnóstico principal",
   "primaryDiagnosisInputPlaceholder": "Elija un diagnóstico principal",
   "primaryDiagnosisRequired": "Elija al menos un diagnóstico principal",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Guardar y cerrar",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "Notas de visita",
   "visitNoteSaved": "Nota de visita guardada",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "Error al guardar la nota de visita"
 }
