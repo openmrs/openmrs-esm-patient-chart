@@ -107,7 +107,7 @@ const SEARCH_TIMEOUT_MS = 500;
 /**
  * The diagnoses already recorded on the note being edited. Values outside the known enums
  * (possible from other REST writers) fall back to the same presumption the checkboxes express:
- * secondary and provisional.
+ * secondary and confirmed. Only an explicit PROVISIONAL ticks the Provisional box.
  */
 const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string): Array<DiagnosisDraft> =>
   (encounter?.diagnoses ?? []).map(
@@ -115,7 +115,7 @@ const toDiagnosisDrafts = (encounter: Encounter | undefined, patientUuid: string
       draftId: nextDraftId(),
       patient: patientUuid,
       diagnosis: d.diagnosis.coded?.uuid ? { coded: d.diagnosis.coded.uuid } : { nonCoded: d.diagnosis.nonCoded },
-      certainty: d.certainty === 'CONFIRMED' ? 'CONFIRMED' : 'PROVISIONAL',
+      certainty: d.certainty === 'PROVISIONAL' ? 'PROVISIONAL' : 'CONFIRMED',
       rank: d.rank === 1 ? 1 : 2,
       display: d.display,
     }),
@@ -232,7 +232,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   }, [debouncedSearch, watch]);
 
   const createDiagnosis = useCallback(
-    // Secondary and provisional are the presumed defaults; the row's Primary and Confirmed
+    // Secondary and confirmed are the presumed defaults; the row's Primary and Provisional
     // checkboxes record the exceptions, always as an explicit choice — nothing is
     // auto-ticked on the clinician's behalf (O3-5823).
     (concept: Concept): DiagnosisDraft => ({
@@ -243,7 +243,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       },
       patient: patientUuid,
       rank: 2,
-      certainty: 'PROVISIONAL',
+      certainty: 'CONFIRMED',
     }),
     [patientUuid],
   );
@@ -570,12 +570,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   />
                   {selectedDiagnoses.length > 0 ? (
                     <>
-                      {/* The Primary/Confirmed column headers already say where to tick, so the
+                      {/* The Primary/Provisional column headers already say where to tick, so the
                           helper only needs to state what unticked means */}
                       <p className={styles.diagnosisHelperText}>
                         {t(
                           'untickedDiagnosesHelperText',
-                          'Unticked diagnoses are recorded as secondary and provisional.',
+                          'Unticked diagnoses are recorded as secondary and confirmed.',
                         )}
                       </p>
                       <DiagnosisListHeader />

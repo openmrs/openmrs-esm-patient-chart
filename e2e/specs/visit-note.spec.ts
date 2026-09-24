@@ -26,7 +26,7 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
   });
 
-  await test.step('When I add `Asthma` as a primary, confirmed diagnosis', async () => {
+  await test.step('When I add `Asthma` as a primary diagnosis (confirmed by default)', async () => {
     await page.getByPlaceholder('Search for a diagnosis').fill('Asthma');
     // Search results are keyboard-accessible buttons: ArrowDown focuses the first result,
     // Enter selects it and returns focus to the input
@@ -39,15 +39,18 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
     await tickCheckbox(asthmaCard, 'Primary');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-    await tickCheckbox(asthmaCard, 'Confirmed');
-    await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
+    // Certainty defaults to confirmed — the Provisional exception stays unticked.
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Provisional' })).not.toBeChecked();
   });
 
-  await test.step('And I add `GI upset`, leaving it presumed secondary and provisional', async () => {
+  await test.step('And I add `GI upset` and mark it provisional', async () => {
     await page.getByPlaceholder('Search for a diagnosis').fill('GI upset');
     await page.getByRole('button', { name: /gi upset/i }).click();
-    // Unticked checkboxes mean secondary + provisional are presumed — no clicks needed.
-    await expect(page.getByRole('group', { name: /gi upset/i })).toBeVisible();
+    const giCard = page.getByRole('group', { name: /gi upset/i });
+    await expect(giCard).toBeVisible();
+    // Leaving Primary unticked keeps it secondary; tick Provisional for the certainty exception.
+    await tickCheckbox(giCard, 'Provisional');
+    await expect(giCard.getByRole('checkbox', { name: 'Provisional' })).toBeChecked();
   });
 
   await test.step('And I add a visit note', async () => {

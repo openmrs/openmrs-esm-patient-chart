@@ -1,10 +1,12 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
-// One compact row per diagnosis, with the Primary/Confirmed checkboxes aligned into
+// One compact row per diagnosis, with the Primary/Provisional checkboxes aligned into
 // labelled columns (headers rendered once above the list) instead of per-row labels and
 // per-row presumed-value text — review feedback: the per-diagnosis lines read as noisy.
+// The header's trailing column aligns with the row padding (checkboxes + remove button).
 $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
 
 .diagnosisListHeader {
@@ -13,6 +15,7 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
   align-items: end;
   column-gap: layout.$spacing-03;
   margin-top: layout.$spacing-03;
+  padding: 0 layout.$spacing-03;
 
   > span {
     @include type.type-style('label-01');
@@ -26,7 +29,17 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
   grid-template-columns: $diagnosis-columns;
   align-items: center;
   column-gap: layout.$spacing-03;
-  padding: layout.$spacing-02 0;
+  padding: layout.$spacing-02 layout.$spacing-03;
+  margin-top: layout.$spacing-02;
+  border-radius: 4px;
+
+  // Shade each row by rank, following the allergy list's data-attribute pattern
+  // (data-severity there, data-rank here): primary reads distinct from secondary.
+  background-color: colors.$gray-10;
+
+  &[data-rank='1'] {
+    background-color: colors.$blue-10;
+  }
 
   // Center each checkbox under its column header and strip Carbon's stacked-form margins
   :global(.cds--form-item) {

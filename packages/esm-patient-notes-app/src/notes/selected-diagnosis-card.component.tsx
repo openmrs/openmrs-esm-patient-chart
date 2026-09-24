@@ -7,10 +7,11 @@ import styles from './selected-diagnosis-card.scss';
 
 /**
  * A diagnosis being assembled on a visit note. Rank and certainty always carry a value:
- * secondary and provisional are the presumed defaults, and the two checkboxes record the
- * exceptions — Primary and Confirmed — so an untouched diagnosis is immediately saveable
- * (O3-5823 design feedback: the earlier per-card rank/certainty toggle groups took too
- * much space and demanded two explicit choices per diagnosis).
+ * secondary and confirmed are the presumed defaults, and the two checkboxes record the
+ * exceptions — Primary and Provisional — so an untouched diagnosis is immediately saveable
+ * (O3-5823 design feedback: most diagnoses recorded at the point of care are confirmed, so
+ * provisional is the thing the clinician ticks; the earlier toggle groups took too much
+ * space and demanded two explicit choices per diagnosis).
  * `draftId` is a client-side identity: coded concept uuids are not unique within an
  * encounter (other writers can record the same concept twice) and non-coded diagnoses
  * have no uuid at all, so cards must not be keyed or matched by concept.
@@ -37,7 +38,7 @@ export function DiagnosisListHeader() {
     <div aria-hidden="true" className={styles.diagnosisListHeader}>
       <span />
       <span>{t('primary', 'Primary')}</span>
-      <span>{t('confirmed', 'Confirmed')}</span>
+      <span>{t('provisional', 'Provisional')}</span>
       <span />
     </div>
   );
@@ -53,7 +54,7 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
   const { t } = useTranslation();
 
   return (
-    <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
+    <div className={styles.diagnosisRow} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
       <span className={styles.diagnosisName}>{diagnosis.display}</span>
       <Checkbox
         checked={diagnosis.rank === 1}
@@ -63,11 +64,11 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
       />
       <Checkbox
-        checked={diagnosis.certainty === 'CONFIRMED'}
+        checked={diagnosis.certainty === 'PROVISIONAL'}
         hideLabel
-        id={`diagnosis-${diagnosis.draftId}-confirmed`}
-        labelText={t('confirmed', 'Confirmed')}
-        onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'CONFIRMED' : 'PROVISIONAL' })}
+        id={`diagnosis-${diagnosis.draftId}-provisional`}
+        labelText={t('provisional', 'Provisional')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'PROVISIONAL' : 'CONFIRMED' })}
       />
       <Button
         hasIconOnly
