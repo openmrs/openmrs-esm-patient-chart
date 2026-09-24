@@ -257,7 +257,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       if (diagnoses.some((diagnosis) => diagnosis.diagnosis.coded === conceptDiagnosisToAdd.uuid)) {
         return;
       }
-      setSelectedDiagnoses([...diagnoses, createDiagnosis(conceptDiagnosisToAdd)]);
+      // Newest first, so a freshly added diagnosis is visible at the top without scrolling
+      setSelectedDiagnoses([createDiagnosis(conceptDiagnosisToAdd), ...diagnoses]);
     },
     [createDiagnosis, getValues, setSelectedDiagnoses, setValue],
   );
