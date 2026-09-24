@@ -541,12 +541,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 <span className={styles.columnLabel}>{t('diagnosis', 'Diagnosis')}</span>
               </Column>
               <Column sm={3}>
-                <FormGroup legendText={t('searchForDiagnosis', 'Search for a diagnosis to add')}>
+                <FormGroup legendText="">
                   <DiagnosisSearch
                     name="diagnosisSearch"
                     control={control}
                     labelText={t('searchForDiagnosis', 'Search for a diagnosis to add')}
-                    placeholder={t('diagnosisInputPlaceholder', 'Choose a diagnosis')}
+                    placeholder={t('diagnosisInputPlaceholder', 'Search for a diagnosis')}
                     handleSearch={handleSearch}
                     setIsSearching={setIsSearching}
                   />
@@ -576,9 +576,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                         {t(
                           'untickedDiagnosesHelperText',
                           'Unticked diagnoses are recorded as secondary and provisional.',
-                        )}
-                        {isPrimaryDiagnosisRequired && (
-                          <> {t('onePrimaryRequiredHelperText', 'At least one primary is required.')}</>
                         )}
                       </p>
                       <DiagnosisListHeader />

@@ -1,6 +1,14 @@
-import { expect } from '@playwright/test';
+import { expect, type Locator } from '@playwright/test';
 import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
+
+// Carbon renders the checkbox input visually hidden behind its styled box, and the column
+// layout hides the per-row label text, so toggle the diagnosis checkboxes by clicking their
+// label (which carries the visible box) rather than the unactionable input.
+const tickCheckbox = async (scope: Locator, name: string) => {
+  const id = await scope.getByRole('checkbox', { name }).getAttribute('id');
+  await scope.locator(`label[for="${id}"]`).click();
+};
 
 test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   const chartPage = new ChartPage(page);
@@ -19,27 +27,24 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
   });
 
   await test.step('When I add `Asthma` as a primary, confirmed diagnosis', async () => {
-    await page.getByPlaceholder('Choose a diagnosis').fill('Asthma');
+    await page.getByPlaceholder('Search for a diagnosis').fill('Asthma');
     // Search results are keyboard-accessible buttons: ArrowDown focuses the first result,
     // Enter selects it and returns focus to the input
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeVisible();
-    await page.getByPlaceholder('Choose a diagnosis').press('ArrowDown');
+    await page.getByPlaceholder('Search for a diagnosis').press('ArrowDown');
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
     // Nothing is auto-ticked: rank and certainty are explicit choices on each row.
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-    // Carbon renders the checkbox input visually hidden behind its styled box (and the
-    // column layout hides the per-row label text), so check() needs force to skip the
-    // visibility actionability check.
-    await asthmaCard.getByRole('checkbox', { name: 'Primary' }).check({ force: true });
+    await tickCheckbox(asthmaCard, 'Primary');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-    await asthmaCard.getByRole('checkbox', { name: 'Confirmed' }).check({ force: true });
+    await tickCheckbox(asthmaCard, 'Confirmed');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
   });
 
   await test.step('And I add `GI upset`, leaving it presumed secondary and provisional', async () => {
-    await page.getByPlaceholder('Choose a diagnosis').fill('GI upset');
+    await page.getByPlaceholder('Search for a diagnosis').fill('GI upset');
     await page.getByRole('button', { name: /gi upset/i }).click();
     // Unticked checkboxes mean secondary + provisional are presumed — no clicks needed.
     await expect(page.getByRole('group', { name: /gi upset/i })).toBeVisible();

@@ -101,7 +101,7 @@ async function addDiagnosis(
   name: string,
   { primary, confirmed }: { primary?: boolean; confirmed?: boolean } = {},
 ) {
-  const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
+  const searchBox = screen.getByPlaceholderText('Search for a diagnosis');
   await user.clear(searchBox);
   await user.type(searchBox, name);
   await user.click(await screen.findByRole('button', { name }));
@@ -198,7 +198,7 @@ test('typing in the diagnosis search input triggers a search', async () => {
 
   renderVisitNotesForm();
 
-  const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
+  const searchBox = screen.getByPlaceholderText('Search for a diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
 
   // Wait for the search results to appear
@@ -212,7 +212,6 @@ test('typing in the diagnosis search input triggers a search', async () => {
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
   expect(screen.getByText(/unticked diagnoses are recorded as secondary and provisional/i)).toBeInTheDocument();
-  expect(screen.getByText(/at least one primary is required/i)).toBeInTheDocument();
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
 
@@ -234,7 +233,7 @@ test('renders an error message when no matching diagnoses are found', async () =
 
   renderVisitNotesForm();
 
-  const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
+  const searchBox = screen.getByPlaceholderText('Search for a diagnosis');
   await user.type(searchBox, 'COVID-21');
 
   await screen.findByText(/No diagnoses found/i);
@@ -291,7 +290,7 @@ test('renders a success snackbar upon successfully recording a visit note', asyn
 
   // With nothing selected yet, the failed save reports the requirement and focuses the search input
   expect(screen.getByText(/choose at least one primary diagnosis/i)).toBeInTheDocument();
-  expect(screen.getByPlaceholderText('Choose a diagnosis')).toHaveFocus();
+  expect(screen.getByPlaceholderText('Search for a diagnosis')).toHaveFocus();
 
   // A newly added diagnosis is never auto-ticked primary — the choice stays explicit
   const card = await addDiagnosis(user, 'Diabetes Mellitus');
@@ -925,7 +924,7 @@ test('tracks added and removed diagnoses as form changes and returns to clean wh
   await user.click(screen.getByRole('button', { name: 'Remove Diabetes Mellitus' }));
   expect(save).toBeDisabled();
   expect(isProtected()).toBe(false);
-  expect(screen.getByPlaceholderText('Choose a diagnosis')).toHaveFocus();
+  expect(screen.getByPlaceholderText('Search for a diagnosis')).toHaveFocus();
 });
 
 test('supports selecting a diagnosis search result with the keyboard', async () => {
@@ -935,7 +934,7 @@ test('supports selecting a diagnosis search result with the keyboard', async () 
 
   renderVisitNotesForm();
 
-  const searchBox = screen.getByPlaceholderText('Choose a diagnosis');
+  const searchBox = screen.getByPlaceholderText('Search for a diagnosis');
   await user.type(searchBox, 'Diabetes Mellitus');
   await screen.findByRole('button', { name: 'Diabetes Mellitus' });
 
