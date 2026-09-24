@@ -71,11 +71,6 @@ export const esmPatientChartSchema = {
       'An array of concept UUIDs. If an observation has a concept UUID that matches any of the ones in this array, it will be hidden from the observations list in the Encounters summary table.',
     _default: [],
   },
-  offlineVisitTypeUuid: {
-    _type: Type.UUID,
-    _description: 'The UUID of the visit type to be used for the automatically created offline visits.',
-    _default: 'a22733fa-3501-4020-a520-da024eeff088',
-  },
   restrictByVisitLocationTag: {
     _type: Type.Boolean,
     _description:
@@ -215,7 +210,6 @@ export interface ChartConfig {
     src: string;
   };
   notesConceptUuids: string[];
-  offlineVisitTypeUuid: string;
   restrictByVisitLocationTag: boolean;
   showAllEncountersTab: boolean;
   showRecommendedVisitTypeTab: boolean;

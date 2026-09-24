@@ -1,12 +1,5 @@
 import useSWR from 'swr';
-import { map } from 'rxjs/operators';
-import {
-  fhirBaseUrl,
-  openmrsFetch,
-  openmrsObservableFetch,
-  restBaseUrl,
-  type OpenmrsResource,
-} from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
 import {
   type Allergy,
   type FHIRAllergy,
