@@ -188,26 +188,11 @@ export function DrugOrderForm({
     formState: { isDirty, isSubmitting },
     getValues,
     handleSubmit,
+    resetField,
     setError,
     setValue,
     watch,
   } = drugOrderForm;
-
-  // reset the dosage information if set to free text dosage
-  const handleIsFreeTextDosageAfterChange = useCallback(
-    (newValue: MedicationOrderFormData['isFreeTextDosage']) => {
-      if (newValue) {
-        setValue('dosage', null, { shouldValidate: true });
-        setValue('unit', null, { shouldValidate: true });
-        setValue('route', null, { shouldValidate: true });
-        setValue('frequency', null, { shouldValidate: true });
-        setValue('patientInstructions', null, { shouldValidate: true });
-      } else {
-        setValue('freeTextDosage', null, { shouldValidate: true });
-      }
-    },
-    [setValue],
-  );
 
   const handleUnitAfterChange = useCallback(
     (newValue: MedicationOrderFormData['unit'], prevValue: MedicationOrderFormData['unit']) => {
@@ -346,11 +331,11 @@ export function DrugOrderForm({
       ...initialOrderBasketItem,
       drug: data.drug,
       isFreeTextDosage: data.isFreeTextDosage,
-      freeTextDosage: data.freeTextDosage,
-      dosage: data.dosage,
-      unit: data.unit,
-      route: data.route,
-      patientInstructions: data.patientInstructions,
+      freeTextDosage: data.isFreeTextDosage ? data.freeTextDosage : null,
+      dosage: data.isFreeTextDosage ? null : data.dosage,
+      unit: data.isFreeTextDosage ? null : data.unit,
+      route: data.isFreeTextDosage ? null : data.route,
+      patientInstructions: data.isFreeTextDosage ? null : data.patientInstructions,
       asNeeded: data.asNeeded,
       asNeededCondition: data.asNeededCondition,
       duration: data.duration,
@@ -369,6 +354,12 @@ export function DrugOrderForm({
     } as DrugOrderBasketItem;
 
     await onSave(newBasketItem);
+    resetField('patientInstructions', { defaultValue: '' });
+    resetField('freeTextDosage', { defaultValue: '' });
+    resetField('indication', { defaultValue: '' });
+    resetField('pillsDispensed', { defaultValue: null });
+    resetField('quantityUnits', { defaultValue: null });
+    resetField('numRefills', { defaultValue: null });
   };
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {
@@ -472,10 +463,10 @@ export function DrugOrderForm({
         {showStickyMedicationHeader && (
           <div className={styles.stickyMedicationInfo}>
             <MedicationInfoHeader
-              dosage={watchedDosage}
+              dosage={watchedIsFreeText ? null : watchedDosage}
               drug={drug}
-              routeValue={routeValue}
-              unitValue={watchedUnitValue}
+              routeValue={watchedIsFreeText ? '' : routeValue}
+              unitValue={watchedIsFreeText ? '' : watchedUnitValue}
             />
           </div>
         )}
@@ -506,10 +497,10 @@ export function DrugOrderForm({
             <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
             <div ref={medicationInfoHeaderRef}>
               <MedicationInfoHeader
-                dosage={watchedDosage}
+                dosage={watchedIsFreeText ? null : watchedDosage}
                 drug={drug}
-                routeValue={routeValue}
-                unitValue={watchedUnitValue}
+                routeValue={watchedIsFreeText ? '' : routeValue}
+                unitValue={watchedIsFreeText ? '' : watchedUnitValue}
               />
             </div>
             <section className={styles.formSection}>
@@ -526,7 +517,6 @@ export function DrugOrderForm({
                     id="freeTextDosageToggle"
                     aria-label={t('freeTextDosage', 'Free text dosage')}
                     labelText={t('freeTextDosage', 'Free text dosage')}
-                    handleAfterChange={handleIsFreeTextDosageAfterChange}
                   />
                 </Column>
               </Grid>
