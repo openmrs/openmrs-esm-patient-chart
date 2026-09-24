@@ -325,6 +325,23 @@ describe('buildMedicationOrder', () => {
     },
   );
 
+  it('returns a basket item with a null visit when the source order has no encounter visit', () => {
+    const orderWithoutVisit = {
+      ...medicationOrder,
+      encounter: {
+        ...medicationOrder.encounter,
+        visit: null,
+      },
+    } as Order;
+
+    expect(buildMedicationOrder(orderWithoutVisit, 'REVISE')).toEqual(
+      expect.objectContaining({
+        encounterUuid: medicationOrder.encounter.uuid,
+        visit: null,
+      }),
+    );
+  });
+
   it('uses the original activation date when building a DISCONTINUE basket item', () => {
     const result = buildMedicationOrder(medicationOrder, 'DISCONTINUE');
 
