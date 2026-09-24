@@ -46,9 +46,10 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
     justify-self: center;
   }
 
-  // The remove button auto-flows into the last column; keep it at the row's far end
+  // The remove button auto-flows into the last column; keep it at the row's top-right
   > :global(.cds--btn) {
     justify-self: end;
+    align-self: start;
   }
 }
 
