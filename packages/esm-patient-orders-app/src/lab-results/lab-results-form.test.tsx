@@ -1267,4 +1267,22 @@ describe('LabResultsForm', () => {
       ),
     );
   });
+
+  test('keeps what the user typed when saved results load after they edit a field', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<LabResultsForm {...testProps} />);
+
+    const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
+    await user.type(input, '65');
+
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [{ uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+    rerender(<LabResultsForm {...testProps} />);
+
+    await waitFor(() => expect(screen.getByLabelText(`Test Concept (0 - 100 mg/dL)`)).toHaveValue(65));
+  });
 });

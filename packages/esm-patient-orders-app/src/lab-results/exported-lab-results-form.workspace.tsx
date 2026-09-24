@@ -119,6 +119,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
+    getFieldState,
     setValue,
     handleSubmit,
   } = useForm<Record<string, ObservationValue>>({
@@ -157,15 +158,22 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     enableAddTestsDuringResultEntry && !isEditMode && !hasSavedResults && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
+    // Leave fields the user has changed alone, so saved results that load later don't overwrite their edits
+    const fillSavedValue = (fieldName: string, value: ObservationValue) => {
+      if (!getFieldState(fieldName).isDirty) {
+        setValue(fieldName, value);
+      }
+    };
+
     conceptArray.forEach((concept, index) => {
       const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
       if (concept && completeLabResult && (isEditMode || hasSavedResults)) {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
-          setValue(concept.uuid, completeLabResult.value.uuid);
+          fillSavedValue(concept.uuid, completeLabResult.value.uuid);
         } else if (isNumeric(concept) && completeLabResult?.value) {
-          setValue(concept.uuid, parseFloat(completeLabResult.value as string));
+          fillSavedValue(concept.uuid, parseFloat(completeLabResult.value as string));
         } else if (isText(concept) && completeLabResult?.value) {
-          setValue(concept.uuid, completeLabResult?.value);
+          fillSavedValue(concept.uuid, completeLabResult?.value);
         } else if (isPanel(concept)) {
           concept.setMembers.forEach((member) => {
             const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
@@ -177,12 +185,12 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
             } else if (isText(member)) {
               value = obs?.value;
             }
-            if (value) setValue(member.uuid, value);
+            if (value) fillSavedValue(member.uuid, value);
           });
         }
       }
     });
-  }, [conceptArray, completeLabResults, hasSavedResults, isEditMode, setValue]);
+  }, [conceptArray, completeLabResults, getFieldState, hasSavedResults, isEditMode, setValue]);
 
   if (isLoadingResultConcepts) {
     return (
