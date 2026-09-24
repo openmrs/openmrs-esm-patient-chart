@@ -1268,15 +1268,16 @@ describe('LabResultsForm', () => {
     );
   });
 
-  test('keeps what the user typed when saved results load after they edit a field', async () => {
+  test('saves what the user typed when saved results load after they edit a field', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<LabResultsForm {...testProps} />);
 
     const input = await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`);
     await user.type(input, '65');
 
+    const savedResult = { uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation;
     mockUseCompletedLabResultsArray.mockReturnValue({
-      completeLabResults: [{ uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation],
+      completeLabResults: [savedResult],
       isLoading: false,
       error: null,
       mutate: vi.fn(),
@@ -1284,5 +1285,17 @@ describe('LabResultsForm', () => {
     rerender(<LabResultsForm {...testProps} />);
 
     await waitFor(() => expect(screen.getByLabelText(`Test Concept (0 - 100 mg/dL)`)).toHaveValue(65));
+
+    mockFetchSavedLabResults.mockResolvedValueOnce([savedResult]);
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() => expect(mockCloseWorkspace).toHaveBeenCalled());
+    expect(updateObservation).toHaveBeenCalledWith('saved-obs-uuid', { value: 65 });
+    expect(mockShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'success',
+        subtitle: 'Lab results for ORD-1 have been successfully updated',
+      }),
+    );
   });
 });
