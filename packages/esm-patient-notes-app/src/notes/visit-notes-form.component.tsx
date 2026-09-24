@@ -466,22 +466,27 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           .then((encounterUuid) => {
             // Only images added in this session are in the form state. Images already saved on the
             // note are shown from the server and never re-uploaded.
-            if (images?.length) {
-              return Promise.all(
-                images.map((image) => {
-                  const imageToUpload: UploadedFile = {
-                    base64Content: image.base64Content,
-                    file: image.file,
-                    fileName: image.fileName,
-                    fileType: image.fileType,
-                    fileDescription: image.fileDescription || '',
-                  };
-                  return createAttachment(patientUuid, imageToUpload, encounterUuid);
-                }),
-              );
-            } else {
-              return Promise.resolve([]);
+            if (!images?.length) {
+              return [];
             }
+            // The note and its diagnoses are already saved by now, so one rejected image must not
+            // fail the whole save: every image that can upload does, and the rest are reported.
+            return Promise.allSettled(
+              images.map((image) => {
+                const imageToUpload: UploadedFile = {
+                  base64Content: image.base64Content,
+                  file: image.file,
+                  fileName: image.fileName,
+                  fileType: image.fileType,
+                  fileDescription: image.fileDescription || '',
+                };
+                return createAttachment(patientUuid, imageToUpload, encounterUuid);
+              }),
+            ).then((results) =>
+              results.flatMap((result, index) =>
+                result.status === 'rejected' ? [{ image: images[index], reason: result.reason }] : [],
+              ),
+            );
           });
       };
       return Promise.resolve()
@@ -518,7 +523,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               Object.keys(dirtyFields).some((field) => field !== 'removedImageIds')
             ) {
               noteSaveAttempted = true;
-              await saveNote();
+              return await saveNote();
             }
           } finally {
             if (removedAny || noteSaveAttempted) {
@@ -530,8 +535,31 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             }
           }
         })
-        .then(() => {
+        .then((failedUploads = []) => {
           closeWorkspace({ discardUnsavedChanges: true });
+
+          if (failedUploads.length) {
+            const [{ reason }] = failedUploads;
+            const names = failedUploads
+              .map(({ image }) => image.fileDescription?.trim() || image.fileName?.trim())
+              .filter(Boolean)
+              .join(', ');
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'warning',
+              title: t('visitNoteSavedImagesFailed', 'Visit note saved, but {{count}} image was not uploaded', {
+                count: failedUploads.length,
+              }),
+              subtitle: [names, reason?.responseBody?.error?.message ?? reason?.message]
+                .filter(Boolean)
+                .join(': ')
+                .concat(
+                  ' ',
+                  t('reAddImagesFromNote', 'Open the note to add it again.', { count: failedUploads.length }),
+                ),
+            });
+            return;
+          }
 
           showSnackbar({
             isLowContrast: true,
