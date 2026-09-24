@@ -31,13 +31,8 @@ $diagnosis-columns: minmax(0, 1fr) 4rem 5rem 2.5rem;
   margin-top: layout.$spacing-02;
   border-radius: 4px;
 
-  // Shade each row by rank, following the allergy list's data-attribute pattern
-  // (data-severity there, data-rank here): primary reads distinct from secondary.
+  // A subtle shaded background sets each selected diagnosis apart from the form around it
   background-color: colors.$gray-10;
-
-  &[data-rank='1'] {
-    background-color: colors.$blue-10;
-  }
 
   // Center each checkbox under its column header and strip Carbon's stacked-form margins
   :global(.cds--form-item) {

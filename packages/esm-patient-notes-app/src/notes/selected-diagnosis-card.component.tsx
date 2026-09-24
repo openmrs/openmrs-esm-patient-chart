@@ -54,7 +54,7 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
   const { t } = useTranslation();
 
   return (
-    <div className={styles.diagnosisRow} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
+    <div className={styles.diagnosisRow} role="group" aria-label={diagnosis.display}>
       <span className={styles.diagnosisName}>{diagnosis.display}</span>
       <Checkbox
         checked={diagnosis.rank === 1}
