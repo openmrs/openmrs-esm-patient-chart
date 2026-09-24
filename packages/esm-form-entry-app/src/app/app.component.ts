@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { singleSpaPropsSubject } from '../single-spa-props';
+import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 
 @Component({
   selector: 'my-app-root',
@@ -11,10 +11,12 @@ import { singleSpaPropsSubject } from '../single-spa-props';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'openmrs-esm-form-entry';
   view: string;
-  sub: Subscription;
-  constructor() {}
+  private sub: Subscription;
+
+  constructor(private readonly singleSpaPropsService: SingleSpaPropsService) {}
+
   ngOnInit(): void {
-    this.sub = singleSpaPropsSubject.subscribe({
+    this.sub = this.singleSpaPropsService.props$.subscribe({
       next: (prop) => {
         this.view = prop.view;
       },
@@ -22,8 +24,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.sub) {
-      this.sub.unsubscribe();
-    }
+    this.sub?.unsubscribe();
   }
 }
