@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   launchWorkspace2,
   navigate,
@@ -57,31 +57,51 @@ export function useLaunchWorkspaceRequiringVisit<T extends object>(patientUuid: 
 }
 
 export function useStartVisitIfNeeded(patientUuid: string) {
-  const { visitContext } = usePatientChartStore(patientUuid);
+  const { visitContext, workspaceGroupVisitUuid } = usePatientChartStore(patientUuid);
   const { systemVisitEnabled } = useSystemVisitSetting();
   const isRdeEnabled = useFeatureFlag('rde');
+  // Setting a new visit context makes the patient chart relaunch its workspace group, which closes
+  // any workspace opened before the relaunch. So a pending prompt resolves only once the workspace
+  // group has the new visit context.
+  const pendingPromptResolvers = useRef<Array<() => void>>([]);
+
+  useEffect(() => {
+    if (visitContext && workspaceGroupVisitUuid === visitContext.uuid) {
+      const resolvers = pendingPromptResolvers.current;
+      pendingPromptResolvers.current = [];
+      resolvers.forEach((resolvePrompt) => resolvePrompt());
+    }
+  }, [visitContext, workspaceGroupVisitUuid]);
 
   const startVisitIfNeeded = useCallback(async (): Promise<boolean> => {
     if (!systemVisitEnabled || visitContext) {
       return true;
     } else {
       return new Promise<boolean>((resolve) => {
+        const resolveOnceWorkspaceGroupHasVisit = () => {
+          pendingPromptResolvers.current.push(() => resolve(true));
+        };
+
         if (isRdeEnabled) {
+          let isVisitSelected = false;
           const dispose = showModal('visit-context-switcher', {
             patientUuid,
             closeModal: () => {
               dispose();
-              resolve(false);
+              if (!isVisitSelected) {
+                resolve(false);
+              }
             },
             onAfterVisitSelected: () => {
-              resolve(true);
+              isVisitSelected = true;
+              resolveOnceWorkspaceGroupHasVisit();
             },
             size: 'sm',
           });
         } else {
           const dispose = showModal('start-visit-dialog', {
             closeModal: () => dispose(),
-            onVisitStarted: () => resolve(true),
+            onVisitStarted: resolveOnceWorkspaceGroupHasVisit,
           });
         }
       });
