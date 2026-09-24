@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { launchWorkspaceGroup2, usePatient, useVisit, type Visit } from '@openmrs/esm-framework';
-import { usePatientChartStore } from '@openmrs/esm-patient-common-lib';
+import { setPatientChartWorkspaceGroupVisitUuid, usePatientChartStore } from '@openmrs/esm-patient-common-lib';
 import { mockFhirPatient } from '__mocks__';
 import { usePatientChartPatientAndVisit } from './patient-chart.resources';
 
@@ -12,6 +12,7 @@ vi.mock('@openmrs/esm-framework', async () => {
 });
 
 vi.mock('@openmrs/esm-patient-common-lib', () => ({
+  setPatientChartWorkspaceGroupVisitUuid: vi.fn(),
   usePatientChartStore: vi.fn(),
 }));
 
@@ -23,6 +24,7 @@ const mockUsePatientChartStore = vi.mocked(usePatientChartStore);
 const mutateVisitContext = vi.fn();
 const setPatient = vi.fn();
 const setVisitContext = vi.fn();
+const setWorkspaceGroupVisitUuid = vi.mocked(setPatientChartWorkspaceGroupVisitUuid);
 
 const visitA = { uuid: 'visit-a', patient: { uuid: mockFhirPatient.id } } as Visit;
 const visitB = { uuid: 'visit-b', patient: { uuid: mockFhirPatient.id } } as Visit;
@@ -112,6 +114,55 @@ describe('usePatientChartPatientAndVisit', () => {
         mutateVisitContext,
       }),
     );
+  });
+
+  it('records the visit the workspace group was relaunched with', async () => {
+    let activeVisit = visitA;
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisitContext,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+
+    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+    expect(mockLaunchWorkspaceGroup.mock.invocationCallOrder[0]).toBeLessThan(
+      setWorkspaceGroupVisitUuid.mock.invocationCallOrder.at(-1),
+    );
+
+    activeVisit = visitB;
+    rerender();
+
+    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitB.uuid));
+  });
+
+  it('does not record a new visit when the workspace group relaunch is declined', async () => {
+    let activeVisit = visitA;
+    mockUseVisit.mockImplementation(() => ({
+      activeVisit,
+      mutate: mutateVisitContext,
+      isValidating: false,
+      error: null,
+      currentVisit: null,
+      currentVisitIsRetrospective: false,
+      isLoading: false,
+    }));
+
+    const { rerender } = renderHook(() => usePatientChartPatientAndVisit(mockFhirPatient.id));
+    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid));
+
+    mockLaunchWorkspaceGroup.mockResolvedValueOnce(false);
+    activeVisit = visitB;
+    rerender();
+
+    await waitFor(() => expect(mockLaunchWorkspaceGroup).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(setWorkspaceGroupVisitUuid).toHaveBeenCalledTimes(2));
+    expect(setWorkspaceGroupVisitUuid).toHaveBeenLastCalledWith(visitA.uuid);
   });
 
   it('does not relaunch when the same visit UUID is returned with new object references', async () => {

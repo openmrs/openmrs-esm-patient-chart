@@ -471,6 +471,22 @@ describe('Visit form', () => {
     });
   });
 
+  it('calls the onVisitStarted workspace prop with the saved visit after closing the form', async () => {
+    const user = userEvent.setup();
+    const onVisitStarted = vi.fn();
+
+    render(<VisitForm {...defaultProps} workspaceProps={{ ...defaultProps.workspaceProps, onVisitStarted }} />);
+
+    await user.click(screen.getByLabelText(/Outpatient visit/i));
+    await user.click(screen.getByRole('combobox', { name: /Select a location/i }));
+    await user.click(screen.getByText('Inpatient Ward'));
+    await user.click(screen.getByRole('button', { name: /Start visit/i }));
+
+    await waitFor(() => expect(onVisitStarted).toHaveBeenCalledTimes(1));
+    expect(onVisitStarted).toHaveBeenCalledWith(expect.objectContaining({ uuid: visitUuid }));
+    expect(mockCloseWorkspace.mock.invocationCallOrder[0]).toBeLessThan(onVisitStarted.mock.invocationCallOrder[0]);
+  });
+
   it('reports no unsaved changes after a successful save, even while callbacks are still pending', async () => {
     const user = userEvent.setup();
 

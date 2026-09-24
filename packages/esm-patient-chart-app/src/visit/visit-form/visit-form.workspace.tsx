@@ -16,6 +16,10 @@ export interface VisitFormProps {
    */
   openedFrom: string;
   showPatientHeader?: boolean;
+  /**
+   * Called after the visit is saved and set as the patient chart's visit context.
+   */
+  onVisitStarted?: (visit: Visit) => void;
 }
 
 /**
@@ -26,7 +30,7 @@ export interface VisitFormProps {
  * @see exported-visit-form.workspace.tsx
  */
 const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> = ({
-  workspaceProps: { openedFrom, showPatientHeader = false },
+  workspaceProps: { openedFrom, showPatientHeader = false, onVisitStarted: onVisitStartedCallback },
   groupProps: { patient, patientUuid, visitContext },
   ...rest
 }) => {
@@ -41,6 +45,7 @@ const VisitForm: React.FC<PatientWorkspace2DefinitionProps<VisitFormProps, {}>> 
     const mutateSavedOrUpdatedVisit = () => invalidateVisitByUuid(globalMutate, visit.uuid);
     mutateActiveVisit();
     setVisitContext?.(visit, mutateSavedOrUpdatedVisit);
+    onVisitStartedCallback?.(visit);
   };
   return (
     <ExportedVisitForm
