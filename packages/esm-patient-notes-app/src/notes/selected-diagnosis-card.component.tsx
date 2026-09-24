@@ -7,11 +7,10 @@ import styles from './selected-diagnosis-card.scss';
 
 /**
  * A diagnosis being assembled on a visit note. Rank and certainty always carry a value:
- * secondary and confirmed are the presumed defaults, and the two checkboxes record the
- * exceptions — Primary and Provisional — so an untouched diagnosis is immediately saveable
- * (O3-5823 design feedback: most diagnoses recorded at the point of care are confirmed, so
- * provisional is the thing the clinician ticks; the earlier toggle groups took too much
- * space and demanded two explicit choices per diagnosis).
+ * secondary and confirmed are the presumed defaults. Primary starts unticked (secondary) and
+ * Confirmed starts ticked (confirmed) — most diagnoses recorded at the point of care are
+ * confirmed — so an untouched diagnosis is immediately saveable and the clinician only
+ * unticks Confirmed for a provisional diagnosis or ticks Primary to promote one (O3-5823).
  * `draftId` is a client-side identity: coded concept uuids are not unique within an
  * encounter (other writers can record the same concept twice) and non-coded diagnoses
  * have no uuid at all, so cards must not be keyed or matched by concept.
@@ -28,8 +27,9 @@ export function nextDraftId(): number {
 }
 
 /**
- * Column headers for the diagnosis rows below. Rendered once above the list rather than
- * per row; hidden from assistive tech because every checkbox carries its own hidden label.
+ * Column headers for the diagnosis cards below. Rendered once above the list and aligned to
+ * the cards' checkbox columns; hidden from assistive tech because every checkbox carries its
+ * own hidden label.
  */
 export function DiagnosisListHeader() {
   const { t } = useTranslation();
@@ -38,7 +38,7 @@ export function DiagnosisListHeader() {
     <div aria-hidden="true" className={styles.diagnosisListHeader}>
       <span />
       <span>{t('primary', 'Primary')}</span>
-      <span>{t('provisional', 'Provisional')}</span>
+      <span>{t('confirmed', 'Confirmed')}</span>
       <span />
     </div>
   );
@@ -54,23 +54,10 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
   const { t } = useTranslation();
 
   return (
-    <div className={styles.diagnosisRow} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
+    <div className={styles.diagnosisCard} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
       <span className={styles.diagnosisName}>{diagnosis.display}</span>
-      <Checkbox
-        checked={diagnosis.rank === 1}
-        hideLabel
-        id={`diagnosis-${diagnosis.draftId}-primary`}
-        labelText={t('primary', 'Primary')}
-        onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
-      />
-      <Checkbox
-        checked={diagnosis.certainty === 'PROVISIONAL'}
-        hideLabel
-        id={`diagnosis-${diagnosis.draftId}-provisional`}
-        labelText={t('provisional', 'Provisional')}
-        onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'PROVISIONAL' : 'CONFIRMED' })}
-      />
       <Button
+        className={styles.removeButton}
         hasIconOnly
         iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
         kind="ghost"
@@ -78,6 +65,22 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         renderIcon={(props) => <Close size={16} {...props} />}
         size="sm"
         tooltipAlignment="end"
+      />
+      <Checkbox
+        className={styles.primaryControl}
+        checked={diagnosis.rank === 1}
+        hideLabel
+        id={`diagnosis-${diagnosis.draftId}-primary`}
+        labelText={t('primary', 'Primary')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
+      />
+      <Checkbox
+        className={styles.confirmedControl}
+        checked={diagnosis.certainty === 'CONFIRMED'}
+        hideLabel
+        id={`diagnosis-${diagnosis.draftId}-confirmed`}
+        labelText={t('confirmed', 'Confirmed')}
+        onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'CONFIRMED' : 'PROVISIONAL' })}
       />
     </div>
   );

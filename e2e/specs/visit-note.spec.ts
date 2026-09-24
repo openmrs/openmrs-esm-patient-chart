@@ -3,9 +3,9 @@ import { test } from '../core';
 import { ChartPage, VisitsPage } from '../pages';
 
 // Carbon renders the checkbox input visually hidden behind its styled box, and the column
-// layout hides the per-row label text, so toggle the diagnosis checkboxes by clicking their
+// layout hides the per-card label text, so toggle the diagnosis checkboxes by clicking their
 // label (which carries the visible box) rather than the unactionable input.
-const tickCheckbox = async (scope: Locator, name: string) => {
+const toggleCheckbox = async (scope: Locator, name: string) => {
   const id = await scope.getByRole('checkbox', { name }).getAttribute('id');
   await scope.locator(`label[for="${id}"]`).click();
 };
@@ -35,12 +35,11 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await expect(page.getByRole('button', { name: 'Asthma', exact: true })).toBeFocused();
     await page.keyboard.press('Enter');
     const asthmaCard = page.getByRole('group', { name: 'Asthma' });
-    // Nothing is auto-ticked: rank and certainty are explicit choices on each row.
+    // Primary starts unticked (secondary); certainty defaults to confirmed (Confirmed ticked).
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
-    await tickCheckbox(asthmaCard, 'Primary');
+    await expect(asthmaCard.getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
+    await toggleCheckbox(asthmaCard, 'Primary');
     await expect(asthmaCard.getByRole('checkbox', { name: 'Primary' })).toBeChecked();
-    // Certainty defaults to confirmed — the Provisional exception stays unticked.
-    await expect(asthmaCard.getByRole('checkbox', { name: 'Provisional' })).not.toBeChecked();
   });
 
   await test.step('And I add `GI upset` and mark it provisional', async () => {
@@ -48,9 +47,9 @@ test('Add, edit, and delete a visit note', async ({ page, patient }) => {
     await page.getByRole('button', { name: /gi upset/i }).click();
     const giCard = page.getByRole('group', { name: /gi upset/i });
     await expect(giCard).toBeVisible();
-    // Leaving Primary unticked keeps it secondary; tick Provisional for the certainty exception.
-    await tickCheckbox(giCard, 'Provisional');
-    await expect(giCard.getByRole('checkbox', { name: 'Provisional' })).toBeChecked();
+    // Leaving Primary unticked keeps it secondary; untick Confirmed to mark it provisional.
+    await toggleCheckbox(giCard, 'Confirmed');
+    await expect(giCard.getByRole('checkbox', { name: 'Confirmed' })).not.toBeChecked();
   });
 
   await test.step('And I add a visit note', async () => {

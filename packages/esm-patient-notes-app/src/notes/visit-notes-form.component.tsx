@@ -570,13 +570,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   />
                   {selectedDiagnoses.length > 0 ? (
                     <>
-                      {/* The Primary/Provisional column headers already say where to tick, so the
-                          helper only needs to state what unticked means */}
                       <p className={styles.diagnosisHelperText}>
-                        {t(
-                          'untickedDiagnosesHelperText',
-                          'Unticked diagnoses are recorded as secondary and confirmed.',
-                        )}
+                        {t('untickedDiagnosesHelperText', 'Unticked diagnoses are saved as secondary and confirmed.')}
                       </p>
                       <DiagnosisListHeader />
                       {selectedDiagnoses.map((diagnosis) => (
