@@ -15,6 +15,7 @@
   "chooseAnOption": "Wählen Sie eine Option",
   "clearSearchResults": "Ergebnisse löschen",
   "collapsePinnedOrders": "Fixierte Aufträge ausblenden",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Auftragsdatum",
   "dateRange": "Zeitraum",
   "directlyAddToBasket": "In den Warenkorb legen",
