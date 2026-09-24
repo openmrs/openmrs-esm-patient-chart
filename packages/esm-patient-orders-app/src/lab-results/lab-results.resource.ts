@@ -259,6 +259,19 @@ export function useCompletedLabResultsArray(order: Order) {
 }
 
 /**
+ * Fetches the results currently saved for an order. Used right before saving so the decision to
+ * create or update results reflects the backend, not data the form loaded earlier.
+ */
+export async function fetchSavedLabResults(order: Order, abortController: AbortController) {
+  const { data: encounter } = await openmrsFetch<Encounter>(
+    `${restBaseUrl}/encounter/${order.encounter.uuid}?v=${labEncounterRepresentation}`,
+    { signal: abortController.signal },
+  );
+
+  return (encounter.obs ?? []).filter((obs) => obs.order?.uuid === order.uuid);
+}
+
+/**
  * Saves the results and discontinues the order in a single encounter request, so the backend
  * commits or rolls back both together, then marks the order as fulfilled.
  */

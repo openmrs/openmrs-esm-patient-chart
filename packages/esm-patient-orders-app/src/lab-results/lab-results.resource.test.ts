@@ -1,6 +1,7 @@
 import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { completeOrderWithSavedResults, updateOrderResult } from './lab-results.resource';
+import { completeOrderWithSavedResults, fetchSavedLabResults, updateOrderResult } from './lab-results.resource';
+import { type Order } from '@openmrs/esm-patient-common-lib';
 import { type OrderDiscontinuationPayload } from '../types/order';
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
@@ -98,5 +99,27 @@ describe('completeOrderWithSavedResults', () => {
       `${restBaseUrl}/order/order-uuid?v=custom:(uuid,dateStopped)`,
       `${restBaseUrl}/order/order-uuid/fulfillerdetails/`,
     ]);
+  });
+});
+
+describe('fetchSavedLabResults', () => {
+  test('returns only the results linked to the order', async () => {
+    mockOpenmrsFetch.mockResolvedValue({
+      data: {
+        obs: [
+          { uuid: 'result-uuid', order: { uuid: 'order-uuid' } },
+          { uuid: 'other-order-result-uuid', order: { uuid: 'other-order-uuid' } },
+          { uuid: 'unlinked-obs-uuid', order: null },
+        ],
+      },
+    } as FetchResponse);
+
+    const savedResults = await fetchSavedLabResults(
+      { uuid: 'order-uuid', encounter: { uuid: 'encounter-uuid' } } as Order,
+      new AbortController(),
+    );
+
+    expect(savedResults.map(({ uuid }) => uuid)).toEqual(['result-uuid']);
+    expect(mockOpenmrsFetch.mock.calls[0][0]).toMatch(new RegExp(`^${restBaseUrl}/encounter/encounter-uuid\\?v=`));
   });
 });

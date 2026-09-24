@@ -21,6 +21,7 @@ import { type ObservationValue } from '../types/encounter';
 import {
   completeOrderWithSavedResults,
   createCompositeObservationPayload,
+  fetchSavedLabResults,
   isCoded,
   isNumeric,
   isPanel,
@@ -222,14 +223,26 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
       fulfillerComment: 'Test Results Entered',
     };
 
+    // Check the backend rather than the loaded results, which may not have refreshed since a failed attempt
+    let savedResults = completeLabResults;
+    if (!isEditMode) {
+      try {
+        savedResults = await fetchSavedLabResults(order, abortController);
+      } catch (err) {
+        showNotification('error', err?.message);
+        return setShowEmptyFormErrorNotification(false);
+      }
+    }
+    const completesEarlierAttempt = !isEditMode && savedResults.length > 0;
+
     // Update the saved results, then finish completing the order if an earlier attempt did not
-    if (isEditMode || hasSavedResults) {
+    if (isEditMode || completesEarlierAttempt) {
       const updateTasks = Object.entries(formValues)
         .filter(([, value]) => value !== undefined && value !== null && value !== '')
         .map(([conceptUuid, value]) => {
-          let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
+          let obs = savedResults.find((r) => r.concept.uuid === conceptUuid);
           if (!obs) {
-            for (const result of completeLabResults) {
+            for (const result of savedResults) {
               obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
               if (obs) break;
             }
@@ -253,7 +266,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         return setShowEmptyFormErrorNotification(false);
       }
 
-      if (hasSavedResults) {
+      if (completesEarlierAttempt) {
         try {
           await completeOrderWithSavedResults(
             order.uuid,

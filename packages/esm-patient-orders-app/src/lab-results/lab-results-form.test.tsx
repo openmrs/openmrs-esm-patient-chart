@@ -18,6 +18,7 @@ import {
   type Datatype,
   useCompletedLabResultsArray,
   completeOrderWithSavedResults,
+  fetchSavedLabResults,
   updateObservation,
 } from './lab-results.resource';
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
@@ -31,7 +32,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type Encounter } from '../types/encounter';
+import { type Encounter, type Observation } from '../types/encounter';
 import { mockPatient } from 'tools';
 
 const mockUseOrderConceptByUuids = vi.mocked(useOrderConceptsByUuids);
@@ -41,6 +42,7 @@ const mockUseCompletedLabResultsArray = vi.mocked(useCompletedLabResultsArray);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderBasket = vi.mocked(useOrderBasket);
 const mockUpdateOrderResult = vi.mocked(updateOrderResult);
+const mockFetchSavedLabResults = vi.mocked(fetchSavedLabResults);
 
 vi.mock('./lab-results.resource', async () => ({
   ...((await vi.importActual('./lab-results.resource')) as object),
@@ -50,6 +52,7 @@ vi.mock('./lab-results.resource', async () => ({
   useObservation: vi.fn(),
   updateOrderResult: vi.fn().mockResolvedValue({}),
   completeOrderWithSavedResults: vi.fn().mockResolvedValue({}),
+  fetchSavedLabResults: vi.fn().mockResolvedValue([]),
   updateObservation: vi.fn().mockResolvedValue({}),
   useCompletedLabResultsArray: vi.fn(),
 }));
@@ -1068,12 +1071,14 @@ describe('LabResultsForm', () => {
 
   test('updates results saved by an earlier attempt and completes the order instead of saving the results again', async () => {
     const user = userEvent.setup();
+    const savedResult = { uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation;
     mockUseCompletedLabResultsArray.mockReturnValue({
-      completeLabResults: [{ uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' }],
+      completeLabResults: [savedResult],
       isLoading: false,
       error: null,
       mutate: vi.fn(),
-    } as unknown as ReturnType<typeof useCompletedLabResultsArray>);
+    });
+    mockFetchSavedLabResults.mockResolvedValueOnce([savedResult]);
 
     render(<LabResultsForm {...testProps} />);
 
@@ -1092,5 +1097,38 @@ describe('LabResultsForm', () => {
       expect.anything(),
     );
     expect(updateOrderResult).not.toHaveBeenCalled();
+  });
+
+  test('completes results saved by an earlier attempt when the retry runs before the loaded results refresh', async () => {
+    const user = userEvent.setup();
+    mockFetchSavedLabResults.mockResolvedValueOnce([
+      { uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation,
+    ]);
+
+    render(<LabResultsForm {...testProps} />);
+
+    await user.type(await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`), '65');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() => expect(mockCloseWorkspace).toHaveBeenCalled());
+    expect(updateObservation).toHaveBeenCalledWith('saved-obs-uuid', { value: 65 });
+    expect(completeOrderWithSavedResults).toHaveBeenCalled();
+    expect(updateOrderResult).not.toHaveBeenCalled();
+  });
+
+  test('does not save anything when checking for saved results fails', async () => {
+    const user = userEvent.setup();
+    mockFetchSavedLabResults.mockRejectedValueOnce(new Error('Network error'));
+
+    render(<LabResultsForm {...testProps} />);
+
+    await user.type(await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`), '50');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() => expect(mockFetchSavedLabResults).toHaveBeenCalled());
+    expect(updateOrderResult).not.toHaveBeenCalled();
+    expect(updateObservation).not.toHaveBeenCalled();
+    expect(completeOrderWithSavedResults).not.toHaveBeenCalled();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 });
