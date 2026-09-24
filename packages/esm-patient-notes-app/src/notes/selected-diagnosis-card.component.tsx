@@ -54,20 +54,9 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
   const { t } = useTranslation();
 
   return (
-    <div className={styles.diagnosisCard} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
+    <div className={styles.diagnosisRow} data-rank={diagnosis.rank} role="group" aria-label={diagnosis.display}>
       <span className={styles.diagnosisName}>{diagnosis.display}</span>
-      <Button
-        className={styles.removeButton}
-        hasIconOnly
-        iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
-        kind="ghost"
-        onClick={() => onRemove(diagnosis)}
-        renderIcon={(props) => <Close size={16} {...props} />}
-        size="sm"
-        tooltipAlignment="end"
-      />
       <Checkbox
-        className={styles.primaryControl}
         checked={diagnosis.rank === 1}
         hideLabel
         id={`diagnosis-${diagnosis.draftId}-primary`}
@@ -75,12 +64,20 @@ export default function SelectedDiagnosisCard({ diagnosis, onRemove, onUpdate }:
         onChange={(_, { checked }) => onUpdate(diagnosis, { rank: checked ? 1 : 2 })}
       />
       <Checkbox
-        className={styles.confirmedControl}
         checked={diagnosis.certainty === 'CONFIRMED'}
         hideLabel
         id={`diagnosis-${diagnosis.draftId}-confirmed`}
         labelText={t('confirmed', 'Confirmed')}
         onChange={(_, { checked }) => onUpdate(diagnosis, { certainty: checked ? 'CONFIRMED' : 'PROVISIONAL' })}
+      />
+      <Button
+        hasIconOnly
+        iconDescription={t('removeDiagnosisNamed', 'Remove {{diagnosis}}', { diagnosis: diagnosis.display })}
+        kind="ghost"
+        onClick={() => onRemove(diagnosis)}
+        renderIcon={(props) => <Close size={16} {...props} />}
+        size="sm"
+        tooltipAlignment="end"
       />
     </div>
   );

@@ -44,7 +44,7 @@
   "stickyNoteDeleted": "Sticky note deleted",
   "stickyNoteDeletedSuccessfully": "The sticky note was deleted successfully",
   "stickyNoteUpdated": "Sticky note updated",
-  "untickedDiagnosesHelperText": "Unticked diagnoses are saved as secondary and confirmed.",
+  "untickedDiagnosesHelperText": "Unticked diagnoses are saved as secondary and provisional.",
   "visitDate": "Visit date",
   "visitNote": "Visit note",
   "visitNoteNowVisible": "It is now visible on the Encounters page",

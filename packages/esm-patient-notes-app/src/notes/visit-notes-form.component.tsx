@@ -571,7 +571,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   {selectedDiagnoses.length > 0 ? (
                     <>
                       <p className={styles.diagnosisHelperText}>
-                        {t('untickedDiagnosesHelperText', 'Unticked diagnoses are saved as secondary and confirmed.')}
+                        {t('untickedDiagnosesHelperText', 'Unticked diagnoses are saved as secondary and provisional.')}
                       </p>
                       <DiagnosisListHeader />
                       {selectedDiagnoses.map((diagnosis) => (

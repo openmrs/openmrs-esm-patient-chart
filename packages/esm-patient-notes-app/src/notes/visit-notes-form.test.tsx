@@ -185,7 +185,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
   expect(screen.getByRole('textbox', { name: /write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('searchbox', { name: /search for a diagnosis to add/i })).toBeInTheDocument();
   // The defaults helper text only appears once a diagnosis has been added
-  expect(screen.queryByText(/unticked diagnoses are saved as secondary and confirmed/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/unticked diagnoses are saved as secondary and provisional/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add image/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
@@ -211,7 +211,7 @@ test('typing in the diagnosis search input triggers a search', async () => {
   // confirmed, so Primary starts unticked (secondary) and Confirmed starts ticked
   await user.click(targetSearchResult);
   const card = screen.getByRole('group', { name: 'Diabetes Mellitus' });
-  expect(screen.getByText(/unticked diagnoses are saved as secondary and confirmed/i)).toBeInTheDocument();
+  expect(screen.getByText(/unticked diagnoses are saved as secondary and provisional/i)).toBeInTheDocument();
   expect(within(card).getByRole('checkbox', { name: 'Primary' })).not.toBeChecked();
   expect(within(card).getByRole('checkbox', { name: 'Confirmed' })).toBeChecked();
 
