@@ -8,7 +8,7 @@ import React from 'react';
 import { vi, describe, expect, test, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   useOrderConceptsByUuids,
   useLabEncounter,
@@ -17,6 +17,7 @@ import {
   updateOrderResult,
   type Datatype,
   useCompletedLabResultsArray,
+  updateObservation,
 } from './lab-results.resource';
 import LabResultsForm, { type LabResultsFormProps } from './lab-results-form.workspace';
 import ExportedLabResultsForm, {
@@ -29,7 +30,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { configSchema, type ConfigObject } from '../config-schema';
-import { type Encounter } from '../types/encounter';
+import { type Encounter, type Observation } from '../types/encounter';
 import { mockPatient } from 'tools';
 
 const mockUseOrderConceptByUuids = vi.mocked(useOrderConceptsByUuids);
@@ -38,6 +39,9 @@ const mockUseObservation = vi.mocked(useObservation);
 const mockUseCompletedLabResultsArray = vi.mocked(useCompletedLabResultsArray);
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
 const mockUseOrderBasket = vi.mocked(useOrderBasket);
+const mockUpdateOrderResult = vi.mocked(updateOrderResult);
+const mockUpdateObservation = vi.mocked(updateObservation);
+const mockShowSnackbar = vi.mocked(showSnackbar);
 
 vi.mock('./lab-results.resource', async () => ({
   ...((await vi.importActual('./lab-results.resource')) as object),
@@ -46,6 +50,7 @@ vi.mock('./lab-results.resource', async () => ({
   useLabEncounter: vi.fn(),
   useObservation: vi.fn(),
   updateOrderResult: vi.fn().mockResolvedValue({}),
+  updateObservation: vi.fn().mockResolvedValue({}),
   useCompletedLabResultsArray: vi.fn(),
 }));
 
@@ -1039,5 +1044,139 @@ describe('LabResultsForm', () => {
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
     expect(saveButton).toBeDisabled();
+  });
+
+  test('names the tests whose results could not be updated', async () => {
+    const user = userEvent.setup();
+    const numericConcept = (uuid: string, display: string) =>
+      ({
+        uuid,
+        display,
+        setMembers: [],
+        datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+        hiAbsolute: 100,
+        lowAbsolute: 0,
+        units: 'mg/dL',
+        allowDecimal: false,
+      }) as LabOrderConcept;
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        numericConcept('first-concept-uuid', 'First Concept'),
+        numericConcept('second-concept-uuid', 'Second Concept'),
+      ],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUseCompletedLabResultsArray.mockReturnValue({
+      completeLabResults: [
+        { uuid: 'first-obs-uuid', concept: { uuid: 'first-concept-uuid' }, value: '60' } as Observation,
+        { uuid: 'second-obs-uuid', concept: { uuid: 'second-concept-uuid' }, value: '70' } as Observation,
+      ],
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+    });
+    mockUpdateObservation.mockRejectedValueOnce(new Error('Internal Server Error'));
+
+    render(
+      <LabResultsForm
+        {...testProps}
+        workspaceProps={{ ...testProps.workspaceProps, order: { ...mockOrder, fulfillerStatus: 'COMPLETED' } as Order }}
+      />,
+    );
+
+    const firstInput = await screen.findByLabelText('First Concept (0 - 100 mg/dL)');
+    const secondInput = screen.getByLabelText('Second Concept (0 - 100 mg/dL)');
+    await waitFor(() => expect(secondInput).toHaveValue(70));
+    await user.clear(firstInput);
+    await user.clear(secondInput);
+    await user.type(secondInput, '75');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Could not save results for Second Concept' }),
+      ),
+    );
+    expect(mockUpdateObservation).toHaveBeenCalledTimes(1);
+    expect(mockUpdateObservation).toHaveBeenCalledWith('second-obs-uuid', { value: 75 });
+  });
+
+  test('names a nested panel member whose result could not be updated', async () => {
+    const user = userEvent.setup();
+    mockUseOrderConceptByUuids.mockReturnValue({
+      concepts: [
+        {
+          uuid: 'concept-uuid',
+          display: 'Test Panel',
+          set: true,
+          datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+          setMembers: [
+            {
+              uuid: 'nested-panel-uuid',
+              display: 'Nested Panel',
+              set: true,
+              datatype: { display: 'N/A', hl7Abbreviation: 'ZZ' },
+              setMembers: [
+                {
+                  uuid: 'nested-member-uuid',
+                  display: 'Nested Member',
+                  setMembers: [],
+                  datatype: { display: 'Numeric', hl7Abbreviation: 'NM' },
+                  hiAbsolute: 80,
+                  lowAbsolute: 0,
+                  units: 'mg/dL',
+                },
+              ],
+            },
+          ],
+        },
+      ] as unknown as LabOrderConcept[],
+      isLoading: false,
+      error: null,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    mockUpdateObservation.mockRejectedValueOnce(new Error('Internal Server Error'));
+
+    render(
+      <LabResultsForm
+        {...testProps}
+        workspaceProps={{ ...testProps.workspaceProps, order: { ...mockOrder, fulfillerStatus: 'COMPLETED' } as Order }}
+      />,
+    );
+
+    await user.type(await screen.findByLabelText('Nested Member (0 - 80 mg/dL)'), '40');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Could not save results for Nested Member' }),
+      ),
+    );
+  });
+
+  test("shows the backend's error message when saving the results fails", async () => {
+    const user = userEvent.setup();
+    mockUpdateOrderResult.mockRejectedValueOnce({
+      message: 'Server responded with 500 (Internal Server Error) for url /openmrs/ws/rest/v1/order',
+      responseBody: { error: { message: 'Cannot stop an order that is already stopped, expired or voided' } },
+    });
+
+    render(<LabResultsForm {...testProps} />);
+
+    await user.type(await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`), '50');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'error',
+          subtitle: 'Cannot stop an order that is already stopped, expired or voided',
+        }),
+      ),
+    );
   });
 });
