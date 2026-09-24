@@ -31,17 +31,11 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
         additionalProps: { openedFrom: 'patient-chart-start-visit' },
       });
     } else {
-      // onCancel is forwarded so that discarding the visit form reports the same cancellation
-      // to our caller as backing out of this dialog does.
-      launchWorkspace2('start-visit-workspace-form', {
-        openedFrom: 'patient-chart-start-visit',
-        onVisitStarted,
-        onCancel,
-      });
+      launchWorkspace2('start-visit-workspace-form', { openedFrom: 'patient-chart-start-visit', onVisitStarted });
     }
 
     closeModal();
-  }, [closeModal, patientUuid, launchPatientChart, onVisitStarted, onCancel]);
+  }, [closeModal, patientUuid, launchPatientChart, onVisitStarted]);
 
   const modalHeaderText = t('noActiveVisit', 'No active visit');
 

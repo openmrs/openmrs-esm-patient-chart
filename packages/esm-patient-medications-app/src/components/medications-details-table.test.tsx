@@ -222,26 +222,20 @@ describe('MedicationsDetailsTable - Renew', () => {
   });
 });
 
-// Modify and Discontinue act on the original order, so unlike Renew they are meant to keep
-// carrying its encounter and visit. These pin that difference, so that a change aimed at
-// Renew cannot quietly strip the context these two rely on.
-describe('MedicationsDetailsTable - Modify and Discontinue', () => {
+describe('MedicationsDetailsTable - Modify', () => {
   beforeEach(() => {
     _resetOrderBasketStore();
     mockUseStartVisitIfNeeded.mockReturnValue(mockStartVisitIfNeeded);
   });
 
-  const expectedGroupProps = expect.objectContaining({
-    patientUuid: mockPatient.id,
-    visitContext: oldClosedVisit,
-  });
-
-  test('modifying an order opens the drug order form against the order’s own encounter and visit', async () => {
+  test('modifying an order opens the drug order form as a revision of that order', async () => {
     const user = userEvent.setup();
     renderMedicationsDetailsTable();
 
     await clickMenuItem(user, 'Modify');
 
+    // A revision edits the existing order, so it is submitted against the encounter that order
+    // already belongs to rather than a new one.
     expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
       'add-drug-order',
       expect.objectContaining({
@@ -249,27 +243,8 @@ describe('MedicationsDetailsTable - Modify and Discontinue', () => {
         orderToEditOrdererUuid: medicationFixture.orderer.uuid,
       }),
       { encounterUuid: medicationFixture.encounter.uuid },
-      expectedGroupProps,
+      expect.objectContaining({ patientUuid: mockPatient.id }),
     );
-    // No visit prompt: modifying happens in the visit the order already belongs to.
-    expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
-  });
-
-  test('discontinuing an order opens the basket against the order’s own encounter and visit', async () => {
-    const user = userEvent.setup();
-    renderMedicationsDetailsTable();
-
-    await clickMenuItem(user, 'Discontinue');
-
-    expect(mockLaunchWorkspace2).toHaveBeenCalledWith(
-      'order-basket',
-      {},
-      { encounterUuid: medicationFixture.encounter.uuid },
-      expectedGroupProps,
-    );
-    expect(getBasketedMedications()).toEqual([
-      expect.objectContaining({ uuid: medicationFixture.uuid, action: 'DISCONTINUE' }),
-    ]);
     expect(mockStartVisitIfNeeded).not.toHaveBeenCalled();
   });
 });

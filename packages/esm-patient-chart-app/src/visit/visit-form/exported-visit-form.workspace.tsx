@@ -105,7 +105,6 @@ export interface ExportedVisitFormProps {
   openedFrom: string;
   showPatientHeader?: boolean;
   onVisitStarted?: (visit: Visit) => void;
-  onCancel?: () => void;
   patient: fhir.Patient;
   patientUuid: string;
   visitContext: Visit;
@@ -121,7 +120,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     openedFrom,
     showPatientHeader = false,
     onVisitStarted,
-    onCancel,
     patient,
     patientUuid,
     visitContext: visitToEdit,
@@ -447,12 +445,6 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
     ],
   );
 
-  const handleDiscard = useCallback(async () => {
-    if (await closeWorkspace()) {
-      onCancel?.();
-    }
-  }, [closeWorkspace, onCancel]);
-
   return (
     <Workspace2
       title={visitToEdit ? t('editVisit', 'Edit visit') : t('startVisitWorkspaceTitle', 'Start a visit')}
@@ -677,7 +669,7 @@ const ExportedVisitForm: React.FC<Workspace2DefinitionProps<ExportedVisitFormPro
               [styles.desktop]: !isTablet,
             })}
           >
-            <Button className={styles.button} kind="secondary" onClick={handleDiscard}>
+            <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
               {t('discard', 'Discard')}
             </Button>
             <Button
