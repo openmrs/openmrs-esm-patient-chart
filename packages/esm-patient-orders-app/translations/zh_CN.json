@@ -15,6 +15,7 @@
   "chooseAnOption": "选择一个选项",
   "clearSearchResults": "清除结果",
   "collapsePinnedOrders": "折叠置顶医嘱",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "医嘱日期",
   "dateRange": "日期范围",
   "directlyAddToBasket": "添加到医嘱篮",

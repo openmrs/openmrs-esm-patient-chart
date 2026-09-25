@@ -15,6 +15,7 @@
   "chooseAnOption": "Выберите вариант",
   "clearSearchResults": "Очистить результаты",
   "collapsePinnedOrders": "Свернуть закреплённые",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Дата заказа",
   "dateRange": "Диапазон",
   "directlyAddToBasket": "Добавить в корзину",

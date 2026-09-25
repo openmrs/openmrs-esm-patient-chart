@@ -79,19 +79,6 @@ export const getSessionStore = () => ({
   },
 });
 
-export interface SyncItem<T = any> {
-  id: string;
-  content: T;
-  createdOn: Date;
-  descriptor: any;
-}
-
-export const getSynchronizationItems = <T>(_key: string): Promise<T[]> => Promise.resolve([]);
-export const getFullSynchronizationItems = <T>(_key: string): Promise<Array<SyncItem<T>>> => Promise.resolve([]);
-export const queueSynchronizationItem = <T>(_key: string, _content: T, _options?: any): Promise<void> =>
-  Promise.resolve();
-export const messageOmrsServiceWorker = () => Promise.resolve();
-
 export const defineConfigSchema = () => {};
 
 export const Type = {

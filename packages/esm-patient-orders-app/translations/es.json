@@ -15,6 +15,7 @@
   "chooseAnOption": "Elegir una opción",
   "clearSearchResults": "Borrar resultados",
   "collapsePinnedOrders": "Collapse pinned orders",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Fecha de la orden",
   "dateRange": "Rango de fechas",
   "directlyAddToBasket": "Agregar a la canasta",
