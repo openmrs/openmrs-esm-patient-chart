@@ -74,3 +74,23 @@
   @include type.type-style('body-compact-02');
   margin-top: layout.$spacing-03;
 }
+
+.notifyToggle {
+  margin-bottom: layout.$spacing-03;
+}
+
+.notifyCallout {
+  max-width: none;
+  width: 100%;
+
+  // The callout is explanatory only — there is no title, so drop the empty heading slot.
+  :global(.cds--inline-notification__title) {
+    display: none;
+  }
+}
+
+.notifyHelperText {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+}

@@ -18,6 +18,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
+import { type SmartTestOrderBasketItem } from './add-test-order/test-order';
 
 /**
  * SWR-based data fetcher for patient orders.
@@ -94,7 +95,7 @@ export function useOrderReasons(conceptUuids: Array<string>) {
 }
 
 export const prepTestOrderPostData: PostDataPrepFunction = (
-  order: TestOrderBasketItem,
+  order: SmartTestOrderBasketItem,
   patientUuid,
   encounterUuid,
   orderingProviderUuid,

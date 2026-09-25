@@ -1,0 +1,116 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.modalHeader {
+  padding-bottom: layout.$spacing-04;
+
+  :global(.cds--modal-header__heading) {
+    margin-bottom: 0;
+  }
+}
+
+.headerContent {
+  align-items: center;
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.headerMeta {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.modalBody {
+  padding-bottom: 0;
+}
+
+.patientRow {
+  align-items: center;
+  display: flex;
+  gap: layout.$spacing-04;
+  padding-bottom: layout.$spacing-05;
+}
+
+.modalAvatar {
+  display: flex;
+  flex-shrink: 0;
+
+  // PatientPhoto defaults to 56px; the dialog wants it a touch smaller.
+  :global(img),
+  :global(svg) {
+    block-size: layout.$spacing-09;
+    inline-size: layout.$spacing-09;
+  }
+}
+
+.patientName {
+  @include type.type-style('heading-03');
+  color: $ui-05;
+}
+
+.patientMeta {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-01;
+}
+
+.detailGrid {
+  border: 1px solid $ui-03;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detailCell {
+  border-bottom: 1px solid $ui-03;
+  padding: layout.$spacing-04 layout.$spacing-05;
+
+  &:not(:nth-child(2n)) {
+    border-right: 1px solid $ui-03;
+  }
+
+  &:nth-last-child(-n + 2) {
+    border-bottom: none;
+  }
+}
+
+.detailLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+  letter-spacing: 0.04em;
+  margin-bottom: layout.$spacing-02;
+  text-transform: uppercase;
+}
+
+.detailValue {
+  @include type.type-style('body-compact-01');
+  color: $ui-05;
+}
+
+.detailSubValue {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-top: layout.$spacing-01;
+}
+
+.resultValue {
+  @include type.type-style('heading-04');
+  align-items: baseline;
+  color: $ui-05;
+  display: flex;
+  gap: layout.$spacing-02;
+}
+
+.resultUnits {
+  @include type.type-style('body-compact-01');
+  color: $ui-05;
+}
+
+.modalFooter {
+  margin-top: layout.$spacing-05;
+
+  :global(.cds--btn) {
+    max-width: none;
+    width: 50%;
+  }
+}
