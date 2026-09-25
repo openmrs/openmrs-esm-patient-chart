@@ -1,8 +1,12 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "patientdocuments": ">=1.1.0",
+    "webservices.rest": ">=2.12.0"
+  },
   "optionalBackendDependencies": {
     "emrapi": {
-      "version": ">=2.0.0 <4.0.0",
+      "version": ">=2.1.0 <4.0.0",
       "feature": {
         "flagName": "emrapi-module",
         "label": "EMR API Module",
