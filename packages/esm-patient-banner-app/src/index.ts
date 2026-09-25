@@ -3,8 +3,6 @@ import {
   defineExtensionConfigSchema,
   getAsyncLifecycle,
   getSyncLifecycle,
-  messageOmrsServiceWorker,
-  restBaseUrl,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import deceasedPatientTagComponent from './banner-tags/deceased-patient-tag.extension';
@@ -23,11 +21,6 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/relationship.+`,
-  });
-
   defineConfigSchema(moduleName, configSchema);
   defineExtensionConfigSchema('person-attribute-tag', personAttributeTagsExtensionConfigSchema);
 }
