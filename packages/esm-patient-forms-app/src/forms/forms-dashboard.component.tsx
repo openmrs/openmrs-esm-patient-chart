@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ResponsiveWrapper, useConfig, useConnectivity, type Visit } from '@openmrs/esm-framework';
@@ -21,16 +21,20 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
   const {
     data: forms,
     error,
-    mutateForms,
+    totalForms,
   } = useForms(patient.id, visitContext?.uuid, undefined, undefined, !isOnline, config.orderBy);
 
   const sections = useMemo(() => {
-    return config.formSections?.map((formSection) => ({
-      ...formSection,
-      availableForms: forms?.filter((formInfo) =>
-        formSection.forms.some((formConfig) => formInfo.form.uuid === formConfig || formInfo.form.name === formConfig),
-      ),
-    }));
+    return (
+      config.formSections?.map((formSection) => ({
+        ...formSection,
+        availableForms: forms?.filter((formInfo) =>
+          formSection.forms.some(
+            (formConfig) => formInfo.form.uuid === formConfig || formInfo.form.name === formConfig,
+          ),
+        ),
+      })) ?? []
+    );
   }, [config.formSections, forms]);
 
   if (forms?.length === 0) {
@@ -47,16 +51,18 @@ const FormsDashboard: React.FC<FormsDashbaordProps> = ({ handleFormOpen, patient
   return (
     <div className={styles.container}>
       {sections.length === 0 ? (
-        <FormsList forms={forms} error={error} handleFormOpen={handleFormOpen} />
+        <FormsList forms={forms} error={error} handleFormOpen={handleFormOpen} totalForms={totalForms} />
       ) : (
         sections.map((section) => {
+          const sectionForms = section.availableForms ?? [];
           return (
             <FormsList
               key={`form-section-${section.name}`}
               sectionName={section.name}
-              forms={section.availableForms}
+              forms={sectionForms.length > 0 ? sectionForms : undefined}
               error={error}
               handleFormOpen={handleFormOpen}
+              totalForms={totalForms}
             />
           );
         })
