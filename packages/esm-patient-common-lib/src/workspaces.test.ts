@@ -88,6 +88,23 @@ describe('useStartVisitIfNeeded', () => {
     expect(settlement).toEqual({ settled: true, value: true });
   });
 
+  it('resolves false and closes the dialog when starting a visit is cancelled', async () => {
+    mockUseFeatureFlag.mockReturnValue(false);
+    const dispose = vi.fn();
+    mockShowModal.mockReturnValue(dispose);
+    const result = setUpStartVisitIfNeeded();
+
+    let promise: Promise<boolean>;
+    act(() => {
+      promise = result.current.startVisitIfNeeded();
+    });
+    const { onCancel } = getModalProps('start-visit-dialog');
+    act(() => onCancel());
+
+    await expect(promise).resolves.toBe(false);
+    expect(dispose).toHaveBeenCalledOnce();
+  });
+
   it('resolves every pending prompt once the workspace group has the new visit', async () => {
     mockUseFeatureFlag.mockReturnValue(false);
     const result = setUpStartVisitIfNeeded();
