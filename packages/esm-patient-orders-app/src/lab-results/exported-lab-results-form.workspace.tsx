@@ -352,7 +352,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         }),
       );
     } catch (err) {
-      // Refetch the saved results so a retry updates them instead of saving them again
+      // Refetch the saved results so the form fills in anything the failed attempt saved
       mutateResults();
       showNotification('error', getErrorMessage(err));
     } finally {

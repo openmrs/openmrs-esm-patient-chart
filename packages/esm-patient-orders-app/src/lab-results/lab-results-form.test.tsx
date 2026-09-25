@@ -1134,6 +1134,27 @@ describe('LabResultsForm', () => {
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
 
+  test('does not complete the order when updating results saved by an earlier attempt fails', async () => {
+    const user = userEvent.setup();
+    mockFetchSavedLabResults.mockResolvedValueOnce([
+      { uuid: 'saved-obs-uuid', concept: { uuid: 'concept-uuid' }, value: '60' } as Observation,
+    ]);
+    mockUpdateObservation.mockRejectedValueOnce(new Error('Internal Server Error'));
+
+    render(<LabResultsForm {...testProps} />);
+
+    await user.type(await screen.findByLabelText(`Test Concept (0 - 100 mg/dL)`), '65');
+    await user.click(screen.getByRole('button', { name: /Save and close/i }));
+
+    await waitFor(() =>
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'error', subtitle: 'Could not save results for Test Concept' }),
+      ),
+    );
+    expect(completeOrderWithSavedResults).not.toHaveBeenCalled();
+    expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
   test('names the tests whose results could not be updated', async () => {
     const user = userEvent.setup();
     const numericConcept = (uuid: string, display: string) =>
