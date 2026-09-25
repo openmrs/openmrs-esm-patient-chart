@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Diagnosis utama",
   "primaryDiagnosisInputPlaceholder": "Pilih diagnosis utama",
   "primaryDiagnosisRequired": "Pilih setidaknya satu diagnosis utama",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Simpan dan tutup",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "Catatan kunjungan",
   "visitNoteSaved": "Catatan kunjungan disimpan",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "Kesalahan menyimpan catatan kunjungan"
 }

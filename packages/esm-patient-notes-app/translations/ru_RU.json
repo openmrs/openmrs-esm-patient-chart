@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Основной диагноз",
   "primaryDiagnosisInputPlaceholder": "Выберите основной диагноз",
   "primaryDiagnosisRequired": "Выберите хотя бы один основной диагноз",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Удалить изображение: {{name}}",
   "retry": "Повторить",
   "saveAndClose": "Сохранить и закрыть",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Не удалось сохранить все изменения. Некоторые изменения могли быть уже сохранены. Попробуйте сохранить ещё раз.",
   "visitNotes": "Примечания",
   "visitNoteSaved": "Примечание сохранено",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "Ошибка при сохранении примечания"
 }
