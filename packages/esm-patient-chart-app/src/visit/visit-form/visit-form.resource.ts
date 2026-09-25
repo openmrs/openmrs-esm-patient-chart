@@ -18,7 +18,6 @@ import {
 } from '@openmrs/esm-framework';
 import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';
 import { useDefaultVisitLocation } from '../hooks/useDefaultVisitLocation';
-import { useOfflineVisitType } from '../hooks/useOfflineVisitType';
 import { type ChartConfig } from '../../config-schema';
 
 export const visitStatuses = ['new', 'ongoing', 'past'] as const;
@@ -74,15 +73,6 @@ export function extractErrorMessagesFromResponse(errorObject: ErrorObject, t: TF
   }
 
   return message ?? code ?? t('unknownError', 'Unknown error');
-}
-// *****************
-
-export function useConditionalVisitTypes() {
-  const isOnline = useConnectivity();
-
-  const visitTypesHook = isOnline ? useVisitTypes : useOfflineVisitType;
-
-  return visitTypesHook();
 }
 
 interface PatientPersonResponse {
@@ -163,9 +153,8 @@ export function useEarliestAllowedVisitStartDate(patientUuid: string) {
 }
 
 export function useAllowOverlappingVisits() {
-  const isOnline = useConnectivity();
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ value: string }>>(
-    isOnline ? `${restBaseUrl}/systemsetting/visits.allowOverlappingVisits?v=custom:(value)` : null,
+    `${restBaseUrl}/systemsetting/visits.allowOverlappingVisits?v=custom:(value)`,
     openmrsFetch,
   );
   return {
