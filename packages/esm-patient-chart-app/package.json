@@ -56,6 +56,7 @@
     "swr": "2.x"
   },
   "devDependencies": {
+    "@carbon/react": "^1.92.1",
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "@types/uuid": "^9.0.4",
     "openmrs": "next",

@@ -2133,7 +2133,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/react@npm:^1.83.0, @carbon/react@npm:^1.92.1":
+"@carbon/react@npm:^1.92.1":
   version: 1.92.1
   resolution: "@carbon/react@npm:1.92.1"
   dependencies:
@@ -5303,12 +5303,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-form-engine-app@workspace:packages/esm-form-engine-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-form-engine-lib": "npm:next"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5455,11 +5456,12 @@ __metadata:
   resolution: "@openmrs/esm-generic-patient-widgets-app@workspace:packages/esm-generic-patient-widgets-app"
   dependencies:
     "@carbon/charts-react": "npm:^1.27.0"
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5515,11 +5517,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-allergies-app@workspace:packages/esm-patient-allergies-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5535,7 +5538,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-attachments-app@workspace:packages/esm-patient-attachments-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     linkify-react: "npm:^4.3.2"
     linkifyjs: "npm:^4.3.2"
@@ -5543,6 +5546,7 @@ __metadata:
     react-html5-camera-photo: "npm:^1.5.11"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5558,11 +5562,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-banner-app@workspace:packages/esm-patient-banner-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5578,6 +5583,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart-app@workspace:packages/esm-patient-chart-app"
   dependencies:
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     "@types/uuid": "npm:^9.0.4"
     lodash-es: "npm:^4.18.1"
@@ -5658,12 +5664,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     uuid: "npm:^8.3.2"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     react: 18.x
     single-spa: 6.x
@@ -5674,11 +5681,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-conditions-app@workspace:packages/esm-patient-conditions-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5694,11 +5702,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5714,13 +5723,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-forms-app@workspace:packages/esm-patient-forms-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     fuzzy: "npm:^0.1.3"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5738,11 +5748,12 @@ __metadata:
   dependencies:
     "@carbon/charts": "npm:^1.27.3"
     "@carbon/charts-react": "npm:^1.27.3"
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5758,7 +5769,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-immunizations-app@workspace:packages/esm-patient-immunizations-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
@@ -5767,6 +5778,7 @@ __metadata:
     vitest: "npm:^4.1.2"
     zod: "npm:^3.23.8"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5782,10 +5794,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-label-printing-app@workspace:packages/esm-patient-label-printing-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     react: 18.x
     react-i18next: 16.x
@@ -5797,11 +5810,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-lists-app@workspace:packages/esm-patient-lists-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5817,12 +5831,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5838,12 +5853,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-notes-app@workspace:packages/esm-patient-notes-app"
   dependencies:
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     html-entities: "npm:^2.5.2"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5859,12 +5876,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-orders-app@workspace:packages/esm-patient-orders-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5880,7 +5898,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-procedures-app@workspace:packages/esm-patient-procedures-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
@@ -5888,6 +5906,7 @@ __metadata:
     vitest: "npm:^4.1.2"
     zod: "npm:^3.23.8"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5903,12 +5922,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-programs-app@workspace:packages/esm-patient-programs-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5924,7 +5944,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-task-list-app@workspace:packages/esm-patient-task-list-app"
   dependencies:
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
@@ -5932,6 +5952,7 @@ __metadata:
     vitest: "npm:^4.1.2"
     zod: "npm:^3.23.8"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
@@ -5948,12 +5969,13 @@ __metadata:
   resolution: "@openmrs/esm-patient-tests-app@workspace:packages/esm-patient-tests-app"
   dependencies:
     "@carbon/charts-react": "npm:^1.27.0"
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     lodash-es: "npm:^4.18.1"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     react: 18.x
@@ -5969,11 +5991,12 @@ __metadata:
   resolution: "@openmrs/esm-patient-vitals-app@workspace:packages/esm-patient-vitals-app"
   dependencies:
     "@carbon/charts-react": "npm:^1.27.0"
-    "@carbon/react": "npm:^1.83.0"
+    "@carbon/react": "npm:^1.92.1"
     "@openmrs/esm-patient-common-lib": "workspace:*"
     openmrs: "npm:next"
     vitest: "npm:^4.1.2"
   peerDependencies:
+    "@carbon/react": 1.x
     "@openmrs/esm-framework": 10.x
     "@openmrs/esm-patient-common-lib": 12.x
     dayjs: 1.x
