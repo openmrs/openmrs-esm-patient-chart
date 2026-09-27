@@ -45,6 +45,7 @@
     "react-router-dom": "6.x"
   },
   "devDependencies": {
+    "@carbon/react": "^1.92.1",
     "openmrs": "next",
     "vitest": "^4.1.2"
   }
