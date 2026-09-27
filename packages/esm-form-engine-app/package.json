@@ -54,6 +54,6 @@
     "@carbon/react": "^1.92.1",
     "@openmrs/esm-patient-common-lib": "workspace:*",
     "openmrs": "next",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.11"
   }
 }
