@@ -33,6 +33,7 @@ import {
   type PatientWorkspaceGroupProps,
   useLaunchWorkspaceRequiringVisit,
   useOrderBasket,
+  useStartVisitIfNeeded,
 } from '@openmrs/esm-patient-common-lib';
 import {
   AddIcon,
@@ -401,6 +402,15 @@ function OrderBasketItemActions({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+  const startVisitIfNeeded = useStartVisitIfNeeded(patient.id);
+
+  // Renewing awaits the visit prompt, which stays open for as long as the user takes to answer
+  // it. Reading the basket through a ref means the renewal is appended to whatever the basket
+  // holds by then, rather than to a snapshot taken before the prompt opened.
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   const workspaceGroupProps: PatientWorkspaceGroupProps = useMemo(
     () => ({
@@ -436,15 +446,16 @@ function OrderBasketItemActions({
     );
   }, [medication, workspaceGroupProps]);
 
-  const handleRenewClick = useCallback(() => {
-    setItems([...items, buildMedicationOrder(medication, 'RENEW')]);
-    launchWorkspace2<{}, OrderBasketWindowProps, PatientWorkspaceGroupProps>(
-      'order-basket',
-      {},
-      { encounterUuid: medication.encounter.uuid },
-      workspaceGroupProps,
-    );
-  }, [items, setItems, medication, workspaceGroupProps]);
+  const handleRenewClick = useCallback(async () => {
+    const canProceed = await startVisitIfNeeded();
+    if (!canProceed) {
+      return;
+    }
+
+    setItems([...itemsRef.current, buildMedicationOrder(medication, 'RENEW')]);
+    // Launched without window or group props so that the basket uses the chart's current visit
+    launchWorkspace2('order-basket');
+  }, [startVisitIfNeeded, setItems, medication]);
 
   return (
     <OverflowMenu
