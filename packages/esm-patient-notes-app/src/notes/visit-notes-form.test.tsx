@@ -1156,7 +1156,7 @@ test('waits for the extension list before opening an image-only picker', async (
 });
 
 test.each([
-  { allowedFileExtensions: undefined, error: undefined },
+  { allowedFileExtensions: undefined, error: new Error('Offline') },
   { allowedFileExtensions: ['png', 'pdf'], error: new Error('Offline') },
 ])('does not open the picker when restrictions are unavailable: %o', async (result) => {
   const user = userEvent.setup();
@@ -1167,4 +1167,50 @@ test.each([
   expect(addImage).toBeDisabled();
   await user.click(addImage);
   expect(showModal).not.toHaveBeenCalled();
+});
+
+test.each([undefined, [], [''], ['  ']].map((allowedFileExtensions) => ({ allowedFileExtensions })))(
+  'offers supported images when the backend has no extension restrictions: %j',
+  async ({ allowedFileExtensions }) => {
+    const user = userEvent.setup();
+    vi.mocked(useAllowedFileExtensions).mockReturnValue({ allowedFileExtensions, error: undefined, isLoading: false });
+    vi.mocked(showModal).mockReturnValue(vi.fn());
+    renderVisitNotesForm();
+
+    const addImage = screen.getByRole('button', { name: /add image/i });
+    expect(addImage).toBeEnabled();
+    await user.click(addImage);
+    expect(showModal).toHaveBeenCalledWith(
+      'capture-photo-modal',
+      expect.objectContaining({ allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] }),
+    );
+  },
+);
+
+test('disables image capture when the backend only allows documents', async () => {
+  const user = userEvent.setup();
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: ['pdf', 'docx'],
+    error: undefined,
+    isLoading: false,
+  });
+  renderVisitNotesForm();
+
+  const addImage = screen.getByRole('button', { name: /add image/i });
+  expect(addImage).toBeDisabled();
+  await user.click(addImage);
+  expect(showModal).not.toHaveBeenCalled();
+});
+
+test('explains why image capture is disabled when loading restrictions fails', () => {
+  vi.mocked(useAllowedFileExtensions).mockReturnValue({
+    allowedFileExtensions: undefined,
+    error: new Error('Offline'),
+    isLoading: false,
+  });
+  renderVisitNotesForm();
+
+  expect(screen.getByRole('button', { name: /add image/i })).toBeDisabled();
+  expect(screen.getByText("Couldn't load the allowed image formats")).toBeInTheDocument();
+  expect(screen.getByText('Reload the page to add images to this note.')).toBeInTheDocument();
 });

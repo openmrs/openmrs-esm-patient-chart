@@ -38,18 +38,14 @@ const MediaUploaderComponent = () => {
             )} ${maxFileSize} MB.`,
           });
         } else if (!isFileExtensionAllowed(file.name, allowedFileExtensions)) {
-          const otherExtensions = allowedFileExtensions.slice(0, -1);
-          const lastExtension = allowedFileExtensions[allowedFileExtensions.length - 1];
-
           setErrorNotification({
             title: t('unsupportedFileType', 'Unsupported file type'),
             subtitle: t(
-              'chooseAnAllowedFileType',
-              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{lastExtension}}.',
+              'chooseSupportedFileType',
+              'The file "{{fileName}}" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.',
               {
                 fileName: file.name,
-                lastExtension: lastExtension,
-                supportedExtensions: otherExtensions.join(', '),
+                supportedExtensions: allowedFileExtensions.join(', '),
               },
             ),
           });

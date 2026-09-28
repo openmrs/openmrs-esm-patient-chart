@@ -11,7 +11,12 @@ vi.mock('@openmrs/esm-patient-common-lib', () => ({
 }));
 vi.mock('../utils', () => ({ readFileAsString: vi.fn().mockResolvedValue('data:image/png;base64,test') }));
 
-function renderUploader(maxFileSize: number | undefined, isLoading = false, error?: Error) {
+function renderUploader(
+  maxFileSize: number | undefined,
+  isLoading = false,
+  error?: Error,
+  allowedExtensions = ['png'],
+) {
   const retry = vi.fn().mockResolvedValue(undefined);
   vi.mocked(useMaxAttachmentFileSize).mockReturnValue({
     maxFileSize,
@@ -22,7 +27,7 @@ function renderUploader(maxFileSize: number | undefined, isLoading = false, erro
   });
   const setFilesToUpload = vi.fn();
   const content = () => (
-    <CameraMediaUploaderContext.Provider value={{ setFilesToUpload, multipleFiles: true, allowedExtensions: ['png'] }}>
+    <CameraMediaUploaderContext.Provider value={{ setFilesToUpload, multipleFiles: true, allowedExtensions }}>
       <MediaUploader />
     </CameraMediaUploaderContext.Provider>
   );
@@ -98,4 +103,56 @@ test('enables selection after retry obtains a valid limit', () => {
   rerender();
   expect(screen.getByLabelText(/drag and drop files here or click to upload/i)).toBeEnabled();
   expect(screen.queryByText('Could not load the upload size limit')).not.toBeInTheDocument();
+});
+
+test('lists only the extensions the caller allows and refuses anything else', async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  const { setFilesToUpload } = renderUploader(5, false, undefined, ['jpeg', 'jpg', 'png']);
+
+  expect(screen.getByText(/supported files are jpeg, jpg, png/i)).toBeInTheDocument();
+  expect(screen.queryByText(/pdf/i)).not.toBeInTheDocument();
+
+  const input = screen.getByLabelText(/drag and drop files here/i);
+  await user.upload(input, new File(['%PDF-1.4'], 'consent.pdf', { type: 'application/pdf' }));
+
+  expect(screen.getByText(/unsupported file type/i)).toBeInTheDocument();
+  expect(screen.getByText(/one of the following extensions: jpeg, jpg, png/i)).toBeInTheDocument();
+  expect(setFilesToUpload).not.toHaveBeenCalled();
+});
+
+test('keeps the allowed list intact after refusing a file', async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  const allowed = ['jpeg', 'png'];
+  renderUploader(5, false, undefined, allowed);
+
+  const input = screen.getByLabelText(/drag and drop files here/i);
+  await user.upload(input, new File(['x'], 'notes.txt', { type: 'text/plain' }));
+  await user.upload(input, new File(['y'], 'more.txt', { type: 'text/plain' }));
+
+  expect(allowed).toEqual(['jpeg', 'png']);
+  expect(screen.getByText(/extensions: jpeg, png/i)).toBeInTheDocument();
+});
+
+test('accepts an allowed file and stages it', async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  const { setFilesToUpload } = renderUploader(5);
+
+  const input = screen.getByLabelText(/drag and drop files here/i);
+  await user.upload(input, new File(['png'], 'scan.PNG', { type: 'image/png' }));
+
+  await vi.waitFor(() => expect(setFilesToUpload).toHaveBeenCalledTimes(1));
+  expect(screen.queryByText(/unsupported file type/i)).not.toBeInTheDocument();
+});
+
+test('names a single allowed extension without a dangling separator', async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  const { input, setFilesToUpload } = renderUploader(5);
+  await user.upload(input, new File(['text'], 'notes.txt', { type: 'text/plain' }));
+
+  expect(
+    screen.getByText(
+      'The file "notes.txt" cannot be uploaded. Please upload a file with one of the following extensions: png.',
+    ),
+  ).toBeInTheDocument();
+  expect(setFilesToUpload).not.toHaveBeenCalled();
 });

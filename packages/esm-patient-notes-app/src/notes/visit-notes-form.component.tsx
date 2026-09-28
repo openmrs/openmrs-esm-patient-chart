@@ -147,8 +147,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     error: allowedFileExtensionsError,
     isLoading: isLoadingAllowedFileExtensions,
   } = useAllowedFileExtensions();
+  const allowedImageExtensions = useMemo(() => {
+    const extensions = allowedFileExtensions?.map((extension) => extension.trim().toLowerCase()).filter(Boolean);
+    return extensions?.length ? extensions.filter((extension) => imageExtensions.has(extension)) : [...imageExtensions];
+  }, [allowedFileExtensions]);
   const isImageCaptureDisabled =
-    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || !allowedFileExtensions;
+    isLoadingAllowedFileExtensions || Boolean(allowedFileExtensionsError) || allowedImageExtensions.length === 0;
   const isRetrospectiveDataEntryEnabled = useFeatureFlag('rde');
 
   const visitNoteFormSchema = useMemo(
@@ -369,13 +373,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       closeModal: () => {
         close();
       },
-      allowedExtensions: allowedFileExtensions?.filter((ext) => imageExtensions.has(ext.toLowerCase())),
+      allowedExtensions: allowedImageExtensions,
       collectDescription: true,
       multipleFiles: true,
       // Files are only staged here; they upload when the note is saved.
       showUploadSnackbar: false,
     });
-  }, [allowedFileExtensions, getValues, isImageCaptureDisabled, setValue]);
+  }, [allowedImageExtensions, getValues, isImageCaptureDisabled, setValue]);
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...currentImages];
@@ -795,6 +799,16 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   >
                     {t('addImage', 'Add image')}
                   </Button>
+                  {allowedFileExtensionsError && (
+                    <InlineNotification
+                      className={styles.savedImagesLoading}
+                      kind="error"
+                      lowContrast
+                      hideCloseButton
+                      title={t('allowedFileExtensionsLoadError', "Couldn't load the allowed image formats")}
+                      subtitle={t('allowedFileExtensionsLoadErrorHint', 'Reload the page to add images to this note.')}
+                    />
+                  )}
                   {isLoadingSavedImages && (
                     <InlineLoading
                       className={styles.savedImagesLoading}
