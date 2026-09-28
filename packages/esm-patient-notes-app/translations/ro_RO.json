@@ -37,6 +37,8 @@
   "primaryDiagnosis": "Diagnostic primar",
   "primaryDiagnosisInputPlaceholder": "Alege un diagnostic primar",
   "primaryDiagnosisRequired": "Alege cel putin un diagnostic primar",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "Salveaza si inchide",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "Note vizita",
   "visitNoteSaved": "Nota de vizita salvata",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "Eroare la salvarea notei de vizita"
 }

@@ -37,6 +37,8 @@
   "primaryDiagnosis": "ძირითადი დიაგნოზი",
   "primaryDiagnosisInputPlaceholder": "აირჩიეთ ძირითადი დიაგნოზი",
   "primaryDiagnosisRequired": "Choose at least one primary diagnosis",
+  "reAddImagesFromNote_one": "Open the note to add it again.",
+  "reAddImagesFromNote_other": "Open the note to add them again.",
   "removeImage": "Remove image: {{name}}",
   "retry": "Retry",
   "saveAndClose": "შენახვა და დახურვა",
@@ -62,5 +64,7 @@
   "visitNotePartialSaveError": "Could not save all changes. Some changes may already be saved. Try saving again.",
   "visitNotes": "ვიზიტის შენიშვნები",
   "visitNoteSaved": "ვიზიტის შენიშვნა შენახულია",
+  "visitNoteSavedImagesFailed_one": "Visit note saved, but {{count}} image was not uploaded",
+  "visitNoteSavedImagesFailed_other": "Visit note saved, but {{count}} images were not uploaded",
   "visitNoteSaveError": "ვიზიტის შენიშვნის შენახვის შეცდომა"
 }

@@ -15,6 +15,7 @@
   "chooseAnOption": "Choose an option",
   "clearSearchResults": "Clear results",
   "collapsePinnedOrders": "Collapse pinned orders",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Date of order",
   "dateRange": "טווח תאריכים",
   "directlyAddToBasket": "Add to basket",

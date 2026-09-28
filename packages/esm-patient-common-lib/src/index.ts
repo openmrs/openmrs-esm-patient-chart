@@ -7,7 +7,6 @@ export * from './error-state';
 export * from './form-entry/form-entry';
 export * from './results';
 export * from './launchStartVisitPrompt';
-export * from './offline/visit';
 export * from './orders';
 export * from './pagination';
 export * from './patient-summary/patient-summary-extension-order';

@@ -9,8 +9,7 @@
       "name": "form-widget",
       "component": "formWidget",
       "slot": "form-widget-slot",
-      "online": true,
-      "offline": true
+      "online": true
     }
   ]
 }

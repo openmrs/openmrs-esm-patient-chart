@@ -1,12 +1,5 @@
 import useSWR from 'swr';
-import { map } from 'rxjs/operators';
-import {
-  fhirBaseUrl,
-  openmrsFetch,
-  openmrsObservableFetch,
-  restBaseUrl,
-  type OpenmrsResource,
-} from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
 import {
   type Allergy,
   type FHIRAllergy,
@@ -56,12 +49,6 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
     reactionSeverity: allergy?.reaction[0]?.severity,
     lastUpdated: allergy?.meta?.lastUpdated,
   };
-}
-
-export function fetchAllergyByUuid(allergyUuid: string) {
-  return openmrsObservableFetch<FHIRAllergy>(`${fhirBaseUrl}/AllergyIntolerance/${allergyUuid}`).pipe(
-    map(({ data }) => mapAllergyProperties(data)),
-  );
 }
 
 export function saveAllergy(
