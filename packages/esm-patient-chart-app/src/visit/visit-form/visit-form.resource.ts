@@ -9,11 +9,9 @@ import {
   openmrsFetch,
   restBaseUrl,
   useConfig,
-  useConnectivity,
   useEmrConfiguration,
   useFeatureFlag,
   useSession,
-  useVisitTypes,
   type Visit,
 } from '@openmrs/esm-framework';
 import { time12HourFormatRegex, type amPm } from '@openmrs/esm-patient-common-lib';

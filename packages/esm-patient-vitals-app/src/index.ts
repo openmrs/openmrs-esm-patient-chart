@@ -1,11 +1,4 @@
-import {
-  defineConfigSchema,
-  fhirBaseUrl,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import biometricsDetailedSummaryComponent from './biometrics/biometrics-main.component';
@@ -25,16 +18,6 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `${fhirBaseUrl}/Observation.+`,
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${restBaseUrl}/concept.+`,
-  });
-
   defineConfigSchema(moduleName, configSchema);
 }
 

@@ -8,6 +8,7 @@ import styles from './start-visit-dialog.scss';
 interface StartVisitDialogProps {
   patientUuid: string;
   closeModal: () => void;
+  onCancel?: () => void;
   launchPatientChart?: boolean;
   onVisitStarted?: () => void;
 }
@@ -15,10 +16,12 @@ interface StartVisitDialogProps {
 const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   patientUuid,
   closeModal,
+  onCancel,
   launchPatientChart,
   onVisitStarted,
 }) => {
   const { t } = useTranslation();
+  const handleCancel = onCancel ?? closeModal;
 
   const handleStartNewVisit = useCallback(() => {
     if (launchPatientChart) {
@@ -43,14 +46,14 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
 
   return (
     <div>
-      <ModalHeader closeModal={closeModal}>
+      <ModalHeader closeModal={handleCancel}>
         <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
       <ModalBody>
         <p className={styles.body}>{modalBodyText}</p>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
+        <Button kind="secondary" onClick={handleCancel}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="primary" onClick={handleStartNewVisit}>
