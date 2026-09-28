@@ -2,6 +2,8 @@
   "add": "הוסף",
   "addImage": "הוסף תמונה",
   "addVisitNote": "Add visit note",
+  "allowedFileExtensionsLoadError": "Couldn't load the allowed image formats",
+  "allowedFileExtensionsLoadErrorHint": "Reload the page to add images to this note.",
   "clinicalNoteLabel": "כתוב הערה נוספת",
   "clinicalNotePlaceholder": "כתוב כל נקודות נוספות כאן",
   "confirmDeleteStickyNote": "Confirm delete sticky note",

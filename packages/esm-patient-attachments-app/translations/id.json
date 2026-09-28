@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Lampiran",
   "cameraAccessErrorMessage": "Silakan aktifkan akses kamera di pengaturan browser Anda dan coba lagi.",
   "cameraError": "Kesalahan Kamera",
-  "chooseAnAllowedFileType": "File \"{{fileName}}\" tidak dapat diunggah. Silakan unggah file dengan salah satu ekstensi berikut: {{supportedExtensions}}, atau {{ lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Tutup",
   "closePreview": "Tutup pratinjau",
   "dateUploaded": "Tanggal diunggah",

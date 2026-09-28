@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Đính kèm",
   "cameraAccessErrorMessage": "Vui lòng bật quyền truy cập camera trong cài đặt trình duyệt của bạn và thử lại.",
   "cameraError": "Lỗi máy ảnh",
-  "chooseAnAllowedFileType": "Không thể tải lên tệp \"{{fileName}}\". Vui lòng tải lên tệp có một trong các phần mở rộng sau: {{supportedExtensions}} hoặc {{lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Đóng",
   "closePreview": "Đóng bản xem trước",
   "dateUploaded": "Ngày tải lên",

@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Anexos",
   "cameraAccessErrorMessage": "Ative o acesso à câmera nas configurações do seu navegador e tente novamente.",
   "cameraError": "Erro da câmera",
-  "chooseAnAllowedFileType": "O arquivo \"{{fileName}}\" não pode ser carregado. Carregue um arquivo com uma das seguintes extensões: {{supportedExtensions}}, ou {{ lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Fechar",
   "closePreview": "Fechar visualização",
   "dateUploaded": "Data do upload",

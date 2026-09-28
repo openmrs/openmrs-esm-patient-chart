@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Pièces jointes",
   "cameraAccessErrorMessage": "Veuillez authoriser l'accès à la caméra dans les paramètres de votre navigateur web et réessayer.",
   "cameraError": "Erreur avec la caméra",
-  "chooseAnAllowedFileType": "Le fichier « {{fileName}} » ne peut pas être téléchargé. Veuillez télécharger un fichier avec l'une des extensions suivantes : {{supportedExtensions}} ou {{ lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Fermer",
   "closePreview": "Fermer l'aperçu",
   "dateUploaded": "Date d'ajout",
