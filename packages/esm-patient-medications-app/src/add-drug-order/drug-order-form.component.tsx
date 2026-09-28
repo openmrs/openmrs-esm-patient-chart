@@ -353,13 +353,17 @@ export function DrugOrderForm({
       visit: initialOrderBasketItem?.visit ?? visitContext, // TODO: they really should be the same
     } as DrugOrderBasketItem;
 
-    await onSave(newBasketItem);
-    resetField('patientInstructions', { defaultValue: '' });
-    resetField('freeTextDosage', { defaultValue: '' });
-    resetField('indication', { defaultValue: '' });
-    resetField('pillsDispensed', { defaultValue: null });
-    resetField('quantityUnits', { defaultValue: null });
-    resetField('numRefills', { defaultValue: null });
+    try {
+      await onSave(newBasketItem);
+      resetField('patientInstructions', { defaultValue: '' });
+      resetField('freeTextDosage', { defaultValue: '' });
+      resetField('indication', { defaultValue: '' });
+      resetField('pillsDispensed', { defaultValue: null });
+      resetField('quantityUnits', { defaultValue: null });
+      resetField('numRefills', { defaultValue: null });
+    } catch (error) {
+      console.error('Error saving drug order', error);
+    }
   };
 
   const handleFormSubmissionError = (errors: FieldErrors<MedicationOrderFormData>) => {

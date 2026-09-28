@@ -385,6 +385,29 @@ describe('DrugOrderForm - auto-calculation of dispense quantity', () => {
     expect(screen.getByRole('spinbutton', { name: /prescription refills/i })).not.toHaveValue();
   });
 
+  it('keeps draft values when saving fails so clinicians can retry', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockRejectedValue(new Error('Save failed'));
+    renderDrugOrderForm(createNewOrderBasketItem(completeMedicationOrderFields), onSave);
+
+    const patientInstructions = screen.getByPlaceholderText(/additional dosing instructions/i);
+    await user.clear(patientInstructions);
+    await user.type(patientInstructions, 'Take after eating');
+
+    const indication = screen.getByPlaceholderText(/e\.g\. "Hypertension"/i);
+    await user.clear(indication);
+    await user.type(indication, 'Pain');
+
+    fireEvent.submit(screen.getByRole('form', { name: /add drug order/i }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(patientInstructions).toHaveValue('Take after eating');
+    expect(indication).toHaveValue('Pain');
+    expect(screen.getByRole('spinbutton', { name: /quantity to dispense/i })).toHaveValue(7);
+    expect(screen.getByRole('combobox', { name: /quantity unit/i })).toHaveValue('Tablet');
+    expect(screen.getByRole('spinbutton', { name: /prescription refills/i })).toHaveValue(0);
+  });
+
   it('does not auto-calculate when quantity unit differs from dose unit', async () => {
     const user = userEvent.setup();
     renderDrugOrderForm(createNewOrderBasketItem());
