@@ -2,6 +2,8 @@
   "add": "Добавить",
   "addImage": "Добавить изображение",
   "addVisitNote": "Добавить заметку",
+  "allowedFileExtensionsLoadError": "Couldn't load the allowed image formats",
+  "allowedFileExtensionsLoadErrorHint": "Reload the page to add images to this note.",
   "clinicalNoteLabel": "Напишите текст вашей записи",
   "clinicalNotePlaceholder": "Введите любой текст здесь",
   "confirmDeleteStickyNote": "Подтвердите удаление",

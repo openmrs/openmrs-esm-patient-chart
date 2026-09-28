@@ -2,6 +2,8 @@
   "add": "أضف",
   "addImage": "أضف صورة",
   "addVisitNote": "Add visit note",
+  "allowedFileExtensionsLoadError": "Couldn't load the allowed image formats",
+  "allowedFileExtensionsLoadErrorHint": "Reload the page to add images to this note.",
   "clinicalNoteLabel": "اكتب ملاحظاتك",
   "clinicalNotePlaceholder": "اكتب أي ملاحظات هنا",
   "confirmDeleteStickyNote": "Confirm delete sticky note",

@@ -2,6 +2,8 @@
   "add": "បន្ថែម",
   "addImage": "បន្ថែមរូបភាព",
   "addVisitNote": "Add visit note",
+  "allowedFileExtensionsLoadError": "Couldn't load the allowed image formats",
+  "allowedFileExtensionsLoadErrorHint": "Reload the page to add images to this note.",
   "clinicalNoteLabel": "សរសេរកំណត់ចំណាំរបស់អ្នក។",
   "clinicalNotePlaceholder": "សរសេរកំណត់ចំណាំណាមួយនៅទីនេះ",
   "confirmDeleteStickyNote": "Confirm delete sticky note",
