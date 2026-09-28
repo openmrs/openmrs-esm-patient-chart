@@ -2,6 +2,8 @@
   "add": "添加",
   "addImage": "添加图像",
   "addVisitNote": "Add visit note",
+  "allowedFileExtensionsLoadError": "Couldn't load the allowed image formats",
+  "allowedFileExtensionsLoadErrorHint": "Reload the page to add images to this note.",
   "clinicalNoteLabel": "撰写您的记录",
   "clinicalNotePlaceholder": "在这里记录任何内容",
   "confirmDeleteStickyNote": "Confirm delete sticky note",

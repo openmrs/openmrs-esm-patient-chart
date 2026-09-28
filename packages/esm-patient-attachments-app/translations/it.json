@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Allegati",
   "cameraAccessErrorMessage": "Abilita l'accesso alla fotocamera nelle impostazioni del browser e riprova.",
   "cameraError": "Errore fotocamera",
-  "chooseAnAllowedFileType": "Il file \"{{fileName}}\" non può essere caricato. Carica un file con una delle seguenti estensioni: {{supportedExtensions}}, o {{lastExtension}}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Chiudi",
   "closePreview": "Chiudi anteprima",
   "dateUploaded": "Data di caricamento",
