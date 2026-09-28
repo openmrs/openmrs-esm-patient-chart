@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "მიმაგრებული ფაილები",
   "cameraAccessErrorMessage": "Please enable camera access in your browser settings and try again.",
   "cameraError": "კამერის შეცდომა",
-  "chooseAnAllowedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}, or {{ lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "დახურვა",
   "closePreview": "მინიატურის დახურვა",
   "dateUploaded": "ატვირთვის თარიღი",

@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Документы",
   "cameraAccessErrorMessage": "Пожалуйста, разрешите доступ к камере в настройках браузера и попробуйте снова.",
   "cameraError": "Ошибка камеры",
-  "chooseAnAllowedFileType": "Файл \"{{fileName}}\" не может быть загружен. Пожалуйста, загрузите файл с одним из следующих расширений: {{supportedExtensions}} или {{ lastExtension }}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Закрыть",
   "closePreview": "Закрыть предпросмотр",
   "dateUploaded": "Дата загрузки",
