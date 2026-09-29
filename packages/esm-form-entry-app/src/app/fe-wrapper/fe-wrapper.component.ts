@@ -143,8 +143,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     )
       .then((module) => registerLocaleData(module.default))
       .catch((err) => {
-        // Unsupported locale — Angular falls back to en-US automatically.
-        // Log the error so network/deployment failures are not silently swallowed.
         console.warn(`Could not load Angular locale data for "${locale}":`, err);
       });
 
