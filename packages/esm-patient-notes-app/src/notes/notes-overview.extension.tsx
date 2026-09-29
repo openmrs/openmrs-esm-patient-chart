@@ -38,7 +38,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, bas
     return <ErrorState error={error} headerTitle={headerTitle} />;
   }
   if (!visitNotes?.length) {
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={() => launchVisitNoteForm()} />;
   }
 
   return (
