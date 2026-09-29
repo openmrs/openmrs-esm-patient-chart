@@ -175,10 +175,7 @@ describe('VisitSummary encounter editing', () => {
     await user.click(editItem);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockVisitNoteEncounter.uuid, encounterType: 'Visit Note' }),
-      true,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockVisitNoteEncounter), true);
   });
 
   it('passes onEditEncounter down to the completed forms tab', async () => {
@@ -206,10 +203,7 @@ describe('VisitSummary encounter editing', () => {
     await clickEditEncounter(/poc consent form/i);
 
     expect(onEditEncounter).toHaveBeenCalledTimes(1);
-    expect(onEditEncounter).toHaveBeenCalledWith(
-      expect.objectContaining({ id: mockCompletedFormEncounter.uuid, encounterType: 'Admission' }),
-      false,
-    );
+    expect(onEditEncounter).toHaveBeenCalledWith(expect.objectContaining(mockCompletedFormEncounter), false);
   });
 });
 

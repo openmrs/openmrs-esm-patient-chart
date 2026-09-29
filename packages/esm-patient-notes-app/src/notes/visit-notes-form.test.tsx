@@ -445,8 +445,7 @@ test.each(['small-desktop', 'tablet'] as const)(
     const mockEncounter = {
       id: '123',
       uuid: '123',
-      datetime: '20/03/2024',
-      rawDatetime: '2024-03-20T10:00:00.000Z',
+      encounterDatetime: '2024-03-20T10:00:00.000Z',
       obs: [
         {
           concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -490,8 +489,7 @@ test('updates existing visit note when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     obs: [
       {
         concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -564,8 +562,7 @@ test('handles existing diagnoses correctly when in edit mode', async () => {
   const mockEncounter = {
     id: '123',
     uuid: '123',
-    datetime: '20/03/2024',
-    rawDatetime: '2024-03-20T10:00:00.000Z',
+    encounterDatetime: '2024-03-20T10:00:00.000Z',
     diagnoses: [
       {
         uuid: '456',
@@ -731,7 +728,7 @@ test.each([false, true])(
     const encounter: Encounter = {
       uuid: 'existing-note',
       id: 'existing-note',
-      rawDatetime: '2024-03-20T10:00:00.000Z',
+      encounterDatetime: '2024-03-20T10:00:00.000Z',
       obs: [],
       diagnoses: [],
     };
@@ -782,7 +779,7 @@ test.each(['creating', 'editing'] as const)(
         encounter: {
           uuid: 'existing-note',
           id: 'existing-note',
-          rawDatetime: '2024-03-20T10:00:00.000Z',
+          encounterDatetime: '2024-03-20T10:00:00.000Z',
           obs: [],
           diagnoses: [],
         },
@@ -844,7 +841,7 @@ test('labels image removal with the description, filename or image number', asyn
 const existingNote: Encounter = {
   uuid: 'existing-note',
   id: 'existing-note',
-  rawDatetime: '2024-03-20T10:00:00.000Z',
+  encounterDatetime: '2024-03-20T10:00:00.000Z',
   obs: [{ concept: { uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }, value: 'Existing clinical note' }],
   diagnoses: [],
 } as unknown as Encounter;

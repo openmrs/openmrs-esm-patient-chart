@@ -72,8 +72,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
 
           return {
             canDeleteEncounter,
-            canEditEncounter:
-              canDeleteEncounter && Boolean(encounter.form?.uuid || isVisitNoteEncounter(mappedEncounter)),
+            canEditEncounter: canDeleteEncounter && Boolean(encounter.form?.uuid || isVisitNoteEncounter(encounter)),
             canPrintEncounter: canPrintEncounters && hasJsonSchemaForm,
             encounter,
             hasJsonSchemaForm,
@@ -198,7 +197,7 @@ function VisitTimeline({ onEditEncounter, mutateVisitContext, patient, patientUu
                           <OverflowMenuItem
                             className={styles.menuItem}
                             itemText={t('editThisEncounter', 'Edit this encounter')}
-                            onClick={() => editEncounter(mappedEncounter, patientUuid, onEditEncounter)}
+                            onClick={() => editEncounter(mappedEncounter.encounter, patientUuid, onEditEncounter)}
                           />
                         )}
                         {canPrintEncounter && (
