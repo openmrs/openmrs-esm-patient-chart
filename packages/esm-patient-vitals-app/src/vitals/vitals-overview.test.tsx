@@ -262,7 +262,7 @@ describe('VitalsOverview', () => {
 
     await user.click(chartViewButton);
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
+    expect(await screen.findByText(/vital sign displayed/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /bp/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /pulse/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /spo2/i })).toBeInTheDocument();
