@@ -217,6 +217,24 @@ test('Verify visit context when starting / ending / deleting / restoring active 
     await expect(chartPage.page.getByLabel(/active visit/i)).toBeVisible();
   });
 
+  await test.step('Then I should see the visit note form launch in the workspace', async () => {
+    await expect(page.getByText('Add visit note', { exact: true })).toBeVisible();
+  });
+
+  await test.step('And I should be able to write a note', async () => {
+    await page.getByPlaceholder('Write any notes here').fill('This is a note');
+    await expect(page.getByPlaceholder('Write any notes here')).toHaveValue('This is a note');
+  });
+
+  await test.step('When I discard the visit note', async () => {
+    await page.getByRole('button', { name: /discard/i }).click();
+    await page.getByRole('button', { name: /discard changes/i }).click();
+  });
+
+  await test.step('Then the visit note form should close', async () => {
+    await expect(page.getByText('Add visit note', { exact: true })).toBeHidden();
+  });
+
   await test.step('When I click the patient header action menu', async () => {
     await page.getByRole('button', { name: 'Actions' }).click();
   });

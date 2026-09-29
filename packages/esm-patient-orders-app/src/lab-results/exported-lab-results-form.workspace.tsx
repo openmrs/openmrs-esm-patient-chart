@@ -19,11 +19,14 @@ import { useOrderBasket, type Order, type OrderBasketItem } from '@openmrs/esm-p
 import { type ConfigObject } from '../config-schema';
 import { type ObservationValue } from '../types/encounter';
 import {
+  completeOrderWithSavedResults,
   createCompositeObservationPayload,
+  fetchSavedLabResults,
   isCoded,
   isNumeric,
   isPanel,
   isText,
+  type LabOrderConcept,
   updateObservation,
   updateOrderResult,
   useCompletedLabResultsArray,
@@ -45,6 +48,18 @@ export interface LabResultsFormProps {
   invalidateLabOrders?: () => void;
 }
 
+function findConceptName(concepts: Array<LabOrderConcept>, conceptUuid: string): string | undefined {
+  for (const concept of concepts) {
+    if (concept.uuid === conceptUuid) {
+      return concept.display;
+    }
+    const memberName = concept.setMembers && findConceptName(concept.setMembers, conceptUuid);
+    if (memberName) {
+      return memberName;
+    }
+  }
+}
+
 const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormProps, {}, {}>> = ({
   workspaceProps: { patient, order, invalidateLabOrders, launchLabOrderForm, labOrderWorkspaceName },
   launchChildWorkspace,
@@ -63,6 +78,8 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   const { orders, clearOrders } = useOrderBasket(patient);
   const [isSavingOrders, setIsSavingOrders] = useState(false);
   const { isLoading, completeLabResults, mutate: mutateResults } = useCompletedLabResultsArray(order);
+  // Results saved by an earlier attempt that failed before the order was marked as fulfilled
+  const hasSavedResults = !isEditMode && completeLabResults.length > 0;
 
   const mutateOrderData = useCallback(() => {
     mutate(
@@ -102,6 +119,7 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
   const {
     control,
     formState: { errors, isDirty, isSubmitting },
+    getFieldState,
     setValue,
     handleSubmit,
   } = useForm<Record<string, ObservationValue>>({
@@ -136,18 +154,26 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
     }),
     [patient, resolvedLaunchLabOrderForm],
   );
-  const canUseResultEntryAddTests = enableAddTestsDuringResultEntry && !isEditMode && !!resolvedLaunchLabOrderForm;
+  const canUseResultEntryAddTests =
+    enableAddTestsDuringResultEntry && !isEditMode && !hasSavedResults && !!resolvedLaunchLabOrderForm;
 
   useEffect(() => {
+    // Leave fields the user has changed alone, so saved results that load later don't overwrite their edits
+    const fillSavedValue = (fieldName: string, value: ObservationValue) => {
+      if (!getFieldState(fieldName).isDirty) {
+        setValue(fieldName, value);
+      }
+    };
+
     conceptArray.forEach((concept, index) => {
       const completeLabResult = completeLabResults.find((r) => r.concept.uuid === concept.uuid);
-      if (concept && completeLabResult && isEditMode) {
+      if (concept && completeLabResult && (isEditMode || hasSavedResults)) {
         if (isCoded(concept) && typeof completeLabResult?.value === 'object' && completeLabResult?.value?.uuid) {
-          setValue(concept.uuid, completeLabResult.value.uuid);
+          fillSavedValue(concept.uuid, completeLabResult.value.uuid);
         } else if (isNumeric(concept) && completeLabResult?.value) {
-          setValue(concept.uuid, parseFloat(completeLabResult.value as string));
+          fillSavedValue(concept.uuid, parseFloat(completeLabResult.value as string));
         } else if (isText(concept) && completeLabResult?.value) {
-          setValue(concept.uuid, completeLabResult?.value);
+          fillSavedValue(concept.uuid, completeLabResult?.value);
         } else if (isPanel(concept)) {
           concept.setMembers.forEach((member) => {
             const obs = completeLabResult.groupMembers.find((v) => v.concept.uuid === member.uuid);
@@ -159,12 +185,12 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
             } else if (isText(member)) {
               value = obs?.value;
             }
-            if (value) setValue(member.uuid, value);
+            if (value) fillSavedValue(member.uuid, value);
           });
         }
       }
     });
-  }, [conceptArray, completeLabResults, isEditMode, setValue]);
+  }, [conceptArray, completeLabResults, getFieldState, hasSavedResults, isEditMode, setValue]);
 
   if (isLoadingResultConcepts) {
     return (
@@ -203,51 +229,9 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
       });
     };
 
-    // Handle update operation for completed lab order results
-    if (isEditMode) {
-      const updateTasks = Object.entries(formValues)
-        .filter(([, value]) => value !== undefined && value !== null && value !== '')
-        .map(([conceptUuid, value]) => {
-          let obs = completeLabResults.find((r) => r.concept.uuid === conceptUuid);
-          if (!obs) {
-            for (const result of completeLabResults) {
-              obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
-              if (obs) break;
-            }
-          }
-          return updateObservation(obs?.uuid, { value });
-        });
-      const updateResults = await Promise.allSettled(updateTasks);
-      const failedObsconceptUuids = updateResults.reduce((prev, curr, index) => {
-        if (curr.status === 'rejected') {
-          return [...prev, Object.keys(formValues).at(index)];
-        }
-        return prev;
-      }, []);
+    const getErrorMessage = (err: { responseBody?: { error?: { message?: string } }; message?: string }) =>
+      err?.responseBody?.error?.message ?? err?.message;
 
-      // Invalidate caches before closing workspace
-      mutateResults();
-      mutateObstreeData();
-
-      if (failedObsconceptUuids.length) {
-        showNotification('error', 'Could not save obs with concept uuids ' + failedObsconceptUuids.join(', '));
-      } else {
-        closeWorkspace({ discardUnsavedChanges: true });
-        showNotification(
-          'success',
-          t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
-            orderNumber: order?.orderNumber,
-          }),
-        );
-      }
-
-      return setShowEmptyFormErrorNotification(false);
-    }
-
-    // Handle Creation logic
-
-    // Set the observation status to 'FINAL' as we're not capturing it in the form
-    const obsPayload = createCompositeObservationPayload(conceptArray, order, formValues, 'FINAL');
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
       type: 'testorder',
@@ -262,6 +246,87 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
       fulfillerStatus: 'COMPLETED',
       fulfillerComment: 'Test Results Entered',
     };
+
+    // Check the backend rather than the loaded results, which may not have refreshed since a failed attempt
+    let savedResults = completeLabResults;
+    if (!isEditMode) {
+      try {
+        savedResults = await fetchSavedLabResults(order, abortController);
+      } catch (err) {
+        showNotification('error', getErrorMessage(err));
+        return setShowEmptyFormErrorNotification(false);
+      }
+    }
+    const completesEarlierAttempt = !isEditMode && savedResults.length > 0;
+
+    // Update the saved results, then finish completing the order if an earlier attempt did not
+    if (isEditMode || completesEarlierAttempt) {
+      const valuesToUpdate = Object.entries(formValues).filter(
+        ([, value]) => value !== undefined && value !== null && value !== '',
+      );
+      const updateTasks = valuesToUpdate.map(([conceptUuid, value]) => {
+        let obs = savedResults.find((r) => r.concept.uuid === conceptUuid);
+        if (!obs) {
+          for (const result of savedResults) {
+            obs = result.groupMembers?.find((m) => m.concept.uuid === conceptUuid);
+            if (obs) break;
+          }
+        }
+        return updateObservation(obs?.uuid, { value });
+      });
+      const updateResults = await Promise.allSettled(updateTasks);
+      const failedConceptUuids = valuesToUpdate
+        .filter((_, index) => updateResults[index].status === 'rejected')
+        .map(([conceptUuid]) => conceptUuid);
+
+      // Invalidate caches before closing workspace
+      mutateResults();
+      mutateObstreeData();
+
+      if (failedConceptUuids.length) {
+        showNotification(
+          'error',
+          t('couldNotSaveResultsFor', 'Could not save results for {{tests}}', {
+            tests: failedConceptUuids
+              .map((conceptUuid) => findConceptName(conceptArray, conceptUuid) ?? conceptUuid)
+              .join(', '),
+          }),
+        );
+        return setShowEmptyFormErrorNotification(false);
+      }
+
+      if (completesEarlierAttempt) {
+        try {
+          await completeOrderWithSavedResults(
+            order.uuid,
+            resultsStatusPayload,
+            orderDiscontinuationPayload,
+            abortController,
+          );
+        } catch (err) {
+          showNotification('error', getErrorMessage(err));
+          return setShowEmptyFormErrorNotification(false);
+        }
+
+        mutateOrderData();
+        invalidateLabOrders?.();
+      }
+
+      closeWorkspace({ discardUnsavedChanges: true });
+      showNotification(
+        'success',
+        t('successfullySavedLabResults', 'Lab results for {{orderNumber}} have been successfully updated', {
+          orderNumber: order?.orderNumber,
+        }),
+      );
+
+      return setShowEmptyFormErrorNotification(false);
+    }
+
+    // Handle Creation logic
+
+    // Set the observation status to 'FINAL' as we're not capturing it in the form
+    const obsPayload = createCompositeObservationPayload(conceptArray, order, formValues, 'FINAL');
 
     try {
       await updateOrderResult(
@@ -287,7 +352,9 @@ const ExportedLabResultsForm: React.FC<Workspace2DefinitionProps<LabResultsFormP
         }),
       );
     } catch (err) {
-      showNotification('error', err?.message);
+      // Refetch the saved results so the form fills in anything the failed attempt saved
+      mutateResults();
+      showNotification('error', getErrorMessage(err));
     } finally {
       setShowEmptyFormErrorNotification(false);
     }

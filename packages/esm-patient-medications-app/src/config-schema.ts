@@ -56,7 +56,7 @@ export const configSchema = {
   drugCategoryConceptSets: {
     _type: Type.Array,
     _description:
-      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category.',
+      'Concept Set UUIDs that define drug categories shown in the "Browse" tab, allowing users to browse drugs by category. This feature requires webservices.rest 3.2.0 or later.',
     _default: [],
     _elements: {
       _type: Type.String,

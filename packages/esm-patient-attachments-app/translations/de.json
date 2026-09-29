@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Anhänge",
   "cameraAccessErrorMessage": "Bitte aktivieren Sie den Kamerazugriff in Ihren Browsereinstellungen und versuchen Sie es erneut.",
   "cameraError": "Kamerafehler",
-  "chooseAnAllowedFileType": "Die Datei „{{fileName}}“ kann nicht hochgeladen werden. Bitte lade eine Datei mit einer der folgenden Dateiendungen hoch: {{supportedExtensions}} oder {{lastExtension}}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Schließen",
   "closePreview": "Vorschau schließen",
   "dateUploaded": "Hochgeladen am",

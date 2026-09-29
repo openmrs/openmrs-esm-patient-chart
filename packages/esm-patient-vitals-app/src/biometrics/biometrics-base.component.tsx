@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { Suspense, lazy, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, DataTableSkeleton, IconSwitch, InlineLoading } from '@carbon/react';
 import { Add, Analytics, Table } from '@carbon/react/icons';
@@ -9,9 +9,10 @@ import { useConceptUnits, useVitalsAndBiometrics, withUnit } from '../common';
 import { shouldShowBmi } from '../common/helpers';
 import { type ConfigObject } from '../config-schema';
 import type { BiometricsTableHeader, BiometricsTableRow } from './types';
-import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-base.scss';
+
+const BiometricsChart = lazy(() => import('./biometrics-chart.component'));
 
 interface BiometricsBaseProps {
   pageSize: number;
@@ -133,12 +134,14 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({ patientUuid, patient, p
           </div>
         </CardHeader>
         {chartView ? (
-          <BiometricsChart
-            patientBiometrics={biometrics}
-            conceptUnits={conceptUnits}
-            config={config}
-            showBmi={showBmi}
-          />
+          <Suspense fallback={<InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />}>
+            <BiometricsChart
+              patientBiometrics={biometrics}
+              conceptUnits={conceptUnits}
+              config={config}
+              showBmi={showBmi}
+            />
+          </Suspense>
         ) : (
           <PaginatedBiometrics
             tableRows={tableRows}

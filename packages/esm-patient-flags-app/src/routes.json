@@ -3,6 +3,9 @@
   "backendDependencies": {
     "webservices.rest": ">=2.2.0"
   },
+  "optionalBackendDependencies": {
+    "patientflags": ">=3.0.6"
+  },
   "extensions": [
     {
       "name": "patient-flags-risk-count",

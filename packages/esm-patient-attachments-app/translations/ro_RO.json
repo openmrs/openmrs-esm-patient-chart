@@ -12,7 +12,7 @@
   "attachmentsInProperFormat": "Atașamente",
   "cameraAccessErrorMessage": "Te rugăm să activezi accesul la cameră în setările browserului și să încerci din nou.",
   "cameraError": "Eroare cameră",
-  "chooseAnAllowedFileType": "Fișierul „{{fileName}}” nu poate fi încărcat. Te rugăm să încarci un fișier cu una dintre următoarele extensii: {{supportedExtensions}} sau {{lastExtension}}.",
+  "chooseSupportedFileType": "The file \"{{fileName}}\" cannot be uploaded. Please upload a file with one of the following extensions: {{supportedExtensions}}.",
   "closeModal": "Închide",
   "closePreview": "Închide previzualizarea",
   "dateUploaded": "Data încărcării",

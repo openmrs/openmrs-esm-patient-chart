@@ -15,6 +15,7 @@
   "chooseAnOption": "Alege o opțiune",
   "clearSearchResults": "Șterge rezultatele",
   "collapsePinnedOrders": "Collapse pinned orders",
+  "couldNotSaveResultsFor": "Could not save results for {{tests}}",
   "dateOfOrder": "Data comenzii",
   "dateRange": "Interval de date",
   "directlyAddToBasket": "Adaugă în coș",

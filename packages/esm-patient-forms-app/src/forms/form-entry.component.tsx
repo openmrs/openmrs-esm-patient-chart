@@ -6,7 +6,6 @@ import {
   openmrsFetch,
   type FetchResponse,
   useConfig,
-  useConnectivity,
   Workspace2,
   type Workspace2DefinitionProps,
   type Encounter,
@@ -74,7 +73,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
   const visitUuid = effectiveVisitContext?.uuid;
   const htmlForm = toHtmlForm(form, htmlFormEntryForms);
   const isHtmlForm = htmlForm != null;
-  const isOnline = useConnectivity();
   const { mutate: globalMutate } = useSWRConfig();
   const { t } = useTranslation();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -89,7 +87,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
       visitTypeUuid: visitTypeUuid ?? null,
       visitStartDatetime: visitStartDatetime ?? null,
       visitStopDatetime: visitStopDatetime ?? null,
-      isOffline: !isOnline,
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? '',
@@ -124,7 +121,6 @@ const FormEntry: React.FC<FormEntryProps> = ({
       handlePostResponse,
       hideControls,
       hidePatientBanner,
-      isOnline,
       mutateForms,
       mutateVisitContext,
       patient,

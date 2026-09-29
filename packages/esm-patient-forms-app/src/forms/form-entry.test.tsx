@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
-import { ExtensionSlot, openmrsFetch, useConnectivity } from '@openmrs/esm-framework';
+import { ExtensionSlot, openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
 import FormEntry, { type FormEntryProps } from './form-entry.component';
 
@@ -23,14 +23,12 @@ const defaultProps: FormEntryProps = {
 };
 
 const mockFormEntrySub = vi.fn();
-const mockUseConnectivity = vi.mocked(useConnectivity);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 const mockExtensionSlot = vi.mocked(ExtensionSlot);
 
 describe('FormEntry', () => {
   beforeEach(() => {
-    mockUseConnectivity.mockReturnValue(true);
     mockFormEntrySub.mockReturnValue(
       new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
     );

@@ -30,10 +30,6 @@ type UIBehavior = {
   showDiscardSubmitButtons?: boolean;
 };
 
-type ApplicationStatus = {
-  isOffline: boolean;
-};
-
 type Form = {
   formUuid: string;
 };
@@ -50,7 +46,6 @@ export type SingleSpaProps = AppProps &
   VisitProperties &
   EncounterProperties &
   PatientProperties &
-  PreFilledQuestions &
-  ApplicationStatus & {
+  PreFilledQuestions & {
     additionalProps?: any;
   } & Partial<DefaultWorkspaceProps>;
